@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Settings, FileText } from "lucide-react";
+import { Settings, FileText, Edit } from "lucide-react";
 
 type SidebarProps = {
   isMobileOpen: boolean;
@@ -16,6 +16,8 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
       setActiveItem("admin");
     } else if (location.startsWith("/templates")) {
       setActiveItem("templates");
+    } else if (location.startsWith("/editor")) {
+      setActiveItem("editor");
     } else {
       setActiveItem("");
     }
@@ -51,6 +53,18 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
               >
                 <FileText className="mr-3 h-6 w-6" />
                 Templates
+              </div>
+            </Link>
+          </div>
+          
+          <div className="sidebar-item-container">
+            <Link href="/editor">
+              <div 
+                className={`sidebar-item ${activeItem === "editor" ? "sidebar-active" : ""}`}
+                onClick={closeMobileMenu}
+              >
+                <Edit className="mr-3 h-6 w-6" />
+                Editor
               </div>
             </Link>
           </div>
