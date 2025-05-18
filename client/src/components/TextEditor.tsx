@@ -171,7 +171,6 @@ export default function TextEditor() {
         <AutoFocusPlugin />
         <ListPlugin />
         <LinkPlugin />
-        {(editor) => <FooterPlugin editor={editor} />}
       </LexicalComposer>
     </div>
   );
