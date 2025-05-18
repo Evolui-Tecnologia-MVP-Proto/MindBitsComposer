@@ -22,7 +22,18 @@ export default function TemplatesPage() {
   // Consulta templates por tipo (struct ou output)
   const { data: templates, isLoading } = useQuery<Template[]>({
     queryKey: ["/api/templates", activeTab],
-    queryFn: () => apiRequest("GET", `/api/templates/${activeTab}`).then(res => res.json())
+    queryFn: async () => {
+      try {
+        const res = await apiRequest("GET", `/api/templates/${activeTab}`);
+        if (!res.ok) {
+          throw new Error("Erro ao carregar templates");
+        }
+        return await res.json();
+      } catch (error) {
+        console.error("Erro ao carregar templates:", error);
+        return [];
+      }
+    }
   });
 
   // Mutação para criar template

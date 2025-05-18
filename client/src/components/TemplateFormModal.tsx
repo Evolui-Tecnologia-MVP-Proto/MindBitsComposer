@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -45,7 +45,7 @@ export default function TemplateFormModal({
           code: template.code,
           description: template.description,
           type: template.type,
-          structure: template.structure,
+          structure: template.structure || {},
         }
       : { ...emptyTemplate, type: selectedType || "struct" }
   );
@@ -64,7 +64,14 @@ export default function TemplateFormModal({
 
   const handleStructureChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     try {
-      const structure = JSON.parse(e.target.value);
+      const structureValue = e.target.value.trim();
+      // Verifica se o campo está vazio
+      if (!structureValue) {
+        setFormData((prev) => ({ ...prev, structure: {} }));
+        return;
+      }
+      
+      const structure = JSON.parse(structureValue);
       setFormData((prev) => ({ ...prev, structure }));
       setStructureError("");
     } catch (error) {
@@ -106,6 +113,9 @@ export default function TemplateFormModal({
           <DialogTitle>
             {mode === "create" ? "Novo Template" : "Editar Template"}
           </DialogTitle>
+          <DialogDescription>
+            Preencha os campos para {mode === "create" ? "criar um novo" : "editar o"} template.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-4 py-4">
