@@ -25,14 +25,17 @@ async function hashPassword(password: string) {
 
 async function comparePasswords(supplied: string, stored: string) {
   try {
-    // Para testes diretos com usuário admin
-    if (supplied === "senha-inicial" && stored.includes(".")) {
+    // Para testes diretos com usuário admin (senha não criptografada)
+    if (stored === "123456" && supplied === "123456") {
+      console.log("Comparação direta da senha para o usuário admin");
       return true;
     }
     
+    // Para senhas criptografadas com salt
     if (!stored || !stored.includes(".")) {
-      console.error("Formato de senha inválido:", stored);
-      return false;
+      console.log("Formato de senha sem salt, fazendo comparação direta");
+      // Comparação direta para senhas sem criptografia
+      return supplied === stored;
     }
     
     const [hashed, salt] = stored.split(".");
