@@ -12,9 +12,15 @@ import { AutoLinkNode, LinkNode } from "@lexical/link";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { Button } from "@/components/ui/button";
-import { Bold, Italic, List, FileText, Save, Undo, Redo, Link as LinkIcon } from "lucide-react";
+import { Bold, Italic, List, FileText, Save, Undo, Redo, Link as LinkIcon, ChevronDown } from "lucide-react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $getRoot, $getSelection, FORMAT_TEXT_COMMAND, LexicalEditor } from "lexical";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
@@ -166,11 +172,50 @@ export default function TextEditor() {
         <div className="border-t-0 border-l-0 border-r-0 border-b border-gray-200">
           <ToolbarPlugin />
         </div>
-        <div className="flex-1 overflow-auto">
-          <RichTextPlugin
-            contentEditable={<ContentEditable className="outline-none h-full w-full min-h-[calc(100vh-280px)] px-4 py-4" />}
-            placeholder={<div className="absolute top-[76px] left-8 text-gray-400 pointer-events-none">Comece a escrever...</div>}
-          />
+        <div className="flex-1 overflow-auto px-4 py-4">
+          <Accordion type="multiple" defaultValue={["sessao-01", "sessao-02", "sessao-03"]} className="w-full mb-6">
+            <AccordionItem value="sessao-01" className="border rounded-md mb-4">
+              <AccordionTrigger className="px-4 py-3 bg-gray-50 hover:bg-gray-100 font-medium">
+                Sessão 01
+              </AccordionTrigger>
+              <AccordionContent className="px-0 pt-2">
+                <div className="min-h-[150px]">
+                  <RichTextPlugin
+                    contentEditable={<ContentEditable className="outline-none px-4 py-2 min-h-[150px]" />}
+                    placeholder={<div className="absolute ml-4 mt-2 text-gray-400 pointer-events-none">Conteúdo da sessão 01...</div>}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="sessao-02" className="border rounded-md mb-4">
+              <AccordionTrigger className="px-4 py-3 bg-gray-50 hover:bg-gray-100 font-medium">
+                Sessão 02
+              </AccordionTrigger>
+              <AccordionContent className="px-0 pt-2">
+                <div className="min-h-[150px]">
+                  <RichTextPlugin
+                    contentEditable={<ContentEditable className="outline-none px-4 py-2 min-h-[150px]" />}
+                    placeholder={<div className="absolute ml-4 mt-2 text-gray-400 pointer-events-none">Conteúdo da sessão 02...</div>}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            
+            <AccordionItem value="sessao-03" className="border rounded-md mb-4">
+              <AccordionTrigger className="px-4 py-3 bg-gray-50 hover:bg-gray-100 font-medium">
+                Sessão 03
+              </AccordionTrigger>
+              <AccordionContent className="px-0 pt-2">
+                <div className="min-h-[150px]">
+                  <RichTextPlugin
+                    contentEditable={<ContentEditable className="outline-none px-4 py-2 min-h-[150px]" />}
+                    placeholder={<div className="absolute ml-4 mt-2 text-gray-400 pointer-events-none">Conteúdo da sessão 03...</div>}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
         <HistoryPlugin />
         <AutoFocusPlugin />
