@@ -161,14 +161,14 @@ export default function TextEditor() {
   };
 
   return (
-    <div className="flex flex-col h-full border-0 rounded-none bg-white">
+    <div className="flex flex-col h-full w-full border-0 rounded-none bg-white">
       <LexicalComposer initialConfig={initialConfig}>
         <div className="border-t-0 border-l-0 border-r-0 border-b border-gray-200">
           <ToolbarPlugin />
         </div>
         <div className="flex-1 overflow-auto">
           <RichTextPlugin
-            contentEditable={<ContentEditable className="outline-none h-full min-h-[calc(100vh-280px)] px-4 py-4" />}
+            contentEditable={<ContentEditable className="outline-none h-full w-full min-h-[calc(100vh-280px)] px-4 py-4" />}
             placeholder={<div className="absolute top-[76px] left-8 text-gray-400 pointer-events-none">Comece a escrever...</div>}
           />
         </div>
