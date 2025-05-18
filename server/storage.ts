@@ -1,4 +1,4 @@
-import { users, type User, type InsertUser, UserStatus, UserRole } from "@shared/schema";
+import { users, templates, type User, type InsertUser, type Template, type InsertTemplate, UserStatus, UserRole, TemplateType } from "@shared/schema";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
 import session from "express-session";
@@ -21,6 +21,15 @@ export interface IStorage {
   updateUserPassword(id: number, password: string): Promise<void>;
   updateUserStatus(id: number, status: UserStatus): Promise<User>;
   updateUserMustChangePassword(id: number, mustChange: boolean): Promise<void>;
+  
+  // Template operations
+  getTemplate(id: string): Promise<Template | undefined>;
+  getTemplateByCode(code: string): Promise<Template | undefined>;
+  createTemplate(template: InsertTemplate): Promise<Template>;
+  getAllTemplates(): Promise<Template[]>;
+  getTemplatesByType(type: TemplateType): Promise<Template[]>;
+  updateTemplate(id: string, data: Partial<Template>): Promise<Template>;
+  deleteTemplate(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -40,6 +49,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
+  // User operations
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
@@ -92,6 +102,48 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ mustChangePassword })
       .where(eq(users.id, id));
+  }
+
+  // Template operations
+  async getTemplate(id: string): Promise<Template | undefined> {
+    const [template] = await db.select().from(templates).where(eq(templates.id, id));
+    return template;
+  }
+
+  async getTemplateByCode(code: string): Promise<Template | undefined> {
+    const [template] = await db.select().from(templates).where(eq(templates.code, code));
+    return template;
+  }
+
+  async createTemplate(templateData: InsertTemplate): Promise<Template> {
+    const [template] = await db
+      .insert(templates)
+      .values(templateData)
+      .returning();
+    return template;
+  }
+
+  async getAllTemplates(): Promise<Template[]> {
+    return await db.select().from(templates);
+  }
+
+  async getTemplatesByType(type: TemplateType): Promise<Template[]> {
+    return await db.select().from(templates).where(eq(templates.type, type));
+  }
+
+  async updateTemplate(id: string, data: Partial<Template>): Promise<Template> {
+    const [updatedTemplate] = await db
+      .update(templates)
+      .set(data)
+      .where(eq(templates.id, id))
+      .returning();
+    return updatedTemplate;
+  }
+
+  async deleteTemplate(id: string): Promise<void> {
+    await db
+      .delete(templates)
+      .where(eq(templates.id, id));
   }
 }
 
