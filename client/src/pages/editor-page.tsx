@@ -4,7 +4,7 @@ import { Save, FileText, Upload, Download, Settings } from "lucide-react";
 
 export default function EditorPage() {
   return (
-    <div className="h-full fade-in flex flex-col p-0 m-0">
+    <div className="h-full w-full fade-in flex flex-col p-0 m-0 -mx-4 sm:-mx-6 lg:-mx-8 -my-6">
       {/* Área do editor - ocupando todo o espaço disponível */}
       <div className="flex-grow flex">
         <div className="w-full">
@@ -13,7 +13,7 @@ export default function EditorPage() {
       </div>
       
       {/* Barra de botões inferior */}
-      <div className="h-14 bg-white border-t border-gray-200 shadow-sm flex items-center justify-between px-4">
+      <div className="h-14 bg-white border-t border-gray-200 shadow-sm flex items-center justify-between px-4 sm:px-6 lg:px-8">
         <div className="flex items-center space-x-2">
           <Button variant="outline" size="sm" className="h-9">
             <FileText className="h-4 w-4 mr-2" />
