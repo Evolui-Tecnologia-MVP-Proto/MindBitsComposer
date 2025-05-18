@@ -8,6 +8,7 @@ import AuthPage from "@/pages/auth-page";
 import HomePage from "@/pages/home-page";
 import AdminPage from "@/pages/admin-page";
 import PreferencesPage from "@/pages/preferences-page";
+import TemplatesPage from "@/pages/templates-page";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "./lib/protected-route";
 
@@ -18,6 +19,7 @@ function Router() {
       <ProtectedRoute path="/" component={HomePage} />
       <ProtectedRoute path="/admin" component={AdminPage} />
       <ProtectedRoute path="/preferences" component={PreferencesPage} />
+      <ProtectedRoute path="/templates" component={TemplatesPage} />
       <Route component={NotFound} />
     </Switch>
   );

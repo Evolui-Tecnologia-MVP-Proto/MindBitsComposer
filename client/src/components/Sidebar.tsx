@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Settings } from "lucide-react";
+import { Settings, FileText } from "lucide-react";
 
 type SidebarProps = {
   isMobileOpen: boolean;
@@ -14,8 +14,9 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
   useEffect(() => {
     if (location.startsWith("/admin")) {
       setActiveItem("admin");
+    } else if (location.startsWith("/templates")) {
+      setActiveItem("templates");
     } else {
-      // Could add more matches here for other menu items
       setActiveItem("");
     }
   }, [location]);
@@ -39,7 +40,16 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
               Administração
             </a>
           </Link>
-          {/* Espaço para futuros itens de menu */}
+          
+          <Link href="/templates">
+            <a 
+              className={`sidebar-item ${activeItem === "templates" ? "sidebar-active" : ""}`}
+              onClick={closeMobileMenu}
+            >
+              <FileText className="mr-3 h-6 w-6" />
+              Templates
+            </a>
+          </Link>
         </nav>
       </aside>
 
