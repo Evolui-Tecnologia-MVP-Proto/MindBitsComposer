@@ -71,8 +71,12 @@
     @apply bg-blue-50 text-blue-700 font-medium;
   }
 
+  .sidebar-item-container {
+    @apply w-full block;
+  }
+
   .sidebar-item {
-    @apply flex items-center px-4 py-2 my-1 transition-colors duration-200 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-600;
+    @apply flex items-center px-4 py-2 my-1 transition-colors duration-200 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-600 cursor-pointer;
   }
 
   .sidebar-overlay {

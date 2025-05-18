@@ -31,25 +31,29 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
         className={`sidebar ${isMobileOpen ? "translate-x-0" : ""}`}
       >
         <nav className="mt-5 px-2 space-y-1">
-          <Link href="/admin">
-            <a 
-              className={`sidebar-item ${activeItem === "admin" ? "sidebar-active" : ""}`}
-              onClick={closeMobileMenu}
-            >
-              <Settings className="mr-3 h-6 w-6" />
-              Administração
-            </a>
-          </Link>
+          <div className="sidebar-item-container">
+            <Link href="/admin">
+              <div 
+                className={`sidebar-item ${activeItem === "admin" ? "sidebar-active" : ""}`}
+                onClick={closeMobileMenu}
+              >
+                <Settings className="mr-3 h-6 w-6" />
+                Administração
+              </div>
+            </Link>
+          </div>
           
-          <Link href="/templates">
-            <a 
-              className={`sidebar-item ${activeItem === "templates" ? "sidebar-active" : ""}`}
-              onClick={closeMobileMenu}
-            >
-              <FileText className="mr-3 h-6 w-6" />
-              Templates
-            </a>
-          </Link>
+          <div className="sidebar-item-container">
+            <Link href="/templates">
+              <div 
+                className={`sidebar-item ${activeItem === "templates" ? "sidebar-active" : ""}`}
+                onClick={closeMobileMenu}
+              >
+                <FileText className="mr-3 h-6 w-6" />
+                Templates
+              </div>
+            </Link>
+          </div>
         </nav>
       </aside>
 
