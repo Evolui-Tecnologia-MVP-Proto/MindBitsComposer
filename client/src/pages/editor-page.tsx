@@ -4,10 +4,12 @@ import { Save, FileText, Upload, Download, Settings } from "lucide-react";
 
 export default function EditorPage() {
   return (
-    <div className="h-full fade-in flex flex-col">
+    <div className="h-full fade-in flex flex-col p-0 m-0">
       {/* Área do editor - ocupando todo o espaço disponível */}
-      <div className="flex-grow">
-        <TextEditor />
+      <div className="flex-grow flex">
+        <div className="w-full">
+          <TextEditor />
+        </div>
       </div>
       
       {/* Barra de botões inferior */}

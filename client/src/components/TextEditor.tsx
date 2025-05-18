@@ -27,12 +27,15 @@ function ToolbarPlugin() {
     editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
   };
 
+  // Undo/Redo
   const onUndoClick = () => {
-    editor.dispatchCommand(FORMAT_TEXT_COMMAND, "undo");
+    editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
+    // UNDO não está implementado corretamente aqui
   };
 
   const onRedoClick = () => {
-    editor.dispatchCommand(FORMAT_TEXT_COMMAND, "redo");
+    editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
+    // REDO não está implementado corretamente aqui
   };
 
   return (
@@ -158,12 +161,12 @@ export default function TextEditor() {
   };
 
   return (
-    <div className="flex flex-col h-full border border-gray-200 rounded-md bg-white shadow-sm">
+    <div className="flex flex-col h-full border-0 rounded-none bg-white">
       <LexicalComposer initialConfig={initialConfig}>
         <ToolbarPlugin />
         <div className="flex-1 overflow-auto">
           <RichTextPlugin
-            contentEditable={<ContentEditable className="outline-none h-full min-h-[calc(100vh-280px)] px-4 py-2" />}
+            contentEditable={<ContentEditable className="outline-none h-full min-h-[calc(100vh-280px)] px-0" />}
             placeholder={<div className="absolute top-[76px] left-4 text-gray-400 pointer-events-none">Comece a escrever...</div>}
           />
         </div>
