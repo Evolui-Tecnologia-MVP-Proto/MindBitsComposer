@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -12,14 +12,14 @@ type TemplateFormValues = {
   code: string;
   description: string;
   type: string;
-  structure: object;
+  structure: string | object;
 };
 
 const emptyTemplate: TemplateFormValues = {
   code: "",
   description: "",
   type: "struct",
-  structure: {},
+  structure: "{}",
 };
 
 interface TemplateFormModalProps {
@@ -45,9 +45,15 @@ export default function TemplateFormModal({
           code: template.code,
           description: template.description,
           type: template.type,
-          structure: template.structure || {},
+          structure: typeof template.structure === 'object' 
+            ? JSON.stringify(template.structure, null, 2) 
+            : "{}",
         }
-      : { ...emptyTemplate, type: selectedType || "struct" }
+      : { 
+          ...emptyTemplate, 
+          type: selectedType || "struct", 
+          structure: "{}" 
+        }
   );
   const [isLoading, setIsLoading] = useState(false);
   const [structureError, setStructureError] = useState("");
@@ -63,18 +69,26 @@ export default function TemplateFormModal({
   };
 
   const handleStructureChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    // Armazenar o texto bruto da estrutura
+    const structureValue = e.target.value.trim();
+    
     try {
-      const structureValue = e.target.value.trim();
       // Verifica se o campo está vazio
       if (!structureValue) {
-        setFormData((prev) => ({ ...prev, structure: {} }));
+        setFormData((prev) => ({ ...prev, structure: "{}" }));
+        setStructureError("");
         return;
       }
       
-      const structure = JSON.parse(structureValue);
-      setFormData((prev) => ({ ...prev, structure }));
+      // Validar se é um JSON válido
+      JSON.parse(structureValue);
+      
+      // Armazenar o texto JSON original, não o objeto parseado
+      setFormData((prev) => ({ ...prev, structure: structureValue }));
       setStructureError("");
     } catch (error) {
+      // Se não for um JSON válido, manter o valor no campo mas marcar erro
+      setFormData((prev) => ({ ...prev, structure: structureValue }));
       setStructureError("Formato JSON inválido");
     }
   };
@@ -175,7 +189,9 @@ export default function TemplateFormModal({
                 <Textarea
                   id="structure"
                   name="structure"
-                  defaultValue={JSON.stringify(formData.structure, null, 2)}
+                  value={typeof formData.structure === 'string' 
+                    ? formData.structure 
+                    : JSON.stringify(formData.structure, null, 2)}
                   onChange={handleStructureChange}
                   className="font-mono text-sm h-32"
                   required

@@ -39,18 +39,47 @@ export default function TemplatesPage() {
   // Mutação para criar template
   const createTemplateMutation = useMutation({
     mutationFn: async (templateData: any) => {
-      const res = await apiRequest("POST", "/api/templates", templateData);
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || "Erro ao criar template");
+      try {
+        // Garantir que a estrutura seja um objeto JavaScript válido, não uma string JSON
+        const dataToSend = {
+          ...templateData,
+          structure: typeof templateData.structure === 'string' 
+            ? JSON.parse(templateData.structure) 
+            : templateData.structure
+        };
+        
+        console.log("Enviando template:", JSON.stringify(dataToSend, null, 2));
+        
+        const res = await apiRequest("POST", "/api/templates", dataToSend);
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error("Resposta do servidor:", errorText);
+          try {
+            const errorData = JSON.parse(errorText);
+            throw new Error(errorData.message || "Erro ao criar template");
+          } catch (e) {
+            throw new Error(errorText || "Erro ao criar template");
+          }
+        }
+        return await res.json();
+      } catch (error) {
+        console.error("Erro completo:", error);
+        throw error;
       }
-      return await res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/templates"] });
       toast({
         title: "Template criado",
         description: "O template foi criado com sucesso",
+      });
+    },
+    onError: (error: any) => {
+      console.error("Erro na mutação:", error);
+      toast({
+        title: "Erro ao criar template",
+        description: error.message || "Ocorreu um erro ao salvar o template",
+        variant: "destructive",
       });
     }
   });
