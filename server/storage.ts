@@ -5,6 +5,7 @@ import session from "express-session";
 import createMemoryStore from "memorystore";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
+import crypto from "crypto";
 
 const MemoryStore = createMemoryStore(session);
 const PostgresSessionStore = connectPg(session);
@@ -149,11 +150,13 @@ export class DatabaseStorage implements IStorage {
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
+  private templates: Map<string, Template>;
   sessionStore: session.Store;
   currentId: number;
 
   constructor() {
     this.users = new Map();
+    this.templates = new Map();
     this.currentId = 1;
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000 // 24 hours
@@ -168,8 +171,24 @@ export class MemStorage implements IStorage {
       status: "ACTIVE",
       mustChangePassword: true,
     });
+    
+    // Add some example templates
+    this.createTemplate({
+      code: "STRUCT001",
+      description: "Template de Estrutura Padrão",
+      type: "struct",
+      structure: { sections: ["Introdução", "Desenvolvimento", "Conclusão"] }
+    });
+    
+    this.createTemplate({
+      code: "OUTPUT001",
+      description: "Template de Saída Básico",
+      type: "output",
+      structure: { format: "texto", variables: ["nome", "data"] }
+    });
   }
 
+  // User operations
   async getUser(id: number): Promise<User | undefined> {
     return this.users.get(id);
   }
@@ -252,6 +271,64 @@ export class MemStorage implements IStorage {
     user.mustChangePassword = mustChangePassword;
     user.updatedAt = new Date();
     this.users.set(id, user);
+  }
+  
+  // Template operations
+  async getTemplate(id: string): Promise<Template | undefined> {
+    return this.templates.get(id);
+  }
+
+  async getTemplateByCode(code: string): Promise<Template | undefined> {
+    return Array.from(this.templates.values()).find(
+      (template) => template.code === code,
+    );
+  }
+
+  async createTemplate(templateData: InsertTemplate): Promise<Template> {
+    const id = crypto.randomUUID();
+    const template: Template = {
+      id,
+      code: templateData.code,
+      description: templateData.description,
+      type: templateData.type,
+      structure: templateData.structure,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.templates.set(id, template);
+    return template;
+  }
+
+  async getAllTemplates(): Promise<Template[]> {
+    return Array.from(this.templates.values());
+  }
+
+  async getTemplatesByType(type: TemplateType): Promise<Template[]> {
+    return Array.from(this.templates.values()).filter(
+      (template) => template.type === type
+    );
+  }
+
+  async updateTemplate(id: string, data: Partial<Template>): Promise<Template> {
+    const template = this.templates.get(id);
+    if (!template) {
+      throw new Error("Template não encontrado");
+    }
+
+    const updatedTemplate = {
+      ...template,
+      ...data,
+      updatedAt: new Date()
+    };
+    this.templates.set(id, updatedTemplate);
+    return updatedTemplate;
+  }
+
+  async deleteTemplate(id: string): Promise<void> {
+    if (!this.templates.has(id)) {
+      throw new Error("Template não encontrado");
+    }
+    this.templates.delete(id);
   }
 }
 

@@ -1,13 +1,186 @@
 import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import { Template, TemplateType } from "@shared/schema";
+import { Plus, Edit, Trash2, FileCode, FileJson } from "lucide-react";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import TemplateFormModal from "@/components/TemplateFormModal";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function TemplatesPage() {
-  const [activeTab, setActiveTab] = useState("struct");
+  const [activeTab, setActiveTab] = useState<string>("struct");
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const { toast } = useToast();
+
+  // Consulta templates por tipo (struct ou output)
+  const { data: templates, isLoading } = useQuery<Template[]>({
+    queryKey: ["/api/templates", activeTab],
+    queryFn: () => apiRequest("GET", `/api/templates/${activeTab}`).then(res => res.json())
+  });
+
+  // Mutação para criar template
+  const createTemplateMutation = useMutation({
+    mutationFn: async (templateData: any) => {
+      const res = await apiRequest("POST", "/api/templates", templateData);
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "Erro ao criar template");
+      }
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/templates"] });
+      toast({
+        title: "Template criado",
+        description: "O template foi criado com sucesso",
+      });
+    }
+  });
+
+  // Mutação para atualizar template
+  const updateTemplateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const res = await apiRequest("PUT", `/api/template/${id}`, data);
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "Erro ao atualizar template");
+      }
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/templates"] });
+      toast({
+        title: "Template atualizado",
+        description: "O template foi atualizado com sucesso",
+      });
+    }
+  });
+
+  // Mutação para excluir template
+  const deleteTemplateMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await apiRequest("DELETE", `/api/template/${id}`);
+      if (!res.ok) {
+        throw new Error("Erro ao excluir template");
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/templates"] });
+      toast({
+        title: "Template excluído",
+        description: "O template foi excluído com sucesso",
+      });
+    }
+  });
+
+  // Manipuladores
+  const handleCreateTemplate = async (data: any) => {
+    await createTemplateMutation.mutateAsync(data);
+    setIsCreateModalOpen(false);
+  };
+
+  const handleUpdateTemplate = async (data: any) => {
+    if (!selectedTemplate) return;
+    await updateTemplateMutation.mutateAsync({ id: selectedTemplate.id, data });
+    setIsEditModalOpen(false);
+  };
+
+  const handleDeleteTemplate = async () => {
+    if (!selectedTemplate) return;
+    await deleteTemplateMutation.mutateAsync(selectedTemplate.id);
+    setIsDeleteDialogOpen(false);
+    setSelectedTemplate(null);
+  };
+
+  const openEditModal = (template: Template) => {
+    setSelectedTemplate(template);
+    setIsEditModalOpen(true);
+  };
+
+  const openDeleteDialog = (template: Template) => {
+    setSelectedTemplate(template);
+    setIsDeleteDialogOpen(true);
+  };
+
+  // Função para renderizar os cards de templates
+  const renderTemplateCards = (templates: Template[]) => {
+    if (templates.length === 0) {
+      return (
+        <Card className="col-span-full p-6 text-center border-dashed border-2">
+          <CardContent className="pt-6">
+            <p className="text-gray-500">Nenhum template encontrado.</p>
+            <Button 
+              onClick={() => setIsCreateModalOpen(true)} 
+              variant="outline" 
+              className="mt-4"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Criar novo template
+            </Button>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    return templates.map((template) => (
+      <Card 
+        key={template.id} 
+        className="border border-gray-200 hover:border-blue-400 transition-colors"
+      >
+        <CardContent className="p-4 pt-6">
+          <div className="flex justify-between items-start mb-2">
+            <div className="flex items-center">
+              {template.type === "struct" ? (
+                <FileCode className="h-5 w-5 mr-2 text-blue-500" />
+              ) : (
+                <FileJson className="h-5 w-5 mr-2 text-purple-500" />
+              )}
+              <h3 className="font-medium">{template.code}</h3>
+            </div>
+            <div className="text-xs bg-gray-100 px-2 py-1 rounded-full">
+              {template.type === "struct" ? "Estrutural" : "Saída"}
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mb-4">{template.description}</p>
+          <div className="flex justify-end space-x-2 mt-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 px-2"
+              onClick={() => openEditModal(template)}
+            >
+              <Edit className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 px-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+              onClick={() => openDeleteDialog(template)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    ));
+  };
 
   return (
     <div className="fade-in">
-      <h1 className="text-2xl font-bold mb-6">Templates</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Templates</h1>
+        <Button onClick={() => setIsCreateModalOpen(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          Novo Template
+        </Button>
+      </div>
       
       <Tabs 
         defaultValue="struct" 
@@ -16,69 +189,109 @@ export default function TemplatesPage() {
       >
         <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value="struct">Struct Templates</TabsTrigger>
-          <TabsTrigger value="out">Out Templates</TabsTrigger>
+          <TabsTrigger value="output">Out Templates</TabsTrigger>
         </TabsList>
         
         <TabsContent value="struct" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Struct Templates</CardTitle>
+              <CardDescription>
+                Templates estruturais para definição de modelos de dados e interfaces.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 mb-4">
-                Templates estruturais para definição de modelos de dados e interfaces.
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Template cards irão aqui */}
-                <Card className="border border-gray-200 hover:border-blue-400 transition-colors">
-                  <CardContent className="p-4">
-                    <h3 className="font-medium mb-2">Modelo Base</h3>
-                    <p className="text-sm text-gray-600">Template estrutural padrão para novos projetos</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="border border-gray-200 hover:border-blue-400 transition-colors">
-                  <CardContent className="p-4">
-                    <h3 className="font-medium mb-2">Interface API</h3>
-                    <p className="text-sm text-gray-600">Estrutura para definição de interfaces de API</p>
-                  </CardContent>
-                </Card>
-              </div>
+              {isLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <Card key={i} className="border">
+                      <CardContent className="p-4">
+                        <Skeleton className="h-4 w-1/3 mb-2 mt-2" />
+                        <Skeleton className="h-4 w-full mb-1" />
+                        <Skeleton className="h-4 w-2/3" />
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {renderTemplateCards(templates?.filter(t => t.type === 'struct') || [])}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
         
-        <TabsContent value="out" className="space-y-4">
+        <TabsContent value="output" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Out Templates</CardTitle>
+              <CardDescription>
+                Templates de saída para geração de relatórios e documentos.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-600 mb-4">
-                Templates de saída para geração de relatórios e documentos.
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Template cards irão aqui */}
-                <Card className="border border-gray-200 hover:border-blue-400 transition-colors">
-                  <CardContent className="p-4">
-                    <h3 className="font-medium mb-2">Relatório PDF</h3>
-                    <p className="text-sm text-gray-600">Template para geração de relatórios em PDF</p>
-                  </CardContent>
-                </Card>
-                
-                <Card className="border border-gray-200 hover:border-blue-400 transition-colors">
-                  <CardContent className="p-4">
-                    <h3 className="font-medium mb-2">Documento JSON</h3>
-                    <p className="text-sm text-gray-600">Estrutura para exportação de dados em formato JSON</p>
-                  </CardContent>
-                </Card>
-              </div>
+              {isLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[1, 2, 3, 4].map((i) => (
+                    <Card key={i} className="border">
+                      <CardContent className="p-4">
+                        <Skeleton className="h-4 w-1/3 mb-2 mt-2" />
+                        <Skeleton className="h-4 w-full mb-1" />
+                        <Skeleton className="h-4 w-2/3" />
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {renderTemplateCards(templates?.filter(t => t.type === 'output') || [])}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Modal para criação de template */}
+      {isCreateModalOpen && (
+        <TemplateFormModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onSave={handleCreateTemplate}
+          mode="create"
+          selectedType={activeTab as TemplateType}
+        />
+      )}
+
+      {/* Modal para edição de template */}
+      {isEditModalOpen && selectedTemplate && (
+        <TemplateFormModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSave={handleUpdateTemplate}
+          template={selectedTemplate}
+          mode="edit"
+        />
+      )}
+
+      {/* Diálogo de confirmação para exclusão */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir este template? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteTemplate} className="bg-red-500 hover:bg-red-600">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
