@@ -94,6 +94,7 @@ export default function AdminPage() {
   
   // Estados para mapeamento de colunas
   const [isColumnMappingModalOpen, setIsColumnMappingModalOpen] = useState(false);
+  const [showColumnMapping, setShowColumnMapping] = useState(false);
   const [columnMappings, setColumnMappings] = useState<ColumnMapping[]>([]);
   const [currentColumnMapping, setCurrentColumnMapping] = useState<ColumnMapping>({
     mondayColumnId: "",
@@ -463,7 +464,7 @@ export default function AdminPage() {
     };
     
     // Armazenar também os mapeamentos de colunas se houver
-    if (showColumnMapping && columnMappings.length > 0) {
+    if (columnMappings.length > 0) {
       // Aqui seria implementado o salvamento dos mapeamentos de colunas no banco de dados
       // Por enquanto, apenas exibimos um feedback ao usuário
       toast({
@@ -487,7 +488,6 @@ export default function AdminPage() {
     // Fecha o modal e reseta os estados
     setIsModalOpen(false);
     setSelectedMapping(null);
-    setShowColumnMapping(false);
     setColumnMappings([]);
   };
 
@@ -501,11 +501,12 @@ export default function AdminPage() {
         onOpenChange={(open) => {
           setIsModalOpen(open);
           if (!open) {
-            setShowColumnMapping(false);
+            // Limpar estado ao fechar o modal
+            setColumnMappings([]);
           }
         }}
       >
-        <DialogContent className={showColumnMapping ? "sm:max-w-3xl" : "sm:max-w-lg"}>
+        <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>
               {isEditing ? "Editar Mapeamento" : "Novo Mapeamento"}
@@ -1213,7 +1214,7 @@ export default function AdminPage() {
                               </TableCell>
                             </TableRow>
                           ) : (
-                            boardMappings.map((mapping) => (
+                            boardMappings.map((mapping: BoardMapping) => (
                               <TableRow key={mapping.id}>
                                 <TableCell className="font-medium">{mapping.name}</TableCell>
                                 <TableCell>{mapping.boardId}</TableCell>
