@@ -5,8 +5,19 @@ import {
   DialogContent, 
   DialogHeader, 
   DialogTitle, 
-  DialogFooter 
+  DialogFooter,
+  DialogDescription
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { 
   Table, 
   TableBody, 
@@ -33,6 +44,7 @@ type BoardMapping = {
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("usuarios");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedMapping, setSelectedMapping] = useState<BoardMapping | null>(null);
   
   // Dados de exemplo para a tabela
@@ -69,6 +81,21 @@ export default function AdminPage() {
   const openEditModal = (mapping: BoardMapping | null = null) => {
     setSelectedMapping(mapping);
     setIsModalOpen(true);
+  };
+  
+  const openDeleteDialog = (mapping: BoardMapping) => {
+    setSelectedMapping(mapping);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  const handleDeleteMapping = () => {
+    if (selectedMapping) {
+      setBoardMappings(currentMappings => 
+        currentMappings.filter(mapping => mapping.id !== selectedMapping.id)
+      );
+      setIsDeleteDialogOpen(false);
+      setSelectedMapping(null);
+    }
   };
 
   // Modal de configuração do mapeamento
@@ -199,6 +226,24 @@ export default function AdminPage() {
       </div>
       
       {renderConfigModal()}
+      
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o mapeamento "{selectedMapping?.name}"?
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteMapping} className="bg-red-600 hover:bg-red-700">
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <div className="mt-6">
         <Tabs 
@@ -293,6 +338,7 @@ export default function AdminPage() {
                                   <Pencil className="h-4 w-4" />
                                 </button>
                                 <button
+                                  onClick={() => openDeleteDialog(mapping)}
                                   className="p-1 text-red-600 hover:text-red-800 rounded-md hover:bg-red-50"
                                   title="Excluir"
                                 >
