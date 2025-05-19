@@ -1,4 +1,4 @@
-import { users, templates, mondayMappings, type User, type InsertUser, type Template, type InsertTemplate, type MondayMapping, type InsertMondayMapping, UserStatus, UserRole, TemplateType } from "@shared/schema";
+import { users, templates, mondayMappings, mondayColumns, type User, type InsertUser, type Template, type InsertTemplate, type MondayMapping, type InsertMondayMapping, type MondayColumn, type InsertMondayColumn, UserStatus, UserRole, TemplateType } from "@shared/schema";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
 import session from "express-session";
@@ -43,6 +43,13 @@ export interface IStorage {
   deleteMondayMapping(id: string): Promise<void>;
   saveMondayApiKey(apiKey: string): Promise<void>;
   getMondayApiKey(): Promise<string | undefined>;
+  
+  // Monday Column operations
+  getMondayColumns(mappingId: string): Promise<MondayColumn[]>;
+  getMondayColumnById(id: string): Promise<MondayColumn | undefined>;
+  createMondayColumn(column: InsertMondayColumn): Promise<MondayColumn>;
+  createManyMondayColumns(columns: InsertMondayColumn[]): Promise<MondayColumn[]>;
+  deleteMondayColumns(mappingId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -272,12 +279,55 @@ export class DatabaseStorage implements IStorage {
     }
     return undefined;
   }
+  
+  // Monday Column implementations
+  async getMondayColumns(mappingId: string): Promise<MondayColumn[]> {
+    return await db
+      .select()
+      .from(mondayColumns)
+      .where(eq(mondayColumns.mappingId, mappingId));
+  }
+  
+  async getMondayColumnById(id: string): Promise<MondayColumn | undefined> {
+    const [column] = await db
+      .select()
+      .from(mondayColumns)
+      .where(eq(mondayColumns.id, id));
+    return column;
+  }
+  
+  async createMondayColumn(column: InsertMondayColumn): Promise<MondayColumn> {
+    const [newColumn] = await db
+      .insert(mondayColumns)
+      .values(column)
+      .returning();
+    return newColumn;
+  }
+  
+  async createManyMondayColumns(columns: InsertMondayColumn[]): Promise<MondayColumn[]> {
+    if (columns.length === 0) {
+      return [];
+    }
+    
+    const newColumns = await db
+      .insert(mondayColumns)
+      .values(columns)
+      .returning();
+    return newColumns;
+  }
+  
+  async deleteMondayColumns(mappingId: string): Promise<void> {
+    await db
+      .delete(mondayColumns)
+      .where(eq(mondayColumns.mappingId, mappingId));
+  }
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private templates: Map<string, Template>;
   private mondayMappings: Map<string, MondayMapping>;
+  private mondayColumns: Map<string, MondayColumn>;
   private mondayApiKey: string | undefined;
   sessionStore: session.Store;
   currentId: number;
@@ -286,6 +336,7 @@ export class MemStorage implements IStorage {
     this.users = new Map();
     this.templates = new Map();
     this.mondayMappings = new Map();
+    this.mondayColumns = new Map();
     this.mondayApiKey = undefined;
     this.currentId = 1;
     this.sessionStore = new MemoryStore({
@@ -546,6 +597,53 @@ export class MemStorage implements IStorage {
   
   async getMondayApiKey(): Promise<string | undefined> {
     return this.mondayApiKey;
+  }
+  
+  // Monday Column operations
+  async getMondayColumns(mappingId: string): Promise<MondayColumn[]> {
+    return Array.from(this.mondayColumns.values())
+      .filter(column => column.mappingId === mappingId);
+  }
+  
+  async getMondayColumnById(id: string): Promise<MondayColumn | undefined> {
+    return this.mondayColumns.get(id);
+  }
+  
+  async createMondayColumn(column: InsertMondayColumn): Promise<MondayColumn> {
+    const id = crypto.randomUUID();
+    const newColumn: MondayColumn = {
+      id,
+      mappingId: column.mappingId,
+      columnId: column.columnId,
+      title: column.title,
+      type: column.type,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.mondayColumns.set(id, newColumn);
+    return newColumn;
+  }
+  
+  async createManyMondayColumns(columns: InsertMondayColumn[]): Promise<MondayColumn[]> {
+    const newColumns: MondayColumn[] = [];
+    
+    for (const column of columns) {
+      const newColumn = await this.createMondayColumn(column);
+      newColumns.push(newColumn);
+    }
+    
+    return newColumns;
+  }
+  
+  async deleteMondayColumns(mappingId: string): Promise<void> {
+    const columnsToDelete = Array.from(this.mondayColumns.entries())
+      .filter(([_, column]) => column.mappingId === mappingId)
+      .map(([id, _]) => id);
+    
+    for (const id of columnsToDelete) {
+      this.mondayColumns.delete(id);
+    }
   }
 }
 

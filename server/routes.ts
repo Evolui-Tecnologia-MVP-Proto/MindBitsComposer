@@ -2,8 +2,9 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { TemplateType, insertTemplateSchema, insertMondayMappingSchema } from "@shared/schema";
+import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema } from "@shared/schema";
 import { ZodError } from "zod";
+import fetch from "node-fetch";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication and user management routes

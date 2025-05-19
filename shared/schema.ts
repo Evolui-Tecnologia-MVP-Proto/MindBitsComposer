@@ -54,6 +54,16 @@ export const mondayMappings = pgTable("monday_mappings", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const mondayColumns = pgTable("monday_columns", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  mappingId: uuid("mapping_id").notNull().references(() => mondayMappings.id, { onDelete: "cascade" }),
+  columnId: text("column_id").notNull(),
+  title: text("title").notNull(),
+  type: text("type").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
@@ -72,6 +82,12 @@ export const insertMondayMappingSchema = createInsertSchema(mondayMappings).omit
   updatedAt: true,
 });
 
+export const insertMondayColumnSchema = createInsertSchema(mondayColumns).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
@@ -80,3 +96,6 @@ export type Template = typeof templates.$inferSelect;
 
 export type InsertMondayMapping = z.infer<typeof insertMondayMappingSchema>;
 export type MondayMapping = typeof mondayMappings.$inferSelect;
+
+export type InsertMondayColumn = z.infer<typeof insertMondayColumnSchema>;
+export type MondayColumn = typeof mondayColumns.$inferSelect;
