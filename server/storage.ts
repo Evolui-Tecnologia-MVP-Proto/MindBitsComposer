@@ -1,4 +1,4 @@
-import { users, templates, mondayMappings, mondayColumns, type User, type InsertUser, type Template, type InsertTemplate, type MondayMapping, type InsertMondayMapping, type MondayColumn, type InsertMondayColumn, UserStatus, UserRole, TemplateType } from "@shared/schema";
+import { users, templates, mondayMappings, mondayColumns, mappingColumns, type User, type InsertUser, type Template, type InsertTemplate, type MondayMapping, type InsertMondayMapping, type MondayColumn, type InsertMondayColumn, type MappingColumn, type InsertMappingColumn, UserStatus, UserRole, TemplateType } from "@shared/schema";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
 import session from "express-session";
@@ -402,6 +402,7 @@ export class MemStorage implements IStorage {
   private templates: Map<string, Template>;
   private mondayMappings: Map<string, MondayMapping>;
   private mondayColumns: Map<string, MondayColumn>;
+  private mappingColumns: Map<string, MappingColumn>;
   private mondayApiKey: string | undefined;
   sessionStore: session.Store;
   currentId: number;
@@ -411,6 +412,7 @@ export class MemStorage implements IStorage {
     this.templates = new Map();
     this.mondayMappings = new Map();
     this.mondayColumns = new Map();
+    this.mappingColumns = new Map();
     this.mondayApiKey = undefined;
     this.currentId = 1;
     this.sessionStore = new MemoryStore({
@@ -717,6 +719,74 @@ export class MemStorage implements IStorage {
     
     for (const id of columnsToDelete) {
       this.mondayColumns.delete(id);
+    }
+  }
+  
+  // Implementação das operações de mapeamento de colunas
+  async getMappingColumns(mappingId: string): Promise<MappingColumn[]> {
+    return Array.from(this.mappingColumns.values())
+      .filter(column => column.mappingId === mappingId);
+  }
+  
+  async getMappingColumnById(id: string): Promise<MappingColumn | undefined> {
+    return this.mappingColumns.get(id);
+  }
+  
+  async createMappingColumn(column: InsertMappingColumn): Promise<MappingColumn> {
+    const id = crypto.randomUUID();
+    const newColumn: MappingColumn = {
+      id,
+      mappingId: column.mappingId,
+      mondayColumnId: column.mondayColumnId,
+      mondayColumnTitle: column.mondayColumnTitle,
+      cpxField: column.cpxField,
+      transformFunction: column.transformFunction || "",
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.mappingColumns.set(id, newColumn);
+    return newColumn;
+  }
+  
+  async createManyMappingColumns(columns: InsertMappingColumn[]): Promise<MappingColumn[]> {
+    const newColumns: MappingColumn[] = [];
+    
+    for (const column of columns) {
+      const newColumn = await this.createMappingColumn(column);
+      newColumns.push(newColumn);
+    }
+    
+    return newColumns;
+  }
+  
+  async updateMappingColumn(id: string, data: Partial<MappingColumn>): Promise<MappingColumn> {
+    const column = this.mappingColumns.get(id);
+    if (!column) {
+      throw new Error("Mapeamento de coluna não encontrado");
+    }
+    
+    const updatedColumn = {
+      ...column,
+      ...data,
+      updatedAt: new Date()
+    };
+    
+    this.mappingColumns.set(id, updatedColumn);
+    return updatedColumn;
+  }
+  
+  async deleteMappingColumn(id: string): Promise<void> {
+    this.mappingColumns.delete(id);
+  }
+  
+  async deleteMappingColumns(mappingId: string): Promise<void> {
+    const columnsToDelete = Array.from(this.mappingColumns.entries())
+      .filter(([_, column]) => column.mappingId === mappingId)
+      .map(([id, _]) => id);
+    
+    for (const id of columnsToDelete) {
+      this.mappingColumns.delete(id);
     }
   }
 }
