@@ -259,29 +259,6 @@ const FlowCanvas = () => {
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center mb-4 bg-white p-4 rounded-lg shadow-sm">
         <div className="flex items-center space-x-4">
-          <div className="w-64">
-            <Label htmlFor="flow-name">Nome do Fluxo</Label>
-            <Input 
-              id="flow-name" 
-              value={flowName} 
-              onChange={(e) => setFlowName(e.target.value)}
-              className="mt-1"
-            />
-          </div>
-          <div className="w-48">
-            <Label htmlFor="flow-type">Tipo de Documento</Label>
-            <Select>
-              <SelectTrigger id="flow-type" className="mt-1">
-                <SelectValue placeholder="Selecione..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="crp">CRP</SelectItem>
-                <SelectItem value="crs">CRS</SelectItem>
-                <SelectItem value="contrato">Contrato</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
           {/* Combo de Nódulos */}
           <div className="w-64">
             <Label htmlFor="node-type">Adicionar Nódulo</Label>
