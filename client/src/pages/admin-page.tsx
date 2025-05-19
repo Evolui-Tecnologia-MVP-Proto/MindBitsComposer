@@ -293,11 +293,8 @@ export default function AdminPage() {
       setMondayColumns(data);
       setTestResult({
         success: true,
-        message: `Quadro encontrado! ${data.length} colunas carregadas com sucesso. Você pode configurar o mapeamento de colunas abaixo.`
+        message: `Quadro encontrado! ${data.length} colunas carregadas com sucesso.`
       });
-      
-      // Mostrar a seção de mapeamento de colunas na mesma modal
-      setShowColumnMapping(true);
     },
     onError: (error) => {
       toast({
