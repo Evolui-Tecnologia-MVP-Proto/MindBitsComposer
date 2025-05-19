@@ -94,6 +94,17 @@ export default function AdminPage() {
   
   // Estados para colunas do Monday
   const [mondayColumns, setMondayColumns] = useState<MondayColumnType[]>([]);
+  const [isColumnMapModalOpen, setIsColumnMapModalOpen] = useState(false);
+  const [columnMappings, setColumnMappings] = useState<{id: string, mondayColumn: string, cpxField: string, transformFunction?: string}[]>([
+    {id: "1", mondayColumn: "Nome", cpxField: "titulo", transformFunction: ""},
+    {id: "2", mondayColumn: "Status", cpxField: "status", transformFunction: ""},
+    {id: "3", mondayColumn: "Data", cpxField: "data_criacao", transformFunction: ""}
+  ]);
+  const [currentMapping, setCurrentMapping] = useState<{mondayColumn: string, cpxField: string, transformFunction: string}>({
+    mondayColumn: "",
+    cpxField: "",
+    transformFunction: ""
+  });
   
   // Consulta para buscar a chave da API do Monday
   const { 
@@ -537,7 +548,12 @@ export default function AdminPage() {
                       size="sm"
                       className="flex items-center"
                       onClick={() => {
-                        // Função para adicionar novo mapeamento
+                        setCurrentMapping({
+                          mondayColumn: "",
+                          cpxField: "",
+                          transformFunction: ""
+                        });
+                        setIsColumnMapModalOpen(true);
                       }}
                     >
                       <PlusCircle className="h-4 w-4 mr-2" />
@@ -555,88 +571,43 @@ export default function AdminPage() {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {/* Exemplos para demonstração */}
-                        <TableRow>
-                          <TableCell className="font-medium">Nome</TableCell>
-                          <TableCell>titulo</TableCell>
-                          <TableCell>
-                            <div className="flex space-x-2">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => {
-                                  // Função para editar
-                                }}
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="text-red-500 hover:text-red-600"
-                                onClick={() => {
-                                  // Função para excluir
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="font-medium">Status</TableCell>
-                          <TableCell>status</TableCell>
-                          <TableCell>
-                            <div className="flex space-x-2">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => {
-                                  // Função para editar
-                                }}
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="text-red-500 hover:text-red-600"
-                                onClick={() => {
-                                  // Função para excluir
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="font-medium">Data</TableCell>
-                          <TableCell>data_criacao</TableCell>
-                          <TableCell>
-                            <div className="flex space-x-2">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => {
-                                  // Função para editar
-                                }}
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="text-red-500 hover:text-red-600"
-                                onClick={() => {
-                                  // Função para excluir
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
+                        {columnMappings.map((mapping) => (
+                          <TableRow key={mapping.id}>
+                            <TableCell className="font-medium">{mapping.mondayColumn}</TableCell>
+                            <TableCell>{mapping.cpxField}</TableCell>
+                            <TableCell>
+                              <div className="flex space-x-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {
+                                    setCurrentMapping({
+                                      mondayColumn: mapping.mondayColumn,
+                                      cpxField: mapping.cpxField,
+                                      transformFunction: mapping.transformFunction || ""
+                                    });
+                                    setIsColumnMapModalOpen(true);
+                                  }}
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="text-red-500 hover:text-red-600"
+                                  onClick={() => {
+                                    // Remove o mapeamento
+                                    setColumnMappings(
+                                      columnMappings.filter((m) => m.id !== mapping.id)
+                                    );
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
                       </TableBody>
                     </Table>
                   </div>
@@ -664,6 +635,131 @@ export default function AdminPage() {
     );
   };
 
+  // Renderiza a modal de mapeamento de colunas
+  const renderColumnMappingModal = () => {
+    return (
+      <Dialog open={isColumnMapModalOpen} onOpenChange={setIsColumnMapModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Mapeamento de Coluna</DialogTitle>
+            <DialogDescription>
+              Configure o mapeamento entre uma coluna do Monday e um campo interno
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4 space-y-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="mondayColumn" className="text-right">
+                Coluna Monday
+              </Label>
+              <Select 
+                value={currentMapping.mondayColumn}
+                onValueChange={(value) => setCurrentMapping({...currentMapping, mondayColumn: value})}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Selecione uma coluna" />
+                </SelectTrigger>
+                <SelectContent>
+                  {mondayColumns.map((column) => (
+                    <SelectItem key={column.columnId} value={column.title}>
+                      {column.title}
+                    </SelectItem>
+                  ))}
+                  {/* Opções adicionais para demonstração */}
+                  {mondayColumns.length === 0 && (
+                    <>
+                      <SelectItem value="Nome">Nome</SelectItem>
+                      <SelectItem value="Status">Status</SelectItem>
+                      <SelectItem value="Data">Data</SelectItem>
+                      <SelectItem value="Responsável">Responsável</SelectItem>
+                      <SelectItem value="Prioridade">Prioridade</SelectItem>
+                    </>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="cpxField" className="text-right">
+                Campo CPx
+              </Label>
+              <Select 
+                value={currentMapping.cpxField}
+                onValueChange={(value) => setCurrentMapping({...currentMapping, cpxField: value})}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Selecione um campo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="titulo">Título</SelectItem>
+                  <SelectItem value="descricao">Descrição</SelectItem>
+                  <SelectItem value="status">Status</SelectItem>
+                  <SelectItem value="data_criacao">Data de Criação</SelectItem>
+                  <SelectItem value="responsavel">Responsável</SelectItem>
+                  <SelectItem value="prioridade">Prioridade</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="grid grid-cols-4 gap-4">
+              <Label htmlFor="transformFunction" className="text-right self-start pt-2">
+                Função de Transformação
+              </Label>
+              <Textarea
+                id="transformFunction"
+                placeholder="Função JavaScript opcional para transformar o valor"
+                className="col-span-3"
+                value={currentMapping.transformFunction}
+                onChange={(e) => setCurrentMapping({...currentMapping, transformFunction: e.target.value})}
+                rows={4}
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsColumnMapModalOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={() => {
+              // Adiciona ou atualiza o mapeamento
+              const existingIndex = columnMappings.findIndex(
+                (m) => m.mondayColumn === currentMapping.mondayColumn
+              );
+              
+              if (existingIndex >= 0) {
+                // Atualiza um mapeamento existente
+                const updatedMappings = [...columnMappings];
+                updatedMappings[existingIndex] = {
+                  ...updatedMappings[existingIndex],
+                  mondayColumn: currentMapping.mondayColumn,
+                  cpxField: currentMapping.cpxField,
+                  transformFunction: currentMapping.transformFunction
+                };
+                setColumnMappings(updatedMappings);
+              } else {
+                // Adiciona um novo mapeamento
+                setColumnMappings([
+                  ...columnMappings,
+                  {
+                    id: uuidv4(),
+                    mondayColumn: currentMapping.mondayColumn,
+                    cpxField: currentMapping.cpxField,
+                    transformFunction: currentMapping.transformFunction
+                  }
+                ]);
+              }
+              
+              // Fecha a modal
+              setIsColumnMapModalOpen(false);
+            }}>
+              Salvar Mapeamento
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
   return (
     <div className="fade-in">
       <div className="pb-5 border-b border-gray-200 sm:flex sm:items-center sm:justify-between">
@@ -671,6 +767,7 @@ export default function AdminPage() {
       </div>
       
       {renderConfigModal()}
+      {renderColumnMappingModal()}
       
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
