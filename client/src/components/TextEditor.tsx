@@ -260,7 +260,7 @@ export default function TextEditor() {
   const initialConfig = {
     namespace: "EvoMindBitsEditor",
     theme: {
-      root: "p-4 border-0 focus:outline-none h-full min-h-[400px] font-sans text-base text-gray-700",
+      root: "p-4 border-0 focus:outline-none h-full min-h-[400px] font-mono text-base text-gray-700",
       link: "cursor-pointer text-blue-600 underline",
       heading: {
         h1: "text-3xl font-bold",
@@ -308,8 +308,8 @@ export default function TextEditor() {
                   <AccordionContent className="px-0 pt-2">
                     <div className="min-h-[150px]">
                       <RichTextPlugin
-                        contentEditable={<ContentEditable className="outline-none px-4 py-2 min-h-[150px]" />}
-                        placeholder={<div className="absolute ml-4 mt-2 text-gray-400 pointer-events-none">Conteúdo de {section}...</div>}
+                        contentEditable={<ContentEditable className="outline-none px-4 py-2 min-h-[150px] font-mono" />}
+                        placeholder={<div className="absolute ml-4 mt-2 text-gray-400 pointer-events-none font-mono">Conteúdo de {section}...</div>}
                         ErrorBoundary={() => <div>Erro no editor!</div>}
                       />
                     </div>
@@ -320,8 +320,8 @@ export default function TextEditor() {
           ) : (
             <div className="h-full min-h-[400px]">
               <RichTextPlugin
-                contentEditable={<ContentEditable className="outline-none p-6 h-full min-h-[400px]" />}
-                placeholder={<div className="absolute ml-6 mt-6 text-gray-400 pointer-events-none">Selecione um template estrutural ou digite seu conteúdo aqui...</div>}
+                contentEditable={<ContentEditable className="outline-none p-6 h-full min-h-[400px] font-mono" />}
+                placeholder={<div className="absolute ml-6 mt-6 text-gray-400 pointer-events-none font-mono">Selecione um template estrutural ou digite seu conteúdo aqui...</div>}
                 ErrorBoundary={() => <div>Erro no editor!</div>}
               />
             </div>
