@@ -27,11 +27,28 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { PlusCircle, Pencil, Trash2, ExternalLink, Eye, EyeOff, Loader2 } from "lucide-react";
+import { 
+  PlusCircle, 
+  Pencil, 
+  Trash2, 
+  ExternalLink, 
+  Eye, 
+  EyeOff, 
+  Loader2, 
+  Link, 
+  ArrowDown, 
+  CheckCircle2, 
+  AlertCircle 
+} from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import UserTable from "@/components/UserTable";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 // Tipo para representar o mapeamento de quadros
 type BoardMapping = {
@@ -42,6 +59,25 @@ type BoardMapping = {
   statusColumn: string;
   responsibleColumn: string;
   lastSync: string | null;
+};
+
+// Tipo para as colunas do Monday.com
+type MondayColumnType = {
+  id: string;
+  mappingId: string;
+  columnId: string;
+  title: string;
+  type: string;
+};
+
+// Tipos de colunas que podem ser mapeadas no sistema
+type MindBitsColumnType = "nome" | "cliente" | "requisitante" | "data_inclusao" | "status_origem" | "descricao" | "anexos";
+
+// Estrutura para o mapeamento de colunas
+type ColumnMapping = {
+  mondayColumnId: string;  // ID da coluna no Monday
+  mindBitsColumn: MindBitsColumnType;  // Tipo de coluna no MindBits
+  transformFunction?: string;  // Função de transformação opcional
 };
 
 export default function AdminPage() {
@@ -218,6 +254,34 @@ export default function AdminPage() {
     }
   };
   
+  // Consulta para obter as colunas de um mapeamento específico
+  const fetchMondayColumns = (mappingId: string) => {
+    return useQuery({
+      queryKey: [`/api/monday/mappings/${mappingId}/columns`],
+      queryFn: async () => {
+        const response = await fetch(`/api/monday/mappings/${mappingId}/columns`);
+        if (!response.ok) {
+          throw new Error('Falha ao carregar as colunas do mapeamento');
+        }
+        return response.json();
+      },
+      enabled: !!mappingId, // Só executa se tiver um mappingId
+    });
+  };
+
+  // Se temos um mapping selecionado, buscamos suas colunas
+  const { 
+    data: mondayColumnsData = [],
+    isLoading: isLoadingColumns
+  } = selectedMapping ? fetchMondayColumns(selectedMapping.id) : { data: [], isLoading: false };
+
+  // Efeito para atualizar o estado das colunas quando os dados forem carregados
+  useEffect(() => {
+    if (mondayColumnsData && mondayColumnsData.length > 0) {
+      setMondayColumns(mondayColumnsData);
+    }
+  }, [mondayColumnsData]);
+
   // Mutação para buscar as colunas do quadro do Monday
   const fetchColumnsMutation = useMutation({
     mutationFn: async (mappingId: string) => {
@@ -235,10 +299,16 @@ export default function AdminPage() {
         variant: "default",
       });
       queryClient.invalidateQueries({ queryKey: ['/api/monday/mappings'] });
+      queryClient.invalidateQueries({ queryKey: [`/api/monday/mappings/${selectedMapping?.id}/columns`] });
+      setMondayColumns(data);
       setTestResult({
         success: true,
         message: `Quadro encontrado! ${data.length} colunas carregadas com sucesso.`
       });
+      // Abre a modal de mapeamento de colunas após carregar as colunas
+      if (data.length > 0) {
+        setIsColumnMappingModalOpen(true);
+      }
     },
     onError: (error) => {
       toast({
