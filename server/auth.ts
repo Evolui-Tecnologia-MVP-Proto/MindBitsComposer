@@ -315,10 +315,15 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ message: "E-mail já está em uso" });
       }
 
+      // Gerar senha inicial baseada no email (parte antes do "@" + "123")
+      const username = userData.email.split('@')[0];
+      const initialPassword = `${username}123`;
+      console.log(`Gerando senha inicial para ${userData.email}: ${initialPassword}`);
+
       // New users created by admin must change password on first login
       const user = await storage.createUser({
         ...userData,
-        password: await hashPassword(userData.password || "senha-inicial"),
+        password: await hashPassword(initialPassword),
         mustChangePassword: true,
       });
 

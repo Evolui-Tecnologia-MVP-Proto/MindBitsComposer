@@ -5,7 +5,7 @@ import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { insertUserSchema, UserRole, UserStatus } from "@shared/schema";
+import { UserRole, UserStatus } from "@shared/schema";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import {
   Select,
@@ -31,17 +32,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
-// Extended schema for the form
-const formSchema = insertUserSchema.extend({
+// Schema do formulário
+const formSchema = z.object({
   name: z.string().min(3, {
-    message: "Nome deve ter pelo menos 3 caracteres.",
+    message: "Nome deve ter pelo menos 3 caracteres."
   }),
   email: z.string().email({
-    message: "E-mail inválido.",
+    message: "E-mail inválido."
   }),
-  status: z.nativeEnum(UserStatus),
   role: z.nativeEnum(UserRole),
+  status: z.nativeEnum(UserStatus)
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -60,7 +63,6 @@ export default function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
     defaultValues: {
       name: "",
       email: "",
-      password: "senha-inicial", // Default initial password
       status: UserStatus.ACTIVE,
       role: UserRole.USER,
     },
@@ -73,9 +75,10 @@ export default function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      const username = form.getValues("email").split('@')[0];
       toast({
         title: "Usuário criado",
-        description: "O usuário foi criado com sucesso.",
+        description: `O usuário foi criado com sucesso. A senha inicial é: ${username}123`,
       });
       onClose();
       form.reset();
