@@ -45,13 +45,13 @@ import UserTable from "@/components/UserTable";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -1075,7 +1075,12 @@ export default function AdminPage() {
                               {mappingsData.map((mapping: BoardMapping) => (
                                 <TableRow key={mapping.id}>
                                   <TableCell className="font-medium">
-                                    {mapping.name}
+                                    <div className="flex items-center gap-2">
+                                      {mapping.name}
+                                      <Badge variant="outline" className="text-xs font-normal bg-gray-50">
+                                        {mapping.columnCount || 0} cols
+                                      </Badge>
+                                    </div>
                                   </TableCell>
                                   <TableCell>
                                     <span className="font-mono text-xs bg-gray-100 p-1 rounded">

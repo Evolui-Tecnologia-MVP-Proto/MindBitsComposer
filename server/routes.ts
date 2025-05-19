@@ -204,7 +204,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const mappings = await storage.getAllMondayMappings();
-      res.json(mappings);
+      
+      // Para cada mapeamento, buscar a contagem de colunas mapeadas
+      const mappingsWithColumnCount = await Promise.all(
+        mappings.map(async (mapping) => {
+          try {
+            const columns = await storage.getMappingColumns(mapping.id);
+            return {
+              ...mapping,
+              columnCount: columns.length
+            };
+          } catch (error) {
+            console.error(`Erro ao buscar colunas para mapeamento ${mapping.id}:`, error);
+            return {
+              ...mapping,
+              columnCount: 0
+            };
+          }
+        })
+      );
+      
+      res.json(mappingsWithColumnCount);
     } catch (error) {
       console.error("Erro ao buscar mapeamentos:", error);
       res.status(500).send("Erro ao buscar mapeamentos");
