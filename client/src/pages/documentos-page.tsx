@@ -33,7 +33,8 @@ import {
   Image,
   FileJson,
   FileSpreadsheet,
-  FileX
+  FileX,
+  Pencil
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -357,10 +358,10 @@ export default function DocumentosPage() {
                               </td>
                               <td className="px-3 py-2 whitespace-nowrap text-right text-sm font-medium">
                                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                                  <Download className="h-4 w-4" />
+                                  <Pencil className="h-4 w-4 text-blue-500" />
                                 </Button>
                                 <Button variant="ghost" size="sm" className="h-7 w-7 p-0 ml-1">
-                                  <Eye className="h-4 w-4" />
+                                  <Trash2 className="h-4 w-4 text-red-500" />
                                 </Button>
                               </td>
                             </tr>
