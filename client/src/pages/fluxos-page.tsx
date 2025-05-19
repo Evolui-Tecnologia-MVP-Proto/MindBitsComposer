@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, memo } from 'react';
 import ReactFlow, {
   ReactFlowProvider,
   Controls,
@@ -12,7 +12,10 @@ import ReactFlow, {
   ConnectionLineType,
   NodeTypes,
   Node,
-  Edge
+  Edge,
+  Position,
+  Handle,
+  NodeProps
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
