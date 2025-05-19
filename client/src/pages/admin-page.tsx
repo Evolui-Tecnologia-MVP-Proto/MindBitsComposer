@@ -1088,7 +1088,7 @@ export default function AdminPage() {
                                     </span>
                                   </TableCell>
                                   <TableCell className="max-w-md truncate">
-                                    {mapping.description || "-"}
+                                    {mapping.name || "-"}
                                   </TableCell>
                                   <TableCell>
                                     {mapping.lastSync ? (
