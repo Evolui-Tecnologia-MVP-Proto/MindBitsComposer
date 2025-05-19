@@ -27,7 +27,7 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { PlusCircle, Pencil, Trash2, ExternalLink } from "lucide-react";
+import { PlusCircle, Pencil, Trash2, ExternalLink, Eye, EyeOff } from "lucide-react";
 import UserTable from "@/components/UserTable";
 
 // Tipo para representar o mapeamento de quadros
@@ -325,29 +325,27 @@ export default function AdminPage() {
                     API Key do Monday.com
                   </label>
                   <div className="mt-1 flex rounded-md shadow-sm">
-                    <div className="relative flex-1">
-                      <input
-                        type={showApiKey ? "text" : "password"}
-                        name="monday-api-key"
-                        id="monday-api-key"
-                        value={apiKey}
-                        onChange={(e) => setApiKey(e.target.value)}
-                        className="flex-1 min-w-0 block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-primary focus:border-primary"
-                        placeholder="Informe a chave de API do Monday.com"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowApiKey(!showApiKey)}
-                        className="absolute inset-y-0 right-0 px-3 flex items-center text-sm text-gray-600 hover:text-gray-900"
-                      >
-                        {showApiKey ? "Ocultar" : "Mostrar"}
-                      </button>
-                    </div>
+                    <input
+                      type={showApiKey ? "text" : "password"}
+                      name="monday-api-key"
+                      id="monday-api-key"
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      className="flex-1 min-w-0 block px-3 py-2 rounded-l-md border border-r-0 border-gray-300 focus:ring-primary focus:border-primary"
+                      placeholder="Informe a chave de API do Monday.com"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowApiKey(!showApiKey)}
+                      className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm bg-gray-50 text-gray-700 hover:bg-gray-100"
+                    >
+                      {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
                     <button
                       type="button"
                       onClick={saveApiKey}
                       disabled={apiKeySaving}
-                      className="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md shadow-sm text-white bg-primary hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {apiKeySaving ? (
                         <>
