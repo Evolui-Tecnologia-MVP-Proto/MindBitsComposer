@@ -280,6 +280,13 @@ export class MemStorage implements IStorage {
     this.users.set(id, user);
   }
   
+  async deleteUser(id: number): Promise<void> {
+    if (!this.users.has(id)) {
+      throw new Error("Usuário não encontrado");
+    }
+    this.users.delete(id);
+  }
+  
   // Template operations
   async getTemplate(id: string): Promise<Template | undefined> {
     return this.templates.get(id);
