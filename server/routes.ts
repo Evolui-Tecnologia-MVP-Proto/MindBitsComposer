@@ -264,7 +264,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Salva na nova estrutura e mantém compatibilidade com código legado
       await storage.saveMondayApiKey(apiKey);
       res.json({ success: true });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao salvar chave da API:", error);
       res.status(500).send("Erro ao salvar chave da API");
     }

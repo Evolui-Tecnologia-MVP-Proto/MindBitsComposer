@@ -8,6 +8,7 @@ import AuthPage from "@/pages/auth-page";
 import HomePage from "@/pages/home-page";
 import AdminPage from "@/pages/admin-page";
 import PreferencesPage from "@/pages/preferences-page";
+import ConfiguracoesPage from "@/pages/configuracoes-page";
 import TemplatesPage from "@/pages/templates-page";
 import EditorPage from "@/pages/editor-page";
 import FluxosPage from "@/pages/fluxos-page-new";
@@ -26,6 +27,7 @@ function Router() {
       <ProtectedRoute path="/editor" component={EditorPage} />
       <ProtectedRoute path="/fluxos" component={FluxosPage} />
       <ProtectedRoute path="/documentos" component={DocumentosPage} />
+      <ProtectedRoute path="/configuracoes" component={ConfiguracoesPage} />
       <Route component={NotFound} />
     </Switch>
   );
