@@ -347,7 +347,6 @@ const FlowCanvas = () => {
             connectionLineType={ConnectionLineType.SmoothStep}
           >
             <Controls />
-            <MiniMap />
             <Background color="#f0f0f0" gap={12} size={1} />
           </ReactFlow>
         </div>
