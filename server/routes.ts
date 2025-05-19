@@ -2,7 +2,8 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema } from "@shared/schema";
+import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
+import { db } from "./db";
 import { ZodError } from "zod";
 import fetch from "node-fetch";
 
@@ -166,6 +167,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Monday.com integration routes
+  // Rotas para gerenciar conexões de serviço (tokens)
+  
+  // Listar todas as conexões de serviço
+  app.get("/api/services/connections", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const connections = await storage.getAllServiceConnections();
+      res.json(connections);
+    } catch (error: any) {
+      console.error("Erro ao listar conexões de serviço:", error);
+      res.status(500).send("Erro ao listar conexões de serviço");
+    }
+  });
+  
+  // Obter uma conexão específica por nome do serviço
+  app.get("/api/services/connections/:serviceName", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { serviceName } = req.params;
+    
+    try {
+      const connection = await storage.getServiceConnection(serviceName);
+      if (!connection) {
+        return res.status(404).send("Conexão de serviço não encontrada");
+      }
+      res.json(connection);
+    } catch (error: any) {
+      console.error(`Erro ao buscar conexão de serviço ${serviceName}:`, error);
+      res.status(500).send("Erro ao buscar conexão de serviço");
+    }
+  });
+  
+  // Criar ou atualizar uma conexão de serviço
+  app.post("/api/services/connections", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const connectionData = insertServiceConnectionSchema.parse(req.body);
+      const connection = await storage.saveServiceConnection(connectionData);
+      res.status(201).json(connection);
+    } catch (error: any) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ 
+          message: "Dados inválidos", 
+          errors: error.errors 
+        });
+      }
+      console.error("Erro ao salvar conexão de serviço:", error);
+      res.status(500).send("Erro ao salvar conexão de serviço");
+    }
+  });
+  
+  // Excluir uma conexão de serviço
+  app.delete("/api/services/connections/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      await storage.deleteServiceConnection(id);
+      res.status(204).send();
+    } catch (error: any) {
+      console.error(`Erro ao excluir conexão de serviço ${id}:`, error);
+      res.status(500).send("Erro ao excluir conexão de serviço");
+    }
+  });
+  
+  // Rotas legadas para compatibilidade com código existente
+  
   // Get API Key
   app.get("/api/monday/apikey", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
@@ -173,7 +244,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const apiKey = await storage.getMondayApiKey();
       res.json({ apiKey: apiKey || "" });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao buscar chave da API:", error);
       res.status(500).send("Erro ao buscar chave da API");
     }
@@ -190,6 +261,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
+      // Salva na nova estrutura e mantém compatibilidade com código legado
       await storage.saveMondayApiKey(apiKey);
       res.json({ success: true });
     } catch (error) {
