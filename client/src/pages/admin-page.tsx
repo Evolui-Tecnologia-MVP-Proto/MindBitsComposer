@@ -48,6 +48,9 @@ export default function AdminPage() {
   const [selectedMapping, setSelectedMapping] = useState<BoardMapping | null>(null);
   const [isTesting, setIsTesting] = useState(false);
   const [testResult, setTestResult] = useState<{success: boolean; message: string} | null>(null);
+  const [apiKey, setApiKey] = useState("");
+  const [apiKeySaving, setApiKeySaving] = useState(false);
+  const [apiKeySaved, setApiKeySaved] = useState(false);
   
   // Dados de exemplo para a tabela
   const [boardMappings, setBoardMappings] = useState<BoardMapping[]>([
@@ -130,6 +133,29 @@ export default function AdminPage() {
       
       setIsTesting(false);
     }, 1500);
+  };
+
+  const saveApiKey = () => {
+    if (!apiKey.trim()) {
+      alert("Por favor, informe uma chave de API válida.");
+      return;
+    }
+
+    setApiKeySaving(true);
+
+    // Simula o envio da API Key para o servidor
+    setTimeout(() => {
+      // Aqui seria feita a chamada para a API para salvar a chave
+      console.log("API Key salva:", apiKey);
+      
+      setApiKeySaving(false);
+      setApiKeySaved(true);
+      
+      // Reset o estado de "salvo" após alguns segundos
+      setTimeout(() => {
+        setApiKeySaved(false);
+      }, 3000);
+    }, 1000);
   };
 
   // Modal de configuração do mapeamento
@@ -302,16 +328,34 @@ export default function AdminPage() {
                       type="password"
                       name="monday-api-key"
                       id="monday-api-key"
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
                       className="flex-1 min-w-0 block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-primary focus:border-primary"
                       placeholder="Informe a chave de API do Monday.com"
                     />
                     <button
                       type="button"
-                      className="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                      onClick={saveApiKey}
+                      disabled={apiKeySaving}
+                      className="ml-3 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Salvar
+                      {apiKeySaving ? (
+                        <>
+                          <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent mr-1.5 align-[-2px]"></span>
+                          Salvando...
+                        </>
+                      ) : apiKeySaved ? (
+                        "Salvo ✓"
+                      ) : (
+                        "Salvar"
+                      )}
                     </button>
                   </div>
+                  {apiKeySaved && (
+                    <div className="mt-2 px-3 py-2 bg-green-50 text-green-700 border border-green-200 rounded-md text-sm">
+                      Chave de API salva com sucesso!
+                    </div>
+                  )}
                   <p className="mt-2 text-sm text-gray-500">
                     A API Key é necessária para integrar com o Monday.com. Você pode encontrá-la nas configurações da sua conta.
                   </p>
