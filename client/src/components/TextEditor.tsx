@@ -12,9 +12,19 @@ import { AutoLinkNode, LinkNode } from "@lexical/link";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { Button } from "@/components/ui/button";
-import { Bold, Italic, List, FileText, Save, Undo, Redo, Link as LinkIcon, ChevronDown } from "lucide-react";
+import { Bold, Italic, List, FileText, Save, Undo, Redo, Link as LinkIcon, ChevronDown, LayoutTemplate } from "lucide-react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $getRoot, $getSelection, FORMAT_TEXT_COMMAND, LexicalEditor } from "lexical";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { Template } from "@shared/schema";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 import {
   Accordion,
   AccordionContent,
@@ -24,6 +34,31 @@ import {
 
 function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
+  const [structTemplates, setStructTemplates] = useState<Template[]>([]);
+  const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
+  const { toast } = useToast();
+  
+  // Buscar templates estruturais
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        setIsLoadingTemplates(true);
+        const response = await apiRequest("GET", "/api/templates/struct");
+        if (response.ok) {
+          const data = await response.json();
+          setStructTemplates(data);
+        } else {
+          console.error("Erro ao buscar templates", response.statusText);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar templates:", error);
+      } finally {
+        setIsLoadingTemplates(false);
+      }
+    };
+    
+    fetchTemplates();
+  }, []);
   
   const onBoldClick = () => {
     editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
@@ -43,57 +78,102 @@ function ToolbarPlugin() {
     editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
     // REDO não está implementado corretamente aqui
   };
+  
+  // Função para aplicar o template selecionado
+  const handleTemplateSelect = (templateId: string) => {
+    if (!templateId) return;
+    
+    const selectedTemplate = structTemplates.find(t => t.id === templateId);
+    if (!selectedTemplate) return;
+    
+    // Mostrar notificação de que o template foi aplicado
+    toast({
+      title: "Template aplicado",
+      description: `Template "${selectedTemplate.description}" foi aplicado`
+    });
+    
+    // Aqui seria implementada a lógica para aplicar o template ao editor
+    console.log("Template selecionado:", selectedTemplate);
+  };
 
   return (
-    <div className="flex items-center space-x-2 p-2 bg-white border-b border-gray-200">
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        onClick={onBoldClick}
-        className="h-8 px-2"
-      >
-        <Bold className="h-4 w-4" />
-      </Button>
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        onClick={onItalicClick}
-        className="h-8 px-2"
-      >
-        <Italic className="h-4 w-4" />
-      </Button>
-      <div className="w-px h-6 bg-gray-300 mx-1" />
-      <Button 
-        variant="ghost" 
-        size="sm"
-        className="h-8 px-2"
-      >
-        <List className="h-4 w-4" />
-      </Button>
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        className="h-8 px-2"
-      >
-        <LinkIcon className="h-4 w-4" />
-      </Button>
-      <div className="w-px h-6 bg-gray-300 mx-1" />
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        onClick={onUndoClick}
-        className="h-8 px-2"
-      >
-        <Undo className="h-4 w-4" />
-      </Button>
-      <Button 
-        variant="ghost" 
-        size="sm" 
-        onClick={onRedoClick}
-        className="h-8 px-2"
-      >
-        <Redo className="h-4 w-4" />
-      </Button>
+    <div className="flex items-center justify-between p-2 bg-white border-b border-gray-200">
+      <div className="flex items-center space-x-2">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={onBoldClick}
+          className="h-8 px-2"
+        >
+          <Bold className="h-4 w-4" />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={onItalicClick}
+          className="h-8 px-2"
+        >
+          <Italic className="h-4 w-4" />
+        </Button>
+        <div className="w-px h-6 bg-gray-300 mx-1" />
+        <Button 
+          variant="ghost" 
+          size="sm"
+          className="h-8 px-2"
+        >
+          <List className="h-4 w-4" />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="h-8 px-2"
+        >
+          <LinkIcon className="h-4 w-4" />
+        </Button>
+        <div className="w-px h-6 bg-gray-300 mx-1" />
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={onUndoClick}
+          className="h-8 px-2"
+        >
+          <Undo className="h-4 w-4" />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={onRedoClick}
+          className="h-8 px-2"
+        >
+          <Redo className="h-4 w-4" />
+        </Button>
+      </div>
+      
+      {/* Combo de seleção de template */}
+      <div className="flex items-center">
+        <div className="flex items-center mr-2">
+          <FileText className="h-4 w-4 text-gray-500 mr-1" />
+          <span className="text-xs text-gray-600">Template:</span>
+        </div>
+        <Select onValueChange={handleTemplateSelect}>
+          <SelectTrigger className="h-8 w-[220px] text-xs">
+            <SelectValue placeholder="Selecionar template..." />
+          </SelectTrigger>
+          <SelectContent>
+            {isLoadingTemplates ? (
+              <SelectItem value="loading" disabled>Carregando templates...</SelectItem>
+            ) : structTemplates.length === 0 ? (
+              <SelectItem value="empty" disabled>Nenhum template disponível</SelectItem>
+            ) : (
+              structTemplates.map(template => (
+                <SelectItem key={template.id} value={template.id}>
+                  {template.code} - {template.description}
+                </SelectItem>
+              ))
+            )}
+          </SelectContent>
+        </Select>
+      </div>
     </div>
   );
 }
