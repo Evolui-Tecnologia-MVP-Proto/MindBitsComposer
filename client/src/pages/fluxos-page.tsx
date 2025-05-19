@@ -261,7 +261,6 @@ const FlowCanvas = () => {
         <div className="flex items-center space-x-4">
           {/* Combo de Nódulos */}
           <div className="w-64">
-            <Label htmlFor="node-type">Adicionar Nódulo</Label>
             <Select onValueChange={(value) => {
               if (!value) return;
               
@@ -293,7 +292,7 @@ const FlowCanvas = () => {
                 setNodes((nds) => nds.concat(newNode));
               }
             }}>
-              <SelectTrigger id="node-type" className="mt-1">
+              <SelectTrigger id="node-type">
                 <SelectValue placeholder="Adicionar nódulo..." />
               </SelectTrigger>
               <SelectContent>
