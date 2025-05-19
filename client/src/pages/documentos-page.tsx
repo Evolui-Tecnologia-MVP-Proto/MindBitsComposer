@@ -29,7 +29,11 @@ import {
   FileText,
   Eye,
   MoreHorizontal,
-  Trash2
+  Trash2,
+  Image,
+  FileJson,
+  FileSpreadsheet,
+  FileX
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -46,6 +50,16 @@ export default function DocumentosPage() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
 
+  // Definição dos tipos de anexos
+  type TipoAnexo = "Imagem" | "DOC" | "XLX" | "PDF" | "TXT" | "JSON" | "Outro";
+  
+  // Interface para anexos
+  interface Anexo {
+    id: number;
+    tipo: TipoAnexo;
+    nome: string;
+  }
+  
   // Dados de exemplo para documentos
   const documentosIntegrados = [
     { 
@@ -58,7 +72,12 @@ export default function DocumentosPage() {
       dataOrigem: "18/05/2025",
       dataIntegracao: "19/05/2025",
       statusOrigem: "Completo",
-      descricaoOrigem: "Contrato de prestação de serviços aprovado pelo cliente. Este documento serve como base para todas as atividades relacionadas ao projeto e define escopo, prazos e termos de pagamento."
+      descricaoOrigem: "Contrato de prestação de serviços aprovado pelo cliente. Este documento serve como base para todas as atividades relacionadas ao projeto e define escopo, prazos e termos de pagamento.",
+      anexos: [
+        { id: 1, tipo: "PDF" as TipoAnexo, nome: "Contrato_Assinado.pdf" },
+        { id: 2, tipo: "DOC" as TipoAnexo, nome: "Termos_Adicionais.docx" },
+        { id: 3, tipo: "Imagem" as TipoAnexo, nome: "Assinatura_Cliente.jpg" }
+      ]
     },
     { 
       id: 2, 
@@ -70,7 +89,13 @@ export default function DocumentosPage() {
       dataOrigem: "15/05/2025",
       dataIntegracao: "18/05/2025",
       statusOrigem: "Aprovado",
-      descricaoOrigem: "Proposta comercial final enviada ao cliente com detalhamento dos serviços, cronograma e valores."
+      descricaoOrigem: "Proposta comercial final enviada ao cliente com detalhamento dos serviços, cronograma e valores.",
+      anexos: [
+        { id: 4, tipo: "XLX" as TipoAnexo, nome: "Planilha_Custos.xlsx" },
+        { id: 5, tipo: "PDF" as TipoAnexo, nome: "Proposta_Final.pdf" },
+        { id: 6, tipo: "Imagem" as TipoAnexo, nome: "Logo_Cliente.png" },
+        { id: 7, tipo: "JSON" as TipoAnexo, nome: "Dados_Integração.json" }
+      ]
     },
     { 
       id: 3, 
@@ -82,7 +107,12 @@ export default function DocumentosPage() {
       dataOrigem: "12/05/2025",
       dataIntegracao: "15/05/2025",
       statusOrigem: "Desatualizado",
-      descricaoOrigem: "Versão inicial do termo de compromisso para o projeto. Este documento foi substituído pela versão final do contrato."
+      descricaoOrigem: "Versão inicial do termo de compromisso para o projeto. Este documento foi substituído pela versão final do contrato.",
+      anexos: [
+        { id: 8, tipo: "PDF" as TipoAnexo, nome: "Termo_Original.pdf" },
+        { id: 9, tipo: "TXT" as TipoAnexo, nome: "Comentários.txt" },
+        { id: 10, tipo: "Outro" as TipoAnexo, nome: "Arquivo_Sistema.bin" }
+      ]
     }
   ];
 
@@ -101,6 +131,25 @@ export default function DocumentosPage() {
     return tipo === "PDF" ? 
       <FileType className="h-5 w-5 text-red-500" /> : 
       <FileText className="h-5 w-5 text-blue-500" />;
+  };
+  
+  const getAnexoIcon = (tipo: TipoAnexo) => {
+    switch (tipo) {
+      case "PDF":
+        return <FileType className="h-5 w-5 text-red-500" />;
+      case "DOC":
+        return <FileText className="h-5 w-5 text-blue-500" />;
+      case "XLX":
+        return <FileSpreadsheet className="h-5 w-5 text-green-500" />;
+      case "Imagem":
+        return <Image className="h-5 w-5 text-purple-500" />;
+      case "TXT":
+        return <File className="h-5 w-5 text-gray-500" />;
+      case "JSON":
+        return <FileJson className="h-5 w-5 text-yellow-500" />;
+      default:
+        return <FileX className="h-5 w-5 text-gray-400" />;
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -275,6 +324,52 @@ export default function DocumentosPage() {
                     {selectedDocument.descricaoOrigem}
                   </p>
                 </div>
+                
+                {selectedDocument.anexos && selectedDocument.anexos.length > 0 && (
+                  <div className="col-span-2 mt-2">
+                    <p className="text-sm font-medium text-gray-500 mb-2">Anexos</p>
+                    <div className="bg-gray-50 rounded-md border border-gray-200">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-100">
+                          <tr>
+                            <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Tipo
+                            </th>
+                            <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Nome
+                            </th>
+                            <th scope="col" className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                              Ações
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {selectedDocument.anexos.map((anexo: Anexo) => (
+                            <tr key={anexo.id} className="hover:bg-gray-50">
+                              <td className="px-3 py-2 whitespace-nowrap">
+                                <div className="flex items-center">
+                                  {getAnexoIcon(anexo.tipo)}
+                                  <span className="ml-2 text-xs text-gray-500">{anexo.tipo}</span>
+                                </div>
+                              </td>
+                              <td className="px-3 py-2 whitespace-nowrap text-sm">
+                                {anexo.nome}
+                              </td>
+                              <td className="px-3 py-2 whitespace-nowrap text-right text-sm font-medium">
+                                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                                  <Download className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 ml-1">
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
             
