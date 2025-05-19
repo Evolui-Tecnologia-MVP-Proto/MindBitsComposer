@@ -252,11 +252,11 @@ export default function TextEditor() {
         <div className="border-t-0 border-l-0 border-r-0 border-b border-gray-200">
           <ToolbarPlugin />
         </div>
-        <div className="flex-1 overflow-auto p-4">
-          <div className="border rounded-md h-full min-h-[400px] flex flex-col">
+        <div className="flex-1 overflow-auto">
+          <div className="h-full min-h-[400px]">
             <RichTextPlugin
-              contentEditable={<ContentEditable className="outline-none p-4 h-full min-h-[400px] flex-1" />}
-              placeholder={<div className="absolute ml-4 mt-4 text-gray-400 pointer-events-none">Digite seu conteúdo aqui...</div>}
+              contentEditable={<ContentEditable className="outline-none p-6 h-full min-h-[400px]" />}
+              placeholder={<div className="absolute ml-6 mt-6 text-gray-400 pointer-events-none">Digite seu conteúdo aqui...</div>}
               ErrorBoundary={() => <div>Erro no editor!</div>}
             />
           </div>
