@@ -303,10 +303,6 @@ export default function TemplatesPage() {
     <div className="fade-in">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Templates</h1>
-        <Button onClick={() => setIsCreateModalOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Novo Template
-        </Button>
       </div>
       
       <Tabs 
@@ -321,11 +317,17 @@ export default function TemplatesPage() {
         
         <TabsContent value="struct" className="space-y-4">
           <Card>
-            <CardHeader>
-              <CardTitle>Struct Templates</CardTitle>
-              <CardDescription>
-                Templates estruturais para definição de modelos de dados e interfaces.
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Struct Templates</CardTitle>
+                <CardDescription>
+                  Templates estruturais para definição de modelos de dados e interfaces.
+                </CardDescription>
+              </div>
+              <Button onClick={() => setIsCreateModalOpen(true)} size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Novo Template
+              </Button>
             </CardHeader>
             <CardContent>
               {isLoading ? (
@@ -351,11 +353,17 @@ export default function TemplatesPage() {
         
         <TabsContent value="output" className="space-y-4">
           <Card>
-            <CardHeader>
-              <CardTitle>Out Templates</CardTitle>
-              <CardDescription>
-                Templates de saída para geração de relatórios e documentos.
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Out Templates</CardTitle>
+                <CardDescription>
+                  Templates de saída para geração de relatórios e documentos.
+                </CardDescription>
+              </div>
+              <Button onClick={() => setIsCreateModalOpen(true)} size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Novo Template
+              </Button>
             </CardHeader>
             <CardContent>
               {isLoading ? (
