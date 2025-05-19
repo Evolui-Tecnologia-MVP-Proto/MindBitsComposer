@@ -75,6 +75,15 @@ export const mappingColumns = pgTable("mapping_columns", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const serviceConnections = pgTable("service_connections", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  serviceName: text("service_name").notNull().unique(),
+  token: text("token").notNull(),
+  description: text("description").default(""),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
@@ -100,6 +109,12 @@ export const insertMondayColumnSchema = createInsertSchema(mondayColumns).omit({
 });
 
 export const insertMappingColumnSchema = createInsertSchema(mappingColumns).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertServiceConnectionSchema = createInsertSchema(serviceConnections).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
