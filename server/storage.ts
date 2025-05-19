@@ -1,4 +1,4 @@
-import { users, templates, type User, type InsertUser, type Template, type InsertTemplate, UserStatus, UserRole, TemplateType } from "@shared/schema";
+import { users, templates, mondayMappings, type User, type InsertUser, type Template, type InsertTemplate, type MondayMapping, type InsertMondayMapping, UserStatus, UserRole, TemplateType } from "@shared/schema";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
 import session from "express-session";
@@ -32,6 +32,17 @@ export interface IStorage {
   getTemplatesByType(type: TemplateType): Promise<Template[]>;
   updateTemplate(id: string, data: Partial<Template>): Promise<Template>;
   deleteTemplate(id: string): Promise<void>;
+  
+  // Monday Mapping operations
+  getMondayMapping(id: string): Promise<MondayMapping | undefined>;
+  getMondayMappingByBoardId(boardId: string): Promise<MondayMapping | undefined>;
+  createMondayMapping(mapping: InsertMondayMapping): Promise<MondayMapping>;
+  getAllMondayMappings(): Promise<MondayMapping[]>;
+  updateMondayMapping(id: string, data: Partial<MondayMapping>): Promise<MondayMapping>;
+  updateMondayMappingLastSync(id: string): Promise<MondayMapping>;
+  deleteMondayMapping(id: string): Promise<void>;
+  saveMondayApiKey(apiKey: string): Promise<void>;
+  getMondayApiKey(): Promise<string | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
