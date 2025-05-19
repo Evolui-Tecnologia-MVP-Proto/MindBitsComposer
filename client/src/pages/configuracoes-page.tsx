@@ -21,6 +21,7 @@ import {
   DialogHeader,
   DialogTitle
 } from "@/components/ui/dialog";
+import type { ServiceConnection as ServiceConnectionType } from "@shared/schema";
 import {
   Form,
   FormControl,
@@ -57,7 +58,6 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ServiceConnection } from "@shared/schema";
 
 // Schema para o formulário de conexão
 const connectionFormSchema = z.object({
@@ -79,11 +79,11 @@ export default function ConfiguracoesPage() {
   const { toast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedConnection, setSelectedConnection] = useState<ServiceConnection | null>(null);
+  const [selectedConnection, setSelectedConnection] = useState<ServiceConnectionType | null>(null);
   const [selectedServiceName, setSelectedServiceName] = useState<string>("");
 
   // Consulta para buscar todas as conexões
-  const { data: connections = [], isLoading } = useQuery({
+  const { data: connections = [], isLoading } = useQuery<ServiceConnectionType[]>({
     queryKey: ["/api/services/connections"],
     queryFn: async () => {
       const res = await fetch("/api/services/connections");
@@ -158,7 +158,7 @@ export default function ConfiguracoesPage() {
     setIsModalOpen(true);
   };
 
-  const openEditModal = (connection: ServiceConnection) => {
+  const openEditModal = (connection: ServiceConnectionType) => {
     form.reset({
       serviceName: connection.serviceName,
       token: connection.token,
@@ -169,7 +169,7 @@ export default function ConfiguracoesPage() {
     setIsModalOpen(true);
   };
 
-  const openDeleteDialog = (connection: ServiceConnection) => {
+  const openDeleteDialog = (connection: ServiceConnectionType) => {
     setSelectedConnection(connection);
     setIsDeleteDialogOpen(true);
   };
@@ -198,12 +198,12 @@ export default function ConfiguracoesPage() {
 
   // Verifica se uma conexão existe para um serviço específico
   const hasConnection = (serviceName: string): boolean => {
-    return connections.some((conn: ServiceConnection) => conn.serviceName === serviceName);
+    return connections.some((conn: ServiceConnectionType) => conn.serviceName === serviceName);
   };
 
   // Obtém conexão por nome do serviço
-  const getConnection = (serviceName: string): ServiceConnection | undefined => {
-    return connections.find((conn: ServiceConnection) => conn.serviceName === serviceName);
+  const getConnection = (serviceName: string): ServiceConnectionType | undefined => {
+    return connections.find((conn: ServiceConnectionType) => conn.serviceName === serviceName);
   };
 
   return (
@@ -322,7 +322,7 @@ export default function ConfiguracoesPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {connections.map((connection: ServiceConnection) => (
+                        {connections.map((connection: ServiceConnectionType) => (
                           <tr key={connection.id} className="border-b">
                             <td className="px-4 py-3">
                               <div className="flex items-center space-x-2">
