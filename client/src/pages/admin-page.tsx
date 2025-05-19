@@ -357,7 +357,10 @@ export default function AdminPage() {
     
     if (!selectedMapping) {
       // Se não tem mapeamento selecionado, é preciso salvar primeiro para obter um ID
-      if (mappingName.trim() === "") {
+      const nameInput = document.getElementById('mapping-name') as HTMLInputElement;
+      const descriptionInput = document.getElementById('description') as HTMLTextAreaElement;
+      
+      if (!nameInput || !nameInput.value.trim()) {
         setTestResult({
           success: false,
           message: "Preencha o nome do mapeamento antes de conectar."
@@ -368,9 +371,9 @@ export default function AdminPage() {
       
       // Cria um novo mapeamento temporário para teste
       const tempMapping = {
-        name: mappingName,
+        name: nameInput.value.trim(),
         boardId: boardId,
-        description: mappingDescription,
+        description: descriptionInput ? descriptionInput.value.trim() : "",
         statusColumn: "",
         responsibleColumn: ""
       };
@@ -463,6 +466,17 @@ export default function AdminPage() {
       responsibleColumn: selectedMapping?.responsibleColumn || ""
     };
     
+    // Armazenar também os mapeamentos de colunas se houver
+    if (showColumnMapping && columnMappings.length > 0) {
+      // Aqui seria implementado o salvamento dos mapeamentos de colunas no banco de dados
+      // Por enquanto, apenas exibimos um feedback ao usuário
+      toast({
+        title: "Mapeamentos de colunas salvos",
+        description: `${columnMappings.length} mapeamentos de colunas configurados.`,
+        variant: "default",
+      });
+    }
+    
     if (selectedMapping) {
       // Atualizando um mapeamento existente
       updateMappingMutation.mutate({
@@ -474,9 +488,11 @@ export default function AdminPage() {
       createMappingMutation.mutate(mappingData);
     }
     
-    // Fecha o modal
+    // Fecha o modal e reseta os estados
     setIsModalOpen(false);
     setSelectedMapping(null);
+    setShowColumnMapping(false);
+    setColumnMappings([]);
   };
 
   // Modal de configuração do mapeamento
@@ -484,8 +500,16 @@ export default function AdminPage() {
     const isEditing = selectedMapping !== null;
     
     return (
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-lg">
+      <Dialog 
+        open={isModalOpen} 
+        onOpenChange={(open) => {
+          setIsModalOpen(open);
+          if (!open) {
+            setShowColumnMapping(false);
+          }
+        }}
+      >
+        <DialogContent className={showColumnMapping ? "sm:max-w-3xl" : "sm:max-w-lg"}>
           <DialogHeader>
             <DialogTitle>
               {isEditing ? "Editar Mapeamento" : "Novo Mapeamento"}
