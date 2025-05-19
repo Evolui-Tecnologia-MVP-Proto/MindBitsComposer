@@ -267,28 +267,52 @@ const FlowCanvas = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="startNode" className="flex items-center">
-                  <div className="h-4 w-4 rounded-full bg-blue-600 mr-2 flex-shrink-0"></div>
-                  <span>Início</span>
+                  <div className="flex-1 flex items-center">
+                    <div className="h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                    </div>
+                    <span className="ml-3">Início</span>
+                  </div>
                 </SelectItem>
                 <SelectItem value="elaboreNode" className="flex items-center">
-                  <div className="h-4 w-4 rounded bg-green-600 mr-2 flex-shrink-0"></div>
-                  <span>Elaborar</span>
+                  <div className="flex-1 flex items-center">
+                    <div className="h-5 w-5 rounded-lg bg-green-600 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </div>
+                    <span className="ml-3">Elaborar</span>
+                  </div>
                 </SelectItem>
                 <SelectItem value="approveNode" className="flex items-center">
-                  <div className="h-4 w-4 rounded bg-indigo-600 mr-2 flex-shrink-0"></div>
-                  <span>Aprovar</span>
+                  <div className="flex-1 flex items-center">
+                    <div className="h-5 w-5 rounded-lg bg-indigo-600 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                    </div>
+                    <span className="ml-3">Aprovar</span>
+                  </div>
                 </SelectItem>
                 <SelectItem value="decisionNode" className="flex items-center">
-                  <div className="h-4 w-4 rotate-45 bg-amber-600 mr-2 flex-shrink-0"></div>
-                  <span>Decisão</span>
+                  <div className="flex-1 flex items-center">
+                    <div className="h-5 w-5 rotate-45 bg-amber-600 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform -rotate-45"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    </div>
+                    <span className="ml-3">Decisão</span>
+                  </div>
                 </SelectItem>
                 <SelectItem value="reviseNode" className="flex items-center">
-                  <div className="h-4 w-4 rounded bg-rose-600 mr-2 flex-shrink-0"></div>
-                  <span>Revisar</span>
+                  <div className="flex-1 flex items-center">
+                    <div className="h-5 w-5 rounded-lg bg-rose-600 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 2v6h6M21.5 22v-6h-6"></path><path d="M22 11.5A10 10 0 0 0 3 9"></path><path d="M2 13a10 10 0 0 0 19 2.5"></path></svg>
+                    </div>
+                    <span className="ml-3">Revisar</span>
+                  </div>
                 </SelectItem>
                 <SelectItem value="endNode" className="flex items-center">
-                  <div className="h-4 w-4 rounded-full bg-slate-600 mr-2 flex-shrink-0"></div>
-                  <span>Fim</span>
+                  <div className="flex-1 flex items-center">
+                    <div className="h-5 w-5 rounded-full bg-slate-600 flex items-center justify-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                    </div>
+                    <span className="ml-3">Fim</span>
+                  </div>
                 </SelectItem>
               </SelectContent>
             </Select>
