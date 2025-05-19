@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Template, TemplateType } from "@shared/schema";
-import { Plus, Edit, Trash2, FileCode, FileJson } from "lucide-react";
+import { Plus, Edit, Trash2, FileCode, FileJson, Copy } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import TemplateFormModal from "@/components/TemplateFormModal";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -149,6 +149,49 @@ export default function TemplatesPage() {
     }
   });
 
+  // Mutação para duplicar template
+  const duplicateTemplateMutation = useMutation({
+    mutationFn: async (template: Template) => {
+      // Criar uma cópia do template com um novo código
+      const newTemplate = {
+        code: `${template.code}-CÓPIA`,
+        description: `${template.description} (Cópia)`,
+        type: template.type,
+        structure: template.structure
+      };
+      
+      console.log("Duplicando template:", JSON.stringify(newTemplate, null, 2));
+      
+      const res = await apiRequest("POST", "/api/templates", newTemplate);
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Resposta do servidor:", errorText);
+        try {
+          const errorData = JSON.parse(errorText);
+          throw new Error(errorData.message || "Erro ao duplicar template");
+        } catch (e) {
+          throw new Error(errorText || "Erro ao duplicar template");
+        }
+      }
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/templates"] });
+      toast({
+        title: "Template duplicado",
+        description: "Uma cópia do template foi criada com sucesso",
+      });
+    },
+    onError: (error: any) => {
+      console.error("Erro ao duplicar template:", error);
+      toast({
+        title: "Erro ao duplicar template",
+        description: error.message || "Ocorreu um erro ao duplicar o template",
+        variant: "destructive",
+      });
+    }
+  });
+
   // Manipuladores
   const handleCreateTemplate = async (data: any) => {
     await createTemplateMutation.mutateAsync(data);
@@ -166,6 +209,10 @@ export default function TemplatesPage() {
     await deleteTemplateMutation.mutateAsync(selectedTemplate.id);
     setIsDeleteDialogOpen(false);
     setSelectedTemplate(null);
+  };
+  
+  const handleDuplicateTemplate = async (template: Template) => {
+    await duplicateTemplateMutation.mutateAsync(template);
   };
 
   const openEditModal = (template: Template) => {
@@ -222,7 +269,8 @@ export default function TemplatesPage() {
             <Button 
               variant="ghost" 
               size="sm" 
-              className="h-8 px-2"
+              className="h-8 px-2" 
+              title="Editar"
               onClick={() => openEditModal(template)}
             >
               <Edit className="h-4 w-4" />
@@ -230,7 +278,17 @@ export default function TemplatesPage() {
             <Button 
               variant="ghost" 
               size="sm" 
-              className="h-8 px-2 text-red-500 hover:text-red-700 hover:bg-red-50"
+              className="h-8 px-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50" 
+              title="Duplicar"
+              onClick={() => handleDuplicateTemplate(template)}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-8 px-2 text-red-500 hover:text-red-700 hover:bg-red-50" 
+              title="Excluir"
               onClick={() => openDeleteDialog(template)}
             >
               <Trash2 className="h-4 w-4" />
