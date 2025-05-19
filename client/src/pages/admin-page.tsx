@@ -402,6 +402,12 @@ export default function AdminPage() {
       description: "",
     });
     
+    // Define o resultado do teste como falso para um novo mapeamento
+    setTestResult({
+      success: false,
+      message: "Nenhuma coluna encontrada. Clique em 'Conectar' para buscar colunas."
+    });
+    
     setIsModalOpen(true);
   };
   
@@ -501,7 +507,7 @@ export default function AdminPage() {
                               variant="outline"
                               onClick={() => testMondayConnection(form.getValues().boardId)}
                               disabled={isTesting || !form.getValues().boardId}
-                              className={testResult ? (testResult.success ? "bg-green-600 hover:bg-green-700 text-white" : "bg-yellow-500 hover:bg-yellow-600 text-white") : ""}
+                              className={"bg-yellow-500 hover:bg-yellow-600 text-white " + (testResult && testResult.success ? "bg-green-600 hover:bg-green-700" : "")}
                             >
                               {isTesting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Link className="h-4 w-4 mr-2" />}
                               Testar
