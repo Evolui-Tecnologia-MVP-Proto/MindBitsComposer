@@ -837,8 +837,8 @@ export default function AdminPage() {
     );
   };
 
-  // Modal para mapeamento de colunas
-  const renderColumnsMapModal = () => {
+  // Modal para mapeamento de colunas detalhado
+  const renderColumnsDetailModal = () => {
     return (
       <Dialog open={isColumnMappingModalOpen} onOpenChange={setIsColumnMappingModalOpen}>
         <DialogContent className="sm:max-w-2xl">
@@ -1075,7 +1075,7 @@ export default function AdminPage() {
       </div>
       
       {renderConfigModal()}
-      {renderColumnsMapModal()}
+      {renderColumnMappingModal()}
       
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
