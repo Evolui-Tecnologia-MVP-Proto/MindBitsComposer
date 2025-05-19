@@ -95,13 +95,10 @@ export default function AdminPage() {
   // Estados para colunas do Monday
   const [mondayColumns, setMondayColumns] = useState<MondayColumnType[]>([]);
   const [isColumnMapModalOpen, setIsColumnMapModalOpen] = useState(false);
-  const [columnMappings, setColumnMappings] = useState<{id: string, mondayColumn: string, cpxField: string, transformFunction?: string}[]>([
-    {id: "1", mondayColumn: "Nome", cpxField: "titulo", transformFunction: ""},
-    {id: "2", mondayColumn: "Status", cpxField: "status", transformFunction: ""},
-    {id: "3", mondayColumn: "Data", cpxField: "data_criacao", transformFunction: ""}
-  ]);
-  const [currentMapping, setCurrentMapping] = useState<{mondayColumn: string, cpxField: string, transformFunction: string}>({
+  const [columnMappings, setColumnMappings] = useState<{id: string, mondayColumn: string, mondayColumnId: string, cpxField: string, transformFunction?: string}[]>([]);
+  const [currentMapping, setCurrentMapping] = useState<{mondayColumn: string, mondayColumnId: string, cpxField: string, transformFunction: string}>({
     mondayColumn: "",
+    mondayColumnId: "",
     cpxField: "",
     transformFunction: ""
   });

@@ -388,6 +388,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rotas para mapeamento de colunas
+  // Obter mapeamentos de colunas para um mapeamento
+  app.get("/api/monday/mappings/:id/column-mappings", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      // Verificar se o mapeamento existe
+      const existingMapping = await storage.getMondayMapping(id);
+      if (!existingMapping) {
+        return res.status(404).send("Mapeamento não encontrado");
+      }
+      
+      const mappingColumns = await storage.getMappingColumns(id);
+      res.json(mappingColumns);
+    } catch (error) {
+      console.error("Erro ao buscar mapeamentos de colunas:", error);
+      res.status(500).send("Erro ao buscar mapeamentos de colunas");
+    }
+  });
+  
+  // Criar mapeamento de coluna
+  app.post("/api/monday/mappings/:id/column-mappings", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      // Verificar se o mapeamento existe
+      const existingMapping = await storage.getMondayMapping(id);
+      if (!existingMapping) {
+        return res.status(404).send("Mapeamento não encontrado");
+      }
+      
+      const columnMapping = {
+        mappingId: id,
+        ...req.body
+      };
+      
+      const newColumnMapping = await storage.createMappingColumn(columnMapping);
+      res.status(201).json(newColumnMapping);
+    } catch (error) {
+      console.error("Erro ao criar mapeamento de coluna:", error);
+      res.status(500).send("Erro ao criar mapeamento de coluna");
+    }
+  });
+  
+  // Atualizar mapeamento de coluna
+  app.patch("/api/monday/mappings/column-mappings/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      // Verificar se o mapeamento de coluna existe
+      const existingColumnMapping = await storage.getMappingColumnById(id);
+      if (!existingColumnMapping) {
+        return res.status(404).send("Mapeamento de coluna não encontrado");
+      }
+      
+      const updatedColumnMapping = await storage.updateMappingColumn(id, req.body);
+      res.json(updatedColumnMapping);
+    } catch (error) {
+      console.error("Erro ao atualizar mapeamento de coluna:", error);
+      res.status(500).send("Erro ao atualizar mapeamento de coluna");
+    }
+  });
+  
+  // Excluir mapeamento de coluna
+  app.delete("/api/monday/mappings/column-mappings/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      // Verificar se o mapeamento de coluna existe
+      const existingColumnMapping = await storage.getMappingColumnById(id);
+      if (!existingColumnMapping) {
+        return res.status(404).send("Mapeamento de coluna não encontrado");
+      }
+      
+      await storage.deleteMappingColumn(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Erro ao excluir mapeamento de coluna:", error);
+      res.status(500).send("Erro ao excluir mapeamento de coluna");
+    }
+  });
+
   // Delete Monday mapping
   app.delete("/api/monday/mappings/:id", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
