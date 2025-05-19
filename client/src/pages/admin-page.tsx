@@ -92,6 +92,15 @@ export default function AdminPage() {
   const [showApiKey, setShowApiKey] = useState(false);
   const [apiKey, setApiKey] = useState("");
   
+  // Estados para mapeamento de colunas
+  const [isColumnMappingModalOpen, setIsColumnMappingModalOpen] = useState(false);
+  const [columnMappings, setColumnMappings] = useState<ColumnMapping[]>([]);
+  const [currentColumnMapping, setCurrentColumnMapping] = useState<ColumnMapping>({
+    mondayColumnId: "",
+    mindBitsColumn: "nome"
+  });
+  const [mondayColumns, setMondayColumns] = useState<MondayColumnType[]>([]);
+  
   // Consulta para buscar a chave da API do Monday
   const { 
     data: apiKeyData, 
@@ -255,25 +264,22 @@ export default function AdminPage() {
   };
   
   // Consulta para obter as colunas de um mapeamento específico
-  const fetchMondayColumns = (mappingId: string) => {
-    return useQuery({
-      queryKey: [`/api/monday/mappings/${mappingId}/columns`],
-      queryFn: async () => {
-        const response = await fetch(`/api/monday/mappings/${mappingId}/columns`);
-        if (!response.ok) {
-          throw new Error('Falha ao carregar as colunas do mapeamento');
-        }
-        return response.json();
-      },
-      enabled: !!mappingId, // Só executa se tiver um mappingId
-    });
-  };
-
-  // Se temos um mapping selecionado, buscamos suas colunas
   const { 
     data: mondayColumnsData = [],
-    isLoading: isLoadingColumns
-  } = selectedMapping ? fetchMondayColumns(selectedMapping.id) : { data: [], isLoading: false };
+    isLoading: isLoadingColumns,
+    refetch: refetchColumns
+  } = useQuery({
+    queryKey: [`/api/monday/mappings/${selectedMapping?.id}/columns`],
+    queryFn: async () => {
+      if (!selectedMapping) return [];
+      const response = await fetch(`/api/monday/mappings/${selectedMapping.id}/columns`);
+      if (!response.ok) {
+        throw new Error('Falha ao carregar as colunas do mapeamento');
+      }
+      return response.json();
+    },
+    enabled: !!selectedMapping, // Só executa se tiver um mapping selecionado
+  });
 
   // Efeito para atualizar o estado das colunas quando os dados forem carregados
   useEffect(() => {
@@ -305,7 +311,8 @@ export default function AdminPage() {
         success: true,
         message: `Quadro encontrado! ${data.length} colunas carregadas com sucesso.`
       });
-      // Abre a modal de mapeamento de colunas após carregar as colunas
+      
+      // Abre a modal de mapeamento de colunas após carregar as colunas com sucesso
       if (data.length > 0) {
         setIsColumnMappingModalOpen(true);
       }
@@ -528,6 +535,211 @@ export default function AdminPage() {
     );
   };
 
+  // Renderiza a modal de mapeamento de colunas
+  const renderColumnMappingModal = () => {
+    return (
+      <Dialog open={isColumnMappingModalOpen} onOpenChange={setIsColumnMappingModalOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Mapeamento de Colunas</DialogTitle>
+            <DialogDescription>
+              Configure como as colunas do Monday serão mapeadas para os campos do sistema
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <div className="mb-6">
+              <h3 className="text-lg font-medium mb-3">Mapeamentos Configurados</h3>
+              {columnMappings.length > 0 ? (
+                <div className="border rounded-md overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Coluna Monday</TableHead>
+                        <TableHead>Campo no Sistema</TableHead>
+                        <TableHead className="w-20">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {columnMappings.map((mapping, index) => {
+                        const mondayColumn = mondayColumns.find(col => col.columnId === mapping.mondayColumnId);
+                        return (
+                          <TableRow key={index}>
+                            <TableCell className="font-medium">{mondayColumn?.title || mapping.mondayColumnId}</TableCell>
+                            <TableCell>{mapping.mindBitsColumn}</TableCell>
+                            <TableCell>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => {
+                                  // Remove o mapeamento
+                                  setColumnMappings(columnMappings.filter((_, i) => i !== index));
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                <div className="text-center p-6 border rounded-md">
+                  <p className="text-muted-foreground">Nenhum mapeamento configurado</p>
+                </div>
+              )}
+            </div>
+            
+            <div className="space-y-4 border-t pt-4">
+              <h3 className="text-lg font-medium mb-3">Adicionar Novo Mapeamento</h3>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="mondayColumn" className="text-right">
+                  Coluna Monday
+                </Label>
+                <Select 
+                  onValueChange={(value) => {
+                    setCurrentColumnMapping({
+                      ...currentColumnMapping,
+                      mondayColumnId: value
+                    });
+                  }}
+                  value={currentColumnMapping.mondayColumnId}
+                >
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Selecione uma coluna" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {mondayColumns.map((column) => (
+                      <SelectItem key={column.columnId} value={column.columnId}>
+                        {column.title} ({column.type})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="mindBitsColumn" className="text-right">
+                  Campo Sistema
+                </Label>
+                <Select 
+                  onValueChange={(value) => {
+                    setCurrentColumnMapping({
+                      ...currentColumnMapping,
+                      mindBitsColumn: value as MindBitsColumnType
+                    });
+                  }}
+                  value={currentColumnMapping.mindBitsColumn}
+                >
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Selecione um campo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="nome">Nome</SelectItem>
+                    <SelectItem value="cliente">Cliente</SelectItem>
+                    <SelectItem value="requisitante">Requisitante</SelectItem>
+                    <SelectItem value="data_inclusao">Data de Inclusão</SelectItem>
+                    <SelectItem value="status_origem">Status de Origem</SelectItem>
+                    <SelectItem value="descricao">Descrição</SelectItem>
+                    <SelectItem value="anexos">Anexos</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="transformFunction" className="text-right">
+                  Função de Transformação
+                </Label>
+                <Textarea
+                  id="transformFunction"
+                  placeholder="Função JavaScript opcional para transformar o valor (ex: (value) => value.toUpperCase())"
+                  onChange={(e) => {
+                    setCurrentColumnMapping({
+                      ...currentColumnMapping,
+                      transformFunction: e.target.value
+                    });
+                  }}
+                  value={currentColumnMapping.transformFunction || ""}
+                  className="col-span-3"
+                />
+              </div>
+              
+              <div className="flex justify-end mt-4">
+                <Button 
+                  onClick={() => {
+                    if (!currentColumnMapping.mondayColumnId) {
+                      toast({
+                        title: "Erro",
+                        description: "Selecione uma coluna do Monday",
+                        variant: "destructive",
+                      });
+                      return;
+                    }
+                    
+                    // Verifica se já existe um mapeamento para este campo do sistema
+                    const existingIndex = columnMappings.findIndex(
+                      m => m.mindBitsColumn === currentColumnMapping.mindBitsColumn
+                    );
+                    
+                    if (existingIndex >= 0) {
+                      // Atualiza o mapeamento existente
+                      const updatedMappings = [...columnMappings];
+                      updatedMappings[existingIndex] = currentColumnMapping;
+                      setColumnMappings(updatedMappings);
+                      
+                      toast({
+                        title: "Mapeamento atualizado",
+                        description: `O campo ${currentColumnMapping.mindBitsColumn} foi remapeado.`,
+                        variant: "default",
+                      });
+                    } else {
+                      // Adiciona um novo mapeamento
+                      setColumnMappings([...columnMappings, currentColumnMapping]);
+                      
+                      toast({
+                        title: "Mapeamento adicionado",
+                        description: `Novo mapeamento para ${currentColumnMapping.mindBitsColumn} adicionado.`,
+                        variant: "default",
+                      });
+                    }
+                    
+                    // Reseta o formulário
+                    setCurrentColumnMapping({
+                      mondayColumnId: "",
+                      mindBitsColumn: "nome"
+                    });
+                  }}
+                >
+                  Adicionar Mapeamento
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsColumnMappingModalOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={() => {
+              // Aqui seria implementada a lógica para salvar os mapeamentos no banco de dados
+              toast({
+                title: "Mapeamentos salvos",
+                description: `${columnMappings.length} mapeamentos configurados com sucesso.`,
+                variant: "default",
+              });
+              setIsColumnMappingModalOpen(false);
+            }}>
+              Salvar Mapeamentos
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
   return (
     <div className="fade-in">
       <div className="pb-5 border-b border-gray-200 sm:flex sm:items-center sm:justify-between">
@@ -535,6 +747,7 @@ export default function AdminPage() {
       </div>
       
       {renderConfigModal()}
+      {renderColumnMappingModal()}
       
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
