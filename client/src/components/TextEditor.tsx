@@ -252,53 +252,14 @@ export default function TextEditor() {
         <div className="border-t-0 border-l-0 border-r-0 border-b border-gray-200">
           <ToolbarPlugin />
         </div>
-        <div className="flex-1 overflow-auto px-4 py-4">
-          <Accordion type="multiple" defaultValue={["sessao-01", "sessao-02", "sessao-03"]} className="w-full mb-6">
-            <AccordionItem value="sessao-01" className="border rounded-md mb-4">
-              <AccordionTrigger className="px-4 py-3 bg-gray-50 hover:bg-gray-100 font-medium">
-                Sessão 01
-              </AccordionTrigger>
-              <AccordionContent className="px-0 pt-2">
-                <div className="min-h-[150px]">
-                  <RichTextPlugin
-                    contentEditable={<ContentEditable className="outline-none px-4 py-2 min-h-[150px]" />}
-                    placeholder={<div className="absolute ml-4 mt-2 text-gray-400 pointer-events-none">Conteúdo da sessão 01...</div>}
-                    ErrorBoundary={() => <div>Erro no editor!</div>}
-                  />
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-            
-            <AccordionItem value="sessao-02" className="border rounded-md mb-4">
-              <AccordionTrigger className="px-4 py-3 bg-gray-50 hover:bg-gray-100 font-medium">
-                Sessão 02
-              </AccordionTrigger>
-              <AccordionContent className="px-0 pt-2">
-                <div className="min-h-[150px]">
-                  <RichTextPlugin
-                    contentEditable={<ContentEditable className="outline-none px-4 py-2 min-h-[150px]" />}
-                    placeholder={<div className="absolute ml-4 mt-2 text-gray-400 pointer-events-none">Conteúdo da sessão 02...</div>}
-                    ErrorBoundary={() => <div>Erro no editor!</div>}
-                  />
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-            
-            <AccordionItem value="sessao-03" className="border rounded-md mb-4">
-              <AccordionTrigger className="px-4 py-3 bg-gray-50 hover:bg-gray-100 font-medium">
-                Sessão 03
-              </AccordionTrigger>
-              <AccordionContent className="px-0 pt-2">
-                <div className="min-h-[150px]">
-                  <RichTextPlugin
-                    contentEditable={<ContentEditable className="outline-none px-4 py-2 min-h-[150px]" />}
-                    placeholder={<div className="absolute ml-4 mt-2 text-gray-400 pointer-events-none">Conteúdo da sessão 03...</div>}
-                    ErrorBoundary={() => <div>Erro no editor!</div>}
-                  />
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+        <div className="flex-1 overflow-auto p-4">
+          <div className="border rounded-md min-h-[400px]">
+            <RichTextPlugin
+              contentEditable={<ContentEditable className="outline-none p-4 min-h-[400px]" />}
+              placeholder={<div className="absolute ml-4 mt-4 text-gray-400 pointer-events-none">Digite seu conteúdo aqui...</div>}
+              ErrorBoundary={() => <div>Erro no editor!</div>}
+            />
+          </div>
         </div>
         <HistoryPlugin />
         <AutoFocusPlugin />
