@@ -1,4 +1,8 @@
-import { users, templates, mondayMappings, mondayColumns, mappingColumns, type User, type InsertUser, type Template, type InsertTemplate, type MondayMapping, type InsertMondayMapping, type MondayColumn, type InsertMondayColumn, type MappingColumn, type InsertMappingColumn, UserStatus, UserRole, TemplateType } from "@shared/schema";
+import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, 
+  type User, type InsertUser, type Template, type InsertTemplate, 
+  type MondayMapping, type InsertMondayMapping, type MondayColumn, type InsertMondayColumn, 
+  type MappingColumn, type InsertMappingColumn, type ServiceConnection, type InsertServiceConnection,
+  UserStatus, UserRole, TemplateType } from "@shared/schema";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
 import session from "express-session";
@@ -41,6 +45,15 @@ export interface IStorage {
   updateMondayMapping(id: string, data: Partial<MondayMapping>): Promise<MondayMapping>;
   updateMondayMappingLastSync(id: string): Promise<MondayMapping>;
   deleteMondayMapping(id: string): Promise<void>;
+  
+  // Service Connection operations
+  getServiceConnection(serviceName: string): Promise<ServiceConnection | undefined>;
+  saveServiceConnection(connection: InsertServiceConnection): Promise<ServiceConnection>;
+  getAllServiceConnections(): Promise<ServiceConnection[]>;
+  updateServiceConnection(id: string, data: Partial<ServiceConnection>): Promise<ServiceConnection>;
+  deleteServiceConnection(id: string): Promise<void>;
+  
+  // Métodos legados - serão removidos após migração
   saveMondayApiKey(apiKey: string): Promise<void>;
   getMondayApiKey(): Promise<string | undefined>;
   
@@ -246,47 +259,85 @@ export class DatabaseStorage implements IStorage {
       .where(eq(mondayMappings.id, id));
   }
 
-  // Armazenamento do token da API do Monday
-  // Como é apenas uma chave, vamos usar uma opção simplificada com uma tabela especial
-  async saveMondayApiKey(apiKey: string): Promise<void> {
-    // Vamos verificar se já temos um mapeamento especial para a chave API
-    const [apiKeyMapping] = await db
+  // Métodos para Service Connections
+  async getServiceConnection(serviceName: string): Promise<ServiceConnection | undefined> {
+    const [connection] = await db
       .select()
-      .from(mondayMappings)
-      .where(eq(mondayMappings.name, "API_KEY_STORAGE"));
+      .from(serviceConnections)
+      .where(eq(serviceConnections.serviceName, serviceName));
     
-    if (apiKeyMapping) {
-      // Se já existe, atualizamos
-      await db
-        .update(mondayMappings)
+    return connection;
+  }
+
+  async saveServiceConnection(connection: InsertServiceConnection): Promise<ServiceConnection> {
+    // Verificar se já existe uma conexão com este nome de serviço
+    const existingConnection = await this.getServiceConnection(connection.serviceName);
+    
+    if (existingConnection) {
+      // Se existe, atualiza
+      const [updated] = await db
+        .update(serviceConnections)
         .set({
-          statusColumn: apiKey
+          token: connection.token,
+          description: connection.description,
+          updatedAt: new Date()
         })
-        .where(eq(mondayMappings.id, apiKeyMapping.id));
+        .where(eq(serviceConnections.id, existingConnection.id))
+        .returning();
+      
+      return updated;
     } else {
-      // Se não existe, criamos um novo
-      await db
-        .insert(mondayMappings)
-        .values({
-          name: "API_KEY_STORAGE",
-          description: "Registro para armazenar a chave API do Monday",
-          boardId: "api_key_" + crypto.randomBytes(4).toString('hex'),
-          statusColumn: apiKey  // Usamos statusColumn para armazenar a chave
-        });
+      // Se não existe, cria
+      const [newConnection] = await db
+        .insert(serviceConnections)
+        .values(connection)
+        .returning();
+      
+      return newConnection;
     }
   }
 
-  async getMondayApiKey(): Promise<string | undefined> {
-    // Buscamos o registro especial que armazena a chave da API
-    const [apiKeyMapping] = await db
+  async getAllServiceConnections(): Promise<ServiceConnection[]> {
+    return await db
       .select()
-      .from(mondayMappings)
-      .where(eq(mondayMappings.name, "API_KEY_STORAGE"));
+      .from(serviceConnections);
+  }
+
+  async updateServiceConnection(id: string, data: Partial<ServiceConnection>): Promise<ServiceConnection> {
+    const [updated] = await db
+      .update(serviceConnections)
+      .set({
+        ...data,
+        updatedAt: new Date()
+      })
+      .where(eq(serviceConnections.id, id))
+      .returning();
     
-    if (apiKeyMapping?.statusColumn) {
-      return apiKeyMapping.statusColumn;
+    if (!updated) {
+      throw new Error("Conexão de serviço não encontrada");
     }
-    return undefined;
+    
+    return updated;
+  }
+
+  async deleteServiceConnection(id: string): Promise<void> {
+    await db
+      .delete(serviceConnections)
+      .where(eq(serviceConnections.id, id));
+  }
+  
+  // Métodos legados - usam a nova implementação internamente
+  async saveMondayApiKey(apiKey: string): Promise<void> {
+    await this.saveServiceConnection({
+      serviceName: "monday",
+      token: apiKey,
+      description: "API Key do Monday.com"
+    });
+  }
+
+  async getMondayApiKey(): Promise<string | undefined> {
+    const connection = await this.getServiceConnection("monday");
+    return connection?.token;
   }
   
   // Monday Column implementations
@@ -403,7 +454,8 @@ export class MemStorage implements IStorage {
   private mondayMappings: Map<string, MondayMapping>;
   private mondayColumns: Map<string, MondayColumn>;
   private mappingColumns: Map<string, MappingColumn>;
-  private mondayApiKey: string | undefined;
+  private serviceConnections: Map<string, ServiceConnection>;
+  private mondayApiKey: string | undefined; // Legado
   sessionStore: session.Store;
   currentId: number;
 
@@ -413,6 +465,7 @@ export class MemStorage implements IStorage {
     this.mondayMappings = new Map();
     this.mondayColumns = new Map();
     this.mappingColumns = new Map();
+    this.serviceConnections = new Map<string, ServiceConnection>();
     this.mondayApiKey = undefined;
     this.currentId = 1;
     this.sessionStore = new MemoryStore({
@@ -667,12 +720,87 @@ export class MemStorage implements IStorage {
     this.mondayMappings.delete(id);
   }
   
+  // Service Connection implementations
+  async getServiceConnection(serviceName: string): Promise<ServiceConnection | undefined> {
+    const serviceConnections = Array.from(this.serviceConnections.values());
+    return serviceConnections.find(conn => conn.serviceName === serviceName);
+  }
+  
+  async saveServiceConnection(connection: InsertServiceConnection): Promise<ServiceConnection> {
+    const existingConnection = await this.getServiceConnection(connection.serviceName);
+    
+    if (existingConnection) {
+      // Se existe, atualiza
+      const updatedConnection: ServiceConnection = {
+        ...existingConnection,
+        token: connection.token,
+        description: connection.description || existingConnection.description,
+        updatedAt: new Date()
+      };
+      
+      this.serviceConnections.set(existingConnection.id, updatedConnection);
+      return updatedConnection;
+    } else {
+      // Se não existe, cria um novo
+      const id = crypto.randomUUID();
+      const newConnection: ServiceConnection = {
+        id,
+        serviceName: connection.serviceName,
+        token: connection.token,
+        description: connection.description || "",
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      this.serviceConnections.set(id, newConnection);
+      return newConnection;
+    }
+  }
+  
+  async getAllServiceConnections(): Promise<ServiceConnection[]> {
+    return Array.from(this.serviceConnections.values());
+  }
+  
+  async updateServiceConnection(id: string, data: Partial<ServiceConnection>): Promise<ServiceConnection> {
+    const connection = this.serviceConnections.get(id);
+    
+    if (!connection) {
+      throw new Error("Conexão de serviço não encontrada");
+    }
+    
+    const updatedConnection: ServiceConnection = {
+      ...connection,
+      ...data,
+      updatedAt: new Date()
+    };
+    
+    this.serviceConnections.set(id, updatedConnection);
+    return updatedConnection;
+  }
+  
+  async deleteServiceConnection(id: string): Promise<void> {
+    if (!this.serviceConnections.has(id)) {
+      throw new Error("Conexão de serviço não encontrada");
+    }
+    
+    this.serviceConnections.delete(id);
+  }
+  
+  // Métodos legados - usam a nova implementação internamente
   async saveMondayApiKey(apiKey: string): Promise<void> {
-    this.mondayApiKey = apiKey;
+    const connection: InsertServiceConnection = {
+      serviceName: "monday",
+      token: apiKey,
+      description: "API Key do Monday.com"
+    };
+    
+    await this.saveServiceConnection(connection);
+    this.mondayApiKey = apiKey; // Mantém compatibilidade
   }
   
   async getMondayApiKey(): Promise<string | undefined> {
-    return this.mondayApiKey;
+    const connection = await this.getServiceConnection("monday");
+    return connection?.token || this.mondayApiKey; // Busca na nova implementação ou no legado
   }
   
   // Monday Column operations

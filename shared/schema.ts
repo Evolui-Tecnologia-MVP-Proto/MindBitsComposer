@@ -134,3 +134,6 @@ export type MondayColumn = typeof mondayColumns.$inferSelect;
 
 export type InsertMappingColumn = z.infer<typeof insertMappingColumnSchema>;
 export type MappingColumn = typeof mappingColumns.$inferSelect;
+
+export type InsertServiceConnection = z.infer<typeof insertServiceConnectionSchema>;
+export type ServiceConnection = typeof serviceConnections.$inferSelect;
