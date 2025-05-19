@@ -198,30 +198,77 @@ export default function DocumentosPage() {
       <TableCaption>{documentos.length === 0 ? "Nenhum documento encontrado" : "Lista de documentos"}</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[120px]">Tipo</TableHead>
-          <TableHead>Nome do Documento</TableHead>
-          <TableHead>Data</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead className="text-right">Ações</TableHead>
+          {activeTab === "integrados" ? (
+            <>
+              <TableHead>Origem</TableHead>
+              <TableHead>Nome do Documento</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Data Origem</TableHead>
+              <TableHead>Data Integração</TableHead>
+              <TableHead>Status Origem</TableHead>
+              <TableHead>Anexos</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
+            </>
+          ) : (
+            <>
+              <TableHead className="w-[120px]">Tipo</TableHead>
+              <TableHead>Nome do Documento</TableHead>
+              <TableHead>Data</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
+            </>
+          )}
         </TableRow>
       </TableHeader>
       <TableBody>
         {documentos.map((documento) => (
           <TableRow key={documento.id}>
-            <TableCell>
-              <div className="flex items-center">
-                {getTipoIcon(documento.tipo)}
-                <span className="ml-2 text-xs text-gray-500">{documento.tipo}</span>
-              </div>
-            </TableCell>
-            <TableCell className="font-medium">{documento.nome}</TableCell>
-            <TableCell>
-              <div className="flex items-center text-gray-500 text-sm">
-                <Clock className="mr-1.5 h-3.5 w-3.5" />
-                {documento.data}
-              </div>
-            </TableCell>
-            <TableCell>{getStatusBadge(documento.status)}</TableCell>
+            {activeTab === "integrados" ? (
+              <>
+                <TableCell>
+                  <div className="flex items-center">
+                    {documento.origem === "Monday" ? (
+                      <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">Monday</div>
+                    ) : (
+                      <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-medium">EVO-CTx</div>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell className="font-medium">{documento.nome}</TableCell>
+                <TableCell>{getStatusBadge(documento.status)}</TableCell>
+                <TableCell className="text-sm text-gray-500">{documento.dataOrigem}</TableCell>
+                <TableCell className="text-sm text-gray-500">{documento.dataIntegracao}</TableCell>
+                <TableCell className="text-sm">{documento.statusOrigem}</TableCell>
+                <TableCell>
+                  {documento.anexos && documento.anexos.length > 0 ? (
+                    <Badge variant="outline" className="bg-amber-50 text-amber-700 hover:bg-amber-100">
+                      {documento.anexos.length} anexo{documento.anexos.length > 1 ? 's' : ''}
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="bg-gray-100 text-gray-500">
+                      Sem anexos
+                    </Badge>
+                  )}
+                </TableCell>
+              </>
+            ) : (
+              <>
+                <TableCell>
+                  <div className="flex items-center">
+                    {getTipoIcon(documento.tipo)}
+                    <span className="ml-2 text-xs text-gray-500">{documento.tipo}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="font-medium">{documento.nome}</TableCell>
+                <TableCell>
+                  <div className="flex items-center text-gray-500 text-sm">
+                    <Clock className="mr-1.5 h-3.5 w-3.5" />
+                    {documento.data}
+                  </div>
+                </TableCell>
+                <TableCell>{getStatusBadge(documento.status)}</TableCell>
+              </>
+            )}
             <TableCell className="text-right">
               <div className="flex justify-end space-x-2">
                 <Button 
