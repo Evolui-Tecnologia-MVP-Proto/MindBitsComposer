@@ -385,9 +385,38 @@ export default function AdminPage() {
         });
       });
     
+    // Carrega os mapeamentos de colunas
+    loadColumnMappings(mapping.id);
+    
     setIsModalOpen(true);
   };
   
+  // Função para carregar mapeamentos de colunas para um mapeamento
+  const loadColumnMappings = (mappingId: string) => {
+    fetch(`/api/monday/mappings/${mappingId}/column-mappings`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("Erro ao buscar mapeamentos de colunas");
+        }
+        return response.json();
+      })
+      .then(data => {
+        // Converte os dados recebidos para o formato esperado pelo estado
+        const formattedMappings = data.map((item: any) => ({
+          id: item.id,
+          mondayColumn: item.mondayColumnTitle,
+          mondayColumnId: item.mondayColumnId,
+          cpxField: item.cpxField,
+          transformFunction: item.transformFunction || ""
+        }));
+        setColumnMappings(formattedMappings);
+      })
+      .catch(error => {
+        console.error("Erro ao buscar mapeamentos de colunas:", error);
+        setColumnMappings([]);
+      });
+  };
+
   // Função para abrir o modal no modo criação
   const openCreateModal = () => {
     setSelectedMapping(null);
@@ -404,6 +433,9 @@ export default function AdminPage() {
       success: false,
       message: "Nenhuma coluna encontrada. Clique em 'Conectar' para buscar colunas."
     });
+    
+    // Limpa os mapeamentos de colunas
+    setColumnMappings([]);
     
     setIsModalOpen(true);
   };
@@ -586,6 +618,7 @@ export default function AdminPage() {
                       onClick={() => {
                         setCurrentMapping({
                           mondayColumn: "",
+                          mondayColumnId: "",
                           cpxField: "",
                           transformFunction: ""
                         });
@@ -619,6 +652,7 @@ export default function AdminPage() {
                                   onClick={() => {
                                     setCurrentMapping({
                                       mondayColumn: mapping.mondayColumn,
+                                      mondayColumnId: mapping.mondayColumnId,
                                       cpxField: mapping.cpxField,
                                       transformFunction: mapping.transformFunction || ""
                                     });
@@ -632,10 +666,41 @@ export default function AdminPage() {
                                   size="icon"
                                   className="text-red-500 hover:text-red-600"
                                   onClick={() => {
-                                    // Remove o mapeamento
-                                    setColumnMappings(
-                                      columnMappings.filter((m) => m.id !== mapping.id)
-                                    );
+                                    if (!selectedMapping) {
+                                      toast({
+                                        title: "Erro",
+                                        description: "Nenhum mapeamento selecionado",
+                                        variant: "destructive",
+                                      });
+                                      return;
+                                    }
+                                    
+                                    // Remove o mapeamento do servidor
+                                    fetch(`/api/monday/mappings/column-mappings/${mapping.id}`, {
+                                      method: "DELETE",
+                                    })
+                                      .then(response => {
+                                        if (!response.ok) {
+                                          throw new Error("Erro ao excluir mapeamento de coluna");
+                                        }
+                                        
+                                        // Remove o mapeamento do estado local
+                                        setColumnMappings(
+                                          columnMappings.filter((m) => m.id !== mapping.id)
+                                        );
+                                        
+                                        toast({
+                                          title: "Mapeamento excluído",
+                                          description: "O mapeamento de coluna foi excluído com sucesso",
+                                        });
+                                      })
+                                      .catch(error => {
+                                        toast({
+                                          title: "Erro",
+                                          description: error.message,
+                                          variant: "destructive",
+                                        });
+                                      });
                                   }}
                                 >
                                   <Trash2 className="h-4 w-4" />
@@ -759,32 +824,111 @@ export default function AdminPage() {
               Cancelar
             </Button>
             <Button onClick={() => {
-              // Adiciona ou atualiza o mapeamento
+              if (!selectedMapping) {
+                toast({
+                  title: "Erro",
+                  description: "Nenhum mapeamento selecionado",
+                  variant: "destructive",
+                });
+                return;
+              }
+
+              // Prepara os dados para salvar
+              const mappingData = {
+                mappingId: selectedMapping.id,
+                mondayColumnId: currentMapping.mondayColumnId || 
+                  mondayColumns.find(col => col.title === currentMapping.mondayColumn)?.columnId || "",
+                mondayColumnTitle: currentMapping.mondayColumn,
+                cpxField: currentMapping.cpxField,
+                transformFunction: currentMapping.transformFunction
+              };
+              
+              // Verifica se é uma edição ou uma criação
               const existingIndex = columnMappings.findIndex(
                 (m) => m.mondayColumn === currentMapping.mondayColumn
               );
               
-              if (existingIndex >= 0) {
+              if (existingIndex >= 0 && columnMappings[existingIndex].id !== "temp-id") {
                 // Atualiza um mapeamento existente
-                const updatedMappings = [...columnMappings];
-                updatedMappings[existingIndex] = {
-                  ...updatedMappings[existingIndex],
-                  mondayColumn: currentMapping.mondayColumn,
-                  cpxField: currentMapping.cpxField,
-                  transformFunction: currentMapping.transformFunction
-                };
-                setColumnMappings(updatedMappings);
+                const id = columnMappings[existingIndex].id;
+                
+                fetch(`/api/monday/mappings/column-mappings/${id}`, {
+                  method: "PATCH",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(mappingData),
+                })
+                  .then(response => {
+                    if (!response.ok) {
+                      throw new Error("Erro ao atualizar mapeamento de coluna");
+                    }
+                    return response.json();
+                  })
+                  .then(updatedMapping => {
+                    toast({
+                      title: "Mapeamento atualizado",
+                      description: "O mapeamento de coluna foi atualizado com sucesso",
+                    });
+                    
+                    // Atualiza o estado local
+                    const updatedMappings = [...columnMappings];
+                    updatedMappings[existingIndex] = {
+                      id: updatedMapping.id,
+                      mondayColumn: updatedMapping.mondayColumnTitle,
+                      mondayColumnId: updatedMapping.mondayColumnId,
+                      cpxField: updatedMapping.cpxField,
+                      transformFunction: updatedMapping.transformFunction
+                    };
+                    setColumnMappings(updatedMappings);
+                  })
+                  .catch(error => {
+                    toast({
+                      title: "Erro",
+                      description: error.message,
+                      variant: "destructive",
+                    });
+                  });
               } else {
                 // Adiciona um novo mapeamento
-                setColumnMappings([
-                  ...columnMappings,
-                  {
-                    id: uuidv4(),
-                    mondayColumn: currentMapping.mondayColumn,
-                    cpxField: currentMapping.cpxField,
-                    transformFunction: currentMapping.transformFunction
-                  }
-                ]);
+                fetch(`/api/monday/mappings/${selectedMapping.id}/column-mappings`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(mappingData),
+                })
+                  .then(response => {
+                    if (!response.ok) {
+                      throw new Error("Erro ao criar mapeamento de coluna");
+                    }
+                    return response.json();
+                  })
+                  .then(newMapping => {
+                    toast({
+                      title: "Mapeamento criado",
+                      description: "O mapeamento de coluna foi criado com sucesso",
+                    });
+                    
+                    // Adiciona ao estado local
+                    setColumnMappings([
+                      ...columnMappings,
+                      {
+                        id: newMapping.id,
+                        mondayColumn: newMapping.mondayColumnTitle,
+                        mondayColumnId: newMapping.mondayColumnId,
+                        cpxField: newMapping.cpxField,
+                        transformFunction: newMapping.transformFunction || ""
+                      }
+                    ]);
+                  })
+                  .catch(error => {
+                    toast({
+                      title: "Erro",
+                      description: error.message,
+                      variant: "destructive",
+                    });
+                  });
               }
               
               // Fecha a modal
