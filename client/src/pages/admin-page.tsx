@@ -793,7 +793,6 @@ export default function AdminPage() {
       </div>
       
       {renderConfigModal()}
-      {renderColumnMappingModal()}
       
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <AlertDialogContent>
