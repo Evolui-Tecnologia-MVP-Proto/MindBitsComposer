@@ -96,33 +96,33 @@ const DecisionNode = memo(({ data }: NodeProps) => (
       <div className="font-medium text-amber-800 text-sm">{data.label}</div>
     </div>
     
-    {/* Pontos de conexão nos vértices */}
+    {/* Pontos de conexão nos vértices do losango */}
     <Handle 
       type="target" 
       position={Position.Top} 
       className="w-2 h-2 bg-amber-500" 
-      style={{ top: 0, left: '50%' }}
+      style={{ top: '0%', left: '50%' }}
     />
     <Handle 
       type="source" 
       position={Position.Right} 
       className="w-2 h-2 bg-amber-500" 
       id="a"
-      style={{ top: '50%', right: 0 }}
+      style={{ top: '0%', right: '0%', transform: 'translate(50%, 0%)' }}
     />
     <Handle 
       type="source" 
       position={Position.Bottom} 
       className="w-2 h-2 bg-amber-500" 
       id="b"
-      style={{ bottom: 0, left: '50%' }}
+      style={{ bottom: '0%', right: '0%', transform: 'translate(50%, 50%)' }}
     />
     <Handle 
       type="source" 
       position={Position.Left} 
       className="w-2 h-2 bg-amber-500" 
       id="c"
-      style={{ top: '50%', left: 0 }}
+      style={{ bottom: '0%', left: '0%', transform: 'translate(-50%, 50%)' }}
     />
   </div>
 ));
