@@ -48,7 +48,11 @@ export default function AdminPage() {
   const [selectedMapping, setSelectedMapping] = useState<BoardMapping | null>(null);
   const [isTesting, setIsTesting] = useState(false);
   const [testResult, setTestResult] = useState<{success: boolean; message: string} | null>(null);
-  const [apiKey, setApiKey] = useState("");
+  const [apiKey, setApiKey] = useState(() => {
+    // Recupera o token do localStorage ao carregar o componente
+    const savedToken = localStorage.getItem('monday_api_token');
+    return savedToken || "";
+  });
   const [apiKeySaving, setApiKeySaving] = useState(false);
   const [apiKeySaved, setApiKeySaved] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
@@ -148,6 +152,9 @@ export default function AdminPage() {
     setTimeout(() => {
       // Aqui seria feita a chamada para a API para salvar a chave
       console.log("API Key salva:", apiKey);
+      
+      // Salva a chave no localStorage para persistência
+      localStorage.setItem('monday_api_token', apiKey);
       
       setApiKeySaving(false);
       setApiKeySaved(true);
