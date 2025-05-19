@@ -64,32 +64,65 @@ const ApproveNode = memo(({ data }: NodeProps) => (
 ));
 
 const DecisionNode = memo(({ data }: NodeProps) => (
-  <div className="relative w-36 h-24 rotate-45 flex items-center justify-center bg-amber-100 border-2 border-amber-500 text-amber-700 shadow-md">
-    <div className="font-medium text-center -rotate-45 w-full">{data.label}</div>
+  <div className="relative" style={{ width: '100px', height: '100px' }}>
+    {/* Losango isométrico usando CSS */}
+    <div
+      className="absolute"
+      style={{
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#FEF3C7', // bg-amber-100
+        border: '2px solid #D97706', // border-amber-500
+        transformStyle: 'preserve-3d',
+        transform: 'rotateX(60deg) rotateZ(45deg)',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+      }}
+    >
+      {/* Linhas horizontais para efeito similar à imagem */}
+      <div 
+        className="absolute inset-0 flex flex-col justify-between"
+        style={{ opacity: 0.3, padding: '5px' }}
+      >
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div key={i} className="w-full h-px bg-amber-500" />
+        ))}
+      </div>
+    </div>
+    
+    {/* Texto centralizado acima do losango */}
+    <div 
+      className="absolute inset-0 flex items-center justify-center z-10"
+    >
+      <div className="font-medium text-amber-800 text-sm">{data.label}</div>
+    </div>
     
     {/* Pontos de conexão nos vértices */}
     <Handle 
       type="target" 
       position={Position.Top} 
-      className="!left-0 !top-0 w-2 h-2 bg-amber-500 -rotate-45 transform -translate-x-1/2 -translate-y-1/2" 
+      className="w-2 h-2 bg-amber-500" 
+      style={{ top: 0, left: '50%' }}
     />
     <Handle 
       type="source" 
       position={Position.Right} 
-      className="!right-0 !top-0 w-2 h-2 bg-amber-500 -rotate-45 transform translate-x-1/2 -translate-y-1/2" 
-      id="a" 
+      className="w-2 h-2 bg-amber-500" 
+      id="a"
+      style={{ top: '50%', right: 0 }}
     />
     <Handle 
       type="source" 
       position={Position.Bottom} 
-      className="!right-0 !bottom-0 w-2 h-2 bg-amber-500 -rotate-45 transform translate-x-1/2 translate-y-1/2" 
-      id="b" 
+      className="w-2 h-2 bg-amber-500" 
+      id="b"
+      style={{ bottom: 0, left: '50%' }}
     />
     <Handle 
       type="source" 
       position={Position.Left} 
-      className="!left-0 !bottom-0 w-2 h-2 bg-amber-500 -rotate-45 transform -translate-x-1/2 translate-y-1/2" 
-      id="c" 
+      className="w-2 h-2 bg-amber-500" 
+      id="c"
+      style={{ top: '50%', left: 0 }}
     />
   </div>
 ));
