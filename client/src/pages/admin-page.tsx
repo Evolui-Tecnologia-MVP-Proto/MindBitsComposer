@@ -164,6 +164,20 @@ export default function AdminPage() {
               </div>
               
               <div className="flex flex-col space-y-1.5">
+                <label htmlFor="description" className="text-sm font-medium text-gray-700">
+                  Descrição
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  rows={2}
+                  defaultValue={selectedMapping?.description || ""}
+                  placeholder="Descrição breve deste mapeamento"
+                  className="px-3 py-2 rounded-md border border-gray-300 focus:ring-primary focus:border-primary"
+                />
+              </div>
+              
+              <div className="flex flex-col space-y-1.5">
                 <label htmlFor="board-id" className="text-sm font-medium text-gray-700">
                   ID do Quadro
                 </label>
@@ -204,20 +218,6 @@ export default function AdminPage() {
                 <p className="text-xs text-gray-500 mt-1">
                   O ID do quadro pode ser encontrado na URL do quadro no Monday.com
                 </p>
-              </div>
-              
-              <div className="flex flex-col space-y-1.5">
-                <label htmlFor="description" className="text-sm font-medium text-gray-700">
-                  Descrição
-                </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  rows={2}
-                  defaultValue={selectedMapping?.description || ""}
-                  placeholder="Descrição breve deste mapeamento"
-                  className="px-3 py-2 rounded-md border border-gray-300 focus:ring-primary focus:border-primary"
-                />
               </div>
               
               <div className="grid grid-cols-2 gap-4">
