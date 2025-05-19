@@ -94,6 +94,7 @@ export default function AdminPage() {
   
   // Estados para mapeamento de colunas
   const [isColumnMappingModalOpen, setIsColumnMappingModalOpen] = useState(false);
+  const [showColumnMapping, setShowColumnMapping] = useState(false);
   const [columnMappings, setColumnMappings] = useState<ColumnMapping[]>([]);
   const [currentColumnMapping, setCurrentColumnMapping] = useState<ColumnMapping>({
     mondayColumnId: "",
@@ -309,13 +310,11 @@ export default function AdminPage() {
       setMondayColumns(data);
       setTestResult({
         success: true,
-        message: `Quadro encontrado! ${data.length} colunas carregadas com sucesso.`
+        message: `Quadro encontrado! ${data.length} colunas carregadas com sucesso. Você pode configurar o mapeamento de colunas abaixo.`
       });
       
-      // Abre a modal de mapeamento de colunas após carregar as colunas com sucesso
-      if (data.length > 0) {
-        setIsColumnMappingModalOpen(true);
-      }
+      // Mostrar a seção de mapeamento de colunas na mesma modal
+      setShowColumnMapping(true);
     },
     onError: (error) => {
       toast({
@@ -334,15 +333,6 @@ export default function AdminPage() {
   });
 
   const testBoardConnection = (boardId: string) => {
-    if (!selectedMapping) {
-      toast({
-        title: "Erro",
-        description: "É necessário salvar o mapeamento antes de buscar as colunas.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
     setIsTesting(true);
     setTestResult(null);
     
@@ -365,7 +355,72 @@ export default function AdminPage() {
       return;
     }
     
-    // Chama a API para buscar as colunas do quadro
+    if (!selectedMapping) {
+      // Se não tem mapeamento selecionado, é preciso salvar primeiro para obter um ID
+      if (mappingName.trim() === "") {
+        setTestResult({
+          success: false,
+          message: "Preencha o nome do mapeamento antes de conectar."
+        });
+        setIsTesting(false);
+        return;
+      }
+      
+      // Cria um novo mapeamento temporário para teste
+      const tempMapping = {
+        name: mappingName,
+        boardId: boardId,
+        description: mappingDescription,
+        statusColumn: "",
+        responsibleColumn: ""
+      };
+      
+      createMappingMutation.mutate(tempMapping, {
+        onSuccess: (data) => {
+          // Após criar o mapeamento, busca as colunas
+          fetchColumnsMutation.mutate(data.id);
+          setSelectedMapping(data);
+        },
+        onError: (error) => {
+          setTestResult({
+            success: false,
+            message: `Erro ao criar mapeamento: ${error.message}`
+          });
+          setIsTesting(false);
+        }
+      });
+      
+      return;
+    }
+    
+    // Se já tem um mapeamento selecionado, atualiza-o com o novo ID do quadro
+    if (boardId !== selectedMapping.boardId) {
+      const updatedMapping = {
+        ...selectedMapping,
+        boardId: boardId
+      };
+      
+      updateMappingMutation.mutate({
+        id: selectedMapping.id,
+        data: updatedMapping
+      }, {
+        onSuccess: (data) => {
+          setSelectedMapping(data);
+          fetchColumnsMutation.mutate(data.id);
+        },
+        onError: (error) => {
+          setTestResult({
+            success: false,
+            message: `Erro ao atualizar mapeamento: ${error.message}`
+          });
+          setIsTesting(false);
+        }
+      });
+      
+      return;
+    }
+    
+    // Caso já tenha um mapeamento selecionado com o mesmo boardId
     fetchColumnsMutation.mutate(selectedMapping.id);
   };
 
