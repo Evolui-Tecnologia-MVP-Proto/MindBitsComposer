@@ -183,41 +183,7 @@ function ToolbarPlugin() {
   );
 }
 
-function FooterPlugin() {
-  const [editor] = useLexicalComposerContext();
-  const [wordCount, setWordCount] = useState(0);
 
-  useEffect(() => {
-    if (editor) {
-      return editor.registerUpdateListener(({ editorState }) => {
-        editorState.read(() => {
-          const root = $getRoot();
-          const text = root.getTextContent();
-          const words = text.trim().split(/\s+/);
-          setWordCount(text.trim() === "" ? 0 : words.length);
-        });
-      });
-    }
-  }, [editor]);
-
-  return (
-    <div className="flex justify-between items-center p-2 bg-white border-t border-gray-200 text-sm text-gray-500">
-      <div>
-        <span>{wordCount} palavras</span>
-      </div>
-      <div className="flex items-center space-x-2">
-        <Button variant="outline" size="sm" className="h-8">
-          <FileText className="h-4 w-4 mr-2" />
-          Novo
-        </Button>
-        <Button size="sm" className="h-8">
-          <Save className="h-4 w-4 mr-2" />
-          Salvar
-        </Button>
-      </div>
-    </div>
-  );
-}
 
 export default function TextEditor() {
   const [sections, setSections] = useState<string[]>([]);
@@ -348,9 +314,7 @@ export default function TextEditor() {
         <AutoFocusPlugin />
         <ListPlugin />
         <LinkPlugin />
-        <div className="border-t border-gray-200">
-          <FooterPlugin />
-        </div>
+
       </LexicalComposer>
     </div>
   );
