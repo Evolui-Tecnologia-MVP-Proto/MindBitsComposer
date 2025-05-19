@@ -529,7 +529,118 @@ export default function AdminPage() {
               </TabsContent>
               
               <TabsContent value="colunas">
-                {/* Conteúdo removido conforme solicitado */}
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="text-base font-medium">Mapeamento de Colunas</h4>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center"
+                      onClick={() => {
+                        // Função para adicionar novo mapeamento
+                      }}
+                    >
+                      <PlusCircle className="h-4 w-4 mr-2" />
+                      Adicionar
+                    </Button>
+                  </div>
+                  
+                  <div className="border rounded-md overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Coluna Monday</TableHead>
+                          <TableHead>Campo CPx</TableHead>
+                          <TableHead className="w-20">Ações</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {/* Exemplos para demonstração */}
+                        <TableRow>
+                          <TableCell className="font-medium">Nome</TableCell>
+                          <TableCell>titulo</TableCell>
+                          <TableCell>
+                            <div className="flex space-x-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                  // Função para editar
+                                }}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-red-500 hover:text-red-600"
+                                onClick={() => {
+                                  // Função para excluir
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium">Status</TableCell>
+                          <TableCell>status</TableCell>
+                          <TableCell>
+                            <div className="flex space-x-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                  // Função para editar
+                                }}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-red-500 hover:text-red-600"
+                                onClick={() => {
+                                  // Função para excluir
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                        <TableRow>
+                          <TableCell className="font-medium">Data</TableCell>
+                          <TableCell>data_criacao</TableCell>
+                          <TableCell>
+                            <div className="flex space-x-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                  // Função para editar
+                                }}
+                              >
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-red-500 hover:text-red-600"
+                                onClick={() => {
+                                  // Função para excluir
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
               </TabsContent>
             </Tabs>
           </div>
