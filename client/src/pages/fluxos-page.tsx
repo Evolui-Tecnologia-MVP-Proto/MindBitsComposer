@@ -64,12 +64,33 @@ const ApproveNode = memo(({ data }: NodeProps) => (
 ));
 
 const DecisionNode = memo(({ data }: NodeProps) => (
-  <div className="w-32 h-32 rotate-45 flex items-center justify-center bg-amber-100 border-2 border-amber-500 text-amber-700 shadow-md">
+  <div className="relative w-36 h-24 rotate-45 flex items-center justify-center bg-amber-100 border-2 border-amber-500 text-amber-700 shadow-md">
     <div className="font-medium text-center -rotate-45 w-full">{data.label}</div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-amber-500 -rotate-45" />
-    <Handle type="source" position={Position.Right} className="w-2 h-2 bg-amber-500 -rotate-45" id="a" />
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-amber-500 -rotate-45" id="b" />
-    <Handle type="source" position={Position.Left} className="w-2 h-2 bg-amber-500 -rotate-45" id="c" />
+    
+    {/* Pontos de conexão nos vértices */}
+    <Handle 
+      type="target" 
+      position={Position.Top} 
+      className="!left-0 !top-0 w-2 h-2 bg-amber-500 -rotate-45 transform -translate-x-1/2 -translate-y-1/2" 
+    />
+    <Handle 
+      type="source" 
+      position={Position.Right} 
+      className="!right-0 !top-0 w-2 h-2 bg-amber-500 -rotate-45 transform translate-x-1/2 -translate-y-1/2" 
+      id="a" 
+    />
+    <Handle 
+      type="source" 
+      position={Position.Bottom} 
+      className="!right-0 !bottom-0 w-2 h-2 bg-amber-500 -rotate-45 transform translate-x-1/2 translate-y-1/2" 
+      id="b" 
+    />
+    <Handle 
+      type="source" 
+      position={Position.Left} 
+      className="!left-0 !bottom-0 w-2 h-2 bg-amber-500 -rotate-45 transform -translate-x-1/2 translate-y-1/2" 
+      id="c" 
+    />
   </div>
 ));
 
