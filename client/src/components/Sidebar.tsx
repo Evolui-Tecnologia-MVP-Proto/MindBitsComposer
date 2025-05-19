@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Settings, FileText, Edit, GitBranch } from "lucide-react";
+import { Settings, FileText, Edit, GitBranch, File } from "lucide-react";
 
 type SidebarProps = {
   isMobileOpen: boolean;
@@ -20,6 +20,8 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
       setActiveItem("editor");
     } else if (location.startsWith("/fluxos")) {
       setActiveItem("fluxos");
+    } else if (location.startsWith("/documentos")) {
+      setActiveItem("documentos");
     } else {
       setActiveItem("");
     }
@@ -79,6 +81,18 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
               >
                 <GitBranch className="mr-3 h-6 w-6" />
                 Fluxos
+              </div>
+            </Link>
+          </div>
+          
+          <div className="sidebar-item-container">
+            <Link href="/documentos">
+              <div 
+                className={`sidebar-item ${activeItem === "documentos" ? "sidebar-active" : ""}`}
+                onClick={closeMobileMenu}
+              >
+                <File className="mr-3 h-6 w-6" />
+                Documentos
               </div>
             </Link>
           </div>

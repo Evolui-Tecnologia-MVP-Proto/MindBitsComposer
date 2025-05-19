@@ -11,6 +11,7 @@ import PreferencesPage from "@/pages/preferences-page";
 import TemplatesPage from "@/pages/templates-page";
 import EditorPage from "@/pages/editor-page";
 import FluxosPage from "@/pages/fluxos-page-new";
+import DocumentosPage from "@/pages/documentos-page";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "./lib/protected-route";
 
@@ -24,6 +25,7 @@ function Router() {
       <ProtectedRoute path="/templates" component={TemplatesPage} />
       <ProtectedRoute path="/editor" component={EditorPage} />
       <ProtectedRoute path="/fluxos" component={FluxosPage} />
+      <ProtectedRoute path="/documentos" component={DocumentosPage} />
       <Route component={NotFound} />
     </Switch>
   );
