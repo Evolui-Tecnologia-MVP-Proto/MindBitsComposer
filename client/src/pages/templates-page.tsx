@@ -87,18 +87,47 @@ export default function TemplatesPage() {
   // Mutação para atualizar template
   const updateTemplateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
-      const res = await apiRequest("PUT", `/api/template/${id}`, data);
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || "Erro ao atualizar template");
+      try {
+        // Garantir que a estrutura seja um objeto JavaScript válido, não uma string JSON
+        const dataToSend = {
+          ...data,
+          structure: typeof data.structure === 'string' 
+            ? JSON.parse(data.structure) 
+            : data.structure
+        };
+        
+        console.log("Atualizando template:", JSON.stringify(dataToSend, null, 2));
+        
+        const res = await apiRequest("PUT", `/api/template/${id}`, dataToSend);
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error("Resposta do servidor:", errorText);
+          try {
+            const errorData = JSON.parse(errorText);
+            throw new Error(errorData.message || "Erro ao atualizar template");
+          } catch (e) {
+            throw new Error(errorText || "Erro ao atualizar template");
+          }
+        }
+        return await res.json();
+      } catch (error) {
+        console.error("Erro completo na atualização:", error);
+        throw error;
       }
-      return await res.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/templates"] });
       toast({
         title: "Template atualizado",
         description: "O template foi atualizado com sucesso",
+      });
+    },
+    onError: (error: any) => {
+      console.error("Erro na mutação de atualização:", error);
+      toast({
+        title: "Erro ao atualizar template",
+        description: error.message || "Ocorreu um erro ao atualizar o template",
+        variant: "destructive",
       });
     }
   });
