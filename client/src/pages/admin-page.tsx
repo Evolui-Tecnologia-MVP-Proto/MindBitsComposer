@@ -57,36 +57,49 @@ export default function AdminPage() {
   const [apiKeySaved, setApiKeySaved] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
   
-  // Dados de exemplo para a tabela
-  const [boardMappings, setBoardMappings] = useState<BoardMapping[]>([
-    {
-      id: "1",
-      name: "Quadro de Projetos",
-      boardId: "12345678",
-      description: "Quadro principal para gerenciamento de projetos",
-      statusColumn: "status",
-      responsibleColumn: "person",
-      lastSync: "19/05/2025 10:45"
-    },
-    {
-      id: "2",
-      name: "Quadro de Tarefas",
-      boardId: "87654321",
-      description: "Tarefas diárias da equipe",
-      statusColumn: "status",
-      responsibleColumn: "owner",
-      lastSync: "19/05/2025 09:30"
-    },
-    {
-      id: "3",
-      name: "Quadro de Bugs",
-      boardId: "24681357",
-      description: "Rastreamento de bugs e correções",
-      statusColumn: "stage",
-      responsibleColumn: "assignee",
-      lastSync: null
+  // Estado para armazenar os mapeamentos de quadros
+  const [boardMappings, setBoardMappings] = useState<BoardMapping[]>(() => {
+    // Recupera os mapeamentos salvos ou usa os dados de exemplo
+    const savedMappings = localStorage.getItem('monday_board_mappings');
+    if (savedMappings) {
+      return JSON.parse(savedMappings);
     }
-  ]);
+    
+    // Dados de exemplo para a tabela inicial
+    const defaultMappings = [
+      {
+        id: "1",
+        name: "Quadro de Projetos",
+        boardId: "12345678",
+        description: "Quadro principal para gerenciamento de projetos",
+        statusColumn: "status",
+        responsibleColumn: "person",
+        lastSync: "19/05/2025 10:45"
+      },
+      {
+        id: "2",
+        name: "Quadro de Tarefas",
+        boardId: "87654321",
+        description: "Tarefas diárias da equipe",
+        statusColumn: "status",
+        responsibleColumn: "owner",
+        lastSync: "19/05/2025 09:30"
+      },
+      {
+        id: "3",
+        name: "Quadro de Bugs",
+        boardId: "24681357",
+        description: "Rastreamento de bugs e correções",
+        statusColumn: "stage",
+        responsibleColumn: "assignee",
+        lastSync: null
+      }
+    ];
+    
+    // Salva os mapeamentos padrão no localStorage
+    localStorage.setItem('monday_board_mappings', JSON.stringify(defaultMappings));
+    return defaultMappings;
+  });
   
   const openEditModal = (mapping: BoardMapping | null = null) => {
     setSelectedMapping(mapping);
@@ -100,9 +113,12 @@ export default function AdminPage() {
   
   const handleDeleteMapping = () => {
     if (selectedMapping) {
-      setBoardMappings(currentMappings => 
-        currentMappings.filter(mapping => mapping.id !== selectedMapping.id)
-      );
+      const updatedMappings = boardMappings.filter(mapping => mapping.id !== selectedMapping.id);
+      setBoardMappings(updatedMappings);
+      
+      // Salva os mapeamentos atualizados no localStorage
+      localStorage.setItem('monday_board_mappings', JSON.stringify(updatedMappings));
+      
       setIsDeleteDialogOpen(false);
       setSelectedMapping(null);
     }
@@ -164,6 +180,53 @@ export default function AdminPage() {
         setApiKeySaved(false);
       }, 3000);
     }, 1000);
+  };
+
+  // Função para salvar um novo mapeamento ou atualizar um existente
+  const saveMappingSettings = () => {
+    // Obter os valores do formulário
+    const nameInput = document.getElementById('mapping-name') as HTMLInputElement;
+    const descriptionInput = document.getElementById('description') as HTMLTextAreaElement;
+    const boardIdInput = document.getElementById('board-id') as HTMLInputElement;
+    
+    // Validar campos
+    if (!nameInput.value.trim() || !boardIdInput.value.trim()) {
+      alert("Por favor, preencha o nome do mapeamento e o ID do quadro.");
+      return;
+    }
+    
+    // Criação de novo objeto de mapeamento
+    const updatedMapping: BoardMapping = {
+      id: selectedMapping?.id || Date.now().toString(), // Gera um ID baseado no timestamp se for um novo mapeamento
+      name: nameInput.value.trim(),
+      description: descriptionInput.value.trim(),
+      boardId: boardIdInput.value.trim(),
+      statusColumn: selectedMapping?.statusColumn || "",
+      responsibleColumn: selectedMapping?.responsibleColumn || "",
+      lastSync: selectedMapping?.lastSync || null
+    };
+    
+    let updatedMappings: BoardMapping[];
+    
+    if (selectedMapping) {
+      // Atualizando um mapeamento existente
+      updatedMappings = boardMappings.map(mapping => 
+        mapping.id === selectedMapping.id ? updatedMapping : mapping
+      );
+    } else {
+      // Adicionando um novo mapeamento
+      updatedMappings = [...boardMappings, updatedMapping];
+    }
+    
+    // Atualiza o estado
+    setBoardMappings(updatedMappings);
+    
+    // Salva no localStorage
+    localStorage.setItem('monday_board_mappings', JSON.stringify(updatedMappings));
+    
+    // Fecha o modal
+    setIsModalOpen(false);
+    setSelectedMapping(null);
   };
 
   // Modal de configuração do mapeamento
@@ -269,7 +332,7 @@ export default function AdminPage() {
             <button
               type="button"
               className="inline-flex justify-center px-4 py-2 ml-3 text-sm font-medium text-white bg-primary border border-transparent rounded-md shadow-sm hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-              onClick={() => setIsModalOpen(false)}
+              onClick={saveMappingSettings}
             >
               {isEditing ? "Salvar Alterações" : "Criar Mapeamento"}
             </button>
