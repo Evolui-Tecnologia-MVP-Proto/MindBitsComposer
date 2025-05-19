@@ -315,6 +315,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Validate Monday board
+  app.get("/api/monday/boards/:boardId/validate", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { boardId } = req.params;
+    
+    try {
+      // Obter a chave da API
+      const apiKey = await storage.getMondayApiKey();
+      if (!apiKey) {
+        return res.status(400).json({
+          success: false,
+          message: "API key do Monday não configurada"
+        });
+      }
+      
+      // Fazer requisição à API do Monday.com para verificar se o quadro existe
+      const query = `
+        query {
+          boards(ids: ${boardId}) {
+            id
+            name
+          }
+        }
+      `;
+      
+      const mondayResponse = await fetch("https://api.monday.com/v2", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": apiKey
+        },
+        body: JSON.stringify({ query })
+      });
+      
+      if (!mondayResponse.ok) {
+        return res.status(500).json({
+          success: false,
+          message: `Erro na API do Monday: ${mondayResponse.status} ${mondayResponse.statusText}`
+        });
+      }
+      
+      const data = await mondayResponse.json();
+      
+      if (data.errors) {
+        return res.status(400).json({
+          success: false,
+          message: `Erro na consulta GraphQL: ${JSON.stringify(data.errors)}`
+        });
+      }
+      
+      // Verifica se o quadro existe e tem dados válidos
+      if (!data.data?.boards || data.data.boards.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Quadro não encontrado"
+        });
+      }
+      
+      res.json({
+        success: true,
+        message: "Quadro encontrado",
+        board: data.data.boards[0]
+      });
+    } catch (error) {
+      console.error("Erro ao validar quadro:", error);
+      res.status(500).json({
+        success: false,
+        message: "Erro ao validar quadro"
+      });
+    }
+  });
+
   // Delete Monday mapping
   app.delete("/api/monday/mappings/:id", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
