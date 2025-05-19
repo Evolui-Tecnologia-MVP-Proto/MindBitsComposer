@@ -92,7 +92,12 @@ function ToolbarPlugin() {
       description: `Template "${selectedTemplate.description}" foi aplicado`
     });
     
-    // Aqui seria implementada a lógica para aplicar o template ao editor
+    // Enviar evento para o EditorContext para aplicar o template
+    const customEvent = new CustomEvent('applyTemplate', { 
+      detail: selectedTemplate 
+    });
+    window.dispatchEvent(customEvent);
+    
     console.log("Template selecionado:", selectedTemplate);
   };
 
@@ -212,6 +217,60 @@ function FooterPlugin({ editor }: { editor: LexicalEditor }) {
 }
 
 export default function TextEditor() {
+  const [sections, setSections] = useState<string[]>([]);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const { toast } = useToast();
+  
+  // Escutar o evento de aplicação de template
+  useEffect(() => {
+    const handleApplyTemplate = (event: CustomEvent<Template>) => {
+      const template = event.detail;
+      
+      try {
+        if (template.structure && typeof template.structure === 'object') {
+          const structure = template.structure as any;
+          
+          if (structure.sections && Array.isArray(structure.sections)) {
+            // Definir as seções do template
+            setSections(structure.sections);
+            
+            // Ativar a primeira seção se houver
+            if (structure.sections.length > 0) {
+              setActiveSection(structure.sections[0]);
+            }
+            
+            toast({
+              title: "Seções criadas",
+              description: `${structure.sections.length} seções foram criadas com base no template.`
+            });
+          } else {
+            console.error("Formato de template inválido: não contém array de sections");
+            toast({
+              title: "Erro ao aplicar template",
+              description: "O template não possui um formato válido para seções",
+              variant: "destructive"
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao processar template:", error);
+        toast({
+          title: "Erro ao aplicar template",
+          description: "Ocorreu um erro ao processar o template",
+          variant: "destructive"
+        });
+      }
+    };
+    
+    // Registrar o listener de evento
+    window.addEventListener('applyTemplate', handleApplyTemplate as EventListener);
+    
+    // Limpar o listener quando o componente for desmontado
+    return () => {
+      window.removeEventListener('applyTemplate', handleApplyTemplate as EventListener);
+    };
+  }, [toast]);
+  
   const initialConfig = {
     namespace: "EvoMindBitsEditor",
     theme: {
@@ -253,18 +312,42 @@ export default function TextEditor() {
           <ToolbarPlugin />
         </div>
         <div className="flex-1 overflow-auto">
-          <div className="h-full min-h-[400px]">
-            <RichTextPlugin
-              contentEditable={<ContentEditable className="outline-none p-6 h-full min-h-[400px]" />}
-              placeholder={<div className="absolute ml-6 mt-6 text-gray-400 pointer-events-none">Digite seu conteúdo aqui...</div>}
-              ErrorBoundary={() => <div>Erro no editor!</div>}
-            />
-          </div>
+          {sections.length > 0 ? (
+            <Accordion type="single" collapsible defaultValue={sections[0]} className="p-4">
+              {sections.map((section, index) => (
+                <AccordionItem key={section} value={section} className="border rounded-md mb-3">
+                  <AccordionTrigger className="px-4 py-3 bg-gray-50 hover:bg-gray-100 font-medium">
+                    {section}
+                  </AccordionTrigger>
+                  <AccordionContent className="px-0 pt-2">
+                    <div className="min-h-[150px]">
+                      <RichTextPlugin
+                        contentEditable={<ContentEditable className="outline-none px-4 py-2 min-h-[150px]" />}
+                        placeholder={<div className="absolute ml-4 mt-2 text-gray-400 pointer-events-none">Conteúdo de {section}...</div>}
+                        ErrorBoundary={() => <div>Erro no editor!</div>}
+                      />
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          ) : (
+            <div className="h-full min-h-[400px]">
+              <RichTextPlugin
+                contentEditable={<ContentEditable className="outline-none p-6 h-full min-h-[400px]" />}
+                placeholder={<div className="absolute ml-6 mt-6 text-gray-400 pointer-events-none">Selecione um template estrutural ou digite seu conteúdo aqui...</div>}
+                ErrorBoundary={() => <div>Erro no editor!</div>}
+              />
+            </div>
+          )}
         </div>
         <HistoryPlugin />
         <AutoFocusPlugin />
         <ListPlugin />
         <LinkPlugin />
+        <div className="border-t border-gray-200">
+          <FooterPlugin editor={null as any} />
+        </div>
       </LexicalComposer>
     </div>
   );
