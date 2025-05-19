@@ -49,7 +49,7 @@ export const mondayMappings = pgTable("monday_mappings", {
   boardId: text("board_id").notNull(),
   statusColumn: text("status_column").default(""),
   responsibleColumn: text("responsible_column").default(""),
-  lastSync: timestamp("last_sync").default(null),
+  lastSync: timestamp("last_sync"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -60,6 +60,17 @@ export const mondayColumns = pgTable("monday_columns", {
   columnId: text("column_id").notNull(),
   title: text("title").notNull(),
   type: text("type").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const mappingColumns = pgTable("mapping_columns", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  mappingId: uuid("mapping_id").notNull().references(() => mondayMappings.id, { onDelete: "cascade" }),
+  mondayColumnId: text("monday_column_id").notNull(),
+  mondayColumnTitle: text("monday_column_title").notNull(),
+  cpxField: text("cpx_field").notNull(),
+  transformFunction: text("transform_function").default(""),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -88,6 +99,12 @@ export const insertMondayColumnSchema = createInsertSchema(mondayColumns).omit({
   updatedAt: true,
 });
 
+export const insertMappingColumnSchema = createInsertSchema(mappingColumns).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
@@ -99,3 +116,6 @@ export type MondayMapping = typeof mondayMappings.$inferSelect;
 
 export type InsertMondayColumn = z.infer<typeof insertMondayColumnSchema>;
 export type MondayColumn = typeof mondayColumns.$inferSelect;
+
+export type InsertMappingColumn = z.infer<typeof insertMappingColumnSchema>;
+export type MappingColumn = typeof mappingColumns.$inferSelect;

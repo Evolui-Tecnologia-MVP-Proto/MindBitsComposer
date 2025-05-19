@@ -50,6 +50,15 @@ export interface IStorage {
   createMondayColumn(column: InsertMondayColumn): Promise<MondayColumn>;
   createManyMondayColumns(columns: InsertMondayColumn[]): Promise<MondayColumn[]>;
   deleteMondayColumns(mappingId: string): Promise<void>;
+  
+  // Mapping Column operations
+  getMappingColumns(mappingId: string): Promise<MappingColumn[]>;
+  getMappingColumnById(id: string): Promise<MappingColumn | undefined>;
+  createMappingColumn(column: InsertMappingColumn): Promise<MappingColumn>;
+  createManyMappingColumns(columns: InsertMappingColumn[]): Promise<MappingColumn[]>;
+  updateMappingColumn(id: string, data: Partial<MappingColumn>): Promise<MappingColumn>;
+  deleteMappingColumn(id: string): Promise<void>;
+  deleteMappingColumns(mappingId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -320,6 +329,71 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(mondayColumns)
       .where(eq(mondayColumns.mappingId, mappingId));
+  }
+
+  // Implementação das operações de mapeamento de colunas
+  async getMappingColumns(mappingId: string): Promise<MappingColumn[]> {
+    return await db
+      .select()
+      .from(mappingColumns)
+      .where(eq(mappingColumns.mappingId, mappingId));
+  }
+  
+  async getMappingColumnById(id: string): Promise<MappingColumn | undefined> {
+    const [column] = await db
+      .select()
+      .from(mappingColumns)
+      .where(eq(mappingColumns.id, id));
+    return column;
+  }
+  
+  async createMappingColumn(column: InsertMappingColumn): Promise<MappingColumn> {
+    const [newColumn] = await db
+      .insert(mappingColumns)
+      .values(column)
+      .returning();
+    return newColumn;
+  }
+  
+  async createManyMappingColumns(columns: InsertMappingColumn[]): Promise<MappingColumn[]> {
+    if (columns.length === 0) {
+      return [];
+    }
+    
+    const newColumns = await db
+      .insert(mappingColumns)
+      .values(columns)
+      .returning();
+    return newColumns;
+  }
+  
+  async updateMappingColumn(id: string, data: Partial<MappingColumn>): Promise<MappingColumn> {
+    const [updatedColumn] = await db
+      .update(mappingColumns)
+      .set({
+        ...data,
+        updatedAt: new Date()
+      })
+      .where(eq(mappingColumns.id, id))
+      .returning();
+    
+    if (!updatedColumn) {
+      throw new Error("Mapeamento de coluna não encontrado");
+    }
+    
+    return updatedColumn;
+  }
+  
+  async deleteMappingColumn(id: string): Promise<void> {
+    await db
+      .delete(mappingColumns)
+      .where(eq(mappingColumns.id, id));
+  }
+  
+  async deleteMappingColumns(mappingId: string): Promise<void> {
+    await db
+      .delete(mappingColumns)
+      .where(eq(mappingColumns.mappingId, mappingId));
   }
 }
 
