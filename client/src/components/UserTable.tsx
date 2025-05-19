@@ -124,9 +124,16 @@ export default function UserTable() {
   );
 
   const getStatusBadgeClass = (status: UserStatus) => {
-    return status === UserStatus.ACTIVE
-      ? "bg-green-100 text-green-800"
-      : "bg-gray-100 text-gray-800";
+    switch (status) {
+      case UserStatus.ACTIVE:
+        return "bg-green-100 text-green-800";
+      case UserStatus.PENDING:
+        return "bg-yellow-100 text-yellow-800";
+      case UserStatus.INACTIVE:
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
   };
 
   const getTranslatedRole = (role: UserRole) => {
@@ -143,13 +150,28 @@ export default function UserTable() {
   };
 
   const getTranslatedStatus = (status: UserStatus) => {
-    return status === UserStatus.ACTIVE ? "Ativo" : "Inativo";
+    switch (status) {
+      case UserStatus.ACTIVE:
+        return "Ativo";
+      case UserStatus.PENDING:
+        return "Pendente";
+      case UserStatus.INACTIVE:
+        return "Inativo";
+      default:
+        return status;
+    }
   };
 
   const toggleStatus = (user: User) => {
-    const newStatus = user.status === UserStatus.ACTIVE 
-      ? UserStatus.INACTIVE 
-      : UserStatus.ACTIVE;
+    let newStatus;
+    
+    // Se estiver pendente ou inativo, ativar
+    if (user.status === UserStatus.PENDING || user.status === UserStatus.INACTIVE) {
+      newStatus = UserStatus.ACTIVE;
+    } else {
+      // Se estiver ativo, desativar
+      newStatus = UserStatus.INACTIVE;
+    }
     
     toggleUserStatusMutation.mutate({ 
       id: user.id, 

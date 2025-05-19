@@ -10,7 +10,8 @@ export enum UserRole {
 
 export enum UserStatus {
   ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE"
+  INACTIVE = "INACTIVE",
+  PENDING = "PENDING"
 }
 
 export enum TemplateType {
@@ -24,7 +25,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   role: text("role", { enum: ["ADMIN", "EDITOR", "USER"] }).notNull().default("USER"),
-  status: text("status", { enum: ["ACTIVE", "INACTIVE"] }).notNull().default("ACTIVE"),
+  status: text("status", { enum: ["ACTIVE", "INACTIVE", "PENDING"] }).notNull().default("ACTIVE"),
   avatarUrl: text("avatar_url").default(""),
   mustChangePassword: boolean("must_change_password").default(false),
   createdAt: timestamp("created_at").defaultNow(),

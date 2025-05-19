@@ -5,7 +5,7 @@ import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
-import { User as SelectUser } from "@shared/schema";
+import { User as SelectUser, UserStatus } from "@shared/schema";
 import { insertUserSchema } from "@shared/schema";
 import { z } from "zod";
 
@@ -412,9 +412,10 @@ export function setupAuth(app: Express) {
       const username = user.email.split('@')[0];
       const initialPassword = `${username}123`;
 
-      // Atualizar a senha e definir flag para mudar senha no próximo login
+      // Atualizar a senha, definir flag para mudar senha no próximo login e alterar status para PENDENTE
       await storage.updateUserPassword(userId, await hashPassword(initialPassword));
       await storage.updateUserMustChangePassword(userId, true);
+      await storage.updateUserStatus(userId, UserStatus.PENDING);
 
       res.status(200).json({ 
         message: "Senha resetada com sucesso",
