@@ -328,11 +328,121 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).send("Mapeamento não encontrado");
       }
       
+      // Primeiro excluímos as colunas associadas a este mapeamento
+      await storage.deleteMondayColumns(id);
+      
+      // Depois excluímos o mapeamento
       await storage.deleteMondayMapping(id);
       res.status(204).send();
     } catch (error) {
       console.error("Erro ao excluir mapeamento:", error);
       res.status(500).send("Erro ao excluir mapeamento");
+    }
+  });
+  
+  // Get columns for a Monday mapping
+  app.get("/api/monday/mappings/:id/columns", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      // Verificar se o mapeamento existe
+      const existingMapping = await storage.getMondayMapping(id);
+      if (!existingMapping) {
+        return res.status(404).send("Mapeamento não encontrado");
+      }
+      
+      const columns = await storage.getMondayColumns(id);
+      res.json(columns);
+    } catch (error) {
+      console.error("Erro ao buscar colunas:", error);
+      res.status(500).send("Erro ao buscar colunas");
+    }
+  });
+  
+  // Fetch columns from Monday.com API and save them
+  app.post("/api/monday/mappings/:id/fetch-columns", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      // Verificar se o mapeamento existe
+      const existingMapping = await storage.getMondayMapping(id);
+      if (!existingMapping) {
+        return res.status(404).send("Mapeamento não encontrado");
+      }
+      
+      // Obter a chave da API
+      const apiKey = await storage.getMondayApiKey();
+      if (!apiKey) {
+        return res.status(400).send("Chave da API do Monday não configurada");
+      }
+      
+      // Fazer requisição à API do Monday.com para obter as colunas do quadro
+      const query = `
+        query {
+          boards(ids: ${existingMapping.boardId}) {
+            columns {
+              id
+              title
+              type
+            }
+          }
+        }
+      `;
+      
+      try {
+        const mondayResponse = await fetch("https://api.monday.com/v2", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": apiKey
+          },
+          body: JSON.stringify({ query })
+        });
+        
+        if (!mondayResponse.ok) {
+          throw new Error(`Erro na API do Monday: ${mondayResponse.status} ${mondayResponse.statusText}`);
+        }
+        
+        const data = await mondayResponse.json();
+        
+        if (data.errors) {
+          throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(data.errors)}`);
+        }
+        
+        if (!data.data?.boards?.[0]?.columns) {
+          throw new Error("Não foi possível obter as colunas do quadro");
+        }
+        
+        const columns = data.data.boards[0].columns;
+        
+        // Excluir as colunas existentes
+        await storage.deleteMondayColumns(id);
+        
+        // Inserir as novas colunas
+        const columnsToInsert = columns.map((column: any) => ({
+          mappingId: id,
+          columnId: column.id,
+          title: column.title,
+          type: column.type
+        }));
+        
+        const savedColumns = await storage.createManyMondayColumns(columnsToInsert);
+        
+        // Atualizar a data de última sincronização
+        await storage.updateMondayMappingLastSync(id);
+        
+        res.status(200).json(savedColumns);
+      } catch (error) {
+        console.error("Erro ao comunicar com a API do Monday:", error);
+        res.status(500).send(`Erro ao comunicar com a API do Monday: ${error.message}`);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar colunas:", error);
+      res.status(500).send("Erro ao buscar colunas");
     }
   });
 

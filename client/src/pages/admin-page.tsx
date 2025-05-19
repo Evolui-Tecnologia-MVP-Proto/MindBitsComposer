@@ -218,46 +218,78 @@ export default function AdminPage() {
     }
   };
   
+  // Mutação para buscar as colunas do quadro do Monday
+  const fetchColumnsMutation = useMutation({
+    mutationFn: async (mappingId: string) => {
+      const response = await apiRequest('POST', `/api/monday/mappings/${mappingId}/fetch-columns`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Falha ao buscar colunas do quadro');
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Colunas carregadas",
+        description: `${data.length} colunas foram carregadas com sucesso.`,
+        variant: "default",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/monday/mappings'] });
+      setTestResult({
+        success: true,
+        message: `Quadro encontrado! ${data.length} colunas carregadas com sucesso.`
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao buscar colunas",
+        description: error.message,
+        variant: "destructive",
+      });
+      setTestResult({
+        success: false,
+        message: `Erro: ${error.message}`
+      });
+    },
+    onSettled: () => {
+      setIsTesting(false);
+    }
+  });
+
   const testBoardConnection = (boardId: string) => {
+    if (!selectedMapping) {
+      toast({
+        title: "Erro",
+        description: "É necessário salvar o mapeamento antes de buscar as colunas.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsTesting(true);
     setTestResult(null);
     
-    // Verifica a conexão fazendo uma requisição para a API do Monday
-    if (apiKey && boardId) {
-      // Aqui faríamos uma chamada real para o Monday.com
-      // Como prova de conceito, simulamos uma verificação básica
-      setTimeout(() => {
-        if (boardId && boardId.trim() !== "") {
-          // Verificar se o ID do quadro é válido (exemplo simples)
-          const isValid = boardId.length >= 6 && /^\d+$/.test(boardId);
-          
-          if (isValid) {
-            setTestResult({
-              success: true,
-              message: "Quadro encontrado! Conexão estabelecida com sucesso."
-            });
-          } else {
-            setTestResult({
-              success: false,
-              message: "ID de quadro inválido ou não encontrado. Verifique o ID e tente novamente."
-            });
-          }
-        } else {
-          setTestResult({
-            success: false,
-            message: "Por favor, informe um ID de quadro válido."
-          });
-        }
-        
-        setIsTesting(false);
-      }, 1500);
-    } else {
+    // Verifica se temos o ID do quadro e a chave da API
+    if (!apiKey) {
       setTestResult({
         success: false,
-        message: apiKey ? "Por favor, informe um ID de quadro válido." : "Configure a chave da API primeiro."
+        message: "Configure a chave da API do Monday primeiro."
       });
       setIsTesting(false);
+      return;
     }
+    
+    if (!boardId || boardId.trim() === "") {
+      setTestResult({
+        success: false,
+        message: "Por favor, informe um ID de quadro válido."
+      });
+      setIsTesting(false);
+      return;
+    }
+    
+    // Chama a API para buscar as colunas do quadro
+    fetchColumnsMutation.mutate(selectedMapping.id);
   };
 
   const saveApiKey = () => {
