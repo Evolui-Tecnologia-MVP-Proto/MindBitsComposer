@@ -106,7 +106,17 @@ export default function TemplateFormModal({
 
     try {
       setIsLoading(true);
-      await onSave(formData);
+      
+      // Converter a estrutura de string para objeto JSON antes de enviar
+      const processedData = {
+        ...formData,
+        structure: typeof formData.structure === 'string' 
+          ? JSON.parse(formData.structure) 
+          : formData.structure
+      };
+      
+      console.log("Enviando template:", JSON.stringify(processedData, null, 2));
+      await onSave(processedData);
       onClose();
     } catch (error) {
       console.error("Erro ao salvar template:", error);
