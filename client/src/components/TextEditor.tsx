@@ -172,7 +172,7 @@ function ToolbarPlugin() {
             ) : (
               structTemplates.map(template => (
                 <SelectItem key={template.id} value={template.id}>
-                  {template.code} - {template.description}
+                  {template.code}
                 </SelectItem>
               ))
             )}
