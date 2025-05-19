@@ -51,6 +51,7 @@ export default function AdminPage() {
   const [apiKey, setApiKey] = useState("");
   const [apiKeySaving, setApiKeySaving] = useState(false);
   const [apiKeySaved, setApiKeySaved] = useState(false);
+  const [showApiKey, setShowApiKey] = useState(false);
   
   // Dados de exemplo para a tabela
   const [boardMappings, setBoardMappings] = useState<BoardMapping[]>([
@@ -324,15 +325,24 @@ export default function AdminPage() {
                     API Key do Monday.com
                   </label>
                   <div className="mt-1 flex rounded-md shadow-sm">
-                    <input
-                      type="password"
-                      name="monday-api-key"
-                      id="monday-api-key"
-                      value={apiKey}
-                      onChange={(e) => setApiKey(e.target.value)}
-                      className="flex-1 min-w-0 block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-primary focus:border-primary"
-                      placeholder="Informe a chave de API do Monday.com"
-                    />
+                    <div className="relative flex-1">
+                      <input
+                        type={showApiKey ? "text" : "password"}
+                        name="monday-api-key"
+                        id="monday-api-key"
+                        value={apiKey}
+                        onChange={(e) => setApiKey(e.target.value)}
+                        className="flex-1 min-w-0 block w-full px-3 py-2 rounded-md border border-gray-300 focus:ring-primary focus:border-primary"
+                        placeholder="Informe a chave de API do Monday.com"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowApiKey(!showApiKey)}
+                        className="absolute inset-y-0 right-0 px-3 flex items-center text-sm text-gray-600 hover:text-gray-900"
+                      >
+                        {showApiKey ? "Ocultar" : "Mostrar"}
+                      </button>
+                    </div>
                     <button
                       type="button"
                       onClick={saveApiKey}
