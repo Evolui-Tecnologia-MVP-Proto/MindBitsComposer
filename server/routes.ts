@@ -210,6 +210,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         mappings.map(async (mapping) => {
           try {
             const columns = await storage.getMappingColumns(mapping.id);
+            console.log(`Mapeamento ID ${mapping.id} (${mapping.name}): ${columns.length} colunas mapeadas`);
             return {
               ...mapping,
               columnCount: columns.length
