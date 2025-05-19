@@ -9,6 +9,14 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { 
   File, 
@@ -35,12 +43,47 @@ import { Badge } from "@/components/ui/badge";
 
 export default function DocumentosPage() {
   const [activeTab, setActiveTab] = useState("integrados");
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<any>(null);
 
   // Dados de exemplo para documentos
   const documentosIntegrados = [
-    { id: 1, nome: "Contrato de Serviços", data: "19/05/2025", tipo: "PDF", status: "Ativo" },
-    { id: 2, nome: "Proposta Comercial", data: "18/05/2025", tipo: "DOCX", status: "Ativo" },
-    { id: 3, nome: "Termo de Compromisso", data: "15/05/2025", tipo: "PDF", status: "Arquivado" }
+    { 
+      id: 1, 
+      nome: "Contrato de Serviços", 
+      data: "19/05/2025", 
+      tipo: "PDF", 
+      status: "Ativo",
+      origem: "Monday.com",
+      dataOrigem: "18/05/2025",
+      dataIntegracao: "19/05/2025",
+      statusOrigem: "Completo",
+      descricaoOrigem: "Contrato de prestação de serviços aprovado pelo cliente. Este documento serve como base para todas as atividades relacionadas ao projeto e define escopo, prazos e termos de pagamento."
+    },
+    { 
+      id: 2, 
+      nome: "Proposta Comercial", 
+      data: "18/05/2025", 
+      tipo: "DOCX", 
+      status: "Ativo",
+      origem: "Google Drive",
+      dataOrigem: "15/05/2025",
+      dataIntegracao: "18/05/2025",
+      statusOrigem: "Aprovado",
+      descricaoOrigem: "Proposta comercial final enviada ao cliente com detalhamento dos serviços, cronograma e valores."
+    },
+    { 
+      id: 3, 
+      nome: "Termo de Compromisso", 
+      data: "15/05/2025", 
+      tipo: "PDF", 
+      status: "Arquivado",
+      origem: "Dropbox",
+      dataOrigem: "12/05/2025",
+      dataIntegracao: "15/05/2025",
+      statusOrigem: "Desatualizado",
+      descricaoOrigem: "Versão inicial do termo de compromisso para o projeto. Este documento foi substituído pela versão final do contrato."
+    }
   ];
 
   const documentosEmProcesso = [
@@ -95,6 +138,11 @@ export default function DocumentosPage() {
     );
   };
 
+  const openViewModal = (documento: any) => {
+    setSelectedDocument(documento);
+    setIsViewModalOpen(true);
+  };
+  
   const renderDocumentosTable = (documentos: any[]) => (
     <Table>
       <TableCaption>{documentos.length === 0 ? "Nenhum documento encontrado" : "Lista de documentos"}</TableCaption>
@@ -126,7 +174,12 @@ export default function DocumentosPage() {
             <TableCell>{getStatusBadge(documento.status)}</TableCell>
             <TableCell className="text-right">
               <div className="flex justify-end space-x-2">
-                <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8"
+                  onClick={() => openViewModal(documento)}
+                >
                   <Eye className="h-4 w-4" />
                 </Button>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -141,7 +194,7 @@ export default function DocumentosPage() {
                   <DropdownMenuContent align="end">
                     <DropdownMenuLabel>Ações</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openViewModal(documento)}>
                       <Eye className="mr-2 h-4 w-4" />
                       Visualizar
                     </DropdownMenuItem>
@@ -171,6 +224,99 @@ export default function DocumentosPage() {
     </Table>
   );
 
+  const renderViewModal = () => {
+    if (!selectedDocument) return null;
+    
+    const isIntegrated = activeTab === "integrados";
+    
+    return (
+      <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {getTipoIcon(selectedDocument.tipo)}
+              <span>{selectedDocument.nome}</span>
+            </DialogTitle>
+            <DialogDescription>
+              Detalhes do documento {isIntegrated ? "integrado" : ""}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-6 py-4">
+            {isIntegrated && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500 mb-1">Origem</p>
+                  <p className="text-sm">{selectedDocument.origem}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500 mb-1">Nome</p>
+                  <p className="text-sm">{selectedDocument.nome}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500 mb-1">Status</p>
+                  <div>{getStatusBadge(selectedDocument.status)}</div>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500 mb-1">Data Origem</p>
+                  <p className="text-sm">{selectedDocument.dataOrigem}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500 mb-1">Data Integração</p>
+                  <p className="text-sm">{selectedDocument.dataIntegracao}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500 mb-1">Status Origem</p>
+                  <p className="text-sm">{selectedDocument.statusOrigem}</p>
+                </div>
+                <div className="col-span-2">
+                  <p className="text-sm font-medium text-gray-500 mb-1">Descrições Origem</p>
+                  <p className="text-sm bg-gray-50 p-3 rounded-md text-gray-700 max-h-24 overflow-y-auto">
+                    {selectedDocument.descricaoOrigem}
+                  </p>
+                </div>
+              </div>
+            )}
+            
+            {!isIntegrated && (
+              <div className="grid gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-500 mb-1">Nome</p>
+                  <p className="text-sm">{selectedDocument.nome}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500 mb-1">Status</p>
+                  <div>{getStatusBadge(selectedDocument.status)}</div>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500 mb-1">Data</p>
+                  <p className="text-sm">{selectedDocument.data}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500 mb-1">Tipo</p>
+                  <div className="flex items-center">
+                    {getTipoIcon(selectedDocument.tipo)}
+                    <span className="ml-2">{selectedDocument.tipo}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsViewModalOpen(false)}>
+              Fechar
+            </Button>
+            <Button>
+              <Download className="mr-2 h-4 w-4" />
+              Baixar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
   return (
     <div className="fade-in">
       <div className="pb-5 border-b border-gray-200 sm:flex sm:items-center sm:justify-between">
@@ -183,6 +329,8 @@ export default function DocumentosPage() {
           </Button>
         </div>
       </div>
+      
+      {renderViewModal()}
 
       <div className="mt-6">
         <Tabs 
