@@ -183,18 +183,21 @@ function ToolbarPlugin() {
   );
 }
 
-function FooterPlugin({ editor }: { editor: LexicalEditor }) {
+function FooterPlugin() {
+  const [editor] = useLexicalComposerContext();
   const [wordCount, setWordCount] = useState(0);
 
   useEffect(() => {
-    return editor.registerUpdateListener(({ editorState }) => {
-      editorState.read(() => {
-        const root = $getRoot();
-        const text = root.getTextContent();
-        const words = text.trim().split(/\s+/);
-        setWordCount(text.trim() === "" ? 0 : words.length);
+    if (editor) {
+      return editor.registerUpdateListener(({ editorState }) => {
+        editorState.read(() => {
+          const root = $getRoot();
+          const text = root.getTextContent();
+          const words = text.trim().split(/\s+/);
+          setWordCount(text.trim() === "" ? 0 : words.length);
+        });
       });
-    });
+    }
   }, [editor]);
 
   return (
@@ -346,7 +349,7 @@ export default function TextEditor() {
         <ListPlugin />
         <LinkPlugin />
         <div className="border-t border-gray-200">
-          <FooterPlugin editor={null as any} />
+          <FooterPlugin />
         </div>
       </LexicalComposer>
     </div>
