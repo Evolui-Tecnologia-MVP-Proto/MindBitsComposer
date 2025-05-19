@@ -361,7 +361,7 @@ export default function AdminPage() {
         if (columns && columns.length > 0) {
           setTestResult({
             success: true,
-            message: `${columns.length} colunas encontradas no banco de dados.`
+            message: ""
           });
         } else {
           setTestResult({
@@ -487,10 +487,10 @@ export default function AdminPage() {
                             </FormControl>
                             <Button 
                               type="button"
-                              variant={testResult ? (testResult.success ? "default" : "warning") : "outline"}
+                              variant="outline"
                               onClick={() => testMondayConnection(form.getValues().boardId)}
                               disabled={isTesting || !form.getValues().boardId}
-                              className={testResult ? (testResult.success ? "bg-green-600 hover:bg-green-700" : "bg-yellow-500 hover:bg-yellow-600 text-white") : ""}
+                              className={testResult ? (testResult.success ? "bg-green-600 hover:bg-green-700 text-white" : "bg-yellow-500 hover:bg-yellow-600 text-white") : ""}
                             >
                               {isTesting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Link className="h-4 w-4 mr-2" />}
                               Testar
@@ -504,19 +504,12 @@ export default function AdminPage() {
                       )}
                     />
                     
-                    {testResult && (
-                      <div className={`p-3 rounded-md ${testResult.success ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-                        {testResult.success ? (
-                          <div className="flex items-center">
-                            <CheckCircle2 className="h-5 w-5 mr-2" />
-                            <span>{testResult.message}</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center">
-                            <AlertCircle className="h-5 w-5 mr-2" />
-                            <span>{testResult.message}</span>
-                          </div>
-                        )}
+                    {testResult && !testResult.success && (
+                      <div className="p-3 rounded-md bg-red-50 text-red-700">
+                        <div className="flex items-center">
+                          <AlertCircle className="h-5 w-5 mr-2" />
+                          <span>{testResult.message}</span>
+                        </div>
                       </div>
                     )}
                     
