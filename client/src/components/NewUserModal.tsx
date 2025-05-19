@@ -107,6 +107,14 @@ export default function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
           <DialogTitle>Novo Usuário</DialogTitle>
         </DialogHeader>
 
+        <Alert variant="info" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Será gerada uma senha inicial com base no email do usuário (parte antes do @ + "123").
+            O usuário deverá alterar esta senha no primeiro acesso.
+          </AlertDescription>
+        </Alert>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
