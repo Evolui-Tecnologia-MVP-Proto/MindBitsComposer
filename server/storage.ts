@@ -22,6 +22,7 @@ export interface IStorage {
   updateUserPassword(id: number, password: string): Promise<void>;
   updateUserStatus(id: number, status: UserStatus): Promise<User>;
   updateUserMustChangePassword(id: number, mustChange: boolean): Promise<void>;
+  deleteUser(id: number): Promise<void>;
   
   // Template operations
   getTemplate(id: string): Promise<Template | undefined>;
@@ -102,6 +103,12 @@ export class DatabaseStorage implements IStorage {
     await db
       .update(users)
       .set({ mustChangePassword })
+      .where(eq(users.id, id));
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    await db
+      .delete(users)
       .where(eq(users.id, id));
   }
 

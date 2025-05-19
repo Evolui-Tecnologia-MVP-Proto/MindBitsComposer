@@ -3,15 +3,43 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, UserPlus } from "lucide-react";
+import { 
+  Search, 
+  UserPlus, 
+  Trash2, 
+  Edit, 
+  Lock, 
+  Unlock, 
+  KeyRound,
+  MoreHorizontal 
+} from "lucide-react";
 import { User, UserStatus, UserRole } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import NewUserModal from "./NewUserModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function UserTable() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isNewUserModalOpen, setIsNewUserModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [userToResetPassword, setUserToResetPassword] = useState<User | null>(null);
   const { toast } = useToast();
   
   const {
@@ -40,6 +68,52 @@ export default function UserTable() {
         description: error.message,
         variant: "destructive",
       });
+    },
+  });
+
+  const deleteUserMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await apiRequest("DELETE", `/api/users/${id}`);
+      return res.status === 204 ? {} : res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      toast({
+        title: "Usuário excluído",
+        description: "O usuário foi excluído com sucesso.",
+      });
+      setUserToDelete(null);
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao excluir usuário",
+        description: error.message,
+        variant: "destructive",
+      });
+      setUserToDelete(null);
+    },
+  });
+
+  const resetPasswordMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await apiRequest("POST", `/api/users/${id}/reset-password`);
+      return res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      toast({
+        title: "Senha resetada",
+        description: `A senha foi resetada com sucesso. A nova senha é: ${data.initialPassword}`,
+      });
+      setUserToResetPassword(null);
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao resetar senha",
+        description: error.message,
+        variant: "destructive",
+      });
+      setUserToResetPassword(null);
     },
   });
 
@@ -193,13 +267,57 @@ export default function UserTable() {
                           {getTranslatedRole(user.role)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <Button 
-                            variant="link" 
-                            className="text-primary-600 hover:text-primary-900"
-                            onClick={() => toggleStatus(user)}
-                          >
-                            {user.status === UserStatus.ACTIVE ? "Desativar" : "Ativar"}
-                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={() => console.log("Editar", user.id)}
+                                className="cursor-pointer"
+                              >
+                                <Edit className="mr-2 h-4 w-4" />
+                                Editar
+                              </DropdownMenuItem>
+                              
+                              <DropdownMenuItem
+                                onClick={() => toggleStatus(user)}
+                                className="cursor-pointer"
+                              >
+                                {user.status === UserStatus.ACTIVE ? (
+                                  <>
+                                    <Lock className="mr-2 h-4 w-4" />
+                                    Bloquear
+                                  </>
+                                ) : (
+                                  <>
+                                    <Unlock className="mr-2 h-4 w-4" />
+                                    Desbloquear
+                                  </>
+                                )}
+                              </DropdownMenuItem>
+                              
+                              <DropdownMenuItem
+                                onClick={() => setUserToResetPassword(user)}
+                                className="cursor-pointer"
+                              >
+                                <KeyRound className="mr-2 h-4 w-4" />
+                                Resetar Senha
+                              </DropdownMenuItem>
+                              
+                              <DropdownMenuSeparator />
+                              
+                              <DropdownMenuItem
+                                onClick={() => setUserToDelete(user)}
+                                className="cursor-pointer text-red-600"
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Excluir
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </td>
                       </tr>
                     ))}
@@ -215,6 +333,49 @@ export default function UserTable() {
         isOpen={isNewUserModalOpen} 
         onClose={() => setIsNewUserModalOpen(false)} 
       />
+
+      {/* Diálogo de confirmação para excluir usuário */}
+      <AlertDialog open={!!userToDelete} onOpenChange={() => setUserToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir Usuário</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o usuário "{userToDelete?.name}"?
+              Esta ação não poderá ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => userToDelete && deleteUserMutation.mutate(userToDelete.id)}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleteUserMutation.isPending ? "Excluindo..." : "Excluir"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Diálogo de confirmação para resetar senha */}
+      <AlertDialog open={!!userToResetPassword} onOpenChange={() => setUserToResetPassword(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Resetar Senha</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja resetar a senha do usuário "{userToResetPassword?.name}"?
+              Uma nova senha será gerada automaticamente e exibida para você.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => userToResetPassword && resetPasswordMutation.mutate(userToResetPassword.id)}
+            >
+              {resetPasswordMutation.isPending ? "Resetando..." : "Resetar Senha"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

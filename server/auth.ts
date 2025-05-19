@@ -360,4 +360,68 @@ export function setupAuth(app: Express) {
       next(error);
     }
   });
+
+  // Delete user (admin only)
+  app.delete("/api/users/:id", async (req, res, next) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    if (req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Acesso não autorizado" });
+    }
+
+    try {
+      const userId = parseInt(req.params.id);
+
+      if (userId === req.user.id) {
+        return res.status(400).json({ message: "Não é possível excluir o próprio usuário" });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      await storage.deleteUser(userId);
+      res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // Reset user password (admin only)
+  app.post("/api/users/:id/reset-password", async (req, res, next) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Não autenticado" });
+    }
+
+    if (req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Acesso não autorizado" });
+    }
+
+    try {
+      const userId = parseInt(req.params.id);
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+
+      // Gerar nova senha baseada no email (parte antes do @ + "123")
+      const username = user.email.split('@')[0];
+      const initialPassword = `${username}123`;
+
+      // Atualizar a senha e definir flag para mudar senha no próximo login
+      await storage.updateUserPassword(userId, await hashPassword(initialPassword));
+      await storage.updateUserMustChangePassword(userId, true);
+
+      res.status(200).json({ 
+        message: "Senha resetada com sucesso",
+        initialPassword
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
 }
