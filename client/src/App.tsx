@@ -10,7 +10,7 @@ import AdminPage from "@/pages/admin-page";
 import PreferencesPage from "@/pages/preferences-page";
 import TemplatesPage from "@/pages/templates-page";
 import EditorPage from "@/pages/editor-page";
-import FluxosPage from "@/pages/fluxos-page";
+import FluxosPage from "@/pages/fluxos-page-new";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "./lib/protected-route";
 

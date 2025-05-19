@@ -5,24 +5,20 @@ import ReactFlow, {
   Background,
   MiniMap,
   addEdge,
-  Panel,
   useNodesState,
   useEdgesState,
   MarkerType,
   ConnectionLineType,
   NodeTypes,
   Node,
-  Edge,
   Position,
   Handle,
   NodeProps
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { PlusCircle, Save, RotateCcw, Share2 } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { PlusCircle, Save, RotateCcw } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -158,8 +154,40 @@ const FlowCanvas = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
-  const [flowName, setFlowName] = useState('Novo Fluxo');
   const [selectedNodeType, setSelectedNodeType] = useState<string | null>(null);
+
+  // Função para adicionar um novo nó ao centro do canvas
+  const addNode = () => {
+    if (!selectedNodeType || !reactFlowInstance || !reactFlowWrapper.current) return;
+    
+    const nodeData = {
+      'startNode': { type: 'startNode', label: 'Início' },
+      'elaboreNode': { type: 'elaboreNode', label: 'Elaborar' },
+      'approveNode': { type: 'approveNode', label: 'Aprovar' },
+      'decisionNode': { type: 'decisionNode', label: 'Decisão' },
+      'reviseNode': { type: 'reviseNode', label: 'Revisar' },
+      'endNode': { type: 'endNode', label: 'Fim' }
+    }[selectedNodeType];
+    
+    if (!nodeData) return;
+    
+    const centerPosition = reactFlowInstance.screenToFlowPosition({
+      x: reactFlowWrapper.current.clientWidth / 2,
+      y: reactFlowWrapper.current.clientHeight / 2,
+    });
+    
+    const newNode = {
+      id: `${nodeData.type}-${nodes.length + 1}`,
+      type: nodeData.type,
+      position: centerPosition,
+      data: { label: nodeData.label },
+    };
+    
+    setNodes((nds) => nds.concat(newNode));
+    
+    // Reset de seleção para facilitar a adição de múltiplos nós do mesmo tipo
+    // setSelectedNodeType(null);
+  };
 
   const onConnect = useCallback((params: any) => {
     setEdges((eds) =>
@@ -177,47 +205,15 @@ const FlowCanvas = () => {
     );
   }, [setEdges]);
 
-  const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
-  }, []);
-
-  const onDrop = useCallback(
-    (event: React.DragEvent<HTMLDivElement>) => {
-      event.preventDefault();
-
-      if (reactFlowWrapper.current && reactFlowInstance) {
-        const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-        const type = event.dataTransfer.getData('application/reactflow');
-        const label = event.dataTransfer.getData('application/reactflow/label');
-
-        // Verificar se o tipo é válido
-        if (!type || !nodeTypes[type as keyof NodeTypes]) {
-          return;
-        }
-
-        const position = reactFlowInstance.project({
-          x: event.clientX - reactFlowBounds.left,
-          y: event.clientY - reactFlowBounds.top,
-        });
-
-        const newNode = {
-          id: `${type}-${nodes.length + 1}`,
-          type,
-          position,
-          data: { label },
-        };
-
-        setNodes((nds) => nds.concat(newNode));
-      }
-    },
-    [reactFlowInstance, setNodes, nodes.length]
-  );
-
-  const onDragStart = (event: React.DragEvent<HTMLDivElement>, nodeType: string, label: string) => {
-    event.dataTransfer.setData('application/reactflow', nodeType);
-    event.dataTransfer.setData('application/reactflow/label', label);
-    event.dataTransfer.effectAllowed = 'move';
+  const handleReset = () => {
+    setNodes(initialNodes);
+    setEdges([]);
+    setSelectedNodeType(null);
+    
+    toast({
+      title: 'Fluxo reiniciado',
+      description: 'Todas as alterações foram descartadas',
+    });
   };
 
   const handleSave = () => {
@@ -232,7 +228,6 @@ const FlowCanvas = () => {
 
     // Aqui você pode implementar a lógica para salvar o fluxo
     const flow = {
-      name: flowName,
       nodes,
       edges,
     };
@@ -241,89 +236,83 @@ const FlowCanvas = () => {
     
     toast({
       title: 'Fluxo salvo',
-      description: `O fluxo "${flowName}" foi salvo com sucesso!`,
-    });
-  };
-
-  const handleReset = () => {
-    setNodes(initialNodes);
-    setEdges([]);
-    setFlowName('Novo Fluxo');
-    
-    toast({
-      title: 'Fluxo reiniciado',
-      description: 'Todas as alterações foram descartadas',
+      description: 'O fluxo foi salvo com sucesso!',
     });
   };
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center mb-4 bg-white p-4 rounded-lg shadow-sm">
-        <div className="flex items-center space-x-4">
-          {/* Combo de Nódulos e Botão de Criação */}
-          <div className="flex items-center space-x-2">
-            <div className="w-64">
-              <Select onValueChange={(value) => {
-                // Apenas armazena o tipo selecionado, sem criar o nó
-                if (value) {
-                  setSelectedNodeType(value as string);
-                }
-              }}>
-                <SelectTrigger id="node-type">
-                  <SelectValue placeholder="Selecione um nó" />
-                </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="startNode" className="flex items-center">
-                  <div className="flex-1 flex items-center">
-                    <div className="h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                    </div>
-                    <span className="ml-3">Início</span>
+        <div className="flex items-center space-x-2">
+          {/* Combo de seleção de nó */}
+          <Select
+            value={selectedNodeType || undefined}
+            onValueChange={(value) => setSelectedNodeType(value)}
+          >
+            <SelectTrigger className="w-64">
+              <SelectValue placeholder="Selecione um nó" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="startNode" className="flex items-center">
+                <div className="flex-1 flex items-center">
+                  <div className="h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="10 8 16 12 10 16 10 8"/></svg>
                   </div>
-                </SelectItem>
-                <SelectItem value="elaboreNode" className="flex items-center">
-                  <div className="flex-1 flex items-center">
-                    <div className="h-5 w-5 rounded-lg bg-green-600 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                    </div>
-                    <span className="ml-3">Elaborar</span>
+                  <span className="ml-3">Início</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="elaboreNode" className="flex items-center">
+                <div className="flex-1 flex items-center">
+                  <div className="h-5 w-5 rounded-lg bg-green-600 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                   </div>
-                </SelectItem>
-                <SelectItem value="approveNode" className="flex items-center">
-                  <div className="flex-1 flex items-center">
-                    <div className="h-5 w-5 rounded-lg bg-indigo-600 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                    </div>
-                    <span className="ml-3">Aprovar</span>
+                  <span className="ml-3">Elaborar</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="approveNode" className="flex items-center">
+                <div className="flex-1 flex items-center">
+                  <div className="h-5 w-5 rounded-lg bg-indigo-600 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
                   </div>
-                </SelectItem>
-                <SelectItem value="decisionNode" className="flex items-center">
-                  <div className="flex-1 flex items-center">
-                    <div className="h-5 w-5 rotate-45 bg-amber-600 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform -rotate-45"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    </div>
-                    <span className="ml-3">Decisão</span>
+                  <span className="ml-3">Aprovar</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="decisionNode" className="flex items-center">
+                <div className="flex-1 flex items-center">
+                  <div className="h-5 w-5 rotate-45 bg-amber-600 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform -rotate-45"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                   </div>
-                </SelectItem>
-                <SelectItem value="reviseNode" className="flex items-center">
-                  <div className="flex-1 flex items-center">
-                    <div className="h-5 w-5 rounded-lg bg-rose-600 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 2v6h6M21.5 22v-6h-6"></path><path d="M22 11.5A10 10 0 0 0 3 9"></path><path d="M2 13a10 10 0 0 0 19 2.5"></path></svg>
-                    </div>
-                    <span className="ml-3">Revisar</span>
+                  <span className="ml-3">Decisão</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="reviseNode" className="flex items-center">
+                <div className="flex-1 flex items-center">
+                  <div className="h-5 w-5 rounded-lg bg-rose-600 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 2v6h6M21.5 22v-6h-6"></path><path d="M22 11.5A10 10 0 0 0 3 9"></path><path d="M2 13a10 10 0 0 0 19 2.5"></path></svg>
                   </div>
-                </SelectItem>
-                <SelectItem value="endNode" className="flex items-center">
-                  <div className="flex-1 flex items-center">
-                    <div className="h-5 w-5 rounded-full bg-slate-600 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="12" x2="16" y2="12"/></svg>
-                    </div>
-                    <span className="ml-3">Fim</span>
+                  <span className="ml-3">Revisar</span>
+                </div>
+              </SelectItem>
+              <SelectItem value="endNode" className="flex items-center">
+                <div className="flex-1 flex items-center">
+                  <div className="h-5 w-5 rounded-full bg-slate-600 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="12" x2="16" y2="12"/></svg>
                   </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+                  <span className="ml-3">Fim</span>
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+          
+          {/* Botão de adicionar nó */}
+          <Button 
+            onClick={addNode} 
+            size="sm" 
+            disabled={!selectedNodeType}
+          >
+            <PlusCircle className="mr-1 h-4 w-4" />
+            Adicionar
+          </Button>
         </div>
         
         <div className="flex space-x-2">
@@ -338,10 +327,8 @@ const FlowCanvas = () => {
         </div>
       </div>
       
-      <div className="flex flex-1 overflow-hidden border border-gray-200 rounded-md">
-        {/* Nódulos agora como combo na barra superior */}
-        
-        <div className="flex-1 h-full" ref={reactFlowWrapper}>
+      <div className="flex-1 h-full border border-gray-200 rounded-md">
+        <div className="w-full h-full" ref={reactFlowWrapper}>
           <ReactFlow
             nodes={nodes}
             edges={edges}
@@ -349,8 +336,6 @@ const FlowCanvas = () => {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onInit={setReactFlowInstance}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
             nodeTypes={nodeTypes}
             defaultEdgeOptions={{
               type: 'smoothstep',
