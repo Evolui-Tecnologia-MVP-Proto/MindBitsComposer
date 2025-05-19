@@ -64,6 +64,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
+      console.log("Body recebido para criação de template:", JSON.stringify(req.body, null, 2));
       const templateData = insertTemplateSchema.parse(req.body);
       
       // Verificar se já existe template com o mesmo código
@@ -72,7 +73,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).send("Já existe um template com este código");
       }
       
+      // Garantir que a estrutura seja um objeto e não uma string
+      if (typeof templateData.structure === 'string') {
+        try {
+          templateData.structure = JSON.parse(templateData.structure);
+        } catch (e) {
+          console.warn("Não foi possível analisar a estrutura como JSON:", e);
+        }
+      }
+      
+      console.log("Dados do template a ser criado:", templateData);
       const newTemplate = await storage.createTemplate(templateData);
+      console.log("Template criado com sucesso:", newTemplate);
+      
       res.status(201).json(newTemplate);
     } catch (error) {
       console.error("Erro ao criar template:", error);
@@ -93,6 +106,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const { id } = req.params;
     
     try {
+      console.log("Body recebido para atualização de template:", JSON.stringify(req.body, null, 2));
+      
       // Verificar se o template existe
       const existingTemplate = await storage.getTemplate(id);
       if (!existingTemplate) {
@@ -107,7 +122,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      const updatedTemplate = await storage.updateTemplate(id, req.body);
+      // Garantir que a estrutura seja um objeto e não uma string
+      const dataToUpdate = { ...req.body };
+      if (typeof dataToUpdate.structure === 'string') {
+        try {
+          dataToUpdate.structure = JSON.parse(dataToUpdate.structure);
+        } catch (e) {
+          console.warn("Não foi possível analisar a estrutura como JSON:", e);
+        }
+      }
+      
+      console.log("Dados do template a ser atualizado:", dataToUpdate);
+      const updatedTemplate = await storage.updateTemplate(id, dataToUpdate);
+      console.log("Template atualizado com sucesso:", updatedTemplate);
+      
       res.json(updatedTemplate);
     } catch (error) {
       console.error("Erro ao atualizar template:", error);
