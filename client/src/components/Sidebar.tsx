@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Settings, FileText, Edit, GitBranch, File, Code2, Activity } from "lucide-react";
+import { Settings, FileText, Edit, GitBranch, File } from "lucide-react";
 
 type SidebarProps = {
   isMobileOpen: boolean;
@@ -50,18 +50,6 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
           </div>
           
           <div className="sidebar-item-container">
-            <Link href="/monday-mapping">
-              <div 
-                className={`sidebar-item ${activeItem === "monday-mapping" ? "sidebar-active" : ""}`}
-                onClick={closeMobileMenu}
-              >
-                <Code2 className="mr-3 h-6 w-6" />
-                Mapear Colunas Monday
-              </div>
-            </Link>
-          </div>
-          
-          <div className="sidebar-item-container">
             <Link href="/templates">
               <div 
                 className={`sidebar-item ${activeItem === "templates" ? "sidebar-active" : ""}`}
@@ -105,18 +93,6 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
               >
                 <File className="mr-3 h-6 w-6" />
                 Documentos
-              </div>
-            </Link>
-          </div>
-          
-          <div className="sidebar-item-container">
-            <Link href="/monday-mapping">
-              <div 
-                className={`sidebar-item ${activeItem === "monday-mapping" ? "sidebar-active" : ""}`}
-                onClick={closeMobileMenu}
-              >
-                <Code2 className="mr-3 h-6 w-6" />
-                Monday.com
               </div>
             </Link>
           </div>
