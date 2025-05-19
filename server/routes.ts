@@ -206,24 +206,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const mappings = await storage.getAllMondayMappings();
       
       // Para cada mapeamento, buscar a contagem de colunas mapeadas
-      const mappingsWithColumnCount = await Promise.all(
-        mappings.map(async (mapping) => {
-          try {
-            const columns = await storage.getMappingColumns(mapping.id);
-            console.log(`Mapeamento ID ${mapping.id} (${mapping.name}): ${columns.length} colunas mapeadas`);
-            return {
-              ...mapping,
-              columnCount: columns.length
-            };
-          } catch (error) {
-            console.error(`Erro ao buscar colunas para mapeamento ${mapping.id}:`, error);
-            return {
-              ...mapping,
-              columnCount: 0
-            };
-          }
-        })
-      );
+      const mappingsWithColumnCount = [];
+      
+      for (const mapping of mappings) {
+        try {
+          // Consulta SQL direta para contar as colunas mapeadas
+          const result = await db.execute(
+            `SELECT COUNT(*) as count FROM mapping_columns WHERE mapping_id = $1`,
+            [mapping.id]
+          );
+          
+          const count = parseInt(result.rows[0].count);
+          console.log(`Mapeamento SQL ID ${mapping.id} (${mapping.name}): ${count} colunas mapeadas`);
+          
+          mappingsWithColumnCount.push({
+            ...mapping,
+            columnCount: count
+          });
+        } catch (error) {
+          console.error(`Erro ao buscar colunas para mapeamento ${mapping.id}:`, error);
+          mappingsWithColumnCount.push({
+            ...mapping,
+            columnCount: 0
+          });
+        }
+      }
       
       res.json(mappingsWithColumnCount);
     } catch (error) {
