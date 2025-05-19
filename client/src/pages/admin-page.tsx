@@ -354,6 +354,29 @@ export default function AdminPage() {
       description: mapping.description || "",
     });
     
+    // Verifica se existem colunas para este mapeamento e ajusta o resultado do teste
+    fetch(`/api/monday/mappings/${mapping.id}/columns`)
+      .then(response => response.json())
+      .then(columns => {
+        if (columns && columns.length > 0) {
+          setTestResult({
+            success: true,
+            message: `${columns.length} colunas encontradas no banco de dados.`
+          });
+        } else {
+          setTestResult({
+            success: false,
+            message: "Nenhuma coluna encontrada. Clique em 'Conectar' para buscar colunas."
+          });
+        }
+      })
+      .catch(() => {
+        setTestResult({
+          success: false,
+          message: "Nenhuma coluna encontrada. Clique em 'Conectar' para buscar colunas."
+        });
+      });
+    
     setIsModalOpen(true);
   };
   
@@ -464,9 +487,10 @@ export default function AdminPage() {
                             </FormControl>
                             <Button 
                               type="button"
-                              variant="outline"
+                              variant={testResult ? (testResult.success ? "default" : "warning") : "outline"}
                               onClick={() => testMondayConnection(form.getValues().boardId)}
                               disabled={isTesting || !form.getValues().boardId}
+                              className={testResult ? (testResult.success ? "bg-green-600 hover:bg-green-700" : "bg-yellow-500 hover:bg-yellow-600 text-white") : ""}
                             >
                               {isTesting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Link className="h-4 w-4 mr-2" />}
                               Testar
