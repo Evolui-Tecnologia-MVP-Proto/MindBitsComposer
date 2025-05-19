@@ -329,8 +329,6 @@ export default function AdminPage() {
     name: z.string().min(1, "O nome é obrigatório"),
     boardId: z.string().min(1, "O ID do quadro é obrigatório"),
     description: z.string().optional(),
-    statusColumn: z.string().optional(),
-    responsibleColumn: z.string().optional(),
   });
   
   type FormValues = z.infer<typeof formSchema>;
@@ -342,8 +340,6 @@ export default function AdminPage() {
       name: "",
       boardId: "",
       description: "",
-      statusColumn: "",
-      responsibleColumn: "",
     }
   });
   
@@ -356,8 +352,6 @@ export default function AdminPage() {
       name: mapping.name,
       boardId: mapping.boardId,
       description: mapping.description || "",
-      statusColumn: mapping.statusColumn || "",
-      responsibleColumn: mapping.responsibleColumn || "",
     });
     
     setIsModalOpen(true);
@@ -372,8 +366,6 @@ export default function AdminPage() {
       name: "",
       boardId: "",
       description: "",
-      statusColumn: "",
-      responsibleColumn: "",
     });
     
     setIsModalOpen(true);
@@ -511,39 +503,7 @@ export default function AdminPage() {
                   )}
                 />
                 
-                <FormField
-                  control={form.control}
-                  name="statusColumn"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Coluna de Status (opcional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Nome ou ID da coluna de status" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        Coluna que define o status do item no Monday
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="responsibleColumn"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Coluna de Responsável (opcional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Nome ou ID da coluna de responsável" {...field} />
-                      </FormControl>
-                      <FormDescription>
-                        Coluna que define o responsável pelo item no Monday
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {/* Campos de status e responsável removidos conforme solicitado */}
               </div>
             </Form>
           </div>
