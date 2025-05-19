@@ -72,7 +72,7 @@ export default function DocumentosPage() {
       origem: "Monday",
       dataOrigem: "18/05/2025",
       dataIntegracao: "19/05/2025",
-      statusOrigem: "Completo",
+      statusOrigem: "Concluido",
       descricaoOrigem: "Contrato de prestação de serviços aprovado pelo cliente. Este documento serve como base para todas as atividades relacionadas ao projeto e define escopo, prazos e termos de pagamento.",
       anexos: [
         { id: 1, tipo: "PDF" as TipoAnexo, nome: "Contrato_Assinado.pdf" },
@@ -89,7 +89,7 @@ export default function DocumentosPage() {
       origem: "EVO-CTx",
       dataOrigem: "15/05/2025",
       dataIntegracao: "18/05/2025",
-      statusOrigem: "Aprovado",
+      statusOrigem: "Em CRP",
       descricaoOrigem: "Proposta comercial final enviada ao cliente com detalhamento dos serviços, cronograma e valores.",
       anexos: [
         { id: 4, tipo: "XLX" as TipoAnexo, nome: "Planilha_Custos.xlsx" },
@@ -107,13 +107,42 @@ export default function DocumentosPage() {
       origem: "Monday",
       dataOrigem: "12/05/2025",
       dataIntegracao: "15/05/2025",
-      statusOrigem: "Desatualizado",
+      statusOrigem: "Em Aprovação",
       descricaoOrigem: "Versão inicial do termo de compromisso para o projeto. Este documento foi substituído pela versão final do contrato.",
       anexos: [
         { id: 8, tipo: "PDF" as TipoAnexo, nome: "Termo_Original.pdf" },
         { id: 9, tipo: "TXT" as TipoAnexo, nome: "Comentários.txt" },
         { id: 10, tipo: "Outro" as TipoAnexo, nome: "Arquivo_Sistema.bin" }
       ]
+    },
+    { 
+      id: 9, 
+      nome: "Memorando Técnico", 
+      data: "17/05/2025", 
+      tipo: "DOCX", 
+      status: "Ativo",
+      origem: "Monday",
+      dataOrigem: "16/05/2025",
+      dataIntegracao: "17/05/2025",
+      statusOrigem: "Em DRP",
+      descricaoOrigem: "Memorando técnico detalhando as especificações de hardware e software necessárias para o projeto.",
+      anexos: [
+        { id: 11, tipo: "PDF" as TipoAnexo, nome: "Diagrama_Rede.pdf" },
+        { id: 12, tipo: "XLX" as TipoAnexo, nome: "Requisitos_Hardware.xlsx" }
+      ]
+    },
+    { 
+      id: 10, 
+      nome: "Requisitos de Sistema", 
+      data: "14/05/2025", 
+      tipo: "PDF", 
+      status: "Ativo",
+      origem: "EVO-CTx",
+      dataOrigem: "13/05/2025",
+      dataIntegracao: "14/05/2025",
+      statusOrigem: "Incluido",
+      descricaoOrigem: "Documento de requisitos de sistema contendo todas as funcionalidades solicitadas pelo cliente.",
+      anexos: []
     }
   ];
 
@@ -187,6 +216,50 @@ export default function DocumentosPage() {
       </Badge>
     );
   };
+  
+  const getStatusOrigemBadge = (status: string) => {
+    let bgColor = "";
+    let textColor = "";
+    let icon = null;
+    
+    switch(status) {
+      case "Incluido":
+        bgColor = "bg-gray-100";
+        textColor = "text-gray-700";
+        icon = <File className="mr-1 h-3 w-3" />;
+        break;
+      case "Em CRP":
+        bgColor = "bg-blue-100";
+        textColor = "text-blue-700";
+        icon = <FileText className="mr-1 h-3 w-3" />;
+        break;
+      case "Em Aprovação":
+        bgColor = "bg-amber-100";
+        textColor = "text-amber-700";
+        icon = <Clock className="mr-1 h-3 w-3" />;
+        break;
+      case "Em DRP":
+        bgColor = "bg-purple-100";
+        textColor = "text-purple-700";
+        icon = <FileSearch className="mr-1 h-3 w-3" />;
+        break;
+      case "Concluido":
+        bgColor = "bg-green-100";
+        textColor = "text-green-700";
+        icon = <Check className="mr-1 h-3 w-3" />;
+        break;
+      default:
+        bgColor = "bg-gray-100";
+        textColor = "text-gray-700";
+    }
+    
+    return (
+      <div className={`px-2 py-1 rounded-full inline-flex items-center ${bgColor} ${textColor} text-xs font-medium`}>
+        {icon}
+        {status}
+      </div>
+    );
+  };
 
   const openViewModal = (documento: any) => {
     setSelectedDocument(documento);
@@ -238,7 +311,7 @@ export default function DocumentosPage() {
                 <TableCell>{getStatusBadge(documento.status)}</TableCell>
                 <TableCell className="text-sm text-gray-500">{documento.dataOrigem}</TableCell>
                 <TableCell className="text-sm text-gray-500">{documento.dataIntegracao}</TableCell>
-                <TableCell className="text-sm">{documento.statusOrigem}</TableCell>
+                <TableCell>{getStatusOrigemBadge(documento.statusOrigem)}</TableCell>
                 <TableCell>
                   {documento.anexos && documento.anexos.length > 0 ? (
                     <Badge variant="outline" className="bg-amber-50 text-amber-700 hover:bg-amber-100">
@@ -291,7 +364,7 @@ export default function DocumentosPage() {
         ))}
         {documentos.length === 0 && (
           <TableRow>
-            <TableCell colSpan={5} className="text-center py-6 text-gray-500">
+            <TableCell colSpan={activeTab === "integrados" ? 8 : 5} className="text-center py-6 text-gray-500">
               Nenhum documento encontrado nesta categoria.
             </TableCell>
           </TableRow>
@@ -343,7 +416,7 @@ export default function DocumentosPage() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500 mb-1">Status Origem</p>
-                  <p className="text-sm">{selectedDocument.statusOrigem}</p>
+                  <div>{getStatusOrigemBadge(selectedDocument.statusOrigem)}</div>
                 </div>
                 <div className="col-span-2">
                   <p className="text-sm font-medium text-gray-500 mb-1">Descrições Origem</p>
