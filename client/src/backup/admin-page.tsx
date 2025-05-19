@@ -1226,16 +1226,6 @@ export default function AdminPage() {
                                       <Pencil className="h-4 w-4" />
                                     </button>
                                     <button
-                                      onClick={() => {
-                                        setSelectedMapping(mapping);
-                                        setIsColumnMappingModalOpen(true);
-                                      }}
-                                      className="p-1 text-gray-500 hover:text-blue-500 transition-colors"
-                                      title="Mapear Colunas"
-                                    >
-                                      <ArrowDown className="h-4 w-4" />
-                                    </button>
-                                    <button
                                       onClick={() => openDeleteDialog(mapping)}
                                       className="p-1 text-gray-500 hover:text-red-600 transition-colors"
                                       title="Excluir mapeamento"
