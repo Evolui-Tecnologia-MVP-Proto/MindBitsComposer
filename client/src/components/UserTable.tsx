@@ -316,7 +316,7 @@ export default function UserTable() {
                                 ) : (
                                   <>
                                     <Unlock className="mr-2 h-4 w-4" />
-                                    Desbloquear
+                                    {user.status === UserStatus.PENDING ? "Ativar" : "Desbloquear"}
                                   </>
                                 )}
                               </DropdownMenuItem>
