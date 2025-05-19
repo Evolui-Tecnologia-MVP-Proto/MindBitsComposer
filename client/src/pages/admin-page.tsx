@@ -416,23 +416,42 @@ export default function AdminPage() {
     setIsTesting(true);
     setTestResult(null);
     
-    // Simulação de teste - em ambiente real, seria uma chamada API
-    // Simulando erro para quadros com ID < 1000 (apenas para demonstração)
-    setTimeout(() => {
-      if (parseInt(boardId) < 1000) {
+    // Faz uma requisição para a API do Monday para verificar o quadro
+    fetch(`/api/monday/boards/${boardId}/validate`, {
+      method: "GET",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          // Se o servidor retornar erro, significa que não conseguiu conectar ao quadro
+          setTestResult({
+            success: false,
+            message: "Não foi possível conectar ao quadro. Verifique o ID e a chave da API.",
+            error: true // Indica erro crítico que impede o salvamento
+          });
+          return;
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data) {
+          // Se retornou dados, conexão bem-sucedida
+          setTestResult({
+            success: true,
+            message: "Conexão com o Monday.com estabelecida e quadro encontrado!"
+          });
+        }
+      })
+      .catch((error) => {
+        // Em caso de erro na requisição ou no processamento
         setTestResult({
           success: false,
-          message: "Quadro não encontrado. Verifique o ID e tente novamente.",
-          error: true // Indica que é um erro que deve impedir o salvamento
+          message: "Erro ao testar conexão: " + (error.message || "Falha na conexão"),
+          error: true // Indica erro crítico que impede o salvamento
         });
-      } else {
-        setTestResult({
-          success: true,
-          message: "Conexão com o Monday.com estabelecida e quadro encontrado!"
-        });
-      }
-      setIsTesting(false);
-    }, 1000);
+      })
+      .finally(() => {
+        setIsTesting(false);
+      });
   };
   
   // Função para salvar as configurações do mapeamento
