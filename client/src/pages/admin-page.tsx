@@ -1066,7 +1066,7 @@ export default function AdminPage() {
                               <TableRow>
                                 <TableHead>Nome</TableHead>
                                 <TableHead>ID do Quadro</TableHead>
-                                <TableHead>Descrição</TableHead>
+                                <TableHead>Nome do Mapeamento</TableHead>
                                 <TableHead>Última Sincronização</TableHead>
                                 <TableHead className="w-32">Ações</TableHead>
                               </TableRow>
