@@ -29,13 +29,54 @@ import {
 } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
 
-// Componentes personalizados de nós
-import StartNode from '@/components/flow/StartNode';
-import EndNode from '@/components/flow/EndNode';
-import ElaboreNode from '@/components/flow/ElaboreNode';
-import ApproveNode from '@/components/flow/ApproveNode';
-import DecisionNode from '@/components/flow/DecisionNode';
-import ReviseNode from '@/components/flow/ReviseNode';
+// Definição dos componentes de nós personalizados
+const StartNode = memo(({ data }: NodeProps) => (
+  <div className="px-4 py-2 rounded-full bg-blue-100 border-2 border-blue-500 text-blue-700 shadow-md min-w-[100px] text-center">
+    <div className="font-medium">{data.label}</div>
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-blue-500" />
+  </div>
+));
+
+const EndNode = memo(({ data }: NodeProps) => (
+  <div className="px-4 py-2 rounded-full bg-slate-100 border-2 border-slate-500 text-slate-700 shadow-md min-w-[100px] text-center">
+    <div className="font-medium">{data.label}</div>
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-slate-500" />
+  </div>
+));
+
+const ElaboreNode = memo(({ data }: NodeProps) => (
+  <div className="px-4 py-2 rounded-lg bg-green-100 border-2 border-green-500 text-green-700 shadow-md min-w-[120px] text-center">
+    <div className="font-medium">{data.label}</div>
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-green-500" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-green-500" />
+  </div>
+));
+
+const ApproveNode = memo(({ data }: NodeProps) => (
+  <div className="px-4 py-2 rounded-lg bg-indigo-100 border-2 border-indigo-500 text-indigo-700 shadow-md min-w-[120px] text-center">
+    <div className="font-medium">{data.label}</div>
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-indigo-500" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-indigo-500" />
+  </div>
+));
+
+const DecisionNode = memo(({ data }: NodeProps) => (
+  <div className="w-32 h-32 rotate-45 flex items-center justify-center bg-amber-100 border-2 border-amber-500 text-amber-700 shadow-md">
+    <div className="font-medium text-center -rotate-45 w-full">{data.label}</div>
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-amber-500 -rotate-45" />
+    <Handle type="source" position={Position.Right} className="w-2 h-2 bg-amber-500 -rotate-45" id="a" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-amber-500 -rotate-45" id="b" />
+    <Handle type="source" position={Position.Left} className="w-2 h-2 bg-amber-500 -rotate-45" id="c" />
+  </div>
+));
+
+const ReviseNode = memo(({ data }: NodeProps) => (
+  <div className="px-4 py-2 rounded-lg bg-rose-100 border-2 border-rose-500 text-rose-700 shadow-md min-w-[120px] text-center">
+    <div className="font-medium">{data.label}</div>
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-rose-500" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-rose-500" />
+  </div>
+));
 
 const initialNodes: Node[] = [
   {
