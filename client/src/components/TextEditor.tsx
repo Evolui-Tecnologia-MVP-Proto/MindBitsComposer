@@ -199,6 +199,7 @@ export default function TextEditor() {
         if (template.structure && typeof template.structure === 'object') {
           const structure = template.structure as any;
           
+          // Verifica se é o formato com array de seções
           if (structure.sections && Array.isArray(structure.sections)) {
             // Definir as seções do template
             setSections(structure.sections);
@@ -212,8 +213,24 @@ export default function TextEditor() {
               title: "Seções criadas",
               description: `${structure.sections.length} seções foram criadas com base no template.`
             });
+          } 
+          // Verifica se é o formato com objeto de seções
+          else if (structure.sections && typeof structure.sections === 'object') {
+            // Extrair as chaves do objeto sections como um array
+            const sectionKeys = Object.keys(structure.sections);
+            setSections(sectionKeys);
+            
+            // Ativar a primeira seção se houver
+            if (sectionKeys.length > 0) {
+              setActiveSection(sectionKeys[0]);
+            }
+            
+            toast({
+              title: "Seções criadas",
+              description: `${sectionKeys.length} seções foram criadas com base no template.`
+            });
           } else {
-            console.error("Formato de template inválido: não contém array de sections");
+            console.error("Formato de template inválido: não contém sections compatível");
             toast({
               title: "Erro ao aplicar template",
               description: "O template não possui um formato válido para seções",
