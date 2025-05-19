@@ -635,7 +635,7 @@ export default function AdminPage() {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Coluna Monday</TableHead>
-                          <TableHead>Campo CPx</TableHead>
+                          <TableHead>Nome do Mapeamento</TableHead>
                           <TableHead className="w-20">Ações</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -643,7 +643,7 @@ export default function AdminPage() {
                         {columnMappings.map((mapping) => (
                           <TableRow key={mapping.id}>
                             <TableCell className="font-medium">{mapping.mondayColumn}</TableCell>
-                            <TableCell>{mapping.cpxField}</TableCell>
+                            <TableCell>{selectedMapping?.name || "Sem nome"}</TableCell>
                             <TableCell>
                               <div className="flex space-x-2">
                                 <Button
