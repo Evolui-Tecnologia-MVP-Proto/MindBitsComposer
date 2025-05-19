@@ -46,6 +46,8 @@ export default function AdminPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedMapping, setSelectedMapping] = useState<BoardMapping | null>(null);
+  const [isTesting, setIsTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{success: boolean; message: string} | null>(null);
   
   // Dados de exemplo para a tabela
   const [boardMappings, setBoardMappings] = useState<BoardMapping[]>([
@@ -97,6 +99,38 @@ export default function AdminPage() {
       setSelectedMapping(null);
     }
   };
+  
+  const testBoardConnection = (boardId: string) => {
+    setIsTesting(true);
+    setTestResult(null);
+    
+    // Simulando um teste de conexão
+    setTimeout(() => {
+      if (boardId && boardId.trim() !== "") {
+        // Verificar se o ID do quadro é válido (exemplo simples)
+        const isValid = boardId.length >= 6 && /^\d+$/.test(boardId);
+        
+        if (isValid) {
+          setTestResult({
+            success: true,
+            message: "Quadro encontrado! Conexão estabelecida com sucesso."
+          });
+        } else {
+          setTestResult({
+            success: false,
+            message: "ID de quadro inválido ou não encontrado. Verifique o ID e tente novamente."
+          });
+        }
+      } else {
+        setTestResult({
+          success: false,
+          message: "Por favor, informe um ID de quadro válido."
+        });
+      }
+      
+      setIsTesting(false);
+    }, 1500);
+  };
 
   // Modal de configuração do mapeamento
   const renderConfigModal = () => {
@@ -109,6 +143,9 @@ export default function AdminPage() {
             <DialogTitle>
               {isEditing ? "Editar Mapeamento" : "Novo Mapeamento"}
             </DialogTitle>
+            <DialogDescription>
+              Configure os detalhes do mapeamento com o Monday.com
+            </DialogDescription>
           </DialogHeader>
           
           <div className="grid gap-4 py-4">
@@ -130,14 +167,41 @@ export default function AdminPage() {
                 <label htmlFor="board-id" className="text-sm font-medium text-gray-700">
                   ID do Quadro
                 </label>
-                <input
-                  id="board-id"
-                  name="board-id"
-                  defaultValue={selectedMapping?.boardId || ""}
-                  placeholder="Ex: 12345678"
-                  className="px-3 py-2 rounded-md border border-gray-300 focus:ring-primary focus:border-primary"
-                />
-                <p className="text-xs text-gray-500">
+                <div className="flex space-x-2">
+                  <input
+                    id="board-id"
+                    name="board-id"
+                    defaultValue={selectedMapping?.boardId || ""}
+                    placeholder="Ex: 12345678"
+                    className="flex-1 px-3 py-2 rounded-md border border-gray-300 focus:ring-primary focus:border-primary"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const boardIdInput = document.getElementById('board-id') as HTMLInputElement;
+                      testBoardConnection(boardIdInput.value);
+                    }}
+                    className="whitespace-nowrap px-3 py-2 text-sm font-medium rounded-md border border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    disabled={isTesting}
+                  >
+                    {isTesting ? (
+                      <>
+                        <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent mr-1 align-[-2px]"></span>
+                        Testando...
+                      </>
+                    ) : (
+                      "Conectar"
+                    )}
+                  </button>
+                </div>
+                {testResult && (
+                  <div className={`mt-2 px-3 py-2 rounded-md text-sm ${
+                    testResult.success ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
+                  }`}>
+                    {testResult.message}
+                  </div>
+                )}
+                <p className="text-xs text-gray-500 mt-1">
                   O ID do quadro pode ser encontrado na URL do quadro no Monday.com
                 </p>
               </div>
