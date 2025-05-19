@@ -58,7 +58,7 @@ import { ptBR } from 'date-fns/locale';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-// import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
 
 // Tipos das props
 type BoardMapping = {
@@ -646,7 +646,7 @@ export default function AdminPage() {
                     </button>
                   </div>
                   <p className="mt-1 text-sm text-gray-500">
-                    A chave pode ser obtida nas configurações do Monday.com &rarr; APIs &rarr; API v2 Token
+                    A chave pode ser obtida nas configurações do Monday.com (menu APIs, seção API v2 Token)
                   </p>
                 </div>
                 
