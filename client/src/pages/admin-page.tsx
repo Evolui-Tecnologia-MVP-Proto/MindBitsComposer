@@ -646,6 +646,8 @@ export default function AdminPage() {
             <Button
               type="button"
               onClick={saveMappingSettings}
+              disabled={testResult?.error === true}
+              className={testResult?.error ? "opacity-50 cursor-not-allowed" : ""}
             >
               {isEditing ? "Salvar Alterações" : "Criar Mapeamento"}
             </Button>
