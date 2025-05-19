@@ -516,7 +516,7 @@ export default function AdminPage() {
               <TabsContent value="colunas">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center mb-4">
-                    <h4 className="text-base font-medium">Colunas do Quadro</h4>
+                    <h4 className="text-base font-medium">Sincronização de Colunas</h4>
                     {selectedMapping && (
                       <Button
                         variant="outline"
@@ -535,50 +535,23 @@ export default function AdminPage() {
                     )}
                   </div>
                   
-                  {isLoadingColumns ? (
-                    <div className="space-y-2">
-                      <Skeleton className="h-10 w-full" />
-                      <Skeleton className="h-10 w-full" />
-                    </div>
-                  ) : (
-                    <>
-                      {mondayColumns.length === 0 ? (
-                        <div className="text-center p-4 border border-dashed border-gray-300 rounded-md">
-                          <p className="text-gray-500">Nenhuma coluna disponível</p>
-                          <p className="text-xs text-gray-400 mt-1">
-                            Clique em "Conectar" para carregar as colunas do quadro
-                          </p>
+                  <div className="text-center p-8 border border-dashed border-gray-300 rounded-md">
+                    <p className="text-gray-600 mb-2">
+                      Clique no botão "Conectar" para sincronizar as colunas do quadro do Monday.com
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      As colunas serão buscadas da API do Monday.com e salvas no banco de dados
+                    </p>
+                    
+                    {testResult && testResult.success && (
+                      <div className="mt-4 p-3 rounded-md bg-green-50 text-green-700 text-center">
+                        <div className="flex items-center justify-center">
+                          <CheckCircle2 className="h-5 w-5 mr-2" />
+                          <span>Sincronização concluída com sucesso!</span>
                         </div>
-                      ) : (
-                        <div className="border rounded-md overflow-hidden">
-                          <Table>
-                            <TableHeader>
-                              <TableRow>
-                                <TableHead>Nome da Coluna</TableHead>
-                                <TableHead>ID da Coluna</TableHead>
-                                <TableHead>Tipo</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {mondayColumns.map((column) => (
-                                <TableRow key={column.id}>
-                                  <TableCell className="font-medium">{column.title}</TableCell>
-                                  <TableCell>
-                                    <span className="font-mono text-xs bg-gray-100 p-1 rounded">
-                                      {column.columnId}
-                                    </span>
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge variant="outline">{column.type}</Badge>
-                                  </TableCell>
-                                </TableRow>
-                              ))}
-                            </TableBody>
-                          </Table>
-                        </div>
-                      )}
-                    </>
-                  )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </TabsContent>
             </Tabs>
