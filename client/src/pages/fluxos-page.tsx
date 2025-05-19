@@ -108,7 +108,7 @@ const DecisionNode = memo(({ data }: NodeProps) => (
       position={Position.Right} 
       className="w-3 h-3 bg-green-500" 
       id="a"
-      style={{ top: '50%', right: '-5px', transform: 'translateY(-50%)' }}
+      style={{ top: '50%', right: '-10px', transform: 'translateY(-50%)' }}
     />
     <Handle 
       type="source" 
@@ -122,7 +122,7 @@ const DecisionNode = memo(({ data }: NodeProps) => (
       position={Position.Left} 
       className="w-3 h-3 bg-green-500" 
       id="c"
-      style={{ top: '50%', left: '-5px', transform: 'translateY(-50%)' }}
+      style={{ top: '50%', left: '-10px', transform: 'translateY(-50%)' }}
     />
   </div>
 ));
