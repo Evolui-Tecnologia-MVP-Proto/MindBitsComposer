@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Settings, FileText, Edit, GitBranch, File, Code2 } from "lucide-react";
+import { Settings, FileText, Edit, GitBranch, File, Code2, Activity } from "lucide-react";
 
 type SidebarProps = {
   isMobileOpen: boolean;
@@ -115,7 +115,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
                 className={`sidebar-item ${activeItem === "monday-mapping" ? "sidebar-active" : ""}`}
                 onClick={closeMobileMenu}
               >
-                <Activity className="mr-3 h-6 w-6" />
+                <Code2 className="mr-3 h-6 w-6" />
                 Monday.com
               </div>
             </Link>

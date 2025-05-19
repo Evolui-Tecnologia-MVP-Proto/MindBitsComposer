@@ -28,7 +28,6 @@ function Router() {
       <ProtectedRoute path="/fluxos" component={FluxosPage} />
       <ProtectedRoute path="/documentos" component={DocumentosPage} />
       <ProtectedRoute path="/monday-mapping" component={MondayMappingPage} />
-      <ProtectedRoute path="/monday-mapeamento" component={() => import("@/pages/monday-mapeamento").then(mod => <mod.default />)} />
       <Route component={NotFound} />
     </Switch>
   );
