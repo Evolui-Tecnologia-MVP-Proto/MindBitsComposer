@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Dialog, 
@@ -27,8 +27,11 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { PlusCircle, Pencil, Trash2, ExternalLink, Eye, EyeOff } from "lucide-react";
+import { PlusCircle, Pencil, Trash2, ExternalLink, Eye, EyeOff, Loader2 } from "lucide-react";
 import UserTable from "@/components/UserTable";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 
 // Tipo para representar o mapeamento de quadros
 type BoardMapping = {
@@ -42,68 +45,164 @@ type BoardMapping = {
 };
 
 export default function AdminPage() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("usuarios");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedMapping, setSelectedMapping] = useState<BoardMapping | null>(null);
   const [isTesting, setIsTesting] = useState(false);
   const [testResult, setTestResult] = useState<{success: boolean; message: string} | null>(null);
-  const [apiKey, setApiKey] = useState(() => {
-    // Recupera o token do localStorage ao carregar o componente
-    const savedToken = localStorage.getItem('monday_api_token');
-    return savedToken || "";
-  });
-  const [apiKeySaving, setApiKeySaving] = useState(false);
-  const [apiKeySaved, setApiKeySaved] = useState(false);
   const [showApiKey, setShowApiKey] = useState(false);
+  const [apiKey, setApiKey] = useState("");
   
-  // Estado para armazenar os mapeamentos de quadros
-  const [boardMappings, setBoardMappings] = useState<BoardMapping[]>(() => {
-    // Recupera os mapeamentos salvos ou usa os dados de exemplo
-    const savedMappings = localStorage.getItem('monday_board_mappings');
-    if (savedMappings) {
-      return JSON.parse(savedMappings);
-    }
-    
-    // Dados de exemplo para a tabela inicial
-    const defaultMappings = [
-      {
-        id: "1",
-        name: "Quadro de Projetos",
-        boardId: "12345678",
-        description: "Quadro principal para gerenciamento de projetos",
-        statusColumn: "status",
-        responsibleColumn: "person",
-        lastSync: "19/05/2025 10:45"
-      },
-      {
-        id: "2",
-        name: "Quadro de Tarefas",
-        boardId: "87654321",
-        description: "Tarefas diárias da equipe",
-        statusColumn: "status",
-        responsibleColumn: "owner",
-        lastSync: "19/05/2025 09:30"
-      },
-      {
-        id: "3",
-        name: "Quadro de Bugs",
-        boardId: "24681357",
-        description: "Rastreamento de bugs e correções",
-        statusColumn: "stage",
-        responsibleColumn: "assignee",
-        lastSync: null
+  // Consulta para buscar a chave da API do Monday
+  const { 
+    data: apiKeyData, 
+    isLoading: isLoadingApiKey 
+  } = useQuery({
+    queryKey: ['/api/monday/apikey'],
+    queryFn: async () => {
+      try {
+        const response = await fetch('/api/monday/apikey');
+        if (!response.ok) {
+          if (response.status === 404) {
+            return { apiKey: "" };
+          }
+          throw new Error('Falha ao carregar a chave da API');
+        }
+        return response.json();
+      } catch (error) {
+        console.error("Erro ao buscar a chave da API:", error);
+        return { apiKey: "" };
       }
-    ];
-    
-    // Salva os mapeamentos padrão no localStorage
-    localStorage.setItem('monday_board_mappings', JSON.stringify(defaultMappings));
-    return defaultMappings;
+    }
+  });
+  
+  // Atualiza o estado local quando os dados da API são carregados
+  useEffect(() => {
+    if (apiKeyData && apiKeyData.apiKey) {
+      setApiKey(apiKeyData.apiKey);
+    }
+  }, [apiKeyData]);
+  
+  // Mutação para salvar a chave da API
+  const saveApiKeyMutation = useMutation({
+    mutationFn: async (newApiKey: string) => {
+      const response = await apiRequest('POST', '/api/monday/apikey', { apiKey: newApiKey });
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Chave da API salva",
+        description: "A chave da API foi salva com sucesso.",
+        variant: "default",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/monday/apikey'] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao salvar a chave da API",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Consulta para buscar os mapeamentos do Monday
+  const { 
+    data: boardMappings = [], 
+    isLoading: isLoadingMappings,
+    isError: isMappingsError,
+    error: mappingsError
+  } = useQuery({
+    queryKey: ['/api/monday/mappings'],
+    queryFn: async () => {
+      try {
+        const response = await fetch('/api/monday/mappings');
+        if (!response.ok) {
+          throw new Error('Falha ao carregar os mapeamentos');
+        }
+        return response.json();
+      } catch (error) {
+        console.error("Erro ao buscar mapeamentos:", error);
+        return [];
+      }
+    }
+  });
+  
+  // Mutação para criar um novo mapeamento
+  const createMappingMutation = useMutation({
+    mutationFn: async (newMapping: Omit<BoardMapping, 'id' | 'lastSync'>) => {
+      const response = await apiRequest('POST', '/api/monday/mappings', newMapping);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Mapeamento criado",
+        description: "O mapeamento foi criado com sucesso.",
+        variant: "default",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/monday/mappings'] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao criar mapeamento",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Mutação para atualizar um mapeamento existente
+  const updateMappingMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string, data: Partial<BoardMapping> }) => {
+      const response = await apiRequest('PATCH', `/api/monday/mappings/${id}`, data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Mapeamento atualizado",
+        description: "O mapeamento foi atualizado com sucesso.",
+        variant: "default",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/monday/mappings'] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao atualizar mapeamento",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Mutação para excluir um mapeamento
+  const deleteMappingMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiRequest('DELETE', `/api/monday/mappings/${id}`);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Mapeamento excluído",
+        description: "O mapeamento foi excluído com sucesso.",
+        variant: "default",
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/monday/mappings'] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao excluir mapeamento",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   });
   
   const openEditModal = (mapping: BoardMapping | null = null) => {
     setSelectedMapping(mapping);
     setIsModalOpen(true);
+    setTestResult(null);
   };
   
   const openDeleteDialog = (mapping: BoardMapping) => {
@@ -113,12 +212,7 @@ export default function AdminPage() {
   
   const handleDeleteMapping = () => {
     if (selectedMapping) {
-      const updatedMappings = boardMappings.filter(mapping => mapping.id !== selectedMapping.id);
-      setBoardMappings(updatedMappings);
-      
-      // Salva os mapeamentos atualizados no localStorage
-      localStorage.setItem('monday_board_mappings', JSON.stringify(updatedMappings));
-      
+      deleteMappingMutation.mutate(selectedMapping.id);
       setIsDeleteDialogOpen(false);
       setSelectedMapping(null);
     }
@@ -128,58 +222,55 @@ export default function AdminPage() {
     setIsTesting(true);
     setTestResult(null);
     
-    // Simulando um teste de conexão
-    setTimeout(() => {
-      if (boardId && boardId.trim() !== "") {
-        // Verificar se o ID do quadro é válido (exemplo simples)
-        const isValid = boardId.length >= 6 && /^\d+$/.test(boardId);
-        
-        if (isValid) {
-          setTestResult({
-            success: true,
-            message: "Quadro encontrado! Conexão estabelecida com sucesso."
-          });
+    // Verifica a conexão fazendo uma requisição para a API do Monday
+    if (apiKey && boardId) {
+      // Aqui faríamos uma chamada real para o Monday.com
+      // Como prova de conceito, simulamos uma verificação básica
+      setTimeout(() => {
+        if (boardId && boardId.trim() !== "") {
+          // Verificar se o ID do quadro é válido (exemplo simples)
+          const isValid = boardId.length >= 6 && /^\d+$/.test(boardId);
+          
+          if (isValid) {
+            setTestResult({
+              success: true,
+              message: "Quadro encontrado! Conexão estabelecida com sucesso."
+            });
+          } else {
+            setTestResult({
+              success: false,
+              message: "ID de quadro inválido ou não encontrado. Verifique o ID e tente novamente."
+            });
+          }
         } else {
           setTestResult({
             success: false,
-            message: "ID de quadro inválido ou não encontrado. Verifique o ID e tente novamente."
+            message: "Por favor, informe um ID de quadro válido."
           });
         }
-      } else {
-        setTestResult({
-          success: false,
-          message: "Por favor, informe um ID de quadro válido."
-        });
-      }
-      
+        
+        setIsTesting(false);
+      }, 1500);
+    } else {
+      setTestResult({
+        success: false,
+        message: apiKey ? "Por favor, informe um ID de quadro válido." : "Configure a chave da API primeiro."
+      });
       setIsTesting(false);
-    }, 1500);
+    }
   };
 
   const saveApiKey = () => {
     if (!apiKey.trim()) {
-      alert("Por favor, informe uma chave de API válida.");
+      toast({
+        title: "Erro",
+        description: "Por favor, informe uma chave de API válida.",
+        variant: "destructive",
+      });
       return;
     }
 
-    setApiKeySaving(true);
-
-    // Simula o envio da API Key para o servidor
-    setTimeout(() => {
-      // Aqui seria feita a chamada para a API para salvar a chave
-      console.log("API Key salva:", apiKey);
-      
-      // Salva a chave no localStorage para persistência
-      localStorage.setItem('monday_api_token', apiKey);
-      
-      setApiKeySaving(false);
-      setApiKeySaved(true);
-      
-      // Reset o estado de "salvo" após alguns segundos
-      setTimeout(() => {
-        setApiKeySaved(false);
-      }, 3000);
-    }, 1000);
+    saveApiKeyMutation.mutate(apiKey);
   };
 
   // Função para salvar um novo mapeamento ou atualizar um existente
@@ -191,38 +282,33 @@ export default function AdminPage() {
     
     // Validar campos
     if (!nameInput.value.trim() || !boardIdInput.value.trim()) {
-      alert("Por favor, preencha o nome do mapeamento e o ID do quadro.");
+      toast({
+        title: "Erro",
+        description: "Por favor, preencha o nome do mapeamento e o ID do quadro.",
+        variant: "destructive",
+      });
       return;
     }
     
     // Criação de novo objeto de mapeamento
-    const updatedMapping: BoardMapping = {
-      id: selectedMapping?.id || Date.now().toString(), // Gera um ID baseado no timestamp se for um novo mapeamento
+    const mappingData = {
       name: nameInput.value.trim(),
       description: descriptionInput.value.trim(),
       boardId: boardIdInput.value.trim(),
       statusColumn: selectedMapping?.statusColumn || "",
-      responsibleColumn: selectedMapping?.responsibleColumn || "",
-      lastSync: selectedMapping?.lastSync || null
+      responsibleColumn: selectedMapping?.responsibleColumn || ""
     };
-    
-    let updatedMappings: BoardMapping[];
     
     if (selectedMapping) {
       // Atualizando um mapeamento existente
-      updatedMappings = boardMappings.map(mapping => 
-        mapping.id === selectedMapping.id ? updatedMapping : mapping
-      );
+      updateMappingMutation.mutate({
+        id: selectedMapping.id,
+        data: mappingData
+      });
     } else {
       // Adicionando um novo mapeamento
-      updatedMappings = [...boardMappings, updatedMapping];
+      createMappingMutation.mutate(mappingData);
     }
-    
-    // Atualiza o estado
-    setBoardMappings(updatedMappings);
-    
-    // Salva no localStorage
-    localStorage.setItem('monday_board_mappings', JSON.stringify(updatedMappings));
     
     // Fecha o modal
     setIsModalOpen(false);
@@ -316,8 +402,6 @@ export default function AdminPage() {
                   O ID do quadro pode ser encontrado na URL do quadro no Monday.com
                 </p>
               </div>
-              
-
             </div>
           </div>
           
@@ -414,160 +498,115 @@ export default function AdminPage() {
                     <button
                       type="button"
                       onClick={saveApiKey}
-                      disabled={apiKeySaving}
+                      disabled={saveApiKeyMutation.isPending}
                       className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-r-md shadow-sm text-white bg-primary hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {apiKeySaving ? (
+                      {saveApiKeyMutation.isPending ? (
                         <>
-                          <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent mr-1.5 align-[-2px]"></span>
+                          <Loader2 className="animate-spin h-4 w-4 mr-2" />
                           Salvando...
                         </>
-                      ) : apiKeySaved ? (
-                        "Salvo ✓"
+                      ) : saveApiKeyMutation.isSuccess ? (
+                        "Salvo com sucesso!"
                       ) : (
                         "Salvar"
                       )}
                     </button>
                   </div>
-                  {apiKeySaved && (
-                    <div className="mt-2 px-3 py-2 bg-green-50 text-green-700 border border-green-200 rounded-md text-sm">
-                      Chave de API salva com sucesso!
-                    </div>
-                  )}
                   <p className="mt-2 text-sm text-gray-500">
-                    A API Key é necessária para integrar com o Monday.com. Você pode encontrá-la nas configurações da sua conta.
+                    A API Key é necessária para integração com o Monday.com. 
+                    <a href="https://monday.com/developers/v2/api_keys/" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-600 ml-1 inline-flex items-center">
+                      Como obter uma chave <ExternalLink className="h-3 w-3 ml-1" />
+                    </a>
                   </p>
                 </div>
-
-                <div className="border-t border-gray-200 pt-5">
+                
+                <div>
                   <div className="flex justify-between items-center mb-4">
-                    <h4 className="text-md font-medium text-gray-900">Mapeamento de Quadros</h4>
+                    <h4 className="text-base font-medium text-gray-900">Mapeamentos de Quadros</h4>
                     <button
+                      type="button"
                       onClick={() => openEditModal()}
-                      className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+                      className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
                     >
-                      <PlusCircle className="mr-1.5 h-4 w-4" />
+                      <PlusCircle className="h-4 w-4 mr-2" />
                       Novo Mapeamento
                     </button>
                   </div>
                   
-                  <div className="mt-4 border rounded-md">
-                    <Table>
-                      <TableCaption>Lista de mapeamentos de quadros do Monday.com</TableCaption>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="w-1/5">Nome</TableHead>
-                          <TableHead className="w-1/6">ID do Quadro</TableHead>
-                          <TableHead className="w-1/4">Descrição</TableHead>
-                          <TableHead className="w-1/6">Última Sincronização</TableHead>
-                          <TableHead className="w-1/6 text-right">Ações</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {boardMappings.map((mapping) => (
-                          <TableRow key={mapping.id}>
-                            <TableCell className="font-medium">{mapping.name}</TableCell>
-                            <TableCell>{mapping.boardId}</TableCell>
-                            <TableCell className="text-sm text-gray-600">{mapping.description}</TableCell>
-                            <TableCell>
-                              {mapping.lastSync ? (
-                                <span className="text-sm">{mapping.lastSync}</span>
-                              ) : (
-                                <span className="text-sm text-gray-400 italic">Nunca sincronizado</span>
-                              )}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex justify-end space-x-2">
-                                <button
-                                  onClick={() => openEditModal(mapping)}
-                                  className="p-1 text-blue-600 hover:text-blue-800 rounded-md hover:bg-blue-50"
-                                  title="Editar"
-                                >
-                                  <Pencil className="h-4 w-4" />
-                                </button>
-                                <button
-                                  onClick={() => openDeleteDialog(mapping)}
-                                  className="p-1 text-red-600 hover:text-red-800 rounded-md hover:bg-red-50"
-                                  title="Excluir"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </button>
-                                <a
-                                  href={`https://monday.com/boards/${mapping.boardId}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="p-1 text-gray-600 hover:text-gray-800 rounded-md hover:bg-gray-50"
-                                  title="Abrir no Monday.com"
-                                >
-                                  <ExternalLink className="h-4 w-4" />
-                                </a>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                        {boardMappings.length === 0 && (
+                  <div className="border rounded-md overflow-hidden">
+                    {isLoadingMappings ? (
+                      <div className="flex justify-center items-center p-8">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <span className="ml-2 text-gray-500">Carregando mapeamentos...</span>
+                      </div>
+                    ) : isMappingsError ? (
+                      <div className="p-6 text-center">
+                        <p className="text-red-600 mb-2">Erro ao carregar mapeamentos</p>
+                        <p className="text-gray-600 text-sm">{String(mappingsError)}</p>
+                      </div>
+                    ) : (
+                      <Table>
+                        <TableCaption>Lista de mapeamentos configurados com o Monday.com</TableCaption>
+                        <TableHeader>
                           <TableRow>
-                            <TableCell colSpan={5} className="text-center py-6 text-gray-500">
-                              Nenhum mapeamento configurado. Clique em "Novo Mapeamento" para adicionar.
-                            </TableCell>
+                            <TableHead>Nome</TableHead>
+                            <TableHead>ID do Quadro</TableHead>
+                            <TableHead>Descrição</TableHead>
+                            <TableHead>Última Sincronização</TableHead>
+                            <TableHead className="w-[150px] text-right">Ações</TableHead>
                           </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
-                </div>
-                
-                <div className="border-t border-gray-200 pt-5">
-                  <h4 className="text-md font-medium text-gray-900 mb-4">Sincronização de Dados</h4>
-                  
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-3">
-                      <input
-                        id="sync-automatic"
-                        name="sync-type"
-                        type="radio"
-                        className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
-                        defaultChecked
-                      />
-                      <label htmlFor="sync-automatic" className="block text-sm font-medium text-gray-700">
-                        Sincronização Automática
-                      </label>
-                    </div>
-                    
-                    <div className="flex items-center space-x-3">
-                      <input
-                        id="sync-manual"
-                        name="sync-type"
-                        type="radio"
-                        className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
-                      />
-                      <label htmlFor="sync-manual" className="block text-sm font-medium text-gray-700">
-                        Sincronização Manual
-                      </label>
-                    </div>
-                    
-                    <div className="pl-7">
-                      <label htmlFor="sync-interval" className="block text-sm font-medium text-gray-700 mb-1">
-                        Intervalo de Sincronização (minutos)
-                      </label>
-                      <input
-                        type="number"
-                        name="sync-interval"
-                        id="sync-interval"
-                        min="5"
-                        defaultValue="30"
-                        className="rounded-md border border-gray-300 focus:ring-primary focus:border-primary px-3 py-2 w-28"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="mt-5">
-                    <button
-                      type="button"
-                      className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-                    >
-                      Sincronizar Agora
-                    </button>
+                        </TableHeader>
+                        <TableBody>
+                          {boardMappings.length === 0 ? (
+                            <TableRow>
+                              <TableCell colSpan={5} className="h-24 text-center">
+                                Nenhum mapeamento configurado.
+                                <button
+                                  onClick={() => openEditModal()}
+                                  className="text-primary hover:underline ml-1"
+                                >
+                                  Adicionar um mapeamento
+                                </button>
+                              </TableCell>
+                            </TableRow>
+                          ) : (
+                            boardMappings.map((mapping) => (
+                              <TableRow key={mapping.id}>
+                                <TableCell className="font-medium">{mapping.name}</TableCell>
+                                <TableCell>{mapping.boardId}</TableCell>
+                                <TableCell className="text-sm text-gray-600">{mapping.description}</TableCell>
+                                <TableCell>
+                                  {mapping.lastSync ? (
+                                    <span className="text-sm text-gray-600">{mapping.lastSync}</span>
+                                  ) : (
+                                    <span className="text-xs text-gray-500 italic">Nunca sincronizado</span>
+                                  )}
+                                </TableCell>
+                                <TableCell className="text-right">
+                                  <div className="flex justify-end space-x-2">
+                                    <button
+                                      onClick={() => openEditModal(mapping)}
+                                      className="p-1 text-gray-500 hover:text-primary transition-colors"
+                                      title="Editar mapeamento"
+                                    >
+                                      <Pencil className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                      onClick={() => openDeleteDialog(mapping)}
+                                      className="p-1 text-gray-500 hover:text-red-600 transition-colors"
+                                      title="Excluir mapeamento"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          )}
+                        </TableBody>
+                      </Table>
+                    )}
                   </div>
                 </div>
               </div>
@@ -577,7 +616,9 @@ export default function AdminPage() {
           <TabsContent value="configuracao" className="slide-in">
             <div className="bg-white shadow-sm rounded-lg p-6">
               <h3 className="text-lg font-medium text-gray-900 mb-4">Configurações do Sistema</h3>
-              <p className="text-gray-500 italic">Esta seção está em desenvolvimento.</p>
+              <p className="text-gray-600 mb-4">
+                Esta seção está em desenvolvimento. Configurações adicionais estarão disponíveis em breve.
+              </p>
             </div>
           </TabsContent>
         </Tabs>

@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { TemplateType, insertTemplateSchema } from "@shared/schema";
+import { TemplateType, insertTemplateSchema, insertMondayMappingSchema } from "@shared/schema";
 import { ZodError } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -161,6 +161,177 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erro ao excluir template:", error);
       res.status(500).send("Erro ao excluir template");
+    }
+  });
+
+  // Monday.com integration routes
+  // Get API Key
+  app.get("/api/monday/apikey", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const apiKey = await storage.getMondayApiKey();
+      res.json({ apiKey: apiKey || "" });
+    } catch (error) {
+      console.error("Erro ao buscar chave da API:", error);
+      res.status(500).send("Erro ao buscar chave da API");
+    }
+  });
+  
+  // Save API Key
+  app.post("/api/monday/apikey", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { apiKey } = req.body;
+    
+    if (!apiKey || typeof apiKey !== 'string') {
+      return res.status(400).send("Chave da API inválida");
+    }
+    
+    try {
+      await storage.saveMondayApiKey(apiKey);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Erro ao salvar chave da API:", error);
+      res.status(500).send("Erro ao salvar chave da API");
+    }
+  });
+  
+  // Get all Monday mappings
+  app.get("/api/monday/mappings", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const mappings = await storage.getAllMondayMappings();
+      res.json(mappings);
+    } catch (error) {
+      console.error("Erro ao buscar mapeamentos:", error);
+      res.status(500).send("Erro ao buscar mapeamentos");
+    }
+  });
+  
+  // Get Monday mapping by ID
+  app.get("/api/monday/mappings/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      const mapping = await storage.getMondayMapping(id);
+      if (!mapping) {
+        return res.status(404).send("Mapeamento não encontrado");
+      }
+      res.json(mapping);
+    } catch (error) {
+      console.error("Erro ao buscar mapeamento:", error);
+      res.status(500).send("Erro ao buscar mapeamento");
+    }
+  });
+  
+  // Create Monday mapping
+  app.post("/api/monday/mappings", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      console.log("Body recebido para criação de mapeamento:", JSON.stringify(req.body, null, 2));
+      const mappingData = insertMondayMappingSchema.parse(req.body);
+      
+      // Verificar se já existe mapeamento com o mesmo Board ID
+      const existingMapping = await storage.getMondayMappingByBoardId(mappingData.boardId);
+      if (existingMapping) {
+        return res.status(400).send("Já existe um mapeamento para este quadro");
+      }
+      
+      console.log("Dados do mapeamento a ser criado:", mappingData);
+      const newMapping = await storage.createMondayMapping(mappingData);
+      console.log("Mapeamento criado com sucesso:", newMapping);
+      
+      res.status(201).json(newMapping);
+    } catch (error) {
+      console.error("Erro ao criar mapeamento:", error);
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          message: "Dados inválidos para o mapeamento",
+          errors: error.errors
+        });
+      }
+      res.status(500).send("Erro ao criar mapeamento");
+    }
+  });
+  
+  // Update Monday mapping
+  app.patch("/api/monday/mappings/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      console.log("Body recebido para atualização de mapeamento:", JSON.stringify(req.body, null, 2));
+      
+      // Verificar se o mapeamento existe
+      const existingMapping = await storage.getMondayMapping(id);
+      if (!existingMapping) {
+        return res.status(404).send("Mapeamento não encontrado");
+      }
+      
+      // Se o boardId estiver sendo alterado, verificar duplicidade
+      if (req.body.boardId && req.body.boardId !== existingMapping.boardId) {
+        const mappingWithBoardId = await storage.getMondayMappingByBoardId(req.body.boardId);
+        if (mappingWithBoardId && mappingWithBoardId.id !== id) {
+          return res.status(400).send("Já existe um mapeamento para este quadro");
+        }
+      }
+      
+      console.log("Dados do mapeamento a ser atualizado:", req.body);
+      const updatedMapping = await storage.updateMondayMapping(id, req.body);
+      console.log("Mapeamento atualizado com sucesso:", updatedMapping);
+      
+      res.json(updatedMapping);
+    } catch (error) {
+      console.error("Erro ao atualizar mapeamento:", error);
+      res.status(500).send("Erro ao atualizar mapeamento");
+    }
+  });
+  
+  // Update last sync time for a Monday mapping
+  app.post("/api/monday/mappings/:id/sync", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      // Verificar se o mapeamento existe
+      const existingMapping = await storage.getMondayMapping(id);
+      if (!existingMapping) {
+        return res.status(404).send("Mapeamento não encontrado");
+      }
+      
+      const updatedMapping = await storage.updateMondayMappingLastSync(id);
+      res.json(updatedMapping);
+    } catch (error) {
+      console.error("Erro ao atualizar data de sincronização:", error);
+      res.status(500).send("Erro ao atualizar data de sincronização");
+    }
+  });
+  
+  // Delete Monday mapping
+  app.delete("/api/monday/mappings/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      // Verificar se o mapeamento existe
+      const existingMapping = await storage.getMondayMapping(id);
+      if (!existingMapping) {
+        return res.status(404).send("Mapeamento não encontrado");
+      }
+      
+      await storage.deleteMondayMapping(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Erro ao excluir mapeamento:", error);
+      res.status(500).send("Erro ao excluir mapeamento");
     }
   });
 
