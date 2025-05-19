@@ -429,83 +429,159 @@ export default function AdminPage() {
           </DialogHeader>
           
           <div className="py-4">
-            <Form {...form}>
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nome do Mapeamento</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Nome descritivo para o mapeamento" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="boardId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>ID do Quadro Monday</FormLabel>
-                      <div className="flex gap-2">
-                        <FormControl>
-                          <Input placeholder="ID numérico do quadro" {...field} />
-                        </FormControl>
-                        <Button 
-                          type="button"
-                          variant="outline"
-                          onClick={() => testMondayConnection(form.getValues().boardId)}
-                          disabled={isTesting || !form.getValues().boardId}
-                        >
-                          {isTesting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Link className="h-4 w-4 mr-2" />}
-                          Testar
-                        </Button>
-                      </div>
-                      <FormDescription>
-                        O ID do quadro pode ser encontrado na URL do Monday.com
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                {testResult && (
-                  <div className={`p-3 rounded-md ${testResult.success ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-                    {testResult.success ? (
-                      <div className="flex items-center">
-                        <CheckCircle2 className="h-5 w-5 mr-2" />
-                        <span>{testResult.message}</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center">
-                        <AlertCircle className="h-5 w-5 mr-2" />
-                        <span>{testResult.message}</span>
+            <Tabs defaultValue="quadro" className="w-full">
+              <TabsList className="mb-4">
+                <TabsTrigger value="quadro">Quadro</TabsTrigger>
+                <TabsTrigger value="colunas">Colunas</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="quadro">
+                <Form {...form}>
+                  <div className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Nome do Mapeamento</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Nome descritivo para o mapeamento" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="boardId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>ID do Quadro Monday</FormLabel>
+                          <div className="flex gap-2">
+                            <FormControl>
+                              <Input placeholder="ID numérico do quadro" {...field} />
+                            </FormControl>
+                            <Button 
+                              type="button"
+                              variant="outline"
+                              onClick={() => testMondayConnection(form.getValues().boardId)}
+                              disabled={isTesting || !form.getValues().boardId}
+                            >
+                              {isTesting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Link className="h-4 w-4 mr-2" />}
+                              Testar
+                            </Button>
+                          </div>
+                          <FormDescription>
+                            O ID do quadro pode ser encontrado na URL do Monday.com
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    {testResult && (
+                      <div className={`p-3 rounded-md ${testResult.success ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                        {testResult.success ? (
+                          <div className="flex items-center">
+                            <CheckCircle2 className="h-5 w-5 mr-2" />
+                            <span>{testResult.message}</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center">
+                            <AlertCircle className="h-5 w-5 mr-2" />
+                            <span>{testResult.message}</span>
+                          </div>
+                        )}
                       </div>
                     )}
+                    
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Descrição</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Descrição opcional" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </div>
-                )}
-                
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Descrição</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Descrição opcional" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                </Form>
+              </TabsContent>
+              
+              <TabsContent value="colunas">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="text-base font-medium">Colunas do Quadro</h4>
+                    {selectedMapping && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fetchColumnsMutation.mutate(selectedMapping.id)}
+                        disabled={fetchColumnsMutation.isPending}
+                        className="flex items-center"
+                      >
+                        {fetchColumnsMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        ) : (
+                          <ArrowDown className="h-4 w-4 mr-2" />
+                        )}
+                        Conectar
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {isLoadingColumns ? (
+                    <div className="space-y-2">
+                      <Skeleton className="h-10 w-full" />
+                      <Skeleton className="h-10 w-full" />
+                    </div>
+                  ) : (
+                    <>
+                      {mondayColumns.length === 0 ? (
+                        <div className="text-center p-4 border border-dashed border-gray-300 rounded-md">
+                          <p className="text-gray-500">Nenhuma coluna disponível</p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            Clique em "Conectar" para carregar as colunas do quadro
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="border rounded-md overflow-hidden">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Nome da Coluna</TableHead>
+                                <TableHead>ID da Coluna</TableHead>
+                                <TableHead>Tipo</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {mondayColumns.map((column) => (
+                                <TableRow key={column.id}>
+                                  <TableCell className="font-medium">{column.title}</TableCell>
+                                  <TableCell>
+                                    <span className="font-mono text-xs bg-gray-100 p-1 rounded">
+                                      {column.columnId}
+                                    </span>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Badge variant="outline">{column.type}</Badge>
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
+                      )}
+                    </>
                   )}
-                />
-                
-                {/* Campos de status e responsável removidos conforme solicitado */}
-              </div>
-            </Form>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
           
           <DialogFooter>
