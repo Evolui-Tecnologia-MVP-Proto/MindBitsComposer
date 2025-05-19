@@ -96,33 +96,33 @@ const DecisionNode = memo(({ data }: NodeProps) => (
       <div className="font-medium text-amber-800 text-sm">{data.label}</div>
     </div>
     
-    {/* Pontos de conexão exatamente nos 4 cantos do losango (verde na imagem) */}
+    {/* Pontos de conexão ajustados para ficarem exatamente na borda do losango */}
     <Handle 
       type="target" 
       position={Position.Top} 
       className="w-3 h-3 bg-green-500" 
-      style={{ top: '-1px', left: '50%', transform: 'translateX(-50%)' }}
+      style={{ top: '10px', left: '50%', transform: 'translateX(-50%)' }}
     />
     <Handle 
       type="source" 
       position={Position.Right} 
       className="w-3 h-3 bg-green-500" 
       id="a"
-      style={{ top: '50%', right: '-1px', transform: 'translateY(-50%)' }}
+      style={{ top: '50%', right: '-5px', transform: 'translateY(-50%)' }}
     />
     <Handle 
       type="source" 
       position={Position.Bottom} 
       className="w-3 h-3 bg-green-500" 
       id="b"
-      style={{ bottom: '-1px', left: '50%', transform: 'translateX(-50%)' }}
+      style={{ bottom: '10px', left: '50%', transform: 'translateX(-50%)' }}
     />
     <Handle 
       type="source" 
       position={Position.Left} 
       className="w-3 h-3 bg-green-500" 
       id="c"
-      style={{ top: '50%', left: '-1px', transform: 'translateY(-50%)' }}
+      style={{ top: '50%', left: '-5px', transform: 'translateY(-50%)' }}
     />
   </div>
 ));
