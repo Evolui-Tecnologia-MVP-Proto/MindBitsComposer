@@ -164,17 +164,129 @@ export class DatabaseStorage implements IStorage {
       .delete(templates)
       .where(eq(templates.id, id));
   }
+  
+  // Monday mapping implementation
+  async getMondayMapping(id: string): Promise<MondayMapping | undefined> {
+    const [mapping] = await db
+      .select()
+      .from(mondayMappings)
+      .where(eq(mondayMappings.id, id));
+    return mapping;
+  }
+
+  async getMondayMappingByBoardId(boardId: string): Promise<MondayMapping | undefined> {
+    const [mapping] = await db
+      .select()
+      .from(mondayMappings)
+      .where(eq(mondayMappings.boardId, boardId));
+    return mapping;
+  }
+
+  async createMondayMapping(mappingData: InsertMondayMapping): Promise<MondayMapping> {
+    const [mapping] = await db
+      .insert(mondayMappings)
+      .values(mappingData)
+      .returning();
+    return mapping;
+  }
+
+  async getAllMondayMappings(): Promise<MondayMapping[]> {
+    return await db.select().from(mondayMappings);
+  }
+
+  async updateMondayMapping(id: string, data: Partial<MondayMapping>): Promise<MondayMapping> {
+    const [mapping] = await db
+      .update(mondayMappings)
+      .set(data)
+      .where(eq(mondayMappings.id, id))
+      .returning();
+    
+    if (!mapping) {
+      throw new Error("Mapeamento não encontrado");
+    }
+    
+    return mapping;
+  }
+
+  async updateMondayMappingLastSync(id: string): Promise<MondayMapping> {
+    const [mapping] = await db
+      .update(mondayMappings)
+      .set({
+        lastSync: new Date()
+      })
+      .where(eq(mondayMappings.id, id))
+      .returning();
+    
+    if (!mapping) {
+      throw new Error("Mapeamento não encontrado");
+    }
+    
+    return mapping;
+  }
+
+  async deleteMondayMapping(id: string): Promise<void> {
+    await db
+      .delete(mondayMappings)
+      .where(eq(mondayMappings.id, id));
+  }
+
+  // Armazenamento do token da API do Monday
+  // Como é apenas uma chave, vamos usar uma opção simplificada com uma tabela especial
+  async saveMondayApiKey(apiKey: string): Promise<void> {
+    // Vamos verificar se já temos um mapeamento especial para a chave API
+    const [apiKeyMapping] = await db
+      .select()
+      .from(mondayMappings)
+      .where(eq(mondayMappings.name, "API_KEY_STORAGE"));
+    
+    if (apiKeyMapping) {
+      // Se já existe, atualizamos
+      await db
+        .update(mondayMappings)
+        .set({
+          statusColumn: apiKey
+        })
+        .where(eq(mondayMappings.id, apiKeyMapping.id));
+    } else {
+      // Se não existe, criamos um novo
+      await db
+        .insert(mondayMappings)
+        .values({
+          name: "API_KEY_STORAGE",
+          description: "Registro para armazenar a chave API do Monday",
+          boardId: "api_key_" + crypto.randomBytes(4).toString('hex'),
+          statusColumn: apiKey  // Usamos statusColumn para armazenar a chave
+        });
+    }
+  }
+
+  async getMondayApiKey(): Promise<string | undefined> {
+    // Buscamos o registro especial que armazena a chave da API
+    const [apiKeyMapping] = await db
+      .select()
+      .from(mondayMappings)
+      .where(eq(mondayMappings.name, "API_KEY_STORAGE"));
+    
+    if (apiKeyMapping?.statusColumn) {
+      return apiKeyMapping.statusColumn;
+    }
+    return undefined;
+  }
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private templates: Map<string, Template>;
+  private mondayMappings: Map<string, MondayMapping>;
+  private mondayApiKey: string | undefined;
   sessionStore: session.Store;
   currentId: number;
 
   constructor() {
     this.users = new Map();
     this.templates = new Map();
+    this.mondayMappings = new Map();
+    this.mondayApiKey = undefined;
     this.currentId = 1;
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000 // 24 hours
@@ -354,6 +466,86 @@ export class MemStorage implements IStorage {
       throw new Error("Template não encontrado");
     }
     this.templates.delete(id);
+  }
+  
+  // Monday mapping implementation
+  async getMondayMapping(id: string): Promise<MondayMapping | undefined> {
+    return this.mondayMappings.get(id);
+  }
+  
+  async getMondayMappingByBoardId(boardId: string): Promise<MondayMapping | undefined> {
+    return Array.from(this.mondayMappings.values()).find(
+      mapping => mapping.boardId === boardId
+    );
+  }
+  
+  async createMondayMapping(mappingData: InsertMondayMapping): Promise<MondayMapping> {
+    const id = crypto.randomUUID();
+    const mapping: MondayMapping = {
+      id,
+      name: mappingData.name,
+      description: mappingData.description || "",
+      boardId: mappingData.boardId,
+      statusColumn: mappingData.statusColumn || "",
+      responsibleColumn: mappingData.responsibleColumn || "",
+      lastSync: mappingData.lastSync || null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.mondayMappings.set(id, mapping);
+    return mapping;
+  }
+  
+  async getAllMondayMappings(): Promise<MondayMapping[]> {
+    return Array.from(this.mondayMappings.values());
+  }
+  
+  async updateMondayMapping(id: string, data: Partial<MondayMapping>): Promise<MondayMapping> {
+    const mapping = this.mondayMappings.get(id);
+    if (!mapping) {
+      throw new Error("Mapeamento não encontrado");
+    }
+    
+    const updatedMapping = {
+      ...mapping,
+      ...data,
+      updatedAt: new Date()
+    };
+    
+    this.mondayMappings.set(id, updatedMapping);
+    return updatedMapping;
+  }
+  
+  async updateMondayMappingLastSync(id: string): Promise<MondayMapping> {
+    const mapping = this.mondayMappings.get(id);
+    if (!mapping) {
+      throw new Error("Mapeamento não encontrado");
+    }
+    
+    const updatedMapping = {
+      ...mapping,
+      lastSync: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.mondayMappings.set(id, updatedMapping);
+    return updatedMapping;
+  }
+  
+  async deleteMondayMapping(id: string): Promise<void> {
+    if (!this.mondayMappings.has(id)) {
+      throw new Error("Mapeamento não encontrado");
+    }
+    this.mondayMappings.delete(id);
+  }
+  
+  async saveMondayApiKey(apiKey: string): Promise<void> {
+    this.mondayApiKey = apiKey;
+  }
+  
+  async getMondayApiKey(): Promise<string | undefined> {
+    return this.mondayApiKey;
   }
 }
 
