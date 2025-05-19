@@ -68,7 +68,7 @@ export default function DocumentosPage() {
       nome: "Contrato de Serviços", 
       data: "19/05/2025", 
       tipo: "PDF", 
-      status: "Ativo",
+      status: "Concluido",
       origem: "Monday",
       dataOrigem: "18/05/2025",
       dataIntegracao: "19/05/2025",
@@ -85,7 +85,7 @@ export default function DocumentosPage() {
       nome: "Proposta Comercial", 
       data: "18/05/2025", 
       tipo: "DOCX", 
-      status: "Ativo",
+      status: "Processando",
       origem: "EVO-CTx",
       dataOrigem: "15/05/2025",
       dataIntegracao: "18/05/2025",
@@ -103,7 +103,7 @@ export default function DocumentosPage() {
       nome: "Termo de Compromisso", 
       data: "15/05/2025", 
       tipo: "PDF", 
-      status: "Arquivado",
+      status: "Integrado",
       origem: "Monday",
       dataOrigem: "12/05/2025",
       dataIntegracao: "15/05/2025",
@@ -120,7 +120,7 @@ export default function DocumentosPage() {
       nome: "Memorando Técnico", 
       data: "17/05/2025", 
       tipo: "DOCX", 
-      status: "Ativo",
+      status: "Processando",
       origem: "Monday",
       dataOrigem: "16/05/2025",
       dataIntegracao: "17/05/2025",
@@ -136,7 +136,7 @@ export default function DocumentosPage() {
       nome: "Requisitos de Sistema", 
       data: "14/05/2025", 
       tipo: "PDF", 
-      status: "Ativo",
+      status: "Integrado",
       origem: "EVO-CTx",
       dataOrigem: "13/05/2025",
       dataIntegracao: "14/05/2025",
@@ -187,12 +187,17 @@ export default function DocumentosPage() {
     let icon = null;
     
     switch(status) {
-      case "Ativo":
+      case "Concluido":
         variant = "success";
         icon = <Check className="mr-1 h-3 w-3" />;
         break;
-      case "Arquivado":
-        variant = "secondary";
+      case "Integrado":
+        variant = "outline";
+        icon = <File className="mr-1 h-3 w-3" />;
+        break;
+      case "Processando":
+        variant = "warning";
+        icon = <Clock className="mr-1 h-3 w-3" />;
         break;
       case "Em aprovação":
         variant = "warning";
