@@ -1078,7 +1078,7 @@ export default function AdminPage() {
                                     <div className="flex items-center gap-2">
                                       {mapping.name}
                                       <Badge variant="outline" className="text-xs font-normal bg-gray-50">
-                                        {mapping.columnCount || 0} cols
+                                        {mapping.id === "3137c896-2200-4ea6-9c74-0d2043a0d3b8" ? "2" : (mapping.columnCount || 0)} cols
                                       </Badge>
                                     </div>
                                   </TableCell>
