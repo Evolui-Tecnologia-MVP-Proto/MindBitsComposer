@@ -220,45 +220,7 @@ export default function AdminPage() {
                 </p>
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col space-y-1.5">
-                  <label htmlFor="status-column" className="text-sm font-medium text-gray-700">
-                    Coluna de Status
-                  </label>
-                  <input
-                    id="status-column"
-                    name="status-column"
-                    defaultValue={selectedMapping?.statusColumn || ""}
-                    placeholder="Ex: status"
-                    className="px-3 py-2 rounded-md border border-gray-300 focus:ring-primary focus:border-primary"
-                  />
-                </div>
-                
-                <div className="flex flex-col space-y-1.5">
-                  <label htmlFor="responsible-column" className="text-sm font-medium text-gray-700">
-                    Coluna de Responsável
-                  </label>
-                  <input
-                    id="responsible-column"
-                    name="responsible-column"
-                    defaultValue={selectedMapping?.responsibleColumn || ""}
-                    placeholder="Ex: person"
-                    className="px-3 py-2 rounded-md border border-gray-300 focus:ring-primary focus:border-primary"
-                  />
-                </div>
-              </div>
-              
-              <div className="flex items-center mt-2">
-                <button
-                  type="button"
-                  className="px-3 py-1.5 text-sm bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200"
-                >
-                  Verificar Colunas
-                </button>
-                <span className="ml-2 text-xs text-gray-500">
-                  Obtém a lista de colunas disponíveis neste quadro
-                </span>
-              </div>
+
             </div>
           </div>
           
