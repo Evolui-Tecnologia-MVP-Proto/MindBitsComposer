@@ -100,27 +100,27 @@ const DecisionNode = memo(({ data }: NodeProps) => (
     <Handle 
       type="target" 
       position={Position.Top} 
-      className="w-3 h-3 bg-green-500" 
+      className="w-2 h-2 bg-amber-500" 
       style={{ top: '10px', left: '50%', transform: 'translateX(-50%)' }}
     />
     <Handle 
       type="source" 
       position={Position.Right} 
-      className="w-3 h-3 bg-green-500" 
+      className="w-2 h-2 bg-amber-500" 
       id="a"
       style={{ top: '50%', right: '-25px', transform: 'translateY(-50%)' }}
     />
     <Handle 
       type="source" 
       position={Position.Bottom} 
-      className="w-3 h-3 bg-green-500" 
+      className="w-2 h-2 bg-amber-500" 
       id="b"
       style={{ bottom: '10px', left: '50%', transform: 'translateX(-50%)' }}
     />
     <Handle 
       type="source" 
       position={Position.Left} 
-      className="w-3 h-3 bg-green-500" 
+      className="w-2 h-2 bg-amber-500" 
       id="c"
       style={{ top: '50%', left: '-25px', transform: 'translateY(-50%)' }}
     />
