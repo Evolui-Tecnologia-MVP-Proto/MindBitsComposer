@@ -227,6 +227,72 @@ const FlowCanvas = () => {
               </SelectContent>
             </Select>
           </div>
+          
+          {/* Combo de Nódulos */}
+          <div className="w-64">
+            <Label htmlFor="node-type">Adicionar Nódulo</Label>
+            <Select onValueChange={(value) => {
+              if (!value) return;
+              
+              const nodeData = {
+                'startNode': { type: 'startNode', label: 'Início' },
+                'elaboreNode': { type: 'elaboreNode', label: 'Elaborar' },
+                'approveNode': { type: 'approveNode', label: 'Aprovar' },
+                'decisionNode': { type: 'decisionNode', label: 'Decisão' },
+                'reviseNode': { type: 'reviseNode', label: 'Revisar' },
+                'endNode': { type: 'endNode', label: 'Fim' }
+              }[value];
+              
+              if (!nodeData) return;
+              
+              // Adicionar o nó ao centro da visualização
+              if (reactFlowInstance) {
+                const centerPosition = reactFlowInstance.screenToFlowPosition({
+                  x: reactFlowWrapper.current!.clientWidth / 2,
+                  y: reactFlowWrapper.current!.clientHeight / 2,
+                });
+                
+                const newNode = {
+                  id: `${nodeData.type}-${nodes.length + 1}`,
+                  type: nodeData.type,
+                  position: centerPosition,
+                  data: { label: nodeData.label },
+                };
+                
+                setNodes((nds) => nds.concat(newNode));
+              }
+            }}>
+              <SelectTrigger id="node-type" className="mt-1">
+                <SelectValue placeholder="Adicionar nódulo..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="startNode" className="flex items-center">
+                  <div className="h-4 w-4 rounded-full bg-blue-600 mr-2 flex-shrink-0"></div>
+                  <span>Início</span>
+                </SelectItem>
+                <SelectItem value="elaboreNode" className="flex items-center">
+                  <div className="h-4 w-4 rounded bg-green-600 mr-2 flex-shrink-0"></div>
+                  <span>Elaborar</span>
+                </SelectItem>
+                <SelectItem value="approveNode" className="flex items-center">
+                  <div className="h-4 w-4 rounded bg-indigo-600 mr-2 flex-shrink-0"></div>
+                  <span>Aprovar</span>
+                </SelectItem>
+                <SelectItem value="decisionNode" className="flex items-center">
+                  <div className="h-4 w-4 rotate-45 bg-amber-600 mr-2 flex-shrink-0"></div>
+                  <span>Decisão</span>
+                </SelectItem>
+                <SelectItem value="reviseNode" className="flex items-center">
+                  <div className="h-4 w-4 rounded bg-rose-600 mr-2 flex-shrink-0"></div>
+                  <span>Revisar</span>
+                </SelectItem>
+                <SelectItem value="endNode" className="flex items-center">
+                  <div className="h-4 w-4 rounded-full bg-slate-600 mr-2 flex-shrink-0"></div>
+                  <span>Fim</span>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         
         <div className="flex space-x-2">
@@ -242,77 +308,7 @@ const FlowCanvas = () => {
       </div>
       
       <div className="flex flex-1 overflow-hidden border border-gray-200 rounded-md">
-        <div className="w-64 bg-white border-r border-gray-200 p-4 overflow-y-auto">
-          <h3 className="font-medium text-sm mb-2 text-gray-500">NÓDULOS DISPONÍVEIS</h3>
-          
-          <div className="grid grid-cols-1 gap-2">
-            <div 
-              className="border border-gray-200 p-2 rounded cursor-move bg-blue-50 hover:bg-blue-100 flex items-center"
-              draggable
-              onDragStart={(event) => onDragStart(event, 'startNode', 'Início')}
-            >
-              <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center mr-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-              </div>
-              <span>Início</span>
-            </div>
-            
-            <div 
-              className="border border-gray-200 p-2 rounded cursor-move bg-green-50 hover:bg-green-100 flex items-center"
-              draggable
-              onDragStart={(event) => onDragStart(event, 'elaboreNode', 'Elaborar')}
-            >
-              <div className="h-8 w-8 rounded-lg bg-green-600 flex items-center justify-center mr-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              </div>
-              <span>Elaborar</span>
-            </div>
-            
-            <div 
-              className="border border-gray-200 p-2 rounded cursor-move bg-indigo-50 hover:bg-indigo-100 flex items-center"
-              draggable
-              onDragStart={(event) => onDragStart(event, 'approveNode', 'Aprovar')}
-            >
-              <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center mr-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-              </div>
-              <span>Aprovar</span>
-            </div>
-            
-            <div 
-              className="border border-gray-200 p-2 rounded cursor-move bg-amber-50 hover:bg-amber-100 flex items-center"
-              draggable
-              onDragStart={(event) => onDragStart(event, 'decisionNode', 'Decisão')}
-            >
-              <div className="h-8 w-8 rounded-none transform rotate-45 bg-amber-600 flex items-center justify-center mr-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transform -rotate-45"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-              </div>
-              <span>Decisão</span>
-            </div>
-            
-            <div 
-              className="border border-gray-200 p-2 rounded cursor-move bg-rose-50 hover:bg-rose-100 flex items-center"
-              draggable
-              onDragStart={(event) => onDragStart(event, 'reviseNode', 'Revisar')}
-            >
-              <div className="h-8 w-8 rounded-lg bg-rose-600 flex items-center justify-center mr-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 2v6h6M21.5 22v-6h-6"></path><path d="M22 11.5A10 10 0 0 0 3 9"></path><path d="M2 13a10 10 0 0 0 19 2.5"></path></svg>
-              </div>
-              <span>Revisar</span>
-            </div>
-            
-            <div 
-              className="border border-gray-200 p-2 rounded cursor-move bg-slate-50 hover:bg-slate-100 flex items-center"
-              draggable
-              onDragStart={(event) => onDragStart(event, 'endNode', 'Fim')}
-            >
-              <div className="h-8 w-8 rounded-full bg-slate-600 flex items-center justify-center mr-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-              </div>
-              <span>Fim</span>
-            </div>
-          </div>
-        </div>
+        {/* Nódulos agora como combo na barra superior */}
         
         <div className="flex-1 h-full" ref={reactFlowWrapper}>
           <ReactFlow
