@@ -88,7 +88,7 @@ export default function AdminPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedMapping, setSelectedMapping] = useState<BoardMapping | null>(null);
   const [isTesting, setIsTesting] = useState(false);
-  const [testResult, setTestResult] = useState<{success: boolean; message: string} | null>(null);
+  const [testResult, setTestResult] = useState<{success: boolean; message: string; error?: boolean} | null>(null);
   const [showApiKey, setShowApiKey] = useState(false);
   const [apiKey, setApiKey] = useState("");
   
@@ -416,13 +416,21 @@ export default function AdminPage() {
     setIsTesting(true);
     setTestResult(null);
     
-    // Aqui implementaria a lógica para testar a conexão com o Monday
-    // Por enquanto, vamos simular um teste bem-sucedido
+    // Simulação de teste - em ambiente real, seria uma chamada API
+    // Simulando erro para quadros com ID < 1000 (apenas para demonstração)
     setTimeout(() => {
-      setTestResult({
-        success: true,
-        message: "Conexão com o Monday.com estabelecida e quadro encontrado!"
-      });
+      if (parseInt(boardId) < 1000) {
+        setTestResult({
+          success: false,
+          message: "Quadro não encontrado. Verifique o ID e tente novamente.",
+          error: true // Indica que é um erro que deve impedir o salvamento
+        });
+      } else {
+        setTestResult({
+          success: true,
+          message: "Conexão com o Monday.com estabelecida e quadro encontrado!"
+        });
+      }
       setIsTesting(false);
     }, 1000);
   };
@@ -507,7 +515,13 @@ export default function AdminPage() {
                               variant="outline"
                               onClick={() => testMondayConnection(form.getValues().boardId)}
                               disabled={isTesting || !form.getValues().boardId}
-                              className={"bg-yellow-500 hover:bg-yellow-600 text-white " + (testResult && testResult.success ? "bg-green-600 hover:bg-green-700" : "")}
+                              className={
+                                testResult && testResult.error 
+                                  ? "bg-red-500 hover:bg-red-600 text-white" 
+                                  : testResult && testResult.success 
+                                    ? "bg-green-600 hover:bg-green-700 text-white" 
+                                    : "bg-yellow-500 hover:bg-yellow-600 text-white"
+                              }
                             >
                               {isTesting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Link className="h-4 w-4 mr-2" />}
                               Testar
