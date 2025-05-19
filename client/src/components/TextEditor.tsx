@@ -263,6 +263,7 @@ export default function TextEditor() {
                   <RichTextPlugin
                     contentEditable={<ContentEditable className="outline-none px-4 py-2 min-h-[150px]" />}
                     placeholder={<div className="absolute ml-4 mt-2 text-gray-400 pointer-events-none">Conteúdo da sessão 01...</div>}
+                    ErrorBoundary={() => <div>Erro no editor!</div>}
                   />
                 </div>
               </AccordionContent>
@@ -277,6 +278,7 @@ export default function TextEditor() {
                   <RichTextPlugin
                     contentEditable={<ContentEditable className="outline-none px-4 py-2 min-h-[150px]" />}
                     placeholder={<div className="absolute ml-4 mt-2 text-gray-400 pointer-events-none">Conteúdo da sessão 02...</div>}
+                    ErrorBoundary={() => <div>Erro no editor!</div>}
                   />
                 </div>
               </AccordionContent>
@@ -291,6 +293,7 @@ export default function TextEditor() {
                   <RichTextPlugin
                     contentEditable={<ContentEditable className="outline-none px-4 py-2 min-h-[150px]" />}
                     placeholder={<div className="absolute ml-4 mt-2 text-gray-400 pointer-events-none">Conteúdo da sessão 03...</div>}
+                    ErrorBoundary={() => <div>Erro no editor!</div>}
                   />
                 </div>
               </AccordionContent>
