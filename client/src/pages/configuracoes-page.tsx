@@ -162,7 +162,7 @@ export default function ConfiguracoesPage() {
     form.reset({
       serviceName: connection.serviceName,
       token: connection.token,
-      description: connection.description
+      description: connection.description || ""
     });
     setSelectedConnection(connection);
     setSelectedServiceName(connection.serviceName);
@@ -198,12 +198,12 @@ export default function ConfiguracoesPage() {
 
   // Verifica se uma conexão existe para um serviço específico
   const hasConnection = (serviceName: string): boolean => {
-    return connections.some(conn => conn.serviceName === serviceName);
+    return connections.some((conn: ServiceConnection) => conn.serviceName === serviceName);
   };
 
   // Obtém conexão por nome do serviço
   const getConnection = (serviceName: string): ServiceConnection | undefined => {
-    return connections.find(conn => conn.serviceName === serviceName);
+    return connections.find((conn: ServiceConnection) => conn.serviceName === serviceName);
   };
 
   return (
@@ -322,7 +322,7 @@ export default function ConfiguracoesPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {connections.map((connection) => (
+                        {connections.map((connection: ServiceConnection) => (
                           <tr key={connection.id} className="border-b">
                             <td className="px-4 py-3">
                               <div className="flex items-center space-x-2">
