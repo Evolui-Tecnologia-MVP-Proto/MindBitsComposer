@@ -590,6 +590,188 @@ export default function AdminPage() {
                   O ID do quadro pode ser encontrado na URL do quadro no Monday.com
                 </p>
               </div>
+              
+              {/* Seção de mapeamento de colunas - exibida após a conexão com o Monday */}
+              {showColumnMapping && (
+                <div className="mt-6 pt-5 border-t border-gray-200">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Mapeamento de Colunas</h3>
+                  
+                  {/* Lista de mapeamentos já configurados */}
+                  <div className="mb-5">
+                    <h4 className="text-sm font-medium mb-2">Mapeamentos Configurados</h4>
+                    {columnMappings.length > 0 ? (
+                      <div className="border rounded-md overflow-hidden">
+                        <table className="min-w-full divide-y divide-gray-300">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Coluna Monday
+                              </th>
+                              <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Campo no Sistema
+                              </th>
+                              <th scope="col" className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-16">
+                                Ações
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {columnMappings.map((mapping, index) => {
+                              const mondayColumn = mondayColumns.find(col => col.columnId === mapping.mondayColumnId);
+                              return (
+                                <tr key={index}>
+                                  <td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    {mondayColumn?.title || mapping.mondayColumnId}
+                                  </td>
+                                  <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-700">
+                                    {mapping.mindBitsColumn}
+                                  </td>
+                                  <td className="px-3 py-2 whitespace-nowrap text-right text-sm font-medium">
+                                    <button
+                                      onClick={() => {
+                                        // Remove o mapeamento
+                                        setColumnMappings(columnMappings.filter((_, i) => i !== index));
+                                      }}
+                                      className="text-red-600 hover:text-red-800"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="text-sm text-gray-500 border rounded-md p-4 text-center">
+                        Nenhum mapeamento configurado ainda
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Formulário para adicionar novo mapeamento */}
+                  <div className="space-y-3 mt-4">
+                    <h4 className="text-sm font-medium mb-2">Adicionar Novo Mapeamento</h4>
+                    
+                    <div className="grid grid-cols-1 gap-3">
+                      <div className="flex flex-col space-y-1.5">
+                        <label htmlFor="monday-column" className="text-sm font-medium text-gray-700">
+                          Coluna Monday
+                        </label>
+                        <select
+                          id="monday-column"
+                          value={currentColumnMapping.mondayColumnId}
+                          onChange={(e) => setCurrentColumnMapping({
+                            ...currentColumnMapping,
+                            mondayColumnId: e.target.value
+                          })}
+                          className="px-3 py-2 rounded-md border border-gray-300 focus:ring-primary focus:border-primary"
+                        >
+                          <option value="">Selecione uma coluna</option>
+                          {mondayColumns.map(column => (
+                            <option key={column.columnId} value={column.columnId}>
+                              {column.title} ({column.type})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      
+                      <div className="flex flex-col space-y-1.5">
+                        <label htmlFor="mindbits-column" className="text-sm font-medium text-gray-700">
+                          Campo do Sistema
+                        </label>
+                        <select
+                          id="mindbits-column"
+                          value={currentColumnMapping.mindBitsColumn}
+                          onChange={(e) => setCurrentColumnMapping({
+                            ...currentColumnMapping,
+                            mindBitsColumn: e.target.value as MindBitsColumnType
+                          })}
+                          className="px-3 py-2 rounded-md border border-gray-300 focus:ring-primary focus:border-primary"
+                        >
+                          <option value="nome">Nome</option>
+                          <option value="cliente">Cliente</option>
+                          <option value="requisitante">Requisitante</option>
+                          <option value="data_inclusao">Data de Inclusão</option>
+                          <option value="status_origem">Status de Origem</option>
+                          <option value="descricao">Descrição</option>
+                          <option value="anexos">Anexos</option>
+                        </select>
+                      </div>
+                      
+                      <div className="flex flex-col space-y-1.5">
+                        <label htmlFor="transform-function" className="text-sm font-medium text-gray-700">
+                          Função JavaScript (opcional)
+                        </label>
+                        <textarea
+                          id="transform-function"
+                          placeholder="Função para transformar o valor (ex: value => value.toUpperCase())"
+                          value={currentColumnMapping.transformFunction || ""}
+                          onChange={(e) => setCurrentColumnMapping({
+                            ...currentColumnMapping,
+                            transformFunction: e.target.value
+                          })}
+                          rows={2}
+                          className="px-3 py-2 rounded-md border border-gray-300 focus:ring-primary focus:border-primary"
+                        />
+                      </div>
+                      
+                      <div className="flex justify-end mt-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (!currentColumnMapping.mondayColumnId) {
+                              toast({
+                                title: "Erro",
+                                description: "Selecione uma coluna do Monday",
+                                variant: "destructive",
+                              });
+                              return;
+                            }
+                            
+                            // Verifica se já existe um mapeamento para este campo do sistema
+                            const existingIndex = columnMappings.findIndex(
+                              m => m.mindBitsColumn === currentColumnMapping.mindBitsColumn
+                            );
+                            
+                            if (existingIndex >= 0) {
+                              // Atualiza o mapeamento existente
+                              const updatedMappings = [...columnMappings];
+                              updatedMappings[existingIndex] = currentColumnMapping;
+                              setColumnMappings(updatedMappings);
+                              
+                              toast({
+                                title: "Mapeamento atualizado",
+                                description: `O campo ${currentColumnMapping.mindBitsColumn} foi remapeado.`,
+                                variant: "default",
+                              });
+                            } else {
+                              // Adiciona um novo mapeamento
+                              setColumnMappings([...columnMappings, currentColumnMapping]);
+                              
+                              toast({
+                                title: "Mapeamento adicionado",
+                                description: `Novo mapeamento para ${currentColumnMapping.mindBitsColumn} adicionado.`,
+                                variant: "default",
+                              });
+                            }
+                            
+                            // Reseta o formulário
+                            setCurrentColumnMapping({
+                              mondayColumnId: "",
+                              mindBitsColumn: "nome"
+                            });
+                          }}
+                          className="px-3 py-2 text-sm font-medium rounded-md border border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        >
+                          Adicionar Mapeamento
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           
