@@ -496,9 +496,7 @@ export default function AdminPage() {
                               Testar
                             </Button>
                           </div>
-                          <FormDescription>
-                            O ID do quadro pode ser encontrado na URL do Monday.com
-                          </FormDescription>
+                          {/* Descrição removida conforme solicitado */}
                           <FormMessage />
                         </FormItem>
                       )}
