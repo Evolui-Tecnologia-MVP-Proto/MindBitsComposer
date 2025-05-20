@@ -267,7 +267,7 @@ export default function AuthPage() {
             EVO-MindBits Composer
           </h2>
           <p className="text-xl mb-6">
-            Sistema avançado para otimização de produtividade e colaboração empresarial
+            Compositor integrado de documentação técnica e empresarial assistido por IA
           </p>
           <ul className="space-y-2">
             <li className="flex items-center">
