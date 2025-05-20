@@ -61,6 +61,7 @@ type BoardMapping = {
   id: string;
   name: string;
   boardId: string;
+  quadroMonday: string;
   description: string;
   lastSync: string | null;
   colunas?: number;

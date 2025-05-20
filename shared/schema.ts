@@ -47,6 +47,7 @@ export const mondayMappings = pgTable("monday_mappings", {
   name: text("name").notNull(),
   description: text("description").default(""),
   boardId: text("board_id").notNull(),
+  quadroMonday: text("quadro_monday").default(""),
   statusColumn: text("status_column").default(""),
   responsibleColumn: text("responsible_column").default(""),
   lastSync: timestamp("last_sync"),
