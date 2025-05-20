@@ -262,7 +262,7 @@ export default function AuthPage() {
       
       {/* Lado direito - Hero/Imagem */}
       <div className="w-1/2 flex items-center justify-center" style={{ backgroundColor: "#0e4f82" }}>
-        <div className="px-12 text-white">
+        <div className="px-12" style={{ color: "#acc3e3" }}>
           <h2 className="text-3xl font-bold mb-4">
             EVO-MindBits Composer
           </h2>
@@ -271,25 +271,25 @@ export default function AuthPage() {
           </p>
           <ul className="space-y-2">
             <li className="flex items-center">
-              <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full text-white font-bold text-sm mr-2">
+              <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full font-bold text-sm mr-2" style={{ color: "#acc3e3" }}>
                 1
               </div>
               Integração com sistemas externos
             </li>
             <li className="flex items-center">
-              <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full text-white font-bold text-sm mr-2">
+              <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full font-bold text-sm mr-2" style={{ color: "#acc3e3" }}>
                 2
               </div>
               Gerenciamento de mapeamentos
             </li>
             <li className="flex items-center">
-              <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full text-white font-bold text-sm mr-2">
+              <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full font-bold text-sm mr-2" style={{ color: "#acc3e3" }}>
                 3
               </div>
               Ambiente de edição dinâmico
             </li>
             <li className="flex items-center">
-              <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full text-white font-bold text-sm mr-2">
+              <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full font-bold text-sm mr-2" style={{ color: "#acc3e3" }}>
                 4
               </div>
               Validação de documentos
