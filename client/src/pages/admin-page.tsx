@@ -8,6 +8,7 @@ import {
   DialogFooter,
   DialogDescription
 } from "@/components/ui/dialog";
+// Importações já movidas para outra parte do arquivo
 import {
   AlertDialog,
   AlertDialogAction,
@@ -56,7 +57,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+//import já existente acima
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -96,6 +97,12 @@ export default function AdminPage() {
   const [testResult, setTestResult] = useState<{success: boolean; message: string; error?: boolean} | null>(null);
   const [showApiKey, setShowApiKey] = useState(false);
   const [apiKey, setApiKey] = useState("");
+  
+  // Estados para integrações de serviços
+  const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+  const [isServiceDeleteDialogOpen, setIsServiceDeleteDialogOpen] = useState(false);
+  const [selectedConnection, setSelectedConnection] = useState<ServiceConnectionType | null>(null);
+  const [selectedServiceName, setSelectedServiceName] = useState<string>("");
   
   // Estados para colunas do Monday
   const [mondayColumns, setMondayColumns] = useState<MondayColumnType[]>([]);
@@ -170,6 +177,19 @@ export default function AdminPage() {
       return response.json();
     },
     enabled: !!selectedMapping, // Só executa se tiver um mapping selecionado
+  });
+  
+  // Consulta para buscar todas as conexões de serviços
+  const { 
+    data: connections = [], 
+    isLoading: isLoadingConnections 
+  } = useQuery<ServiceConnectionType[]>({
+    queryKey: ["/api/services/connections"],
+    queryFn: async () => {
+      const res = await fetch("/api/services/connections");
+      if (!res.ok) throw new Error("Falha ao buscar conexões");
+      return res.json();
+    }
   });
   
   // Efeito para atualizar o estado das colunas quando os dados forem carregados
@@ -989,6 +1009,7 @@ export default function AdminPage() {
           <TabsList className="mb-6">
             <TabsTrigger value="usuarios">Usuários</TabsTrigger>
             <TabsTrigger value="integracao-monday">Integração Monday</TabsTrigger>
+            <TabsTrigger value="integracao-servicos">Integrações de Serviços</TabsTrigger>
             <TabsTrigger value="configuracao">Configuração</TabsTrigger>
           </TabsList>
           
