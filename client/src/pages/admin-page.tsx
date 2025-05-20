@@ -174,12 +174,14 @@ export default function AdminPage() {
       mappingForm.reset({
         name: selectedMapping.name,
         boardId: selectedMapping.boardId,
+        quadroMonday: selectedMapping.quadroMonday,
         description: selectedMapping.description,
       });
     } else {
       mappingForm.reset({
         name: "",
         boardId: "",
+        quadroMonday: "",
         description: "",
       });
     }
@@ -258,6 +260,7 @@ export default function AdminPage() {
       const mappingData = {
         name: data.name,
         boardId: data.boardId,
+        quadroMonday: data.quadroMonday || "",
         description: data.description || "",
         statusColumn: "",
         responsibleColumn: "",
