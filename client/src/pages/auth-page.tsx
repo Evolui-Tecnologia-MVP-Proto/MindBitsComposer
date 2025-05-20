@@ -316,7 +316,7 @@ export default function AuthPage() {
           {/* Textos descritivos com mesma margem da imagem principal */}
           <div className="mt-6" style={{ color: "#acc3e3" }}>
             <p className="text-xl mb-8">
-              Compositor integrado para, documentação técnica e empresarial, assistido por IA e para a IA.
+              Compositor integrado para documentação técnica e empresarial, assistido por IA e para a IA.
             </p>
             <ul className="space-y-4">
               <li className="flex items-center">
