@@ -99,17 +99,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
             </Link>
           </div>
 
-          <div className="sidebar-item-container">
-            <Link href="/configuracoes">
-              <div 
-                className={`sidebar-item ${activeItem === "configuracoes" ? "sidebar-active" : ""}`}
-                onClick={closeMobileMenu}
-              >
-                <Cog className="mr-3 h-6 w-6" />
-                Configurações
-              </div>
-            </Link>
-          </div>
+
         </nav>
       </aside>
 
