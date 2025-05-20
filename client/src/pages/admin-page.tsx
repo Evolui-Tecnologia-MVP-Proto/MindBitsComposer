@@ -251,6 +251,16 @@ export default function AdminPage() {
   const onSubmitMapping = async (data: z.infer<typeof mappingFormSchema>) => {
     setIsSubmitting(true);
     try {
+      // Preparar os dados no formato esperado pelo servidor
+      const mappingData = {
+        name: data.name,
+        boardId: data.boardId,
+        description: data.description || "",
+        statusColumn: "",
+        responsibleColumn: "",
+        lastSync: null
+      };
+      
       // Criar/atualizar o mapeamento na tabela monday_mappings
       const apiUrl = selectedMapping 
         ? `/api/monday/mappings/${selectedMapping.id}` 
@@ -263,7 +273,7 @@ export default function AdminPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(mappingData)
       });
       
       if (!response.ok) {
