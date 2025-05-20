@@ -276,19 +276,27 @@ export default function AdminPage() {
       if (mondayColumnsData.length > 0) {
         try {
           // Enviar as colunas para o servidor
-          await fetch(`/api/monday/mappings/${savedMapping.id}/fetch-columns`, {
+          const columnsResponse = await fetch(`/api/monday/mappings/${savedMapping.id}/fetch-columns`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({ columns: mondayColumnsData })
           });
+          
+          if (!columnsResponse.ok) {
+            throw new Error('Falha ao salvar as colunas');
+          }
+          
+          // Limpar os dados temporários das colunas após salvar
+          setMondayColumnsData([]);
+          
         } catch (columnError) {
           console.error("Erro ao salvar colunas:", columnError);
           toast({
             title: "Atenção",
             description: "Mapeamento criado, mas houve um erro ao salvar as colunas.",
-            variant: "warning",
+            variant: "destructive",
           });
         }
       }
@@ -304,8 +312,8 @@ export default function AdminPage() {
       // Definir o mapeamento selecionado para o que acabamos de salvar
       setSelectedMapping(savedMapping);
       
-      // Mudar para a tab de colunas após o salvamento
-      setActiveTab("columns");
+      // Mudar para a tab de colunas após o salvamento (não fecha o modal)
+      setActiveTab("colunas");
       
     } catch (error) {
       toast({
