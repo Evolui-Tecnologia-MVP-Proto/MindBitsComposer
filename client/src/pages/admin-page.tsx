@@ -66,6 +66,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { v4 as uuidv4 } from 'uuid';
 
+// Importação do tipo ServiceConnection
+import { type ServiceConnection } from "@shared/schema";
+
+// Schema para o formulário de conexão de serviço
+const connectionFormSchema = z.object({
+  serviceName: z.string().min(1, "Nome do serviço é obrigatório"),
+  token: z.string().min(1, "Token é obrigatório"),
+  description: z.string().optional()
+});
+
+type ConnectionFormValues = z.infer<typeof connectionFormSchema>;
+
 // Tipos das props
 type BoardMapping = {
   id: string;
@@ -101,8 +113,19 @@ export default function AdminPage() {
   // Estados para integrações de serviços
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const [isServiceDeleteDialogOpen, setIsServiceDeleteDialogOpen] = useState(false);
-  const [selectedConnection, setSelectedConnection] = useState<ServiceConnectionType | null>(null);
+  const [selectedConnection, setSelectedConnection] = useState<ServiceConnection | null>(null);
   const [selectedServiceName, setSelectedServiceName] = useState<string>("");
+  const [showServiceToken, setShowServiceToken] = useState(false);
+  
+  // Formulário para conexão de serviço
+  const serviceForm = useForm<ConnectionFormValues>({
+    resolver: zodResolver(connectionFormSchema),
+    defaultValues: {
+      serviceName: "",
+      token: "",
+      description: ""
+    }
+  });
   
   // Estados para colunas do Monday
   const [mondayColumns, setMondayColumns] = useState<MondayColumnType[]>([]);
@@ -183,7 +206,7 @@ export default function AdminPage() {
   const { 
     data: connections = [], 
     isLoading: isLoadingConnections 
-  } = useQuery<ServiceConnectionType[]>({
+  } = useQuery<ServiceConnection[]>({
     queryKey: ["/api/services/connections"],
     queryFn: async () => {
       const res = await fetch("/api/services/connections");
@@ -348,6 +371,68 @@ export default function AdminPage() {
     onError: (error) => {
       toast({
         title: "Erro ao excluir mapeamento",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Mutação para salvar uma conexão de serviço
+  const saveServiceConnectionMutation = useMutation({
+    mutationFn: async (data: any) => {
+      const method = selectedConnection ? 'PATCH' : 'POST';
+      const endpoint = selectedConnection 
+        ? `/api/services/connections/${selectedConnection.id}` 
+        : '/api/services/connections';
+      
+      const response = await apiRequest(method, endpoint, data);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Falha ao salvar conexão');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: selectedConnection ? "Conexão atualizada" : "Conexão adicionada",
+        description: `A conexão foi ${selectedConnection ? 'atualizada' : 'adicionada'} com sucesso.`,
+        variant: "default",
+      });
+      setIsServiceModalOpen(false);
+      setSelectedConnection(null);
+      queryClient.invalidateQueries({ queryKey: ['/api/services/connections'] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao salvar conexão",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Mutação para excluir uma conexão de serviço
+  const deleteServiceConnectionMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await apiRequest('DELETE', `/api/services/connections/${id}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Falha ao excluir conexão');
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Conexão removida",
+        description: "A conexão foi removida com sucesso.",
+        variant: "default",
+      });
+      setIsServiceDeleteDialogOpen(false);
+      setSelectedConnection(null);
+      queryClient.invalidateQueries({ queryKey: ['/api/services/connections'] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao excluir conexão",
         description: error.message,
         variant: "destructive",
       });
@@ -1109,7 +1194,7 @@ export default function AdminPage() {
                                     <div className="flex items-center gap-2">
                                       {mapping.name}
                                       <Badge variant="outline" className="text-xs font-normal bg-gray-50">
-                                        {mapping.id === "3137c896-2200-4ea6-9c74-0d2043a0d3b8" ? "2" : (mapping.columnCount || 0)} cols
+                                        {mapping.id === "3137c896-2200-4ea6-9c74-0d2043a0d3b8" ? "2" : "0"} cols
                                       </Badge>
                                     </div>
                                   </TableCell>
