@@ -98,6 +98,13 @@ type MondayColumnType = {
   type: string;
 };
 
+// Predefined services for the service integrations tab
+const predefinedServices = [
+  { name: "monday", label: "Monday.com", icon: <Key size={18} /> },
+  { name: "github", label: "GitHub", icon: <GitBranchPlus size={18} /> },
+  { name: "openai", label: "OpenAI", icon: <BrainCircuit size={18} /> }
+];
+
 export default function AdminPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
