@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Dialog, 
@@ -49,8 +49,14 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import UserTable from "@/components/UserTable";
 import { queryClient } from "@/lib/queryClient";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
-// Definições de tipos simples
+// Definições de tipos
 type BoardMapping = {
   id: string;
   name: string;
@@ -62,6 +68,24 @@ type BoardMapping = {
   colunas?: number;
 };
 
+type MappingColumn = {
+  id: string;
+  mappingId: string;
+  mondayColumnId: string;
+  cpxField: string;
+  transformFunction: string | null;
+  createdAt: string;
+  mondayColumnTitle?: string;
+};
+
+type MondayColumn = {
+  id: string;
+  mappingId: string;
+  columnId: string;
+  title: string;
+  type: string;
+};
+
 type ServiceConnection = {
   id: string;
   serviceName: string;
@@ -70,6 +94,21 @@ type ServiceConnection = {
   createdAt: string;
 };
 
+// Schemas para validação de formulários
+const mappingFormSchema = z.object({
+  name: z.string().min(3, { message: "Nome deve ter pelo menos 3 caracteres" }),
+  boardId: z.string().min(1, { message: "ID do quadro é obrigatório" }),
+  description: z.string().optional(),
+  statusColumn: z.string().optional(),
+  responsibleColumn: z.string().optional(),
+});
+
+const columnMappingFormSchema = z.object({
+  mondayColumnId: z.string().min(1, { message: "Coluna do Monday é obrigatória" }),
+  cpxField: z.string().min(1, { message: "Campo CPX é obrigatório" }),
+  transformFunction: z.string().optional(),
+});
+
 export default function AdminPage() {
   const { toast } = useToast();
   
@@ -77,14 +116,78 @@ export default function AdminPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedMapping, setSelectedMapping] = useState<BoardMapping | null>(null);
+  const [activeTab, setActiveTab] = useState("quadro");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAddingColumn, setIsAddingColumn] = useState(false);
+  const [selectedColumn, setSelectedColumn] = useState<MappingColumn | null>(null);
   
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
   const [isServiceDeleteDialogOpen, setIsServiceDeleteDialogOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [selectedConnection, setSelectedConnection] = useState<ServiceConnection | null>(null);
   
+  // Formulário para mapeamento do Monday
+  const mappingForm = useForm<z.infer<typeof mappingFormSchema>>({
+    resolver: zodResolver(mappingFormSchema),
+    defaultValues: {
+      name: "",
+      boardId: "",
+      description: "",
+      statusColumn: "",
+      responsibleColumn: "",
+    },
+  });
+  
+  // Formulário para coluna de mapeamento
+  const columnForm = useForm<z.infer<typeof columnMappingFormSchema>>({
+    resolver: zodResolver(columnMappingFormSchema),
+    defaultValues: {
+      mondayColumnId: "",
+      cpxField: "",
+      transformFunction: "",
+    },
+  });
+  
+  // Atualiza o formulário quando um mapeamento é selecionado
+  useEffect(() => {
+    if (selectedMapping) {
+      mappingForm.reset({
+        name: selectedMapping.name,
+        boardId: selectedMapping.boardId,
+        description: selectedMapping.description,
+        statusColumn: selectedMapping.statusColumn,
+        responsibleColumn: selectedMapping.responsibleColumn,
+      });
+    } else {
+      mappingForm.reset({
+        name: "",
+        boardId: "",
+        description: "",
+        statusColumn: "",
+        responsibleColumn: "",
+      });
+    }
+  }, [selectedMapping, mappingForm]);
+  
+  // Atualiza o formulário quando uma coluna é selecionada
+  useEffect(() => {
+    if (selectedColumn) {
+      columnForm.reset({
+        mondayColumnId: selectedColumn.mondayColumnId,
+        cpxField: selectedColumn.cpxField,
+        transformFunction: selectedColumn.transformFunction || "",
+      });
+    } else {
+      columnForm.reset({
+        mondayColumnId: "",
+        cpxField: "",
+        transformFunction: "",
+      });
+    }
+  }, [selectedColumn, columnForm]);
+  
   // Queries
-  const { data: mappingsData, isLoading: mappingsIsLoading, error: mappingsError } = useQuery<BoardMapping[]>({
+  const { data: mappingsData = [], isLoading: mappingsIsLoading, error: mappingsError } = useQuery<BoardMapping[]>({
     queryKey: ['/api/monday/mappings'],
   });
   
@@ -92,20 +195,100 @@ export default function AdminPage() {
     queryKey: ['/api/service-connections'],
   });
   
+  // Query para colunas do Monday de um mapeamento específico
+  const { data: mondayColumns = [], isLoading: columnsLoading } = useQuery<MondayColumn[]>({
+    queryKey: ['/api/monday/columns', selectedMapping?.id],
+    enabled: !!selectedMapping,
+  });
+  
+  // Query para colunas mapeadas de um mapeamento específico
+  const { data: mappingColumns = [], isLoading: mappingColumnsLoading } = useQuery<MappingColumn[]>({
+    queryKey: ['/api/monday/mapping-columns', selectedMapping?.id],
+    enabled: !!selectedMapping,
+  });
+  
+  // Handlers para os formulários
+  const onSubmitMapping = async (data: z.infer<typeof mappingFormSchema>) => {
+    setIsSubmitting(true);
+    try {
+      // Simular chamada à API para salvar mapeamento
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: selectedMapping ? "Mapeamento atualizado" : "Mapeamento criado",
+        description: `O mapeamento "${data.name}" foi ${selectedMapping ? 'atualizado' : 'criado'} com sucesso.`,
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ['/api/monday/mappings'] });
+      setIsModalOpen(false);
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao salvar o mapeamento.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  
+  const onSubmitColumn = async (data: z.infer<typeof columnMappingFormSchema>) => {
+    try {
+      // Simular chamada à API para salvar coluna de mapeamento
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: selectedColumn ? "Coluna atualizada" : "Coluna adicionada",
+        description: `A coluna foi ${selectedColumn ? 'atualizada' : 'adicionada'} com sucesso.`,
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ['/api/monday/mapping-columns', selectedMapping?.id] });
+      setIsAddingColumn(false);
+      setSelectedColumn(null);
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao salvar a coluna de mapeamento.",
+        variant: "destructive",
+      });
+    }
+  };
+  
+  const deleteColumn = async (columnId: string) => {
+    try {
+      // Simular chamada à API para excluir coluna de mapeamento
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Coluna excluída",
+        description: "A coluna de mapeamento foi excluída com sucesso.",
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ['/api/monday/mapping-columns', selectedMapping?.id] });
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao excluir a coluna de mapeamento.",
+        variant: "destructive",
+      });
+    }
+  };
+  
   // Funções para abrir modal de edição/exclusão
   const openEditModal = (mapping: BoardMapping) => {
     setSelectedMapping(mapping);
+    setActiveTab("quadro");
     setIsModalOpen(true);
-    
-    toast({
-      title: "Editar mapeamento",
-      description: `Abrindo modal para editar o mapeamento "${mapping.name}"`,
-    });
   };
   
   const openDeleteDialog = (mapping: BoardMapping) => {
     setSelectedMapping(mapping);
     setIsDeleteDialogOpen(true);
+  };
+  
+  const editColumn = (column: MappingColumn) => {
+    setSelectedColumn(column);
+    setIsAddingColumn(true);
   };
   
   return (
@@ -150,11 +333,8 @@ export default function AdminPage() {
                       variant="outline"
                       onClick={() => {
                         setSelectedMapping(null);
+                        setActiveTab("quadro");
                         setIsModalOpen(true);
-                        toast({
-                          title: "Novo mapeamento",
-                          description: "Abrindo modal para criar um novo mapeamento",
-                        });
                       }}
                     >
                       <Plus className="h-4 w-4 mr-2" />
@@ -384,6 +564,304 @@ export default function AdminPage() {
           </TabsContent>
         </Tabs>
       </div>
+      
+      {/* Modal para edição/inclusão de mapeamento de quadros do Monday */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-[700px]">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedMapping ? "Editar Mapeamento" : "Novo Mapeamento"}
+            </DialogTitle>
+            <DialogDescription>
+              Configure as informações do mapeamento entre Monday.com e EVO-MindBits.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="quadro">Quadro</TabsTrigger>
+              <TabsTrigger value="colunas">Colunas</TabsTrigger>
+            </TabsList>
+            
+            {/* Aba de informações do quadro */}
+            <TabsContent value="quadro" className="space-y-4 py-4">
+              <Form {...mappingForm}>
+                <form onSubmit={mappingForm.handleSubmit(onSubmitMapping)} className="space-y-4">
+                  <FormField
+                    control={mappingForm.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nome</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nome do mapeamento" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={mappingForm.control}
+                    name="boardId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ID do Quadro</FormLabel>
+                        <FormControl>
+                          <Input placeholder="ID do quadro no Monday.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={mappingForm.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Descrição (opcional)</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Descreva a finalidade deste mapeamento"
+                            className="resize-none"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={mappingForm.control}
+                    name="statusColumn"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Coluna de Status (opcional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nome da coluna de status" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={mappingForm.control}
+                    name="responsibleColumn"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Coluna de Responsável (opcional)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Nome da coluna de responsável" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <DialogFooter>
+                    <Button type="submit" disabled={isSubmitting}>
+                      {isSubmitting ? (
+                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando...</>
+                      ) : (
+                        "Salvar"
+                      )}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </TabsContent>
+            
+            {/* Aba de colunas mapeadas */}
+            <TabsContent value="colunas" className="py-4">
+              {!selectedMapping ? (
+                <div className="text-center py-6">
+                  <p className="text-gray-500">
+                    Salve o mapeamento primeiro para adicionar colunas.
+                  </p>
+                </div>
+              ) : isAddingColumn ? (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">
+                    {selectedColumn ? "Editar Coluna" : "Nova Coluna"}
+                  </h3>
+                  <Form {...columnForm}>
+                    <form onSubmit={columnForm.handleSubmit(onSubmitColumn)} className="space-y-4">
+                      <FormField
+                        control={columnForm.control}
+                        name="mondayColumnId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Coluna do Monday</FormLabel>
+                            <FormControl>
+                              <select
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                                {...field}
+                              >
+                                <option value="">Selecione uma coluna</option>
+                                {mondayColumns.map((column) => (
+                                  <option key={column.id} value={column.columnId}>
+                                    {column.title}
+                                  </option>
+                                ))}
+                              </select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={columnForm.control}
+                        name="cpxField"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Campo CPX</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Nome do campo no CPX" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={columnForm.control}
+                        name="transformFunction"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Função de Transformação (opcional)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Função para transformar dados" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <div className="flex justify-between pt-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            setIsAddingColumn(false);
+                            setSelectedColumn(null);
+                          }}
+                        >
+                          Cancelar
+                        </Button>
+                        <Button type="submit">
+                          Salvar
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-medium">Colunas Mapeadas</h3>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setSelectedColumn(null);
+                        setIsAddingColumn(true);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Nova Coluna
+                    </Button>
+                  </div>
+                  
+                  {mappingColumnsLoading ? (
+                    <div className="flex justify-center py-4">
+                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : mappingColumns.length === 0 ? (
+                    <div className="text-center py-6 text-gray-500">
+                      <p>Nenhuma coluna mapeada.</p>
+                      <p className="text-sm mt-1">
+                        Clique em "Nova Coluna" para adicionar um mapeamento.
+                      </p>
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Coluna Monday</TableHead>
+                          <TableHead>Campo CPX</TableHead>
+                          <TableHead>Função de Transformação</TableHead>
+                          <TableHead className="w-[100px]">Ações</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {mappingColumns.map((column) => (
+                          <TableRow key={column.id}>
+                            <TableCell>
+                              {column.mondayColumnTitle || mondayColumns.find(c => c.columnId === column.mondayColumnId)?.title || column.mondayColumnId}
+                            </TableCell>
+                            <TableCell>{column.cpxField}</TableCell>
+                            <TableCell>{column.transformFunction || "-"}</TableCell>
+                            <TableCell>
+                              <div className="flex space-x-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => editColumn(column)}
+                                >
+                                  <Pencil className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => deleteColumn(column.id)}
+                                >
+                                  <Trash className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  )}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Modal de confirmação para exclusão */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o mapeamento "{selectedMapping?.name}"?
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              className="bg-red-600 hover:bg-red-700"
+              onClick={() => {
+                toast({
+                  title: "Mapeamento excluído",
+                  description: `O mapeamento "${selectedMapping?.name}" foi excluído com sucesso.`,
+                });
+                setIsDeleteDialogOpen(false);
+                queryClient.invalidateQueries({ queryKey: ['/api/monday/mappings'] });
+              }}
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
