@@ -284,8 +284,8 @@ export default function AuthPage() {
         <div className="mt-8 ml-10 flex items-center">
           <div 
             style={{
-              width: "68px",  /* Aumento adicional de 30% */
-              height: "68px", /* Aumento adicional de 30% */
+              width: "64px",
+              height: "64px",
               borderRadius: "50%",
               overflow: "hidden",
               display: "flex",
@@ -299,7 +299,7 @@ export default function AuthPage() {
               src="/logo-icon.jpg" 
               alt="Logo da Aplicação" 
               style={{ 
-                height: "51px", /* Aumento adicional de 30% */
+                height: "48px",
                 width: "auto", 
                 objectFit: "contain"
               }} 
