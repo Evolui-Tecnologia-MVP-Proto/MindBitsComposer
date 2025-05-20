@@ -216,10 +216,10 @@ export default function AuthPage() {
                 </div>
               ) : (
                 <div className="fade-in">
-                  <h2 className="text-xl font-semibold text-center text-gray-800 mb-2">
+                  <h2 className="text-xl font-semibold text-left text-gray-800 mb-2">
                     Entrar
                   </h2>
-                  <p className="text-center text-gray-600 mb-6">
+                  <p className="text-left text-gray-600 mb-6">
                     Entre com suas credenciais para acessar a plataforma
                   </p>
 
