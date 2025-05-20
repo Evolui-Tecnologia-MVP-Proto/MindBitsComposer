@@ -264,11 +264,43 @@ export default function AdminPage() {
     }
   };
   
+  // Estado para controle dos botões
+  const [isSaveDisabled, setIsSaveDisabled] = useState(true);
+  const [isConnectDisabled, setIsConnectDisabled] = useState(true);
+
+  // Monitora mudanças no campo boardId para habilitar/desabilitar o botão Conectar
+  useEffect(() => {
+    const boardId = mappingForm.watch("boardId");
+    setIsConnectDisabled(!boardId);
+  }, [mappingForm.watch("boardId")]);
+
+  // Monitora mudanças no campo name para habilitar/desabilitar o botão Salvar
+  useEffect(() => {
+    const name = mappingForm.watch("name");
+    const boardId = mappingForm.watch("boardId");
+    setIsSaveDisabled(!name || !boardId);
+  }, [mappingForm.watch("name"), mappingForm.watch("boardId")]);
+
   // Funções para abrir modal de edição/exclusão
   const openEditModal = (mapping: BoardMapping) => {
     setSelectedMapping(mapping);
     setActiveTab("quadro");
     setIsModalOpen(true);
+    setIsSaveDisabled(false);
+    setIsConnectDisabled(false);
+  };
+  
+  const openNewModal = () => {
+    setSelectedMapping(null);
+    setActiveTab("quadro");
+    mappingForm.reset({
+      name: "",
+      boardId: "",
+      description: "",
+    });
+    setIsModalOpen(true);
+    setIsSaveDisabled(true);
+    setIsConnectDisabled(true);
   };
   
   const openDeleteDialog = (mapping: BoardMapping) => {
@@ -321,11 +353,7 @@ export default function AdminPage() {
                     <CardTitle>Mapeamentos de Quadros do Monday</CardTitle>
                     <Button
                       variant="outline"
-                      onClick={() => {
-                        setSelectedMapping(null);
-                        setActiveTab("quadro");
-                        setIsModalOpen(true);
-                      }}
+                      onClick={openNewModal}
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       Novo Mapeamento
@@ -570,7 +598,7 @@ export default function AdminPage() {
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="quadro">Quadro</TabsTrigger>
-              <TabsTrigger value="colunas">Colunas</TabsTrigger>
+              <TabsTrigger value="colunas" disabled={!selectedMapping}>Colunas</TabsTrigger>
             </TabsList>
             
             {/* Aba de informações do quadro */}
@@ -621,7 +649,8 @@ export default function AdminPage() {
                           </FormControl>
                           <Button 
                             type="button"
-                            className="bg-yellow-500 hover:bg-yellow-600 text-white"
+                            className="bg-yellow-500 hover:bg-yellow-600 text-white disabled:bg-yellow-300 disabled:text-gray-100 disabled:cursor-not-allowed"
+                            disabled={isConnectDisabled}
                             onClick={() => {
                               if (!field.value) {
                                 toast({
@@ -665,7 +694,7 @@ export default function AdminPage() {
                     >
                       Cancelar
                     </Button>
-                    <Button type="submit" disabled={isSubmitting}>
+                    <Button type="submit" disabled={isSubmitting || isSaveDisabled}>
                       {isSubmitting ? (
                         <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando...</>
                       ) : (
