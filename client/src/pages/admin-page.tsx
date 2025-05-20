@@ -656,7 +656,14 @@ export default function AdminPage() {
                       </FormItem>
                     )}
                   />
-                  <DialogFooter>
+                  <DialogFooter className="flex justify-between">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={() => setIsModalOpen(false)}
+                    >
+                      Cancelar
+                    </Button>
                     <Button type="submit" disabled={isSubmitting}>
                       {isSubmitting ? (
                         <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando...</>
