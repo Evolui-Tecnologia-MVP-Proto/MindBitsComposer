@@ -131,6 +131,9 @@ export default function AdminPage() {
   const [showServiceToken, setShowServiceToken] = useState(false);
   const [isServiceSubmitting, setIsServiceSubmitting] = useState(false);
   
+  // Estado para armazenar o status da conexão com o Monday
+  const [connectionStatus, setConnectionStatus] = useState<"idle" | "success" | "error">("idle");
+  
   // Formulário para serviços externos
   const serviceForm = useForm<z.infer<typeof serviceConnectionSchema>>({
     resolver: zodResolver(serviceConnectionSchema),
@@ -785,7 +788,7 @@ export default function AdminPage() {
                           </FormControl>
                           <Button 
                             type="button"
-                            className="bg-yellow-500 hover:bg-yellow-600 text-white disabled:bg-yellow-300 disabled:text-gray-100 disabled:cursor-not-allowed"
+                            className={`${connectButtonColor} hover:opacity-90 text-white disabled:opacity-50 disabled:text-gray-100 disabled:cursor-not-allowed`}
                             disabled={isConnectDisabled}
                             onClick={async () => {
                               if (!field.value) {
@@ -797,62 +800,46 @@ export default function AdminPage() {
                                 return;
                               }
                               
-                              toast({
-                                title: "Conectando ao quadro",
-                                description: `Buscando colunas para o quadro ${field.value}...`
-                              });
+                              // Definir cor padrão (amarelo) durante a tentativa de conexão
+                              setConnectButtonColor("bg-yellow-500");
                               
                               try {
-                                // Tentando validar o quadro na API do Monday
-                                const response = await fetch(`/api/monday/validate-board?boardId=${field.value}`, {
+                                // Recuperar colunas do quadro via API usando a conexão do Monday
+                                const response = await fetch(`/api/monday/board/${field.value}/columns`, {
                                   method: 'GET',
                                 });
                                 
                                 if (response.ok) {
-                                  const result = await response.json();
+                                  const columns = await response.json();
                                   
-                                  if (result.success) {
-                                    toast({
-                                      title: "Conectado com sucesso",
-                                      description: "As colunas do quadro foram carregadas",
-                                      variant: "default"
-                                    });
-                                    
-                                    // Habilitando o botão salvar após conexão bem-sucedida
-                                    setIsSaveDisabled(false);
-                                    
-                                    // Atualizamos o nome do quadro se disponível
-                                    if (result.board?.name) {
-                                      setBoardName(result.board.name);
-                                      mappingForm.setValue("boardName", result.board.name);
-                                    }
-                                  } else {
-                                    toast({
-                                      title: "Erro na conexão",
-                                      description: result.message || "Não foi possível conectar ao quadro",
-                                      variant: "destructive"
-                                    });
+                                  // Definir cor verde para indicar sucesso
+                                  setConnectButtonColor("bg-green-600");
+                                  
+                                  // Habilitando o botão salvar após conexão bem-sucedida
+                                  setIsSaveDisabled(false);
+                                  
+                                  // Armazenar colunas recuperadas
+                                  setMondayColumns(columns);
+                                  
+                                  // Opcional: armazenar nome do quadro se disponível na resposta
+                                  if (columns.boardName) {
+                                    mappingForm.setValue("boardName", columns.boardName);
                                   }
                                 } else {
-                                  toast({
-                                    title: "Erro na conexão",
-                                    description: "Falha ao validar o quadro. Verifique o ID e tente novamente.",
-                                    variant: "destructive"
-                                  });
+                                  // Definir cor vermelha para indicar falha
+                                  setConnectButtonColor("bg-red-600");
+                                  
+                                  // Manter o botão salvar desabilitado
+                                  setIsSaveDisabled(true);
                                 }
                               } catch (error) {
                                 console.error("Erro ao conectar com o quadro:", error);
                                 
-                                // Simulação temporária para desenvolvimento
-                                // REMOVER EM PRODUÇÃO
-                                toast({
-                                  title: "Conectado com sucesso (simulação)",
-                                  description: "As colunas do quadro foram carregadas",
-                                  variant: "default"
-                                });
+                                // Definir cor vermelha para indicar falha
+                                setConnectButtonColor("bg-red-600");
                                 
-                                // Habilitando o botão salvar após conexão simulada
-                                setIsSaveDisabled(false);
+                                // Manter o botão salvar desabilitado
+                                setIsSaveDisabled(true);
                               }
                             }}
                           >
@@ -1057,13 +1044,36 @@ export default function AdminPage() {
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction 
               className="bg-red-600 hover:bg-red-700"
-              onClick={() => {
-                toast({
-                  title: "Mapeamento excluído",
-                  description: `O mapeamento "${selectedMapping?.name}" foi excluído com sucesso.`,
-                });
-                setIsDeleteDialogOpen(false);
-                queryClient.invalidateQueries({ queryKey: ['/api/monday/mappings'] });
+              onClick={async () => {
+                setIsSubmitting(true);
+                try {
+                  // Excluir o mapeamento via API
+                  const response = await fetch(`/api/monday/mappings/${selectedMapping?.id}`, {
+                    method: 'DELETE',
+                  });
+                  
+                  if (!response.ok) {
+                    throw new Error(`Erro ao excluir mapeamento: ${response.status}`);
+                  }
+                  
+                  toast({
+                    title: "Mapeamento excluído",
+                    description: `O mapeamento "${selectedMapping?.name}" foi excluído com sucesso.`,
+                  });
+                  
+                  // Atualizar a lista de mapeamentos
+                  queryClient.invalidateQueries({ queryKey: ['/api/monday/mappings'] });
+                } catch (error) {
+                  console.error("Erro ao excluir mapeamento:", error);
+                  toast({
+                    title: "Erro",
+                    description: "Ocorreu um erro ao excluir o mapeamento. Tente novamente.",
+                    variant: "destructive"
+                  });
+                } finally {
+                  setIsSubmitting(false);
+                  setIsDeleteDialogOpen(false);
+                }
               }}
             >
               Excluir
