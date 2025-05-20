@@ -262,9 +262,9 @@ export default function AuthPage() {
       </div>
       
       {/* Lado direito - Hero/Imagem */}
-      <div className="w-1/2 relative" style={{ backgroundColor: "#0e4f82" }}>
+      <div className="w-1/2 flex flex-col" style={{ backgroundColor: "#0e4f82" }}>
         {/* Imagem na parte superior */}
-        <div className="absolute top-0 left-0 mt-10 ml-10">
+        <div className="mt-10 ml-10">
           <img 
             src="/login-image.png" 
             alt="Compositor de Documentação" 
@@ -277,11 +277,15 @@ export default function AuthPage() {
           />
         </div>
         
-        <div className="flex items-center justify-center h-full">
+        {/* Título entre a imagem e os textos */}
+        <div className="mt-8 ml-10">
+          <h1 className="text-4xl font-bold" style={{ color: "#acc3e3" }}>
+            EVO-MindBits CPx
+          </h1>
+        </div>
+        
+        <div className="flex flex-grow items-center justify-center">
           <div className="px-12" style={{ color: "#acc3e3" }}>
-            <h2 className="text-3xl font-bold mb-4">
-              EVO-MindBits CPx
-            </h2>
             <p className="text-xl mb-6">
               Compositor integrado de documentação técnica e empresarial assistido por IA
             </p>
