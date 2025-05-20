@@ -32,7 +32,7 @@ export default function Layout({ children }: LayoutProps) {
               >
                 <Menu className="h-6 w-6 text-gray-700" />
               </button>
-              <div className="flex items-center">
+              <div className="flex items-center ml-10">
                 <Logo />
                 <h1 className="text-xl font-semibold text-gray-800">
                   EVO-MindBits Composer
