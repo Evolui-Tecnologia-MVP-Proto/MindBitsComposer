@@ -280,8 +280,9 @@ export default function AuthPage() {
           />
         </div>
         
-        {/* Título com logo alinhado horizontalmente */}
+        {/* Container para todos os elementos textuais com mesma margem esquerda */}
         <div className="mt-8 ml-10 flex flex-col">
+          {/* Título com logo alinhado horizontalmente */}
           <div className="flex items-center">
             <div 
               style={{
@@ -311,7 +312,8 @@ export default function AuthPage() {
             </h1>
           </div>
           
-          <div className="mt-3 ml-10" style={{ color: "#acc3e3" }}>
+          {/* Textos descritivos com mesma margem da imagem principal */}
+          <div className="mt-3" style={{ color: "#acc3e3" }}>
             <p className="text-xl mb-6">
               Compositor integrado de documentação técnica e empresarial assistido por IA
             </p>
