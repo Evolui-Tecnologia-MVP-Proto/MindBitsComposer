@@ -1267,90 +1267,141 @@ export default function AdminPage() {
           <TabsContent value="integracao-servicos" className="slide-in">
             <div className="bg-white shadow-sm rounded-lg p-6">
               <h3 className="text-lg font-medium text-gray-900 mb-4">Integrações de Serviços</h3>
+              <p className="text-gray-500 mb-6">Configure as integrações com serviços externos</p>
               
-              <div className="flex justify-between items-center mb-6">
-                <p className="text-gray-500">Gerencie as conexões com serviços externos</p>
-                <Button onClick={() => {
-                  setSelectedConnection(null);
-                  setIsServiceModalOpen(true);
-                }}>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Nova Conexão
-                </Button>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Card do Monday.com */}
+                <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-orange-100 p-2 rounded-full">
+                        <Key className="h-5 w-5 text-orange-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium">Monday.com</h4>
+                        <p className="text-xs text-gray-500">Integração com quadros e tarefas</p>
+                      </div>
+                    </div>
+                    
+                    {connections.find(c => c.serviceName === "monday") ? (
+                      <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
+                        Conectado
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-gray-50 text-gray-500 border-gray-200">
+                        Não configurado
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  <div className="mt-4 pt-3 border-t flex justify-end">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        const connection = connections.find(c => c.serviceName === "monday");
+                        if (connection) {
+                          setSelectedConnection(connection);
+                        } else {
+                          setSelectedConnection(null);
+                          serviceForm.setValue("serviceName", "monday");
+                        }
+                        setIsServiceModalOpen(true);
+                      }}
+                    >
+                      {connections.find(c => c.serviceName === "monday") ? "Editar" : "Configurar"}
+                    </Button>
+                  </div>
+                </div>
+                
+                {/* Card do GitHub */}
+                <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-purple-100 p-2 rounded-full">
+                        <GitBranchPlus className="h-5 w-5 text-purple-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium">GitHub</h4>
+                        <p className="text-xs text-gray-500">Integração com repositórios</p>
+                      </div>
+                    </div>
+                    
+                    {connections.find(c => c.serviceName === "github") ? (
+                      <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
+                        Conectado
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-gray-50 text-gray-500 border-gray-200">
+                        Não configurado
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  <div className="mt-4 pt-3 border-t flex justify-end">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        const connection = connections.find(c => c.serviceName === "github");
+                        if (connection) {
+                          setSelectedConnection(connection);
+                        } else {
+                          setSelectedConnection(null);
+                          serviceForm.setValue("serviceName", "github");
+                        }
+                        setIsServiceModalOpen(true);
+                      }}
+                    >
+                      {connections.find(c => c.serviceName === "github") ? "Editar" : "Configurar"}
+                    </Button>
+                  </div>
+                </div>
+                
+                {/* Card do OpenAI */}
+                <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-blue-100 p-2 rounded-full">
+                        <BrainCircuit className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <h4 className="font-medium">OpenAI</h4>
+                        <p className="text-xs text-gray-500">Integração com assistentes de IA</p>
+                      </div>
+                    </div>
+                    
+                    {connections.find(c => c.serviceName === "openai") ? (
+                      <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
+                        Conectado
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="bg-gray-50 text-gray-500 border-gray-200">
+                        Não configurado
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  <div className="mt-4 pt-3 border-t flex justify-end">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        const connection = connections.find(c => c.serviceName === "openai");
+                        if (connection) {
+                          setSelectedConnection(connection);
+                        } else {
+                          setSelectedConnection(null);
+                          serviceForm.setValue("serviceName", "openai");
+                        }
+                        setIsServiceModalOpen(true);
+                      }}
+                    >
+                      {connections.find(c => c.serviceName === "openai") ? "Editar" : "Configurar"}
+                    </Button>
+                  </div>
+                </div>
               </div>
-              
-              {isLoadingConnections ? (
-                <div className="p-4">
-                  <Skeleton className="h-48 w-full" />
-                </div>
-              ) : connections.length === 0 ? (
-                <div className="p-8 text-center">
-                  <p className="text-gray-500">Nenhuma conexão de serviço encontrada</p>
-                  <Button onClick={() => setIsServiceModalOpen(true)} variant="outline" className="mt-4">
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Configurar Primeira Conexão
-                  </Button>
-                </div>
-              ) : (
-                <div className="overflow-hidden border rounded-md">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Serviço</TableHead>
-                        <TableHead>Descrição</TableHead>
-                        <TableHead>Data de Criação</TableHead>
-                        <TableHead className="text-right">Ações</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {connections.map((connection) => (
-                        <TableRow key={connection.id}>
-                          <TableCell className="font-medium">
-                            <div className="flex items-center gap-2">
-                              {connection.serviceName === "monday" && <Key className="h-4 w-4" />}
-                              {connection.serviceName === "github" && <GitBranchPlus className="h-4 w-4" />}
-                              {connection.serviceName === "openai" && <BrainCircuit className="h-4 w-4" />}
-                              {connection.serviceName}
-                            </div>
-                          </TableCell>
-                          <TableCell>{connection.description || "-"}</TableCell>
-                          <TableCell>
-                            {connection.createdAt ? (
-                              format(new Date(connection.createdAt), "dd/MM/yyyy HH:mm", { locale: ptBR })
-                            ) : (
-                              <span className="text-gray-400">-</span>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-2">
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => {
-                                  setSelectedConnection(connection);
-                                  setIsServiceModalOpen(true);
-                                }}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={() => {
-                                  setSelectedConnection(connection);
-                                  setIsServiceDeleteDialogOpen(true);
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
             </div>
           </TabsContent>
           
