@@ -38,7 +38,12 @@ import {
   Link, 
   ArrowDown, 
   CheckCircle2, 
-  AlertCircle 
+  AlertCircle,
+  Key,
+  GitBranchPlus,
+  BrainCircuit,
+  Plus,
+  Edit
 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import UserTable from "@/components/UserTable";
