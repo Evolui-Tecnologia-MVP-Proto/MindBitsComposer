@@ -294,7 +294,8 @@ export default function AuthPage() {
                 justifyContent: "center",
                 alignItems: "center",
                 marginRight: "12px",
-                backgroundColor: "white"
+                backgroundColor: "white",
+                border: "2px solid #acc3e3"
               }}
             >
               <img 
