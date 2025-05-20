@@ -97,6 +97,7 @@ type ServiceConnection = {
 const mappingFormSchema = z.object({
   name: z.string().min(3, { message: "Nome deve ter pelo menos 3 caracteres" }),
   boardId: z.string().min(1, { message: "ID do quadro é obrigatório" }),
+  quadroMonday: z.string().optional(),
   description: z.string().optional(),
 });
 
@@ -152,6 +153,7 @@ export default function AdminPage() {
     defaultValues: {
       name: "",
       boardId: "",
+      quadroMonday: "",
       description: "",
     },
   });
@@ -834,6 +836,25 @@ export default function AdminPage() {
                   
                   <FormField
                     control={mappingForm.control}
+                    name="quadroMonday"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Quadro no Monday</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Nome do quadro no Monday (preenchido automaticamente)" 
+                            {...field} 
+                            readOnly={true}
+                            className="bg-gray-50"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={mappingForm.control}
                     name="description"
                     render={({ field }) => (
                       <FormItem>
@@ -898,7 +919,11 @@ export default function AdminPage() {
                                     
                                     // Se tiver o nome do quadro, atualizar no formulário
                                     if (data.boardName) {
-                                      mappingForm.setValue("name", data.boardName);
+                                      mappingForm.setValue("quadroMonday", data.boardName);
+                                      // Se o nome estiver vazio, sugerir o nome do quadro
+                                      if (!mappingForm.getValues("name")) {
+                                        mappingForm.setValue("name", data.boardName);
+                                      }
                                     }
                                   }
                                   
