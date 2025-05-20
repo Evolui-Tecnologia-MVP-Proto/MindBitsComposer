@@ -1172,6 +1172,96 @@ export default function AdminPage() {
             </div>
           </TabsContent>
           
+          <TabsContent value="integracao-servicos" className="slide-in">
+            <div className="bg-white shadow-sm rounded-lg p-6">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">Integrações de Serviços</h3>
+              
+              <div className="flex justify-between items-center mb-6">
+                <p className="text-gray-500">Gerencie as conexões com serviços externos</p>
+                <Button onClick={() => {
+                  setSelectedConnection(null);
+                  setIsServiceModalOpen(true);
+                }}>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Nova Conexão
+                </Button>
+              </div>
+              
+              {isLoadingConnections ? (
+                <div className="p-4">
+                  <Skeleton className="h-48 w-full" />
+                </div>
+              ) : connections.length === 0 ? (
+                <div className="p-8 text-center">
+                  <p className="text-gray-500">Nenhuma conexão de serviço encontrada</p>
+                  <Button onClick={() => setIsServiceModalOpen(true)} variant="outline" className="mt-4">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Configurar Primeira Conexão
+                  </Button>
+                </div>
+              ) : (
+                <div className="overflow-hidden border rounded-md">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Serviço</TableHead>
+                        <TableHead>Descrição</TableHead>
+                        <TableHead>Data de Criação</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {connections.map((connection) => (
+                        <TableRow key={connection.id}>
+                          <TableCell className="font-medium">
+                            <div className="flex items-center gap-2">
+                              {connection.serviceName === "monday" && <Key className="h-4 w-4" />}
+                              {connection.serviceName === "github" && <GitBranchPlus className="h-4 w-4" />}
+                              {connection.serviceName === "openai" && <BrainCircuit className="h-4 w-4" />}
+                              {connection.serviceName}
+                            </div>
+                          </TableCell>
+                          <TableCell>{connection.description || "-"}</TableCell>
+                          <TableCell>
+                            {connection.createdAt ? (
+                              format(new Date(connection.createdAt), "dd/MM/yyyy HH:mm", { locale: ptBR })
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => {
+                                  setSelectedConnection(connection);
+                                  setIsServiceModalOpen(true);
+                                }}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => {
+                                  setSelectedConnection(connection);
+                                  setIsServiceDeleteDialogOpen(true);
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+          
           <TabsContent value="configuracao" className="slide-in">
             <div className="bg-white shadow-sm rounded-lg p-6">
               <h3 className="text-lg font-medium text-gray-900 mb-4">Configurações Gerais</h3>
