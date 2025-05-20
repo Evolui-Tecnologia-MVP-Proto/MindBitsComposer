@@ -708,6 +708,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).send("Erro ao buscar colunas");
     }
   });
+  
+  // Rotas para conexões de serviços externos
+  
+  // Obter todas as conexões de serviço
+  app.get("/api/service-connections", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const connections = await storage.getAllServiceConnections();
+      res.json(connections);
+    } catch (error) {
+      console.error("Erro ao buscar conexões de serviço:", error);
+      res.status(500).send("Erro ao buscar conexões de serviço");
+    }
+  });
+  
+  // Obter uma conexão de serviço pelo nome do serviço
+  app.get("/api/service-connections/name/:serviceName", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { serviceName } = req.params;
+    
+    try {
+      const connection = await storage.getServiceConnection(serviceName);
+      if (!connection) {
+        return res.status(404).send("Conexão não encontrada");
+      }
+      res.json(connection);
+    } catch (error) {
+      console.error("Erro ao buscar conexão de serviço:", error);
+      res.status(500).send("Erro ao buscar conexão de serviço");
+    }
+  });
+  
+  // Criar uma conexão de serviço
+  app.post("/api/service-connections", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      // Validar os dados recebidos
+      const connectionData = insertServiceConnectionSchema.parse(req.body);
+      
+      // Verificar se já existe uma conexão para este serviço
+      const existingConnection = await storage.getServiceConnection(connectionData.serviceName);
+      
+      // Se já existir, atualizamos em vez de criar nova
+      if (existingConnection) {
+        console.log("Conexão já existe, atualizando:", connectionData.serviceName);
+        const updatedConnection = await storage.updateServiceConnection(existingConnection.id, connectionData);
+        return res.json(updatedConnection);
+      }
+      
+      // Salvar a conexão de serviço
+      console.log("Criando nova conexão:", connectionData.serviceName);
+      const connection = await storage.saveServiceConnection(connectionData);
+      console.log("Conexão salva com sucesso:", connection);
+      res.status(201).json(connection);
+    } catch (error) {
+      console.error("Erro ao salvar conexão de serviço:", error);
+      
+      if (error.name === "ZodError") {
+        return res.status(400).json({ 
+          message: "Dados inválidos", 
+          errors: error.errors 
+        });
+      }
+      
+      res.status(500).send(`Erro ao salvar conexão de serviço: ${error.message}`);
+    }
+  });
+  
+  // Atualizar uma conexão de serviço
+  app.put("/api/service-connections/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      // Validar os dados recebidos
+      const connectionData = insertServiceConnectionSchema.parse(req.body);
+      
+      // Atualizar a conexão de serviço
+      const connection = await storage.updateServiceConnection(id, connectionData);
+      console.log("Conexão atualizada com sucesso:", connection);
+      res.json(connection);
+    } catch (error) {
+      console.error("Erro ao atualizar conexão de serviço:", error);
+      
+      if (error.name === "ZodError") {
+        return res.status(400).json({ 
+          message: "Dados inválidos", 
+          errors: error.errors 
+        });
+      }
+      
+      res.status(500).send(`Erro ao atualizar conexão de serviço: ${error.message}`);
+    }
+  });
+  
+  // Excluir uma conexão de serviço
+  app.delete("/api/service-connections/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      await storage.deleteServiceConnection(id);
+      res.status(204).end();
+    } catch (error) {
+      console.error("Erro ao excluir conexão de serviço:", error);
+      res.status(500).send(`Erro ao excluir conexão de serviço: ${error.message}`);
+    }
+  });
 
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
