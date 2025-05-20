@@ -313,8 +313,8 @@ export default function AuthPage() {
           </div>
           
           {/* Textos descritivos com mesma margem da imagem principal */}
-          <div className="mt-3" style={{ color: "#acc3e3" }}>
-            <p className="text-xl mb-6">
+          <div className="mt-6" style={{ color: "#acc3e3" }}>
+            <p className="text-xl mb-8">
               Compositor integrado de documentação técnica e empresarial assistido por IA
             </p>
             <ul className="space-y-4">
