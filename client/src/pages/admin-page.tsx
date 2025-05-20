@@ -805,20 +805,36 @@ export default function AdminPage() {
                               setButtonStyle("bg-yellow-500");
                               
                               try {
-                                // Simulação de conexão bem-sucedida
-                                await new Promise(resolve => setTimeout(resolve, 1000));
-                                
-                                // Botão verde após sucesso
-                                setButtonStyle("bg-green-600");
-                                
-                                // Habilitando o botão salvar após conexão bem-sucedida
-                                setIsSaveDisabled(false);
-                                
-                                // Simulação para desenvolvimento - em produção, usar API real
-                                toast({
-                                  title: "Conectado com sucesso",
-                                  description: "As colunas do quadro foram carregadas",
+                                // Recuperar colunas do quadro via API usando a conexão do Monday
+                                const response = await fetch(`/api/monday/board/${field.value}/columns`, {
+                                  method: 'GET',
                                 });
+                                
+                                if (response.ok) {
+                                  // Botão verde após sucesso
+                                  setButtonStyle("bg-green-600");
+                                  
+                                  // Habilitando o botão salvar após conexão bem-sucedida
+                                  setIsSaveDisabled(false);
+                                  
+                                  toast({
+                                    title: "Conectado com sucesso",
+                                    description: "As colunas do quadro foram carregadas",
+                                  });
+                                } else {
+                                  // Botão vermelho após falha
+                                  setButtonStyle("bg-red-600");
+                                  
+                                  // Manter o botão salvar desabilitado
+                                  setIsSaveDisabled(true);
+                                  
+                                  toast({
+                                    title: "Erro na conexão",
+                                    description: "Falha ao buscar as colunas do quadro",
+                                    variant: "destructive"
+                                  });
+                                  return;
+                                }
                               } catch (error) {
                                 console.error("Erro ao conectar com o quadro:", error);
                                 
