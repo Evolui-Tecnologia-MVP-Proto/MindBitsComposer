@@ -1,9 +1,7 @@
 export default function Logo() {
   return (
-    <img
-      src="/logo-evolui.jpg"
-      alt="Evolui Logo"
-      className="h-8 w-auto mr-3"
-    />
+    <div className="h-8 flex items-center font-bold text-primary text-lg">
+      EVO-MindBits CPx
+    </div>
   );
 }
