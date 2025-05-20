@@ -261,7 +261,7 @@ export default function AuthPage() {
       </div>
       
       {/* Lado direito - Hero/Imagem */}
-      <div className="w-1/2 bg-blue-700 flex items-center justify-center">
+      <div className="w-1/2 flex items-center justify-center" style={{ backgroundColor: "#0e4f82" }}>
         <div className="px-12 text-white">
           <h2 className="text-3xl font-bold mb-4">
             Bem-vindo ao EVO-MindBits Composer
