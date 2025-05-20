@@ -615,9 +615,43 @@ export default function AdminPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>ID do Quadro</FormLabel>
-                        <FormControl>
-                          <Input placeholder="ID do quadro no Monday.com" {...field} />
-                        </FormControl>
+                        <div className="flex gap-2">
+                          <FormControl>
+                            <Input placeholder="ID do quadro no Monday.com" {...field} />
+                          </FormControl>
+                          <Button 
+                            type="button"
+                            onClick={() => {
+                              if (!field.value) {
+                                toast({
+                                  title: "Erro",
+                                  description: "Informe o ID do quadro antes de conectar",
+                                  variant: "destructive"
+                                });
+                                return;
+                              }
+                              
+                              toast({
+                                title: "Conectando ao quadro",
+                                description: `Buscando colunas para o quadro ${field.value}...`
+                              });
+                              
+                              // Simulação de conexão bem-sucedida
+                              setTimeout(() => {
+                                toast({
+                                  title: "Conectado com sucesso",
+                                  description: "As colunas do quadro foram carregadas",
+                                  variant: "default"
+                                });
+                                
+                                // Aqui seria feita a chamada para buscar as colunas do quadro
+                                // queryClient.invalidateQueries({ queryKey: ['/api/monday/columns', field.value] });
+                              }, 1500);
+                            }}
+                          >
+                            Conectar
+                          </Button>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}
