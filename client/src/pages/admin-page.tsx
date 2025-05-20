@@ -742,7 +742,12 @@ export default function AdminPage() {
   const renderColumnMappingModal = () => {
     return (
       <Dialog open={isColumnMapModalOpen} onOpenChange={setIsColumnMapModalOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md" style={{ 
+          position: "fixed", 
+          top: "30%", 
+          left: "55%", 
+          transform: "translate(-30%, -55%)" 
+        }}>
           <DialogHeader>
             <DialogTitle>Mapeamento de Coluna</DialogTitle>
             <DialogDescription>
