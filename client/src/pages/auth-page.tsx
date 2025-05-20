@@ -140,6 +140,9 @@ export default function AuthPage() {
       {/* Lado esquerdo - Formulário de login */}
       <div className="w-1/2 flex items-center justify-center bg-gray-50">
         <div className="w-full max-w-md mx-4">
+          <div className="flex justify-center mb-6">
+            <Logo />
+          </div>
           <Card className="shadow-lg">
             <CardContent className="pt-6">
               {isFirstLogin ? (
