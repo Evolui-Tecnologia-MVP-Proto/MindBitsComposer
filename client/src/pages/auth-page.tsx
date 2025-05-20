@@ -299,9 +299,9 @@ export default function AuthPage() {
               src="/logo-icon.jpg" 
               alt="Logo da Aplicação" 
               style={{ 
-                height: "60px",
-                width: "auto", 
-                objectFit: "contain"
+                height: "64px",
+                width: "64px", 
+                objectFit: "cover"
               }} 
             />
           </div>
