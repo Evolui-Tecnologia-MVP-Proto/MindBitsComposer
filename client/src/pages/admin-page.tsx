@@ -277,45 +277,8 @@ export default function AdminPage() {
       });
       
       if (!response.ok) {
-        // Se o erro for devido a mapeamento duplicado, vamos verificar se o usuário quer atualizar
-        if (response.status === 400) {
-          const errorText = await response.text();
-          
-          if (errorText.includes("Já existe um mapeamento para este quadro")) {
-            // Buscar o mapeamento existente pelo boardId
-            const existingMappingsResponse = await fetch('/api/monday/mappings');
-            if (existingMappingsResponse.ok) {
-              const mappings = await existingMappingsResponse.json();
-              const existingMapping = mappings.find((m: any) => m.boardId === data.boardId);
-              
-              if (existingMapping) {
-                // Usamos o toast para informar e oferecemos uma alternativa
-                toast({
-                  title: "Mapeamento existente",
-                  description: `Já existe um mapeamento para este quadro: "${existingMapping.name}". Atualizando informações.`,
-                });
-                
-                // Atualizar o mapeamento existente em vez de criar um novo
-                const updateResponse = await fetch(`/api/monday/mappings/${existingMapping.id}`, {
-                  method: 'PATCH',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify(mappingData)
-                });
-                
-                if (updateResponse.ok) {
-                  const updatedMapping = await updateResponse.json();
-                  // Definir este como o mapeamento selecionado
-                  setSelectedMapping(updatedMapping);
-                  return updatedMapping;
-                }
-              }
-            }
-          }
-        }
-        
-        throw new Error('Falha ao salvar o mapeamento');
+        const errorText = await response.text();
+        throw new Error(errorText || 'Falha ao salvar o mapeamento');
       }
       
       // Obter o mapeamento salvo (com ID gerado se for novo)

@@ -337,11 +337,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Body recebido para criação de mapeamento:", JSON.stringify(req.body, null, 2));
       const mappingData = insertMondayMappingSchema.parse(req.body);
       
-      // Verificar se já existe mapeamento com o mesmo Board ID
-      const existingMapping = await storage.getMondayMappingByBoardId(mappingData.boardId);
-      if (existingMapping) {
-        return res.status(400).send("Já existe um mapeamento para este quadro");
-      }
+      // Removida a verificação de mapeamento existente para permitir múltiplos mapeamentos
+      // para o mesmo quadro do Monday
       
       console.log("Dados do mapeamento a ser criado:", mappingData);
       const newMapping = await storage.createMondayMapping(mappingData);
