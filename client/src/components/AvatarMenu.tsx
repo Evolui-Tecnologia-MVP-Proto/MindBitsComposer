@@ -49,7 +49,7 @@ export default function AvatarMenu() {
         onClick={() => setIsOpen(!isOpen)}
       >
         <Avatar className="h-9 w-9">
-          <AvatarImage src={user?.avatarUrl} alt={user?.name} />
+          <AvatarImage src={user?.avatarUrl || ""} alt={user?.name || ""} />
           <AvatarFallback className="bg-primary text-white">
             {user?.name ? getInitials(user.name) : "U"}
           </AvatarFallback>

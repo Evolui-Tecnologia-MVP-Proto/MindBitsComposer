@@ -33,7 +33,7 @@ export default function Layout({ children }: LayoutProps) {
               </div>
             </div>
             
-            <div className="flex items-center">
+            <div className="flex items-center pr-10">
               <AvatarMenu />
             </div>
           </div>
