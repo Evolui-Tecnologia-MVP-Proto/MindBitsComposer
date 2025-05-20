@@ -253,10 +253,6 @@ export default function AuthPage() {
                       </Button>
                     </form>
                   </Form>
-
-                  <div className="text-sm text-center text-gray-600 mt-4">
-                    Acesso restrito a usuários cadastrados
-                  </div>
                 </div>
               )}
             </CardContent>
