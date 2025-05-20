@@ -282,16 +282,29 @@ export default function AuthPage() {
         
         {/* Título com logo alinhado horizontalmente */}
         <div className="mt-8 ml-10 flex items-center">
-          <img 
-            src="/logo-icon.jpg" 
-            alt="Logo da Aplicação" 
-            style={{ 
-              height: "40px", 
-              width: "auto", 
-              objectFit: "contain",
-              marginRight: "12px"
-            }} 
-          />
+          <div 
+            style={{
+              width: "40px",
+              height: "40px",
+              borderRadius: "50%",
+              overflow: "hidden",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              marginRight: "12px",
+              backgroundColor: "white"
+            }}
+          >
+            <img 
+              src="/logo-icon.jpg" 
+              alt="Logo da Aplicação" 
+              style={{ 
+                height: "30px", 
+                width: "auto", 
+                objectFit: "contain"
+              }} 
+            />
+          </div>
           <h1 className="text-4xl font-bold" style={{ color: "#acc3e3" }}>
             EVO-MindBits CPx
           </h1>
