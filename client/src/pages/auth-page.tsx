@@ -280,8 +280,18 @@ export default function AuthPage() {
           />
         </div>
         
-        {/* Título entre a imagem e os textos */}
-        <div className="mt-8 ml-10">
+        {/* Título com logo alinhado horizontalmente */}
+        <div className="mt-8 ml-10 flex items-center">
+          <img 
+            src="/logo-icon.jpg" 
+            alt="Logo da Aplicação" 
+            style={{ 
+              height: "40px", 
+              width: "auto", 
+              objectFit: "contain",
+              marginRight: "12px"
+            }} 
+          />
           <h1 className="text-4xl font-bold" style={{ color: "#acc3e3" }}>
             EVO-MindBits CPx
           </h1>
