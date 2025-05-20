@@ -48,15 +48,15 @@ export default function AvatarMenu() {
         className="flex items-center space-x-3 focus:outline-none"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className="text-sm font-medium text-gray-700 hidden sm:block">
-          {user?.name}
-        </span>
         <Avatar className="h-9 w-9">
           <AvatarImage src={user?.avatarUrl} alt={user?.name} />
           <AvatarFallback className="bg-primary text-white">
             {user?.name ? getInitials(user.name) : "U"}
           </AvatarFallback>
         </Avatar>
+        <span className="text-sm font-medium text-gray-700 hidden sm:block">
+          {user?.name?.split(' ')[0]}
+        </span>
       </button>
 
       {isOpen && (
