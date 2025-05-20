@@ -262,40 +262,55 @@ export default function AuthPage() {
       </div>
       
       {/* Lado direito - Hero/Imagem */}
-      <div className="w-1/2 flex items-center justify-center" style={{ backgroundColor: "#0e4f82" }}>
-        <div className="px-12" style={{ color: "#acc3e3" }}>
-          <h2 className="text-3xl font-bold mb-4">
-            EVO-MindBits Composer
-          </h2>
-          <p className="text-xl mb-6">
-            Compositor integrado de documentação técnica e empresarial assistido por IA
-          </p>
-          <ul className="space-y-2">
-            <li className="flex items-center">
-              <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
-                1
-              </div>
-              Integração com sistemas externos
-            </li>
-            <li className="flex items-center">
-              <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
-                2
-              </div>
-              Gerenciamento de mapeamentos
-            </li>
-            <li className="flex items-center">
-              <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
-                3
-              </div>
-              Ambiente de edição dinâmico
-            </li>
-            <li className="flex items-center">
-              <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
-                4
-              </div>
-              Validação de documentos
-            </li>
-          </ul>
+      <div className="w-1/2 relative" style={{ backgroundColor: "#0e4f82" }}>
+        {/* Imagem na parte superior */}
+        <div className="absolute top-0 left-0 mt-10 ml-10">
+          <img 
+            src="/login-image.png" 
+            alt="Compositor de Documentação" 
+            style={{ 
+              width: "200px", 
+              height: "auto", 
+              objectFit: "contain" 
+            }} 
+          />
+        </div>
+        
+        <div className="flex items-center justify-center h-full">
+          <div className="px-12" style={{ color: "#acc3e3" }}>
+            <h2 className="text-3xl font-bold mb-4">
+              EVO-MindBits Composer
+            </h2>
+            <p className="text-xl mb-6">
+              Compositor integrado de documentação técnica e empresarial assistido por IA
+            </p>
+            <ul className="space-y-2">
+              <li className="flex items-center">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
+                  1
+                </div>
+                Integração com sistemas externos
+              </li>
+              <li className="flex items-center">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
+                  2
+                </div>
+                Gerenciamento de mapeamentos
+              </li>
+              <li className="flex items-center">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
+                  3
+                </div>
+                Ambiente de edição dinâmico
+              </li>
+              <li className="flex items-center">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
+                  4
+                </div>
+                Validação de documentos
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
