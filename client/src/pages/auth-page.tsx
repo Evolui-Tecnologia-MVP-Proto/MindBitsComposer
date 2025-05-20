@@ -311,7 +311,7 @@ export default function AuthPage() {
             </h1>
           </div>
           
-          <div className="mt-3" style={{ color: "#acc3e3", marginLeft: "76px" }}>
+          <div className="mt-3 ml-10" style={{ color: "#acc3e3" }}>
             <p className="text-xl mb-6">
               Compositor integrado de documentação técnica e empresarial assistido por IA
             </p>
