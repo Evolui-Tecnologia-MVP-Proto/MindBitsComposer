@@ -24,7 +24,7 @@ export default function Layout({ children }: LayoutProps) {
       <header className="bg-white shadow-sm z-10 w-full">
         <div className="w-full px-0 mx-0">
           <div className="flex justify-between h-16 w-full">
-            <div className="flex items-center pl-1" style={{ marginLeft: 0 }}>
+            <div className="flex items-center pl-5" style={{ marginLeft: 0 }}>
               <div className="flex items-center">
                 <Logo />
                 <h1 className="text-xl font-semibold text-gray-800">
