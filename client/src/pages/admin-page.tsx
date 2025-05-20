@@ -1010,6 +1010,129 @@ export default function AdminPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      {/* Modal para configuração de conexões de serviços */}
+      <Dialog open={isServiceModalOpen} onOpenChange={setIsServiceModalOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedConnection ? "Editar Conexão" : "Nova Conexão"} - {getServiceDisplayName(selectedService || "")}
+            </DialogTitle>
+            <DialogDescription>
+              Configure as informações de conexão com o serviço externo.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...serviceForm}>
+            <form onSubmit={serviceForm.handleSubmit(onSubmitServiceConnection)} className="space-y-4">
+              <FormField
+                control={serviceForm.control}
+                name="serviceName"
+                render={({ field }) => (
+                  <FormItem className="hidden">
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={serviceForm.control}
+                name="token"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Token/Chave API</FormLabel>
+                    <FormControl>
+                      <div className="flex items-center">
+                        <Input 
+                          {...field} 
+                          type={showServiceToken ? "text" : "password"} 
+                          placeholder="Insira o token ou chave API"
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setShowServiceToken(!showServiceToken)}
+                          className="ml-2"
+                        >
+                          {showServiceToken ? <EyeOff size={16} /> : <Eye size={16} />}
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={serviceForm.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descrição (opcional)</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        {...field} 
+                        placeholder="Descreva a finalidade desta conexão"
+                        className="resize-none"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter className="flex justify-between">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setIsServiceModalOpen(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button 
+                  type="submit"
+                  disabled={isServiceSubmitting || isServiceSaveDisabled}
+                >
+                  {isServiceSubmitting ? (
+                    <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando...</>
+                  ) : (
+                    "Salvar"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Modal para exclusão de conexão de serviço */}
+      <AlertDialog open={isServiceDeleteDialogOpen} onOpenChange={setIsServiceDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir a conexão com o serviço "{getServiceDisplayName(selectedConnection?.serviceName || "")}"?
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              className="bg-red-600 hover:bg-red-700"
+              onClick={deleteServiceConnection}
+            >
+              {isServiceSubmitting ? (
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Excluindo...</>
+              ) : (
+                "Excluir"
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
