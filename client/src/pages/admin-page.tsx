@@ -593,20 +593,6 @@ export default function AdminPage() {
                   
                   <FormField
                     control={mappingForm.control}
-                    name="boardId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>ID do Quadro</FormLabel>
-                        <FormControl>
-                          <Input placeholder="ID do quadro no Monday.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={mappingForm.control}
                     name="description"
                     render={({ field }) => (
                       <FormItem>
@@ -623,8 +609,19 @@ export default function AdminPage() {
                     )}
                   />
                   
-
-                  
+                  <FormField
+                    control={mappingForm.control}
+                    name="boardId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>ID do Quadro</FormLabel>
+                        <FormControl>
+                          <Input placeholder="ID do quadro no Monday.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <DialogFooter>
                     <Button type="submit" disabled={isSubmitting}>
                       {isSubmitting ? (
