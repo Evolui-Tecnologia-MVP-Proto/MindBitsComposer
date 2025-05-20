@@ -299,7 +299,7 @@ export default function AuthPage() {
               src="/logo-icon.jpg" 
               alt="Logo da Aplicação" 
               style={{ 
-                height: "48px",
+                height: "56px",
                 width: "auto", 
                 objectFit: "contain"
               }} 
