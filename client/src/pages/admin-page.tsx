@@ -62,8 +62,6 @@ type BoardMapping = {
   name: string;
   boardId: string;
   description: string;
-  statusColumn: string;
-  responsibleColumn: string;
   lastSync: string | null;
   colunas?: number;
 };
@@ -99,8 +97,6 @@ const mappingFormSchema = z.object({
   name: z.string().min(3, { message: "Nome deve ter pelo menos 3 caracteres" }),
   boardId: z.string().min(1, { message: "ID do quadro é obrigatório" }),
   description: z.string().optional(),
-  statusColumn: z.string().optional(),
-  responsibleColumn: z.string().optional(),
 });
 
 const columnMappingFormSchema = z.object({
@@ -133,8 +129,6 @@ export default function AdminPage() {
       name: "",
       boardId: "",
       description: "",
-      statusColumn: "",
-      responsibleColumn: "",
     },
   });
   
@@ -155,16 +149,12 @@ export default function AdminPage() {
         name: selectedMapping.name,
         boardId: selectedMapping.boardId,
         description: selectedMapping.description,
-        statusColumn: selectedMapping.statusColumn,
-        responsibleColumn: selectedMapping.responsibleColumn,
       });
     } else {
       mappingForm.reset({
         name: "",
         boardId: "",
         description: "",
-        statusColumn: "",
-        responsibleColumn: "",
       });
     }
   }, [selectedMapping, mappingForm]);
@@ -633,33 +623,7 @@ export default function AdminPage() {
                     )}
                   />
                   
-                  <FormField
-                    control={mappingForm.control}
-                    name="statusColumn"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Coluna de Status (opcional)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Nome da coluna de status" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={mappingForm.control}
-                    name="responsibleColumn"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Coluna de Responsável (opcional)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Nome da coluna de responsável" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+
                   
                   <DialogFooter>
                     <Button type="submit" disabled={isSubmitting}>
