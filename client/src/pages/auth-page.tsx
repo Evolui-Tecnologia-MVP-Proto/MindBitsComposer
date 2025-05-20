@@ -281,37 +281,37 @@ export default function AuthPage() {
         </div>
         
         {/* Título com logo alinhado horizontalmente */}
-        <div className="mt-8 ml-10 flex items-center">
-          <div 
-            style={{
-              width: "64px",
-              height: "64px",
-              borderRadius: "50%",
-              overflow: "hidden",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              marginRight: "12px",
-              backgroundColor: "white"
-            }}
-          >
-            <img 
-              src="/logo-icon.jpg" 
-              alt="Logo da Aplicação" 
-              style={{ 
+        <div className="mt-8 ml-10 flex flex-col">
+          <div className="flex items-center">
+            <div 
+              style={{
+                width: "64px",
                 height: "64px",
-                width: "64px", 
-                objectFit: "cover"
-              }} 
-            />
+                borderRadius: "50%",
+                overflow: "hidden",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                marginRight: "12px",
+                backgroundColor: "white"
+              }}
+            >
+              <img 
+                src="/logo-icon.jpg" 
+                alt="Logo da Aplicação" 
+                style={{ 
+                  height: "64px",
+                  width: "64px", 
+                  objectFit: "cover"
+                }} 
+              />
+            </div>
+            <h1 className="text-4xl font-bold" style={{ color: "#acc3e3" }}>
+              EVO-MindBits CPx
+            </h1>
           </div>
-          <h1 className="text-4xl font-bold" style={{ color: "#acc3e3" }}>
-            EVO-MindBits CPx
-          </h1>
-        </div>
-        
-        <div className="flex flex-grow items-center justify-center">
-          <div className="px-12" style={{ color: "#acc3e3" }}>
+          
+          <div className="mt-3" style={{ color: "#acc3e3", marginLeft: "76px" }}>
             <p className="text-xl mb-6">
               Compositor integrado de documentação técnica e empresarial assistido por IA
             </p>
