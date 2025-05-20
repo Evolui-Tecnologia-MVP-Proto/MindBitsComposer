@@ -415,6 +415,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Verify and get columns from a Monday.com board
+  app.get("/api/monday/board/:boardId/columns", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { boardId } = req.params;
+    
+    try {
+      // Obter a chave da API
+      const apiKey = await storage.getMondayApiKey();
+      if (!apiKey) {
+        return res.status(400).json({
+          success: false,
+          message: "API key do Monday não configurada"
+        });
+      }
+      
+      // Fazer requisição à API do Monday.com para verificar se o quadro existe
+      const query = `
+        query {
+          boards(ids: ${boardId}) {
+            id
+            name
+            columns {
+              id
+              title
+              type
+            }
+          }
+        }
+      `;
+      
+      const mondayResponse = await fetch("https://api.monday.com/v2", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": apiKey
+        },
+        body: JSON.stringify({ query })
+      });
+      
+      if (!mondayResponse.ok) {
+        return res.status(500).json({
+          success: false,
+          message: `Erro na API do Monday: ${mondayResponse.status}`
+        });
+      }
+      
+      const data = await mondayResponse.json();
+      
+      if (data.errors) {
+        return res.status(400).json({
+          success: false,
+          message: `Erro na consulta GraphQL: ${JSON.stringify(data.errors)}`
+        });
+      }
+      
+      // Verificar se o quadro existe
+      if (!data.data?.boards || data.data.boards.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Quadro não encontrado no Monday.com"
+        });
+      }
+      
+      const board = data.data.boards[0];
+      const columns = board.columns || [];
+      
+      res.json({
+        success: true,
+        boardName: board.name,
+        columns: columns
+      });
+    } catch (error) {
+      console.error("Erro ao validar quadro:", error);
+      res.status(500).json({
+        success: false,
+        message: "Erro ao validar quadro"
+      });
+    }
+  });
+
   // Validate Monday board
   app.get("/api/monday/boards/:boardId/validate", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
