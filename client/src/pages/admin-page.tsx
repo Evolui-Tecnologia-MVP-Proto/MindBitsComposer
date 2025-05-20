@@ -360,11 +360,14 @@ export default function AdminPage() {
     }
   };
 
-  // Monitora mudanças no campo boardId para habilitar/desabilitar o botão Conectar
+  // Monitora mudanças nos campos para habilitar/desabilitar o botão Conectar
   useEffect(() => {
+    const name = mappingForm.watch("name");
     const boardId = mappingForm.watch("boardId");
-    setIsConnectDisabled(!boardId);
-  }, [mappingForm.watch("boardId")]);
+    const description = mappingForm.watch("description");
+    // Botão Conectar só é habilitado quando todos os campos obrigatórios estiverem preenchidos
+    setIsConnectDisabled(!name || !description || !boardId);
+  }, [mappingForm.watch("name"), mappingForm.watch("description"), mappingForm.watch("boardId")]);
 
   // Monitora mudanças no campo name para habilitar/desabilitar o botão Salvar
   useEffect(() => {
