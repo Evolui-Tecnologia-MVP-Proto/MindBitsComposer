@@ -317,7 +317,7 @@ export default function AuthPage() {
             <p className="text-xl mb-6">
               Compositor integrado de documentação técnica e empresarial assistido por IA
             </p>
-            <ul className="space-y-2">
+            <ul className="space-y-4">
               <li className="flex items-center">
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
                   1
