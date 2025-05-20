@@ -24,15 +24,8 @@ export default function Layout({ children }: LayoutProps) {
       <header className="bg-white shadow-sm z-10 w-full">
         <div className="w-full px-0 mx-0">
           <div className="flex justify-between h-16 w-full">
-            <div className="flex items-center" style={{ marginLeft: 0, paddingLeft: 0 }}>
-              <button
-                className="p-2 rounded-md lg:hidden"
-                onClick={toggleMobileMenu}
-                aria-label="Abrir menu"
-              >
-                <Menu className="h-6 w-6 text-gray-700" />
-              </button>
-              <div className="flex items-center ml-10">
+            <div className="flex items-center pl-1" style={{ marginLeft: 0 }}>
+              <div className="flex items-center">
                 <Logo />
                 <h1 className="text-xl font-semibold text-gray-800">
                   EVO-MindBits Composer
