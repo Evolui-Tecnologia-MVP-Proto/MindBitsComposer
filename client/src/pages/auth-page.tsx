@@ -269,8 +269,8 @@ export default function AuthPage() {
             src="/login-image.png" 
             alt="Compositor de Documentação" 
             style={{ 
-              width: "200px", 
-              height: "auto", 
+              height: "400px", 
+              width: "auto", 
               objectFit: "contain" 
             }} 
           />
