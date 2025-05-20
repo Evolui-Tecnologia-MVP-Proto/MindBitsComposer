@@ -264,7 +264,7 @@ export default function AuthPage() {
       <div className="w-1/2 flex items-center justify-center" style={{ backgroundColor: "#0e4f82" }}>
         <div className="px-12 text-white">
           <h2 className="text-3xl font-bold mb-4">
-            Bem-vindo ao EVO-MindBits Composer
+            EVO-MindBits Composer
           </h2>
           <p className="text-xl mb-6">
             Sistema avançado para otimização de produtividade e colaboração empresarial
