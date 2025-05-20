@@ -621,6 +621,7 @@ export default function AdminPage() {
                           </FormControl>
                           <Button 
                             type="button"
+                            className="bg-yellow-500 hover:bg-yellow-600 text-white"
                             onClick={() => {
                               if (!field.value) {
                                 toast({
