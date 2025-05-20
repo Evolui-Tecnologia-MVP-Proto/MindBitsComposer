@@ -271,7 +271,8 @@ export default function AuthPage() {
             style={{ 
               height: "400px", 
               width: "auto", 
-              objectFit: "contain" 
+              objectFit: "contain",
+              borderRadius: "12px"
             }} 
           />
         </div>
