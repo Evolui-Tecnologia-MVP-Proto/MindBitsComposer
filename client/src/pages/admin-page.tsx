@@ -316,17 +316,20 @@ export default function AdminPage() {
   const onSubmitServiceConnection = async (data: z.infer<typeof serviceConnectionSchema>) => {
     setIsServiceSubmitting(true);
     try {
-      // Simulação de salvamento de conexão
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Chamada à API para salvar a conexão
+      const endpoint = selectedConnection ? `/api/service-connections/${selectedConnection.id}` : "/api/service-connections";
+      const method = selectedConnection ? "PUT" : "POST";
       
-      // Em uma implementação real, faríamos uma chamada à API
-      // const endpoint = selectedConnection ? `/api/service-connections/${selectedConnection.id}` : "/api/service-connections";
-      // const method = selectedConnection ? "PUT" : "POST";
-      // const response = await fetch(endpoint, {
-      //   method,
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(data)
-      // });
+      const response = await fetch(endpoint, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Erro ao salvar conexão");
+      }
       
       toast({
         title: selectedConnection ? "Conexão atualizada" : "Conexão criada",
@@ -339,7 +342,7 @@ export default function AdminPage() {
     } catch (error) {
       toast({
         title: "Erro",
-        description: "Ocorreu um erro ao salvar a conexão. Tente novamente.",
+        description: error instanceof Error ? error.message : "Ocorreu um erro ao salvar a conexão. Tente novamente.",
         variant: "destructive"
       });
     } finally {
@@ -423,12 +426,23 @@ export default function AdminPage() {
   
   const deleteServiceConnection = async () => {
     try {
-      // Simulação de exclusão de conexão
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!selectedConnection) {
+        throw new Error("Nenhuma conexão selecionada");
+      }
+      
+      // Chamada à API para excluir a conexão
+      const response = await fetch(`/api/service-connections/${selectedConnection.id}`, {
+        method: "DELETE",
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Erro ao excluir conexão");
+      }
       
       toast({
         title: "Conexão excluída",
-        description: `A conexão com ${getServiceDisplayName(selectedConnection?.serviceName || "")} foi excluída com sucesso.`
+        description: `A conexão com ${getServiceDisplayName(selectedConnection.serviceName)} foi excluída com sucesso.`
       });
       
       // Atualizar a lista de conexões
@@ -438,7 +452,7 @@ export default function AdminPage() {
     } catch (error) {
       toast({
         title: "Erro",
-        description: "Ocorreu um erro ao excluir a conexão. Tente novamente.",
+        description: error instanceof Error ? error.message : "Ocorreu um erro ao excluir a conexão. Tente novamente.",
         variant: "destructive"
       });
     }
