@@ -244,20 +244,69 @@ export default function AdminPage() {
     enabled: !!selectedMapping,
   });
   
+  // Estado para armazenar as colunas recebidas da API do Monday
+  const [mondayColumnsData, setMondayColumnsData] = useState<any[]>([]);
+  
   // Handlers para os formulários
   const onSubmitMapping = async (data: z.infer<typeof mappingFormSchema>) => {
     setIsSubmitting(true);
     try {
-      // Simular chamada à API para salvar mapeamento
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Enviar os dados para criar/atualizar o mapeamento no servidor
+      const apiUrl = selectedMapping 
+        ? `/api/monday/mappings/${selectedMapping.id}` 
+        : '/api/monday/mappings';
+      
+      const method = selectedMapping ? 'PATCH' : 'POST';
+      
+      const response = await fetch(apiUrl, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Falha ao salvar o mapeamento');
+      }
+      
+      const savedMapping = await response.json();
+      
+      // Após salvar o mapeamento, salvar também as colunas se tivermos dados
+      if (mondayColumnsData.length > 0) {
+        try {
+          // Enviar as colunas para o servidor
+          await fetch(`/api/monday/mappings/${savedMapping.id}/fetch-columns`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ columns: mondayColumnsData })
+          });
+        } catch (columnError) {
+          console.error("Erro ao salvar colunas:", columnError);
+          toast({
+            title: "Atenção",
+            description: "Mapeamento criado, mas houve um erro ao salvar as colunas.",
+            variant: "warning",
+          });
+        }
+      }
       
       toast({
         title: selectedMapping ? "Mapeamento atualizado" : "Mapeamento criado",
         description: `O mapeamento "${data.name}" foi ${selectedMapping ? 'atualizado' : 'criado'} com sucesso.`,
       });
       
+      // Atualizar a lista de mapeamentos
       queryClient.invalidateQueries({ queryKey: ['/api/monday/mappings'] });
-      setIsModalOpen(false);
+      
+      // Definir o mapeamento selecionado para o que acabamos de salvar
+      setSelectedMapping(savedMapping);
+      
+      // Mudar para a tab de colunas após o salvamento
+      setActiveTab("columns");
+      
     } catch (error) {
       toast({
         title: "Erro",
@@ -811,11 +860,23 @@ export default function AdminPage() {
                                 });
                                 
                                 if (response.ok) {
+                                  const data = await response.json();
+                                  
                                   // Botão verde após sucesso
                                   setButtonStyle("bg-green-600");
                                   
                                   // Habilitando o botão salvar após conexão bem-sucedida
                                   setIsSaveDisabled(false);
+                                  
+                                  // Armazenar as colunas recuperadas do Monday
+                                  if (data.columns && data.columns.length > 0) {
+                                    setMondayColumnsData(data.columns);
+                                    
+                                    // Se tiver o nome do quadro, atualizar no formulário
+                                    if (data.boardName) {
+                                      mappingForm.setValue("name", data.boardName);
+                                    }
+                                  }
                                   
                                   toast({
                                     title: "Conectado com sucesso",
