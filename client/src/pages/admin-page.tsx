@@ -119,7 +119,7 @@ export default function AdminPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedMapping, setSelectedMapping] = useState<BoardMapping | null>(null);
-  const [activeTab, setActiveTab] = useState("quadro");
+  const [activeTab, setActiveTab] = useState<string>("quadro");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAddingColumn, setIsAddingColumn] = useState(false);
   const [selectedColumn, setSelectedColumn] = useState<MappingColumn | null>(null);
@@ -247,11 +247,11 @@ export default function AdminPage() {
   // Estado para armazenar as colunas recebidas da API do Monday
   const [mondayColumnsData, setMondayColumnsData] = useState<any[]>([]);
   
-  // Handlers para os formulários
+  // Handler para salvar o mapeamento do Monday
   const onSubmitMapping = async (data: z.infer<typeof mappingFormSchema>) => {
     setIsSubmitting(true);
     try {
-      // Enviar os dados para criar/atualizar o mapeamento no servidor
+      // Criar/atualizar o mapeamento na tabela monday_mappings
       const apiUrl = selectedMapping 
         ? `/api/monday/mappings/${selectedMapping.id}` 
         : '/api/monday/mappings';
@@ -270,10 +270,11 @@ export default function AdminPage() {
         throw new Error('Falha ao salvar o mapeamento');
       }
       
+      // Obter o mapeamento salvo (com ID gerado se for novo)
       const savedMapping = await response.json();
       
-      // Após salvar o mapeamento, salvar também as colunas se tivermos dados
-      if (mondayColumnsData.length > 0) {
+      // Salvar as colunas na tabela monday_columns vinculando com o mapeamento
+      if (mondayColumnsData && mondayColumnsData.length > 0) {
         try {
           // Enviar as colunas para o servidor
           const columnsResponse = await fetch(`/api/monday/mappings/${savedMapping.id}/fetch-columns`, {
@@ -288,8 +289,10 @@ export default function AdminPage() {
             throw new Error('Falha ao salvar as colunas');
           }
           
-          // Limpar os dados temporários das colunas após salvar
-          setMondayColumnsData([]);
+          toast({
+            title: "Colunas sincronizadas",
+            description: `Foram sincronizadas ${mondayColumnsData.length} colunas do quadro.`,
+          });
           
         } catch (columnError) {
           console.error("Erro ao salvar colunas:", columnError);
@@ -309,13 +312,14 @@ export default function AdminPage() {
       // Atualizar a lista de mapeamentos
       queryClient.invalidateQueries({ queryKey: ['/api/monday/mappings'] });
       
-      // Definir o mapeamento selecionado para o que acabamos de salvar
+      // Atualizar o mapeamento selecionado para o que acabamos de salvar
       setSelectedMapping(savedMapping);
       
-      // Mudar para a tab de colunas após o salvamento (não fecha o modal)
+      // Mudar para a aba de colunas após o salvamento sem fechar o modal
       setActiveTab("colunas");
       
     } catch (error) {
+      console.error("Erro ao salvar mapeamento:", error);
       toast({
         title: "Erro",
         description: "Ocorreu um erro ao salvar o mapeamento.",
