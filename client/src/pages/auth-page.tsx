@@ -271,25 +271,25 @@ export default function AuthPage() {
           </p>
           <ul className="space-y-2">
             <li className="flex items-center">
-              <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full font-bold text-sm mr-2" style={{ color: "#acc3e3" }}>
+              <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
                 1
               </div>
               Integração com sistemas externos
             </li>
             <li className="flex items-center">
-              <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full font-bold text-sm mr-2" style={{ color: "#acc3e3" }}>
+              <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
                 2
               </div>
               Gerenciamento de mapeamentos
             </li>
             <li className="flex items-center">
-              <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full font-bold text-sm mr-2" style={{ color: "#acc3e3" }}>
+              <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
                 3
               </div>
               Ambiente de edição dinâmico
             </li>
             <li className="flex items-center">
-              <div className="flex items-center justify-center w-6 h-6 bg-white bg-opacity-20 rounded-full font-bold text-sm mr-2" style={{ color: "#acc3e3" }}>
+              <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
                 4
               </div>
               Validação de documentos
