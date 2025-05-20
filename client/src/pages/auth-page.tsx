@@ -329,19 +329,25 @@ export default function AuthPage() {
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
                   2
                 </div>
-                Gerenciamento de mapeamentos
+                Workflows de fluxo de documentos
               </li>
               <li className="flex items-center">
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
                   3
                 </div>
-                Ambiente de edição dinâmico
+                Aprovações e assinaturas eletrônicas
               </li>
               <li className="flex items-center">
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
                   4
                 </div>
-                Validação de documentos
+                Versionamento documental
+              </li>
+              <li className="flex items-center">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
+                  5
+                </div>
+                Metodologia AI-First
               </li>
             </ul>
           </div>
