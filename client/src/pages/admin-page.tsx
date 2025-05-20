@@ -788,7 +788,7 @@ export default function AdminPage() {
                           </FormControl>
                           <Button 
                             type="button"
-                            className={`${connectButtonColor} hover:opacity-90 text-white disabled:opacity-50 disabled:text-gray-100 disabled:cursor-not-allowed`}
+                            className="bg-yellow-500 hover:opacity-90 text-white disabled:opacity-50 disabled:text-gray-100 disabled:cursor-not-allowed"
                             disabled={isConnectDisabled}
                             onClick={async () => {
                               if (!field.value) {
@@ -800,8 +800,7 @@ export default function AdminPage() {
                                 return;
                               }
                               
-                              // Definir cor padrão (amarelo) durante a tentativa de conexão
-                              setConnectButtonColor("bg-yellow-500");
+                              // Tentativa de conexão iniciada
                               
                               try {
                                 // Recuperar colunas do quadro via API usando a conexão do Monday
@@ -812,34 +811,34 @@ export default function AdminPage() {
                                 if (response.ok) {
                                   const columns = await response.json();
                                   
-                                  // Definir cor verde para indicar sucesso
-                                  setConnectButtonColor("bg-green-600");
-                                  
                                   // Habilitando o botão salvar após conexão bem-sucedida
                                   setIsSaveDisabled(false);
                                   
-                                  // Armazenar colunas recuperadas
-                                  setMondayColumns(columns);
-                                  
-                                  // Opcional: armazenar nome do quadro se disponível na resposta
-                                  if (columns.boardName) {
-                                    mappingForm.setValue("boardName", columns.boardName);
-                                  }
+                                  toast({
+                                    title: "Conectado com sucesso",
+                                    description: "As colunas do quadro foram carregadas",
+                                  });
                                 } else {
-                                  // Definir cor vermelha para indicar falha
-                                  setConnectButtonColor("bg-red-600");
-                                  
                                   // Manter o botão salvar desabilitado
                                   setIsSaveDisabled(true);
+                                  
+                                  toast({
+                                    title: "Erro na conexão",
+                                    description: "Falha ao buscar as colunas do quadro",
+                                    variant: "destructive"
+                                  });
                                 }
                               } catch (error) {
                                 console.error("Erro ao conectar com o quadro:", error);
                                 
-                                // Definir cor vermelha para indicar falha
-                                setConnectButtonColor("bg-red-600");
-                                
                                 // Manter o botão salvar desabilitado
                                 setIsSaveDisabled(true);
+                                
+                                toast({
+                                  title: "Erro na conexão",
+                                  description: "Ocorreu um erro ao conectar com o Monday",
+                                  variant: "destructive"
+                                });
                               }
                             }}
                           >
