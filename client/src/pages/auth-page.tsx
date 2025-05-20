@@ -142,15 +142,6 @@ export default function AuthPage() {
         <div className="w-full max-w-md mx-4">
           <Card className="shadow-lg">
             <CardContent className="pt-6">
-              <div className="flex justify-center mb-6">
-                <div className="text-center">
-                  <Logo />
-                  <h1 className="text-2xl font-semibold text-center text-gray-800 mt-2">
-                    EVO-MindBits Composer
-                  </h1>
-                </div>
-              </div>
-
               {isFirstLogin ? (
                 <div className="fade-in">
                   <h2 className="text-xl font-semibold text-center text-gray-800 mb-2">
