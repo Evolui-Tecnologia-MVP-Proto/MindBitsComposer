@@ -105,6 +105,13 @@ const columnMappingFormSchema = z.object({
   transformFunction: z.string().optional(),
 });
 
+// Schema para conexões de serviço
+const serviceConnectionSchema = z.object({
+  serviceName: z.string().min(1, { message: "Serviço é obrigatório" }),
+  token: z.string().min(1, { message: "Token ou chave API é obrigatório" }),
+  description: z.string().optional(),
+});
+
 export default function AdminPage() {
   const { toast } = useToast();
   
@@ -121,6 +128,18 @@ export default function AdminPage() {
   const [isServiceDeleteDialogOpen, setIsServiceDeleteDialogOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [selectedConnection, setSelectedConnection] = useState<ServiceConnection | null>(null);
+  const [showServiceToken, setShowServiceToken] = useState(false);
+  const [isServiceSubmitting, setIsServiceSubmitting] = useState(false);
+  
+  // Formulário para serviços externos
+  const serviceForm = useForm<z.infer<typeof serviceConnectionSchema>>({
+    resolver: zodResolver(serviceConnectionSchema),
+    defaultValues: {
+      serviceName: "",
+      token: "",
+      description: "",
+    },
+  });
   
   // Formulário para mapeamento do Monday
   const mappingForm = useForm<z.infer<typeof mappingFormSchema>>({
@@ -158,6 +177,30 @@ export default function AdminPage() {
       });
     }
   }, [selectedMapping, mappingForm]);
+  
+  // Atualiza o formulário quando uma conexão de serviço é selecionada
+  useEffect(() => {
+    if (selectedConnection) {
+      serviceForm.reset({
+        serviceName: selectedConnection.serviceName,
+        token: selectedConnection.token,
+        description: selectedConnection.description || "",
+      });
+    } else if (selectedService) {
+      serviceForm.reset({
+        serviceName: selectedService,
+        token: "",
+        description: "",
+      });
+    } else {
+      serviceForm.reset({
+        serviceName: "",
+        token: "",
+        description: "",
+      });
+    }
+    setShowServiceToken(false);
+  }, [selectedConnection, selectedService, serviceForm]);
   
   // Atualiza o formulário quando uma coluna é selecionada
   useEffect(() => {
@@ -267,6 +310,52 @@ export default function AdminPage() {
   // Estado para controle dos botões
   const [isSaveDisabled, setIsSaveDisabled] = useState(true);
   const [isConnectDisabled, setIsConnectDisabled] = useState(true);
+  const [isServiceSaveDisabled, setIsServiceSaveDisabled] = useState(true);
+  
+  // Função para salvar conexões de serviço
+  const onSubmitServiceConnection = async (data: z.infer<typeof serviceConnectionSchema>) => {
+    setIsServiceSubmitting(true);
+    try {
+      // Simulação de salvamento de conexão
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Em uma implementação real, faríamos uma chamada à API
+      // const endpoint = selectedConnection ? `/api/service-connections/${selectedConnection.id}` : "/api/service-connections";
+      // const method = selectedConnection ? "PUT" : "POST";
+      // const response = await fetch(endpoint, {
+      //   method,
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify(data)
+      // });
+      
+      toast({
+        title: selectedConnection ? "Conexão atualizada" : "Conexão criada",
+        description: `A conexão com ${getServiceDisplayName(data.serviceName)} foi ${selectedConnection ? 'atualizada' : 'criada'} com sucesso.`
+      });
+      
+      // Atualizar a lista de conexões
+      queryClient.invalidateQueries({ queryKey: ['/api/service-connections'] });
+      setIsServiceModalOpen(false);
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao salvar a conexão. Tente novamente.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsServiceSubmitting(false);
+    }
+  };
+  
+  // Função para obter o nome de exibição do serviço
+  const getServiceDisplayName = (serviceName: string): string => {
+    switch (serviceName) {
+      case "monday": return "Monday.com";
+      case "github": return "GitHub";
+      case "openai": return "OpenAI";
+      default: return serviceName;
+    }
+  };
 
   // Monitora mudanças no campo boardId para habilitar/desabilitar o botão Conectar
   useEffect(() => {
@@ -280,6 +369,13 @@ export default function AdminPage() {
     const boardId = mappingForm.watch("boardId");
     setIsSaveDisabled(!name || !boardId);
   }, [mappingForm.watch("name"), mappingForm.watch("boardId")]);
+  
+  // Monitora mudanças no formulário de serviço para habilitar/desabilitar o botão Salvar
+  useEffect(() => {
+    const serviceName = serviceForm.watch("serviceName");
+    const token = serviceForm.watch("token");
+    setIsServiceSaveDisabled(!serviceName || !token);
+  }, [serviceForm.watch("serviceName"), serviceForm.watch("token")]);
 
   // Funções para abrir modal de edição/exclusão
   const openEditModal = (mapping: BoardMapping) => {
@@ -311,6 +407,41 @@ export default function AdminPage() {
   const editColumn = (column: MappingColumn) => {
     setSelectedColumn(column);
     setIsAddingColumn(true);
+  };
+  
+  // Funções para modais de serviço
+  const openServiceModal = (serviceName: string, connection: ServiceConnection | null = null) => {
+    setSelectedService(serviceName);
+    setSelectedConnection(connection);
+    setIsServiceModalOpen(true);
+  };
+  
+  const openServiceDeleteDialog = (connection: ServiceConnection) => {
+    setSelectedConnection(connection);
+    setIsServiceDeleteDialogOpen(true);
+  };
+  
+  const deleteServiceConnection = async () => {
+    try {
+      // Simulação de exclusão de conexão
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast({
+        title: "Conexão excluída",
+        description: `A conexão com ${getServiceDisplayName(selectedConnection?.serviceName || "")} foi excluída com sucesso.`
+      });
+      
+      // Atualizar a lista de conexões
+      queryClient.invalidateQueries({ queryKey: ['/api/service-connections'] });
+      setIsServiceDeleteDialogOpen(false);
+      setSelectedConnection(null);
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao excluir a conexão. Tente novamente.",
+        variant: "destructive"
+      });
+    }
   };
   
   return (
@@ -463,13 +594,8 @@ export default function AdminPage() {
                       size="sm" 
                       className="bg-blue-600 hover:bg-blue-700 text-white"
                       onClick={() => {
-                        setSelectedService("monday");
-                        setSelectedConnection(connections.find(c => c.serviceName === "monday") || null);
-                        setIsServiceModalOpen(true);
-                        toast({
-                          title: "Configuração Monday.com",
-                          description: "Abrindo modal para configurar integração com Monday.com",
-                        });
+                        const connection = connections.find(c => c.serviceName === "monday") || null;
+                        openServiceModal("monday", connection);
                       }}
                     >
                       {connections.find(c => c.serviceName === "monday") ? "Editar" : "Configurar"}
@@ -506,13 +632,8 @@ export default function AdminPage() {
                       size="sm" 
                       className="bg-purple-600 hover:bg-purple-700 text-white"
                       onClick={() => {
-                        setSelectedService("github");
-                        setSelectedConnection(connections.find(c => c.serviceName === "github") || null);
-                        setIsServiceModalOpen(true);
-                        toast({
-                          title: "Configuração GitHub",
-                          description: "Abrindo modal para configurar integração com GitHub",
-                        });
+                        const connection = connections.find(c => c.serviceName === "github") || null;
+                        openServiceModal("github", connection);
                       }}
                     >
                       {connections.find(c => c.serviceName === "github") ? "Editar" : "Configurar"}
@@ -549,13 +670,8 @@ export default function AdminPage() {
                       size="sm" 
                       className="bg-green-600 hover:bg-green-700 text-white"
                       onClick={() => {
-                        setSelectedService("openai");
-                        setSelectedConnection(connections.find(c => c.serviceName === "openai") || null);
-                        setIsServiceModalOpen(true);
-                        toast({
-                          title: "Configuração OpenAI",
-                          description: "Abrindo modal para configurar integração com OpenAI",
-                        });
+                        const connection = connections.find(c => c.serviceName === "openai") || null;
+                        openServiceModal("openai", connection);
                       }}
                     >
                       {connections.find(c => c.serviceName === "openai") ? "Editar" : "Configurar"}
