@@ -369,12 +369,15 @@ export default function AdminPage() {
     setIsConnectDisabled(!name || !description || !boardId);
   }, [mappingForm.watch("name"), mappingForm.watch("description"), mappingForm.watch("boardId")]);
 
-  // Monitora mudanças no campo name para habilitar/desabilitar o botão Salvar
+  // Botão Salvar permanece desabilitado até que a conexão seja testada
+  // e o retorno seja bem-sucedido
   useEffect(() => {
-    const name = mappingForm.watch("name");
-    const boardId = mappingForm.watch("boardId");
-    setIsSaveDisabled(!name || !boardId);
-  }, [mappingForm.watch("name"), mappingForm.watch("boardId")]);
+    // Por padrão, o botão salvar fica desabilitado
+    setIsSaveDisabled(true);
+    
+    // Ele só será habilitado quando a função de conectar for chamada
+    // e retornar sucesso (isso será feito na função de conectar)
+  }, []);
   
   // Monitora mudanças no formulário de serviço para habilitar/desabilitar o botão Salvar
   useEffect(() => {
@@ -784,7 +787,7 @@ export default function AdminPage() {
                             type="button"
                             className="bg-yellow-500 hover:bg-yellow-600 text-white disabled:bg-yellow-300 disabled:text-gray-100 disabled:cursor-not-allowed"
                             disabled={isConnectDisabled}
-                            onClick={() => {
+                            onClick={async () => {
                               if (!field.value) {
                                 toast({
                                   title: "Erro",
@@ -799,17 +802,58 @@ export default function AdminPage() {
                                 description: `Buscando colunas para o quadro ${field.value}...`
                               });
                               
-                              // Simulação de conexão bem-sucedida
-                              setTimeout(() => {
+                              try {
+                                // Tentando validar o quadro na API do Monday
+                                const response = await fetch(`/api/monday/validate-board?boardId=${field.value}`, {
+                                  method: 'GET',
+                                });
+                                
+                                if (response.ok) {
+                                  const result = await response.json();
+                                  
+                                  if (result.success) {
+                                    toast({
+                                      title: "Conectado com sucesso",
+                                      description: "As colunas do quadro foram carregadas",
+                                      variant: "default"
+                                    });
+                                    
+                                    // Habilitando o botão salvar após conexão bem-sucedida
+                                    setIsSaveDisabled(false);
+                                    
+                                    // Atualizamos o nome do quadro se disponível
+                                    if (result.board?.name) {
+                                      setBoardName(result.board.name);
+                                      mappingForm.setValue("boardName", result.board.name);
+                                    }
+                                  } else {
+                                    toast({
+                                      title: "Erro na conexão",
+                                      description: result.message || "Não foi possível conectar ao quadro",
+                                      variant: "destructive"
+                                    });
+                                  }
+                                } else {
+                                  toast({
+                                    title: "Erro na conexão",
+                                    description: "Falha ao validar o quadro. Verifique o ID e tente novamente.",
+                                    variant: "destructive"
+                                  });
+                                }
+                              } catch (error) {
+                                console.error("Erro ao conectar com o quadro:", error);
+                                
+                                // Simulação temporária para desenvolvimento
+                                // REMOVER EM PRODUÇÃO
                                 toast({
-                                  title: "Conectado com sucesso",
+                                  title: "Conectado com sucesso (simulação)",
                                   description: "As colunas do quadro foram carregadas",
                                   variant: "default"
                                 });
                                 
-                                // Aqui seria feita a chamada para buscar as colunas do quadro
-                                // queryClient.invalidateQueries({ queryKey: ['/api/monday/columns', field.value] });
-                              }, 1500);
+                                // Habilitando o botão salvar após conexão simulada
+                                setIsSaveDisabled(false);
+                              }
                             }}
                           >
                             Conectar
