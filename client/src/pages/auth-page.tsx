@@ -280,7 +280,7 @@ export default function AuthPage() {
         <div className="flex items-center justify-center h-full">
           <div className="px-12" style={{ color: "#acc3e3" }}>
             <h2 className="text-3xl font-bold mb-4">
-              EVO-MindBits Composer
+              EVO-MindBits CPx
             </h2>
             <p className="text-xl mb-6">
               Compositor integrado de documentação técnica e empresarial assistido por IA
