@@ -301,11 +301,9 @@ export default function AdminPage() {
                             <TableRow>
                               <TableHead>Nome</TableHead>
                               <TableHead>ID do Quadro</TableHead>
-                              <TableHead>Coluna Status</TableHead>
-                              <TableHead>Coluna Responsável</TableHead>
                               <TableHead>Última Sincronização</TableHead>
                               <TableHead>Colunas</TableHead>
-                              <TableHead className="w-[120px] text-right">Ações</TableHead>
+                              <TableHead className="w-[100px] text-right">Ações</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -313,8 +311,6 @@ export default function AdminPage() {
                               <TableRow key={mapping.id}>
                                 <TableCell className="font-medium">{mapping.name}</TableCell>
                                 <TableCell>{mapping.boardId}</TableCell>
-                                <TableCell>{mapping.statusColumn}</TableCell>
-                                <TableCell>{mapping.responsibleColumn}</TableCell>
                                 <TableCell>{mapping.lastSync ? new Date(mapping.lastSync).toLocaleString() : "Nunca"}</TableCell>
                                 <TableCell>
                                   <Badge variant="secondary" className="text-xs">
