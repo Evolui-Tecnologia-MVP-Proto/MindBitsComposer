@@ -300,9 +300,10 @@ export default function AdminPage() {
       const savedMapping = await response.json();
       
       // Salvar as colunas na tabela monday_columns vinculando com o mapeamento
-      if (mondayColumnsData && mondayColumnsData.length > 0) {
+      // Apenas quando for um novo mapeamento (não em edição)
+      if (mondayColumnsData && mondayColumnsData.length > 0 && !selectedMapping) {
         try {
-          // Enviar as colunas para o servidor
+          // Enviar as colunas para o servidor somente se for um novo mapeamento
           const columnsResponse = await fetch(`/api/monday/mappings/${savedMapping.id}/fetch-columns`, {
             method: 'POST',
             headers: {
