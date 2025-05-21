@@ -293,8 +293,21 @@ export default function AdminPage() {
       });
       
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Falha ao salvar o mapeamento');
+        let errorMessage = 'Falha ao salvar o mapeamento';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          // Se não conseguir obter JSON, tentar obter texto
+          try {
+            const errorText = await response.text();
+            if (errorText) errorMessage = errorText;
+          } catch (textError) {
+            console.error("Erro ao ler resposta de erro:", textError);
+          }
+        }
+        console.error("Resposta de erro do servidor:", errorMessage);
+        throw new Error(errorMessage);
       }
       
       // Obter o mapeamento salvo (com ID gerado se for novo)
@@ -342,7 +355,7 @@ export default function AdminPage() {
       
       // Se estiver em modo de edição, fechar a modal
       if (selectedMapping) {
-        setIsMappingModalOpen(false);
+        setIsModalOpen(false);
       } else {
         // Se for inclusão (novo mapeamento), manter aberto e mudar para a aba de colunas
         // Atualizar o mapeamento selecionado para o que acabamos de salvar
