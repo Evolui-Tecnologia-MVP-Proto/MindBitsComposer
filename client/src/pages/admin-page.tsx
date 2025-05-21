@@ -924,7 +924,7 @@ export default function AdminPage() {
                     name="name"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Nome</FormLabel>
+                        <FormLabel>Nome do Mapeamento</FormLabel>
                         <FormControl>
                           <Input placeholder="Nome do mapeamento" {...field} />
                         </FormControl>
