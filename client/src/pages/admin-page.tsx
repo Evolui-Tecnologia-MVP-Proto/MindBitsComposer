@@ -551,8 +551,18 @@ export default function AdminPage() {
   };
   
   const editColumn = (column: MappingColumn) => {
+    // Definir a coluna selecionada
     setSelectedColumn(column);
-    setIsAddingColumn(true);
+    
+    // Preencher o formulário com os dados da coluna
+    columnForm.reset({
+      mondayColumnId: column.mondayColumnId,
+      cpxField: column.cpxField,
+      transformFunction: column.transformFunction || ""
+    });
+    
+    // Abrir a modal
+    setIsColumnModalOpen(true);
   };
   
   // Funções para modais de serviço
