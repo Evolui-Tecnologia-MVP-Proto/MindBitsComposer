@@ -177,6 +177,14 @@ export default function AdminPage() {
         quadroMonday: selectedMapping.quadroMonday,
         description: selectedMapping.description,
       });
+      
+      // Se o campo quadroMonday estiver preenchido, muda a cor do botão para verde
+      if (selectedMapping.quadroMonday) {
+        setButtonStyle("bg-green-600");
+        setIsSaveDisabled(false);
+      } else {
+        setButtonStyle("bg-yellow-500");
+      }
     } else {
       mappingForm.reset({
         name: "",
@@ -184,6 +192,7 @@ export default function AdminPage() {
         quadroMonday: "",
         description: "",
       });
+      setButtonStyle("bg-yellow-500");
     }
   }, [selectedMapping, mappingForm]);
   
