@@ -360,10 +360,18 @@ export default function AdminPage() {
   
   const onSubmitColumn = async (data: z.infer<typeof columnMappingFormSchema>) => {
     try {
+      // Encontrar o título da coluna do Monday selecionada
+      const selectedMondayColumn = mondayColumns.find(col => col.columnId === data.mondayColumnId);
+      
+      if (!selectedMondayColumn && !selectedColumn) {
+        throw new Error("Coluna do Monday não encontrada");
+      }
+      
       // Preparar os dados para envio
       const columnData = {
         ...data,
-        mappingId: selectedMapping?.id
+        mappingId: selectedMapping?.id,
+        mondayColumnTitle: selectedMondayColumn?.title || selectedColumn?.mondayColumnTitle || ""
       };
       
       // Fazer a chamada à API para salvar a coluna de mapeamento
