@@ -360,21 +360,57 @@ export default function AdminPage() {
   
   const onSubmitColumn = async (data: z.infer<typeof columnMappingFormSchema>) => {
     try {
-      // Simular chamada à API para salvar coluna de mapeamento
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Preparar os dados para envio
+      const columnData = {
+        ...data,
+        mappingId: selectedMapping?.id
+      };
+      
+      // Fazer a chamada à API para salvar a coluna de mapeamento
+      const endpoint = selectedColumn
+        ? `/api/monday/mappings/column-mappings/${selectedColumn.id}`
+        : `/api/monday/mappings/${selectedMapping?.id}/column-mappings`;
+      
+      const method = selectedColumn ? 'PATCH' : 'POST';
+      
+      const response = await fetch(endpoint, {
+        method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(columnData)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao salvar a coluna');
+      }
       
       toast({
         title: selectedColumn ? "Coluna atualizada" : "Coluna adicionada",
         description: `A coluna foi ${selectedColumn ? 'atualizada' : 'adicionada'} com sucesso.`,
       });
       
-      queryClient.invalidateQueries({ queryKey: ['/api/monday/mapping-columns', selectedMapping?.id] });
-      setIsAddingColumn(false);
+      // Atualizar a lista de colunas mapeadas
+      queryClient.invalidateQueries({ queryKey: [`/api/monday/mappings/${selectedMapping?.id}/column-mappings`] });
+      
+      // Fechar a modal
+      setIsColumnModalOpen(false);
+      
+      // Limpar a seleção
       setSelectedColumn(null);
+      
+      // Resetar o formulário
+      columnForm.reset({
+        mondayColumnId: "",
+        cpxField: "",
+        transformFunction: ""
+      });
     } catch (error) {
+      console.error("Erro ao salvar coluna de mapeamento:", error);
       toast({
         title: "Erro",
-        description: "Ocorreu um erro ao salvar a coluna de mapeamento.",
+        description: error instanceof Error ? error.message : "Ocorreu um erro ao salvar a coluna de mapeamento.",
         variant: "destructive",
       });
     }
