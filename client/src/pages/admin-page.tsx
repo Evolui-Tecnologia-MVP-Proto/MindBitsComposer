@@ -935,25 +935,6 @@ export default function AdminPage() {
                   
                   <FormField
                     control={mappingForm.control}
-                    name="quadroMonday"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Quadro no Monday</FormLabel>
-                        <FormControl>
-                          <Input 
-                            placeholder="Nome do quadro no Monday (preenchido automaticamente)" 
-                            {...field} 
-                            readOnly={true}
-                            className="bg-gray-50"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={mappingForm.control}
                     name="description"
                     render={({ field }) => (
                       <FormItem>
@@ -978,6 +959,25 @@ export default function AdminPage() {
                         <FormLabel>ID do Quadro</FormLabel>
                         <FormControl>
                           <Input placeholder="ID do quadro no Monday.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={mappingForm.control}
+                    name="quadroMonday"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Quadro no Monday</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Nome do quadro no Monday (preenchido automaticamente)" 
+                            {...field} 
+                            readOnly={true}
+                            className="bg-gray-50"
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
