@@ -124,6 +124,7 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<string>("quadro");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isAddingColumn, setIsAddingColumn] = useState(false);
+  const [isColumnModalOpen, setIsColumnModalOpen] = useState(false);
   const [selectedColumn, setSelectedColumn] = useState<MappingColumn | null>(null);
   
   const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
@@ -1095,7 +1096,7 @@ export default function AdminPage() {
                       size="sm"
                       onClick={() => {
                         setSelectedColumn(null);
-                        setIsAddingColumn(true);
+                        setIsColumnModalOpen(true);
                       }}
                     >
                       <Plus className="h-4 w-4 mr-2" />
@@ -1336,6 +1337,89 @@ export default function AdminPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      {/* Modal para adicionar/editar mapeamento de coluna */}
+      <Dialog open={isColumnModalOpen} onOpenChange={setIsColumnModalOpen}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>{selectedColumn ? "Editar Coluna" : "Nova Coluna"}</DialogTitle>
+            <DialogDescription>
+              {selectedColumn 
+                ? "Edite o mapeamento entre a coluna do Monday e o campo na aplicação." 
+                : "Crie um novo mapeamento entre uma coluna do Monday e um campo na aplicação."}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Form {...columnForm}>
+            <form onSubmit={columnForm.handleSubmit(onSubmitColumn)} className="space-y-4">
+              <FormField
+                control={columnForm.control}
+                name="mondayColumnId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Coluna do Monday</FormLabel>
+                    <FormControl>
+                      <select
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        {...field}
+                      >
+                        <option value="">Selecione a coluna</option>
+                        {columnsData?.map((column) => (
+                          <option key={column.id} value={column.columnId}>
+                            {column.title}
+                          </option>
+                        ))}
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={columnForm.control}
+                name="cpxField"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Campo na Aplicação</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nome do campo na aplicação" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={columnForm.control}
+                name="transformFunction"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Função de Transformação (opcional)</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Função de transformação de dados (JavaScript)" 
+                        className="resize-none h-24"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsColumnModalOpen(false)}>
+                  Cancelar
+                </Button>
+                <Button type="submit">
+                  {selectedColumn ? "Atualizar" : "Adicionar"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
