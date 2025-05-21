@@ -249,13 +249,13 @@ export default function AdminPage() {
   
   // Query para colunas do Monday de um mapeamento específico
   const { data: mondayColumns = [], isLoading: columnsLoading } = useQuery<MondayColumn[]>({
-    queryKey: ['/api/monday/columns', selectedMapping?.id],
+    queryKey: [`/api/monday/mappings/${selectedMapping?.id}/columns`],
     enabled: !!selectedMapping,
   });
   
   // Query para colunas mapeadas de um mapeamento específico
   const { data: mappingColumns = [], isLoading: mappingColumnsLoading } = useQuery<MappingColumn[]>({
-    queryKey: ['/api/monday/mapping-columns', selectedMapping?.id],
+    queryKey: [`/api/monday/mappings/${selectedMapping?.id}/column-mappings`],
     enabled: !!selectedMapping,
   });
   
