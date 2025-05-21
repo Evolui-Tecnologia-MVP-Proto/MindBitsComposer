@@ -1159,7 +1159,7 @@ export default function AdminPage() {
               ) : (
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-medium">Colunas Mapeadas</h3>
+                    <h2 className="text-xl font-semibold">Colunas Mapeadas</h2>
                     <Button
                       size="sm"
                       onClick={() => {
