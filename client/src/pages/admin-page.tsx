@@ -64,7 +64,7 @@ type BoardMapping = {
   quadroMonday: string;
   description: string;
   lastSync: string | null;
-  colunas?: number;
+  columnCount?: number;
 };
 
 type MappingColumn = {
@@ -722,7 +722,7 @@ export default function AdminPage() {
                               <TableCell>{mapping.lastSync ? new Date(mapping.lastSync).toLocaleString() : "Nunca"}</TableCell>
                               <TableCell>
                                 <Badge variant="secondary" className="text-xs">
-                                  {mapping.colunas || 0} cols
+                                  {mapping.columnCount || 0} cols
                                 </Badge>
                               </TableCell>
                               <TableCell className="text-right">
