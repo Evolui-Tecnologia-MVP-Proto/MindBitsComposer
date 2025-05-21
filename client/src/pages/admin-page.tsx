@@ -970,7 +970,6 @@ export default function AdminPage() {
                     name="quadroMonday"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Quadro no Monday</FormLabel>
                         <FormControl>
                           <Input 
                             placeholder="Nome do quadro no Monday (preenchido automaticamente)" 
