@@ -1364,7 +1364,7 @@ export default function AdminPage() {
                         {...field}
                       >
                         <option value="">Selecione a coluna</option>
-                        {columnsData?.map((column) => (
+                        {mondayColumns?.map((column) => (
                           <option key={column.id} value={column.columnId}>
                             {column.title}
                           </option>
