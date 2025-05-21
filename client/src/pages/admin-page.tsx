@@ -426,19 +426,31 @@ export default function AdminPage() {
   
   const deleteColumn = async (columnId: string) => {
     try {
-      // Simular chamada à API para excluir coluna de mapeamento
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Fazer chamada à API para excluir coluna de mapeamento
+      const response = await fetch(`/api/monday/mappings/column-mappings/${columnId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erro ao excluir a coluna');
+      }
       
       toast({
         title: "Coluna excluída",
         description: "A coluna de mapeamento foi excluída com sucesso.",
       });
       
-      queryClient.invalidateQueries({ queryKey: ['/api/monday/mapping-columns', selectedMapping?.id] });
+      // Atualizar a lista de colunas mapeadas
+      queryClient.invalidateQueries({ queryKey: [`/api/monday/mappings/${selectedMapping?.id}/column-mappings`] });
     } catch (error) {
+      console.error("Erro ao excluir coluna de mapeamento:", error);
       toast({
         title: "Erro",
-        description: "Ocorreu um erro ao excluir a coluna de mapeamento.",
+        description: error instanceof Error ? error.message : "Ocorreu um erro ao excluir a coluna de mapeamento.",
         variant: "destructive",
       });
     }
