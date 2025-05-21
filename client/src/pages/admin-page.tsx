@@ -340,11 +340,17 @@ export default function AdminPage() {
       // Atualizar a lista de mapeamentos
       queryClient.invalidateQueries({ queryKey: ['/api/monday/mappings'] });
       
-      // Atualizar o mapeamento selecionado para o que acabamos de salvar
-      setSelectedMapping(savedMapping);
-      
-      // Mudar para a aba de colunas após o salvamento sem fechar o modal
-      setActiveTab("colunas");
+      // Se estiver em modo de edição, fechar a modal
+      if (selectedMapping) {
+        setIsMappingModalOpen(false);
+      } else {
+        // Se for inclusão (novo mapeamento), manter aberto e mudar para a aba de colunas
+        // Atualizar o mapeamento selecionado para o que acabamos de salvar
+        setSelectedMapping(savedMapping);
+        
+        // Mudar para a aba de colunas após o salvamento sem fechar o modal
+        setActiveTab("colunas");
+      }
       
     } catch (error) {
       console.error("Erro ao salvar mapeamento:", error);
