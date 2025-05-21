@@ -1340,7 +1340,9 @@ export default function AdminPage() {
       
       {/* Modal para adicionar/editar mapeamento de coluna */}
       <Dialog open={isColumnModalOpen} onOpenChange={setIsColumnModalOpen}>
-        <DialogContent className="max-w-xl">
+        <DialogContent 
+          className="max-w-xl translate-x-[100px] -translate-y-[50px]"
+        >
           <DialogHeader>
             <DialogTitle>{selectedColumn ? "Editar Coluna" : "Nova Coluna"}</DialogTitle>
             <DialogDescription>
