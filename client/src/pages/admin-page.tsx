@@ -918,7 +918,7 @@ export default function AdminPage() {
             {/* Aba de informações do quadro */}
             <TabsContent value="quadro" className="space-y-4 py-4">
               <Form {...mappingForm}>
-                <form onSubmit={mappingForm.handleSubmit(onSubmitMapping)} className="space-y-4">
+                <form id="mappingForm" onSubmit={mappingForm.handleSubmit(onSubmitMapping)} className="space-y-4">
                   <FormField
                     control={mappingForm.control}
                     name="name"
@@ -1143,6 +1143,120 @@ export default function AdminPage() {
                 </div>
               )}
             </TabsContent>
+            
+            {/* Botões que ficam abaixo do TabContent, visíveis em ambas as abas */}
+            <div className="pt-4 border-t mt-4">
+              <div className="flex flex-col gap-4">
+                <div className="flex justify-start">
+                  <Button 
+                    type="button"
+                    className={`${buttonStyle} hover:opacity-90 text-white disabled:opacity-50 disabled:text-gray-100 disabled:cursor-not-allowed`}
+                    disabled={isConnectDisabled}
+                    onClick={async () => {
+                      const boardId = mappingForm.getValues("boardId");
+                      if (!boardId) {
+                        toast({
+                          title: "Erro",
+                          description: "Informe o ID do quadro antes de conectar",
+                          variant: "destructive"
+                        });
+                        return;
+                      }
+                      
+                      // Tentativa de conexão iniciada - botão amarelo
+                      setButtonStyle("bg-yellow-500");
+                      
+                      try {
+                        // Recuperar colunas do quadro via API usando a conexão do Monday
+                        const response = await fetch(`/api/monday/board/${boardId}/columns`, {
+                          method: 'GET',
+                        });
+                        
+                        if (response.ok) {
+                          const data = await response.json();
+                          
+                          // Botão verde após sucesso
+                          setButtonStyle("bg-green-600");
+                          
+                          // Habilitando o botão salvar após conexão bem-sucedida
+                          setIsSaveDisabled(false);
+                          
+                          // Armazenar as colunas recuperadas do Monday
+                          if (data.columns && data.columns.length > 0) {
+                            setMondayColumnsData(data.columns);
+                            
+                            // Se tiver o nome do quadro, atualizar no formulário
+                            if (data.boardName) {
+                              mappingForm.setValue("quadroMonday", data.boardName);
+                              // Se o nome estiver vazio, sugerir o nome do quadro
+                              if (!mappingForm.getValues("name")) {
+                                mappingForm.setValue("name", data.boardName);
+                              }
+                            }
+                          }
+                          
+                          toast({
+                            title: "Conectado com sucesso",
+                            description: "As colunas do quadro foram carregadas",
+                          });
+                        } else {
+                          // Botão vermelho após falha
+                          setButtonStyle("bg-red-600");
+                          
+                          // Manter o botão salvar desabilitado
+                          setIsSaveDisabled(true);
+                          
+                          toast({
+                            title: "Erro na conexão",
+                            description: "Falha ao buscar as colunas do quadro",
+                            variant: "destructive"
+                          });
+                          return;
+                        }
+                      } catch (error) {
+                        console.error("Erro ao conectar com o quadro:", error);
+                        
+                        // Botão vermelho após falha
+                        setButtonStyle("bg-red-600");
+                        
+                        // Manter o botão salvar desabilitado
+                        setIsSaveDisabled(true);
+                        
+                        toast({
+                          title: "Erro na conexão",
+                          description: "Ocorreu um erro ao conectar com o Monday",
+                          variant: "destructive"
+                        });
+                      }
+                    }}
+                  >
+                    Conectar
+                  </Button>
+                </div>
+                
+                <div className="flex justify-between">
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => setIsModalOpen(false)}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    form="mappingForm"
+                    disabled={isSubmitting || isSaveDisabled}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Salvando...
+                      </>
+                    ) : "Salvar"}
+                  </Button>
+                </div>
+              </div>
+            </div>
           </Tabs>
         </DialogContent>
       </Dialog>
