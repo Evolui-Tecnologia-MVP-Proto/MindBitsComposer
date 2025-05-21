@@ -1230,7 +1230,7 @@ export default function AdminPage() {
             
             {/* Botões que ficam abaixo do TabContent, visíveis em ambas as abas */}
             <div className="pt-4 border-t mt-4">
-              <div className="flex justify-between">
+              <div className="flex justify-end gap-2">
                 <Button 
                   type="button" 
                   variant="outline" 
