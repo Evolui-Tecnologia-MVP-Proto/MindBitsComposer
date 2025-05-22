@@ -34,6 +34,7 @@ export default function FreeHandCanvasPlugin({
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectionRect, setSelectionRect] = useState<{x: number, y: number, width: number, height: number} | null>(null);
+  const [canvasBackup, setCanvasBackup] = useState<ImageData | null>(null);
   
   // Referência para container do canvas para cálculo dinâmico
   const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -149,6 +150,13 @@ export default function FreeHandCanvasPlugin({
     const pos = getMousePos(canvas, e);
 
     if (currentTool === 'select') {
+      // Salvar o estado atual do canvas antes de iniciar a seleção
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        setCanvasBackup(imageData);
+      }
+      
       setIsSelecting(true);
       setSelectionRect({
         x: pos.x,
@@ -175,12 +183,12 @@ export default function FreeHandCanvasPlugin({
     const pos = getMousePos(canvas, e);
 
     // Lógica de seleção
-    if (isSelecting && selectionRect) {
+    if (isSelecting && selectionRect && canvasBackup) {
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
 
-      // Redesenhar o canvas original (sem a seleção anterior)
-      redrawCanvas();
+      // Restaurar o canvas original do backup
+      ctx.putImageData(canvasBackup, 0, 0);
 
       // Calcular dimensões da seleção
       const width = pos.x - selectionRect.x;
@@ -199,6 +207,14 @@ export default function FreeHandCanvasPlugin({
         width,
         height
       });
+
+      console.log('Área selecionada:', {
+        x: selectionRect.x,
+        y: selectionRect.y,
+        width,
+        height
+      });
+
       return;
     }
 
