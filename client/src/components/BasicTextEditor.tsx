@@ -472,8 +472,8 @@ export default function BasicTextEditor() {
                 onOpenChange={() => toggleSection(index)}
                 className="border border-gray-200 rounded-lg"
               >
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 text-left bg-gray-50 hover:bg-gray-100 transition-colors">
-                  <h3 className="text-lg font-bold text-gray-900 font-mono">
+                <CollapsibleTrigger className="flex items-center justify-between w-full px-4 py-2 text-left bg-gray-50 hover:bg-gray-100 transition-colors">
+                  <h3 className="text-base font-bold text-gray-900 font-mono">
                     {section.name}
                   </h3>
                   {section.isOpen ? (
