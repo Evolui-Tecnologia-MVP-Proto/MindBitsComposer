@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Plus, Pencil, Trash, Power, PowerOff, Search, Filter, Play } from "lucide-react";
+import { Plus, Pencil, Trash, Power, PowerOff, Play } from "lucide-react";
 import PluginModal from "@/components/plugin-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+
 import {
   Table,
   TableBody,
@@ -147,9 +147,7 @@ export default function PluginsPage() {
   const [testingPlugin, setTestingPlugin] = useState<Plugin | null>(null);
   const [testResult, setTestResult] = useState<any>(null);
   const [isTestingInProgress, setIsTestingInProgress] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState<string>("all");
-  const [filterStatus, setFilterStatus] = useState<string>("all");
+
   const { toast } = useToast();
 
   // Form para plugin
@@ -245,14 +243,7 @@ export default function PluginsPage() {
     },
   });
 
-  // Filtrar plugins
-  const filteredPlugins = plugins.filter((plugin) => {
-    const matchesSearch = plugin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      plugin.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = filterType === "all" || plugin.type === filterType;
-    const matchesStatus = filterStatus === "all" || plugin.status === filterStatus;
-    return matchesSearch && matchesType && matchesStatus;
-  });
+
 
   const openCreateModal = () => {
     setSelectedPlugin(null);
@@ -393,96 +384,12 @@ export default function PluginsPage() {
         </Button>
       </div>
 
-      {/* Estatísticas */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Plugins</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{plugins.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Plugins Ativos</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {plugins.filter(p => p.status === PluginStatus.ACTIVE).length}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Em Desenvolvimento</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {plugins.filter(p => p.status === PluginStatus.DEVELOPMENT).length}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tipos Diferentes</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {new Set(plugins.map(p => p.type)).size}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
-      {/* Filtros */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Filtros</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Buscar plugins..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="max-w-sm"
-              />
-            </div>
-            <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filtrar por tipo" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os tipos</SelectItem>
-                <SelectItem value={PluginType.DATA_SOURCE}>Fonte de Dados</SelectItem>
-                <SelectItem value={PluginType.AI_AGENT}>Agente de IA</SelectItem>
-                <SelectItem value={PluginType.CHART}>Gráficos</SelectItem>
-                <SelectItem value={PluginType.FORMATTER}>Formatador</SelectItem>
-                <SelectItem value={PluginType.INTEGRATION}>Integração</SelectItem>
-                <SelectItem value={PluginType.UTILITY}>Utilitário</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filtrar por status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos os status</SelectItem>
-                <SelectItem value={PluginStatus.ACTIVE}>Ativo</SelectItem>
-                <SelectItem value={PluginStatus.INACTIVE}>Inativo</SelectItem>
-                <SelectItem value={PluginStatus.DEVELOPMENT}>Desenvolvimento</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Tabela de plugins */}
       <Card>
         <CardHeader>
-          <CardTitle>Plugins ({filteredPlugins.length})</CardTitle>
+          <CardTitle>Plugins ({plugins.length})</CardTitle>
           <CardDescription>
             Lista de todos os plugins configurados no sistema
           </CardDescription>
@@ -490,7 +397,7 @@ export default function PluginsPage() {
         <CardContent>
           {isLoading ? (
             <div className="text-center py-4">Carregando plugins...</div>
-          ) : filteredPlugins.length === 0 ? (
+          ) : plugins.length === 0 ? (
             <div className="text-center py-4 text-muted-foreground">
               Nenhum plugin encontrado
             </div>
@@ -507,7 +414,7 @@ export default function PluginsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredPlugins.map((plugin) => (
+                {plugins.map((plugin) => (
                   <TableRow key={plugin.id}>
                     <TableCell>
                       <div>
