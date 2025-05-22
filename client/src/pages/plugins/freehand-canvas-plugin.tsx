@@ -97,8 +97,8 @@ export default function FreeHandCanvasPlugin({
     // Usar sempre offsetX e offsetY - são sempre relativos ao canvas
     // Adicionar compensação fixa para corrigir deslocamento do container
     return {
-      x: e.nativeEvent.offsetX - 10, // Compensar deslocamento para esquerda
-      y: e.nativeEvent.offsetY - 10  // Compensar deslocamento para cima
+      x: e.nativeEvent.offsetX + 100, // Mover 100px para direita
+      y: e.nativeEvent.offsetY + 50   // Mover 50px para baixo
     };
   };
 
