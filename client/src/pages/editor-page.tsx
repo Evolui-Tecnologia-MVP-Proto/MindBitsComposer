@@ -1,4 +1,4 @@
-import TextEditor from "@/components/TextEditor";
+import SingleEditorWithSections from "@/components/SingleEditorWithSections";
 import { Button } from "@/components/ui/button";
 import { Save, FileText, Upload, Download, Settings } from "lucide-react";
 
@@ -7,7 +7,7 @@ export default function EditorPage() {
     <div className="absolute inset-0 bg-white">
       {/* Área do editor - ocupando todo o espaço disponível */}
       <div className="h-[calc(100%-56px)]">
-        <TextEditor />
+        <SingleEditorWithSections />
       </div>
       
       {/* Barra de botões inferior */}

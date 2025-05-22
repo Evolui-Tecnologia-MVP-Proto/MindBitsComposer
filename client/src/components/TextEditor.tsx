@@ -476,7 +476,13 @@ function ToolbarPlugin() {
 
 
 
-export default function TextEditor() {
+interface TextEditorProps {
+  initialContent?: string;
+  onContentChange?: (content: string) => void;
+  placeholder?: string;
+}
+
+export default function TextEditor({ initialContent, onContentChange, placeholder }: TextEditorProps = {}) {
   const [sections, setSections] = useState<string[]>([]);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [sectionContents, setSectionContents] = useState<Record<string, string>>({});
