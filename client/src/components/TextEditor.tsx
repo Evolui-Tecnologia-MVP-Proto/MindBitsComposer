@@ -395,12 +395,26 @@ function ToolbarPlugin() {
                   console.log('Link da imagem inserido com sucesso!');
                 } else {
                   console.log('Inserindo link no editor Lexical principal');
-                  // Inserir no editor Lexical principal
+                  // Inserir no editor Lexical principal como link clicável
                   editor.update(() => {
                     const selection = $getSelection();
                     if (selection) {
-                      // Inserir texto simples que pode ser transformado em link manualmente
-                      selection.insertText(`\n${linkText}: ${imageUrl}\n`);
+                      // Importar funções necessárias do Lexical
+                      const { $createLinkNode } = require('@lexical/link');
+                      const { $createTextNode } = require('lexical');
+                      
+                      // Inserir quebra de linha
+                      selection.insertText('\n');
+                      
+                      // Criar nó de link
+                      const linkNode = $createLinkNode(imageUrl);
+                      linkNode.append($createTextNode(linkText));
+                      
+                      // Inserir o link
+                      selection.insertNodes([linkNode]);
+                      
+                      // Inserir quebra de linha final
+                      selection.insertText('\n');
                     }
                   });
                 }
