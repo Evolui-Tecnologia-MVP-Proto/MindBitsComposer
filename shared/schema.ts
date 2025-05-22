@@ -180,3 +180,29 @@ export type ServiceConnection = typeof serviceConnections.$inferSelect;
 
 export type InsertPlugin = z.infer<typeof insertPluginSchema>;
 export type Plugin = typeof plugins.$inferSelect;
+
+// Documentos table
+export const documentos = pgTable("documentos", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  origem: text("origem").notNull(),
+  objeto: text("objeto").notNull(),
+  cliente: text("cliente").notNull(),
+  responsavel: text("responsavel").notNull(),
+  sistema: text("sistema").notNull(),
+  modulo: text("modulo").notNull(),
+  descricao: text("descricao").notNull(),
+  status: text("status").notNull().default("Processando"),
+  statusOrigem: text("status_origem").notNull().default("Incluido"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Documentos schema
+export const insertDocumentoSchema = createInsertSchema(documentos).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertDocumento = z.infer<typeof insertDocumentoSchema>;
+export type Documento = typeof documentos.$inferSelect;

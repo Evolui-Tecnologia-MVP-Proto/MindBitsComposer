@@ -1,8 +1,8 @@
-import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins,
+import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos,
   type User, type InsertUser, type Template, type InsertTemplate, 
   type MondayMapping, type InsertMondayMapping, type MondayColumn, type InsertMondayColumn, 
   type MappingColumn, type InsertMappingColumn, type ServiceConnection, type InsertServiceConnection,
-  type Plugin, type InsertPlugin,
+  type Plugin, type InsertPlugin, type Documento, type InsertDocumento,
   UserStatus, UserRole, TemplateType, PluginStatus, PluginType } from "@shared/schema";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
@@ -84,6 +84,13 @@ export interface IStorage {
   updatePlugin(id: string, data: Partial<Plugin>): Promise<Plugin>;
   togglePluginStatus(id: string): Promise<Plugin>;
   deletePlugin(id: string): Promise<void>;
+  
+  // Documento operations
+  getDocumento(id: string): Promise<Documento | undefined>;
+  createDocumento(documento: InsertDocumento): Promise<Documento>;
+  getAllDocumentos(): Promise<Documento[]>;
+  updateDocumento(id: string, data: Partial<Documento>): Promise<Documento>;
+  deleteDocumento(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -535,6 +542,47 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(plugins)
       .where(eq(plugins.id, id));
+  }
+
+  // Documento operations
+  async getDocumento(id: string): Promise<Documento | undefined> {
+    const [documento] = await db.select().from(documentos).where(eq(documentos.id, id));
+    return documento || undefined;
+  }
+
+  async createDocumento(documentoData: InsertDocumento): Promise<Documento> {
+    const [documento] = await db
+      .insert(documentos)
+      .values(documentoData)
+      .returning();
+    return documento;
+  }
+
+  async getAllDocumentos(): Promise<Documento[]> {
+    return await db.select().from(documentos);
+  }
+
+  async updateDocumento(id: string, data: Partial<Documento>): Promise<Documento> {
+    const [updatedDocumento] = await db
+      .update(documentos)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(documentos.id, id))
+      .returning();
+    
+    if (!updatedDocumento) {
+      throw new Error("Documento não encontrado");
+    }
+    
+    return updatedDocumento;
+  }
+
+  async deleteDocumento(id: string): Promise<void> {
+    await db
+      .delete(documentos)
+      .where(eq(documentos.id, id));
   }
 }
 
