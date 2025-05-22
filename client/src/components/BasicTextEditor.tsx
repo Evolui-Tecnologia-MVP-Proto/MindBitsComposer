@@ -387,7 +387,16 @@ export default function BasicTextEditor() {
                         sectionIndex: index
                       });
                     }}
-                    onClick={handleGlobalClick}
+                    onClick={(e) => {
+                      // Capturar posição do cursor no clique
+                      const textarea = e.target as HTMLTextAreaElement;
+                      const position = textarea.selectionStart;
+                      setLastCursorInfo({
+                        elementId: `section-${index}`,
+                        position: position,
+                        sectionIndex: index
+                      });
+                    }}
                     className="w-full h-32 min-h-[8rem] resize-y border border-gray-300 rounded-md p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder={`Escreva o conteúdo para ${section.name}...`}
                   />
