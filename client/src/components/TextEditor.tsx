@@ -292,34 +292,50 @@ function ToolbarPlugin() {
               const imageUrl = `${window.location.origin}${data.data.response.url}`;
               console.log('URL da imagem construída:', imageUrl);
               
-              // Inserir TAG clicável no editor na seção ativa do template
-              editor.update(() => {
-                const selection = $getSelection();
-                if (selection) {
-                  // Criar texto da TAG
-                  const tagText = `[🖼️ IMAGEM: ${data.data.response.filename} - ${Math.round(data.data.selection.width)}x${Math.round(data.data.selection.height)}px - Clique para visualizar]`;
+              // Inserir TAG clicável na seção ativa do template
+              // Verificar se há seções de template ativas
+              const activeSection = document.querySelector('.accordion-content[data-state="open"] [contenteditable="true"]');
+              
+              if (activeSection) {
+                // Inserir na seção ativa
+                const tagText = `\n[🖼️ IMAGEM: ${data.data.response.filename} - ${Math.round(data.data.selection.width)}x${Math.round(data.data.selection.height)}px - Clique para visualizar]\n`;
+                
+                // Inserir o texto na seção ativa
+                const selection = window.getSelection();
+                if (selection && selection.rangeCount > 0) {
+                  const range = selection.getRangeAt(0);
+                  const textNode = document.createTextNode(tagText);
+                  range.insertNode(textNode);
                   
-                  // Inserir diretamente na posição do cursor da seção ativa
-                  // Usar insertText para manter a TAG na seção específica do template
-                  if (selection.isCollapsed()) {
-                    // Cursor posicionado - inserir inline na seção
-                    selection.insertText(`\n${tagText}\n`);
-                  } else {
-                    // Texto selecionado - substituir pela TAG
+                  // Posicionar cursor após a TAG
+                  range.setStartAfter(textNode);
+                  range.collapse(true);
+                  selection.removeAllRanges();
+                  selection.addRange(range);
+                } else {
+                  // Se não há seleção, inserir no final da seção
+                  activeSection.textContent = (activeSection.textContent || '') + tagText;
+                }
+              } else {
+                // Inserir no editor principal se não há seções ativas
+                editor.update(() => {
+                  const selection = $getSelection();
+                  if (selection) {
+                    const tagText = `\n[🖼️ IMAGEM: ${data.data.response.filename} - ${Math.round(data.data.selection.width)}x${Math.round(data.data.selection.height)}px - Clique para visualizar]\n`;
                     selection.insertText(tagText);
                   }
-                  
-                  // Armazenar dados da imagem para uso posterior
-                  const globalWindow = window as any;
-                  globalWindow.imageData = globalWindow.imageData || {};
-                  globalWindow.imageData[data.data.response.filename] = {
-                    url: imageUrl,
-                    filename: data.data.response.filename,
-                    selection: data.data.selection,
-                    timestamp: data.data.response.timestamp
-                  };
-                }
-              });
+                });
+              }
+              
+              // Armazenar dados da imagem para uso posterior
+              const globalWindow = window as any;
+              globalWindow.imageData = globalWindow.imageData || {};
+              globalWindow.imageData[data.data.response.filename] = {
+                url: imageUrl,
+                filename: data.data.response.filename,
+                selection: data.data.selection,
+                timestamp: data.data.response.timestamp
+              };
               
               toast({
                 title: "Imagem inserida",
