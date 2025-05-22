@@ -319,12 +319,12 @@ export default function BasicTextEditor() {
         <div className="flex items-center gap-2">
           <LayoutTemplate className="h-4 w-4 text-gray-500" />
           <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="w-[200px] font-mono">
               <SelectValue placeholder="Selecionar template..." />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="font-mono">
               {templates?.map((template) => (
-                <SelectItem key={template.id} value={template.id}>
+                <SelectItem key={template.id} value={template.id} className="font-mono">
                   {template.code}
                 </SelectItem>
               ))}
