@@ -382,10 +382,17 @@ export default function FreeHandCanvasPlugin({
       {/* Canvas Area */}
       <div 
         ref={canvasContainerRef}
-        className="flex-1 bg-gray-50 min-h-0 p-4"
-        style={{ display: 'grid', gridTemplateRows: '1fr' }}
+        className="flex-1 bg-gray-50 min-h-0 relative"
       >
-        <div className="border border-gray-300 rounded-lg bg-white shadow-sm flex items-center justify-center overflow-hidden">
+        <div 
+          className="border border-gray-300 rounded-lg bg-white shadow-sm flex items-center justify-center overflow-hidden absolute" 
+          style={{ 
+            top: '16px', 
+            left: '16px', 
+            right: '16px', 
+            bottom: '16px' 
+          }}
+        >
           <canvas
             ref={canvasRef}
             className="cursor-crosshair block max-w-full max-h-full"
