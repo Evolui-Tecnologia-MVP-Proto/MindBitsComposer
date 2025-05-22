@@ -88,13 +88,20 @@ export default function FreeHandCanvasPlugin({
 
   const getMousePos = (canvas: HTMLCanvasElement, e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = canvas.getBoundingClientRect();
+    
+    // Posição relativa ao canvas real (1400x800) independente da escala de exibição
+    // O canvas sempre mantém seu tamanho interno de 1400x800
+    const relativeX = e.clientX - rect.left;
+    const relativeY = e.clientY - rect.top;
+    
+    // Se o canvas está sendo exibido em tamanho diferente do real, 
+    // calcular a proporção para mapear para o tamanho real
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
     
-    // Calcular posição considerando escala do canvas se houver
     return {
-      x: (e.clientX - rect.left) * scaleX,
-      y: (e.clientY - rect.top) * scaleY
+      x: relativeX * scaleX,
+      y: relativeY * scaleY
     };
   };
 
