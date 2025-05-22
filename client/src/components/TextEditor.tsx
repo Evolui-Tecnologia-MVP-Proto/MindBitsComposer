@@ -73,8 +73,8 @@ function ToolbarPlugin() {
           const data = await response.json();
           console.log("Todos os plugins:", data);
           console.log("Status dos plugins:", data.map((p: any) => ({ name: p.name, status: p.status })));
-          setPlugins(data.filter((plugin: Plugin) => plugin.status === "ACTIVE"));
-          console.log("Plugins ativos carregados:", data.filter((plugin: Plugin) => plugin.status === "ACTIVE"));
+          setPlugins(data.filter((plugin: Plugin) => plugin.status === "active"));
+          console.log("Plugins ativos carregados:", data.filter((plugin: Plugin) => plugin.status === "active"));
         }
       } catch (error) {
         console.error("Erro ao carregar plugins:", error);
@@ -100,7 +100,7 @@ function ToolbarPlugin() {
 
   // Função para abrir plugin FreeHand Canvas
   const openFreeHandCanvas = () => {
-    const freeHandPlugin = plugins.find(plugin => plugin.name === "FreeHand Canvas");
+    const freeHandPlugin = plugins.find(plugin => plugin.name === "Freehand Canvas");
     if (freeHandPlugin) {
       setSelectedPlugin(freeHandPlugin);
       setIsPluginModalOpen(true);
@@ -108,7 +108,7 @@ function ToolbarPlugin() {
   };
 
   // Verificar se o plugin FreeHand Canvas está ativo
-  const freeHandCanvasPlugin = plugins.find(plugin => plugin.name === "FreeHand Canvas");
+  const freeHandCanvasPlugin = plugins.find(plugin => plugin.name === "Freehand Canvas");
 
   const onRedoClick = () => {
     editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
