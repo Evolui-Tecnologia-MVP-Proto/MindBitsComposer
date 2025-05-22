@@ -60,14 +60,33 @@ export default function RichTextDisplay({
   const handleInput = () => {
     if (editableRef.current) {
       const selection = window.getSelection();
-      const range = selection?.getRangeAt(0);
-      if (range) {
-        // Capturar posição aproximada do cursor
-        const textContent = editableRef.current.innerText || '';
-        const cursorPosition = range.startOffset;
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0);
+        
+        // Calcular posição real do cursor no texto
+        const textBeforeCursor = range.cloneRange();
+        textBeforeCursor.selectNodeContents(editableRef.current);
+        textBeforeCursor.setEnd(range.startContainer, range.startOffset);
+        
+        const textContent = textBeforeCursor.toString();
+        const cursorPosition = textContent.length;
+        
+        console.log('Posição do cursor capturada:', cursorPosition);
         onCursorCapture(cursorPosition);
       }
     }
+  };
+
+  const handleKeyUp = (e: React.KeyboardEvent) => {
+    // Capturar posição em navegação com teclas
+    if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) {
+      handleInput();
+    }
+  };
+
+  const handleMouseUp = () => {
+    // Capturar posição ao clicar ou selecionar
+    setTimeout(handleInput, 10);
   };
 
   const renderEditableContent = (text: string) => {
@@ -172,7 +191,10 @@ export default function RichTextDisplay({
         className={`${className} focus:outline-none`}
         onBlur={handleEditEnd}
         onKeyDown={handleKeyDown}
+        onKeyUp={handleKeyUp}
         onInput={handleInput}
+        onMouseUp={handleMouseUp}
+        onClick={handleInput}
         dangerouslySetInnerHTML={{
           __html: renderEditableContent(content) || `<span style="color: #9CA3AF;">${placeholder}</span>`
         }}
