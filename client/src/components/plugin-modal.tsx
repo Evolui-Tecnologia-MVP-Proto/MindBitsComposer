@@ -42,7 +42,7 @@ export default function PluginModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="p-0 gap-0 transition-all duration-300"
+        className="p-0 gap-0 transition-all duration-300 !max-w-none"
         style={{
           position: 'fixed',
           top: isExpanded ? '0' : '50%',
