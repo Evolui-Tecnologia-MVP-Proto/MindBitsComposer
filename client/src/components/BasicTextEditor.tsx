@@ -6,6 +6,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Bold, Italic, Save, Palette, LayoutTemplate, ChevronDown, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import PluginModal from "@/components/plugin-modal";
+import RichTextDisplay from "@/components/RichTextDisplay";
 import { Plugin, PluginType, PluginStatus, Template } from "@shared/schema";
 
 interface TemplateSection {
@@ -364,41 +365,18 @@ export default function BasicTextEditor() {
                   )}
                 </CollapsibleTrigger>
                 <CollapsibleContent className="p-4 border-t border-gray-200">
-                  <textarea
-                    value={section.content}
-                    onChange={(e) => {
-                      updateSectionContent(index, e.target.value);
-                      // Capturar posição do cursor durante a digitação
-                      const textarea = e.target as HTMLTextAreaElement;
-                      const position = textarea.selectionStart;
+                  <RichTextDisplay
+                    content={section.content}
+                    onContentChange={(newContent) => updateSectionContent(index, newContent)}
+                    onCursorCapture={(position) => {
                       setLastCursorInfo({
                         elementId: `section-${index}`,
                         position: position,
                         sectionIndex: index
                       });
                     }}
-                    onKeyUp={(e) => {
-                      // Capturar posição do cursor também nas teclas de navegação
-                      const textarea = e.target as HTMLTextAreaElement;
-                      const position = textarea.selectionStart;
-                      setLastCursorInfo({
-                        elementId: `section-${index}`,
-                        position: position,
-                        sectionIndex: index
-                      });
-                    }}
-                    onClick={(e) => {
-                      // Capturar posição do cursor no clique
-                      const textarea = e.target as HTMLTextAreaElement;
-                      const position = textarea.selectionStart;
-                      setLastCursorInfo({
-                        elementId: `section-${index}`,
-                        position: position,
-                        sectionIndex: index
-                      });
-                    }}
-                    className="w-full h-32 min-h-[8rem] resize-y border border-gray-300 rounded-md p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder={`Escreva o conteúdo para ${section.name}...`}
+                    className="w-full h-32 min-h-[8rem] resize-y border border-gray-300 rounded-md p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </CollapsibleContent>
               </Collapsible>
