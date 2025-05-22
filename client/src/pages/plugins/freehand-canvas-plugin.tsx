@@ -93,7 +93,7 @@ export default function FreeHandCanvasPlugin({
     
     // Compensar deslocamento quando a modal está retraída
     if (!isExpanded) {
-      x += 50; // 50px para direita
+      x += 100; // 100px para direita (50 + 50)
       y += 30; // 30px para baixo
     }
     
