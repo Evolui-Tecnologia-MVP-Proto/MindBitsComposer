@@ -370,9 +370,22 @@ export default function AdminPage() {
       
       // Se estiver em modo de edição, fechar a modal
       if (selectedMapping) {
+        console.log("Modo edição detectado - fechando modal");
         setIsModalOpen(false);
+        // Limpar a seleção após edição
+        setSelectedMapping(null);
+        // Resetar o formulário
+        mappingForm.reset({
+          name: "",
+          boardId: "",
+          quadroMonday: "",
+          description: "",
+        });
+        // Voltar para a aba do quadro
+        setActiveTab("quadro");
       } else {
         // Se for inclusão (novo mapeamento), manter aberto e mudar para a aba de colunas
+        console.log("Modo criação - mantendo modal aberto e mudando para aba colunas");
         // Atualizar o mapeamento selecionado para o que acabamos de salvar
         setSelectedMapping(savedMapping);
         
