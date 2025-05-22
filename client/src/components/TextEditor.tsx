@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Bold, Italic, List, FileText, Save, Undo, Redo, Link as LinkIcon, ChevronDown, LayoutTemplate, Palette } from "lucide-react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $getRoot, $getSelection, FORMAT_TEXT_COMMAND, LexicalEditor, $createParagraphNode, $createTextNode } from "lexical";
+import { $createLinkNode } from "@lexical/link";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Template, Plugin } from "@shared/schema";
@@ -399,10 +400,6 @@ function ToolbarPlugin() {
                   editor.update(() => {
                     const selection = $getSelection();
                     if (selection) {
-                      // Importar funções necessárias do Lexical
-                      const { $createLinkNode } = require('@lexical/link');
-                      const { $createTextNode } = require('lexical');
-                      
                       // Inserir quebra de linha
                       selection.insertText('\n');
                       
@@ -415,6 +412,8 @@ function ToolbarPlugin() {
                       
                       // Inserir quebra de linha final
                       selection.insertText('\n');
+                      
+                      console.log('Link inserido com sucesso!');
                     }
                   });
                 }
