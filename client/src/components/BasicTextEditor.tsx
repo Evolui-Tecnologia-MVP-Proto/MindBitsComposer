@@ -199,7 +199,7 @@ export default function BasicTextEditor() {
             const newSections: TemplateSection[] = sections.map((sectionName: string) => ({
               name: sectionName,
               content: '',
-              isOpen: true // Começar todas abertas
+              isOpen: false // Começar todas recolhidas
             }));
             
             setTemplateSections(newSections);
@@ -213,9 +213,9 @@ export default function BasicTextEditor() {
       
       // Se não há estrutura válida, criar seções padrão
       const defaultSections: TemplateSection[] = [
-        { name: "Introdução", content: '', isOpen: true },
-        { name: "Desenvolvimento", content: '', isOpen: true },
-        { name: "Conclusão", content: '', isOpen: true }
+        { name: "Introdução", content: '', isOpen: false },
+        { name: "Desenvolvimento", content: '', isOpen: false },
+        { name: "Conclusão", content: '', isOpen: false }
       ];
       
       setTemplateSections(defaultSections);
