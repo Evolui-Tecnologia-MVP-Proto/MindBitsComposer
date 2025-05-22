@@ -80,22 +80,6 @@ export default function SimpleRichTextDisplay({
 
   return (
     <div className="relative">
-      {/* Camada de renderização com links azuis */}
-      <div
-        className={`${className} pointer-events-none absolute inset-0 overflow-hidden`}
-        style={{ 
-          minHeight: '8rem',
-          backgroundColor: 'transparent',
-          zIndex: 2
-        }}
-      >
-        {content ? (
-          <div className="p-3 pointer-events-auto">
-            {renderContent(content)}
-          </div>
-        ) : null}
-      </div>
-
       {/* Textarea para edição */}
       <textarea
         ref={textareaRef}
@@ -106,13 +90,31 @@ export default function SimpleRichTextDisplay({
         }}
         onKeyUp={handleCursorEvents}
         onClick={handleCursorEvents}
-        className={`${className} relative z-1`}
+        className={`${className} relative z-10`}
         placeholder={placeholder}
         style={{
           backgroundColor: content ? 'transparent' : 'white',
           color: content ? 'transparent' : 'inherit'
         }}
       />
+
+      {/* Camada de renderização com links azuis */}
+      <div
+        className="absolute inset-0 overflow-hidden pointer-events-none"
+        style={{ 
+          minHeight: '8rem',
+          backgroundColor: 'transparent',
+          zIndex: 5
+        }}
+      >
+        {content ? (
+          <div className="p-3">
+            <div className="pointer-events-auto" style={{ pointerEvents: 'auto' }}>
+              {renderContent(content)}
+            </div>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }
