@@ -119,6 +119,12 @@ export default function FreeHandCanvasPlugin({
 
     const pos = getMousePos(canvas, e);
     
+    // Debug temporário: log das coordenadas
+    console.log('Mouse:', {
+      raw: { x: e.clientX, y: e.clientY },
+      canvas: getMousePos(canvas, e)
+    });
+    
     // Debug: desenhar ponto vermelho para testar precisão
     drawPoint(pos.x, pos.y);
 
