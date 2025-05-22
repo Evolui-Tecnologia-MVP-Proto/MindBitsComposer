@@ -140,6 +140,7 @@ export default function PluginsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
+  const [isPluginModalOpen, setIsPluginModalOpen] = useState(false);
   const [selectedPlugin, setSelectedPlugin] = useState<Plugin | null>(null);
   const [testingPlugin, setTestingPlugin] = useState<Plugin | null>(null);
   const [testResult, setTestResult] = useState<any>(null);
@@ -285,7 +286,14 @@ export default function PluginsPage() {
   const openTestModal = (plugin: Plugin) => {
     setTestingPlugin(plugin);
     setTestResult(null);
-    setIsTestModalOpen(true);
+    
+    // Se o plugin tem uma página definida, abrir em modal
+    if (plugin.pageName) {
+      setIsPluginModalOpen(true);
+    } else {
+      // Caso contrário, abrir modal de teste tradicional
+      setIsTestModalOpen(true);
+    }
   };
 
   const testPlugin = async (plugin: Plugin) => {
@@ -342,6 +350,26 @@ export default function PluginsPage() {
     } finally {
       setIsTestingInProgress(false);
     }
+  };
+
+  const handlePluginDataExchange = (data: any) => {
+    console.log("Dados recebidos do plugin:", data);
+    
+    // Processar dados recebidos do plugin
+    if (data.action === 'export') {
+      toast({
+        title: "Dados exportados",
+        description: `Plugin "${testingPlugin?.name}" exportou dados com sucesso.`,
+      });
+    } else if (data.action === 'download') {
+      toast({
+        title: "Download realizado",
+        description: `Arquivo "${data.filename}" baixado com sucesso.`,
+      });
+    }
+    
+    // Aqui você pode processar os dados e enviar para outras partes da aplicação
+    // Por exemplo, salvar no banco de dados, integrar com outros sistemas, etc.
   };
 
   const onSubmit = (data: PluginFormValues) => {
@@ -870,6 +898,17 @@ export default function PluginsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Modal do Plugin */}
+      <PluginModal
+        isOpen={isPluginModalOpen}
+        onClose={() => {
+          setIsPluginModalOpen(false);
+          setTestingPlugin(null);
+        }}
+        pluginName={testingPlugin?.pageName || ""}
+        onDataExchange={handlePluginDataExchange}
+      />
     </div>
   );
 }
