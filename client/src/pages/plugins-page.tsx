@@ -178,6 +178,9 @@ export default function PluginsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
+  const [iconSelectionMode, setIconSelectionMode] = useState<'library' | 'upload'>('library');
+  const [showIconSelector, setShowIconSelector] = useState(false);
+  const [uploadedIconUrl, setUploadedIconUrl] = useState<string>('');
   const [isPluginModalOpen, setIsPluginModalOpen] = useState(false);
   const [selectedPlugin, setSelectedPlugin] = useState<Plugin | null>(null);
   const [testingPlugin, setTestingPlugin] = useState<Plugin | null>(null);
@@ -620,7 +623,107 @@ export default function PluginsPage() {
                     <FormItem>
                       <FormLabel>Ícone</FormLabel>
                       <FormControl>
-                        <Input placeholder="Puzzle" {...field} />
+                        <div className="space-y-3">
+                          {/* Botões de alternância */}
+                          <div className="flex gap-2">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant={iconSelectionMode === 'library' ? 'default' : 'outline'}
+                              onClick={() => setIconSelectionMode('library')}
+                            >
+                              Biblioteca
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant={iconSelectionMode === 'upload' ? 'default' : 'outline'}
+                              onClick={() => setIconSelectionMode('upload')}
+                            >
+                              Upload
+                            </Button>
+                          </div>
+
+                          {/* Seleção da biblioteca */}
+                          {iconSelectionMode === 'library' && (
+                            <div className="space-y-2">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => setShowIconSelector(!showIconSelector)}
+                                className="w-full justify-start"
+                              >
+                                {field.value && availableIcons[field.value as keyof typeof availableIcons] ? (
+                                  <>
+                                    {React.createElement(availableIcons[field.value as keyof typeof availableIcons], { className: "mr-2 h-4 w-4" })}
+                                    {field.value}
+                                  </>
+                                ) : (
+                                  <>
+                                    <Puzzle className="mr-2 h-4 w-4" />
+                                    Selecionar ícone
+                                  </>
+                                )}
+                              </Button>
+                              
+                              {showIconSelector && (
+                                <div className="grid grid-cols-6 gap-2 p-3 border rounded-lg bg-gray-50 max-h-48 overflow-y-auto">
+                                  {Object.entries(availableIcons).map(([iconName, IconComponent]) => (
+                                    <Button
+                                      key={iconName}
+                                      type="button"
+                                      variant={field.value === iconName ? 'default' : 'outline'}
+                                      size="sm"
+                                      className="aspect-square p-2"
+                                      onClick={() => {
+                                        field.onChange(iconName);
+                                        setShowIconSelector(false);
+                                      }}
+                                      title={iconName}
+                                    >
+                                      <IconComponent className="h-4 w-4" />
+                                    </Button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Upload de imagem */}
+                          {iconSelectionMode === 'upload' && (
+                            <div className="space-y-2">
+                              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                                <Upload className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                                <p className="text-sm text-gray-600">
+                                  Clique para fazer upload de uma imagem
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  PNG, JPG até 2MB
+                                </p>
+                                <Input
+                                  type="file"
+                                  accept="image/*"
+                                  className="mt-2"
+                                  onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      // Aqui você implementaria o upload real
+                                      const fakeUrl = `/uploads/icons/${file.name}`;
+                                      setUploadedIconUrl(fakeUrl);
+                                      field.onChange(fakeUrl);
+                                    }
+                                  }}
+                                />
+                              </div>
+                              {uploadedIconUrl && (
+                                <div className="flex items-center gap-2 p-2 bg-green-50 border border-green-200 rounded">
+                                  <Image className="h-4 w-4 text-green-600" />
+                                  <span className="text-sm text-green-700">Imagem carregada com sucesso</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
