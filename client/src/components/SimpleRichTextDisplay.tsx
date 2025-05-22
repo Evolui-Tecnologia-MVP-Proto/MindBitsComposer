@@ -89,14 +89,14 @@ export default function SimpleRichTextDisplay({
       {/* Quando não está editando, mostra apenas os links azuis */}
       {!isEditing && content && (
         <div
-          className={`${className} cursor-text overflow-hidden`}
+          className={`${className} cursor-text overflow-auto`}
           onClick={() => {
             setIsEditing(true);
             setTimeout(() => textareaRef.current?.focus(), 10);
           }}
-          style={{ minHeight: '8rem' }}
+          style={{ minHeight: '8rem', height: 'auto' }}
         >
-          <div className="p-3 overflow-hidden">
+          <div className="p-3">
             {renderContent(content)}
           </div>
         </div>
@@ -110,6 +110,11 @@ export default function SimpleRichTextDisplay({
           onChange={(e) => {
             onContentChange(e.target.value);
             handleCursorEvents(e);
+            // Auto-resize o textarea
+            if (textareaRef.current) {
+              textareaRef.current.style.height = 'auto';
+              textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+            }
           }}
           onKeyUp={handleCursorEvents}
           onClick={handleCursorEvents}
@@ -117,6 +122,7 @@ export default function SimpleRichTextDisplay({
           className={className}
           placeholder={placeholder}
           autoFocus={isEditing}
+          style={{ minHeight: '8rem', height: 'auto', resize: 'none' }}
         />
       )}
     </div>
