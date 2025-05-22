@@ -296,38 +296,44 @@ function ToolbarPlugin() {
               const tagText = `[🖼️ IMAGEM: ${data.data.response.filename} - ${Math.round(data.data.selection.width)}x${Math.round(data.data.selection.height)}px - Clique para visualizar]`;
               
               // Verificar se há seções ativas (template carregado)
-              const activeTextarea = document.querySelector('[data-state="open"] textarea');
-              
-              if (activeTextarea) {
-                // Encontrar qual seção está ativa
-                const activeAccordionItem = (activeTextarea as HTMLElement).closest('[data-state="open"]');
-                if (activeAccordionItem) {
-                  const trigger = activeAccordionItem.querySelector('[data-radix-collection-item]');
-                  const sectionName = trigger?.textContent?.trim();
+              setTimeout(() => {
+                const activeTextarea = document.querySelector('[data-state="open"] textarea');
+                
+                if (activeTextarea) {
+                  console.log('Textarea ativo encontrado:', activeTextarea);
                   
-                  if (sectionName) {
-                    // Inserir a TAG diretamente no textarea ativo
-                    const textarea = activeTextarea as HTMLTextAreaElement;
-                    const currentValue = textarea.value || '';
-                    const newValue = currentValue + '\n' + tagText + '\n';
-                    
-                    // Atualizar o valor do textarea
-                    textarea.value = newValue;
-                    
-                    // Disparar evento de input para atualizar o estado React
-                    const inputEvent = new Event('input', { bubbles: true });
-                    textarea.dispatchEvent(inputEvent);
-                  }
+                  // Inserir a TAG diretamente no textarea ativo
+                  const textarea = activeTextarea as HTMLTextAreaElement;
+                  const currentValue = textarea.value || '';
+                  const newValue = currentValue + '\n' + tagText + '\n';
+                  
+                  console.log('Inserindo TAG:', tagText);
+                  console.log('Valor atual:', currentValue);
+                  console.log('Novo valor:', newValue);
+                  
+                  // Atualizar o valor do textarea
+                  textarea.value = newValue;
+                  
+                  // Disparar evento de input para atualizar o estado React
+                  const inputEvent = new Event('input', { bubbles: true });
+                  textarea.dispatchEvent(inputEvent);
+                  
+                  // Também disparar onChange
+                  const changeEvent = new Event('change', { bubbles: true });
+                  textarea.dispatchEvent(changeEvent);
+                  
+                  console.log('TAG inserida com sucesso!');
+                } else {
+                  console.log('Nenhum textarea ativo encontrado, inserindo no editor principal');
+                  // Fallback: inserir no editor principal se não há seções
+                  editor.update(() => {
+                    const selection = $getSelection();
+                    if (selection) {
+                      selection.insertText(`\n${tagText}\n`);
+                    }
+                  });
                 }
-              } else {
-                // Fallback: inserir no editor principal se não há seções
-                editor.update(() => {
-                  const selection = $getSelection();
-                  if (selection) {
-                    selection.insertText(`\n${tagText}\n`);
-                  }
-                });
-              }
+              }, 100); // Pequeno delay para garantir que o DOM está atualizado
               
               // Armazenar dados da imagem para uso posterior
               const globalWindow = window as any;
