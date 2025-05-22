@@ -235,7 +235,7 @@ function ToolbarPlugin() {
       {/* Modal do Plugin */}
       {selectedPlugin && (
         <PluginModal
-          plugin={selectedPlugin}
+          pluginName={selectedPlugin.pageName}
           isOpen={isPluginModalOpen}
           onClose={() => {
             setIsPluginModalOpen(false);
