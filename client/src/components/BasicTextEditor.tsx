@@ -438,22 +438,22 @@ export default function BasicTextEditor() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-200 bg-gray-50">
-                        <th className="px-4 py-3 text-left text-sm font-bold text-gray-900 font-mono w-1/3">Campo</th>
-                        <th className="px-4 py-3 text-left text-sm font-bold text-gray-900 font-mono">Valor</th>
+                        <th className="px-3 py-2 text-left text-sm font-bold text-gray-900 font-mono w-1/3">Campo</th>
+                        <th className="px-3 py-2 text-left text-sm font-bold text-gray-900 font-mono">Valor</th>
                       </tr>
                     </thead>
                     <tbody>
                       {headerFields.map((field, index) => (
                         <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-                          <td className="px-4 py-3 text-sm font-medium text-gray-900 font-mono bg-gray-25">
+                          <td className="px-3 py-2 text-sm font-medium text-gray-900 font-mono bg-gray-25">
                             {field.key}
                           </td>
-                          <td className="px-4 py-3">
+                          <td className="px-3 py-2">
                             <input
                               type="text"
                               value={field.value}
                               onChange={(e) => updateHeaderField(index, e.target.value)}
-                              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+                              className="w-full px-2 py-1 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
                               placeholder={`Digite ${field.key}...`}
                             />
                           </td>
