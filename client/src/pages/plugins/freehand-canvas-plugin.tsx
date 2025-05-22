@@ -96,33 +96,13 @@ export default function FreeHandCanvasPlugin({
     };
   };
 
-  // Função de debug para testar precisão do posicionamento
-  const drawPoint = (x: number, y: number) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
 
-    ctx.fillStyle = 'red';
-    ctx.beginPath();
-    ctx.arc(x, y, 5, 0, 2 * Math.PI);
-    ctx.fill();
-  };
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const pos = getMousePos(canvas, e);
-    
-    // Debug temporário: log das coordenadas
-    console.log('Mouse:', {
-      raw: { x: e.clientX, y: e.clientY },
-      canvas: getMousePos(canvas, e)
-    });
-    
-    // Debug: desenhar ponto vermelho para testar precisão
-    drawPoint(pos.x, pos.y);
 
     setIsDrawing(true);
     
