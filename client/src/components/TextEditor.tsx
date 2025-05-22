@@ -364,48 +364,47 @@ function ToolbarPlugin() {
               const imageUrl = `${window.location.origin}${data.data.response.url}`;
               console.log('URL da imagem construída:', imageUrl);
               
-              // Inserir TAG clicável na seção ativa do template
-              const tagText = `[🖼️ IMAGEM: ${data.data.response.filename} - ${Math.round(data.data.selection.width)}x${Math.round(data.data.selection.height)}px - Clique para visualizar]`;
+              // Inserir link da imagem FreeHand no editor
+              const linkText = "Imagem FreeHand";
               
               // Verificar se há seções ativas (template carregado)
               setTimeout(() => {
                 const activeTextarea = document.querySelector('[data-state="open"] textarea');
                 
                 if (activeTextarea) {
-                  console.log('Textarea ativo encontrado:', activeTextarea);
+                  console.log('Textarea ativo encontrado, inserindo link da imagem');
                   
-                  // Inserir a TAG diretamente no textarea ativo
+                  // Inserir link diretamente no textarea ativo
                   const textarea = activeTextarea as HTMLTextAreaElement;
                   const currentValue = textarea.value || '';
-                  const newValue = currentValue + '\n' + tagText + '\n';
+                  const linkMarkdown = `\n[${linkText}](${imageUrl})\n`;
+                  const newValue = currentValue + linkMarkdown;
                   
-                  console.log('Inserindo TAG:', tagText);
-                  console.log('Valor atual:', currentValue);
-                  console.log('Novo valor:', newValue);
+                  console.log('Inserindo link:', linkMarkdown);
                   
                   // Atualizar o valor do textarea
                   textarea.value = newValue;
                   
-                  // Disparar evento de input para atualizar o estado React
+                  // Disparar eventos para atualizar o estado React
                   const inputEvent = new Event('input', { bubbles: true });
                   textarea.dispatchEvent(inputEvent);
                   
-                  // Também disparar onChange
                   const changeEvent = new Event('change', { bubbles: true });
                   textarea.dispatchEvent(changeEvent);
                   
-                  console.log('TAG inserida com sucesso!');
+                  console.log('Link da imagem inserido com sucesso!');
                 } else {
-                  console.log('Nenhum textarea ativo encontrado, inserindo no editor principal');
-                  // Fallback: inserir no editor principal se não há seções
+                  console.log('Inserindo link no editor Lexical principal');
+                  // Inserir no editor Lexical principal
                   editor.update(() => {
                     const selection = $getSelection();
                     if (selection) {
-                      selection.insertText(`\n${tagText}\n`);
+                      // Inserir texto simples que pode ser transformado em link manualmente
+                      selection.insertText(`\n${linkText}: ${imageUrl}\n`);
                     }
                   });
                 }
-              }, 100); // Pequeno delay para garantir que o DOM está atualizado
+              }, 100);
               
               // Armazenar dados da imagem para uso posterior
               const globalWindow = window as any;
@@ -542,71 +541,7 @@ export default function TextEditor() {
     };
   }, [toast]);
 
-  // Função para renderizar conteúdo com badges de TAG
-  const renderContentWithTags = (content: string, sectionName: string) => {
-    if (!content) {
-      return <span className="text-gray-400">{`Conteúdo de ${sectionName}...`}</span>;
-    }
 
-    const tagRegex = /\[🖼️ IMAGEM: ([^-]+) - (\d+x\d+)px - Clique para visualizar\]/g;
-    const parts = [];
-    let lastIndex = 0;
-    let match;
-
-    while ((match = tagRegex.exec(content)) !== null) {
-      // Adicionar texto antes da TAG
-      if (match.index > lastIndex) {
-        parts.push(
-          <span key={lastIndex}>{content.slice(lastIndex, match.index)}</span>
-        );
-      }
-
-      // Adicionar badge da TAG
-      const filename = match[1];
-      const dimensions = match[2];
-      const imageUrl = `${window.location.origin}/uploads/canvas/${filename}`;
-      
-      parts.push(
-        <span
-          key={match.index}
-          className="inline-flex items-center gap-1 px-2 py-1 mx-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full cursor-pointer hover:bg-blue-200 transition-colors"
-          onClick={() => {
-            setSelectedImageUrl(imageUrl);
-            setImageModalOpen(true);
-          }}
-          title="Clique para visualizar a imagem"
-        >
-          🖼️ IMAGEM: {dimensions}px
-          <button
-            className="ml-1 text-blue-600 hover:text-red-600 font-bold"
-            onClick={(e) => {
-              e.stopPropagation();
-              // Remover a TAG do conteúdo
-              const tagToRemove = match[0];
-              setSectionContents(prev => ({
-                ...prev,
-                [sectionName]: prev[sectionName]?.replace(tagToRemove, '') || ''
-              }));
-            }}
-            title="Remover imagem"
-          >
-            ×
-          </button>
-        </span>
-      );
-
-      lastIndex = match.index + match[0].length;
-    }
-
-    // Adicionar texto restante
-    if (lastIndex < content.length) {
-      parts.push(
-        <span key={lastIndex}>{content.slice(lastIndex)}</span>
-      );
-    }
-
-    return parts.length > 0 ? parts : <span className="text-gray-400">{`Conteúdo de ${sectionName}...`}</span>;
-  };
   
   const initialConfig = {
     namespace: "EvoMindBitsEditor",
@@ -657,12 +592,9 @@ export default function TextEditor() {
                     {section}
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pt-2">
-                    <div className="min-h-[150px] relative">
-                      <div className="w-full min-h-[150px] px-4 py-2 font-mono text-base text-gray-700 border-0 outline-none whitespace-pre-wrap">
-                        {renderContentWithTags(sectionContents[section] || '', section)}
-                      </div>
+                    <div className="min-h-[150px]">
                       <textarea
-                        className="absolute inset-0 w-full h-full px-4 py-2 font-mono text-base text-transparent bg-transparent border-0 outline-none resize-none caret-gray-500"
+                        className="w-full min-h-[150px] px-4 py-2 font-mono text-base text-gray-700 border-0 outline-none resize-none"
                         placeholder={`Conteúdo de ${section}...`}
                         value={sectionContents[section] || ''}
                         data-section={section}
@@ -678,7 +610,6 @@ export default function TextEditor() {
                             [section]: (e.target as HTMLTextAreaElement).value
                           }));
                         }}
-                        style={{ color: 'transparent' }}
                       />
                     </div>
                   </AccordionContent>
