@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import FreeHandCanvasPlugin from "@/pages/plugins/freehand-canvas-plugin";
 
 interface PluginModalProps {
@@ -43,20 +44,20 @@ export default function PluginModal({
     );
   }
 
-  const modalSize = isExpanded 
-    ? "w-screen h-screen max-w-none" 
-    : "w-[50vw] h-[60vh] sm:max-w-[50vw]";
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className={`${modalSize} p-0 gap-0 transition-all duration-300`}
+        className="p-0 gap-0 transition-all duration-300"
         style={{ 
           width: isExpanded ? '100vw' : '50vw',
           height: isExpanded ? '100vh' : '60vh',
-          maxWidth: isExpanded ? 'none' : '50vw'
+          maxWidth: isExpanded ? 'none' : '50vw',
+          maxHeight: isExpanded ? 'none' : '60vh'
         }}
       >
+        <VisuallyHidden>
+          <DialogTitle>Plugin {pluginName}</DialogTitle>
+        </VisuallyHidden>
         <PluginComponent
           isExpanded={isExpanded}
           onToggleExpand={() => setIsExpanded(!isExpanded)}
