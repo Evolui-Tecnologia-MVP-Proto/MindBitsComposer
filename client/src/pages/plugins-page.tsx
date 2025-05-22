@@ -286,14 +286,18 @@ export default function PluginsPage() {
   };
 
   const openTestModal = (plugin: Plugin) => {
+    console.log("Plugin selecionado para teste:", plugin);
+    console.log("Campo pageName:", plugin.pageName);
+    
     setTestingPlugin(plugin);
     setTestResult(null);
     
     // Se o plugin tem uma página definida, abrir em modal
     if (plugin.pageName) {
+      console.log("Abrindo modal do plugin com página:", plugin.pageName);
       setIsPluginModalOpen(true);
     } else {
-      // Caso contrário, abrir modal de teste tradicional
+      console.log("Abrindo modal de teste tradicional");
       setIsTestModalOpen(true);
     }
   };

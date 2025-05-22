@@ -21,7 +21,12 @@ export default function PluginModal({
 }: PluginModalProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  console.log("PluginModal recebeu pluginName:", pluginName);
+  console.log("Componentes disponíveis:", Object.keys(PLUGIN_COMPONENTS));
+
   const PluginComponent = PLUGIN_COMPONENTS[pluginName];
+  
+  console.log("Componente encontrado:", PluginComponent ? "SIM" : "NÃO");
 
   if (!PluginComponent) {
     return (
