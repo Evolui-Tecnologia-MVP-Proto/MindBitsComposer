@@ -288,7 +288,9 @@ function ToolbarPlugin() {
             
             // Verificar se é uma imagem exportada do FreeHand Canvas
             if (data && data.type === 'selection_image' && data.data?.success && data.data?.response?.url) {
-              const imageUrl = data.data.response.url;
+              // Construir URL completa para acessar a imagem
+              const imageUrl = `${window.location.origin}${data.data.response.url}`;
+              console.log('URL da imagem construída:', imageUrl);
               
               // Inserir TAG clicável no editor
               editor.update(() => {
