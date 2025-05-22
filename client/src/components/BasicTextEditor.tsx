@@ -131,15 +131,27 @@ export default function BasicTextEditor() {
     if (lastCursorInfo && templateSections.length > 0 && lastCursorInfo.sectionIndex !== undefined) {
       // Inserir na seção específica onde estava o cursor
       console.log('Inserindo na seção:', lastCursorInfo.sectionIndex);
+      console.log('Seções disponíveis:', templateSections.length);
+      console.log('Seção target:', templateSections[lastCursorInfo.sectionIndex]);
+      
       const targetSection = templateSections[lastCursorInfo.sectionIndex];
-      const currentContent = targetSection.content;
-      const position = lastCursorInfo.position;
-      
-      const newContent = currentContent.slice(0, position) + 
-                        linkText + 
-                        currentContent.slice(position);
-      
-      updateSectionContent(lastCursorInfo.sectionIndex, newContent);
+      if (targetSection) {
+        const currentContent = targetSection.content;
+        const position = lastCursorInfo.position;
+        
+        console.log('Conteúdo atual:', currentContent);
+        console.log('Posição:', position);
+        
+        const newContent = currentContent.slice(0, position) + 
+                          linkText + 
+                          currentContent.slice(position);
+        
+        console.log('Novo conteúdo:', newContent);
+        updateSectionContent(lastCursorInfo.sectionIndex, newContent);
+        console.log('updateSectionContent chamado');
+      } else {
+        console.log('Seção target não encontrada!');
+      }
     } else if (lastCursorInfo && templateSections.length === 0) {
       // Editor simples - inserir na posição do cursor
       console.log('Inserindo no editor simples na posição:', lastCursorInfo.position);
