@@ -95,6 +95,7 @@ const pluginFormSchema = z.object({
   version: z.string().min(1, "Versão é obrigatória"),
   author: z.string().optional(),
   icon: z.string().optional(),
+  pageName: z.string().optional(),
 });
 
 type PluginFormValues = z.infer<typeof pluginFormSchema>;
@@ -688,6 +689,20 @@ export default function PluginsPage() {
                   )}
                 />
               </div>
+              
+              <FormField
+                control={form.control}
+                name="pageName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome da Página (para plugins com interface)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="ex: freehand-canvas-plugin" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               
               <DialogFooter>
                 <Button
