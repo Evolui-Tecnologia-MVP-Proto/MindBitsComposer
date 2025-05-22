@@ -208,15 +208,15 @@ export default function FreeHandCanvasPlugin({
       {/* Header */}
       <Card className="border-b rounded-none">
         <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-lg">FreeHand Canvas</CardTitle>
-              <p className="text-sm text-muted-foreground">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3">
+                <CardTitle className="text-lg">FreeHand Canvas</CardTitle>
+                <Badge variant="default" className="shrink-0">Ativo</Badge>
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
                 Plugin de desenho livre para criação e edição visual
               </p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="default">Ativo</Badge>
             </div>
           </div>
         </CardHeader>
