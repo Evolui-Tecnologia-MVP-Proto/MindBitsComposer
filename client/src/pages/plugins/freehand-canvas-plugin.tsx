@@ -35,6 +35,12 @@ export default function FreeHandCanvasPlugin({
   const [brushSize, setBrushSize] = useState([5]);
   const [currentColor, setCurrentColor] = useState('#000000');
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
+  
+  // Dimensões fixas do canvas
+  const canvasSize = {
+    width: 1400,
+    height: 800
+  };
 
   const colors = [
     '#000000', '#ff0000', '#00ff00', '#0000ff', 
@@ -50,12 +56,6 @@ export default function FreeHandCanvasPlugin({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Definir tamanho grande do canvas com scrollbars para navegação
-    const canvasSize = {
-      width: 1400,
-      height: 800
-    };
-    
     canvas.width = canvasSize.width;
     canvas.height = canvasSize.height;
     
@@ -78,12 +78,12 @@ export default function FreeHandCanvasPlugin({
     
     // Configurar canvas apenas uma vez - dimensões reais sem CSS
     if (canvas.width === 0 || canvas.height === 0) {
-      canvas.width = 1400;  // Tamanho real da superfície de desenho
-      canvas.height = 800;  // Tamanho real da superfície de desenho
+      canvas.width = canvasSize.width;
+      canvas.height = canvasSize.height;
       canvas.style.border = '1px solid #ccc';
     }
     
-    // Apenas estilos básicos - SEM width, height, max-width, max-height, object-fit
+    // Apenas estilos básicos - SEM redimensionamento CSS
     canvas.style.display = 'block';
     canvas.style.margin = '0 auto';
   }, []);
@@ -374,7 +374,11 @@ export default function FreeHandCanvasPlugin({
         <div className="h-full border border-gray-300 rounded-lg overflow-auto bg-white shadow-sm">
           <canvas
             ref={canvasRef}
-            className="cursor-crosshair"
+            className="cursor-crosshair block"
+            style={{
+              width: `${canvasSize.width}px`,
+              height: `${canvasSize.height}px`
+            }}
             onMouseDown={startDrawing}
             onMouseMove={draw}
             onMouseUp={stopDrawing}
