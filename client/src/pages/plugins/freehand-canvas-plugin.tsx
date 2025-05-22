@@ -362,7 +362,7 @@ export default function FreeHandCanvasPlugin({
                 onClick={exportCanvasData}
               >
                 <Upload className="h-4 w-4 mr-1" />
-                Exportar
+                Atualizar
               </Button>
             </div>
           </div>
