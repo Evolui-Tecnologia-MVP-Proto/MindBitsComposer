@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { LexicalComposer } from "@lexical/react/LexicalComposer";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
@@ -295,38 +295,26 @@ function ToolbarPlugin() {
               // Inserir TAG clicável na seção ativa do template
               const tagText = `[🖼️ IMAGEM: ${data.data.response.filename} - ${Math.round(data.data.selection.width)}x${Math.round(data.data.selection.height)}px - Clique para visualizar]`;
               
-              // Tentar inserir na seção ativa usando abordagem mais direta
-              const activeSection = document.querySelector('[data-state="open"] [contenteditable="true"]');
+              // Verificar se há seções ativas (template carregado)
+              const activeTextarea = document.querySelector('[data-state="open"] textarea');
               
-              if (activeSection) {
-                // Focar na seção ativa
-                (activeSection as HTMLElement).focus();
-                
-                // Usar document.execCommand para inserir o texto
-                if (document.execCommand) {
-                  // Posicionar cursor no final
-                  const range = document.createRange();
-                  const selection = window.getSelection();
+              if (activeTextarea && sections.length > 0) {
+                // Encontrar qual seção está ativa
+                const activeAccordionItem = (activeTextarea as HTMLElement).closest('[data-state="open"]');
+                if (activeAccordionItem) {
+                  const trigger = activeAccordionItem.querySelector('[data-radix-collection-item]');
+                  const sectionName = trigger?.textContent?.trim();
                   
-                  if (activeSection.childNodes.length > 0) {
-                    range.setStart(activeSection, activeSection.childNodes.length);
-                  } else {
-                    range.setStart(activeSection, 0);
+                  if (sectionName && sectionContents.hasOwnProperty(sectionName)) {
+                    // Inserir a TAG no conteúdo da seção ativa
+                    setSectionContents(prev => ({
+                      ...prev,
+                      [sectionName]: (prev[sectionName] || '') + '\n' + tagText + '\n'
+                    }));
                   }
-                  range.collapse(true);
-                  
-                  selection?.removeAllRanges();
-                  selection?.addRange(range);
-                  
-                  // Inserir quebra de linha e texto
-                  document.execCommand('insertText', false, '\n' + tagText + '\n');
-                } else {
-                  // Fallback moderno
-                  const currentText = activeSection.textContent || '';
-                  activeSection.textContent = currentText + '\n' + tagText + '\n';
                 }
               } else {
-                // Fallback: inserir no editor principal
+                // Fallback: inserir no editor principal se não há seções
                 editor.update(() => {
                   const selection = $getSelection();
                   if (selection) {
@@ -393,6 +381,7 @@ function ToolbarPlugin() {
 export default function TextEditor() {
   const [sections, setSections] = useState<string[]>([]);
   const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [sectionContents, setSectionContents] = useState<Record<string, string>>({});
   const { toast } = useToast();
   
   // Escutar o evento de aplicação de template
@@ -408,6 +397,13 @@ export default function TextEditor() {
           if (structure.sections && Array.isArray(structure.sections)) {
             // Definir as seções do template
             setSections(structure.sections);
+            
+            // Inicializar conteúdos das seções vazios
+            const initialContents: Record<string, string> = {};
+            structure.sections.forEach((section: string) => {
+              initialContents[section] = '';
+            });
+            setSectionContents(initialContents);
             
             // Ativar a primeira seção se houver
             if (structure.sections.length > 0) {
@@ -512,10 +508,16 @@ export default function TextEditor() {
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pt-2">
                     <div className="min-h-[150px]">
-                      <RichTextPlugin
-                        contentEditable={<ContentEditable className="outline-none px-4 py-2 min-h-[150px] font-mono" />}
-                        placeholder={<div className="absolute ml-4 mt-2 text-gray-400 pointer-events-none font-mono">Conteúdo de {section}...</div>}
-                        ErrorBoundary={() => <div>Erro no editor!</div>}
+                      <textarea
+                        className="w-full min-h-[150px] px-4 py-2 font-mono text-base text-gray-700 border-0 outline-none resize-none"
+                        placeholder={`Conteúdo de ${section}...`}
+                        value={sectionContents[section] || ''}
+                        onChange={(e) => {
+                          setSectionContents(prev => ({
+                            ...prev,
+                            [section]: e.target.value
+                          }));
+                        }}
                       />
                     </div>
                   </AccordionContent>
