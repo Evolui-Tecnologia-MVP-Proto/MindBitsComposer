@@ -104,6 +104,13 @@ export default function FreeHandCanvasPlugin({
     initializeCanvas();
   }, [backgroundColor, canvasSize]); // Adicionar canvasSize como dependência
 
+  // Limpar seleção ao trocar de ferramenta
+  useEffect(() => {
+    if (currentTool !== 'select') {
+      clearSelection();
+    }
+  }, [currentTool]);
+
   // Efeito separado para lidar com mudanças de expansão sem alterar canvas
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -239,6 +246,12 @@ export default function FreeHandCanvasPlugin({
     }
   };
 
+  const clearSelection = () => {
+    setSelectionRect(null);
+    setIsSelecting(false);
+    redrawCanvas();
+  };
+
   const clearCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -248,6 +261,7 @@ export default function FreeHandCanvasPlugin({
 
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    clearSelection();
   };
 
   const downloadCanvas = () => {
@@ -327,6 +341,14 @@ export default function FreeHandCanvasPlugin({
             {/* Ferramentas */}
             <div className="flex items-center space-x-2">
               <span className="text-sm font-medium">Ferramentas:</span>
+              <Button
+                variant={currentTool === 'select' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setCurrentTool('select')}
+              >
+                <MousePointer2 className="h-4 w-4 mr-1" />
+                Seleção
+              </Button>
               <Button
                 variant={currentTool === 'eraser' ? 'default' : 'outline'}
                 size="sm"
