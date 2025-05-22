@@ -43,24 +43,45 @@ export default function FreeHandCanvasPlugin({
     '#808000', '#800080', '#008080', '#c0c0c0'
   ];
 
-  useEffect(() => {
+  const initializeCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Configurar canvas
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+    // Definir tamanho fixo do canvas independente do container
+    const canvasSize = {
+      width: 800,
+      height: 600
+    };
     
-    // Preencher fundo
+    canvas.width = canvasSize.width;
+    canvas.height = canvasSize.height;
+    
+    // Preencher fundo apenas se for a primeira inicialização
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-  }, [isExpanded, backgroundColor]);
+  };
+
+  useEffect(() => {
+    initializeCanvas();
+  }, [backgroundColor]); // Remover isExpanded da dependência
+
+  // Efeito separado para lidar com mudanças de expansão sem reinicializar canvas
+  useEffect(() => {
+    // Apenas ajustar estilos CSS do container quando expandir/retrair
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    // Manter o canvas com tamanho fixo, apenas o container muda
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.objectFit = 'contain';
+  }, [isExpanded]);
 
   const getMousePos = (canvas: HTMLCanvasElement, e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = canvas.getBoundingClientRect();
