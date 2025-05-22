@@ -427,14 +427,6 @@ export default function BasicTextEditor() {
         ) : templateSections.length > 0 ? (
           /* Layout com seções do template */
           <div className="space-y-4">
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                {templates?.find(t => t.id === selectedTemplate)?.code}
-              </h1>
-              <p className="text-gray-600">
-                {templates?.find(t => t.id === selectedTemplate)?.description}
-              </p>
-            </div>
 
             {/* Tabela de campos do header */}
             {headerFields.length > 0 && (
