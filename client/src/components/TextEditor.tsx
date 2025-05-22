@@ -14,7 +14,7 @@ import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { Button } from "@/components/ui/button";
 import { Bold, Italic, List, FileText, Save, Undo, Redo, Link as LinkIcon, ChevronDown, LayoutTemplate, Palette } from "lucide-react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { $getRoot, $getSelection, FORMAT_TEXT_COMMAND, LexicalEditor } from "lexical";
+import { $getRoot, $getSelection, FORMAT_TEXT_COMMAND, LexicalEditor, $createParagraphNode, $createTextNode } from "lexical";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Template, Plugin } from "@shared/schema";
@@ -240,6 +240,31 @@ function ToolbarPlugin() {
           onClose={() => {
             setIsPluginModalOpen(false);
             setSelectedPlugin(null);
+          }}
+          onDataExchange={(data) => {
+            console.log('Dados recebidos do plugin:', data);
+            
+            // Verificar se é uma imagem exportada do FreeHand Canvas
+            if (data && data.type === 'selection_image' && data.data?.success && data.data?.response?.url) {
+              const imageUrl = data.data.response.url;
+              
+              // Inserir imagem no editor na posição do cursor
+              editor.update(() => {
+                const selection = $getSelection();
+                if (selection) {
+                  // Criar texto com referência à imagem (implementação simples)
+                  const imageText = $createTextNode(`[Imagem do FreeHand Canvas: ${data.data.response.filename}]`);
+                  const paragraph = $createParagraphNode();
+                  paragraph.append(imageText);
+                  selection.insertNodes([paragraph]);
+                }
+              });
+              
+              toast({
+                title: "Imagem inserida",
+                description: "A imagem foi inserida no editor com sucesso!",
+              });
+            }
           }}
         />
       )}
