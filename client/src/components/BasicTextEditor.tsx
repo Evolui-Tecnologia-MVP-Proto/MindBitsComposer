@@ -15,12 +15,18 @@ interface TemplateSection {
   isOpen: boolean;
 }
 
+interface HeaderField {
+  key: string;
+  value: string;
+}
+
 export default function BasicTextEditor() {
   const [content, setContent] = useState("");
   const [selectedPlugin, setSelectedPlugin] = useState<Plugin | null>(null);
   const [isPluginModalOpen, setIsPluginModalOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   const [templateSections, setTemplateSections] = useState<TemplateSection[]>([]);
+  const [headerFields, setHeaderFields] = useState<HeaderField[]>([]);
   const [lastCursorInfo, setLastCursorInfo] = useState<{
     elementId: string;
     position: number;
@@ -190,7 +196,37 @@ export default function BasicTextEditor() {
     
     const template = templates?.find(t => t.id === templateId);
     if (template) {
-      // Verificar se há estrutura válida
+      // Processar estrutura do template
+      if (template.structure && typeof template.structure === 'object') {
+        const structure = template.structure as any;
+        
+        // Processar campos do header se existirem
+        if (structure.header && typeof structure.header === 'object') {
+          const newHeaderFields: HeaderField[] = Object.keys(structure.header).map(key => ({
+            key: key,
+            value: structure.header[key] || ''
+          }));
+          setHeaderFields(newHeaderFields);
+        } else {
+          setHeaderFields([]);
+        }
+        
+        // Processar seções
+        if (structure.sections && Array.isArray(structure.sections) && structure.sections.length > 0) {
+          // Criar seções colapsíveis baseadas no template
+          const newSections: TemplateSection[] = structure.sections.map((sectionName: string) => ({
+            name: sectionName,
+            content: '',
+            isOpen: false // Começar todas recolhidas
+          }));
+          
+          setTemplateSections(newSections);
+          setContent(''); // Limpar o editor principal
+          return;
+        }
+      }
+      
+      // Verificar estrutura em string (compatibilidade)
       if (template.structure && typeof template.structure === 'string' && template.structure.trim() !== '') {
         try {
           const sections = JSON.parse(template.structure);
@@ -203,6 +239,7 @@ export default function BasicTextEditor() {
             }));
             
             setTemplateSections(newSections);
+            setHeaderFields([]);
             setContent(''); // Limpar o editor principal
             return;
           }
@@ -219,8 +256,15 @@ export default function BasicTextEditor() {
       ];
       
       setTemplateSections(defaultSections);
+      setHeaderFields([]);
       setContent('');
     }
+  };
+
+  const updateHeaderField = (index: number, value: string) => {
+    const updatedFields = [...headerFields];
+    updatedFields[index].value = value;
+    setHeaderFields(updatedFields);
   };
 
   const updateSectionContent = (index: number, newContent: string) => {
