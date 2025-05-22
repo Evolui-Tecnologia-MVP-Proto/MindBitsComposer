@@ -577,8 +577,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).send("Mapeamento não encontrado");
       }
       
+      // Buscar as colunas mapeadas e as colunas do Monday
       const mappingColumns = await storage.getMappingColumns(id);
-      res.json(mappingColumns);
+      const mondayColumns = await storage.getMondayColumns(id);
+      
+      // Adicionar o tipo da coluna diretamente nas colunas mapeadas
+      const columnsWithType = mappingColumns.map(column => {
+        // Encontrar a coluna do Monday correspondente 
+        const mondayColumn = mondayColumns.find(mc => mc.columnId === column.mondayColumnId);
+        
+        return {
+          ...column,
+          columnType: mondayColumn?.type || "desconhecido"
+        };
+      });
+      
+      res.json(columnsWithType);
     } catch (error) {
       console.error("Erro ao buscar mapeamentos de colunas:", error);
       res.status(500).send("Erro ao buscar mapeamentos de colunas");

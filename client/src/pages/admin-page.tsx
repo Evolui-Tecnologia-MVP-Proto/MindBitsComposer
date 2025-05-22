@@ -1201,23 +1201,9 @@ export default function AdminPage() {
                                 <span className="font-medium">
                                   {column.mondayColumnTitle}
                                 </span>
-                                {column.mondayColumnId === "name" && (
-                                  <Badge variant="outline" className="text-xs">name</Badge>
-                                )}
-                                {column.mondayColumnId === "person" && (
-                                  <Badge variant="outline" className="text-xs">people</Badge>
-                                )}
-                                {column.mondayColumnId === "status_1__1" && (
-                                  <Badge variant="outline" className="text-xs">status</Badge>
-                                )}
-                                {column.mondayColumnId === "texto8" && (
-                                  <Badge variant="outline" className="text-xs">text</Badge>
-                                )}
-                                {!["name", "person", "status_1__1", "texto8"].includes(column.mondayColumnId) && (
-                                  <Badge variant="outline" className="text-xs">
-                                    {mondayColumns.find(c => c.columnId === column.mondayColumnId)?.type || "desconhecido"}
-                                  </Badge>
-                                )}
+                                <Badge variant="outline" className="text-xs">
+                                  {(column as any).columnType || "desconhecido"}
+                                </Badge>
                               </div>
                             </TableCell>
                             <TableCell>{column.cpxField}</TableCell>
