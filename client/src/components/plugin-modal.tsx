@@ -45,13 +45,14 @@ export default function PluginModal({
         className="p-0 gap-0 transition-all duration-300 !max-w-none"
         style={{
           position: 'fixed',
-          top: isExpanded ? '0' : '50%',
+          top: isExpanded ? '0' : '50px',
           left: isExpanded ? '0' : '50%',
-          transform: isExpanded ? 'none' : 'translate(-50%, -50%)',
+          bottom: isExpanded ? '0' : '50px',
+          transform: isExpanded ? 'none' : 'translateX(-50%)',
           width: isExpanded ? '100vw' : '50vw',
-          height: isExpanded ? '100vh' : '60vh',
+          height: isExpanded ? '100vh' : 'calc(100vh - 100px)',
           maxWidth: isExpanded ? '100vw' : '50vw',
-          maxHeight: isExpanded ? '100vh' : '60vh',
+          maxHeight: isExpanded ? '100vh' : 'calc(100vh - 100px)',
           margin: 0,
           zIndex: 9999,
           borderRadius: isExpanded ? 0 : 8
