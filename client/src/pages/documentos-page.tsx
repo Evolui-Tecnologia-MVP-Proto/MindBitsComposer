@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Table, 
@@ -45,24 +46,132 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import type { Documento, InsertDocumento } from "@shared/schema";
 
 export default function DocumentosPage() {
   const [activeTab, setActiveTab] = useState("integrados");
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<any>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<Documento | null>(null);
+  const [formData, setFormData] = useState<InsertDocumento>({
+    origem: "",
+    objeto: "",
+    cliente: "",
+    responsavel: "",
+    sistema: "",
+    modulo: "",
+    descricao: "",
+    status: "Processando",
+    statusOrigem: "Incluido"
+  });
 
-  // Definição dos tipos de anexos
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Buscar todos os documentos
+  const { data: documentos = [], isLoading } = useQuery<Documento[]>({
+    queryKey: ["/api/documentos"],
+  });
+
+  // Mutation para criar documento
+  const createDocumentoMutation = useMutation({
+    mutationFn: async (data: InsertDocumento) => {
+      const response = await fetch("/api/documentos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error("Erro ao criar documento");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+      setIsCreateModalOpen(false);
+      setFormData({
+        origem: "",
+        objeto: "",
+        cliente: "",
+        responsavel: "",
+        sistema: "",
+        modulo: "",
+        descricao: "",
+        status: "Processando",
+        statusOrigem: "Incluido"
+      });
+      toast({
+        title: "Sucesso",
+        description: "Documento criado com sucesso!",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation para deletar documento
+  const deleteDocumentoMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`/api/documentos/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error("Erro ao deletar documento");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+      toast({
+        title: "Sucesso",
+        description: "Documento deletado com sucesso!",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Funções auxiliares
+  const handleCreateDocument = () => {
+    createDocumentoMutation.mutate(formData);
+  };
+
+  const handleDeleteDocument = (id: string) => {
+    if (confirm("Tem certeza que deseja deletar este documento?")) {
+      deleteDocumentoMutation.mutate(id);
+    }
+  };
+
+  const handleViewDocument = (documento: Documento) => {
+    setSelectedDocument(documento);
+    setIsViewModalOpen(true);
+  };
+
+  // Filtrar documentos por status
+  const documentosIntegrados = documentos.filter(doc => doc.status === "Integrado");
+  const documentosProcessando = documentos.filter(doc => doc.status === "Processando");
+  const documentosConcluidos = documentos.filter(doc => doc.status === "Concluido");
+
+  // Definição dos tipos de anexos (para futuras implementações)
   type TipoAnexo = "Imagem" | "DOC" | "XLX" | "PDF" | "TXT" | "JSON" | "Outro";
   
-  // Interface para anexos
+  // Interface para anexos (para futuras implementações)
   interface Anexo {
     id: number;
     tipo: TipoAnexo;
     nome: string;
   }
-  
-  // Dados de exemplo para documentos
-  const documentosIntegrados = [
+
+  // Função para simular anexos para documentos existentes
+  const getAnexosMock = () => [
     { 
       id: 1, 
       nome: "Contrato de Serviços", 
