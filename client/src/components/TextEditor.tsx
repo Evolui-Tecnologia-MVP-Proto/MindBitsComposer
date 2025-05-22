@@ -19,6 +19,8 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Template, Plugin } from "@shared/schema";
 import PluginModal from "@/components/plugin-modal";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import {
   Select,
   SelectContent,
@@ -40,8 +42,48 @@ function ToolbarPlugin() {
   const [plugins, setPlugins] = useState<Plugin[]>([]);
   const [selectedPlugin, setSelectedPlugin] = useState<Plugin | null>(null);
   const [isPluginModalOpen, setIsPluginModalOpen] = useState(false);
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [selectedImageData, setSelectedImageData] = useState<any>(null);
   const { toast } = useToast();
   
+  // Função para lidar com cliques nas TAGs de imagem
+  const handleImageTagClick = (filename: string) => {
+    const globalWindow = window as any;
+    if (globalWindow.imageData && globalWindow.imageData[filename]) {
+      setSelectedImageData(globalWindow.imageData[filename]);
+      setIsImageModalOpen(true);
+    } else {
+      toast({
+        title: "Imagem não encontrada",
+        description: "Não foi possível encontrar os dados da imagem.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Adicionar event listener para cliques no editor
+  useEffect(() => {
+    const editorElement = document.querySelector('[data-lexical-editor="true"]');
+    if (editorElement) {
+      const handleClick = (event: Event) => {
+        const target = event.target as HTMLElement;
+        const text = target.textContent || '';
+        
+        // Verificar se o clique foi numa TAG de imagem
+        const imageTagMatch = text.match(/\[🖼️ IMAGEM: (.*?) - \d+x\d+px - Clique para visualizar\]/);
+        if (imageTagMatch) {
+          const filename = imageTagMatch[1];
+          handleImageTagClick(filename);
+        }
+      };
+
+      editorElement.addEventListener('click', handleClick);
+      return () => {
+        editorElement.removeEventListener('click', handleClick);
+      };
+    }
+  }, []);
+
   // Buscar templates estruturais
   useEffect(() => {
     const fetchTemplates = async () => {
@@ -248,15 +290,25 @@ function ToolbarPlugin() {
             if (data && data.type === 'selection_image' && data.data?.success && data.data?.response?.url) {
               const imageUrl = data.data.response.url;
               
-              // Inserir imagem no editor usando uma abordagem mais direta
+              // Inserir TAG clicável no editor
               editor.update(() => {
                 const selection = $getSelection();
                 if (selection) {
-                  // Criar um placeholder visual para a imagem
-                  const imagePlaceholder = $createTextNode(`\n🖼️ IMAGEM DO FREEHAND CANVAS\n📁 Arquivo: ${data.data.response.filename}\n🔗 URL: ${imageUrl}\n📏 Seleção: ${data.data.selection.width}x${data.data.selection.height}px\n⏰ ${new Date().toLocaleString()}\n`);
+                  // Criar uma TAG clicável para a imagem
+                  const imageTag = $createTextNode(`[🖼️ IMAGEM: ${data.data.response.filename} - ${Math.round(data.data.selection.width)}x${Math.round(data.data.selection.height)}px - Clique para visualizar]`);
                   const paragraph = $createParagraphNode();
-                  paragraph.append(imagePlaceholder);
+                  paragraph.append(imageTag);
                   selection.insertNodes([paragraph]);
+                  
+                  // Armazenar dados da imagem para uso posterior
+                  const globalWindow = window as any;
+                  globalWindow.imageData = globalWindow.imageData || {};
+                  globalWindow.imageData[data.data.response.filename] = {
+                    url: imageUrl,
+                    filename: data.data.response.filename,
+                    selection: data.data.selection,
+                    timestamp: data.data.response.timestamp
+                  };
                 }
               });
               
@@ -267,6 +319,37 @@ function ToolbarPlugin() {
             }
           }}
         />
+      )}
+      
+      {/* Modal de Visualização de Imagem */}
+      {isImageModalOpen && selectedImageData && (
+        <Dialog open={isImageModalOpen} onOpenChange={setIsImageModalOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+            <VisuallyHidden>
+              <DialogTitle>Visualizar Imagem do FreeHand Canvas</DialogTitle>
+            </VisuallyHidden>
+            <div className="p-6">
+              <div className="text-center mb-4">
+                <h3 className="text-lg font-semibold">🖼️ Imagem do FreeHand Canvas</h3>
+                <p className="text-sm text-muted-foreground">
+                  {selectedImageData.filename} - {Math.round(selectedImageData.selection.width)}x{Math.round(selectedImageData.selection.height)}px
+                </p>
+              </div>
+              <div className="flex justify-center">
+                <img 
+                  src={selectedImageData.url} 
+                  alt="Imagem do FreeHand Canvas"
+                  className="max-w-full max-h-[60vh] object-contain border rounded-lg shadow-lg"
+                />
+              </div>
+              <div className="mt-4 text-center">
+                <p className="text-xs text-muted-foreground">
+                  Criado em: {new Date(selectedImageData.timestamp).toLocaleString()}
+                </p>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );
