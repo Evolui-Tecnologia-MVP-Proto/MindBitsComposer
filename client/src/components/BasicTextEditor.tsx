@@ -279,17 +279,9 @@ export default function BasicTextEditor() {
   // Função para gerar markdown do documento
   const generateMarkdown = () => {
     let markdown = '';
-    
-    // Adicionar título do template
-    const template = templates?.find(t => t.id === selectedTemplate);
-    if (template) {
-      markdown += `# ${template.code}\n\n`;
-      markdown += `${template.description}\n\n`;
-    }
 
-    // Adicionar campos do header como tabela
+    // Adicionar campos do header como tabela (sem título do template)
     if (headerFields.length > 0) {
-      markdown += `## Campos do Documento\n\n`;
       markdown += `| Campo | Valor |\n`;
       markdown += `|-------|-------|\n`;
       headerFields.forEach(field => {
