@@ -1197,7 +1197,12 @@ export default function AdminPage() {
                         {mappingColumns.map((column) => (
                           <TableRow key={column.id}>
                             <TableCell>
-                              {column.mondayColumnTitle || mondayColumns.find(c => c.columnId === column.mondayColumnId)?.title || column.mondayColumnId}
+                              {(() => {
+                                const mondayColumn = mondayColumns.find(c => c.columnId === column.mondayColumnId);
+                                const title = column.mondayColumnTitle || mondayColumn?.title || column.mondayColumnId;
+                                const type = mondayColumn?.type;
+                                return type ? `${title} (${type})` : title;
+                              })()}
                             </TableCell>
                             <TableCell>{column.cpxField}</TableCell>
                             <TableCell>{column.transformFunction || "-"}</TableCell>
