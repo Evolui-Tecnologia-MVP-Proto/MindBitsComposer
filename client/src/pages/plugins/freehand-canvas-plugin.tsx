@@ -76,32 +76,28 @@ export default function FreeHandCanvasPlugin({
     const canvas = canvasRef.current;
     if (!canvas) return;
     
-    // Configurar canvas apenas uma vez para não perder o conteúdo
+    // Configurar canvas apenas uma vez - dimensões reais sem CSS
     if (canvas.width === 0 || canvas.height === 0) {
-      canvas.width = 1400;
-      canvas.height = 800;
+      canvas.width = 1400;  // Tamanho real da superfície de desenho
+      canvas.height = 800;  // Tamanho real da superfície de desenho
       canvas.style.border = '1px solid #ccc';
     }
     
-    // Configurar estilos de exibição
-    canvas.style.width = 'auto';
-    canvas.style.height = 'auto';
-    canvas.style.maxWidth = '100%';
-    canvas.style.maxHeight = '100%';
-    canvas.style.objectFit = 'none';
+    // Apenas estilos básicos - SEM width, height, max-width, max-height, object-fit
     canvas.style.display = 'block';
     canvas.style.margin = '0 auto';
   }, []);
 
   const getMousePos = (canvas: HTMLCanvasElement, e: React.MouseEvent<HTMLCanvasElement>) => {
-    const rect = canvas.getBoundingClientRect(); // Tamanho visual
+    const rect = canvas.getBoundingClientRect();
+
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
 
-    const x = (e.clientX - rect.left) * scaleX;
-    const y = (e.clientY - rect.top) * scaleY;
-
-    return { x, y };
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY
+    };
   };
 
   // Função de debug para testar precisão do posicionamento
