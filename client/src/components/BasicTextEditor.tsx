@@ -69,26 +69,37 @@ export default function BasicTextEditor() {
     setSelectedTemplate(templateId);
     
     const template = templates?.find(t => t.id === templateId);
-    if (template && template.structure) {
-      try {
-        const sections = JSON.parse(template.structure as string);
-        if (Array.isArray(sections)) {
-          // Criar seções colapsíveis baseadas no template
-          const newSections: TemplateSection[] = sections.map((sectionName: string) => ({
-            name: sectionName,
-            content: '',
-            isOpen: true // Começar todas abertas
-          }));
-          
-          setTemplateSections(newSections);
-          setContent(''); // Limpar o editor principal
+    if (template) {
+      // Verificar se há estrutura válida
+      if (template.structure && typeof template.structure === 'string' && template.structure.trim() !== '') {
+        try {
+          const sections = JSON.parse(template.structure);
+          if (Array.isArray(sections) && sections.length > 0) {
+            // Criar seções colapsíveis baseadas no template
+            const newSections: TemplateSection[] = sections.map((sectionName: string) => ({
+              name: sectionName,
+              content: '',
+              isOpen: true // Começar todas abertas
+            }));
+            
+            setTemplateSections(newSections);
+            setContent(''); // Limpar o editor principal
+            return;
+          }
+        } catch (error) {
+          console.error('Erro ao processar estrutura do template:', error);
         }
-      } catch (error) {
-        console.error('Erro ao processar estrutura do template:', error);
-        // Em caso de erro, usar formato simples
-        setTemplateSections([]);
-        setContent(`# ${template.code}\n\n${template.description}\n\nEstrutura inválida no template.`);
       }
+      
+      // Se não há estrutura válida, criar seções padrão
+      const defaultSections: TemplateSection[] = [
+        { name: "Introdução", content: '', isOpen: true },
+        { name: "Desenvolvimento", content: '', isOpen: true },
+        { name: "Conclusão", content: '', isOpen: true }
+      ];
+      
+      setTemplateSections(defaultSections);
+      setContent('');
     }
   };
 
