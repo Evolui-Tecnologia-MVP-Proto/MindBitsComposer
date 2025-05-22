@@ -88,12 +88,14 @@ export default function FreeHandCanvasPlugin({
 
   const getMousePos = (canvas: HTMLCanvasElement, e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
     
-    // Usar offsetX e offsetY que são relativos ao canvas diretamente
-    const x = e.nativeEvent.offsetX;
-    const y = e.nativeEvent.offsetY;
-    
-    return { x, y };
+    // Calcular posição considerando escala do canvas se houver
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY
+    };
   };
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
