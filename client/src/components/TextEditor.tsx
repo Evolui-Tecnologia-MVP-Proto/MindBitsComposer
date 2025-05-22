@@ -45,6 +45,78 @@ function ToolbarPlugin() {
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [selectedImageData, setSelectedImageData] = useState<any>(null);
   const { toast } = useToast();
+
+  // Função para renderizar conteúdo com badges de TAG
+  const renderContentWithTags = (content: string, sectionName: string) => {
+    if (!content) {
+      return <span className="text-gray-400">{`Conteúdo de ${sectionName}...`}</span>;
+    }
+
+    const tagRegex = /\[🖼️ IMAGEM: ([^-]+) - (\d+x\d+)px - Clique para visualizar\]/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = tagRegex.exec(content)) !== null) {
+      // Adicionar texto antes da TAG
+      if (match.index > lastIndex) {
+        parts.push(
+          <span key={lastIndex}>{content.slice(lastIndex, match.index)}</span>
+        );
+      }
+
+      // Adicionar badge da TAG
+      const filename = match[1];
+      const dimensions = match[2];
+      const imageUrl = `${window.location.origin}/uploads/canvas/${filename}`;
+      
+      parts.push(
+        <span
+          key={match.index}
+          className="inline-flex items-center gap-1 px-2 py-1 mx-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full cursor-pointer hover:bg-blue-200 transition-colors"
+          onClick={() => {
+            const globalWindow = window as any;
+            globalWindow.imageData = globalWindow.imageData || {};
+            globalWindow.imageData[filename] = { url: imageUrl };
+            setSelectedImageData({ url: imageUrl });
+            setIsImageModalOpen(true);
+          }}
+          title="Clique para visualizar a imagem"
+        >
+          🖼️ IMAGEM: {dimensions}px
+          <button
+            className="ml-1 text-blue-600 hover:text-red-600 font-bold"
+            onClick={(e) => {
+              e.stopPropagation();
+              // Remover a TAG do conteúdo
+              const tagToRemove = match[0];
+              const textarea = document.querySelector(`[data-section="${sectionName}"]`) as HTMLTextAreaElement;
+              if (textarea) {
+                const newValue = textarea.value.replace(tagToRemove, '');
+                textarea.value = newValue;
+                const changeEvent = new Event('change', { bubbles: true });
+                textarea.dispatchEvent(changeEvent);
+              }
+            }}
+            title="Remover imagem"
+          >
+            ×
+          </button>
+        </span>
+      );
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Adicionar texto restante
+    if (lastIndex < content.length) {
+      parts.push(
+        <span key={lastIndex}>{content.slice(lastIndex)}</span>
+      );
+    }
+
+    return parts.length > 0 ? parts : <span className="text-gray-400">{`Conteúdo de ${sectionName}...`}</span>;
+  };
   
   // Função para lidar com cliques nas TAGs de imagem
   const handleImageTagClick = (filename: string) => {
@@ -469,6 +541,72 @@ export default function TextEditor() {
       window.removeEventListener('applyTemplate', handleApplyTemplate as EventListener);
     };
   }, [toast]);
+
+  // Função para renderizar conteúdo com badges de TAG
+  const renderContentWithTags = (content: string, sectionName: string) => {
+    if (!content) {
+      return <span className="text-gray-400">{`Conteúdo de ${sectionName}...`}</span>;
+    }
+
+    const tagRegex = /\[🖼️ IMAGEM: ([^-]+) - (\d+x\d+)px - Clique para visualizar\]/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = tagRegex.exec(content)) !== null) {
+      // Adicionar texto antes da TAG
+      if (match.index > lastIndex) {
+        parts.push(
+          <span key={lastIndex}>{content.slice(lastIndex, match.index)}</span>
+        );
+      }
+
+      // Adicionar badge da TAG
+      const filename = match[1];
+      const dimensions = match[2];
+      const imageUrl = `${window.location.origin}/uploads/canvas/${filename}`;
+      
+      parts.push(
+        <span
+          key={match.index}
+          className="inline-flex items-center gap-1 px-2 py-1 mx-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full cursor-pointer hover:bg-blue-200 transition-colors"
+          onClick={() => {
+            setSelectedImageUrl(imageUrl);
+            setImageModalOpen(true);
+          }}
+          title="Clique para visualizar a imagem"
+        >
+          🖼️ IMAGEM: {dimensions}px
+          <button
+            className="ml-1 text-blue-600 hover:text-red-600 font-bold"
+            onClick={(e) => {
+              e.stopPropagation();
+              // Remover a TAG do conteúdo
+              const tagToRemove = match[0];
+              setSectionContents(prev => ({
+                ...prev,
+                [sectionName]: prev[sectionName]?.replace(tagToRemove, '') || ''
+              }));
+            }}
+            title="Remover imagem"
+          >
+            ×
+          </button>
+        </span>
+      );
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Adicionar texto restante
+    if (lastIndex < content.length) {
+      parts.push(
+        <span key={lastIndex}>{content.slice(lastIndex)}</span>
+      );
+    }
+
+    return parts.length > 0 ? parts : <span className="text-gray-400">{`Conteúdo de ${sectionName}...`}</span>;
+  };
   
   const initialConfig = {
     namespace: "EvoMindBitsEditor",
@@ -519,9 +657,12 @@ export default function TextEditor() {
                     {section}
                   </AccordionTrigger>
                   <AccordionContent className="px-0 pt-2">
-                    <div className="min-h-[150px]">
+                    <div className="min-h-[150px] relative">
+                      <div className="w-full min-h-[150px] px-4 py-2 font-mono text-base text-gray-700 border-0 outline-none whitespace-pre-wrap">
+                        {renderContentWithTags(sectionContents[section] || '', section)}
+                      </div>
                       <textarea
-                        className="w-full min-h-[150px] px-4 py-2 font-mono text-base text-gray-700 border-0 outline-none resize-none"
+                        className="absolute inset-0 w-full h-full px-4 py-2 font-mono text-base text-transparent bg-transparent border-0 outline-none resize-none caret-gray-500"
                         placeholder={`Conteúdo de ${section}...`}
                         value={sectionContents[section] || ''}
                         onChange={(e) => {
@@ -536,6 +677,7 @@ export default function TextEditor() {
                             [section]: (e.target as HTMLTextAreaElement).value
                           }));
                         }}
+                        style={{ color: 'transparent' }}
                       />
                     </div>
                   </AccordionContent>
