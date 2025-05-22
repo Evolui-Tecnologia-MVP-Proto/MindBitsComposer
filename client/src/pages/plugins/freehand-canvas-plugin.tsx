@@ -32,11 +32,12 @@ export default function FreeHandCanvasPlugin({
   const [currentColor, setCurrentColor] = useState('#000000');
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
   
-  // Dimensões fixas do canvas
-  const canvasSize = {
+  // Referência para container do canvas para cálculo dinâmico
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const [canvasSize, setCanvasSize] = useState({
     width: 1400,
     height: 800
-  };
+  });
 
   const colors = [
     '#000000', '#ff0000', '#00ff00', '#0000ff', 
@@ -63,9 +64,39 @@ export default function FreeHandCanvasPlugin({
     ctx.lineJoin = 'round';
   };
 
+  // Efeito para calcular tamanho dinâmico do canvas
+  useEffect(() => {
+    const updateCanvasSize = () => {
+      const container = canvasContainerRef.current;
+      if (!container) return;
+      
+      const rect = container.getBoundingClientRect();
+      const newSize = {
+        width: Math.floor(rect.width - 32), // Subtrair padding
+        height: Math.floor(rect.height - 32)
+      };
+      
+      // Só atualizar se o tamanho mudou significativamente
+      if (Math.abs(newSize.width - canvasSize.width) > 10 || 
+          Math.abs(newSize.height - canvasSize.height) > 10) {
+        setCanvasSize(newSize);
+      }
+    };
+
+    // Executar imediatamente
+    updateCanvasSize();
+    
+    // Escutar redimensionamento da janela
+    window.addEventListener('resize', updateCanvasSize);
+    
+    return () => {
+      window.removeEventListener('resize', updateCanvasSize);
+    };
+  }, []);
+
   useEffect(() => {
     initializeCanvas();
-  }, [backgroundColor]); // Remover isExpanded da dependência
+  }, [backgroundColor, canvasSize]); // Adicionar canvasSize como dependência
 
   // Efeito separado para lidar com mudanças de expansão sem alterar canvas
   useEffect(() => {
@@ -344,8 +375,11 @@ export default function FreeHandCanvasPlugin({
       </Card>
 
       {/* Canvas Area */}
-      <div className="flex-1 p-4 bg-gray-50">
-        <div className="h-full border border-gray-300 rounded-lg overflow-auto bg-white shadow-sm">
+      <div 
+        ref={canvasContainerRef}
+        className="flex-1 p-4 bg-gray-50"
+      >
+        <div className="h-full border border-gray-300 rounded-lg bg-white shadow-sm flex items-center justify-center">
           <canvas
             ref={canvasRef}
             className="cursor-crosshair block"
