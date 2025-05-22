@@ -1125,6 +1125,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Canvas selection upload endpoint
+  app.post("/api/canvas/upload-selection", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      // Simular upload bem-sucedido da seleção
+      // Em uma implementação real, você salvaria a imagem em um storage
+      const timestamp = new Date().toISOString();
+      const filename = `selection_${Date.now()}.jpg`;
+      
+      const result = {
+        success: true,
+        filename,
+        timestamp,
+        message: "Seleção do canvas salva com sucesso",
+        url: `/uploads/canvas/${filename}`, // URL fictícia
+        metadata: {
+          format: "jpeg",
+          quality: 0.9,
+          uploadedBy: req.user?.name || "Usuário",
+          size: "tamanho_da_imagem" // seria calculado na implementação real
+        }
+      };
+
+      console.log("Seleção do canvas recebida:", {
+        user: req.user?.name,
+        filename,
+        timestamp
+      });
+
+      res.status(200).json(result);
+    } catch (error: any) {
+      console.error("Erro ao fazer upload da seleção:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "Erro ao fazer upload da seleção",
+        error: error.message 
+      });
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 

@@ -285,33 +285,96 @@ export default function FreeHandCanvasPlugin({
     }
   };
 
-  const exportCanvasData = () => {
+  const exportCanvasData = async () => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas || !selectionRect || selectionRect.width === 0 || selectionRect.height === 0) return;
 
-    const canvasData = {
-      imageData: canvas.toDataURL(),
-      dimensions: {
-        width: canvas.width,
-        height: canvas.height
-      },
-      settings: {
-        backgroundColor,
-        lastTool: currentTool,
-        lastBrushSize: brushSize[0],
-        lastColor: currentColor
-      },
-      timestamp: new Date().toISOString()
-    };
+    try {
+      // Criar um canvas temporário para a área selecionada
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d');
+      if (!tempCtx) return;
 
-    // Enviar dados para a aplicação principal
-    if (onDataExchange) {
-      onDataExchange({
-        action: 'export',
-        type: 'canvas_data',
-        data: canvasData,
-        message: 'Dados do canvas exportados com sucesso'
+      // Definir dimensões do canvas temporário
+      const { x, y, width, height } = selectionRect;
+      tempCanvas.width = Math.abs(width);
+      tempCanvas.height = Math.abs(height);
+
+      // Copiar a área selecionada para o canvas temporário
+      tempCtx.drawImage(
+        canvas,
+        Math.min(x, x + width), // x da origem
+        Math.min(y, y + height), // y da origem  
+        Math.abs(width), // largura da origem
+        Math.abs(height), // altura da origem
+        0, // x do destino
+        0, // y do destino
+        Math.abs(width), // largura do destino
+        Math.abs(height) // altura do destino
+      );
+
+      // Converter para JPG com qualidade alta
+      const jpegDataUrl = tempCanvas.toDataURL('image/jpeg', 0.9);
+      
+      // Converter para Blob
+      const response = await fetch(jpegDataUrl);
+      const blob = await response.blob();
+
+      // Criar FormData para envio
+      const formData = new FormData();
+      formData.append('image', blob, `selection_${Date.now()}.jpg`);
+      formData.append('metadata', JSON.stringify({
+        selection: selectionRect,
+        timestamp: new Date().toISOString(),
+        format: 'jpeg',
+        quality: 0.9
+      }));
+
+      // Enviar via API (você pode ajustar o endpoint conforme necessário)
+      const apiResponse = await fetch('/api/canvas/upload-selection', {
+        method: 'POST',
+        body: formData
       });
+
+      if (apiResponse.ok) {
+        const result = await apiResponse.json();
+        console.log('Seleção enviada com sucesso:', result);
+        
+        // Limpar seleção após envio bem-sucedido
+        clearSelection();
+        
+        // Notificar aplicação principal
+        if (onDataExchange) {
+          onDataExchange({
+            action: 'export',
+            type: 'selection_image',
+            data: {
+              success: true,
+              selection: selectionRect,
+              response: result
+            },
+            message: 'Seleção exportada como JPG com sucesso!'
+          });
+        }
+      } else {
+        throw new Error(`Erro na API: ${apiResponse.status}`);
+      }
+
+    } catch (error) {
+      console.error('Erro ao exportar seleção:', error);
+      
+      // Notificar aplicação principal do erro
+      if (onDataExchange) {
+        onDataExchange({
+          action: 'export',
+          type: 'selection_image',
+          data: {
+            success: false,
+            error: error instanceof Error ? error.message : 'Erro desconhecido'
+          },
+          message: 'Erro ao exportar seleção'
+        });
+      }
     }
   };
 
@@ -446,6 +509,10 @@ export default function FreeHandCanvasPlugin({
                 variant="outline"
                 size="sm"
                 onClick={exportCanvasData}
+                disabled={!selectionRect || selectionRect.width === 0 || selectionRect.height === 0}
+                className={selectionRect && selectionRect.width !== 0 && selectionRect.height !== 0 ? 
+                  "bg-green-50 border-green-200 text-green-700 hover:bg-green-100" : 
+                  ""}
               >
                 <Upload className="h-4 w-4 mr-1" />
                 Atualizar
