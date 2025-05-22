@@ -12,12 +12,13 @@ import { AutoLinkNode, LinkNode } from "@lexical/link";
 import { LinkPlugin } from "@lexical/react/LexicalLinkPlugin";
 import { ListPlugin } from "@lexical/react/LexicalListPlugin";
 import { Button } from "@/components/ui/button";
-import { Bold, Italic, List, FileText, Save, Undo, Redo, Link as LinkIcon, ChevronDown, LayoutTemplate } from "lucide-react";
+import { Bold, Italic, List, FileText, Save, Undo, Redo, Link as LinkIcon, ChevronDown, LayoutTemplate, Palette } from "lucide-react";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $getRoot, $getSelection, FORMAT_TEXT_COMMAND, LexicalEditor } from "lexical";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Template } from "@shared/schema";
+import { Template, Plugin } from "@shared/schema";
+import PluginModal from "@/components/plugin-modal";
 import {
   Select,
   SelectContent,
@@ -36,6 +37,9 @@ function ToolbarPlugin() {
   const [editor] = useLexicalComposerContext();
   const [structTemplates, setStructTemplates] = useState<Template[]>([]);
   const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
+  const [plugins, setPlugins] = useState<Plugin[]>([]);
+  const [selectedPlugin, setSelectedPlugin] = useState<Plugin | null>(null);
+  const [isPluginModalOpen, setIsPluginModalOpen] = useState(false);
   const { toast } = useToast();
   
   // Buscar templates estruturais
@@ -59,6 +63,23 @@ function ToolbarPlugin() {
     
     fetchTemplates();
   }, []);
+
+  // Buscar plugins ativos
+  useEffect(() => {
+    const fetchPlugins = async () => {
+      try {
+        const response = await apiRequest("GET", "/api/plugins");
+        if (response.ok) {
+          const data = await response.json();
+          setPlugins(data.filter((plugin: Plugin) => plugin.status === "ACTIVE"));
+        }
+      } catch (error) {
+        console.error("Erro ao carregar plugins:", error);
+      }
+    };
+    
+    fetchPlugins();
+  }, []);
   
   const onBoldClick = () => {
     editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
@@ -73,6 +94,18 @@ function ToolbarPlugin() {
     editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
     // UNDO não está implementado corretamente aqui
   };
+
+  // Função para abrir plugin FreeHand Canvas
+  const openFreeHandCanvas = () => {
+    const freeHandPlugin = plugins.find(plugin => plugin.name === "FreeHand Canvas");
+    if (freeHandPlugin) {
+      setSelectedPlugin(freeHandPlugin);
+      setIsPluginModalOpen(true);
+    }
+  };
+
+  // Verificar se o plugin FreeHand Canvas está ativo
+  const freeHandCanvasPlugin = plugins.find(plugin => plugin.name === "FreeHand Canvas");
 
   const onRedoClick = () => {
     editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
@@ -152,6 +185,22 @@ function ToolbarPlugin() {
         >
           <Redo className="h-4 w-4" />
         </Button>
+        
+        {/* Botão do plugin FreeHand Canvas se estiver ativo */}
+        {freeHandCanvasPlugin && (
+          <>
+            <div className="w-px h-6 bg-gray-300 mx-1" />
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={openFreeHandCanvas}
+              className="h-8 px-2"
+              title="Abrir FreeHand Canvas"
+            >
+              <Palette className="h-4 w-4" />
+            </Button>
+          </>
+        )}
       </div>
       
       {/* Combo de seleção de template */}
