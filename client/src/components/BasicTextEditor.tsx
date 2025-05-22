@@ -20,6 +20,11 @@ export default function BasicTextEditor() {
   const [isPluginModalOpen, setIsPluginModalOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   const [templateSections, setTemplateSections] = useState<TemplateSection[]>([]);
+  const [lastCursorInfo, setLastCursorInfo] = useState<{
+    elementId: string;
+    position: number;
+    sectionIndex?: number;
+  } | null>(null);
 
   // Buscar templates estruturais
   const { data: templates } = useQuery<Template[]>({
@@ -32,6 +37,25 @@ export default function BasicTextEditor() {
   });
 
   const openFreeHandCanvas = () => {
+    // Capturar posição do cursor antes de abrir o modal
+    const activeElement = document.activeElement as HTMLTextAreaElement;
+    if (activeElement && activeElement.tagName === 'TEXTAREA') {
+      const textareas = document.querySelectorAll('textarea');
+      const textareaIndex = Array.from(textareas).indexOf(activeElement);
+      
+      setLastCursorInfo({
+        elementId: activeElement.id || 'editor-textarea',
+        position: activeElement.selectionStart,
+        sectionIndex: textareaIndex >= 0 ? textareaIndex : undefined
+      });
+      
+      console.log('Cursor capturado:', {
+        elementId: activeElement.id || 'editor-textarea',
+        position: activeElement.selectionStart,
+        sectionIndex: textareaIndex >= 0 ? textareaIndex : undefined
+      });
+    }
+    
     // Log para debug
     console.log("Plugins disponíveis:", plugins?.map(p => ({ name: p.name, pageName: p.pageName })));
     
@@ -79,20 +103,44 @@ export default function BasicTextEditor() {
 
   const insertFreeHandLink = (imageUrl: string) => {
     console.log('Inserindo link FreeHand:', imageUrl);
+    console.log('Info do cursor capturado:', lastCursorInfo);
     const linkText = `[Imagem FreeHand](${imageUrl})`;
     
-    // Se há seções do template, inserir na primeira seção (Introdução)
-    if (templateSections.length > 0) {
-      console.log('Inserindo em seções do template');
-      const firstSection = templateSections[0];
-      const newContent = firstSection.content + '\n\n' + linkText;
-      updateSectionContent(0, newContent);
-    } else {
-      // Editor simples - adicionar ao final do conteúdo
-      console.log('Inserindo no editor simples');
-      const newContent = content + '\n\n' + linkText;
+    if (lastCursorInfo && templateSections.length > 0 && lastCursorInfo.sectionIndex !== undefined) {
+      // Inserir na seção específica onde estava o cursor
+      console.log('Inserindo na seção:', lastCursorInfo.sectionIndex);
+      const targetSection = templateSections[lastCursorInfo.sectionIndex];
+      const currentContent = targetSection.content;
+      const position = lastCursorInfo.position;
+      
+      const newContent = currentContent.slice(0, position) + 
+                        linkText + 
+                        currentContent.slice(position);
+      
+      updateSectionContent(lastCursorInfo.sectionIndex, newContent);
+    } else if (lastCursorInfo && templateSections.length === 0) {
+      // Editor simples - inserir na posição do cursor
+      console.log('Inserindo no editor simples na posição:', lastCursorInfo.position);
+      const position = lastCursorInfo.position;
+      const newContent = content.slice(0, position) + 
+                        linkText + 
+                        content.slice(position);
       setContent(newContent);
+    } else {
+      // Fallback - adicionar ao final
+      console.log('Fallback - inserindo ao final');
+      if (templateSections.length > 0) {
+        const firstSection = templateSections[0];
+        const newContent = firstSection.content + '\n\n' + linkText;
+        updateSectionContent(0, newContent);
+      } else {
+        const newContent = content + '\n\n' + linkText;
+        setContent(newContent);
+      }
     }
+    
+    // Limpar info do cursor após uso
+    setLastCursorInfo(null);
   };
 
   // Função para ser chamada pelo plugin quando uma imagem for exportada
