@@ -79,7 +79,44 @@ export default function BasicTextEditor() {
 
   const insertFreeHandLink = (imageUrl: string) => {
     const linkText = `[Imagem FreeHand](${imageUrl})`;
-    setContent(prev => prev + "\n" + linkText + "\n");
+    
+    // Se há seções do template, inserir na seção que está sendo editada
+    if (templateSections.length > 0) {
+      // Encontrar textarea ativa no documento
+      const activeElement = document.activeElement as HTMLTextAreaElement;
+      if (activeElement && activeElement.tagName === 'TEXTAREA') {
+        const cursorPosition = activeElement.selectionStart;
+        const currentValue = activeElement.value;
+        const newValue = currentValue.slice(0, cursorPosition) + 
+                        linkText + 
+                        currentValue.slice(cursorPosition);
+        
+        // Atualizar a seção correspondente
+        const textareas = document.querySelectorAll('textarea');
+        const textareaIndex = Array.from(textareas).indexOf(activeElement);
+        
+        if (textareaIndex >= 0 && textareaIndex < templateSections.length) {
+          updateSectionContent(textareaIndex, newValue);
+        }
+      }
+    } else {
+      // Editor simples - inserir no textarea principal
+      const textarea = document.getElementById('editor-textarea') as HTMLTextAreaElement;
+      if (textarea) {
+        const cursorPosition = textarea.selectionStart;
+        const currentValue = textarea.value;
+        const newValue = currentValue.slice(0, cursorPosition) + 
+                        linkText + 
+                        currentValue.slice(cursorPosition);
+        setContent(newValue);
+        
+        // Reposicionar cursor após a inserção
+        setTimeout(() => {
+          textarea.focus();
+          textarea.setSelectionRange(cursorPosition + linkText.length, cursorPosition + linkText.length);
+        }, 0);
+      }
+    }
   };
 
   // Função para ser chamada pelo plugin quando uma imagem for exportada
