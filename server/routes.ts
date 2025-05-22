@@ -282,14 +282,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       for (const mapping of mappings) {
         try {
-          // Consulta SQL direta para contar as colunas mapeadas
-          const result = await db.execute(
-            `SELECT COUNT(*) as count FROM mapping_columns WHERE mapping_id = $1`,
-            [mapping.id]
-          );
+          // Usar Drizzle ORM para consultar as colunas mapeadas
+          const columns = await storage.getMappingColumns(mapping.id);
+          const count = columns.length;
           
-          const count = parseInt(result.rows[0].count);
-          console.log(`Mapeamento SQL ID ${mapping.id} (${mapping.name}): ${count} colunas mapeadas`);
+          console.log(`Mapeamento ID ${mapping.id} (${mapping.name}): ${count} colunas mapeadas`);
           
           mappingsWithColumnCount.push({
             ...mapping,
