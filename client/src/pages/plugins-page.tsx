@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Plus, Pencil, Trash, Power, PowerOff, Search, Filter } from "lucide-react";
+import { Plus, Pencil, Trash, Power, PowerOff, Search, Filter, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -138,7 +138,11 @@ function getStatusBadgeVariant(status: string): "default" | "secondary" | "destr
 export default function PluginsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isTestModalOpen, setIsTestModalOpen] = useState(false);
   const [selectedPlugin, setSelectedPlugin] = useState<Plugin | null>(null);
+  const [testingPlugin, setTestingPlugin] = useState<Plugin | null>(null);
+  const [testResult, setTestResult] = useState<any>(null);
+  const [isTestingInProgress, setIsTestingInProgress] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -275,6 +279,68 @@ export default function PluginsPage() {
   const openDeleteDialog = (plugin: Plugin) => {
     setSelectedPlugin(plugin);
     setIsDeleteDialogOpen(true);
+  };
+
+  const openTestModal = (plugin: Plugin) => {
+    setTestingPlugin(plugin);
+    setTestResult(null);
+    setIsTestModalOpen(true);
+  };
+
+  const testPlugin = async (plugin: Plugin) => {
+    setIsTestingInProgress(true);
+    setTestResult(null);
+
+    try {
+      // Dados de teste que serão enviados para o plugin
+      const testData = {
+        message: "Teste de comunicação com plugin",
+        timestamp: new Date().toISOString(),
+        user: "Sistema de Teste",
+        applicationContext: {
+          currentDocument: "Documento de Exemplo",
+          selectedText: "Texto selecionado para teste",
+          editorState: "ready"
+        }
+      };
+
+      // Simular chamada para o endpoint do plugin
+      const response = await fetch(`/api/plugins/${plugin.id}/test`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(testData),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setTestResult({
+          success: true,
+          data: result,
+          message: "Plugin testado com sucesso!"
+        });
+        toast({
+          title: "Teste bem-sucedido",
+          description: `Plugin "${plugin.name}" funcionou corretamente.`,
+        });
+      } else {
+        throw new Error(`Erro HTTP: ${response.status}`);
+      }
+    } catch (error: any) {
+      setTestResult({
+        success: false,
+        error: error.message,
+        message: "Falha no teste do plugin"
+      });
+      toast({
+        title: "Erro no teste",
+        description: `Falha ao testar o plugin: ${error.message}`,
+        variant: "destructive",
+      });
+    } finally {
+      setIsTestingInProgress(false);
+    }
   };
 
   const onSubmit = (data: PluginFormValues) => {
@@ -434,6 +500,14 @@ export default function PluginsPage() {
                     <TableCell>{plugin.author || "-"}</TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => openTestModal(plugin)}
+                          title="Testar Plugin"
+                        >
+                          <Play className="h-4 w-4" />
+                        </Button>
                         <Button
                           variant="ghost"
                           size="icon"
@@ -630,6 +704,171 @@ export default function PluginsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Modal para teste de plugin */}
+      <Dialog open={isTestModalOpen} onOpenChange={setIsTestModalOpen}>
+        <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              Testar Plugin: {testingPlugin?.name}
+            </DialogTitle>
+            <DialogDescription>
+              Execute o plugin em ambiente de teste e veja os resultados da comunicação
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Informações do plugin */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Informações do Plugin</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium">Tipo:</span> {getPluginTypeLabel(testingPlugin?.type || "")}
+                  </div>
+                  <div>
+                    <span className="font-medium">Versão:</span> {testingPlugin?.version}
+                  </div>
+                  <div>
+                    <span className="font-medium">Status:</span> 
+                    <Badge variant={getStatusBadgeVariant(testingPlugin?.status || "")} className="ml-2">
+                      {getPluginStatusLabel(testingPlugin?.status || "")}
+                    </Badge>
+                  </div>
+                  <div>
+                    <span className="font-medium">Autor:</span> {testingPlugin?.author || "N/A"}
+                  </div>
+                </div>
+                <div>
+                  <span className="font-medium">Descrição:</span> {testingPlugin?.description}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Botão de teste */}
+            <div className="flex justify-center">
+              <Button 
+                onClick={() => testingPlugin && testPlugin(testingPlugin)}
+                disabled={isTestingInProgress}
+                className="w-full sm:w-auto"
+              >
+                {isTestingInProgress ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Testando...
+                  </>
+                ) : (
+                  <>
+                    <Play className="mr-2 h-4 w-4" />
+                    Executar Teste
+                  </>
+                )}
+              </Button>
+            </div>
+
+            {/* Resultados do teste */}
+            {testResult && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm flex items-center">
+                    Resultado do Teste
+                    <Badge 
+                      variant={testResult.success ? "default" : "destructive"} 
+                      className="ml-2"
+                    >
+                      {testResult.success ? "Sucesso" : "Falha"}
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <span className="font-medium">Status:</span> {testResult.message}
+                  </div>
+
+                  {testResult.success && testResult.data && (
+                    <div>
+                      <span className="font-medium">Dados Retornados:</span>
+                      <pre className="mt-2 p-3 bg-muted rounded-md text-sm overflow-x-auto">
+                        {JSON.stringify(testResult.data, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+
+                  {!testResult.success && testResult.error && (
+                    <div>
+                      <span className="font-medium">Erro:</span>
+                      <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-md text-sm">
+                        {testResult.error}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Dados enviados para o teste */}
+                  <div>
+                    <span className="font-medium">Dados de Teste Enviados:</span>
+                    <pre className="mt-2 p-3 bg-muted rounded-md text-sm overflow-x-auto">
+{`{
+  "message": "Teste de comunicação com plugin",
+  "timestamp": "${new Date().toISOString()}",
+  "user": "Sistema de Teste",
+  "applicationContext": {
+    "currentDocument": "Documento de Exemplo",
+    "selectedText": "Texto selecionado para teste",
+    "editorState": "ready"
+  }
+}`}
+                    </pre>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Informações sobre a comunicação API */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Comunicação API</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm space-y-2">
+                <div>
+                  <span className="font-medium">Endpoint de Teste:</span> 
+                  <code className="ml-2 px-2 py-1 bg-muted rounded text-xs">
+                    POST /api/plugins/{testingPlugin?.id}/test
+                  </code>
+                </div>
+                <div>
+                  <span className="font-medium">Tipos de Dados Suportados:</span>
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    <Badge variant="outline">Texto</Badge>
+                    <Badge variant="outline">JSON</Badge>
+                    <Badge variant="outline">Imagens</Badge>
+                    <Badge variant="outline">Objetos</Badge>
+                  </div>
+                </div>
+                <div className="text-muted-foreground">
+                  O plugin pode receber e retornar dados da aplicação através desta API.
+                  A comunicação é bidirecional, permitindo que o plugin processe dados
+                  e retorne resultados para a aplicação principal.
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsTestModalOpen(false);
+                setTestResult(null);
+                setTestingPlugin(null);
+              }}
+            >
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

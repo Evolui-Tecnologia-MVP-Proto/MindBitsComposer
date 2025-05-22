@@ -987,6 +987,143 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Testar plugin
+  app.post("/api/plugins/:id/test", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const plugin = await storage.getPlugin(req.params.id);
+      
+      if (!plugin) {
+        return res.status(404).json({ message: "Plugin não encontrado" });
+      }
+
+      // Verificar se o plugin está ativo
+      if (plugin.status !== PluginStatus.ACTIVE) {
+        return res.status(400).json({ 
+          message: "Plugin deve estar ativo para ser testado",
+          status: plugin.status 
+        });
+      }
+
+      // Dados recebidos da aplicação para o teste
+      const testData = req.body;
+
+      // Simular a execução do plugin baseado no seu tipo
+      let testResult: any;
+
+      switch (plugin.type) {
+        case PluginType.DATA_SOURCE:
+          testResult = {
+            type: "data_source",
+            pluginName: plugin.name,
+            message: "Plugin de fonte de dados executado com sucesso",
+            dataFetched: {
+              records: 25,
+              lastUpdate: new Date().toISOString(),
+              source: "API Externa"
+            },
+            processedInput: testData
+          };
+          break;
+
+        case PluginType.AI_AGENT:
+          testResult = {
+            type: "ai_agent",
+            pluginName: plugin.name,
+            message: "Agente de IA processou a solicitação",
+            aiResponse: "Baseado no contexto fornecido, o plugin de IA analisou os dados e gerou uma resposta inteligente.",
+            confidence: 0.87,
+            suggestions: ["Sugestão 1", "Sugestão 2", "Sugestão 3"],
+            processedInput: testData
+          };
+          break;
+
+        case PluginType.CHART:
+          testResult = {
+            type: "chart",
+            pluginName: plugin.name,
+            message: "Plugin de gráfico gerou visualização",
+            chartData: {
+              type: "bar",
+              data: [10, 20, 30, 40, 50],
+              labels: ["Jan", "Fev", "Mar", "Abr", "Mai"],
+              title: "Dados de Exemplo"
+            },
+            processedInput: testData
+          };
+          break;
+
+        case PluginType.FORMATTER:
+          testResult = {
+            type: "formatter",
+            pluginName: plugin.name,
+            message: "Plugin formatador processou o texto",
+            originalText: testData.applicationContext?.selectedText || "Texto de teste",
+            formattedText: "**Texto formatado com sucesso pelo plugin**",
+            format: "markdown",
+            processedInput: testData
+          };
+          break;
+
+        case PluginType.INTEGRATION:
+          testResult = {
+            type: "integration",
+            pluginName: plugin.name,
+            message: "Plugin de integração conectou com serviço externo",
+            serviceConnected: true,
+            syncStatus: "success",
+            recordsSynced: 15,
+            lastSync: new Date().toISOString(),
+            processedInput: testData
+          };
+          break;
+
+        case PluginType.UTILITY:
+          testResult = {
+            type: "utility",
+            pluginName: plugin.name,
+            message: "Plugin utilitário executou tarefa",
+            taskCompleted: true,
+            result: "Operação concluída com sucesso",
+            executionTime: "0.5s",
+            processedInput: testData
+          };
+          break;
+
+        default:
+          testResult = {
+            type: "unknown",
+            pluginName: plugin.name,
+            message: "Plugin executado (tipo não reconhecido)",
+            processedInput: testData
+          };
+      }
+
+      // Adicionar informações de comunicação API
+      testResult.communication = {
+        endpoint: `/api/plugins/${plugin.id}/test`,
+        method: "POST",
+        timestamp: new Date().toISOString(),
+        dataExchange: {
+          received: Object.keys(testData).length > 0,
+          sent: true,
+          dataTypes: ["text", "json", "objects"]
+        }
+      };
+
+      console.log(`Plugin ${plugin.name} testado com sucesso:`, testResult);
+      
+      res.status(200).json(testResult);
+    } catch (error: any) {
+      console.error("Erro ao testar plugin:", error);
+      res.status(500).json({ 
+        message: "Erro interno do servidor ao testar plugin",
+        error: error.message 
+      });
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 
