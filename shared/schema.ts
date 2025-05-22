@@ -19,6 +19,21 @@ export enum TemplateType {
   OUTPUT = "output"
 }
 
+export enum PluginStatus {
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  DEVELOPMENT = "development"
+}
+
+export enum PluginType {
+  DATA_SOURCE = "data_source",
+  AI_AGENT = "ai_agent", 
+  CHART = "chart",
+  FORMATTER = "formatter",
+  INTEGRATION = "integration",
+  UTILITY = "utility"
+}
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
@@ -85,6 +100,23 @@ export const serviceConnections = pgTable("service_connections", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const plugins = pgTable("plugins", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  type: text("type").$type<PluginType>().notNull(),
+  status: text("status").$type<PluginStatus>().notNull().default(PluginStatus.INACTIVE),
+  version: text("version").notNull().default("1.0.0"),
+  author: text("author"),
+  icon: text("icon").default("Puzzle"),
+  configuration: json("configuration").$type<Record<string, any>>().default({}),
+  endpoints: json("endpoints").$type<Record<string, string>>().default({}),
+  permissions: json("permissions").$type<string[]>().default([]),
+  dependencies: json("dependencies").$type<string[]>().default([]),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull()
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
@@ -121,6 +153,12 @@ export const insertServiceConnectionSchema = createInsertSchema(serviceConnectio
   updatedAt: true,
 });
 
+export const insertPluginSchema = createInsertSchema(plugins).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
@@ -138,3 +176,6 @@ export type MappingColumn = typeof mappingColumns.$inferSelect;
 
 export type InsertServiceConnection = z.infer<typeof insertServiceConnectionSchema>;
 export type ServiceConnection = typeof serviceConnections.$inferSelect;
+
+export type InsertPlugin = z.infer<typeof insertPluginSchema>;
+export type Plugin = typeof plugins.$inferSelect;
