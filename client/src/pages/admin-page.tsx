@@ -1242,10 +1242,10 @@ export default function AdminPage() {
                       </TableHeader>
                       <TableBody>
                         {mappingColumns.map((column) => (
-                          <TableRow key={column.id}>
-                            <TableCell>
+                          <TableRow key={column.id} className="h-12">
+                            <TableCell className="py-2">
                               <div className="flex items-center gap-2">
-                                <span className="font-medium">
+                                <span className="font-medium text-sm">
                                   {column.mondayColumnTitle}
                                 </span>
                                 <Badge variant="outline" className="text-xs">
@@ -1253,9 +1253,9 @@ export default function AdminPage() {
                                 </Badge>
                               </div>
                             </TableCell>
-                            <TableCell>{column.cpxField}</TableCell>
-                            <TableCell>{column.transformFunction || "-"}</TableCell>
-                            <TableCell>
+                            <TableCell className="py-2 text-sm">{column.cpxField}</TableCell>
+                            <TableCell className="py-2 text-sm">{column.transformFunction || "-"}</TableCell>
+                            <TableCell className="py-2">
                               <div className="flex space-x-2">
                                 <Button
                                   variant="ghost"
