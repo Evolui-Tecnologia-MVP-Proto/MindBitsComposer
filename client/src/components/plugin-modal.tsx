@@ -6,8 +6,10 @@ import FreeHandCanvasPlugin from "@/pages/plugins/freehand-canvas-plugin";
 interface PluginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  pluginName: string;
+  pluginName?: string;
+  plugin?: any;
   onDataExchange?: (data: any) => void;
+  onImageExport?: (imageUrl: string) => void;
 }
 
 const PLUGIN_COMPONENTS: Record<string, React.ComponentType<any>> = {
@@ -18,9 +20,13 @@ export default function PluginModal({
   isOpen, 
   onClose, 
   pluginName,
-  onDataExchange 
+  plugin,
+  onDataExchange,
+  onImageExport 
 }: PluginModalProps) {
-  const PluginComponent = PLUGIN_COMPONENTS[pluginName];
+  // Determinar o nome do plugin a partir do objeto plugin ou do pluginName
+  const actualPluginName = plugin?.pageName || pluginName || "";
+  const PluginComponent = actualPluginName ? PLUGIN_COMPONENTS[actualPluginName] : null;
 
   // Função para interceptar dados do plugin e verificar se deve fechar modal
   const handleDataExchange = (data: any) => {
@@ -39,10 +45,13 @@ export default function PluginModal({
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-[500px]">
+          <VisuallyHidden>
+            <DialogTitle>Plugin não encontrado</DialogTitle>
+          </VisuallyHidden>
           <div className="p-6 text-center">
             <h3 className="text-lg font-semibold mb-2">Plugin não encontrado</h3>
             <p className="text-muted-foreground">
-              O plugin "{pluginName}" não foi encontrado ou não está disponível.
+              O plugin "{actualPluginName}" não foi encontrado ou não está disponível.
             </p>
           </div>
         </DialogContent>
