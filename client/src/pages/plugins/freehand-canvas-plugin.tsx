@@ -87,13 +87,11 @@ export default function FreeHandCanvasPlugin({
   }, [isExpanded]);
 
   const getMousePos = (canvas: HTMLCanvasElement, e: React.MouseEvent<HTMLCanvasElement>) => {
-    const rect = canvas.getBoundingClientRect();
-    
-    // Posição direta no canvas sem fator de escala
-    // O canvas interno é sempre 1400x800, a posição do cursor é sempre a mesma
+    // Usar offsetX e offsetY que são relativos diretamente ao canvas
+    // Não importa o tamanho da modal ou viewport - sempre relativo ao canvas
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
+      x: e.nativeEvent.offsetX,
+      y: e.nativeEvent.offsetY
     };
   };
 
