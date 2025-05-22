@@ -375,12 +375,13 @@ export default function FreeHandCanvasPlugin({
         className="flex-1 bg-gray-50 min-h-0 relative"
       >
         <div 
-          className="border border-gray-300 rounded-lg bg-white shadow-sm flex items-center justify-center overflow-hidden absolute p-0.5" 
+          className="border border-gray-300 rounded-lg bg-white shadow-sm flex items-center justify-center overflow-hidden absolute" 
           style={{ 
             top: '8px', 
             left: '8px', 
             right: '8px', 
-            bottom: '8px' 
+            bottom: '8px',
+            padding: '1px'
           }}
         >
           <canvas
