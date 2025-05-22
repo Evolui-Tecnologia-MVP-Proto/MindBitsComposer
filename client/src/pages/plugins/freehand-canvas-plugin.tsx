@@ -62,13 +62,22 @@ export default function FreeHandCanvasPlugin({
     ctx.lineJoin = 'round';
   }, [isExpanded, backgroundColor]);
 
+  const getMousePos = (canvas: HTMLCanvasElement, e: React.MouseEvent<HTMLCanvasElement>) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY
+    };
+  };
+
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const pos = getMousePos(canvas, e);
 
     setIsDrawing(true);
     
@@ -76,7 +85,7 @@ export default function FreeHandCanvasPlugin({
     if (!ctx) return;
 
     ctx.beginPath();
-    ctx.moveTo(x, y);
+    ctx.moveTo(pos.x, pos.y);
   };
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -88,9 +97,7 @@ export default function FreeHandCanvasPlugin({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const pos = getMousePos(canvas, e);
 
     if (currentTool === 'eraser') {
       ctx.globalCompositeOperation = 'destination-out';
@@ -101,7 +108,7 @@ export default function FreeHandCanvasPlugin({
       ctx.strokeStyle = currentColor;
     }
 
-    ctx.lineTo(x, y);
+    ctx.lineTo(pos.x, pos.y);
     ctx.stroke();
   };
 
