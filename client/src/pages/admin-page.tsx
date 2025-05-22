@@ -1198,17 +1198,15 @@ export default function AdminPage() {
                           <TableRow key={column.id}>
                             <TableCell>
                               <div className="flex items-center gap-2">
-                                <span>
-                                  {column.mondayColumnTitle || mondayColumns.find(c => c.columnId === column.mondayColumnId)?.title || column.mondayColumnId}
+                                <span className="font-medium">
+                                  {column.mondayColumnTitle}
                                 </span>
-                                {(() => {
-                                  const mondayColumn = mondayColumns.find(c => c.columnId === column.mondayColumnId);
-                                  return mondayColumn?.type ? (
-                                    <Badge variant="outline" className="text-xs">
-                                      {mondayColumn.type}
-                                    </Badge>
-                                  ) : null;
-                                })()}
+                                <Badge 
+                                  variant="outline" 
+                                  className="text-xs"
+                                >
+                                  {mondayColumns.find(c => c.columnId === column.mondayColumnId)?.type || "desconhecido"}
+                                </Badge>
                               </div>
                             </TableCell>
                             <TableCell>{column.cpxField}</TableCell>
