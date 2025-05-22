@@ -170,101 +170,57 @@ export default function DocumentosPage() {
     nome: string;
   }
 
-  // Função para simular anexos para documentos existentes
-  const getAnexosMock = () => [
-    { 
-      id: 1, 
-      nome: "Contrato de Serviços", 
-      data: "19/05/2025", 
-      tipo: "PDF", 
-      status: "Concluido",
-      origem: "Monday",
-      dataOrigem: "18/05/2025",
-      dataIntegracao: "19/05/2025",
-      statusOrigem: "Concluido",
-      descricaoOrigem: "Contrato de prestação de serviços aprovado pelo cliente. Este documento serve como base para todas as atividades relacionadas ao projeto e define escopo, prazos e termos de pagamento.",
-      anexos: [
-        { id: 1, tipo: "PDF" as TipoAnexo, nome: "Contrato_Assinado.pdf" },
-        { id: 2, tipo: "DOC" as TipoAnexo, nome: "Termos_Adicionais.docx" },
-        { id: 3, tipo: "Imagem" as TipoAnexo, nome: "Assinatura_Cliente.jpg" }
-      ]
-    },
-    { 
-      id: 2, 
-      nome: "Proposta Comercial", 
-      data: "18/05/2025", 
-      tipo: "DOCX", 
-      status: "Processando",
-      origem: "EVO-CTx",
-      dataOrigem: "15/05/2025",
-      dataIntegracao: "18/05/2025",
-      statusOrigem: "Em CRP",
-      descricaoOrigem: "Proposta comercial final enviada ao cliente com detalhamento dos serviços, cronograma e valores.",
-      anexos: [
-        { id: 4, tipo: "XLX" as TipoAnexo, nome: "Planilha_Custos.xlsx" },
-        { id: 5, tipo: "PDF" as TipoAnexo, nome: "Proposta_Final.pdf" },
-        { id: 6, tipo: "Imagem" as TipoAnexo, nome: "Logo_Cliente.png" },
-        { id: 7, tipo: "JSON" as TipoAnexo, nome: "Dados_Integração.json" }
-      ]
-    },
-    { 
-      id: 3, 
-      nome: "Termo de Compromisso", 
-      data: "15/05/2025", 
-      tipo: "PDF", 
-      status: "Integrado",
-      origem: "Monday",
-      dataOrigem: "12/05/2025",
-      dataIntegracao: "15/05/2025",
-      statusOrigem: "Em Aprovação",
-      descricaoOrigem: "Versão inicial do termo de compromisso para o projeto. Este documento foi substituído pela versão final do contrato.",
-      anexos: [
-        { id: 8, tipo: "PDF" as TipoAnexo, nome: "Termo_Original.pdf" },
-        { id: 9, tipo: "TXT" as TipoAnexo, nome: "Comentários.txt" },
-        { id: 10, tipo: "Outro" as TipoAnexo, nome: "Arquivo_Sistema.bin" }
-      ]
-    },
-    { 
-      id: 9, 
-      nome: "Memorando Técnico", 
-      data: "17/05/2025", 
-      tipo: "DOCX", 
-      status: "Processando",
-      origem: "Monday",
-      dataOrigem: "16/05/2025",
-      dataIntegracao: "17/05/2025",
-      statusOrigem: "Em DRP",
-      descricaoOrigem: "Memorando técnico detalhando as especificações de hardware e software necessárias para o projeto.",
-      anexos: [
-        { id: 11, tipo: "PDF" as TipoAnexo, nome: "Diagrama_Rede.pdf" },
-        { id: 12, tipo: "XLX" as TipoAnexo, nome: "Requisitos_Hardware.xlsx" }
-      ]
-    },
-    { 
-      id: 10, 
-      nome: "Requisitos de Sistema", 
-      data: "14/05/2025", 
-      tipo: "PDF", 
-      status: "Integrado",
-      origem: "EVO-CTx",
-      dataOrigem: "13/05/2025",
-      dataIntegracao: "14/05/2025",
-      statusOrigem: "Incluido",
-      descricaoOrigem: "Documento de requisitos de sistema contendo todas as funcionalidades solicitadas pelo cliente.",
-      anexos: []
+  // Função para ícones de status
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "Integrado":
+        return <Upload className="h-4 w-4" />;
+      case "Processando":
+        return <Clock className="h-4 w-4" />;
+      case "Concluido":
+        return <Check className="h-4 w-4" />;
+      default:
+        return <File className="h-4 w-4" />;
     }
-  ];
+  };
 
-  const documentosEmProcesso = [
-    { id: 4, nome: "Aditivo Contratual", data: "19/05/2025", tipo: "PDF", status: "Em aprovação" },
-    { id: 5, nome: "Solicitação de Mudança", data: "17/05/2025", tipo: "DOCX", status: "Em revisão" }
-  ];
+  // Função para cor do badge de status
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case "Integrado":
+        return "outline";
+      case "Processando":
+        return "secondary";
+      case "Concluido":
+        return "default";
+      default:
+        return "outline";
+    }
+  };
 
-  const documentosDistribuidos = [
-    { id: 6, nome: "Manual do Usuário", data: "16/05/2025", tipo: "PDF", status: "Distribuído" },
-    { id: 7, nome: "Procedimento Operacional", data: "14/05/2025", tipo: "PDF", status: "Distribuído" },
-    { id: 8, nome: "Guia de Referência", data: "12/05/2025", tipo: "DOCX", status: "Distribuído" }
-  ];
+  // Função para cor do badge de status origem
+  const getStatusOrigemBadgeVariant = (statusOrigem: string) => {
+    switch (statusOrigem) {
+      case "Incluido":
+        return "outline";
+      case "Em CRP":
+        return "secondary";
+      case "Em Aprovação":
+        return "destructive";
+      case "Em DRP":
+        return "secondary";
+      case "Concluido":
+        return "default";
+      default:
+        return "outline";
+    }
+  };
+
+  // Função para formatação de data
+  const formatDate = (date: Date | null) => {
+    if (!date) return "N/A";
+    return new Date(date).toLocaleDateString("pt-BR");
+  };
 
   const getTipoIcon = (tipo: string) => {
     return tipo === "PDF" ? 
@@ -375,12 +331,12 @@ export default function DocumentosPage() {
     );
   };
 
-  const openViewModal = (documento: any) => {
+  const openViewModal = (documento: Documento) => {
     setSelectedDocument(documento);
     setIsViewModalOpen(true);
   };
   
-  const renderDocumentosTable = (documentos: any[]) => (
+  const renderDocumentosTable = (documentos: Documento[]) => (
     <Table>
       <TableCaption>{documentos.length === 0 ? "Nenhum documento encontrado" : "Lista de documentos"}</TableCaption>
       <TableHeader>
@@ -417,43 +373,51 @@ export default function DocumentosPage() {
                     {documento.origem === "Monday" ? (
                       <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">Monday</div>
                     ) : (
-                      <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-medium">EVO-CTx</div>
+                      <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-medium">{documento.origem}</div>
                     )}
                   </div>
                 </TableCell>
-                <TableCell className="font-medium">{documento.nome}</TableCell>
-                <TableCell>{getStatusBadge(documento.status)}</TableCell>
-                <TableCell className="text-sm text-gray-500">{documento.dataOrigem}</TableCell>
-                <TableCell className="text-sm text-gray-500">{documento.dataIntegracao}</TableCell>
-                <TableCell>{getStatusOrigemBadge(documento.statusOrigem)}</TableCell>
+                <TableCell className="font-medium">{documento.objeto}</TableCell>
                 <TableCell>
-                  {documento.anexos && documento.anexos.length > 0 ? (
-                    <Badge variant="outline" className="bg-amber-50 text-amber-700 hover:bg-amber-100">
-                      {documento.anexos.length} anexo{documento.anexos.length > 1 ? 's' : ''}
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline" className="bg-gray-100 text-gray-500">
-                      Sem anexos
-                    </Badge>
-                  )}
+                  <Badge variant={getStatusBadgeVariant(documento.status) as any} className="flex items-center gap-1 whitespace-nowrap">
+                    {getStatusIcon(documento.status)}
+                    {documento.status}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-sm text-gray-500">{formatDate(documento.createdAt)}</TableCell>
+                <TableCell className="text-sm text-gray-500">{formatDate(documento.updatedAt)}</TableCell>
+                <TableCell>
+                  <Badge variant={getStatusOrigemBadgeVariant(documento.statusOrigem) as any} className="flex items-center gap-1 whitespace-nowrap">
+                    {documento.statusOrigem}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className="bg-gray-100 text-gray-500">
+                    0 anexos
+                  </Badge>
                 </TableCell>
               </>
             ) : (
               <>
                 <TableCell>
                   <div className="flex items-center">
-                    {getTipoIcon(documento.tipo)}
-                    <span className="ml-2 text-xs text-gray-500">{documento.tipo}</span>
+                    <File className="h-5 w-5 text-blue-500" />
+                    <span className="ml-2 text-xs text-gray-500">DOC</span>
                   </div>
                 </TableCell>
-                <TableCell className="font-medium">{documento.nome}</TableCell>
+                <TableCell className="font-medium">{documento.objeto}</TableCell>
                 <TableCell>
                   <div className="flex items-center text-gray-500 text-sm">
                     <Clock className="mr-1.5 h-3.5 w-3.5" />
-                    {documento.data}
+                    {formatDate(documento.createdAt)}
                   </div>
                 </TableCell>
-                <TableCell>{getStatusBadge(documento.status)}</TableCell>
+                <TableCell>
+                  <Badge variant={getStatusBadgeVariant(documento.status) as any} className="flex items-center gap-1 whitespace-nowrap">
+                    {getStatusIcon(documento.status)}
+                    {documento.status}
+                  </Badge>
+                </TableCell>
               </>
             )}
             <TableCell className="text-right">
