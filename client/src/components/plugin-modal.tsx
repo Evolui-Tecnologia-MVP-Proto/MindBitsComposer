@@ -20,8 +20,6 @@ export default function PluginModal({
   pluginName,
   onDataExchange 
 }: PluginModalProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
   const PluginComponent = PLUGIN_COMPONENTS[pluginName];
 
   if (!PluginComponent) {
@@ -42,27 +40,24 @@ export default function PluginModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="p-0 gap-0 transition-all duration-300 !max-w-none"
+        className="p-0 gap-0 !max-w-none"
         style={{
           position: 'fixed',
-          top: isExpanded ? '0' : '100px',
-          left: isExpanded ? '0' : '50%',
-          transform: isExpanded ? 'none' : 'translateX(-50%)',
-          width: isExpanded ? '100vw' : '50vw',
-          height: isExpanded ? '100vh' : '300px',
-          maxWidth: isExpanded ? '100vw' : '50vw',
-          maxHeight: isExpanded ? '100vh' : '300px',
+          top: '0',
+          left: '0',
+          width: '100vw',
+          height: '100vh',
+          maxWidth: '100vw',
+          maxHeight: '100vh',
           margin: 0,
           zIndex: 9999,
-          borderRadius: isExpanded ? 0 : 8
+          borderRadius: 0
         }}
       >
         <VisuallyHidden>
           <DialogTitle>Plugin {pluginName}</DialogTitle>
         </VisuallyHidden>
         <PluginComponent
-          isExpanded={isExpanded}
-          onToggleExpand={() => setIsExpanded(!isExpanded)}
           onDataExchange={onDataExchange}
         />
       </DialogContent>

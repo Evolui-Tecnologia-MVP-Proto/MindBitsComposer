@@ -19,14 +19,10 @@ import {
 import { Slider } from "@/components/ui/slider";
 
 interface FreeHandCanvasPluginProps {
-  isExpanded: boolean;
-  onToggleExpand: () => void;
   onDataExchange?: (data: any) => void;
 }
 
 export default function FreeHandCanvasPlugin({ 
-  isExpanded, 
-  onToggleExpand,
   onDataExchange 
 }: FreeHandCanvasPluginProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -241,14 +237,6 @@ export default function FreeHandCanvasPlugin({
             </div>
             <div className="flex items-center space-x-2">
               <Badge variant="default">Ativo</Badge>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={onToggleExpand}
-                title={isExpanded ? "Reduzir" : "Expandir"}
-              >
-                {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-              </Button>
             </div>
           </div>
         </CardHeader>
