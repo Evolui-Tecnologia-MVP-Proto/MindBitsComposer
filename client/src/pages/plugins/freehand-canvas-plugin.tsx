@@ -94,18 +94,13 @@ export default function FreeHandCanvasPlugin({
   }, []);
 
   const getMousePos = (canvas: HTMLCanvasElement, e: React.MouseEvent<HTMLCanvasElement>) => {
-    // Usar sempre offsetX e offsetY - são sempre relativos ao canvas
-    // Adicionar compensação fixa para corrigir deslocamento do container
+    // Teste com valores extremos para verificar se está funcionando
     const originalX = e.nativeEvent.offsetX;
     const originalY = e.nativeEvent.offsetY;
-    const adjustedX = originalX + 100; // +100px para direita
-    const adjustedY = originalY + 50;  // +50px para baixo
-    
-    console.log('TESTE OFFSET - Original:', originalX, originalY, 'Ajustado:', adjustedX, adjustedY);
     
     return {
-      x: adjustedX,
-      y: adjustedY
+      x: originalX - 200, // Valor extremo para teste visível
+      y: originalY - 100  // Valor extremo para teste visível
     };
   };
 
