@@ -71,16 +71,19 @@ export default function FreeHandCanvasPlugin({
     initializeCanvas();
   }, [backgroundColor]); // Remover isExpanded da dependência
 
-  // Efeito separado para lidar com mudanças de expansão sem reinicializar canvas
+  // Efeito separado para lidar com mudanças de expansão sem alterar canvas
   useEffect(() => {
-    // Apenas ajustar estilos CSS do container quando expandir/retrair
     const canvas = canvasRef.current;
     if (!canvas) return;
     
-    // Manter o canvas com tamanho fixo, apenas o container muda
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    canvas.style.objectFit = 'contain';
+    // Remover qualquer escalonamento - canvas mantém tamanho real
+    canvas.style.width = 'auto';
+    canvas.style.height = 'auto';
+    canvas.style.maxWidth = '100%';
+    canvas.style.maxHeight = '100%';
+    canvas.style.objectFit = 'none';
+    canvas.style.display = 'block';
+    canvas.style.margin = '0 auto';
   }, [isExpanded]);
 
   const getMousePos = (canvas: HTMLCanvasElement, e: React.MouseEvent<HTMLCanvasElement>) => {
