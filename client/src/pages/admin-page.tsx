@@ -1197,16 +1197,19 @@ export default function AdminPage() {
                         {mappingColumns.map((column) => (
                           <TableRow key={column.id}>
                             <TableCell>
-                              {column.mondayColumnTitle || mondayColumns.find(c => c.columnId === column.mondayColumnId)?.title || column.mondayColumnId}
-                              {" "}
-                              {(() => {
-                                const mondayColumn = mondayColumns.find(c => c.columnId === column.mondayColumnId);
-                                return mondayColumn?.type ? (
-                                  <Badge variant="outline" className="ml-1">
-                                    {mondayColumn.type}
-                                  </Badge>
-                                ) : null;
-                              })()}
+                              <div className="flex items-center gap-2">
+                                <span>
+                                  {column.mondayColumnTitle || mondayColumns.find(c => c.columnId === column.mondayColumnId)?.title || column.mondayColumnId}
+                                </span>
+                                {(() => {
+                                  const mondayColumn = mondayColumns.find(c => c.columnId === column.mondayColumnId);
+                                  return mondayColumn?.type ? (
+                                    <Badge variant="outline" className="text-xs">
+                                      {mondayColumn.type}
+                                    </Badge>
+                                  ) : null;
+                                })()}
+                              </div>
                             </TableCell>
                             <TableCell>{column.cpxField}</TableCell>
                             <TableCell>{column.transformFunction || "-"}</TableCell>
