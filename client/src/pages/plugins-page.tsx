@@ -72,6 +72,7 @@ type Plugin = {
   version: string;
   author: string | null;
   icon: string | null;
+  pageName: string | null;
   configuration: Record<string, any>;
   endpoints: Record<string, string>;
   permissions: string[];
