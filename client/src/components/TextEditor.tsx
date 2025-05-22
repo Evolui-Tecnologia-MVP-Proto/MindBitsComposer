@@ -292,26 +292,21 @@ function ToolbarPlugin() {
               const imageUrl = `${window.location.origin}${data.data.response.url}`;
               console.log('URL da imagem construída:', imageUrl);
               
-              // Inserir TAG clicável no editor na posição atual do cursor
+              // Inserir TAG clicável no editor na seção ativa do template
               editor.update(() => {
                 const selection = $getSelection();
                 if (selection) {
-                  // Verificar se estamos em uma seção específica de um template
-                  const activeNode = selection.anchor.getNode();
-                  const activeElement = editor.getElementByKey(activeNode.getKey());
+                  // Criar texto da TAG
+                  const tagText = `[🖼️ IMAGEM: ${data.data.response.filename} - ${Math.round(data.data.selection.width)}x${Math.round(data.data.selection.height)}px - Clique para visualizar]`;
                   
-                  // Criar uma TAG clicável para a imagem
-                  const imageTag = $createTextNode(`[🖼️ IMAGEM: ${data.data.response.filename} - ${Math.round(data.data.selection.width)}x${Math.round(data.data.selection.height)}px - Clique para visualizar]`);
-                  
-                  // Se há uma seleção ativa, inserir diretamente na posição do cursor
+                  // Inserir diretamente na posição do cursor da seção ativa
+                  // Usar insertText para manter a TAG na seção específica do template
                   if (selection.isCollapsed()) {
-                    // Cursor em posição específica - inserir inline
-                    selection.insertText(`\n[🖼️ IMAGEM: ${data.data.response.filename} - ${Math.round(data.data.selection.width)}x${Math.round(data.data.selection.height)}px - Clique para visualizar]\n`);
+                    // Cursor posicionado - inserir inline na seção
+                    selection.insertText(`\n${tagText}\n`);
                   } else {
-                    // Há texto selecionado - inserir como novo parágrafo
-                    const paragraph = $createParagraphNode();
-                    paragraph.append(imageTag);
-                    selection.insertNodes([paragraph]);
+                    // Texto selecionado - substituir pela TAG
+                    selection.insertText(tagText);
                   }
                   
                   // Armazenar dados da imagem para uso posterior
