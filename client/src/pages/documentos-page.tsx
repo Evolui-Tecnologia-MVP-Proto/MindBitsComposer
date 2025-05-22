@@ -1,61 +1,50 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Table, 
-  TableBody, 
-  TableCaption, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { 
-  File, 
-  Upload, 
-  Download, 
-  Clock, 
-  Check, 
-  FileSearch, 
-  FileType, 
-  FileText,
-  Eye,
-  MoreHorizontal,
-  Trash2,
-  Image,
-  FileJson,
-  FileSpreadsheet,
-  FileX,
-  Pencil
-} from "lucide-react";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
-import type { Documento, InsertDocumento } from "@shared/schema";
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import {
+  Eye,
+  Pencil,
+  Trash2,
+  Plus,
+  File,
+  Clock,
+  CircleCheck,
+  CircleX,
+  AlertCircle,
+  Loader2,
+} from "lucide-react";
+import { type Documento, type InsertDocumento } from "@shared/schema";
 
 export default function DocumentosPage() {
   const [activeTab, setActiveTab] = useState("integrados");
+  const [selectedDocument, setSelectedDocument] = useState<Documento | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [selectedDocument, setSelectedDocument] = useState<Documento | null>(null);
   const [formData, setFormData] = useState<InsertDocumento>({
     origem: "",
     objeto: "",
@@ -64,14 +53,13 @@ export default function DocumentosPage() {
     sistema: "",
     modulo: "",
     descricao: "",
-    status: "Processando",
-    statusOrigem: "Incluido"
+    status: "Integrado",
+    statusOrigem: "Incluido",
   });
 
-  const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Buscar todos os documentos
+  // Buscar documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
     queryKey: ["/api/documentos"],
   });
@@ -98,253 +86,91 @@ export default function DocumentosPage() {
         sistema: "",
         modulo: "",
         descricao: "",
-        status: "Processando",
-        statusOrigem: "Incluido"
-      });
-      toast({
-        title: "Sucesso",
-        description: "Documento criado com sucesso!",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Erro",
-        description: error.message,
-        variant: "destructive",
+        status: "Integrado",
+        statusOrigem: "Incluido",
       });
     },
   });
 
-  // Mutation para deletar documento
-  const deleteDocumentoMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(`/api/documentos/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Erro ao deletar documento");
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
-      toast({
-        title: "Sucesso",
-        description: "Documento deletado com sucesso!",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Erro",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
+  // Filtrar documentos por status
+  const documentosIntegrados = useMemo(() => 
+    documentos.filter(doc => doc.status === "Integrado"), [documentos]);
+  const documentosProcessando = useMemo(() => 
+    documentos.filter(doc => doc.status === "Processando"), [documentos]);
+  const documentosConcluidos = useMemo(() => 
+    documentos.filter(doc => doc.status === "Concluido"), [documentos]);
 
-  // Funções auxiliares
   const handleCreateDocument = () => {
     createDocumentoMutation.mutate(formData);
   };
 
-  const handleDeleteDocument = (id: string) => {
-    if (confirm("Tem certeza que deseja deletar este documento?")) {
-      deleteDocumentoMutation.mutate(id);
-    }
+  const formatDate = (date: Date | null) => {
+    if (!date) return "-";
+    return new Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "2-digit", 
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(date));
   };
 
-  const handleViewDocument = (documento: Documento) => {
-    setSelectedDocument(documento);
-    setIsViewModalOpen(true);
-  };
-
-  // Filtrar documentos por status
-  const documentosIntegrados = documentos.filter(doc => doc.status === "Integrado");
-  const documentosProcessando = documentos.filter(doc => doc.status === "Processando");
-  const documentosConcluidos = documentos.filter(doc => doc.status === "Concluido");
-
-  // Definição dos tipos de anexos (para futuras implementações)
-  type TipoAnexo = "Imagem" | "DOC" | "XLX" | "PDF" | "TXT" | "JSON" | "Outro";
-  
-  // Interface para anexos (para futuras implementações)
-  interface Anexo {
-    id: number;
-    tipo: TipoAnexo;
-    nome: string;
-  }
-
-  // Função para ícones de status
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "Integrado":
-        return <Upload className="h-4 w-4" />;
+        return <CircleCheck className="h-3 w-3" />;
       case "Processando":
-        return <Clock className="h-4 w-4" />;
+        return <Loader2 className="h-3 w-3 animate-spin" />;
       case "Concluido":
-        return <Check className="h-4 w-4" />;
+        return <CircleCheck className="h-3 w-3" />;
       default:
-        return <File className="h-4 w-4" />;
+        return <AlertCircle className="h-3 w-3" />;
     }
   };
 
-  // Função para cor do badge de status
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case "Integrado":
-        return "outline";
+        return "default";
       case "Processando":
         return "secondary";
       case "Concluido":
-        return "default";
-      default:
         return "outline";
+      default:
+        return "destructive";
     }
   };
 
-  // Função para cor do badge de status origem
   const getStatusOrigemBadgeVariant = (statusOrigem: string) => {
     switch (statusOrigem) {
       case "Incluido":
-        return "outline";
+        return "default";
       case "Em CRP":
         return "secondary";
       case "Em Aprovação":
-        return "destructive";
+        return "outline";
       case "Em DRP":
         return "secondary";
       case "Concluido":
         return "default";
       default:
-        return "outline";
+        return "destructive";
     }
-  };
-
-  // Função para formatação de data
-  const formatDate = (date: Date | null) => {
-    if (!date) return "N/A";
-    return new Date(date).toLocaleDateString("pt-BR");
-  };
-
-  const getTipoIcon = (tipo: string) => {
-    return tipo === "PDF" ? 
-      <FileType className="h-5 w-5 text-red-500" /> : 
-      <FileText className="h-5 w-5 text-blue-500" />;
-  };
-  
-  const getAnexoIcon = (tipo: TipoAnexo) => {
-    switch (tipo) {
-      case "PDF":
-        return <FileType className="h-5 w-5 text-red-500" />;
-      case "DOC":
-        return <FileText className="h-5 w-5 text-blue-500" />;
-      case "XLX":
-        return <FileSpreadsheet className="h-5 w-5 text-green-500" />;
-      case "Imagem":
-        return <Image className="h-5 w-5 text-purple-500" />;
-      case "TXT":
-        return <File className="h-5 w-5 text-gray-500" />;
-      case "JSON":
-        return <FileJson className="h-5 w-5 text-yellow-500" />;
-      default:
-        return <FileX className="h-5 w-5 text-gray-400" />;
-    }
-  };
-
-  const getStatusBadge = (status: string) => {
-    let variant = "default";
-    let icon = null;
-    
-    switch(status) {
-      case "Concluido":
-        variant = "success";
-        icon = <Check className="mr-1 h-3 w-3" />;
-        break;
-      case "Integrado":
-        variant = "outline";
-        icon = <File className="mr-1 h-3 w-3" />;
-        break;
-      case "Processando":
-        variant = "warning";
-        icon = <Clock className="mr-1 h-3 w-3" />;
-        break;
-      case "Em aprovação":
-        variant = "warning";
-        icon = <Clock className="mr-1 h-3 w-3" />;
-        break;
-      case "Em revisão":
-        variant = "default";
-        icon = <FileSearch className="mr-1 h-3 w-3" />;
-        break;
-      case "Distribuído":
-        variant = "outline";
-        break;
-      default:
-        variant = "default";
-    }
-    
-    return (
-      <Badge variant={variant as any} className="flex items-center gap-1 whitespace-nowrap">
-        {icon}
-        {status}
-      </Badge>
-    );
-  };
-  
-  const getStatusOrigemBadge = (status: string) => {
-    let bgColor = "";
-    let textColor = "";
-    let icon = null;
-    
-    switch(status) {
-      case "Incluido":
-        bgColor = "bg-gray-100";
-        textColor = "text-gray-700";
-        icon = <File className="mr-1 h-3 w-3" />;
-        break;
-      case "Em CRP":
-        bgColor = "bg-blue-100";
-        textColor = "text-blue-700";
-        icon = <FileText className="mr-1 h-3 w-3" />;
-        break;
-      case "Em Aprovação":
-        bgColor = "bg-amber-100";
-        textColor = "text-amber-700";
-        icon = <Clock className="mr-1 h-3 w-3" />;
-        break;
-      case "Em DRP":
-        bgColor = "bg-purple-100";
-        textColor = "text-purple-700";
-        icon = <FileSearch className="mr-1 h-3 w-3" />;
-        break;
-      case "Concluido":
-        bgColor = "bg-green-100";
-        textColor = "text-green-700";
-        icon = <Check className="mr-1 h-3 w-3" />;
-        break;
-      default:
-        bgColor = "bg-gray-100";
-        textColor = "text-gray-700";
-    }
-    
-    return (
-      <div className={`px-2 py-1 rounded-full inline-flex items-center ${bgColor} ${textColor} text-xs font-medium`}>
-        {icon}
-        {status}
-      </div>
-    );
   };
 
   const openViewModal = (documento: Documento) => {
     setSelectedDocument(documento);
     setIsViewModalOpen(true);
   };
-  
+
   const renderDocumentosTable = (documentos: Documento[]) => (
     <Table>
-      <TableCaption>{documentos.length === 0 ? "Nenhum documento encontrado" : "Lista de documentos"}</TableCaption>
       <TableHeader>
         <TableRow>
           {activeTab === "integrados" ? (
             <>
               <TableHead>Origem</TableHead>
-              <TableHead>Nome do Documento</TableHead>
+              <TableHead>Nome</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Data Origem</TableHead>
               <TableHead>Data Integração</TableHead>
@@ -354,8 +180,8 @@ export default function DocumentosPage() {
             </>
           ) : (
             <>
-              <TableHead className="w-[120px]">Tipo</TableHead>
-              <TableHead>Nome do Documento</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead>Nome</TableHead>
               <TableHead>Data</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
@@ -454,135 +280,81 @@ export default function DocumentosPage() {
   const renderViewModal = () => {
     if (!selectedDocument) return null;
     
-    const isIntegrated = activeTab === "integrados";
-    
     return (
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              {getTipoIcon(selectedDocument.tipo)}
-              <span>{selectedDocument.nome}</span>
+              <File className="h-5 w-5 text-blue-500" />
+              <span>{selectedDocument.objeto}</span>
             </DialogTitle>
             <DialogDescription>
-              Detalhes do documento {isIntegrated ? "integrado" : ""}
+              Detalhes do documento
             </DialogDescription>
           </DialogHeader>
           
           <div className="grid gap-6 py-4">
-            {isIntegrated && (
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Origem</p>
-                  <p className="text-sm">{selectedDocument.origem}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Nome</p>
-                  <p className="text-sm">{selectedDocument.nome}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Status</p>
-                  <div>{getStatusBadge(selectedDocument.status)}</div>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Data Origem</p>
-                  <p className="text-sm">{selectedDocument.dataOrigem}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Data Integração</p>
-                  <p className="text-sm">{selectedDocument.dataIntegracao}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Status Origem</p>
-                  <div>{getStatusOrigemBadge(selectedDocument.statusOrigem)}</div>
-                </div>
-                <div className="col-span-2">
-                  <p className="text-sm font-medium text-gray-500 mb-1">Descrições Origem</p>
-                  <p className="text-sm bg-gray-50 p-3 rounded-md text-gray-700 max-h-24 overflow-y-auto">
-                    {selectedDocument.descricaoOrigem}
-                  </p>
-                </div>
-                
-                {selectedDocument.anexos && selectedDocument.anexos.length > 0 && (
-                  <div className="col-span-2 mt-2">
-                    <p className="text-sm font-medium text-gray-500 mb-2">Anexos</p>
-                    <div className="bg-gray-50 rounded-md border border-gray-200">
-                      <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-100">
-                          <tr>
-                            <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Tipo
-                            </th>
-                            <th scope="col" className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Nome
-                            </th>
-                            <th scope="col" className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Ações
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                          {selectedDocument.anexos.map((anexo: Anexo) => (
-                            <tr key={anexo.id} className="hover:bg-gray-50">
-                              <td className="px-3 py-2 whitespace-nowrap">
-                                <div className="flex items-center">
-                                  {getAnexoIcon(anexo.tipo)}
-                                  <span className="ml-2 text-xs text-gray-500">{anexo.tipo}</span>
-                                </div>
-                              </td>
-                              <td className="px-3 py-2 whitespace-nowrap text-sm">
-                                {anexo.nome}
-                              </td>
-                              <td className="px-3 py-2 whitespace-nowrap text-right text-sm font-medium">
-                                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                                  <Pencil className="h-4 w-4 text-blue-500" />
-                                </Button>
-                                <Button variant="ghost" size="sm" className="h-7 w-7 p-0 ml-1">
-                                  <Trash2 className="h-4 w-4 text-red-500" />
-                                </Button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1">Origem</p>
+                <p className="text-sm">{selectedDocument.origem}</p>
               </div>
-            )}
-            
-            {!isIntegrated && (
-              <div className="grid gap-4">
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1">Cliente</p>
+                <p className="text-sm">{selectedDocument.cliente}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1">Responsável</p>
+                <p className="text-sm">{selectedDocument.responsavel}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1">Sistema</p>
+                <p className="text-sm">{selectedDocument.sistema}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1">Módulo</p>
+                <p className="text-sm">{selectedDocument.modulo}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1">Status</p>
                 <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Nome</p>
-                  <p className="text-sm">{selectedDocument.nome}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Status</p>
-                  <div>{getStatusBadge(selectedDocument.status)}</div>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Data</p>
-                  <p className="text-sm">{selectedDocument.data}</p>
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-500 mb-1">Tipo</p>
-                  <div className="flex items-center">
-                    {getTipoIcon(selectedDocument.tipo)}
-                    <span className="ml-2">{selectedDocument.tipo}</span>
-                  </div>
+                  <Badge variant={getStatusBadgeVariant(selectedDocument.status) as any} className="flex items-center gap-1 whitespace-nowrap">
+                    {getStatusIcon(selectedDocument.status)}
+                    {selectedDocument.status}
+                  </Badge>
                 </div>
               </div>
-            )}
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1">Status Origem</p>
+                <div>
+                  <Badge variant={getStatusOrigemBadgeVariant(selectedDocument.statusOrigem) as any} className="flex items-center gap-1 whitespace-nowrap">
+                    {selectedDocument.statusOrigem}
+                  </Badge>
+                </div>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-500 mb-1">Data Criação</p>
+                <p className="text-sm">{formatDate(selectedDocument.createdAt)}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-sm font-medium text-gray-500 mb-1">Descrição</p>
+                <p className="text-sm bg-gray-50 p-3 rounded-md text-gray-700 max-h-24 overflow-y-auto">
+                  {selectedDocument.descricao}
+                </p>
+              </div>
+              
+              <div className="col-span-2">
+                <p className="text-sm font-medium text-gray-500 mb-2">Anexos</p>
+                <div className="bg-gray-50 rounded-md border border-gray-200 p-3">
+                  <p className="text-sm text-gray-500">Nenhum anexo disponível</p>
+                </div>
+              </div>
+            </div>
           </div>
           
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsViewModalOpen(false)}>
               Fechar
-            </Button>
-            <Button>
-              <Download className="mr-2 h-4 w-4" />
-              Baixar
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -590,22 +362,128 @@ export default function DocumentosPage() {
     );
   };
 
-  return (
-    <div className="fade-in">
-      <div className="pb-5 border-b border-gray-200 sm:flex sm:items-center sm:justify-between">
-        <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl">Documentos</h2>
+  // Modal para criar novo documento
+  const renderCreateModal = () => (
+    <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Criar Novo Documento</DialogTitle>
+          <DialogDescription>
+            Preencha os dados do novo documento
+          </DialogDescription>
+        </DialogHeader>
         
-        <div className="mt-3 sm:mt-0">
-          <Button className="inline-flex items-center">
-            <Upload className="mr-2 h-4 w-4" />
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="origem">Origem</Label>
+              <Input
+                id="origem"
+                value={formData.origem}
+                onChange={(e) => setFormData({ ...formData, origem: e.target.value })}
+                placeholder="Ex: Monday, EVO-CTx"
+              />
+            </div>
+            <div>
+              <Label htmlFor="cliente">Cliente</Label>
+              <Input
+                id="cliente"
+                value={formData.cliente}
+                onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
+                placeholder="Nome do cliente"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <Label htmlFor="objeto">Objeto/Nome</Label>
+            <Input
+              id="objeto"
+              value={formData.objeto}
+              onChange={(e) => setFormData({ ...formData, objeto: e.target.value })}
+              placeholder="Nome do documento"
+            />
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="responsavel">Responsável</Label>
+              <Input
+                id="responsavel"
+                value={formData.responsavel}
+                onChange={(e) => setFormData({ ...formData, responsavel: e.target.value })}
+                placeholder="Responsável"
+              />
+            </div>
+            <div>
+              <Label htmlFor="sistema">Sistema</Label>
+              <Input
+                id="sistema"
+                value={formData.sistema}
+                onChange={(e) => setFormData({ ...formData, sistema: e.target.value })}
+                placeholder="Sistema"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <Label htmlFor="modulo">Módulo</Label>
+            <Input
+              id="modulo"
+              value={formData.modulo}
+              onChange={(e) => setFormData({ ...formData, modulo: e.target.value })}
+              placeholder="Módulo"
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="descricao">Descrição</Label>
+            <Input
+              id="descricao"
+              value={formData.descricao}
+              onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+              placeholder="Descrição do documento"
+            />
+          </div>
+        </div>
+        
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>
+            Cancelar
+          </Button>
+          <Button 
+            onClick={handleCreateDocument} 
+            disabled={createDocumentoMutation.isPending}
+          >
+            {createDocumentoMutation.isPending ? "Criando..." : "Criar Documento"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-500">Carregando documentos...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col min-h-screen">
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+        <div className="flex items-center justify-between space-y-2">
+          <h2 className="text-3xl font-bold tracking-tight">Documentos</h2>
+          <Button onClick={() => setIsCreateModalOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+            <Plus className="mr-2 h-4 w-4" />
             Novo Documento
           </Button>
         </div>
-      </div>
-      
-      {renderViewModal()}
-
-      <div className="mt-6">
+        
         <Tabs 
           defaultValue="integrados" 
           value={activeTab}
@@ -619,18 +497,33 @@ export default function DocumentosPage() {
           </TabsList>
           
           <TabsContent value="integrados" className="slide-in">
-            {renderDocumentosTable(documentosIntegrados)}
+            {isLoading ? (
+              <div className="text-center py-6">Carregando documentos...</div>
+            ) : (
+              renderDocumentosTable(documentosIntegrados)
+            )}
           </TabsContent>
           
           <TabsContent value="em-processo" className="slide-in">
-            {renderDocumentosTable(documentosEmProcesso)}
+            {isLoading ? (
+              <div className="text-center py-6">Carregando documentos...</div>
+            ) : (
+              renderDocumentosTable(documentosProcessando)
+            )}
           </TabsContent>
           
           <TabsContent value="distribuidos" className="slide-in">
-            {renderDocumentosTable(documentosDistribuidos)}
+            {isLoading ? (
+              <div className="text-center py-6">Carregando documentos...</div>
+            ) : (
+              renderDocumentosTable(documentosConcluidos)
+            )}
           </TabsContent>
         </Tabs>
       </div>
+      
+      {renderViewModal()}
+      {renderCreateModal()}
     </div>
   );
 }
