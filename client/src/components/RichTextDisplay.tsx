@@ -21,7 +21,12 @@ export default function RichTextDisplay({
 
   React.useEffect(() => {
     setEditContent(content);
-  }, [content]);
+    // Se não estamos editando, forçar re-render para mostrar links
+    if (!isEditing && editableRef.current) {
+      // Garantir que o componente sempre mostre a versão formatada
+      setTimeout(() => setIsEditing(false), 10);
+    }
+  }, [content, isEditing]);
 
   const handleEditStart = () => {
     setIsEditing(true);
@@ -42,7 +47,22 @@ export default function RichTextDisplay({
   const handleEditEnd = () => {
     setIsEditing(false);
     if (editableRef.current) {
-      const newContent = editableRef.current.innerText || '';
+      // Extrair o texto, mas preservar os links no formato [Imagem FreeHand](URL)
+      let newContent = editableRef.current.innerHTML || '';
+      
+      // Converter links HTML de volta para o formato markdown
+      newContent = newContent.replace(
+        /<a[^>]*href="([^"]*)"[^>]*>Imagem FreeHand<\/a>/g,
+        '[Imagem FreeHand]($1)'
+      );
+      
+      // Remover outras tags HTML e pegar apenas o texto
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = newContent;
+      newContent = tempDiv.innerText || tempDiv.textContent || '';
+      
+      console.log('Conteúdo final após edição:', newContent);
+      
       if (newContent !== content) {
         onContentChange(newContent);
       }
