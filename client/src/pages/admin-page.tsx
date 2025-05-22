@@ -1197,11 +1197,15 @@ export default function AdminPage() {
                         {mappingColumns.map((column) => (
                           <TableRow key={column.id}>
                             <TableCell>
+                              {column.mondayColumnTitle || mondayColumns.find(c => c.columnId === column.mondayColumnId)?.title || column.mondayColumnId}
+                              {" "}
                               {(() => {
                                 const mondayColumn = mondayColumns.find(c => c.columnId === column.mondayColumnId);
-                                const title = column.mondayColumnTitle || mondayColumn?.title || column.mondayColumnId;
-                                const type = mondayColumn?.type;
-                                return type ? `${title} (${type})` : title;
+                                return mondayColumn?.type ? (
+                                  <Badge variant="outline" className="ml-1">
+                                    {mondayColumn.type}
+                                  </Badge>
+                                ) : null;
                               })()}
                             </TableCell>
                             <TableCell>{column.cpxField}</TableCell>
