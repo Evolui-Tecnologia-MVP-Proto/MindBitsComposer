@@ -56,17 +56,21 @@ export default function BasicTextEditor() {
     return () => document.removeEventListener('click', handleGlobalClick);
   }, []);
 
-  // Buscar templates estruturais
-  const { data: templates } = useQuery<Template[]>({
-    queryKey: ["/api/templates/struct"],
-  });
-
   // Buscar plugins disponíveis
   const { data: plugins } = useQuery<Plugin[]>({
     queryKey: ["/api/plugins"],
   });
 
-  const openFreeHandCanvas = () => {
+  // Filtrar apenas plugins ativos
+  const activePlugins = plugins?.filter(plugin => plugin.status === PluginStatus.ACTIVE) || [];
+
+  // Buscar templates estruturais
+  const { data: templates } = useQuery<Template[]>({
+    queryKey: ["/api/templates/struct"],
+  });
+
+  // Função genérica para abrir qualquer plugin
+  const openPlugin = (plugin: Plugin) => {
     // Capturar posição do cursor antes de abrir o modal
     const activeElement = document.activeElement as HTMLTextAreaElement;
     if (activeElement && activeElement.tagName === 'TEXTAREA') {
@@ -78,19 +82,15 @@ export default function BasicTextEditor() {
         position: activeElement.selectionStart,
         sectionIndex: textareaIndex >= 0 ? textareaIndex : undefined
       });
-      
-      console.log('Cursor capturado:', {
-        elementId: activeElement.id || 'editor-textarea',
-        position: activeElement.selectionStart,
-        sectionIndex: textareaIndex >= 0 ? textareaIndex : undefined
-      });
     }
     
-    // Log para debug
-    console.log("Plugins disponíveis:", plugins?.map(p => ({ name: p.name, pageName: p.pageName })));
-    
+    setSelectedPlugin(plugin);
+    setIsPluginModalOpen(true);
+  };
+
+  const openFreeHandCanvas = () => {
     // Procurar pelo plugin FreeHand Canvas nos plugins disponíveis
-    const freeHandPlugin = plugins?.find(p => 
+    const freeHandPlugin = activePlugins.find(p => 
       p.pageName === "freehand-canvas-plugin" || 
       p.name.toLowerCase().includes("freehand") ||
       p.name.toLowerCase().includes("canvas")
