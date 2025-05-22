@@ -80,6 +80,18 @@ export default function SimpleRichTextDisplay({
 
   const [isEditing, setIsEditing] = React.useState(false);
 
+  // Efeito para ajustar altura do textarea quando entra em modo de edição
+  React.useEffect(() => {
+    if (isEditing && textareaRef.current) {
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.style.height = 'auto';
+          textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
+        }
+      }, 10);
+    }
+  }, [isEditing, content]);
+
   return (
     <div 
       className="relative"
