@@ -50,10 +50,10 @@ export default function FreeHandCanvasPlugin({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Definir tamanho fixo do canvas independente do container
+    // Definir tamanho menor do canvas para caber na modal
     const canvasSize = {
-      width: 800,
-      height: 600
+      width: 400,
+      height: 200
     };
     
     canvas.width = canvasSize.width;
@@ -355,7 +355,7 @@ export default function FreeHandCanvasPlugin({
         <div className="h-full border border-gray-300 rounded-lg overflow-hidden bg-white shadow-sm">
           <canvas
             ref={canvasRef}
-            className="w-full h-full cursor-crosshair"
+            className="cursor-crosshair block mx-auto"
             onMouseDown={startDrawing}
             onMouseMove={draw}
             onMouseUp={stopDrawing}
