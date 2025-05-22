@@ -89,14 +89,14 @@ export default function SimpleRichTextDisplay({
       {/* Quando não está editando, mostra apenas os links azuis */}
       {!isEditing && content && (
         <div
-          className={`${className} cursor-text`}
+          className={`${className} cursor-text overflow-hidden`}
           onClick={() => {
             setIsEditing(true);
             setTimeout(() => textareaRef.current?.focus(), 10);
           }}
           style={{ minHeight: '8rem' }}
         >
-          <div className="p-3">
+          <div className="p-3 overflow-hidden">
             {renderContent(content)}
           </div>
         </div>
