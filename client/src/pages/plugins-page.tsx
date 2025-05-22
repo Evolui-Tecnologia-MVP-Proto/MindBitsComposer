@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { Plus, Pencil, Trash, Power, PowerOff, Play } from "lucide-react";
+import { 
+  Plus, Pencil, Trash, Power, PowerOff, Play, Palette, Settings, 
+  Database, Brain, BarChart, FileText, Zap, Wrench, Upload, Search,
+  Puzzle, Code, Cpu, Globe, Lock, Mail, Image, Video, Music,
+  Calendar, Clock, Users, Star, Heart, Flag, Target, Bookmark
+} from "lucide-react";
 import PluginModal from "@/components/plugin-modal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -46,6 +51,37 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+
+// Dicionário de ícones disponíveis
+const availableIcons = {
+  "Palette": Palette,
+  "Settings": Settings,
+  "Database": Database,
+  "Brain": Brain,
+  "BarChart": BarChart,
+  "FileText": FileText,
+  "Zap": Zap,
+  "Wrench": Wrench,
+  "Puzzle": Puzzle,
+  "Code": Code,
+  "Cpu": Cpu,
+  "Globe": Globe,
+  "Lock": Lock,
+  "Mail": Mail,
+  "Image": Image,
+  "Video": Video,
+  "Music": Music,
+  "Calendar": Calendar,
+  "Clock": Clock,
+  "Users": Users,
+  "Star": Star,
+  "Heart": Heart,
+  "Flag": Flag,
+  "Target": Target,
+  "Bookmark": Bookmark,
+  "Search": Search,
+  "Upload": Upload
+};
 
 // Tipos de plugin
 const PluginType = {
