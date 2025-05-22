@@ -665,6 +665,7 @@ export default function TextEditor() {
                         className="absolute inset-0 w-full h-full px-4 py-2 font-mono text-base text-transparent bg-transparent border-0 outline-none resize-none caret-gray-500"
                         placeholder={`Conteúdo de ${section}...`}
                         value={sectionContents[section] || ''}
+                        data-section={section}
                         onChange={(e) => {
                           setSectionContents(prev => ({
                             ...prev,
