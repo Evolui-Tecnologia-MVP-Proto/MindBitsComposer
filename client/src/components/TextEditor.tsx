@@ -17,7 +17,7 @@ import { Bold, Italic, List, FileText, Save, Undo, Redo, Link as LinkIcon, Chevr
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { $getRoot, $getSelection, FORMAT_TEXT_COMMAND, LexicalEditor, $createParagraphNode, $createTextNode } from "lexical";
 import { $createLinkNode } from "@lexical/link";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Template, Plugin } from "@shared/schema";
@@ -476,13 +476,7 @@ function ToolbarPlugin() {
 
 
 
-interface TextEditorProps {
-  initialContent?: string;
-  onContentChange?: (content: string) => void;
-  placeholder?: string;
-}
-
-export default function TextEditor({ initialContent, onContentChange, placeholder }: TextEditorProps = {}) {
+export default function TextEditor() {
   const [sections, setSections] = useState<string[]>([]);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [sectionContents, setSectionContents] = useState<Record<string, string>>({});
