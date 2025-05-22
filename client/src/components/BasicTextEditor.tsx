@@ -16,6 +16,7 @@ import {
   Puzzle,
   Database,
   Bot,
+  Brain,
   BarChart3,
   FileText,
   Zap,
@@ -421,10 +422,11 @@ export default function BasicTextEditor() {
               } else {
                 // Mapeamento direto dos ícones do Lucide React
                 const iconName = plugin.icon || 'Puzzle';
-                const iconMap = {
+                const iconMap: Record<string, any> = {
                   'Puzzle': Puzzle,
                   'Database': Database,
                   'Bot': Bot,
+                  'Brain': Brain,
                   'BarChart3': BarChart3,
                   'FileText': FileText,
                   'Zap': Zap,
