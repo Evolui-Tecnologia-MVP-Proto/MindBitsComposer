@@ -1093,18 +1093,34 @@ export default function AdminPage() {
                           <FormItem>
                             <FormLabel>Coluna do Monday</FormLabel>
                             <FormControl>
-                              <div className="relative">
-                                <select
-                                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                  {...field}
-                                >
-                                  <option value="">Selecione uma coluna</option>
-                                  {mondayColumns.map((column) => (
-                                    <option key={column.id} value={column.columnId}>
-                                      {column.title} - {column.type?.toUpperCase()}
-                                    </option>
-                                  ))}
-                                </select>
+                              <div className="space-y-2">
+                                <div className="border rounded-md overflow-hidden">
+                                  <div className="p-2 bg-gray-50 border-b text-sm text-gray-500">
+                                    Selecione uma coluna do Monday
+                                  </div>
+                                  <div className="p-1">
+                                    <select
+                                      className="flex h-10 w-full rounded-md border-0 bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                      {...field}
+                                    >
+                                      <option value="">-- Escolha uma coluna --</option>
+                                      {mondayColumns.map((column) => (
+                                        <option key={column.id} value={column.columnId}>
+                                          {column.title} 
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                </div>
+                                
+                                {field.value && (
+                                  <div className="flex items-center gap-2 p-2 border rounded-md bg-muted/20">
+                                    <span className="text-sm font-medium">Tipo:</span>
+                                    <Badge>
+                                      {mondayColumns.find(c => c.columnId === field.value)?.type?.toUpperCase() || 'DESCONHECIDO'}
+                                    </Badge>
+                                  </div>
+                                )}
                               </div>
                             </FormControl>
                             <FormMessage />
