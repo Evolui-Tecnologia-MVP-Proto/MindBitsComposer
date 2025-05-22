@@ -49,9 +49,9 @@ export default function PluginModal({
           left: isExpanded ? '0' : '50%',
           transform: isExpanded ? 'none' : 'translateX(-50%)',
           width: isExpanded ? '100vw' : '50vw',
-          height: isExpanded ? '100vh' : '400px',
+          height: isExpanded ? '100vh' : '300px',
           maxWidth: isExpanded ? '100vw' : '50vw',
-          maxHeight: isExpanded ? '100vh' : '400px',
+          maxHeight: isExpanded ? '100vh' : '300px',
           margin: 0,
           zIndex: 9999,
           borderRadius: isExpanded ? 0 : 8
