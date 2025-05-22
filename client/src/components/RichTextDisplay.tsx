@@ -47,23 +47,26 @@ export default function RichTextDisplay({
   const handleEditEnd = () => {
     setIsEditing(false);
     if (editableRef.current) {
-      // Extrair o texto, mas preservar os links no formato [Imagem FreeHand](URL)
-      let newContent = editableRef.current.innerHTML || '';
+      // Primeiro, converter links HTML de volta para markdown
+      let htmlContent = editableRef.current.innerHTML || '';
       
-      // Converter links HTML de volta para o formato markdown
-      newContent = newContent.replace(
+      // Converter links HTML para formato markdown
+      htmlContent = htmlContent.replace(
         /<a[^>]*href="([^"]*)"[^>]*>Imagem FreeHand<\/a>/g,
         '[Imagem FreeHand]($1)'
       );
       
-      // Remover outras tags HTML e pegar apenas o texto
+      // Criar elemento temporário para extrair texto
       const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = newContent;
-      newContent = tempDiv.innerText || tempDiv.textContent || '';
+      tempDiv.innerHTML = htmlContent;
+      let newContent = tempDiv.innerText || tempDiv.textContent || '';
+      
+      // Limpar quebras de linha extras dos elementos HTML
+      newContent = newContent.replace(/\s+/g, ' ').trim();
       
       console.log('Conteúdo final após edição:', newContent);
       
-      if (newContent !== content) {
+      if (newContent !== content && newContent !== placeholder) {
         onContentChange(newContent);
       }
     }

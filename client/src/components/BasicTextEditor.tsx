@@ -6,7 +6,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Bold, Italic, Save, Palette, LayoutTemplate, ChevronDown, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import PluginModal from "@/components/plugin-modal";
-import RichTextDisplay from "@/components/RichTextDisplay";
+import SimpleRichTextDisplay from "@/components/SimpleRichTextDisplay";
 import { Plugin, PluginType, PluginStatus, Template } from "@shared/schema";
 
 interface TemplateSection {
@@ -365,7 +365,7 @@ export default function BasicTextEditor() {
                   )}
                 </CollapsibleTrigger>
                 <CollapsibleContent className="p-4 border-t border-gray-200">
-                  <RichTextDisplay
+                  <SimpleRichTextDisplay
                     content={section.content}
                     onContentChange={(newContent) => updateSectionContent(index, newContent)}
                     onCursorCapture={(position) => {
@@ -376,7 +376,7 @@ export default function BasicTextEditor() {
                       });
                     }}
                     placeholder={`Escreva o conteúdo para ${section.name}...`}
-                    className="w-full h-32 min-h-[8rem] resize-y border border-gray-300 rounded-md p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full h-32 min-h-[8rem] resize-y border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </CollapsibleContent>
               </Collapsible>
