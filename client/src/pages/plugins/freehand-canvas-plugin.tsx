@@ -27,8 +27,8 @@ export default function FreeHandCanvasPlugin({
 }: FreeHandCanvasPluginProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [currentTool, setCurrentTool] = useState<'pen' | 'eraser' | 'circle' | 'square' | 'line'>('pen');
-  const [brushSize, setBrushSize] = useState([5]);
+  const [currentTool, setCurrentTool] = useState<'eraser' | 'circle' | 'square' | 'line'>('line');
+  const [brushSize, setBrushSize] = useState([3]);
   const [currentColor, setCurrentColor] = useState('#000000');
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
   
@@ -266,14 +266,6 @@ export default function FreeHandCanvasPlugin({
             <div className="flex items-center space-x-2">
               <span className="text-sm font-medium">Ferramentas:</span>
               <Button
-                variant={currentTool === 'pen' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setCurrentTool('pen')}
-              >
-                <Palette className="h-4 w-4 mr-1" />
-                Pincel
-              </Button>
-              <Button
                 variant={currentTool === 'eraser' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setCurrentTool('eraser')}
@@ -413,7 +405,7 @@ export default function FreeHandCanvasPlugin({
         <CardContent className="py-2">
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <div className="flex items-center space-x-4">
-              <span>Ferramenta: {currentTool === 'pen' ? 'Pincel' : currentTool === 'eraser' ? 'Borracha' : 'Linha'}</span>
+              <span>Ferramenta: {currentTool === 'eraser' ? 'Borracha' : currentTool === 'line' ? 'Linha' : currentTool === 'circle' ? 'Círculo' : 'Quadrado'}</span>
               <span>Tamanho: {brushSize[0]}px</span>
               <span>Cor: {currentColor}</span>
             </div>
