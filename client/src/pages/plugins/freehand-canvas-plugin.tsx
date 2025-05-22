@@ -384,7 +384,7 @@ export default function FreeHandCanvasPlugin({
         ref={canvasContainerRef}
         className="flex-1 p-4 bg-gray-50 min-h-0"
       >
-        <div className="h-full border border-gray-300 rounded-lg bg-white shadow-sm flex items-center justify-center overflow-hidden m-4">
+        <div className="border border-gray-300 rounded-lg bg-white shadow-sm flex items-center justify-center overflow-hidden m-4" style={{ height: 'calc(100% - 2rem)' }}>
           <canvas
             ref={canvasRef}
             className="cursor-crosshair block max-w-full max-h-full"
