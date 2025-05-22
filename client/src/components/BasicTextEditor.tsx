@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Bold, Italic, Save, Palette, LayoutTemplate, ChevronDown, ChevronRight } from "lucide-react";
+import { Bold, Italic, Save, Palette, LayoutTemplate, ChevronDown, ChevronRight, Eye, Code } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import PluginModal from "@/components/plugin-modal";
 import SimpleRichTextDisplay from "@/components/SimpleRichTextDisplay";
@@ -27,6 +27,7 @@ export default function BasicTextEditor() {
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
   const [templateSections, setTemplateSections] = useState<TemplateSection[]>([]);
   const [headerFields, setHeaderFields] = useState<HeaderField[]>([]);
+  const [isMarkdownView, setIsMarkdownView] = useState<boolean>(false);
   const [lastCursorInfo, setLastCursorInfo] = useState<{
     elementId: string;
     position: number;
@@ -275,6 +276,37 @@ export default function BasicTextEditor() {
     );
   };
 
+  // Função para gerar markdown do documento
+  const generateMarkdown = () => {
+    let markdown = '';
+    
+    // Adicionar título do template
+    const template = templates?.find(t => t.id === selectedTemplate);
+    if (template) {
+      markdown += `# ${template.code}\n\n`;
+      markdown += `${template.description}\n\n`;
+    }
+
+    // Adicionar campos do header como tabela
+    if (headerFields.length > 0) {
+      markdown += `## Campos do Documento\n\n`;
+      markdown += `| Campo | Valor |\n`;
+      markdown += `|-------|-------|\n`;
+      headerFields.forEach(field => {
+        markdown += `| ${field.key} | ${field.value || ''} |\n`;
+      });
+      markdown += `\n`;
+    }
+
+    // Adicionar seções
+    templateSections.forEach(section => {
+      markdown += `## ${section.name}\n\n`;
+      markdown += `${section.content}\n\n`;
+    });
+
+    return markdown;
+  };
+
   const toggleSection = (index: number) => {
     setTemplateSections(prev => 
       prev.map((section, i) => 
@@ -359,8 +391,22 @@ export default function BasicTextEditor() {
           </Button>
         </div>
 
-        {/* Lado direito - Seletor de templates */}
+        {/* Lado direito - Controles */}
         <div className="flex items-center gap-2">
+          {/* Botão de alternância de visualização */}
+          <Button
+            variant={isMarkdownView ? "default" : "ghost"}
+            size="sm"
+            onClick={() => setIsMarkdownView(!isMarkdownView)}
+            className="flex items-center gap-1"
+            title={isMarkdownView ? "Visualização Lexical" : "Visualização Markdown"}
+          >
+            {isMarkdownView ? <Eye className="h-4 w-4" /> : <Code className="h-4 w-4" />}
+            {isMarkdownView ? "Lexical" : "Markdown"}
+          </Button>
+
+          <Separator orientation="vertical" className="h-6" />
+
           <LayoutTemplate className="h-4 w-4 text-gray-500" />
           <Select value={selectedTemplate} onValueChange={handleTemplateSelect}>
             <SelectTrigger className="w-[200px] font-mono">
@@ -379,7 +425,14 @@ export default function BasicTextEditor() {
 
       {/* Editor Area */}
       <div className="flex-1 p-4 overflow-auto">
-        {templateSections.length > 0 ? (
+        {isMarkdownView ? (
+          /* Visualização Markdown */
+          <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <pre className="whitespace-pre-wrap font-mono text-sm text-gray-900 leading-relaxed">
+              {generateMarkdown()}
+            </pre>
+          </div>
+        ) : templateSections.length > 0 ? (
           /* Layout com seções do template */
           <div className="space-y-4">
             <div className="mb-6">
