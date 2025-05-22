@@ -89,15 +89,10 @@ export default function FreeHandCanvasPlugin({
   const getMousePos = (canvas: HTMLCanvasElement, e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = canvas.getBoundingClientRect();
     
-    // Para canvas sem escalonamento, usar posição direta
-    // Considerar scroll do container se necessário
-    const container = canvas.parentElement;
-    const scrollLeft = container?.scrollLeft || 0;
-    const scrollTop = container?.scrollTop || 0;
-    
+    // Posição simples e direta sem considerações de scroll ou escala
     return {
-      x: e.clientX - rect.left + scrollLeft,
-      y: e.clientY - rect.top + scrollTop
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
     };
   };
 
