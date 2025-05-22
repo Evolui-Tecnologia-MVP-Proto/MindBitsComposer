@@ -276,6 +276,7 @@ export default function PluginsPage() {
       version: plugin.version,
       author: plugin.author || "",
       icon: plugin.icon || "Puzzle",
+      pageName: plugin.pageName || "",
     });
     setIsModalOpen(true);
   };
