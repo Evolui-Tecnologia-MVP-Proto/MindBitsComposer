@@ -41,9 +41,7 @@ export default function FreeHandCanvasPlugin({
 
   const colors = [
     '#000000', '#ff0000', '#00ff00', '#0000ff', 
-    '#ffff00', '#ff00ff', '#00ffff', '#ffffff',
-    '#808080', '#800000', '#008000', '#000080',
-    '#808000', '#800080', '#008080', '#c0c0c0'
+    '#ffff00', '#ffffff'
   ];
 
   const initializeCanvas = () => {
