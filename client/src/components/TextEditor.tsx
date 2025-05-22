@@ -228,6 +228,18 @@ function ToolbarPlugin() {
           </SelectContent>
         </Select>
       </div>
+      
+      {/* Modal do Plugin */}
+      {selectedPlugin && (
+        <PluginModal
+          plugin={selectedPlugin}
+          isOpen={isPluginModalOpen}
+          onClose={() => {
+            setIsPluginModalOpen(false);
+            setSelectedPlugin(null);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -382,18 +394,6 @@ export default function TextEditor() {
         <LinkPlugin />
 
       </LexicalComposer>
-      
-      {/* Modal do Plugin */}
-      {selectedPlugin && (
-        <PluginModal
-          plugin={selectedPlugin}
-          isOpen={isPluginModalOpen}
-          onClose={() => {
-            setIsPluginModalOpen(false);
-            setSelectedPlugin(null);
-          }}
-        />
-      )}
     </div>
   );
 }
