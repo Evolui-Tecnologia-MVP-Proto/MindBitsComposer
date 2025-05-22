@@ -121,6 +121,7 @@ export default function BasicTextEditor() {
 
   // Função para ser chamada pelo plugin quando uma imagem for exportada
   const handleImageExport = (imageUrl: string) => {
+    console.log('BasicTextEditor handleImageExport chamado com URL:', imageUrl);
     insertFreeHandLink(imageUrl);
     handlePluginClose();
   };
