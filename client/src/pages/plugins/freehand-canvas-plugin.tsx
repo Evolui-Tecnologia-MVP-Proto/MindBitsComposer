@@ -94,10 +94,10 @@ export default function FreeHandCanvasPlugin({
   }, []);
 
   const getMousePos = (canvas: HTMLCanvasElement, e: React.MouseEvent<HTMLCanvasElement>) => {
-    // Forçar diminuição do offset com valores negativos
+    // Resetar para posição original sem offset para ver comportamento base
     return {
-      x: e.nativeEvent.offsetX - 100, // -100px para esquerda (inverso)
-      y: e.nativeEvent.offsetY - 50   // -50px para cima (inverso)
+      x: e.nativeEvent.offsetX, // Posição original sem ajuste
+      y: e.nativeEvent.offsetY  // Posição original sem ajuste
     };
   };
 
