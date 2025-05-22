@@ -71,7 +71,10 @@ function ToolbarPlugin() {
         const response = await apiRequest("GET", "/api/plugins");
         if (response.ok) {
           const data = await response.json();
+          console.log("Todos os plugins:", data);
+          console.log("Status dos plugins:", data.map((p: any) => ({ name: p.name, status: p.status })));
           setPlugins(data.filter((plugin: Plugin) => plugin.status === "ACTIVE"));
+          console.log("Plugins ativos carregados:", data.filter((plugin: Plugin) => plugin.status === "ACTIVE"));
         }
       } catch (error) {
         console.error("Erro ao carregar plugins:", error);
