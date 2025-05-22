@@ -47,17 +47,18 @@ export default function PluginModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="p-0 gap-0 transition-all duration-300 fixed"
+        className="p-0 gap-0 transition-all duration-300"
         style={{ 
           width: isExpanded ? '100vw' : '50vw',
           height: isExpanded ? '100vh' : '60vh',
           maxWidth: isExpanded ? '100vw' : '50vw',
           maxHeight: isExpanded ? '100vh' : '60vh',
-          top: isExpanded ? '0' : '50%',
-          left: isExpanded ? '0' : '50%',
-          transform: isExpanded ? 'none' : 'translate(-50%, -50%)',
+          top: isExpanded ? '0' : '20vh',
+          left: isExpanded ? '0' : '25vw',
+          transform: 'none',
           margin: '0',
-          position: 'fixed'
+          position: 'fixed',
+          borderRadius: isExpanded ? '0' : '8px'
         }}
       >
         <VisuallyHidden>
