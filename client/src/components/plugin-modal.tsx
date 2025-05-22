@@ -40,18 +40,22 @@ export default function PluginModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="p-0 gap-0 !max-w-none"
+        className="p-0 gap-0 !max-w-none !max-h-none fixed inset-0 w-full h-full m-0 border-0"
         style={{
           position: 'fixed',
           top: '0',
           left: '0',
+          right: '0',
+          bottom: '0',
           width: '100vw',
           height: '100vh',
-          maxWidth: '100vw',
-          maxHeight: '100vh',
-          margin: 0,
-          zIndex: 9999,
-          borderRadius: 0
+          maxWidth: 'none',
+          maxHeight: 'none',
+          margin: '0',
+          padding: '0',
+          transform: 'none',
+          borderRadius: '0',
+          zIndex: 50
         }}
       >
         <VisuallyHidden>
