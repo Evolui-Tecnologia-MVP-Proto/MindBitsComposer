@@ -366,7 +366,28 @@ export default function BasicTextEditor() {
                 <CollapsibleContent className="p-4 border-t border-gray-200">
                   <textarea
                     value={section.content}
-                    onChange={(e) => updateSectionContent(index, e.target.value)}
+                    onChange={(e) => {
+                      updateSectionContent(index, e.target.value);
+                      // Capturar posição do cursor durante a digitação
+                      const textarea = e.target as HTMLTextAreaElement;
+                      const position = textarea.selectionStart;
+                      setLastCursorInfo({
+                        elementId: `section-${index}`,
+                        position: position,
+                        sectionIndex: index
+                      });
+                    }}
+                    onKeyUp={(e) => {
+                      // Capturar posição do cursor também nas teclas de navegação
+                      const textarea = e.target as HTMLTextAreaElement;
+                      const position = textarea.selectionStart;
+                      setLastCursorInfo({
+                        elementId: `section-${index}`,
+                        position: position,
+                        sectionIndex: index
+                      });
+                    }}
+                    onClick={handleGlobalClick}
                     className="w-full h-32 min-h-[8rem] resize-y border border-gray-300 rounded-md p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder={`Escreva o conteúdo para ${section.name}...`}
                   />
