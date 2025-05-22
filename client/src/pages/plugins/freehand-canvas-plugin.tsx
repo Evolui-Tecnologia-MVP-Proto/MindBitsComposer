@@ -359,7 +359,7 @@ export default function FreeHandCanvasPlugin({
         // Limpar seleção após envio bem-sucedido
         clearSelection();
         
-        // Notificar aplicação principal
+        // Notificar aplicação principal e fechar modal
         if (onDataExchange) {
           onDataExchange({
             action: 'export',
@@ -369,7 +369,8 @@ export default function FreeHandCanvasPlugin({
               selection: selectionRect,
               response: result
             },
-            message: 'Seleção exportada como JPG com sucesso!'
+            message: 'Seleção exportada como JPG com sucesso!',
+            closeModal: true // Instrução para fechar o modal
           });
         }
       } else {

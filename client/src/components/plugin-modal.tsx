@@ -22,6 +22,19 @@ export default function PluginModal({
 }: PluginModalProps) {
   const PluginComponent = PLUGIN_COMPONENTS[pluginName];
 
+  // Função para interceptar dados do plugin e verificar se deve fechar modal
+  const handleDataExchange = (data: any) => {
+    // Chamar função original se existir
+    if (onDataExchange) {
+      onDataExchange(data);
+    }
+    
+    // Verificar se o plugin solicitou fechamento do modal
+    if (data && data.closeModal === true) {
+      onClose();
+    }
+  };
+
   if (!PluginComponent) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
@@ -62,7 +75,7 @@ export default function PluginModal({
           <DialogTitle>Plugin {pluginName}</DialogTitle>
         </VisuallyHidden>
         <PluginComponent
-          onDataExchange={onDataExchange}
+          onDataExchange={handleDataExchange}
         />
       </DialogContent>
     </Dialog>
