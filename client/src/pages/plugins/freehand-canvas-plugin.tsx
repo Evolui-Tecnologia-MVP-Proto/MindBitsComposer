@@ -72,9 +72,13 @@ export default function FreeHandCanvasPlugin({
       
       const rect = container.getBoundingClientRect();
       const newSize = {
-        width: Math.floor(rect.width - 32), // Subtrair padding
-        height: Math.floor(rect.height - 32)
+        width: Math.floor(rect.width - 64), // Subtrair padding + border + margem
+        height: Math.floor(rect.height - 64) // Subtrair padding + border + margem
       };
+      
+      // Garantir tamanhos mínimos
+      if (newSize.width < 100) newSize.width = 100;
+      if (newSize.height < 100) newSize.height = 100;
       
       // Só atualizar se o tamanho mudou significativamente
       if (Math.abs(newSize.width - canvasSize.width) > 10 || 
@@ -83,13 +87,14 @@ export default function FreeHandCanvasPlugin({
       }
     };
 
-    // Executar imediatamente
-    updateCanvasSize();
+    // Aguardar um frame para garantir que o layout esteja estável
+    const timeoutId = setTimeout(updateCanvasSize, 100);
     
     // Escutar redimensionamento da janela
     window.addEventListener('resize', updateCanvasSize);
     
     return () => {
+      clearTimeout(timeoutId);
       window.removeEventListener('resize', updateCanvasSize);
     };
   }, []);
@@ -377,12 +382,12 @@ export default function FreeHandCanvasPlugin({
       {/* Canvas Area */}
       <div 
         ref={canvasContainerRef}
-        className="flex-1 p-4 bg-gray-50"
+        className="flex-1 p-4 bg-gray-50 min-h-0"
       >
-        <div className="h-full border border-gray-300 rounded-lg bg-white shadow-sm flex items-center justify-center">
+        <div className="h-full border border-gray-300 rounded-lg bg-white shadow-sm flex items-center justify-center overflow-hidden">
           <canvas
             ref={canvasRef}
-            className="cursor-crosshair block"
+            className="cursor-crosshair block max-w-full max-h-full"
             style={{
               width: `${canvasSize.width}px`,
               height: `${canvasSize.height}px`
