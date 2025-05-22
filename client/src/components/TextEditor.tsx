@@ -298,19 +298,25 @@ function ToolbarPlugin() {
               // Verificar se há seções ativas (template carregado)
               const activeTextarea = document.querySelector('[data-state="open"] textarea');
               
-              if (activeTextarea && sections.length > 0) {
+              if (activeTextarea) {
                 // Encontrar qual seção está ativa
                 const activeAccordionItem = (activeTextarea as HTMLElement).closest('[data-state="open"]');
                 if (activeAccordionItem) {
                   const trigger = activeAccordionItem.querySelector('[data-radix-collection-item]');
                   const sectionName = trigger?.textContent?.trim();
                   
-                  if (sectionName && sectionContents.hasOwnProperty(sectionName)) {
-                    // Inserir a TAG no conteúdo da seção ativa
-                    setSectionContents(prev => ({
-                      ...prev,
-                      [sectionName]: (prev[sectionName] || '') + '\n' + tagText + '\n'
-                    }));
+                  if (sectionName) {
+                    // Inserir a TAG diretamente no textarea ativo
+                    const textarea = activeTextarea as HTMLTextAreaElement;
+                    const currentValue = textarea.value || '';
+                    const newValue = currentValue + '\n' + tagText + '\n';
+                    
+                    // Atualizar o valor do textarea
+                    textarea.value = newValue;
+                    
+                    // Disparar evento de input para atualizar o estado React
+                    const inputEvent = new Event('input', { bubbles: true });
+                    textarea.dispatchEvent(inputEvent);
                   }
                 }
               } else {
@@ -516,6 +522,12 @@ export default function TextEditor() {
                           setSectionContents(prev => ({
                             ...prev,
                             [section]: e.target.value
+                          }));
+                        }}
+                        onInput={(e) => {
+                          setSectionContents(prev => ({
+                            ...prev,
+                            [section]: (e.target as HTMLTextAreaElement).value
                           }));
                         }}
                       />
