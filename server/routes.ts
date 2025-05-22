@@ -911,6 +911,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Plugin routes
+  app.get("/api/plugins", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const plugins = await storage.getAllPlugins();
+      res.json(plugins);
+    } catch (error) {
+      console.error("Erro ao buscar plugins:", error);
+      res.status(500).send("Erro ao buscar plugins");
+    }
+  });
+
+  app.get("/api/plugins/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const plugin = await storage.getPlugin(req.params.id);
+      if (!plugin) {
+        return res.status(404).send("Plugin não encontrado");
+      }
+      res.json(plugin);
+    } catch (error) {
+      console.error("Erro ao buscar plugin:", error);
+      res.status(500).send("Erro ao buscar plugin");
+    }
+  });
+
+  app.post("/api/plugins", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const plugin = await storage.createPlugin(req.body);
+      res.status(201).json(plugin);
+    } catch (error) {
+      console.error("Erro ao criar plugin:", error);
+      res.status(500).send("Erro ao criar plugin");
+    }
+  });
+
+  app.put("/api/plugins/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const plugin = await storage.updatePlugin(req.params.id, req.body);
+      res.json(plugin);
+    } catch (error) {
+      console.error("Erro ao atualizar plugin:", error);
+      res.status(500).send("Erro ao atualizar plugin");
+    }
+  });
+
+  app.post("/api/plugins/:id/toggle", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const plugin = await storage.togglePluginStatus(req.params.id);
+      res.json(plugin);
+    } catch (error) {
+      console.error("Erro ao alterar status do plugin:", error);
+      res.status(500).send("Erro ao alterar status do plugin");
+    }
+  });
+
+  app.delete("/api/plugins/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      await storage.deletePlugin(req.params.id);
+      res.status(204).end();
+    } catch (error) {
+      console.error("Erro ao excluir plugin:", error);
+      res.status(500).send("Erro ao excluir plugin");
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 

@@ -1009,6 +1009,67 @@ export class MemStorage implements IStorage {
       this.mappingColumns.delete(id);
     }
   }
+
+  // Plugin operations
+  async getPlugin(id: string): Promise<Plugin | undefined> {
+    return this.plugins.get(id);
+  }
+
+  async getPluginByName(name: string): Promise<Plugin | undefined> {
+    return Array.from(this.plugins.values()).find(plugin => plugin.name === name);
+  }
+
+  async createPlugin(insertPlugin: InsertPlugin): Promise<Plugin> {
+    const plugin: Plugin = {
+      id: crypto.randomUUID(),
+      ...insertPlugin,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.plugins.set(plugin.id, plugin);
+    return plugin;
+  }
+
+  async getAllPlugins(): Promise<Plugin[]> {
+    return Array.from(this.plugins.values());
+  }
+
+  async getPluginsByType(type: PluginType): Promise<Plugin[]> {
+    return Array.from(this.plugins.values()).filter(plugin => plugin.type === type);
+  }
+
+  async getPluginsByStatus(status: PluginStatus): Promise<Plugin[]> {
+    return Array.from(this.plugins.values()).filter(plugin => plugin.status === status);
+  }
+
+  async updatePlugin(id: string, data: Partial<Plugin>): Promise<Plugin> {
+    const existingPlugin = this.plugins.get(id);
+    if (!existingPlugin) {
+      throw new Error("Plugin não encontrado");
+    }
+
+    const updatedPlugin: Plugin = {
+      ...existingPlugin,
+      ...data,
+      updatedAt: new Date()
+    };
+    this.plugins.set(id, updatedPlugin);
+    return updatedPlugin;
+  }
+
+  async togglePluginStatus(id: string): Promise<Plugin> {
+    const plugin = await this.getPlugin(id);
+    if (!plugin) {
+      throw new Error("Plugin não encontrado");
+    }
+
+    const newStatus = plugin.status === PluginStatus.ACTIVE ? PluginStatus.INACTIVE : PluginStatus.ACTIVE;
+    return await this.updatePlugin(id, { status: newStatus });
+  }
+
+  async deletePlugin(id: string): Promise<void> {
+    this.plugins.delete(id);
+  }
 }
 
 // Always use DatabaseStorage to ensure data persistence

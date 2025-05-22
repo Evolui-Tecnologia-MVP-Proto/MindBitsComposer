@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Settings, FileText, Edit, GitBranch, File, Cog } from "lucide-react";
+import { Settings, FileText, Edit, GitBranch, File, Cog, Puzzle } from "lucide-react";
 
 type SidebarProps = {
   isMobileOpen: boolean;
@@ -22,6 +22,8 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
       setActiveItem("fluxos");
     } else if (location.startsWith("/documentos")) {
       setActiveItem("documentos");
+    } else if (location.startsWith("/plugins")) {
+      setActiveItem("plugins");
     } else if (location.startsWith("/configuracoes")) {
       setActiveItem("configuracoes");
     } else {
