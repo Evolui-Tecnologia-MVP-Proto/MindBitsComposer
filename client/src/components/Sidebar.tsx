@@ -100,7 +100,18 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
               </div>
             </Link>
           </div>
-
+          
+          <div className="sidebar-item-container">
+            <Link href="/plugins">
+              <div 
+                className={`sidebar-item ${activeItem === "plugins" ? "sidebar-active" : ""}`}
+                onClick={closeMobileMenu}
+              >
+                <Puzzle className="mr-3 h-6 w-6" />
+                Plugins
+              </div>
+            </Link>
+          </div>
 
         </nav>
       </aside>
