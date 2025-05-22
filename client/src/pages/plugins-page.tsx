@@ -450,10 +450,30 @@ export default function PluginsPage() {
                 {plugins.map((plugin) => (
                   <TableRow key={plugin.id}>
                     <TableCell>
-                      <div>
-                        <div className="font-medium">{plugin.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {plugin.description}
+                      <div className="flex items-center gap-3">
+                        {/* Ícone do plugin */}
+                        <div className="flex-shrink-0">
+                          {plugin.icon && availableIcons[plugin.icon as keyof typeof availableIcons] ? (
+                            React.createElement(availableIcons[plugin.icon as keyof typeof availableIcons], { 
+                              className: "h-6 w-6 text-blue-600" 
+                            })
+                          ) : plugin.icon && plugin.icon.startsWith('/uploads/') ? (
+                            <img 
+                              src={plugin.icon} 
+                              alt={`Ícone ${plugin.name}`}
+                              className="h-6 w-6 rounded object-cover"
+                            />
+                          ) : (
+                            <Puzzle className="h-6 w-6 text-gray-400" />
+                          )}
+                        </div>
+                        
+                        {/* Nome e descrição */}
+                        <div>
+                          <div className="font-medium">{plugin.name}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {plugin.description}
+                          </div>
                         </div>
                       </div>
                     </TableCell>
