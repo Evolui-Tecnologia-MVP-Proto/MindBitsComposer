@@ -1093,38 +1093,35 @@ export default function AdminPage() {
                           <FormItem>
                             <FormLabel>Coluna do Monday</FormLabel>
                             <FormControl>
-                              <div className="space-y-2">
-                                <div className="border rounded-md overflow-hidden">
-                                  <div className="p-2 bg-gray-50 border-b text-sm text-gray-500">
-                                    Selecione uma coluna do Monday
-                                  </div>
-                                  <div className="p-1">
-                                    <select
-                                      className="flex h-10 w-full rounded-md border-0 bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                                      {...field}
-                                    >
-                                      <option value="">-- Escolha uma coluna --</option>
-                                      {mondayColumns.map((column) => {
-                                        // Força a exibição do tipo da coluna junto com o título
-                                        const optionText = `${column.title} [${column.type}]`;
-                                        return (
-                                          <option key={column.id} value={column.columnId}>
-                                            {optionText}
-                                          </option>
-                                        );
-                                      })}
-                                    </select>
-                                  </div>
+                              <div className="space-y-4">
+                                <div className="relative">
+                                  <select
+                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                    {...field}
+                                  >
+                                    <option value="">Selecione uma coluna</option>
+                                    {mondayColumns.map((column) => (
+                                      <option key={column.id} value={column.columnId}>
+                                        {column.title} 
+                                      </option>
+                                    ))}
+                                  </select>
                                 </div>
-                                
-                                {field.value && (
-                                  <div className="flex items-center gap-2 p-2 border rounded-md bg-muted/20">
-                                    <span className="text-sm font-medium">Tipo:</span>
-                                    <Badge>
-                                      {mondayColumns.find(c => c.columnId === field.value)?.type?.toUpperCase() || 'DESCONHECIDO'}
-                                    </Badge>
-                                  </div>
-                                )}
+
+                                <div className="grid grid-cols-2 gap-2">
+                                  {mondayColumns.map(column => (
+                                    <div 
+                                      key={column.id} 
+                                      className={`flex items-center justify-between gap-2 p-2 border rounded-md cursor-pointer transition-colors ${field.value === column.columnId ? 'bg-primary/10 border-primary' : 'hover:bg-muted/10'}`}
+                                      onClick={() => field.onChange(column.columnId)}
+                                    >
+                                      <div className="text-sm font-medium truncate">{column.title}</div>
+                                      <Badge variant={field.value === column.columnId ? "default" : "outline"}>
+                                        {column.type?.toUpperCase()}
+                                      </Badge>
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
                             </FormControl>
                             <FormMessage />
