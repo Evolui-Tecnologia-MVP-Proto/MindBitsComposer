@@ -104,17 +104,18 @@
   /* Plugin Modal Positioning Override */
   .plugin-modal-content {
     position: fixed !important;
-    top: 20vh !important;
-    left: 25vw !important;
+    top: 50% !important;
+    left: 50% !important;
     width: 50vw !important;
     height: 60vh !important;
     max-width: 50vw !important;
     max-height: 60vh !important;
     margin: 0 !important;
-    transform: none !important;
+    transform: translate(-50%, -50%) !important;
     right: auto !important;
     bottom: auto !important;
     inset: auto !important;
+    z-index: 9999 !important;
   }
 
   .plugin-modal-content.expanded {
