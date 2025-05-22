@@ -22,12 +22,7 @@ export default function PluginModal({
 }: PluginModalProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  console.log("PluginModal recebeu pluginName:", pluginName);
-  console.log("Componentes disponíveis:", Object.keys(PLUGIN_COMPONENTS));
-
   const PluginComponent = PLUGIN_COMPONENTS[pluginName];
-  
-  console.log("Componente encontrado:", PluginComponent ? "SIM" : "NÃO");
 
   if (!PluginComponent) {
     return (
@@ -47,22 +42,23 @@ export default function PluginModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="p-0 gap-0 transition-all duration-300"
+        className="p-0 gap-0 transition-all duration-300 !fixed !m-0"
         style={{ 
           width: isExpanded ? '100vw' : '50vw',
           height: isExpanded ? '100vh' : '60vh',
-          maxWidth: isExpanded ? '100vw' : '50vw',
+          minHeight: isExpanded ? '100vh' : '60vh',
           maxHeight: isExpanded ? '100vh' : '60vh',
-          top: isExpanded ? '0' : 'calc(50vh - 30vh)',
-          left: isExpanded ? '0' : 'calc(50vw - 25vw)',
+          top: isExpanded ? '0px' : '20vh',
+          left: isExpanded ? '0px' : '25vw',
           right: 'auto',
           bottom: 'auto',
-          transform: 'none',
-          margin: '0',
-          position: 'fixed',
+          transform: 'none !important',
+          margin: '0 !important',
+          position: 'fixed !important',
           borderRadius: isExpanded ? '0' : '8px',
-          zIndex: 9999
-        }}
+          zIndex: 9999,
+          inset: 'auto'
+        } as React.CSSProperties}
       >
         <VisuallyHidden>
           <DialogTitle>Plugin {pluginName}</DialogTitle>
