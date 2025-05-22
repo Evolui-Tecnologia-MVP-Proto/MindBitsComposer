@@ -2,16 +2,24 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Bold, Italic, Save, Palette, LayoutTemplate } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Bold, Italic, Save, Palette, LayoutTemplate, ChevronDown, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import PluginModal from "@/components/plugin-modal";
 import { Plugin, PluginType, PluginStatus, Template } from "@shared/schema";
+
+interface TemplateSection {
+  name: string;
+  content: string;
+  isOpen: boolean;
+}
 
 export default function BasicTextEditor() {
   const [content, setContent] = useState("");
   const [selectedPlugin, setSelectedPlugin] = useState<Plugin | null>(null);
   const [isPluginModalOpen, setIsPluginModalOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+  const [templateSections, setTemplateSections] = useState<TemplateSection[]>([]);
 
   // Buscar templates estruturais
   const { data: templates } = useQuery<Template[]>({
@@ -65,18 +73,39 @@ export default function BasicTextEditor() {
       try {
         const sections = JSON.parse(template.structure as string);
         if (Array.isArray(sections)) {
-          let templateContent = `# ${template.code}\n\n${template.description}\n\n`;
+          // Criar seções colapsíveis baseadas no template
+          const newSections: TemplateSection[] = sections.map((sectionName: string) => ({
+            name: sectionName,
+            content: '',
+            isOpen: true // Começar todas abertas
+          }));
           
-          sections.forEach((section: string) => {
-            templateContent += `## ${section}\n\n[Conteúdo da seção ${section}]\n\n`;
-          });
-          
-          setContent(templateContent);
+          setTemplateSections(newSections);
+          setContent(''); // Limpar o editor principal
         }
       } catch (error) {
         console.error('Erro ao processar estrutura do template:', error);
+        // Em caso de erro, usar formato simples
+        setTemplateSections([]);
+        setContent(`# ${template.code}\n\n${template.description}\n\nEstrutura inválida no template.`);
       }
     }
+  };
+
+  const updateSectionContent = (index: number, newContent: string) => {
+    setTemplateSections(prev => 
+      prev.map((section, i) => 
+        i === index ? { ...section, content: newContent } : section
+      )
+    );
+  };
+
+  const toggleSection = (index: number) => {
+    setTemplateSections(prev => 
+      prev.map((section, i) => 
+        i === index ? { ...section, isOpen: !section.isOpen } : section
+      )
+    );
   };
 
   return (
@@ -174,15 +203,58 @@ export default function BasicTextEditor() {
       </div>
 
       {/* Editor Area */}
-      <div className="flex-1 p-4">
-        <textarea
-          id="editor-textarea"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Comece a escrever seu documento..."
-          className="w-full h-full resize-none border-none outline-none text-gray-900 placeholder-gray-400"
-          style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
-        />
+      <div className="flex-1 p-4 overflow-auto">
+        {templateSections.length > 0 ? (
+          /* Layout com seções do template */
+          <div className="space-y-4">
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                {templates?.find(t => t.id === selectedTemplate)?.code}
+              </h1>
+              <p className="text-gray-600">
+                {templates?.find(t => t.id === selectedTemplate)?.description}
+              </p>
+            </div>
+            
+            {templateSections.map((section, index) => (
+              <Collapsible
+                key={index}
+                open={section.isOpen}
+                onOpenChange={() => toggleSection(index)}
+                className="border border-gray-200 rounded-lg"
+              >
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 text-left bg-gray-50 hover:bg-gray-100 transition-colors">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    {section.name}
+                  </h3>
+                  {section.isOpen ? (
+                    <ChevronDown className="h-5 w-5 text-gray-500" />
+                  ) : (
+                    <ChevronRight className="h-5 w-5 text-gray-500" />
+                  )}
+                </CollapsibleTrigger>
+                <CollapsibleContent className="p-4 border-t border-gray-200">
+                  <textarea
+                    value={section.content}
+                    onChange={(e) => updateSectionContent(index, e.target.value)}
+                    className="w-full h-32 min-h-[8rem] resize-y border border-gray-300 rounded-md p-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder={`Escreva o conteúdo para ${section.name}...`}
+                  />
+                </CollapsibleContent>
+              </Collapsible>
+            ))}
+          </div>
+        ) : (
+          /* Editor simples quando não há template selecionado */
+          <textarea
+            id="editor-textarea"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Comece a escrever seu documento ou selecione um template..."
+            className="w-full h-full resize-none border-none outline-none text-gray-900 placeholder-gray-400"
+            style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
+          />
+        )}
       </div>
 
       <PluginModal
