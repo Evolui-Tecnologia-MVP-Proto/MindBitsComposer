@@ -26,6 +26,28 @@ export default function BasicTextEditor() {
     sectionIndex?: number;
   } | null>(null);
 
+  // Capturar cursor globalmente
+  React.useEffect(() => {
+    const handleGlobalClick = () => {
+      const activeElement = document.activeElement as HTMLTextAreaElement;
+      if (activeElement && activeElement.tagName === 'TEXTAREA') {
+        const textareas = document.querySelectorAll('textarea');
+        const textareaIndex = Array.from(textareas).indexOf(activeElement);
+        
+        setTimeout(() => {
+          setLastCursorInfo({
+            elementId: activeElement.id || 'editor-textarea',
+            position: activeElement.selectionStart,
+            sectionIndex: textareaIndex >= 0 ? textareaIndex : undefined
+          });
+        }, 10);
+      }
+    };
+
+    document.addEventListener('click', handleGlobalClick);
+    return () => document.removeEventListener('click', handleGlobalClick);
+  }, []);
+
   // Buscar templates estruturais
   const { data: templates } = useQuery<Template[]>({
     queryKey: ["/api/templates/struct"],
