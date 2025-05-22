@@ -3,7 +3,51 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Bold, Italic, Save, Palette, LayoutTemplate, ChevronDown, ChevronRight, Eye, Code } from "lucide-react";
+import { 
+  Bold, 
+  Italic, 
+  Save, 
+  Palette, 
+  LayoutTemplate, 
+  ChevronDown, 
+  ChevronRight, 
+  Eye, 
+  Code,
+  Puzzle,
+  Database,
+  Bot,
+  BarChart3,
+  FileText,
+  Zap,
+  Settings,
+  Image,
+  Brush,
+  PenTool,
+  Layers,
+  Globe,
+  Calculator,
+  Clock,
+  Users,
+  Mail,
+  Phone,
+  Search,
+  Filter,
+  Download,
+  Upload,
+  Link,
+  Share,
+  Copy,
+  Edit,
+  Trash,
+  Plus,
+  Minus,
+  Check,
+  X,
+  ArrowRight,
+  ArrowLeft,
+  ArrowUp,
+  ArrowDown
+} from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import PluginModal from "@/components/plugin-modal";
 import SimpleRichTextDisplay from "@/components/SimpleRichTextDisplay";
@@ -375,14 +419,48 @@ export default function BasicTextEditor() {
                   />
                 );
               } else {
-                // Ícone da biblioteca Lucide React
+                // Mapeamento direto dos ícones do Lucide React
                 const iconName = plugin.icon || 'Puzzle';
-                try {
-                  const IconComponent = require('lucide-react')[iconName];
-                  return IconComponent ? <IconComponent className="h-4 w-4" /> : <Palette className="h-4 w-4" />;
-                } catch {
-                  return <Palette className="h-4 w-4" />;
-                }
+                const iconMap = {
+                  'Puzzle': Puzzle,
+                  'Database': Database,
+                  'Bot': Bot,
+                  'BarChart3': BarChart3,
+                  'FileText': FileText,
+                  'Zap': Zap,
+                  'Settings': Settings,
+                  'Image': Image,
+                  'Brush': Brush,
+                  'PenTool': PenTool,
+                  'Palette': Palette,
+                  'Layers': Layers,
+                  'Globe': Globe,
+                  'Calculator': Calculator,
+                  'Clock': Clock,
+                  'Users': Users,
+                  'Mail': Mail,
+                  'Phone': Phone,
+                  'Search': Search,
+                  'Filter': Filter,
+                  'Download': Download,
+                  'Upload': Upload,
+                  'Link': Link,
+                  'Share': Share,
+                  'Copy': Copy,
+                  'Edit': Edit,
+                  'Trash': Trash,
+                  'Plus': Plus,
+                  'Minus': Minus,
+                  'Check': Check,
+                  'X': X,
+                  'ArrowRight': ArrowRight,
+                  'ArrowLeft': ArrowLeft,
+                  'ArrowUp': ArrowUp,
+                  'ArrowDown': ArrowDown
+                };
+                
+                const IconComponent = iconMap[iconName] || Puzzle;
+                return <IconComponent className="h-4 w-4" />;
               }
             };
 
