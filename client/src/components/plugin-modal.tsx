@@ -35,6 +35,11 @@ export default function PluginModal({
       onDataExchange(data);
     }
     
+    // Se é uma exportação de imagem, chamar onImageExport
+    if (data && data.action === 'export' && data.type === 'selection_image' && data.data?.imageUrl && onImageExport) {
+      onImageExport(data.data.imageUrl);
+    }
+    
     // Verificar se o plugin solicitou fechamento do modal
     if (data && data.closeModal === true) {
       onClose();

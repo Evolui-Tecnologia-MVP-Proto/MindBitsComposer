@@ -367,7 +367,8 @@ export default function FreeHandCanvasPlugin({
             data: {
               success: true,
               selection: selectionRect,
-              response: result
+              response: result,
+              imageUrl: result.url // Adicionar URL da imagem para o editor
             },
             message: 'Seleção exportada como JPG com sucesso!',
             closeModal: true // Instrução para fechar o modal
