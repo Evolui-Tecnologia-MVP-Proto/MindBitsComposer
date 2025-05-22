@@ -293,36 +293,44 @@ function ToolbarPlugin() {
               console.log('URL da imagem construída:', imageUrl);
               
               // Inserir TAG clicável na seção ativa do template
-              // Verificar se há seções de template ativas
-              const activeSection = document.querySelector('.accordion-content[data-state="open"] [contenteditable="true"]');
+              const tagText = `[🖼️ IMAGEM: ${data.data.response.filename} - ${Math.round(data.data.selection.width)}x${Math.round(data.data.selection.height)}px - Clique para visualizar]`;
+              
+              // Tentar inserir na seção ativa usando abordagem mais direta
+              const activeSection = document.querySelector('[data-state="open"] [contenteditable="true"]');
               
               if (activeSection) {
-                // Inserir na seção ativa
-                const tagText = `\n[🖼️ IMAGEM: ${data.data.response.filename} - ${Math.round(data.data.selection.width)}x${Math.round(data.data.selection.height)}px - Clique para visualizar]\n`;
+                // Focar na seção ativa
+                (activeSection as HTMLElement).focus();
                 
-                // Inserir o texto na seção ativa
-                const selection = window.getSelection();
-                if (selection && selection.rangeCount > 0) {
-                  const range = selection.getRangeAt(0);
-                  const textNode = document.createTextNode(tagText);
-                  range.insertNode(textNode);
+                // Usar document.execCommand para inserir o texto
+                if (document.execCommand) {
+                  // Posicionar cursor no final
+                  const range = document.createRange();
+                  const selection = window.getSelection();
                   
-                  // Posicionar cursor após a TAG
-                  range.setStartAfter(textNode);
+                  if (activeSection.childNodes.length > 0) {
+                    range.setStart(activeSection, activeSection.childNodes.length);
+                  } else {
+                    range.setStart(activeSection, 0);
+                  }
                   range.collapse(true);
-                  selection.removeAllRanges();
-                  selection.addRange(range);
+                  
+                  selection?.removeAllRanges();
+                  selection?.addRange(range);
+                  
+                  // Inserir quebra de linha e texto
+                  document.execCommand('insertText', false, '\n' + tagText + '\n');
                 } else {
-                  // Se não há seleção, inserir no final da seção
-                  activeSection.textContent = (activeSection.textContent || '') + tagText;
+                  // Fallback moderno
+                  const currentText = activeSection.textContent || '';
+                  activeSection.textContent = currentText + '\n' + tagText + '\n';
                 }
               } else {
-                // Inserir no editor principal se não há seções ativas
+                // Fallback: inserir no editor principal
                 editor.update(() => {
                   const selection = $getSelection();
                   if (selection) {
-                    const tagText = `\n[🖼️ IMAGEM: ${data.data.response.filename} - ${Math.round(data.data.selection.width)}x${Math.round(data.data.selection.height)}px - Clique para visualizar]\n`;
-                    selection.insertText(tagText);
+                    selection.insertText(`\n${tagText}\n`);
                   }
                 });
               }
