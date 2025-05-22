@@ -101,7 +101,7 @@ export default function SimpleRichTextDisplay({
       {/* Quando não está editando, mostra apenas os links azuis */}
       {!isEditing && content && (
         <div
-          className={`${className} cursor-text overflow-auto`}
+          className={`${className} cursor-text overflow-auto font-mono`}
           onClick={() => {
             setIsEditing(true);
             setTimeout(() => textareaRef.current?.focus(), 10);
@@ -131,7 +131,7 @@ export default function SimpleRichTextDisplay({
           onKeyUp={handleCursorEvents}
           onClick={handleCursorEvents}
           onBlur={() => setIsEditing(false)}
-          className={className}
+          className={`${className} font-mono`}
           placeholder={placeholder}
           autoFocus={isEditing}
           style={{ minHeight: '8rem', height: 'auto', resize: 'none' }}
