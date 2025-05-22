@@ -114,6 +114,21 @@ const serviceConnectionSchema = z.object({
   description: z.string().optional(),
 });
 
+// Lista das colunas da tabela documentos com seus tipos
+const DOCUMENTOS_COLUMNS = [
+  { field: "origem", label: "Origem", type: "text" },
+  { field: "objeto", label: "Objeto/Nome", type: "text" },
+  { field: "cliente", label: "Cliente", type: "text" },
+  { field: "responsavel", label: "Responsável", type: "text" },
+  { field: "sistema", label: "Sistema", type: "text" },
+  { field: "modulo", label: "Módulo", type: "text" },
+  { field: "descricao", label: "Descrição", type: "text" },
+  { field: "status", label: "Status", type: "text" },
+  { field: "statusOrigem", label: "Status Origem", type: "text" },
+  { field: "createdAt", label: "Data Criação", type: "timestamp" },
+  { field: "updatedAt", label: "Data Atualização", type: "timestamp" },
+];
+
 export default function AdminPage() {
   const { toast } = useToast();
   
@@ -1505,7 +1520,17 @@ export default function AdminPage() {
                   <FormItem>
                     <FormLabel>Campo na Aplicação</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nome do campo na aplicação" {...field} />
+                      <select
+                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                        {...field}
+                      >
+                        <option value="">Selecione o campo</option>
+                        {DOCUMENTOS_COLUMNS.map((column) => (
+                          <option key={column.field} value={column.field}>
+                            {column.label} ({column.type})
+                          </option>
+                        ))}
+                      </select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
