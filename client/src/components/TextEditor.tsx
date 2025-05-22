@@ -248,14 +248,14 @@ function ToolbarPlugin() {
             if (data && data.type === 'selection_image' && data.data?.success && data.data?.response?.url) {
               const imageUrl = data.data.response.url;
               
-              // Inserir imagem no editor na posição do cursor
+              // Inserir imagem no editor usando uma abordagem mais direta
               editor.update(() => {
                 const selection = $getSelection();
                 if (selection) {
-                  // Criar texto com referência à imagem (implementação simples)
-                  const imageText = $createTextNode(`[Imagem do FreeHand Canvas: ${data.data.response.filename}]`);
+                  // Criar um placeholder visual para a imagem
+                  const imagePlaceholder = $createTextNode(`\n🖼️ IMAGEM DO FREEHAND CANVAS\n📁 Arquivo: ${data.data.response.filename}\n🔗 URL: ${imageUrl}\n📏 Seleção: ${data.data.selection.width}x${data.data.selection.height}px\n⏰ ${new Date().toLocaleString()}\n`);
                   const paragraph = $createParagraphNode();
-                  paragraph.append(imageText);
+                  paragraph.append(imagePlaceholder);
                   selection.insertNodes([paragraph]);
                 }
               });
