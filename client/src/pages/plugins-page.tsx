@@ -388,13 +388,7 @@ export default function PluginsPage() {
 
       {/* Tabela de plugins */}
       <Card>
-        <CardHeader>
-          <CardTitle>Plugins ({plugins.length})</CardTitle>
-          <CardDescription>
-            Lista de todos os plugins configurados no sistema
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
           {isLoading ? (
             <div className="text-center py-4">Carregando plugins...</div>
           ) : plugins.length === 0 ? (
