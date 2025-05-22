@@ -53,13 +53,13 @@ export default function PluginModal({
           height: isExpanded ? '100vh' : '60vh',
           maxWidth: isExpanded ? '100vw' : '50vw',
           maxHeight: isExpanded ? '100vh' : '60vh',
-          top: isExpanded ? '0px' : '20vh',
-          left: isExpanded ? '0px' : '25vw',
+          top: isExpanded ? '0px' : '50%',
+          left: isExpanded ? '0px' : '50%',
+          transform: isExpanded ? 'none' : 'translate(-50%, -50%)',
           right: 'auto',
           bottom: 'auto',
-          transform: 'none !important',
-          margin: '0 !important',
-          position: 'fixed !important',
+          margin: '0',
+          position: 'fixed',
           borderRadius: isExpanded ? '0' : '8px',
           zIndex: 9999
         }}
