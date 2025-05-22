@@ -7,10 +7,19 @@ import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMo
 import { db } from "./db";
 import { ZodError } from "zod";
 import fetch from "node-fetch";
+import path from "path";
+import fs from "fs";
+import multer from "multer";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication and user management routes
   setupAuth(app);
+  
+  // Configure multer for file uploads
+  const upload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+  });
   
   // Template routes
   // Get all templates
@@ -1126,33 +1135,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Canvas selection upload endpoint
-  app.post("/api/canvas/upload-selection", async (req, res) => {
+  app.post("/api/canvas/upload-selection", upload.single('image'), async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      // Simular upload bem-sucedido da seleção
-      // Em uma implementação real, você salvaria a imagem em um storage
+      // Verificar se há arquivo de imagem
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message: "Nenhuma imagem fornecida"
+        });
+      }
+      
       const timestamp = new Date().toISOString();
       const filename = `selection_${Date.now()}.jpg`;
+      const filepath = path.join(process.cwd(), "uploads", "canvas", filename);
+      
+      // Salvar arquivo no servidor
+      await fs.promises.writeFile(filepath, req.file.buffer);
       
       const result = {
         success: true,
         filename,
         timestamp,
         message: "Seleção do canvas salva com sucesso",
-        url: `/uploads/canvas/${filename}`, // URL fictícia
+        url: `/uploads/canvas/${filename}`,
         metadata: {
           format: "jpeg",
           quality: 0.9,
           uploadedBy: req.user?.name || "Usuário",
-          size: "tamanho_da_imagem" // seria calculado na implementação real
+          size: req.file.size
         }
       };
 
       console.log("Seleção do canvas recebida:", {
         user: req.user?.name,
         filename,
-        timestamp
+        timestamp,
+        size: req.file.size
       });
 
       res.status(200).json(result);
