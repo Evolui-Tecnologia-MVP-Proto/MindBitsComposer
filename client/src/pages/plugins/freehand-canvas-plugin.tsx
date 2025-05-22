@@ -91,11 +91,13 @@ export default function FreeHandCanvasPlugin({
     let x = e.nativeEvent.offsetX;
     let y = e.nativeEvent.offsetY;
     
-    // Compensar deslocamento quando a modal está retraída
-    if (!isExpanded) {
-      x += 100; // 100px para direita (50 + 50)
-      y += 30; // 30px para baixo
-    }
+    console.log('Estado isExpanded:', isExpanded, 'Posição original:', x, y);
+    
+    // Sempre aplicar deslocamento para testar
+    x += 100; // 100px para direita
+    y += 30; // 30px para baixo
+    
+    console.log('Posição após ajuste:', x, y);
     
     return { x, y };
   };
