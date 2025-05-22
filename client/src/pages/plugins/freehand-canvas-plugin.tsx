@@ -14,7 +14,8 @@ import {
   Trash2,
   Circle,
   Square,
-  Minus
+  Minus,
+  MousePointer2
 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
 
@@ -27,10 +28,12 @@ export default function FreeHandCanvasPlugin({
 }: FreeHandCanvasPluginProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [currentTool, setCurrentTool] = useState<'eraser' | 'circle' | 'square' | 'line'>('line');
+  const [currentTool, setCurrentTool] = useState<'select' | 'eraser' | 'circle' | 'square' | 'line'>('line');
   const [brushSize, setBrushSize] = useState([3]);
   const [currentColor, setCurrentColor] = useState('#000000');
   const [backgroundColor, setBackgroundColor] = useState('#ffffff');
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [selectionRect, setSelectionRect] = useState<{x: number, y: number, width: number, height: number} | null>(null);
   
   // Referência para container do canvas para cálculo dinâmico
   const canvasContainerRef = useRef<HTMLDivElement>(null);
@@ -138,6 +141,17 @@ export default function FreeHandCanvasPlugin({
 
     const pos = getMousePos(canvas, e);
 
+    if (currentTool === 'select') {
+      setIsSelecting(true);
+      setSelectionRect({
+        x: pos.x,
+        y: pos.y,
+        width: 0,
+        height: 0
+      });
+      return;
+    }
+
     setIsDrawing(true);
     
     const ctx = canvas.getContext('2d');
@@ -148,15 +162,43 @@ export default function FreeHandCanvasPlugin({
   };
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing) return;
-
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    const pos = getMousePos(canvas, e);
+
+    // Lógica de seleção
+    if (isSelecting && selectionRect) {
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // Redesenhar o canvas original (sem a seleção anterior)
+      redrawCanvas();
+
+      // Calcular dimensões da seleção
+      const width = pos.x - selectionRect.x;
+      const height = pos.y - selectionRect.y;
+
+      // Desenhar retângulo de seleção
+      ctx.strokeStyle = '#007bff';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([5, 5]);
+      ctx.strokeRect(selectionRect.x, selectionRect.y, width, height);
+      ctx.setLineDash([]);
+
+      // Atualizar dimensões da seleção
+      setSelectionRect({
+        ...selectionRect,
+        width,
+        height
+      });
+      return;
+    }
+
+    if (!isDrawing) return;
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-
-    const pos = getMousePos(canvas, e);
 
     if (currentTool === 'eraser') {
       ctx.globalCompositeOperation = 'destination-out';
@@ -171,8 +213,30 @@ export default function FreeHandCanvasPlugin({
     ctx.stroke();
   };
 
+  // Função para redesenhar o canvas original
+  const redrawCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Limpar canvas
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Aqui você pode adicionar lógica para redesenhar desenhos salvos se necessário
+  };
+
   const stopDrawing = () => {
     setIsDrawing(false);
+    
+    // Finalizar seleção se estiver selecionando
+    if (isSelecting) {
+      setIsSelecting(false);
+      console.log('Área selecionada:', selectionRect);
+      // Aqui você pode adicionar lógica para processar a área selecionada
+    }
   };
 
   const clearCanvas = () => {
