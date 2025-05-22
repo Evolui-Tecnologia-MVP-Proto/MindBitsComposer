@@ -361,15 +361,20 @@ export default function BasicTextEditor() {
 
           <Separator orientation="vertical" className="h-6" />
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={openFreeHandCanvas}
-            className="flex items-center gap-1"
-            title="Abrir FreeHand Canvas"
-          >
-            <Palette className="h-4 w-4" />
-          </Button>
+          {/* Botões dinâmicos para plugins ativos */}
+          {activePlugins.map((plugin) => (
+            <Button
+              key={plugin.id}
+              variant="ghost"
+              size="sm"
+              onClick={() => openPlugin(plugin)}
+              className="flex items-center gap-1"
+              title={`Abrir ${plugin.name}`}
+            >
+              <Palette className="h-4 w-4" />
+              <span className="text-xs">{plugin.name}</span>
+            </Button>
+          ))}
 
           <Separator orientation="vertical" className="h-6" />
 
