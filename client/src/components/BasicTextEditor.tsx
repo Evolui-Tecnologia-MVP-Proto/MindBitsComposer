@@ -362,19 +362,44 @@ export default function BasicTextEditor() {
           <Separator orientation="vertical" className="h-6" />
 
           {/* Botões dinâmicos para plugins ativos */}
-          {activePlugins.map((plugin) => (
-            <Button
-              key={plugin.id}
-              variant="ghost"
-              size="sm"
-              onClick={() => openPlugin(plugin)}
-              className="flex items-center gap-1"
-              title={`Abrir ${plugin.name}`}
-            >
-              <Palette className="h-4 w-4" />
-              <span className="text-xs">{plugin.name}</span>
-            </Button>
-          ))}
+          {activePlugins.map((plugin) => {
+            // Função para renderizar o ícone correto do plugin
+            const renderPluginIcon = () => {
+              if (plugin.icon && plugin.icon.startsWith('http')) {
+                // Ícone personalizado (URL de imagem)
+                return (
+                  <img 
+                    src={plugin.icon} 
+                    alt={plugin.name}
+                    className="h-4 w-4 object-contain"
+                  />
+                );
+              } else {
+                // Ícone da biblioteca Lucide React
+                const iconName = plugin.icon || 'Puzzle';
+                try {
+                  const IconComponent = require('lucide-react')[iconName];
+                  return IconComponent ? <IconComponent className="h-4 w-4" /> : <Palette className="h-4 w-4" />;
+                } catch {
+                  return <Palette className="h-4 w-4" />;
+                }
+              }
+            };
+
+            return (
+              <Button
+                key={plugin.id}
+                variant="ghost"
+                size="sm"
+                onClick={() => openPlugin(plugin)}
+                className="flex items-center gap-1"
+                title={`Abrir ${plugin.name}`}
+              >
+                {renderPluginIcon()}
+                <span className="text-xs">{plugin.name}</span>
+              </Button>
+            );
+          })}
 
           <Separator orientation="vertical" className="h-6" />
 
