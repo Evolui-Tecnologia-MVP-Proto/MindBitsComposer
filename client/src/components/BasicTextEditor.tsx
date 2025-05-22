@@ -32,6 +32,9 @@ export default function BasicTextEditor() {
   });
 
   const openFreeHandCanvas = () => {
+    // Log para debug
+    console.log("Plugins disponíveis:", plugins?.map(p => ({ name: p.name, pageName: p.pageName })));
+    
     // Procurar pelo plugin FreeHand Canvas nos plugins disponíveis
     const freeHandPlugin = plugins?.find(p => 
       p.pageName === "freehand-canvas-plugin" || 
@@ -40,11 +43,32 @@ export default function BasicTextEditor() {
     );
     
     if (freeHandPlugin) {
+      console.log("Plugin encontrado:", freeHandPlugin.name);
       setSelectedPlugin(freeHandPlugin);
       setIsPluginModalOpen(true);
     } else {
-      // Aviso se o plugin não for encontrado
-      console.warn("Plugin FreeHand Canvas não encontrado nos plugins disponíveis");
+      console.log("Plugin FreeHand Canvas não encontrado. Criando plugin temporário...");
+      // Criar plugin temporário para funcionar
+      const tempPlugin: Plugin = {
+        id: "temp-freehand-canvas",
+        name: "FreeHand Canvas",
+        description: "Canvas de desenho livre para criar diagramas e ilustrações",
+        type: PluginType.UTILITY,
+        status: PluginStatus.ACTIVE,
+        version: "1.0.0",
+        author: "Sistema",
+        icon: "palette",
+        pageName: "freehand-canvas-plugin",
+        configuration: {},
+        endpoints: [],
+        permissions: [],
+        dependencies: [],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      setSelectedPlugin(tempPlugin);
+      setIsPluginModalOpen(true);
     }
   };
 
