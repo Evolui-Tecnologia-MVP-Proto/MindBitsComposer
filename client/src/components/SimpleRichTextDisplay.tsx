@@ -78,43 +78,47 @@ export default function SimpleRichTextDisplay({
     );
   };
 
-  return (
-    <div className="relative">
-      {/* Textarea para edição */}
-      <textarea
-        ref={textareaRef}
-        value={content}
-        onChange={(e) => {
-          onContentChange(e.target.value);
-          handleCursorEvents(e);
-        }}
-        onKeyUp={handleCursorEvents}
-        onClick={handleCursorEvents}
-        className={`${className} relative z-10`}
-        placeholder={placeholder}
-        style={{
-          backgroundColor: content ? 'transparent' : 'white',
-          color: content ? 'transparent' : 'inherit'
-        }}
-      />
+  const [isEditing, setIsEditing] = React.useState(false);
 
-      {/* Camada de renderização com links azuis */}
-      <div
-        className="absolute inset-0 overflow-hidden pointer-events-none"
-        style={{ 
-          minHeight: '8rem',
-          backgroundColor: 'transparent',
-          zIndex: 5
-        }}
-      >
-        {content ? (
+  return (
+    <div 
+      className="relative"
+      onFocus={() => setIsEditing(true)}
+      onBlur={() => setIsEditing(false)}
+    >
+      {/* Quando não está editando, mostra apenas os links azuis */}
+      {!isEditing && content && (
+        <div
+          className={`${className} cursor-text`}
+          onClick={() => {
+            setIsEditing(true);
+            setTimeout(() => textareaRef.current?.focus(), 10);
+          }}
+          style={{ minHeight: '8rem' }}
+        >
           <div className="p-3">
-            <div className="pointer-events-auto" style={{ pointerEvents: 'auto' }}>
-              {renderContent(content)}
-            </div>
+            {renderContent(content)}
           </div>
-        ) : null}
-      </div>
+        </div>
+      )}
+
+      {/* Quando está editando, mostra textarea normal */}
+      {(isEditing || !content) && (
+        <textarea
+          ref={textareaRef}
+          value={content}
+          onChange={(e) => {
+            onContentChange(e.target.value);
+            handleCursorEvents(e);
+          }}
+          onKeyUp={handleCursorEvents}
+          onClick={handleCursorEvents}
+          onBlur={() => setIsEditing(false)}
+          className={className}
+          placeholder={placeholder}
+          autoFocus={isEditing}
+        />
+      )}
     </div>
   );
 }
