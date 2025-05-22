@@ -1186,6 +1186,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Documento routes
+  app.get("/api/documentos", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const documentos = await storage.getAllDocumentos();
+      res.json(documentos);
+    } catch (error: any) {
+      console.error("Erro ao buscar documentos:", error);
+      res.status(500).send("Erro ao buscar documentos");
+    }
+  });
+
+  app.get("/api/documentos/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const documento = await storage.getDocumento(req.params.id);
+      if (!documento) {
+        return res.status(404).send("Documento não encontrado");
+      }
+      res.json(documento);
+    } catch (error: any) {
+      console.error("Erro ao buscar documento:", error);
+      res.status(500).send("Erro ao buscar documento");
+    }
+  });
+
+  app.post("/api/documentos", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const documento = await storage.createDocumento(req.body);
+      res.status(201).json(documento);
+    } catch (error: any) {
+      console.error("Erro ao criar documento:", error);
+      res.status(500).send("Erro ao criar documento");
+    }
+  });
+
+  app.patch("/api/documentos/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const documento = await storage.updateDocumento(req.params.id, req.body);
+      res.json(documento);
+    } catch (error: any) {
+      console.error("Erro ao atualizar documento:", error);
+      res.status(500).send("Erro ao atualizar documento");
+    }
+  });
+
+  app.delete("/api/documentos/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      await storage.deleteDocumento(req.params.id);
+      res.status(204).send();
+    } catch (error: any) {
+      console.error("Erro ao excluir documento:", error);
+      res.status(500).send("Erro ao excluir documento");
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 

@@ -594,6 +594,7 @@ export class MemStorage implements IStorage {
   private mappingColumns: Map<string, MappingColumn>;
   private serviceConnections: Map<string, ServiceConnection>;
   private plugins: Map<string, Plugin>;
+  private documentos: Map<string, Documento>;
   private mondayApiKey: string | undefined; // Legado
   sessionStore: session.Store;
   currentId: number;
@@ -606,6 +607,7 @@ export class MemStorage implements IStorage {
     this.mappingColumns = new Map();
     this.serviceConnections = new Map<string, ServiceConnection>();
     this.plugins = new Map();
+    this.documentos = new Map();
     this.mondayApiKey = undefined;
     this.currentId = 1;
     this.sessionStore = new MemoryStore({
@@ -1117,6 +1119,45 @@ export class MemStorage implements IStorage {
 
   async deletePlugin(id: string): Promise<void> {
     this.plugins.delete(id);
+  }
+
+  // Documento operations
+  async getDocumento(id: string): Promise<Documento | undefined> {
+    return this.documentos.get(id);
+  }
+
+  async createDocumento(insertDocumento: InsertDocumento): Promise<Documento> {
+    const documento: Documento = {
+      id: crypto.randomUUID(),
+      ...insertDocumento,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.documentos.set(documento.id, documento);
+    return documento;
+  }
+
+  async getAllDocumentos(): Promise<Documento[]> {
+    return Array.from(this.documentos.values());
+  }
+
+  async updateDocumento(id: string, data: Partial<Documento>): Promise<Documento> {
+    const existingDocumento = this.documentos.get(id);
+    if (!existingDocumento) {
+      throw new Error("Documento não encontrado");
+    }
+
+    const updatedDocumento: Documento = {
+      ...existingDocumento,
+      ...data,
+      updatedAt: new Date()
+    };
+    this.documentos.set(id, updatedDocumento);
+    return updatedDocumento;
+  }
+
+  async deleteDocumento(id: string): Promise<void> {
+    this.documentos.delete(id);
   }
 }
 
