@@ -76,7 +76,14 @@ export default function FreeHandCanvasPlugin({
     const canvas = canvasRef.current;
     if (!canvas) return;
     
-    // Remover qualquer escalonamento - canvas mantém tamanho real
+    // Configurar canvas apenas uma vez para não perder o conteúdo
+    if (canvas.width === 0 || canvas.height === 0) {
+      canvas.width = 1400;
+      canvas.height = 800;
+      canvas.style.border = '1px solid #ccc';
+    }
+    
+    // Configurar estilos de exibição
     canvas.style.width = 'auto';
     canvas.style.height = 'auto';
     canvas.style.maxWidth = '100%';
@@ -84,20 +91,18 @@ export default function FreeHandCanvasPlugin({
     canvas.style.objectFit = 'none';
     canvas.style.display = 'block';
     canvas.style.margin = '0 auto';
-  }, [isExpanded]);
+  }, []);
 
   const getMousePos = (canvas: HTMLCanvasElement, e: React.MouseEvent<HTMLCanvasElement>) => {
     // Usar offsetX e offsetY que são relativos diretamente ao canvas
     let x = e.nativeEvent.offsetX;
     let y = e.nativeEvent.offsetY;
     
-    console.log('Estado isExpanded:', isExpanded, 'Posição original:', x, y);
-    
-    // Sempre aplicar deslocamento para testar
-    x += 100; // 100px para direita
-    y += 30; // 30px para baixo
-    
-    console.log('Posição após ajuste:', x, y);
+    // Compensar deslocamento quando a modal está retraída
+    if (!isExpanded) {
+      x += 100; // 100px para direita
+      y += 30; // 30px para baixo
+    }
     
     return { x, y };
   };
