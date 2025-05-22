@@ -89,11 +89,11 @@ export default function FreeHandCanvasPlugin({
   const getMousePos = (canvas: HTMLCanvasElement, e: React.MouseEvent<HTMLCanvasElement>) => {
     const rect = canvas.getBoundingClientRect();
     
-    // Posição simples e direta sem considerações de scroll ou escala
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    };
+    // Usar offsetX e offsetY que são relativos ao canvas diretamente
+    const x = e.nativeEvent.offsetX;
+    const y = e.nativeEvent.offsetY;
+    
+    return { x, y };
   };
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
