@@ -109,6 +109,7 @@ export const plugins = pgTable("plugins", {
   version: text("version").notNull().default("1.0.0"),
   author: text("author"),
   icon: text("icon").default("Puzzle"),
+  pageName: text("page_name"), // Nome da página do plugin para invocação
   configuration: json("configuration").$type<Record<string, any>>().default({}),
   endpoints: json("endpoints").$type<Record<string, string>>().default({}),
   permissions: json("permissions").$type<string[]>().default([]),
