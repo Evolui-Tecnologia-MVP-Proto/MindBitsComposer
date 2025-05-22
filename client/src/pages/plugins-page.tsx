@@ -46,6 +46,13 @@ import {
 } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -181,6 +188,8 @@ export default function PluginsPage() {
   const [iconSelectionMode, setIconSelectionMode] = useState<'library' | 'upload'>('library');
   const [showIconSelector, setShowIconSelector] = useState(false);
   const [uploadedIconUrl, setUploadedIconUrl] = useState<string>('');
+  const [activePluginTab, setActivePluginTab] = useState<'geral' | 'config'>('geral');
+  const [configurationJson, setConfigurationJson] = useState<string>('');
   const [isPluginModalOpen, setIsPluginModalOpen] = useState(false);
   const [selectedPlugin, setSelectedPlugin] = useState<Plugin | null>(null);
   const [testingPlugin, setTestingPlugin] = useState<Plugin | null>(null);
@@ -308,6 +317,9 @@ export default function PluginsPage() {
       icon: plugin.icon || "Puzzle",
       pageName: plugin.pageName || "",
     });
+    // Carregar configuração JSON
+    setConfigurationJson(JSON.stringify(plugin.configuration || {}, null, 2));
+    setActivePluginTab('geral');
     setIsModalOpen(true);
   };
 
@@ -405,7 +417,34 @@ export default function PluginsPage() {
   };
 
   const onSubmit = (data: PluginFormValues) => {
-    createPluginMutation.mutate(data);
+    let configuration = {};
+    
+    // Parse da configuração JSON se fornecida
+    if (configurationJson.trim()) {
+      try {
+        configuration = JSON.parse(configurationJson);
+      } catch (error) {
+        toast({
+          title: "Erro no JSON",
+          description: "Configuração JSON inválida: " + error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    const pluginData = {
+      ...data,
+      icon: iconSelectionMode === 'upload' ? uploadedIconUrl : data.icon,
+      configuration,
+    };
+
+    if (selectedPlugin) {
+      // Para edição, usar updatePluginMutation se existir, senão createPluginMutation
+      createPluginMutation.mutate({ id: selectedPlugin.id, ...pluginData });
+    } else {
+      createPluginMutation.mutate(pluginData);
+    }
   };
 
   return (
@@ -537,7 +576,7 @@ export default function PluginsPage() {
 
       {/* Modal para criar/editar plugin */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-[600px]">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {selectedPlugin ? "Editar Plugin" : "Novo Plugin"}
@@ -549,8 +588,17 @@ export default function PluginsPage() {
             </DialogDescription>
           </DialogHeader>
           
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <Tabs value={activePluginTab} onValueChange={setActivePluginTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="geral">Geral</TabsTrigger>
+              <TabsTrigger value="config">Config.</TabsTrigger>
+            </TabsList>
+            
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                
+                {/* Aba Geral */}
+                <TabsContent value="geral" className="space-y-4 mt-4">
               <FormField
                 control={form.control}
                 name="name"
@@ -751,40 +799,88 @@ export default function PluginsPage() {
                 />
               </div>
               
-              <FormField
-                control={form.control}
-                name="pageName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nome da Página (para plugins com interface)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="ex: freehand-canvas-plugin" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <DialogFooter>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsModalOpen(false)}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={createPluginMutation.isPending}
-                >
-                  {createPluginMutation.isPending 
-                    ? "Salvando..." 
-                    : selectedPlugin ? "Salvar" : "Criar"
-                  }
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
+                  <FormField
+                    control={form.control}
+                    name="pageName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Nome da Página (para plugins com interface)</FormLabel>
+                        <FormControl>
+                          <Input placeholder="ex: freehand-canvas-plugin" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </TabsContent>
+                
+                {/* Aba Config. */}
+                <TabsContent value="config" className="space-y-4 mt-4">
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="config-json">Configuração JSON</Label>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        Configure as propriedades avançadas do plugin em formato JSON
+                      </p>
+                      <Textarea
+                        id="config-json"
+                        value={configurationJson}
+                        onChange={(e) => setConfigurationJson(e.target.value)}
+                        placeholder={`{
+  "apiUrl": "https://api.exemplo.com",
+  "timeout": 5000,
+  "retries": 3,
+  "features": {
+    "autoSync": true,
+    "enableCache": false
+  }
+}`}
+                        className="min-h-[300px] font-mono text-sm"
+                      />
+                      {configurationJson && (
+                        <div className="mt-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              try {
+                                JSON.parse(configurationJson);
+                                alert("JSON válido!");
+                              } catch (error) {
+                                alert("JSON inválido: " + error.message);
+                              }
+                            }}
+                          >
+                            Validar JSON
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </TabsContent>
+                
+                <DialogFooter className="mt-6">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsModalOpen(false)}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={createPluginMutation.isPending}
+                  >
+                    {createPluginMutation.isPending 
+                      ? "Salvando..." 
+                      : selectedPlugin ? "Salvar" : "Criar"
+                    }
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </Tabs>
         </DialogContent>
       </Dialog>
 
