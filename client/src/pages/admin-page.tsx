@@ -1104,11 +1104,15 @@ export default function AdminPage() {
                                       {...field}
                                     >
                                       <option value="">-- Escolha uma coluna --</option>
-                                      {mondayColumns.map((column) => (
-                                        <option key={column.id} value={column.columnId}>
-                                          {column.title} 
-                                        </option>
-                                      ))}
+                                      {mondayColumns.map((column) => {
+                                        // Força a exibição do tipo da coluna junto com o título
+                                        const optionText = `${column.title} [${column.type}]`;
+                                        return (
+                                          <option key={column.id} value={column.columnId}>
+                                            {optionText}
+                                          </option>
+                                        );
+                                      })}
                                     </select>
                                   </div>
                                 </div>
