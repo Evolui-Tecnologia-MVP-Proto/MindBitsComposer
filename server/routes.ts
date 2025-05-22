@@ -2,6 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
+import { PluginStatus, PluginType } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
 import { ZodError } from "zod";
@@ -999,7 +1000,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Verificar se o plugin está ativo
-      if (plugin.status !== PluginStatus.ACTIVE) {
+      if (plugin.status !== "active") {
         return res.status(400).json({ 
           message: "Plugin deve estar ativo para ser testado",
           status: plugin.status 
@@ -1013,7 +1014,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let testResult: any;
 
       switch (plugin.type) {
-        case PluginType.DATA_SOURCE:
+        case "data_source":
           testResult = {
             type: "data_source",
             pluginName: plugin.name,
@@ -1027,7 +1028,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
           break;
 
-        case PluginType.AI_AGENT:
+        case "ai_agent":
           testResult = {
             type: "ai_agent",
             pluginName: plugin.name,
@@ -1039,7 +1040,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
           break;
 
-        case PluginType.CHART:
+        case "chart":
           testResult = {
             type: "chart",
             pluginName: plugin.name,
@@ -1054,7 +1055,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
           break;
 
-        case PluginType.FORMATTER:
+        case "formatter":
           testResult = {
             type: "formatter",
             pluginName: plugin.name,
@@ -1066,7 +1067,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
           break;
 
-        case PluginType.INTEGRATION:
+        case "integration":
           testResult = {
             type: "integration",
             pluginName: plugin.name,
@@ -1079,7 +1080,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
           break;
 
-        case PluginType.UTILITY:
+        case "utility":
           testResult = {
             type: "utility",
             pluginName: plugin.name,
