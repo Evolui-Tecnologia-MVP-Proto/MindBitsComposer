@@ -1,8 +1,9 @@
-import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, 
+import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins,
   type User, type InsertUser, type Template, type InsertTemplate, 
   type MondayMapping, type InsertMondayMapping, type MondayColumn, type InsertMondayColumn, 
   type MappingColumn, type InsertMappingColumn, type ServiceConnection, type InsertServiceConnection,
-  UserStatus, UserRole, TemplateType } from "@shared/schema";
+  type Plugin, type InsertPlugin,
+  UserStatus, UserRole, TemplateType, PluginStatus, PluginType } from "@shared/schema";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
 import session from "express-session";
@@ -72,6 +73,17 @@ export interface IStorage {
   updateMappingColumn(id: string, data: Partial<MappingColumn>): Promise<MappingColumn>;
   deleteMappingColumn(id: string): Promise<void>;
   deleteMappingColumns(mappingId: string): Promise<void>;
+  
+  // Plugin operations
+  getPlugin(id: string): Promise<Plugin | undefined>;
+  getPluginByName(name: string): Promise<Plugin | undefined>;
+  createPlugin(plugin: InsertPlugin): Promise<Plugin>;
+  getAllPlugins(): Promise<Plugin[]>;
+  getPluginsByType(type: PluginType): Promise<Plugin[]>;
+  getPluginsByStatus(status: PluginStatus): Promise<Plugin[]>;
+  updatePlugin(id: string, data: Partial<Plugin>): Promise<Plugin>;
+  togglePluginStatus(id: string): Promise<Plugin>;
+  deletePlugin(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -446,6 +458,84 @@ export class DatabaseStorage implements IStorage {
       .delete(mappingColumns)
       .where(eq(mappingColumns.mappingId, mappingId));
   }
+
+  // Plugin operations
+  async getPlugin(id: string): Promise<Plugin | undefined> {
+    const [plugin] = await db
+      .select()
+      .from(plugins)
+      .where(eq(plugins.id, id));
+    return plugin;
+  }
+
+  async getPluginByName(name: string): Promise<Plugin | undefined> {
+    const [plugin] = await db
+      .select()
+      .from(plugins)
+      .where(eq(plugins.name, name));
+    return plugin;
+  }
+
+  async createPlugin(pluginData: InsertPlugin): Promise<Plugin> {
+    const [plugin] = await db
+      .insert(plugins)
+      .values(pluginData)
+      .returning();
+    return plugin;
+  }
+
+  async getAllPlugins(): Promise<Plugin[]> {
+    return await db
+      .select()
+      .from(plugins);
+  }
+
+  async getPluginsByType(type: PluginType): Promise<Plugin[]> {
+    return await db
+      .select()
+      .from(plugins)
+      .where(eq(plugins.type, type));
+  }
+
+  async getPluginsByStatus(status: PluginStatus): Promise<Plugin[]> {
+    return await db
+      .select()
+      .from(plugins)
+      .where(eq(plugins.status, status));
+  }
+
+  async updatePlugin(id: string, data: Partial<Plugin>): Promise<Plugin> {
+    const [updatedPlugin] = await db
+      .update(plugins)
+      .set({
+        ...data,
+        updatedAt: new Date()
+      })
+      .where(eq(plugins.id, id))
+      .returning();
+    
+    if (!updatedPlugin) {
+      throw new Error("Plugin não encontrado");
+    }
+    
+    return updatedPlugin;
+  }
+
+  async togglePluginStatus(id: string): Promise<Plugin> {
+    const plugin = await this.getPlugin(id);
+    if (!plugin) {
+      throw new Error("Plugin não encontrado");
+    }
+
+    const newStatus = plugin.status === PluginStatus.ACTIVE ? PluginStatus.INACTIVE : PluginStatus.ACTIVE;
+    return await this.updatePlugin(id, { status: newStatus });
+  }
+
+  async deletePlugin(id: string): Promise<void> {
+    await db
+      .delete(plugins)
+      .where(eq(plugins.id, id));
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -455,6 +545,7 @@ export class MemStorage implements IStorage {
   private mondayColumns: Map<string, MondayColumn>;
   private mappingColumns: Map<string, MappingColumn>;
   private serviceConnections: Map<string, ServiceConnection>;
+  private plugins: Map<string, Plugin>;
   private mondayApiKey: string | undefined; // Legado
   sessionStore: session.Store;
   currentId: number;
@@ -466,6 +557,7 @@ export class MemStorage implements IStorage {
     this.mondayColumns = new Map();
     this.mappingColumns = new Map();
     this.serviceConnections = new Map<string, ServiceConnection>();
+    this.plugins = new Map();
     this.mondayApiKey = undefined;
     this.currentId = 1;
     this.sessionStore = new MemoryStore({
