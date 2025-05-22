@@ -42,23 +42,7 @@ export default function PluginModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="p-0 gap-0 transition-all duration-300 !fixed !m-0"
-        style={{ 
-          width: isExpanded ? '100vw' : '50vw',
-          height: isExpanded ? '100vh' : '60vh',
-          minHeight: isExpanded ? '100vh' : '60vh',
-          maxHeight: isExpanded ? '100vh' : '60vh',
-          top: isExpanded ? '0px' : '20vh',
-          left: isExpanded ? '0px' : '25vw',
-          right: 'auto',
-          bottom: 'auto',
-          transform: 'none !important',
-          margin: '0 !important',
-          position: 'fixed !important',
-          borderRadius: isExpanded ? '0' : '8px',
-          zIndex: 9999,
-          inset: 'auto'
-        } as React.CSSProperties}
+        className={`p-0 gap-0 transition-all duration-300 plugin-modal-content ${isExpanded ? 'expanded' : ''}`}
       >
         <VisuallyHidden>
           <DialogTitle>Plugin {pluginName}</DialogTitle>
