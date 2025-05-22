@@ -26,27 +26,26 @@ export default function BasicTextEditor() {
     queryKey: ["/api/templates/struct"],
   });
 
+  // Buscar plugins disponíveis
+  const { data: plugins } = useQuery<Plugin[]>({
+    queryKey: ["/api/plugins"],
+  });
+
   const openFreeHandCanvas = () => {
-    const freeHandPlugin: Plugin = {
-      id: "freehand-canvas",
-      name: "FreeHand Canvas",
-      description: "Canvas de desenho livre",
-      type: PluginType.UTILITY,
-      status: PluginStatus.ACTIVE,
-      version: "1.0.0",
-      author: "Sistema",
-      icon: "palette",
-      pageName: "freehand-canvas-plugin",
-      configuration: {} as Record<string, string>,
-      endpoints: [],
-      permissions: [],
-      dependencies: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    // Procurar pelo plugin FreeHand Canvas nos plugins disponíveis
+    const freeHandPlugin = plugins?.find(p => 
+      p.pageName === "freehand-canvas-plugin" || 
+      p.name.toLowerCase().includes("freehand") ||
+      p.name.toLowerCase().includes("canvas")
+    );
     
-    setSelectedPlugin(freeHandPlugin);
-    setIsPluginModalOpen(true);
+    if (freeHandPlugin) {
+      setSelectedPlugin(freeHandPlugin);
+      setIsPluginModalOpen(true);
+    } else {
+      // Aviso se o plugin não for encontrado
+      console.warn("Plugin FreeHand Canvas não encontrado nos plugins disponíveis");
+    }
   };
 
   const handlePluginClose = () => {
