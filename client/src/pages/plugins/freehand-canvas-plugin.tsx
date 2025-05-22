@@ -94,14 +94,20 @@ export default function FreeHandCanvasPlugin({
   }, []);
 
   const getMousePos = (canvas: HTMLCanvasElement, e: React.MouseEvent<HTMLCanvasElement>) => {
-    // Usar offsetX e offsetY que são relativos diretamente ao canvas
-    let x = e.nativeEvent.offsetX;
-    let y = e.nativeEvent.offsetY;
+    const rect = canvas.getBoundingClientRect();
     
-    // Compensar deslocamento quando a modal está retraída
+    // Calcular posição relativa ao canvas
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+    
+    // Para modal retraída, aplicar escala se necessário
     if (!isExpanded) {
-      x += 100; // 100px para direita
-      y += 30; // 30px para baixo
+      // Mapear do tamanho visual para o tamanho real do canvas
+      const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      
+      x = x * scaleX;
+      y = y * scaleY;
     }
     
     return { x, y };
