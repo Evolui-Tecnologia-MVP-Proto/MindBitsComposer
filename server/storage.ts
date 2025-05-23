@@ -92,6 +92,13 @@ export interface IStorage {
   getAllDocumentos(): Promise<Documento[]>;
   updateDocumento(id: string, data: Partial<Documento>): Promise<Documento>;
   deleteDocumento(id: string): Promise<void>;
+  
+  // Document Artifact operations
+  getDocumentArtifact(id: string): Promise<DocumentArtifact | undefined>;
+  getDocumentArtifactsByDocumento(documentoId: string): Promise<DocumentArtifact[]>;
+  createDocumentArtifact(artifact: InsertDocumentArtifact): Promise<DocumentArtifact>;
+  updateDocumentArtifact(id: string, data: Partial<DocumentArtifact>): Promise<DocumentArtifact>;
+  deleteDocumentArtifact(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -585,6 +592,47 @@ export class DatabaseStorage implements IStorage {
       .delete(documentos)
       .where(eq(documentos.id, id));
   }
+
+  // Document Artifact operations
+  async getDocumentArtifact(id: string): Promise<DocumentArtifact | undefined> {
+    const [artifact] = await db.select().from(documentsArtifacts).where(eq(documentsArtifacts.id, id));
+    return artifact || undefined;
+  }
+
+  async getDocumentArtifactsByDocumento(documentoId: string): Promise<DocumentArtifact[]> {
+    return await db.select().from(documentsArtifacts).where(eq(documentsArtifacts.documentoId, documentoId));
+  }
+
+  async createDocumentArtifact(artifactData: InsertDocumentArtifact): Promise<DocumentArtifact> {
+    const [artifact] = await db
+      .insert(documentsArtifacts)
+      .values(artifactData)
+      .returning();
+    return artifact;
+  }
+
+  async updateDocumentArtifact(id: string, data: Partial<DocumentArtifact>): Promise<DocumentArtifact> {
+    const [updatedArtifact] = await db
+      .update(documentsArtifacts)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(documentsArtifacts.id, id))
+      .returning();
+    
+    if (!updatedArtifact) {
+      throw new Error("Artefato não encontrado");
+    }
+    
+    return updatedArtifact;
+  }
+
+  async deleteDocumentArtifact(id: string): Promise<void> {
+    await db
+      .delete(documentsArtifacts)
+      .where(eq(documentsArtifacts.id, id));
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -596,6 +644,7 @@ export class MemStorage implements IStorage {
   private serviceConnections: Map<string, ServiceConnection>;
   private plugins: Map<string, Plugin>;
   private documentos: Map<string, Documento>;
+  private documentArtifacts: Map<string, DocumentArtifact>;
   private mondayApiKey: string | undefined; // Legado
   sessionStore: session.Store;
   currentId: number;
@@ -609,6 +658,7 @@ export class MemStorage implements IStorage {
     this.serviceConnections = new Map<string, ServiceConnection>();
     this.plugins = new Map();
     this.documentos = new Map();
+    this.documentArtifacts = new Map();
     this.mondayApiKey = undefined;
     this.currentId = 1;
     this.sessionStore = new MemoryStore({
