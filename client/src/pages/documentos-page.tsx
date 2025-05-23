@@ -27,6 +27,13 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Eye,
   Pencil,
   Trash2,
@@ -37,14 +44,26 @@ import {
   CircleX,
   AlertCircle,
   Loader2,
+  Paperclip,
+  Upload,
+  Download,
 } from "lucide-react";
-import { type Documento, type InsertDocumento } from "@shared/schema";
+import { type Documento, type InsertDocumento, type DocumentArtifact, type InsertDocumentArtifact } from "@shared/schema";
 
 export default function DocumentosPage() {
   const [activeTab, setActiveTab] = useState("integrados");
   const [selectedDocument, setSelectedDocument] = useState<Documento | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isAddArtifactModalOpen, setIsAddArtifactModalOpen] = useState(false);
+  const [isEditArtifactModalOpen, setIsEditArtifactModalOpen] = useState(false);
+  const [selectedArtifact, setSelectedArtifact] = useState<DocumentArtifact | null>(null);
+  const [artifactFormData, setArtifactFormData] = useState<InsertDocumentArtifact>({
+    documentoId: "",
+    name: "",
+    file: "",
+    type: "",
+  });
   const [formData, setFormData] = useState<InsertDocumento>({
     origem: "",
     objeto: "",
@@ -62,6 +81,12 @@ export default function DocumentosPage() {
   // Buscar documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
     queryKey: ["/api/documentos"],
+  });
+
+  // Buscar artefatos do documento selecionado
+  const { data: artifacts = [], isLoading: isLoadingArtifacts } = useQuery<DocumentArtifact[]>({
+    queryKey: ["/api/documentos", selectedDocument?.id, "artifacts"],
+    enabled: !!selectedDocument?.id,
   });
 
   // Mutation para criar documento
@@ -92,6 +117,55 @@ export default function DocumentosPage() {
     },
   });
 
+  // Mutation para criar artefato
+  const createArtifactMutation = useMutation({
+    mutationFn: async (data: InsertDocumentArtifact) => {
+      const response = await fetch(`/api/documentos/${data.documentoId}/artifacts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error("Erro ao criar artefato");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos", selectedDocument?.id, "artifacts"] });
+      setIsAddArtifactModalOpen(false);
+      resetArtifactForm();
+    },
+  });
+
+  // Mutation para atualizar artefato
+  const updateArtifactMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: Partial<DocumentArtifact> }) => {
+      const response = await fetch(`/api/artifacts/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error("Erro ao atualizar artefato");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos", selectedDocument?.id, "artifacts"] });
+      setIsEditArtifactModalOpen(false);
+      resetArtifactForm();
+    },
+  });
+
+  // Mutation para excluir artefato
+  const deleteArtifactMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`/api/artifacts/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error("Erro ao excluir artefato");
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos", selectedDocument?.id, "artifacts"] });
+    },
+  });
+
   // Filtrar documentos por status
   const documentosIntegrados = useMemo(() => 
     documentos.filter(doc => doc.status === "Integrado"), [documentos]);
@@ -102,6 +176,74 @@ export default function DocumentosPage() {
 
   const handleCreateDocument = () => {
     createDocumentoMutation.mutate(formData);
+  };
+
+  // Funções auxiliares para artefatos
+  const resetArtifactForm = () => {
+    setArtifactFormData({
+      documentoId: "",
+      name: "",
+      file: "",
+      type: "",
+    });
+    setSelectedArtifact(null);
+  };
+
+  const openAddArtifactModal = () => {
+    resetArtifactForm();
+    setArtifactFormData(prev => ({ ...prev, documentoId: selectedDocument?.id || "" }));
+    setIsAddArtifactModalOpen(true);
+  };
+
+  const openEditArtifactModal = (artifact: DocumentArtifact) => {
+    setSelectedArtifact(artifact);
+    setArtifactFormData({
+      documentoId: artifact.documentoId,
+      name: artifact.name,
+      file: artifact.file,
+      type: artifact.type,
+    });
+    setIsEditArtifactModalOpen(true);
+  };
+
+  const handleCreateArtifact = () => {
+    createArtifactMutation.mutate(artifactFormData);
+  };
+
+  const handleUpdateArtifact = () => {
+    if (selectedArtifact) {
+      updateArtifactMutation.mutate({
+        id: selectedArtifact.id,
+        data: artifactFormData,
+      });
+    }
+  };
+
+  const handleDeleteArtifact = (artifactId: string) => {
+    if (confirm("Tem certeza que deseja excluir este artefato?")) {
+      deleteArtifactMutation.mutate(artifactId);
+    }
+  };
+
+  const getFileTypeIcon = (type: string) => {
+    switch (type.toLowerCase()) {
+      case "pdf":
+        return <File className="h-4 w-4 text-red-500" />;
+      case "doc":
+      case "docx":
+        return <File className="h-4 w-4 text-blue-500" />;
+      case "jpg":
+      case "jpeg":
+      case "png":
+      case "gif":
+        return <File className="h-4 w-4 text-green-500" />;
+      case "txt":
+        return <File className="h-4 w-4 text-gray-500" />;
+      case "json":
+        return <File className="h-4 w-4 text-orange-500" />;
+      default:
+        return <File className="h-4 w-4 text-gray-400" />;
+    }
   };
 
   const formatDate = (date: Date | null) => {
@@ -282,77 +424,182 @@ export default function DocumentosPage() {
     
     return (
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <File className="h-5 w-5 text-blue-500" />
               <span>{selectedDocument.objeto}</span>
             </DialogTitle>
             <DialogDescription>
-              Detalhes do documento
+              Detalhes e anexos do documento
             </DialogDescription>
           </DialogHeader>
           
-          <div className="grid gap-6 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">Origem</p>
-                <p className="text-sm">{selectedDocument.origem}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">Cliente</p>
-                <p className="text-sm">{selectedDocument.cliente}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">Responsável</p>
-                <p className="text-sm">{selectedDocument.responsavel}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">Sistema</p>
-                <p className="text-sm">{selectedDocument.sistema}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">Módulo</p>
-                <p className="text-sm">{selectedDocument.modulo}</p>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">Status</p>
+          <Tabs defaultValue="dados-gerais" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="dados-gerais">Dados Gerais</TabsTrigger>
+              <TabsTrigger value="anexos">
+                Anexos ({artifacts.length})
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="dados-gerais" className="mt-6">
+              <div className="grid gap-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500 mb-1">Origem</p>
+                    <p className="text-sm">{selectedDocument.origem}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500 mb-1">Cliente</p>
+                    <p className="text-sm">{selectedDocument.cliente}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500 mb-1">Responsável</p>
+                    <p className="text-sm">{selectedDocument.responsavel}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500 mb-1">Sistema</p>
+                    <p className="text-sm">{selectedDocument.sistema}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500 mb-1">Módulo</p>
+                    <p className="text-sm">{selectedDocument.modulo}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500 mb-1">Status</p>
+                    <div>
+                      <Badge variant={getStatusBadgeVariant(selectedDocument.status) as any} className="flex items-center gap-1 whitespace-nowrap">
+                        {getStatusIcon(selectedDocument.status)}
+                        {selectedDocument.status}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500 mb-1">Status Origem</p>
+                    <div>
+                      <Badge variant={getStatusOrigemBadgeVariant(selectedDocument.statusOrigem) as any} className="flex items-center gap-1 whitespace-nowrap">
+                        {selectedDocument.statusOrigem}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-500 mb-1">Data Criação</p>
+                    <p className="text-sm">{formatDate(selectedDocument.createdAt)}</p>
+                  </div>
+                </div>
+                
                 <div>
-                  <Badge variant={getStatusBadgeVariant(selectedDocument.status) as any} className="flex items-center gap-1 whitespace-nowrap">
-                    {getStatusIcon(selectedDocument.status)}
-                    {selectedDocument.status}
-                  </Badge>
+                  <p className="text-sm font-medium text-gray-500 mb-1">Descrição</p>
+                  <p className="text-sm bg-gray-50 p-3 rounded-md text-gray-700 min-h-[80px]">
+                    {selectedDocument.descricao}
+                  </p>
                 </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">Status Origem</p>
-                <div>
-                  <Badge variant={getStatusOrigemBadgeVariant(selectedDocument.statusOrigem) as any} className="flex items-center gap-1 whitespace-nowrap">
-                    {selectedDocument.statusOrigem}
-                  </Badge>
+            </TabsContent>
+            
+            <TabsContent value="anexos" className="mt-6">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-medium">Anexos do Documento</h3>
+                  <Button 
+                    onClick={openAddArtifactModal}
+                    className="bg-blue-600 hover:bg-blue-700"
+                    size="sm"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Adicionar Anexo
+                  </Button>
                 </div>
+                
+                {isLoadingArtifacts ? (
+                  <div className="text-center py-6">
+                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
+                    <p className="text-sm text-gray-500">Carregando anexos...</p>
+                  </div>
+                ) : artifacts.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Tipo</TableHead>
+                        <TableHead>Nome</TableHead>
+                        <TableHead>Arquivo</TableHead>
+                        <TableHead>Data</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {artifacts.map((artifact) => (
+                        <TableRow key={artifact.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {getFileTypeIcon(artifact.type)}
+                              <span className="text-xs font-medium uppercase text-gray-500">
+                                {artifact.type}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-medium">{artifact.name}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Paperclip className="h-4 w-4 text-gray-400" />
+                              <span className="text-sm text-gray-600">{artifact.file}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-sm text-gray-500">
+                            {formatDate(artifact.createdAt)}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end space-x-2">
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-8 w-8"
+                                onClick={() => window.open(artifact.file, '_blank')}
+                              >
+                                <Download className="h-4 w-4 text-blue-500" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-8 w-8"
+                                onClick={() => openEditArtifactModal(artifact)}
+                              >
+                                <Pencil className="h-4 w-4 text-blue-500" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-8 w-8"
+                                onClick={() => handleDeleteArtifact(artifact.id)}
+                              >
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed">
+                    <Paperclip className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+                    <p className="text-sm text-gray-500 mb-3">Nenhum anexo encontrado</p>
+                    <Button 
+                      onClick={openAddArtifactModal}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Adicionar primeiro anexo
+                    </Button>
+                  </div>
+                )}
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">Data Criação</p>
-                <p className="text-sm">{formatDate(selectedDocument.createdAt)}</p>
-              </div>
-              <div className="col-span-2">
-                <p className="text-sm font-medium text-gray-500 mb-1">Descrição</p>
-                <p className="text-sm bg-gray-50 p-3 rounded-md text-gray-700 max-h-24 overflow-y-auto">
-                  {selectedDocument.descricao}
-                </p>
-              </div>
-              
-              <div className="col-span-2">
-                <p className="text-sm font-medium text-gray-500 mb-2">Anexos</p>
-                <div className="bg-gray-50 rounded-md border border-gray-200 p-3">
-                  <p className="text-sm text-gray-500">Nenhum anexo disponível</p>
-                </div>
-              </div>
-            </div>
-          </div>
+            </TabsContent>
+          </Tabs>
           
-          <DialogFooter>
+          <DialogFooter className="mt-6">
             <Button variant="outline" onClick={() => setIsViewModalOpen(false)}>
               Fechar
             </Button>
