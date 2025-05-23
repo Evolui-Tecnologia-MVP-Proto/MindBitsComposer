@@ -14,6 +14,34 @@ import multer from "multer";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication and user management routes
   setupAuth(app);
+
+  // DOCUMENTO UPDATE - PRIORIDADE MÁXIMA
+  app.all("/api/doc-update/:id", async (req, res) => {
+    console.log("🔥 ENDPOINT DIRETO ACIONADO:", req.method, req.params.id);
+    
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Não autorizado" });
+    }
+    
+    try {
+      const documento = await storage.updateDocumento(req.params.id, req.body);
+      console.log("🔥 SUCESSO DIRETO:", documento);
+      
+      return res.status(200).json({
+        success: true,
+        data: documento
+      });
+    } catch (error: any) {
+      console.error("🔥 ERRO DIRETO:", error);
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      });
+    }
+  });
   
   // Configure multer for file uploads
   const upload = multer({ 
@@ -1270,6 +1298,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log("🎯 ENDPOINT DE UPDATE ACIONADO - ID:", req.params.id);
     console.log("🎯 DADOS:", JSON.stringify(req.body));
     
+    // Forçar cabeçalhos JSON
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Não autorizado" });
     }
@@ -1278,13 +1310,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const documento = await storage.updateDocumento(req.params.id, req.body);
       console.log("✅ SUCESSO:", documento);
       
-      res.status(200).json({
+      // Resposta JSON explícita
+      const response = {
         success: true,
         data: documento
-      });
+      };
+      
+      return res.status(200).json(response);
     } catch (error: any) {
       console.error("❌ ERRO:", error);
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         error: error.message
       });
