@@ -1363,8 +1363,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const parentUid = req.query.parent as string;
-      const structures = await storage.getRepoStructureByParent(parentUid || undefined);
-      res.json(structures);
+      if (parentUid) {
+        // Se especificar um parent, buscar por parent
+        const structures = await storage.getRepoStructureByParent(parentUid);
+        res.json(structures);
+      } else {
+        // Se não especificar parent, buscar todas as estruturas
+        const structures = await storage.getAllRepoStructures();
+        res.json(structures);
+      }
     } catch (error: any) {
       console.error("Erro ao buscar estrutura do repositório:", error);
       res.status(500).send("Erro ao buscar estrutura do repositório");
