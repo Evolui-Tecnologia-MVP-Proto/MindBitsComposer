@@ -656,6 +656,7 @@ export class DatabaseStorage implements IStorage {
   async getRepoStructureTree(): Promise<RepoStructure[]> {
     // Buscar todas as estruturas
     const allStructures = await db.select().from(repoStructure);
+    console.log("DB: Estruturas encontradas:", allStructures.length, allStructures);
     
     // Construir mapa de estruturas
     const structureMap = new Map<string, RepoStructure & { children?: RepoStructure[] }>();
@@ -664,6 +665,7 @@ export class DatabaseStorage implements IStorage {
     // Primeiro, criar o mapa de todas as estruturas
     allStructures.forEach(structure => {
       structureMap.set(structure.uid, { ...structure, children: [] });
+      console.log(`DB: Mapeando ${structure.folderName} (${structure.uid})`);
     });
     
     // Depois, organizar hierarquicamente
@@ -673,6 +675,7 @@ export class DatabaseStorage implements IStorage {
       if (structure.linkedTo) {
         // É uma subpasta - adicionar ao pai
         const parent = structureMap.get(structure.linkedTo);
+        console.log(`DB: ${structure.folderName} é filho de:`, parent?.folderName);
         if (parent) {
           parent.children = parent.children || [];
           parent.children.push(structureWithChildren);
@@ -680,6 +683,7 @@ export class DatabaseStorage implements IStorage {
       } else {
         // É uma pasta raiz
         rootStructures.push(structureWithChildren);
+        console.log(`DB: ${structure.folderName} é pasta raiz`);
       }
     });
     
@@ -691,9 +695,11 @@ export class DatabaseStorage implements IStorage {
         // Adicionar a estrutura atual
         const { children, ...structureData } = structure;
         result.push(structureData);
+        console.log(`DB: Adicionando ${structure.folderName} ao resultado`);
         
         // Adicionar recursivamente os filhos
         if (children && children.length > 0) {
+          console.log(`DB: ${structure.folderName} tem ${children.length} filhos`);
           result.push(...flattenTree(children));
         }
       });
@@ -701,7 +707,9 @@ export class DatabaseStorage implements IStorage {
       return result;
     }
     
-    return flattenTree(rootStructures);
+    const finalResult = flattenTree(rootStructures);
+    console.log("DB: Resultado final:", finalResult.length, finalResult.map(f => f.folderName));
+    return finalResult;
   }
 
   async getRepoStructureByParent(parentUid?: string): Promise<RepoStructure[]> {
