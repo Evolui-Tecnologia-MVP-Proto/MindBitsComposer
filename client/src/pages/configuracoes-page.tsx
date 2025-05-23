@@ -171,6 +171,12 @@ export default function ConfiguracoesPage() {
       description: getServiceLabel(serviceName)
     });
     setSelectedServiceName(serviceName);
+    
+    // Resetar estados do GitHub quando abrir modal para nova conexão
+    setConnectionStatus('idle');
+    setGithubRepos([]);
+    setSelectedRepo("");
+    
     setIsModalOpen(true);
   };
 
@@ -182,6 +188,12 @@ export default function ConfiguracoesPage() {
     });
     setSelectedConnection(connection);
     setSelectedServiceName(connection.serviceName);
+    
+    // Resetar estados do GitHub quando abrir modal de edição
+    setConnectionStatus('idle');
+    setGithubRepos([]);
+    setSelectedRepo("");
+    
     setIsModalOpen(true);
   };
 
