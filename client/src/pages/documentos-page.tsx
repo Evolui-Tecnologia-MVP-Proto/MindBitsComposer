@@ -1109,7 +1109,10 @@ export default function DocumentosPage() {
                       setArtifactFormData({
                         documentoId: editingDocument.id,
                         name: "",
-                        file: "",
+                        fileData: "",
+                        fileName: "",
+                        fileSize: "",
+                        mimeType: "",
                         type: "",
                       });
                       setIsAddArtifactModalOpen(true);
@@ -1149,8 +1152,8 @@ export default function DocumentosPage() {
                           <TableCell className="font-medium">{artifact.name}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
-                              <span className="text-sm text-gray-600 truncate max-w-[200px]" title={artifact.file}>
-                                {artifact.file}
+                              <span className="text-sm text-gray-600 truncate max-w-[200px]" title={artifact.fileName}>
+                                {artifact.fileName}
                               </span>
                               <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
                                 <Download className="h-3 w-3" />
@@ -1261,14 +1264,18 @@ export default function DocumentosPage() {
             </div>
             
             <div>
-              <Label>Arquivo/URL</Label>
+              <Label>Arquivo</Label>
               <div className="space-y-3">
                 <div className="flex gap-2">
                   <Input
+                    type="file"
                     id="artifact-file"
-                    value={artifactFormData.file}
-                    onChange={(e) => setArtifactFormData({ ...artifactFormData, file: e.target.value })}
-                    placeholder="Ex: /uploads/manual.pdf, https://exemplo.com/doc.pdf"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handleFileUpload(file);
+                      }
+                    }}
                     className="flex-1"
                   />
                   <Button
@@ -1282,42 +1289,17 @@ export default function DocumentosPage() {
                     Upload
                   </Button>
                 </div>
-                <input
-                  id="file-upload"
-                  type="file"
-                  className="hidden"
-                  accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.json,.xml,.xlsx,.zip"
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      try {
-                        const formData = new FormData();
-                        formData.append('file', file);
-                        
-                        const response = await fetch('/api/upload', {
-                          method: 'POST',
-                          body: formData,
-                        });
-                        
-                        if (response.ok) {
-                          const result = await response.json();
-                          setArtifactFormData({ 
-                            ...artifactFormData, 
-                            file: result.path,
-                            type: file.name.split('.').pop()?.toLowerCase() || ''
-                          });
-                        } else {
-                          alert('Erro ao fazer upload do arquivo');
-                        }
-                      } catch (error) {
-                        alert('Erro ao fazer upload do arquivo');
-                      }
-                    }
-                  }}
-                />
-                <p className="text-xs text-gray-500">
-                  Você pode inserir uma URL ou fazer upload de um arquivo local
-                </p>
+                
+                {/* Mostrar informações do arquivo selecionado */}
+                {artifactFormData.fileName && (
+                  <div className="p-3 bg-gray-50 rounded-md">
+                    <p className="text-sm font-medium text-gray-700">Arquivo selecionado:</p>
+                    <p className="text-sm text-gray-600">{artifactFormData.fileName}</p>
+                    <p className="text-xs text-gray-500">
+                      Tipo: {artifactFormData.mimeType} | Tamanho: {(parseInt(artifactFormData.fileSize || "0") / 1024).toFixed(2)} KB
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
             
@@ -1355,7 +1337,7 @@ export default function DocumentosPage() {
             </Button>
             <Button 
               onClick={handleCreateArtifact}
-              disabled={createArtifactMutation.isPending || !artifactFormData.name || !artifactFormData.file || !artifactFormData.type}
+              disabled={createArtifactMutation.isPending || !artifactFormData.name || !artifactFormData.fileData || !artifactFormData.type}
               className="bg-blue-600 hover:bg-blue-700"
             >
               {createArtifactMutation.isPending ? (
