@@ -63,8 +63,10 @@ export default function DocumentosPage() {
   const [isAddArtifactModalOpen, setIsAddArtifactModalOpen] = useState(false);
   const [isEditArtifactModalOpen, setIsEditArtifactModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isDeleteArtifactConfirmOpen, setIsDeleteArtifactConfirmOpen] = useState(false);
   const [editingDocument, setEditingDocument] = useState<Documento | null>(null);
   const [documentToDelete, setDocumentToDelete] = useState<Documento | null>(null);
+  const [artifactToDelete, setArtifactToDelete] = useState<string | null>(null);
   const [selectedArtifact, setSelectedArtifact] = useState<DocumentArtifact | null>(null);
   const [githubRepoFiles, setGithubRepoFiles] = useState<any[]>([]);
   const [isLoadingRepo, setIsLoadingRepo] = useState(false);
@@ -634,9 +636,21 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   };
 
   const handleDeleteArtifact = (artifactId: string) => {
-    if (confirm("Tem certeza que deseja excluir este artefato?")) {
-      deleteArtifactMutation.mutate(artifactId);
+    setArtifactToDelete(artifactId);
+    setIsDeleteArtifactConfirmOpen(true);
+  };
+
+  const confirmDeleteArtifact = () => {
+    if (artifactToDelete) {
+      deleteArtifactMutation.mutate(artifactToDelete);
+      setIsDeleteArtifactConfirmOpen(false);
+      setArtifactToDelete(null);
     }
+  };
+
+  const cancelDeleteArtifact = () => {
+    setIsDeleteArtifactConfirmOpen(false);
+    setArtifactToDelete(null);
   };
 
   const getFileTypeIcon = (type: string) => {
