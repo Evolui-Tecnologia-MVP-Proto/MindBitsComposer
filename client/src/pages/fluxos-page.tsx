@@ -147,6 +147,7 @@ const FlowCanvas = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
   const [flowName, setFlowName] = useState('Novo Fluxo');
+  const [selectedNodeType, setSelectedNodeType] = useState<string>('');
 
   const onConnect = useCallback((params: any) => {
     setEdges((eds) =>
@@ -235,13 +236,47 @@ const FlowCanvas = () => {
     });
   };
 
+  const handleAddNode = () => {
+    if (!selectedNodeType) {
+      toast({
+        title: 'Selecione um tipo de nó',
+        description: 'Escolha um tipo de nó na lista antes de adicionar',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const labelMap: Record<string, string> = {
+      'startNode': 'Início',
+      'elaboreNode': 'Elaborar',
+      'approveNode': 'Aprovar',
+      'decisionNode': 'Decisão',
+      'reviseNode': 'Revisar',
+      'endNode': 'Fim'
+    };
+
+    const newNode = {
+      id: `${selectedNodeType}-${nodes.length + 1}`,
+      type: selectedNodeType,
+      position: { x: 250, y: 100 + (nodes.length * 50) },
+      data: { label: labelMap[selectedNodeType] || 'Novo Nó' },
+    };
+
+    setNodes((nds) => nds.concat(newNode));
+    
+    toast({
+      title: 'Nó adicionado',
+      description: `${labelMap[selectedNodeType]} foi adicionado ao fluxo`,
+    });
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center mb-4 bg-white p-4 rounded-lg shadow-sm">
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             <div className="w-64">
-              <Select>
+              <Select onValueChange={setSelectedNodeType}>
                 <SelectTrigger id="node-type">
                   <SelectValue placeholder="Selecione um nó" />
                 </SelectTrigger>
@@ -255,6 +290,10 @@ const FlowCanvas = () => {
                 </SelectContent>
               </Select>
             </div>
+            <Button onClick={handleAddNode} size="sm" disabled={!selectedNodeType}>
+              <PlusCircle className="mr-1 h-4 w-4" />
+              Adicionar Nó
+            </Button>
           </div>
         </div>
         
