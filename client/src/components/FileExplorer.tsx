@@ -234,13 +234,14 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     const localOnlyFolders: FileItem[] = [];
     repoStructures.forEach((structure: any) => {
       if (!processedNames.has(structure.folderName)) {
+        // Pasta existe no banco mas não no GitHub - foi deletada do GitHub
         const folderItem: FileItem = {
           id: structure.uid,
           name: structure.folderName,
           type: 'folder',
           path: structure.folderName,
           children: [],
-          syncStatus: structure.isSync ? 'synced' : 'unsynced'
+          syncStatus: 'local-only' // Mudou para local-only quando não existe no GitHub
         };
         
         if (!structure.linkedTo) {
@@ -277,6 +278,8 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
         return 'text-red-500'; // Vermelho para não sincronizadas
       case 'github-only':
         return 'text-yellow-500'; // Amarelo para GitHub apenas
+      case 'local-only':
+        return 'text-red-500'; // Vermelho para apenas locais (deletadas do GitHub)
       default:
         return 'text-blue-500'; // Azul padrão
     }
@@ -301,6 +304,13 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
         return (
           <Badge variant="outline" className="text-xs text-yellow-600 border-yellow-200">
             ⚠ Apenas no GitHub
+          </Badge>
+        );
+      case 'local-only':
+        return (
+          <Badge variant="outline" className="text-xs text-red-600 border-red-200">
+            <AlertCircle className="h-3 w-3 mr-1" />
+            Deletada do GitHub
           </Badge>
         );
       default:

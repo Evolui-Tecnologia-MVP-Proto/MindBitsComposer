@@ -1503,8 +1503,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Buscar estruturas existentes no banco
       const existingStructures = await storage.getAllRepoStructures();
       const existingFolderNames = existingStructures.map((s: any) => s.folderName);
+      const githubFolderNames = githubFolders.map((f: any) => f.name);
 
       let importedCount = 0;
+      let updatedCount = 0;
 
       // Importar pastas que existem no GitHub mas não no banco
       for (const folder of githubFolders) {
@@ -1519,9 +1521,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
+      // Atualizar status de pastas que existem no banco mas foram deletadas do GitHub
+      for (const structure of existingStructures) {
+        if (!githubFolderNames.includes(structure.folderName)) {
+          // Pasta existe no banco mas não no GitHub (foi deletada)
+          await storage.updateRepoStructureSync(structure.uid, false);
+          updatedCount++;
+          console.log(`Status atualizado - pasta deletada do GitHub: ${structure.folderName}`);
+        } else {
+          // Pasta existe em ambos - garantir que está marcada como sincronizada
+          if (!structure.isSync) {
+            await storage.updateRepoStructureSync(structure.uid, true);
+            updatedCount++;
+            console.log(`Status atualizado - pasta re-sincronizada: ${structure.folderName}`);
+          }
+        }
+      }
+
       res.json({ 
-        message: `Sincronização concluída. ${importedCount} pasta(s) importadas do GitHub.`,
-        importedCount
+        message: `Sincronização concluída. ${importedCount} pasta(s) importadas e ${updatedCount} pasta(s) atualizadas.`,
+        importedCount,
+        updatedCount
       });
     } catch (error: any) {
       console.error("Erro ao sincronizar do GitHub:", error);
