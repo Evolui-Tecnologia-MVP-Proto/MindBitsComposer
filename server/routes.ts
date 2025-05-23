@@ -1411,6 +1411,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // DELETE: Remover pasta do banco local (não do GitHub)
+  app.delete("/api/repo-structure/:uid", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { uid } = req.params;
+      
+      // Verificar se a pasta existe
+      const structure = await storage.getRepoStructure(uid);
+      if (!structure) {
+        return res.status(404).send("Pasta não encontrada");
+      }
+      
+      // Remover apenas do banco local
+      await storage.deleteRepoStructure(uid);
+      
+      res.json({ 
+        message: `Pasta "${structure.folderName}" removida do banco local com sucesso.`,
+        folderName: structure.folderName 
+      });
+    } catch (error: any) {
+      console.error("Erro ao remover pasta:", error);
+      res.status(500).send("Erro ao remover pasta do banco");
+    }
+  });
+
   app.post("/api/repo-structure/:uid/sync-github", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
