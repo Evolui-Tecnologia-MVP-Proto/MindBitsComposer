@@ -107,6 +107,39 @@ export default function DocumentosPage() {
     queryKey: ["/api/repo-structure"],
   });
 
+  // Mutation para sincronizar estrutura do GitHub para o banco local
+  const syncFromGitHubMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest('POST', '/api/repo-structure/sync-from-github');
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Sincronização concluída!",
+        description: `${data.importedCount} pasta(s) foram importadas do GitHub para o banco local.`,
+      });
+      
+      // Atualizar dados locais
+      queryClient.invalidateQueries({ queryKey: ["/api/repo-structure"] });
+      
+      // Atualizar estrutura do GitHub também
+      fetchGithubRepoStructure();
+      
+      // Forçar re-fetch após um pequeno delay
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ["/api/repo-structure"] });
+        fetchGithubRepoStructure();
+      }, 1000);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro na sincronização",
+        description: error.message || "Erro ao importar estrutura do GitHub",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Mutation para sincronizar todas as pastas não sincronizadas com GitHub
   const syncAllToGitHubMutation = useMutation({
     mutationFn: async () => {
@@ -1234,8 +1267,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     </p>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-2" />
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => syncFromGitHubMutation.mutate()}
+                      disabled={syncFromGitHubMutation.isPending}
+                    >
+                      {syncFromGitHubMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Download className="h-4 w-4 mr-2" />
+                      )}
                       Sincronizar
                     </Button>
                     <Button 

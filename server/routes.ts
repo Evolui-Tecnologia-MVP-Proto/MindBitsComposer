@@ -1466,6 +1466,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint para sincronizar estrutura do GitHub para o banco local
+  app.post("/api/repo-structure/sync-from-github", async (req, res) => {
+    try {
+      // Buscar conexão GitHub
+      const githubConnection = await storage.getServiceConnectionByName("github");
+      if (!githubConnection) {
+        return res.status(400).json({ error: "Conexão GitHub não configurada" });
+      }
+
+      const token = githubConnection.token;
+      const repository = githubConnection.parameters![0]; // formato: owner/repo
+      const [owner, repo] = repository.split('/');
+
+      // Buscar estrutura de pastas do GitHub
+      const githubUrl = `https://api.github.com/repos/${owner}/${repo}/contents`;
+      
+      const githubResponse = await fetch(githubUrl, {
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+        },
+      });
+
+      if (!githubResponse.ok) {
+        const errorData = await githubResponse.json();
+        return res.status(400).json({ 
+          error: "Erro ao buscar estrutura do GitHub",
+          details: errorData.message 
+        });
+      }
+
+      const githubContent = await githubResponse.json();
+      const githubFolders = githubContent.filter((item: any) => item.type === 'dir');
+
+      // Buscar estruturas existentes no banco
+      const existingStructures = await storage.getAllRepoStructures();
+      const existingFolderNames = existingStructures.map((s: any) => s.folderName);
+
+      let importedCount = 0;
+
+      // Importar pastas que existem no GitHub mas não no banco
+      for (const folder of githubFolders) {
+        if (!existingFolderNames.includes(folder.name)) {
+          await storage.createRepoStructure({
+            folderName: folder.name,
+            linkedTo: null, // Pastas raiz por padrão
+            isSync: true, // Já existem no GitHub, então estão sincronizadas
+          });
+          importedCount++;
+          console.log(`Pasta importada do GitHub: ${folder.name}`);
+        }
+      }
+
+      res.json({ 
+        message: `Sincronização concluída. ${importedCount} pasta(s) importadas do GitHub.`,
+        importedCount
+      });
+    } catch (error: any) {
+      console.error("Erro ao sincronizar do GitHub:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 
