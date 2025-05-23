@@ -1431,7 +1431,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             Arquivos em: <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono">{selectedFolderPath}</code>
                           </span>
                         ) : (
-                          'Últimas Sincronizações'
+                          'Arquivos na pasta'
                         )}
                       </h4>
                       <div className="space-y-3">
