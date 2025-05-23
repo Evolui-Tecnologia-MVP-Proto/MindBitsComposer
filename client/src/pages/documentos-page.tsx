@@ -776,12 +776,37 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   // Função para determinar tipo do arquivo baseado no MIME type
   const getFileTypeFromMime = (mimeType: string): string => {
-    if (mimeType.startsWith('image/')) return 'imagem';
+    // PDFs
     if (mimeType.includes('pdf')) return 'pdf';
-    if (mimeType.includes('word') || mimeType.includes('document')) return 'doc';
-    if (mimeType.includes('text')) return 'txt';
+    
+    // Documentos Word
+    if (mimeType.includes('word') || 
+        mimeType.includes('document') || 
+        mimeType.includes('ms-word') ||
+        mimeType.includes('officedocument.wordprocessingml')) return 'docx';
+    
+    // Planilhas Excel
+    if (mimeType.includes('excel') || 
+        mimeType.includes('spreadsheet') ||
+        mimeType.includes('officedocument.spreadsheetml')) return 'xlsx';
+    
+    // Imagens
+    if (mimeType.startsWith('image/jpeg') || mimeType.startsWith('image/jpg')) return 'jpg';
+    if (mimeType.startsWith('image/png')) return 'png';
+    if (mimeType.startsWith('image/')) return 'img';
+    
+    // Texto
+    if (mimeType.includes('text/plain')) return 'txt';
     if (mimeType.includes('json')) return 'json';
-    return 'outro';
+    if (mimeType.includes('xml')) return 'xml';
+    
+    // Compactados
+    if (mimeType.includes('zip') || mimeType.includes('compressed')) return 'zip';
+    
+    // Outros documentos
+    if (mimeType.includes('rtf')) return 'doc';
+    
+    return 'outros';
   };
 
   const renderDocumentosTable = (documentos: Documento[]) => (
@@ -1774,35 +1799,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     <p className="text-sm font-medium text-gray-700">Arquivo selecionado:</p>
                     <p className="text-sm text-gray-600">{artifactFormData.fileName}</p>
                     <p className="text-xs text-gray-500">
-                      Tipo: {artifactFormData.mimeType} | Tamanho: {(parseInt(artifactFormData.fileSize || "0") / 1024).toFixed(2)} KB
+                      Tipo detectado: {artifactFormData.type.toUpperCase()} | Tamanho: {(parseInt(artifactFormData.fileSize || "0") / 1024).toFixed(2)} KB
                     </p>
                   </div>
                 )}
               </div>
-            </div>
-            
-            <div>
-              <Label htmlFor="artifact-type">Tipo do Arquivo</Label>
-              <Select
-                value={artifactFormData.type}
-                onValueChange={(value) => setArtifactFormData({ ...artifactFormData, type: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pdf">PDF</SelectItem>
-                  <SelectItem value="doc">DOC</SelectItem>
-                  <SelectItem value="docx">DOCX</SelectItem>
-                  <SelectItem value="txt">TXT</SelectItem>
-                  <SelectItem value="jpg">JPG</SelectItem>
-                  <SelectItem value="png">PNG</SelectItem>
-                  <SelectItem value="json">JSON</SelectItem>
-                  <SelectItem value="xml">XML</SelectItem>
-                  <SelectItem value="xlsx">XLSX</SelectItem>
-                  <SelectItem value="zip">ZIP</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
           
@@ -1815,7 +1816,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             </Button>
             <Button 
               onClick={handleCreateArtifact}
-              disabled={createArtifactMutation.isPending || !artifactFormData.name || !artifactFormData.fileData || !artifactFormData.type}
+              disabled={createArtifactMutation.isPending || !artifactFormData.name || !artifactFormData.fileData}
               className="bg-blue-600 hover:bg-blue-700"
             >
               {createArtifactMutation.isPending ? (
