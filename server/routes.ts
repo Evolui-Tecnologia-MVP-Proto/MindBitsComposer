@@ -1357,6 +1357,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Repo Structure routes
+  app.get("/api/repo-structure", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const parentUid = req.query.parent as string;
+      const structures = await storage.getRepoStructureByParent(parentUid || undefined);
+      res.json(structures);
+    } catch (error: any) {
+      console.error("Erro ao buscar estrutura do repositório:", error);
+      res.status(500).send("Erro ao buscar estrutura do repositório");
+    }
+  });
+
+  app.post("/api/repo-structure", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const structure = await storage.createRepoStructure(req.body);
+      res.status(201).json(structure);
+    } catch (error: any) {
+      console.error("Erro ao criar estrutura do repositório:", error);
+      res.status(500).send("Erro ao criar estrutura do repositório");
+    }
+  });
+
+  app.put("/api/repo-structure/:uid/sync", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { uid } = req.params;
+      const { isSync } = req.body;
+      const structure = await storage.updateRepoStructureSync(uid, isSync);
+      res.json(structure);
+    } catch (error: any) {
+      console.error("Erro ao atualizar sincronização:", error);
+      res.status(500).send("Erro ao atualizar sincronização");
+    }
+  });
+
+  app.post("/api/repo-structure/:uid/sync-github", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { uid } = req.params;
+      const structure = await storage.getRepoStructure(uid);
+      
+      if (!structure) {
+        return res.status(404).send("Estrutura não encontrada");
+      }
+
+      // Buscar conexão GitHub
+      const githubConnection = await storage.getServiceConnection("github");
+      if (!githubConnection) {
+        return res.status(400).send("Conexão GitHub não encontrada");
+      }
+
+      const [owner, repo] = githubConnection.parameters[0].split('/');
+      
+      // Construir caminho da pasta
+      let folderPath = structure.folderName;
+      let parent = structure.linkedTo ? await storage.getRepoStructure(structure.linkedTo) : null;
+      
+      while (parent) {
+        folderPath = `${parent.folderName}/${folderPath}`;
+        parent = parent.linkedTo ? await storage.getRepoStructure(parent.linkedTo) : null;
+      }
+
+      // Criar pasta no GitHub
+      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${folderPath}/.gitkeep`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${githubConnection.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: `Criar pasta ${folderPath}`,
+          content: Buffer.from('# Pasta criada pelo EVO-MindBits Composer').toString('base64')
+        })
+      });
+
+      if (response.ok) {
+        // Marcar como sincronizada
+        await storage.updateRepoStructureSync(uid, true);
+        res.json({ success: true, message: "Pasta criada no GitHub com sucesso" });
+      } else {
+        const errorData = await response.json();
+        res.status(400).json({ success: false, message: errorData.message });
+      }
+    } catch (error: any) {
+      console.error("Erro ao sincronizar com GitHub:", error);
+      res.status(500).send("Erro ao sincronizar com GitHub");
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 

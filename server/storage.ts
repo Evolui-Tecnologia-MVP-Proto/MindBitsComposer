@@ -1330,6 +1330,56 @@ export class MemStorage implements IStorage {
   async deleteDocumentArtifact(id: string): Promise<void> {
     this.documentArtifacts.delete(id);
   }
+
+  // Repo Structure operations
+  async getRepoStructure(uid: string): Promise<RepoStructure | undefined> {
+    return this.repoStructures.get(uid);
+  }
+
+  async getAllRepoStructures(): Promise<RepoStructure[]> {
+    return Array.from(this.repoStructures.values());
+  }
+
+  async getRepoStructureByParent(parentUid?: string): Promise<RepoStructure[]> {
+    return Array.from(this.repoStructures.values()).filter(structure => 
+      structure.linkedTo === parentUid
+    );
+  }
+
+  async createRepoStructure(insertStructure: InsertRepoStructure): Promise<RepoStructure> {
+    const structure: RepoStructure = {
+      uid: crypto.randomUUID(),
+      ...insertStructure,
+      isSync: insertStructure.isSync ?? false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.repoStructures.set(structure.uid, structure);
+    return structure;
+  }
+
+  async updateRepoStructure(uid: string, data: Partial<RepoStructure>): Promise<RepoStructure> {
+    const existingStructure = this.repoStructures.get(uid);
+    if (!existingStructure) {
+      throw new Error("Estrutura do repositório não encontrada");
+    }
+
+    const updatedStructure: RepoStructure = {
+      ...existingStructure,
+      ...data,
+      updatedAt: new Date()
+    };
+    this.repoStructures.set(uid, updatedStructure);
+    return updatedStructure;
+  }
+
+  async updateRepoStructureSync(uid: string, isSync: boolean): Promise<RepoStructure> {
+    return this.updateRepoStructure(uid, { isSync });
+  }
+
+  async deleteRepoStructure(uid: string): Promise<void> {
+    this.repoStructures.delete(uid);
+  }
 }
 
 // Always use DatabaseStorage to ensure data persistence
