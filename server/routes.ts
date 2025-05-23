@@ -1491,14 +1491,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       if (!githubResponse.ok) {
-        const errorData = await githubResponse.json();
+        const errorText = await githubResponse.text();
+        console.error('Erro na resposta do GitHub:', errorText);
         return res.status(400).json({ 
           error: "Erro ao buscar estrutura do GitHub",
-          details: errorData.message 
+          details: `Status: ${githubResponse.status}` 
         });
       }
 
-      const githubContent = await githubResponse.json();
+      const responseText = await githubResponse.text();
+      console.log('Resposta bruta do GitHub:', responseText);
+      
+      let githubContent;
+      try {
+        githubContent = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Erro ao fazer parse do JSON:', parseError);
+        return res.status(500).json({ 
+          error: "Erro ao processar resposta do GitHub",
+          details: "Resposta inválida do GitHub API" 
+        });
+      }
       const githubFolders = githubContent.filter((item: any) => item.type === 'dir');
 
       // Buscar estruturas existentes no banco
