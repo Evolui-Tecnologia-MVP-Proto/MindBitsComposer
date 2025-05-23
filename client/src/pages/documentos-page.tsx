@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -64,6 +64,8 @@ export default function DocumentosPage() {
   const [editingDocument, setEditingDocument] = useState<Documento | null>(null);
   const [documentToDelete, setDocumentToDelete] = useState<Documento | null>(null);
   const [selectedArtifact, setSelectedArtifact] = useState<DocumentArtifact | null>(null);
+  const [githubRepoFiles, setGithubRepoFiles] = useState<any[]>([]);
+  const [isLoadingRepo, setIsLoadingRepo] = useState(false);
   const [artifactFormData, setArtifactFormData] = useState<InsertDocumentArtifact>({
     documentoId: "",
     name: "",
@@ -91,6 +93,117 @@ export default function DocumentosPage() {
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
     queryKey: ["/api/documentos"],
   });
+
+  // Buscar conexões de serviço para obter o repositório GitHub
+  const { data: serviceConnections = [] } = useQuery({
+    queryKey: ["/api/service-connections"],
+  });
+
+  // Função para buscar estrutura do repositório GitHub
+  const fetchGithubRepoStructure = async () => {
+    const githubConnection = serviceConnections.find((conn: any) => conn.serviceName === 'github');
+    
+    if (!githubConnection || !githubConnection.token || !githubConnection.parameters?.[0]) {
+      console.log('Conexão GitHub não encontrada ou incompleta');
+      return [];
+    }
+
+    const [owner, repo] = githubConnection.parameters[0].split('/');
+    
+    setIsLoadingRepo(true);
+    try {
+      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents`, {
+        headers: {
+          'Authorization': `token ${githubConnection.token}`,
+          'Accept': 'application/vnd.github.v3+json',
+        },
+      });
+
+      if (response.ok) {
+        const contents = await response.json();
+        const fileStructure = await buildFileTree(contents, githubConnection.token, owner, repo);
+        setGithubRepoFiles(fileStructure);
+        return fileStructure;
+      } else {
+        console.error('Erro ao buscar repositório:', response.status);
+        return [];
+      }
+    } catch (error) {
+      console.error('Erro na requisição:', error);
+      return [];
+    } finally {
+      setIsLoadingRepo(false);
+    }
+  };
+
+  // Função para construir estrutura hierárquica
+  const buildFileTree = async (items: any[], token: string, owner: string, repo: string, path: string = '') => {
+    const tree: any[] = [];
+    
+    for (const item of items) {
+      if (item.type === 'dir') {
+        // Para pastas, buscar conteúdo recursivamente
+        try {
+          const subResponse = await fetch(item.url, {
+            headers: {
+              'Authorization': `token ${token}`,
+              'Accept': 'application/vnd.github.v3+json',
+            },
+          });
+          
+          if (subResponse.ok) {
+            const subContents = await subResponse.json();
+            const children = await buildFileTree(subContents, token, owner, repo, item.path);
+            
+            tree.push({
+              id: item.path,
+              name: item.name,
+              type: 'folder',
+              path: item.path,
+              children: children
+            });
+          }
+        } catch (error) {
+          // Se falhar, adicionar pasta vazia
+          tree.push({
+            id: item.path,
+            name: item.name,
+            type: 'folder',
+            path: item.path,
+            children: []
+          });
+        }
+      } else {
+        // Para arquivos
+        tree.push({
+          id: item.path,
+          name: item.name,
+          type: 'file',
+          path: item.path,
+          size: formatFileSize(item.size),
+          modified: new Date(item.sha).toLocaleDateString('pt-BR')
+        });
+      }
+    }
+    
+    return tree;
+  };
+
+  // Função para formatar tamanho do arquivo
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  };
+
+  // Carregar estrutura do repositório quando houver conexão GitHub
+  useEffect(() => {
+    if (serviceConnections && serviceConnections.length > 0 && activeTab === 'repositorio') {
+      fetchGithubRepoStructure();
+    }
+  }, [serviceConnections, activeTab]);
 
   // Buscar artefatos do documento selecionado (para visualização ou edição)
   const currentDocumentId = selectedDocument?.id || editingDocument?.id;
@@ -995,73 +1108,63 @@ export default function DocumentosPage() {
                 <div className="border-t pt-6">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-4">Estrutura do Repositório</h4>
-                      <FileExplorer 
-                        data={[
-                          {
-                            id: 'root',
-                            name: 'evoluitecnologia/mindbits-docs',
-                            type: 'folder',
-                            path: '/',
-                            children: [
-                              {
-                                id: 'docs',
-                                name: 'docs',
-                                type: 'folder',
-                                path: '/docs',
-                                children: [
-                                  {
-                                    id: 'manual-cpx.md',
-                                    name: 'manual-cpx.md',
-                                    type: 'file',
-                                    path: '/docs/manual-cpx.md',
-                                    size: '24.5 KB',
-                                    modified: '2 horas atrás'
-                                  },
-                                  {
-                                    id: 'api-docs.md',
-                                    name: 'api-docs.md',
-                                    type: 'file',
-                                    path: '/docs/api-docs.md',
-                                    size: '15.2 KB',
-                                    modified: '3 dias atrás'
-                                  }
-                                ]
-                              },
-                              {
-                                id: 'specs',
-                                name: 'specs',
-                                type: 'folder',
-                                path: '/specs',
-                                children: [
-                                  {
-                                    id: 'requisitos.md',
-                                    name: 'requisitos.md',
-                                    type: 'file',
-                                    path: '/specs/requisitos.md',
-                                    size: '18.7 KB',
-                                    modified: '1 dia atrás'
-                                  }
-                                ]
-                              },
-                              {
-                                id: 'readme.md',
-                                name: 'README.md',
-                                type: 'file',
-                                path: '/README.md',
-                                size: '3.1 KB',
-                                modified: '1 semana atrás'
-                              }
-                            ]
-                          }
-                        ]}
-                        onFileSelect={(file) => {
-                          console.log('Arquivo selecionado:', file);
-                        }}
-                        onFolderToggle={(folder, isExpanded) => {
-                          console.log('Pasta:', folder.name, 'Expandida:', isExpanded);
-                        }}
-                      />
+                      <div className="flex items-center justify-between mb-4">
+                        <h4 className="font-medium text-gray-900">Estrutura do Repositório</h4>
+                        {isLoadingRepo && (
+                          <div className="flex items-center text-sm text-gray-500">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
+                            Carregando...
+                          </div>
+                        )}
+                        {!isLoadingRepo && githubRepoFiles.length === 0 && (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={fetchGithubRepoStructure}
+                          >
+                            Atualizar
+                          </Button>
+                        )}
+                      </div>
+                      
+                      {githubRepoFiles.length > 0 ? (
+                        <FileExplorer 
+                          data={githubRepoFiles}
+                          onFileSelect={(file) => {
+                            console.log('Arquivo selecionado:', file);
+                          }}
+                          onFolderToggle={(folder, isExpanded) => {
+                            console.log('Pasta:', folder.name, 'Expandida:', isExpanded);
+                          }}
+                        />
+                      ) : !isLoadingRepo ? (
+                        <div className="border rounded-lg bg-gray-50 p-6 text-center">
+                          <div className="text-gray-500 mb-2">
+                            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </div>
+                          <h3 className="text-sm font-medium text-gray-900 mb-1">Nenhum repositório conectado</h3>
+                          <p className="text-sm text-gray-500 mb-4">
+                            Configure uma conexão GitHub nas configurações para ver a estrutura do repositório aqui.
+                          </p>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={fetchGithubRepoStructure}
+                          >
+                            Tentar Conectar
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="border rounded-lg bg-white p-6">
+                          <div className="animate-pulse space-y-3">
+                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     
                     <div>
