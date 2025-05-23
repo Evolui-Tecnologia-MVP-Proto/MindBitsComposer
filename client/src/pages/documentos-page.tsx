@@ -53,7 +53,6 @@ import { type Documento, type InsertDocumento, type DocumentArtifact, type Inser
 export default function DocumentosPage() {
   const [activeTab, setActiveTab] = useState("integrados");
   const [selectedDocument, setSelectedDocument] = useState<Documento | null>(null);
-  const [editingDocument, setEditingDocument] = useState<Documento | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAddArtifactModalOpen, setIsAddArtifactModalOpen] = useState(false);
@@ -167,38 +166,6 @@ export default function DocumentosPage() {
     },
   });
 
-  // Mutation para atualizar documento
-  const updateDocumentMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: Partial<InsertDocumento> }) => {
-      const response = await fetch(`/api/documentos/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error("Erro ao atualizar documento");
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
-      setIsCreateModalOpen(false);
-      setEditingDocument(null);
-      resetForm();
-    },
-  });
-
-  // Mutation para excluir documento
-  const deleteDocumentMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(`/api/documentos/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Erro ao excluir documento");
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
-    },
-  });
-
   // Filtrar documentos por status
   const documentosIntegrados = useMemo(() => 
     documentos.filter(doc => doc.status === "Integrado"), [documentos]);
@@ -208,53 +175,7 @@ export default function DocumentosPage() {
     documentos.filter(doc => doc.status === "Concluido"), [documentos]);
 
   const handleCreateDocument = () => {
-    if (editingDocument) {
-      // Atualizar documento existente
-      updateDocumentMutation.mutate({
-        id: editingDocument.id,
-        data: formData,
-      });
-    } else {
-      // Criar novo documento
-      createDocumentoMutation.mutate(formData);
-    }
-  };
-
-  const handleEditDocument = (documento: Documento) => {
-    setEditingDocument(documento);
-    setFormData({
-      origem: documento.origem,
-      objeto: documento.objeto,
-      cliente: documento.cliente,
-      responsavel: documento.responsavel,
-      sistema: documento.sistema,
-      modulo: documento.modulo,
-      descricao: documento.descricao,
-      status: documento.status,
-      statusOrigem: documento.statusOrigem,
-    });
-    setIsCreateModalOpen(true);
-  };
-
-  const handleDeleteDocument = (documentId: string) => {
-    if (confirm("Tem certeza que deseja excluir este documento?")) {
-      deleteDocumentMutation.mutate(documentId);
-    }
-  };
-
-  const resetForm = () => {
-    setFormData({
-      origem: "",
-      objeto: "",
-      cliente: "",
-      responsavel: "",
-      sistema: "",
-      modulo: "",
-      descricao: "",
-      status: "Integrado",
-      statusOrigem: "Incluido",
-    });
-    setEditingDocument(null);
+    createDocumentoMutation.mutate(formData);
   };
 
   // Funções auxiliares para artefatos
@@ -475,16 +396,14 @@ export default function DocumentosPage() {
                   variant="ghost" 
                   size="icon" 
                   className="h-8 w-8"
-                  onClick={() => handleEditDocument(documento)}
+                  onClick={() => openViewModal(documento)}
                 >
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
                   <Pencil className="h-4 w-4 text-blue-500" />
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8"
-                  onClick={() => handleDeleteDocument(documento.id)}
-                >
+                <Button variant="ghost" size="icon" className="h-8 w-8">
                   <Trash2 className="h-4 w-4 text-red-500" />
                 </Button>
               </div>
@@ -697,11 +616,9 @@ export default function DocumentosPage() {
     <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>
-            {editingDocument ? "Editar Documento" : "Criar Novo Documento"}
-          </DialogTitle>
+          <DialogTitle>Criar Novo Documento</DialogTitle>
           <DialogDescription>
-            {editingDocument ? "Edite as informações do documento" : "Preencha os dados do novo documento"}
+            Preencha os dados do novo documento
           </DialogDescription>
         </DialogHeader>
         
@@ -785,12 +702,9 @@ export default function DocumentosPage() {
           </Button>
           <Button 
             onClick={handleCreateDocument} 
-            disabled={createDocumentoMutation.isPending || updateDocumentMutation.isPending}
+            disabled={createDocumentoMutation.isPending}
           >
-            {(createDocumentoMutation.isPending || updateDocumentMutation.isPending) 
-              ? (editingDocument ? "Salvando..." : "Criando...") 
-              : (editingDocument ? "Salvar Alterações" : "Criar Documento")
-            }
+            {createDocumentoMutation.isPending ? "Criando..." : "Criar Documento"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -813,10 +727,7 @@ export default function DocumentosPage() {
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 overflow-y-auto">
         <div className="flex items-center justify-between space-y-2">
           <h2 className="text-3xl font-bold tracking-tight">Documentos</h2>
-          <Button onClick={() => {
-            resetForm();
-            setIsCreateModalOpen(true);
-          }} className="bg-blue-600 hover:bg-blue-700">
+          <Button onClick={() => setIsCreateModalOpen(true)} className="bg-blue-600 hover:bg-blue-700">
             <Plus className="mr-2 h-4 w-4" />
             Novo Documento
           </Button>
