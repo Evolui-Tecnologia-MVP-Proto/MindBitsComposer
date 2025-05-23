@@ -512,15 +512,23 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   // Mutation para atualizar documento
   const updateDocumentoMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: InsertDocumento }) => {
+      console.log("Atualizando documento:", id, data);
       const response = await fetch(`/api/documentos/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      if (!response.ok) throw new Error("Erro ao atualizar documento");
-      return response.json();
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Erro na atualização:", response.status, errorText);
+        throw new Error("Erro ao atualizar documento");
+      }
+      const result = await response.json();
+      console.log("Documento atualizado com sucesso:", result);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log("OnSuccess disparado:", data);
       queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
       queryClient.invalidateQueries({ queryKey: ["/api/documentos/artifacts-count"] });
       setIsEditModalOpen(false);
@@ -539,6 +547,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       toast({
         title: "Sucesso",
         description: "Documento atualizado com sucesso!",
+      });
+      console.log("Modal deve estar fechada agora");
+    },
+    onError: (error) => {
+      console.error("Erro na mutação:", error);
+      toast({
+        title: "Erro",
+        description: "Falha ao atualizar documento",
+        variant: "destructive",
       });
     },
   });
