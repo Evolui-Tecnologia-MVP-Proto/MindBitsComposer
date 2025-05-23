@@ -207,6 +207,26 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     });
   };
 
+  // Função recursiva para construir filhos
+  const buildChildrenRecursively = (parentUid: string): FileItem[] => {
+    const children: FileItem[] = [];
+    const childStructures = repoStructures.filter((s: any) => s.linkedTo === parentUid);
+    
+    childStructures.forEach((childStructure: any) => {
+      const childItem: FileItem = {
+        id: childStructure.uid,
+        name: childStructure.folderName,
+        type: 'folder',
+        path: childStructure.folderName,
+        children: buildChildrenRecursively(childStructure.uid), // Recursão para filhos dos filhos
+        syncStatus: childStructure.isSync ? 'synced' : 'unsynced'
+      };
+      children.push(childItem);
+    });
+    
+    return children;
+  };
+
   // Construir estrutura unificada com status de sincronização
   const buildUnifiedStructure = (): FileItem[] => {
     const processedItems: FileItem[] = [];
@@ -229,20 +249,19 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
             children: [] // Inicializar filhos vazios
           };
           
-          // Encontrar filhos desta pasta no banco local
-          const childStructures = repoStructures.filter((s: any) => s.linkedTo === localStructure.uid);
-          childStructures.forEach((childStructure: any) => {
-            const childItem: FileItem = {
-              id: childStructure.uid,
-              name: childStructure.folderName,
-              type: 'folder',
-              path: childStructure.folderName,
-              children: [],
-              syncStatus: childStructure.isSync ? 'synced' : 'unsynced'
-            };
-            unifiedItem.children!.push(childItem);
-            processedNames.add(childStructure.folderName); // Marcar como processado
-          });
+          // Construir hierarquia completa recursivamente
+          unifiedItem.children = buildChildrenRecursively(localStructure.uid);
+          
+          // Marcar todos os filhos como processados
+          const markProcessed = (children: FileItem[]) => {
+            children.forEach(child => {
+              processedNames.add(child.name);
+              if (child.children) {
+                markProcessed(child.children);
+              }
+            });
+          };
+          markProcessed(unifiedItem.children);
           
           processedItems.push(unifiedItem);
         } else {
