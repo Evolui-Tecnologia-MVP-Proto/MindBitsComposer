@@ -231,3 +231,22 @@ export const insertDocumentArtifactSchema = createInsertSchema(documentsArtifact
 
 export type InsertDocumentArtifact = z.infer<typeof insertDocumentArtifactSchema>;
 export type DocumentArtifact = typeof documentsArtifacts.$inferSelect;
+
+// Repo Structure table
+export const repoStructure = pgTable("repo_structure", {
+  uid: uuid("uid").defaultRandom().primaryKey(),
+  folderName: text("folder_name").notNull(),
+  linkedTo: uuid("linked_to").references(() => repoStructure.uid),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Repo Structure schema
+export const insertRepoStructureSchema = createInsertSchema(repoStructure).omit({
+  uid: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertRepoStructure = z.infer<typeof insertRepoStructureSchema>;
+export type RepoStructure = typeof repoStructure.$inferSelect;
