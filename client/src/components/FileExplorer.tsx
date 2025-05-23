@@ -236,7 +236,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     return (
       <div key={item.id}>
         <div
-          className={`flex items-center justify-between py-1 px-2 hover:bg-gray-50 rounded cursor-pointer group`}
+          className={`flex items-center py-1 px-2 hover:bg-gray-50 rounded cursor-pointer`}
           style={{ paddingLeft }}
           onClick={() => toggleFolder(item.id, item)}
         >
@@ -271,22 +271,6 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
               </Badge>
             )}
           </div>
-          
-          {structure && !structure.isSync && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={(e) => {
-                e.stopPropagation();
-                syncWithGitHubMutation.mutate(structure.uid);
-              }}
-              disabled={syncWithGitHubMutation.isPending}
-            >
-              <Upload className="h-3 w-3 mr-1" />
-              Enviar para GitHub
-            </Button>
-          )}
         </div>
         
         {isExpanded && item.children && item.children.length > 0 && (
