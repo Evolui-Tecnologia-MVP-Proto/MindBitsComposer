@@ -514,8 +514,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     mutationFn: async ({ id, data }: { id: string; data: InsertDocumento }) => {
       console.log("Atualizando documento:", id, data);
       try {
-        const response = await fetch(`/api/doc-update/${id}`, {
-          method: "POST",
+        const response = await fetch(`/api/documentos/${id}`, {
+          method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
         });
@@ -528,38 +528,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           throw new Error(`Erro ${response.status}: ${errorText}`);
         }
         
-        const responseText = await response.text();
-        console.log("Resposta em texto:", responseText);
-        
-        // Interpretar resposta de texto do servidor
-        if (responseText.startsWith("SUCCESS:")) {
-          const jsonPart = responseText.substring(8); // Remove "SUCCESS:"
-          try {
-            const result = JSON.parse(jsonPart);
-            console.log("✅ Sucesso interpretado:", result);
-            return result;
-          } catch (parseError) {
-            console.log("Erro ao fazer parse do JSON:", parseError);
-            throw new Error("Resposta de sucesso mal formada");
-          }
-        } else if (responseText.startsWith("ERROR:")) {
-          const errorMessage = responseText.substring(6); // Remove "ERROR:"
-          console.log("❌ Erro do servidor:", errorMessage);
-          throw new Error(errorMessage);
-        } else if (responseText === "UNAUTHORIZED") {
-          console.log("❌ Não autorizado");
-          throw new Error("Não autorizado");
-        } else {
-          // Fallback para tentar JSON normal
-          try {
-            const result = JSON.parse(responseText);
-            console.log("JSON normal interpretado:", result);
-            return result;
-          } catch (jsonError) {
-            console.log("Resposta inesperada:", responseText.substring(0, 100));
-            throw new Error("Falha na comunicação com o servidor");
-          }
-        }
+        const result = await response.json();
+        console.log("Documento atualizado com sucesso:", result);
+        return result;
       } catch (error) {
         console.error("Erro completo na mutação:", error);
         throw error;
