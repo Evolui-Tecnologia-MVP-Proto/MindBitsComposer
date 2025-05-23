@@ -1265,21 +1265,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint temporário específico para update
   app.put("/api/documentos/:id", async (req, res) => {
-    console.log("🚀 PUT ENDPOINT CHAMADO - ID:", req.params.id);
+    console.log("🚀🚀🚀 PUT ENDPOINT CHAMADO - ID:", req.params.id);
+    console.log("🚀🚀🚀 BODY:", JSON.stringify(req.body));
+    
     if (!req.isAuthenticated()) {
       console.log("❌ PUT - Não autorizado");
       return res.status(401).send("Não autorizado");
     }
     
     try {
-      console.log("✅ PUT - Atualizando documento:", req.params.id, req.body);
+      console.log("✅ STORAGE - Iniciando atualização");
       const documento = await storage.updateDocumento(req.params.id, req.body);
-      console.log("✅ PUT - Documento atualizado:", documento);
-      res.json(documento);
+      console.log("✅ STORAGE - Documento atualizado:", documento);
+      
+      // Forçar resposta JSON válida
+      return res.status(200).json({
+        success: true,
+        document: documento,
+        message: "Documento atualizado com sucesso"
+      });
     } catch (error: any) {
       console.error("❌ Erro ao atualizar documento:", error);
-      res.status(500).send("Erro ao atualizar documento");
+      return res.status(500).json({
+        success: false,
+        error: error.message
+      });
     }
   });
 
