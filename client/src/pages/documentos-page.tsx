@@ -513,7 +513,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   const updateDocumentoMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: InsertDocumento }) => {
       console.log("Atualizando documento:", id, data);
-      const response = await fetch(`/api/documentos/${id}`, {
+      const response = await fetch(`/api/update-documento/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -523,14 +523,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         console.error("Erro na atualização:", response.status, errorText);
         throw new Error("Erro ao atualizar documento");
       }
-      let result;
-      try {
-        result = await response.json();
-        console.log("Documento atualizado com sucesso:", result);
-      } catch (jsonError) {
-        console.log("Resposta não é JSON válido, assumindo sucesso");
-        result = { success: true };
-      }
+      const result = await response.json();
+      console.log("Documento atualizado com sucesso:", result);
       return result;
     },
     onSuccess: (data) => {
