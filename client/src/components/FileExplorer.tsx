@@ -176,60 +176,118 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     });
   };
 
-  // Combinar dados do GitHub com estrutura local
-  const combinedData = [...data];
-  
-  // Adicionar pastas criadas localmente que ainda não estão no GitHub
-  repoStructures.forEach((structure) => {
-    const existsInGithub = data.some(item => item.name === structure.folderName && item.type === 'folder');
-    if (!existsInGithub) {
-      combinedData.push({
+  // Construir estrutura hierárquica das pastas locais
+  const buildLocalHierarchy = (): FileItem[] => {
+    const rootFolders: FileItem[] = [];
+    const folderMap = new Map<string, FileItem>();
+
+    // Primeiro, criar todos os itens de pasta
+    repoStructures.forEach((structure) => {
+      const folderItem: FileItem = {
         id: structure.uid,
         name: structure.folderName,
-        type: 'folder' as const,
+        type: 'folder',
         path: structure.folderName,
         children: []
-      });
-    }
-  });
+      };
+      folderMap.set(structure.uid, folderItem);
+    });
 
-  const renderLocalFolder = (structure: RepoStructure, level: number = 0) => {
+    // Depois, organizar hierarquicamente
+    repoStructures.forEach((structure) => {
+      const folderItem = folderMap.get(structure.uid)!;
+      
+      if (structure.linkedTo) {
+        // É uma subpasta
+        const parent = folderMap.get(structure.linkedTo);
+        if (parent) {
+          parent.children = parent.children || [];
+          parent.children.push(folderItem);
+        }
+      } else {
+        // É uma pasta raiz
+        rootFolders.push(folderItem);
+      }
+    });
+
+    return rootFolders;
+  };
+
+  const localFolders = buildLocalHierarchy();
+  
+  // Combinar dados do GitHub com estrutura local hierárquica
+  const combinedData = [...data, ...localFolders];
+
+  const renderFolderWithStatus = (item: FileItem, level: number = 0) => {
+    // Encontrar a estrutura correspondente para mostrar o status
+    const structure = repoStructures.find(s => s.uid === item.id);
+    const isExpanded = expandedFolders.has(item.id);
+    const paddingLeft = `${level * 20 + 8}px`;
+
     return (
-      <div
-        key={structure.uid}
-        className={`flex items-center justify-between py-1 px-2 hover:bg-gray-50 rounded cursor-pointer group`}
-        style={{ paddingLeft: `${level * 20 + 8}px` }}
-      >
-        <div className="flex items-center gap-2 flex-1">
-          <Folder className="h-4 w-4 text-blue-500" />
-          <span className="text-sm text-gray-700">{structure.folderName}</span>
-          {!structure.isSync && (
-            <Badge variant="outline" className="text-xs text-orange-600 border-orange-200">
-              <AlertCircle className="h-3 w-3 mr-1" />
-              Não sincronizada
-            </Badge>
-          )}
-          {structure.isSync && (
-            <Badge variant="outline" className="text-xs text-green-600 border-green-200">
-              ✓ Sincronizada
-            </Badge>
+      <div key={item.id}>
+        <div
+          className={`flex items-center justify-between py-1 px-2 hover:bg-gray-50 rounded cursor-pointer group`}
+          style={{ paddingLeft }}
+          onClick={() => toggleFolder(item.id, item)}
+        >
+          <div className="flex items-center gap-2 flex-1">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-4 w-4 p-0 mr-1"
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleFolder(item.id, item);
+              }}
+            >
+              {isExpanded ? (
+                <ChevronDown className="h-3 w-3" />
+              ) : (
+                <ChevronRight className="h-3 w-3" />
+              )}
+            </Button>
+            <Folder className="h-4 w-4 text-blue-500" />
+            <span className="text-sm text-gray-700">{item.name}</span>
+            
+            {structure && !structure.isSync && (
+              <Badge variant="outline" className="text-xs text-orange-600 border-orange-200">
+                <AlertCircle className="h-3 w-3 mr-1" />
+                Não sincronizada
+              </Badge>
+            )}
+            {structure && structure.isSync && (
+              <Badge variant="outline" className="text-xs text-green-600 border-green-200">
+                ✓ Sincronizada
+              </Badge>
+            )}
+          </div>
+          
+          {structure && !structure.isSync && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={(e) => {
+                e.stopPropagation();
+                syncWithGitHubMutation.mutate(structure.uid);
+              }}
+              disabled={syncWithGitHubMutation.isPending}
+            >
+              <Upload className="h-3 w-3 mr-1" />
+              Enviar para GitHub
+            </Button>
           )}
         </div>
         
-        {!structure.isSync && (
-          <Button
-            size="sm"
-            variant="outline"
-            className="opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={(e) => {
-              e.stopPropagation();
-              syncWithGitHubMutation.mutate(structure.uid);
-            }}
-            disabled={syncWithGitHubMutation.isPending}
-          >
-            <Upload className="h-3 w-3 mr-1" />
-            Enviar para GitHub
-          </Button>
+        {isExpanded && item.children && item.children.length > 0 && (
+          <div>
+            {item.children.map((child) => 
+              child.type === 'folder' 
+                ? renderFolderWithStatus(child, level + 1)
+                : renderFileTree([child], level + 1)
+            )}
+          </div>
         )}
       </div>
     );
@@ -254,15 +312,13 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
         {/* Renderizar arquivos/pastas do GitHub */}
         {renderFileTree(data)}
         
-        {/* Renderizar pastas criadas localmente não sincronizadas */}
-        {repoStructures.filter(s => !s.isSync).length > 0 && (
+        {/* Renderizar pastas locais hierárquicas */}
+        {localFolders.length > 0 && (
           <div className="mt-3 pt-3 border-t border-gray-100">
             <div className="text-xs text-gray-500 mb-2 px-2 font-medium">
               Pastas criadas localmente:
             </div>
-            {repoStructures
-              .filter(s => !s.linkedTo) // Apenas pastas raiz para simplificar
-              .map(structure => renderLocalFolder(structure))}
+            {localFolders.map((folder) => renderFolderWithStatus(folder))}
           </div>
         )}
       </div>
