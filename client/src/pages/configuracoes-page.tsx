@@ -529,39 +529,57 @@ export default function ConfiguracoesPage() {
                   <FormItem>
                     <FormLabel>Token de API</FormLabel>
                     <FormControl>
-                      <div className="flex space-x-2">
-                        <Input {...field} type="password" autoComplete="off" className="flex-1" />
-                        {/* Debug: sempre mostrar para teste */}
-                        {true && (
-                          <div className="text-xs text-gray-500 mb-2">
-                            Debug: selectedServiceName="{selectedServiceName}", formValue="{form.getValues("serviceName")}"
+                      <div className="space-y-2">
+                        <div className="flex space-x-2">
+                          <Input {...field} type="password" autoComplete="off" className="flex-1" />
+                          {(selectedServiceName === "github" || form.getValues("serviceName") === "github") && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={testGithubConnection}
+                              disabled={isConnecting || !field.value}
+                              className={`px-3 ${
+                                connectionStatus === 'success' 
+                                  ? 'border-green-500 text-green-700 hover:bg-green-50' 
+                                  : connectionStatus === 'error'
+                                  ? 'border-red-500 text-red-700 hover:bg-red-50'
+                                  : 'border-amber-500 text-amber-700 hover:bg-amber-50'
+                              }`}
+                            >
+                              {isConnecting ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : connectionStatus === 'success' ? (
+                                <CheckCircle className="h-4 w-4" />
+                              ) : connectionStatus === 'error' ? (
+                                <XCircle className="h-4 w-4" />
+                              ) : (
+                                "Conectar"
+                              )}
+                            </Button>
+                          )}
+                        </div>
+                        
+                        {/* Combo de repositórios GitHub */}
+                        {(selectedServiceName === "github" || form.getValues("serviceName") === "github") && connectionStatus === 'success' && githubRepos.length > 0 && (
+                          <div className="space-y-2">
+                            <Label>Repositório Padrão</Label>
+                            <Select value={selectedRepo} onValueChange={setSelectedRepo}>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione um repositório..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {githubRepos.map((repo) => (
+                                  <SelectItem key={repo.full_name} value={repo.full_name}>
+                                    {repo.full_name}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <p className="text-sm text-gray-500">
+                              {githubRepos.length} repositório(s) encontrado(s)
+                            </p>
                           </div>
-                        )}
-                        {(selectedServiceName === "github" || form.getValues("serviceName") === "github") && (
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={testGithubConnection}
-                            disabled={isConnecting || !field.value}
-                            className={`px-3 ${
-                              connectionStatus === 'success' 
-                                ? 'border-green-500 text-green-700 hover:bg-green-50' 
-                                : connectionStatus === 'error'
-                                ? 'border-red-500 text-red-700 hover:bg-red-50'
-                                : 'border-amber-500 text-amber-700 hover:bg-amber-50'
-                            }`}
-                          >
-                            {isConnecting ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : connectionStatus === 'success' ? (
-                              <CheckCircle className="h-4 w-4" />
-                            ) : connectionStatus === 'error' ? (
-                              <XCircle className="h-4 w-4" />
-                            ) : (
-                              "Conectar"
-                            )}
-                          </Button>
                         )}
                       </div>
                     </FormControl>
@@ -574,27 +592,7 @@ export default function ConfiguracoesPage() {
                 )}
               />
               
-              {/* Combo de repositórios GitHub */}
-              {(selectedServiceName === "github" || form.getValues("serviceName") === "github") && connectionStatus === 'success' && githubRepos.length > 0 && (
-                <div className="space-y-2">
-                  <Label>Repositório Padrão</Label>
-                  <Select value={selectedRepo} onValueChange={setSelectedRepo}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione um repositório..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {githubRepos.map((repo) => (
-                        <SelectItem key={repo.full_name} value={repo.full_name}>
-                          {repo.full_name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-sm text-gray-500">
-                    {githubRepos.length} repositório(s) encontrado(s)
-                  </p>
-                </div>
-              )}
+
               
               <FormField
                 control={form.control}
