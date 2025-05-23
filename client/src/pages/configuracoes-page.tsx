@@ -531,7 +531,7 @@ export default function ConfiguracoesPage() {
                     <FormControl>
                       <div className="flex space-x-2">
                         <Input {...field} type="password" autoComplete="off" className="flex-1" />
-                        {selectedServiceName === "github" && (
+                        {(selectedServiceName === "github" || form.getValues("serviceName") === "github") && (
                           <Button
                             type="button"
                             variant="outline"
@@ -569,7 +569,7 @@ export default function ConfiguracoesPage() {
               />
               
               {/* Combo de repositórios GitHub */}
-              {selectedServiceName === "github" && connectionStatus === 'success' && githubRepos.length > 0 && (
+              {(selectedServiceName === "github" || form.getValues("serviceName") === "github") && connectionStatus === 'success' && githubRepos.length > 0 && (
                 <div className="space-y-2">
                   <Label>Repositório Padrão</Label>
                   <Select value={selectedRepo} onValueChange={setSelectedRepo}>
