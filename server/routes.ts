@@ -1425,7 +1425,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Remover apenas do banco local
+      console.log(`Removendo pasta ${structure.folderName} (${uid}) do banco`);
       await storage.deleteRepoStructure(uid);
+      console.log(`Pasta ${structure.folderName} removida com sucesso`);
       
       res.json({ 
         message: `Pasta "${structure.folderName}" removida do banco local com sucesso.`,

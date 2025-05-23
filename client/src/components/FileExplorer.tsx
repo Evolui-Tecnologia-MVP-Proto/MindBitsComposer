@@ -74,7 +74,15 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   const deleteFolderMutation = useMutation({
     mutationFn: async (uid: string) => {
       const res = await apiRequest("DELETE", `/api/repo-structure/${uid}`);
-      return await res.json();
+      if (!res.ok) {
+        throw new Error(`Erro ao remover pasta: ${res.status}`);
+      }
+      try {
+        return await res.json();
+      } catch (error) {
+        // Se não conseguir fazer parse do JSON, retorna sucesso básico
+        return { message: "Pasta removida com sucesso" };
+      }
     },
     onSuccess: (data) => {
       toast({
