@@ -523,8 +523,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         console.error("Erro na atualização:", response.status, errorText);
         throw new Error("Erro ao atualizar documento");
       }
-      const result = await response.json();
-      console.log("Documento atualizado com sucesso:", result);
+      let result;
+      try {
+        result = await response.json();
+        console.log("Documento atualizado com sucesso:", result);
+      } catch (jsonError) {
+        console.log("Resposta não é JSON válido, assumindo sucesso");
+        result = { success: true };
+      }
       return result;
     },
     onSuccess: (data) => {
