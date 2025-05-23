@@ -94,6 +94,7 @@ type ServiceConnection = {
   serviceName: string;
   token: string;
   description: string | null;
+  parameters: string[] | null;
   createdAt: string;
 };
 
@@ -116,6 +117,7 @@ const serviceConnectionSchema = z.object({
   serviceName: z.string().min(1, { message: "Serviço é obrigatório" }),
   token: z.string().min(1, { message: "Token ou chave API é obrigatório" }),
   description: z.string().optional(),
+  parameters: z.array(z.string()).optional(),
 });
 
 // Lista das colunas da tabela documentos com seus tipos
@@ -520,6 +522,14 @@ export default function AdminPage() {
   const onSubmitServiceConnection = async (data: z.infer<typeof serviceConnectionSchema>) => {
     setIsServiceSubmitting(true);
     try {
+      // Preparar dados para envio, incluindo parameters para GitHub
+      const submitData = { ...data };
+      
+      // Se for GitHub e houver repositório selecionado, adicionar ao array parameters
+      if (data.serviceName === "github" && selectedRepo) {
+        submitData.parameters = [selectedRepo];
+      }
+      
       // Chamada à API para salvar a conexão
       const endpoint = selectedConnection ? `/api/service-connections/${selectedConnection.id}` : "/api/service-connections";
       const method = selectedConnection ? "PUT" : "POST";
@@ -527,7 +537,7 @@ export default function AdminPage() {
       const response = await fetch(endpoint, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
+        body: JSON.stringify(submitData)
       });
       
       if (!response.ok) {
@@ -535,14 +545,24 @@ export default function AdminPage() {
         throw new Error(errorData.message || "Erro ao salvar conexão");
       }
       
+      const successMessage = selectedRepo 
+        ? `Conexão configurada com repositório: ${selectedRepo}`
+        : "Conexão configurada com sucesso";
+      
       toast({
         title: selectedConnection ? "Conexão atualizada" : "Conexão criada",
-        description: `A conexão com ${getServiceDisplayName(data.serviceName)} foi ${selectedConnection ? 'atualizada' : 'criada'} com sucesso.`
+        description: successMessage
       });
       
       // Atualizar a lista de conexões
       queryClient.invalidateQueries({ queryKey: ['/api/service-connections'] });
       setIsServiceModalOpen(false);
+      
+      // Limpar estados do GitHub
+      setConnectionStatus('idle');
+      setGithubRepos([]);
+      setSelectedRepo("");
+      
     } catch (error) {
       toast({
         title: "Erro",
@@ -642,6 +662,11 @@ export default function AdminPage() {
       setConnectionStatus('success');
       // Buscar repositórios automaticamente com o token existente
       fetchGithubRepos(connection.token);
+      
+      // Se já existe um repositório salvo nos parameters, selecioná-lo
+      if (connection.parameters && connection.parameters.length > 0) {
+        setSelectedRepo(connection.parameters[0]);
+      }
     } else {
       setConnectionStatus('idle');
       setGithubRepos([]);

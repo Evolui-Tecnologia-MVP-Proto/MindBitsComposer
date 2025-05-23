@@ -928,6 +928,7 @@ export class MemStorage implements IStorage {
         ...existingConnection,
         token: connection.token,
         description: connection.description || existingConnection.description,
+        parameters: connection.parameters || existingConnection.parameters || [],
         updatedAt: new Date()
       };
       
@@ -941,6 +942,7 @@ export class MemStorage implements IStorage {
         serviceName: connection.serviceName,
         token: connection.token,
         description: connection.description || "",
+        parameters: connection.parameters || [],
         createdAt: new Date(),
         updatedAt: new Date()
       };
