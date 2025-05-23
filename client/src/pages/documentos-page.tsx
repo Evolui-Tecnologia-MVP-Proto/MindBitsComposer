@@ -396,14 +396,16 @@ export default function DocumentosPage() {
                   variant="ghost" 
                   size="icon" 
                   className="h-8 w-8"
-                  onClick={() => openViewModal(documento)}
+                  onClick={() => handleEditDocument(documento)}
                 >
-                  <Eye className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
                   <Pencil className="h-4 w-4 text-blue-500" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8"
+                  onClick={() => handleDeleteDocument(documento.id)}
+                >
                   <Trash2 className="h-4 w-4 text-red-500" />
                 </Button>
               </div>
