@@ -130,14 +130,7 @@ const ReviseNode = memo(({ data }: NodeProps) => (
   </div>
 ));
 
-const initialNodes: Node[] = [
-  {
-    id: 'start-1',
-    type: 'startNode',
-    position: { x: 250, y: 50 },
-    data: { label: 'Início' },
-  },
-];
+const initialNodes: Node[] = [];
 
 const nodeTypes: NodeTypes = {
   startNode: StartNode,
@@ -299,7 +292,6 @@ const FlowCanvas = () => {
             connectionLineType={ConnectionLineType.SmoothStep}
           >
             <Controls />
-            <MiniMap />
             <Background color="#f0f0f0" gap={12} size={1} />
           </ReactFlow>
         </div>
