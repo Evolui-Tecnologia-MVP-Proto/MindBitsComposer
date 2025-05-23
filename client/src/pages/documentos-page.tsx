@@ -747,8 +747,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   const handleDeleteDocument = (documento: Documento) => {
     console.log('Tentando excluir documento:', documento);
+    console.log('Estado antes:', { isDeleteConfirmOpen, documentToDelete });
     setDocumentToDelete(documento);
     setIsDeleteConfirmOpen(true);
+    console.log('Estado depois:', { isDeleteConfirmOpen: true, documento });
   };
 
   const confirmDelete = () => {
