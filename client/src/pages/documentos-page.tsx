@@ -1360,10 +1360,32 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           onFolderToggle={(folder, isExpanded) => {
                             console.log('Pasta:', folder.name, 'Expandida:', isExpanded);
                             if (isExpanded && folder.type === 'folder') {
-                              // Usar o path completo da pasta, que já está construído corretamente
-                              const folderPath = folder.path;
-                              setSelectedFolderPath(folderPath);
-                              fetchFolderFiles(folderPath);
+                              // Construir caminho completo hierárquico
+                              const buildFullPath = (folderName: string) => {
+                                // Encontrar a estrutura correspondente
+                                const structure = repoStructures.find((s: any) => s.folderName === folderName);
+                                if (!structure) return `/${folderName}/`;
+                                
+                                // Construir caminho recursivamente
+                                let path = structure.folderName;
+                                let current = structure;
+                                
+                                while (current.linkedTo) {
+                                  const parent = repoStructures.find((s: any) => s.uid === current.linkedTo);
+                                  if (parent) {
+                                    path = `${parent.folderName}/${path}`;
+                                    current = parent;
+                                  } else {
+                                    break;
+                                  }
+                                }
+                                
+                                return `/${path}/`;
+                              };
+                              
+                              const fullPath = buildFullPath(folder.name);
+                              setSelectedFolderPath(fullPath);
+                              fetchFolderFiles(folder.path); // Usar o path original para a API
                             }
                           }}
                         />
@@ -1399,7 +1421,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     
                     <div>
                       <h4 className="font-medium text-gray-900 mb-4">
-                        {selectedFolderPath ? `Arquivos em ${selectedFolderPath}` : 'Últimas Sincronizações'}
+                        {selectedFolderPath ? `Arquivos em: ${selectedFolderPath}` : 'Últimas Sincronizações'}
                       </h4>
                       <div className="space-y-3">
                         {isLoadingFolderFiles ? (
