@@ -111,8 +111,8 @@ export default function DocumentosPage() {
       return [];
     }
 
-    // Verificar se o repositório está em parameters[0] ou parameters[1]
-    const repoParam = githubConnection.parameters?.[1] || githubConnection.parameters?.[0];
+    // O repositório está em parameters[0]
+    const repoParam = githubConnection.parameters?.[0];
     
     if (!repoParam) {
       console.log('Repositório não encontrado nos parâmetros');
@@ -122,22 +122,30 @@ export default function DocumentosPage() {
     console.log('Repositório encontrado:', repoParam);
     const [owner, repo] = repoParam.split('/');
     
+    console.log('Owner:', owner, 'Repo:', repo);
+    console.log('URL da API:', `https://api.github.com/repos/${owner}/${repo}/contents`);
+    
     setIsLoadingRepo(true);
     try {
       const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents`, {
         headers: {
           'Authorization': `token ${githubConnection.token}`,
           'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'EVO-MindBits-Composer',
         },
       });
 
+      console.log('Status da resposta:', response.status);
+
       if (response.ok) {
         const contents = await response.json();
+        console.log('Conteúdo recebido:', contents);
         const fileStructure = await buildFileTree(contents, githubConnection.token, owner, repo);
         setGithubRepoFiles(fileStructure);
         return fileStructure;
       } else {
-        console.error('Erro ao buscar repositório:', response.status);
+        const errorText = await response.text();
+        console.error('Erro ao buscar repositório:', response.status, errorText);
         return [];
       }
     } catch (error) {
