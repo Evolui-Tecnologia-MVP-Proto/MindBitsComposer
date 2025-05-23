@@ -1265,27 +1265,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.patch("/api/documentos/:id", async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
-    
-    try {
-      const documento = await storage.updateDocumento(req.params.id, req.body);
-      res.json(documento);
-    } catch (error: any) {
-      console.error("Erro ao atualizar documento:", error);
-      res.status(500).send("Erro ao atualizar documento");
-    }
-  });
-
-  // Endpoint de teste para interceptar PUT
-  app.all("/api/documentos/:id", (req, res, next) => {
-    console.log(`🔍 INTERCEPTANDO ${req.method} /api/documentos/${req.params.id}`);
-    if (req.method === 'PUT') {
-      console.log("📝 Dados recebidos:", req.body);
-    }
-    next();
-  });
-
   app.put("/api/documentos/:id", async (req, res) => {
     console.log("🚀 PUT ENDPOINT CHAMADO - ID:", req.params.id);
     if (!req.isAuthenticated()) {
@@ -1300,6 +1279,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(documento);
     } catch (error: any) {
       console.error("❌ Erro ao atualizar documento:", error);
+      res.status(500).send("Erro ao atualizar documento");
+    }
+  });
+
+  app.patch("/api/documentos/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const documento = await storage.updateDocumento(req.params.id, req.body);
+      res.json(documento);
+    } catch (error: any) {
+      console.error("Erro ao atualizar documento:", error);
       res.status(500).send("Erro ao atualizar documento");
     }
   });
