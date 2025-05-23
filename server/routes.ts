@@ -1265,6 +1265,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint de teste direto
+  app.post("/api/documentos/:id/update", async (req, res) => {
+    console.log("🎯 ENDPOINT DE UPDATE ACIONADO - ID:", req.params.id);
+    console.log("🎯 DADOS:", JSON.stringify(req.body));
+    
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Não autorizado" });
+    }
+    
+    try {
+      const documento = await storage.updateDocumento(req.params.id, req.body);
+      console.log("✅ SUCESSO:", documento);
+      
+      res.status(200).json({
+        success: true,
+        data: documento
+      });
+    } catch (error: any) {
+      console.error("❌ ERRO:", error);
+      res.status(500).json({
+        success: false,
+        error: error.message
+      });
+    }
+  });
+
   app.put("/api/documentos/:id", async (req, res) => {
     console.log("🚀 PUT /api/documentos/:id CHAMADO - ID:", req.params.id);
     console.log("🚀 DADOS RECEBIDOS:", JSON.stringify(req.body));
