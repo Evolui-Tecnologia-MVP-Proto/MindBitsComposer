@@ -1485,8 +1485,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const githubResponse = await fetch(githubUrl, {
         headers: {
-          'Authorization': `token ${token}`,
+          'Authorization': `Bearer ${token}`,
           'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'EVO-MindBits-Composer',
         },
       });
 
@@ -1499,17 +1500,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      const responseText = await githubResponse.text();
-      console.log('Resposta bruta do GitHub:', responseText);
-      
       let githubContent;
       try {
-        githubContent = JSON.parse(responseText);
+        githubContent = await githubResponse.json();
       } catch (parseError) {
-        console.error('Erro ao fazer parse do JSON:', parseError);
-        return res.status(500).json({ 
-          error: "Erro ao processar resposta do GitHub",
-          details: "Resposta inválida do GitHub API" 
+        console.error('Erro ao fazer parse da resposta do GitHub:', parseError);
+        
+        // Se falhar, apenas sincronizar com base no que temos no banco
+        const existingStructures = await storage.getAllRepoStructures();
+        let updatedCount = 0;
+        
+        // Marcar todas as pastas como não sincronizadas por precaução
+        for (const structure of existingStructures) {
+          if (structure.isSync) {
+            await storage.updateRepoStructureSync(structure.uid, false);
+            updatedCount++;
+          }
+        }
+        
+        return res.json({ 
+          message: `Token GitHub pode estar inválido. ${updatedCount} pasta(s) marcadas como não sincronizadas.`,
+          importedCount: 0,
+          updatedCount,
+          warning: "Verifique o token do GitHub"
         });
       }
       const githubFolders = githubContent.filter((item: any) => item.type === 'dir');
