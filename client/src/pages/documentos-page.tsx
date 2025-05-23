@@ -513,19 +513,28 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   const updateDocumentoMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: InsertDocumento }) => {
       console.log("Atualizando documento:", id, data);
-      const response = await fetch(`/api/update-documento/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Erro na atualização:", response.status, errorText);
-        throw new Error("Erro ao atualizar documento");
+      try {
+        const response = await fetch(`/api/update-documento/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        
+        console.log("Status da resposta:", response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Erro na atualização:", response.status, errorText);
+          throw new Error(`Erro ${response.status}: ${errorText}`);
+        }
+        
+        const result = await response.json();
+        console.log("Documento atualizado com sucesso:", result);
+        return result;
+      } catch (error) {
+        console.error("Erro completo na mutação:", error);
+        throw error;
       }
-      const result = await response.json();
-      console.log("Documento atualizado com sucesso:", result);
-      return result;
     },
     onSuccess: (data) => {
       console.log("OnSuccess disparado:", data);
