@@ -771,6 +771,190 @@ export default function DocumentosPage() {
       
       {renderViewModal()}
       {renderCreateModal()}
+      {renderAddArtifactModal()}
+      {renderEditArtifactModal()}
     </div>
   );
+
+  // Modal para adicionar artefato
+  function renderAddArtifactModal() {
+    return (
+      <Dialog open={isAddArtifactModalOpen} onOpenChange={setIsAddArtifactModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Paperclip className="h-5 w-5 text-blue-500" />
+              Adicionar Anexo
+            </DialogTitle>
+            <DialogDescription>
+              Adicione um novo anexo ao documento
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div>
+              <Label htmlFor="artifact-name">Nome do Anexo</Label>
+              <Input
+                id="artifact-name"
+                value={artifactFormData.name}
+                onChange={(e) => setArtifactFormData({ ...artifactFormData, name: e.target.value })}
+                placeholder="Ex: Manual de usuário, Especificação técnica"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="artifact-file">Arquivo/URL</Label>
+              <Input
+                id="artifact-file"
+                value={artifactFormData.file}
+                onChange={(e) => setArtifactFormData({ ...artifactFormData, file: e.target.value })}
+                placeholder="Ex: /uploads/manual.pdf, https://exemplo.com/doc.pdf"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="artifact-type">Tipo do Arquivo</Label>
+              <Select
+                value={artifactFormData.type}
+                onValueChange={(value) => setArtifactFormData({ ...artifactFormData, type: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pdf">PDF</SelectItem>
+                  <SelectItem value="doc">DOC</SelectItem>
+                  <SelectItem value="docx">DOCX</SelectItem>
+                  <SelectItem value="txt">TXT</SelectItem>
+                  <SelectItem value="jpg">JPG</SelectItem>
+                  <SelectItem value="png">PNG</SelectItem>
+                  <SelectItem value="json">JSON</SelectItem>
+                  <SelectItem value="xml">XML</SelectItem>
+                  <SelectItem value="xlsx">XLSX</SelectItem>
+                  <SelectItem value="zip">ZIP</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsAddArtifactModalOpen(false)}
+            >
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleCreateArtifact}
+              disabled={createArtifactMutation.isPending || !artifactFormData.name || !artifactFormData.file || !artifactFormData.type}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {createArtifactMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Adicionando...
+                </>
+              ) : (
+                <>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Adicionar Anexo
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Modal para editar artefato
+  function renderEditArtifactModal() {
+    return (
+      <Dialog open={isEditArtifactModalOpen} onOpenChange={setIsEditArtifactModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Pencil className="h-5 w-5 text-blue-500" />
+              Editar Anexo
+            </DialogTitle>
+            <DialogDescription>
+              Edite as informações do anexo
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div>
+              <Label htmlFor="edit-artifact-name">Nome do Anexo</Label>
+              <Input
+                id="edit-artifact-name"
+                value={artifactFormData.name}
+                onChange={(e) => setArtifactFormData({ ...artifactFormData, name: e.target.value })}
+                placeholder="Ex: Manual de usuário, Especificação técnica"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="edit-artifact-file">Arquivo/URL</Label>
+              <Input
+                id="edit-artifact-file"
+                value={artifactFormData.file}
+                onChange={(e) => setArtifactFormData({ ...artifactFormData, file: e.target.value })}
+                placeholder="Ex: /uploads/manual.pdf, https://exemplo.com/doc.pdf"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="edit-artifact-type">Tipo do Arquivo</Label>
+              <Select
+                value={artifactFormData.type}
+                onValueChange={(value) => setArtifactFormData({ ...artifactFormData, type: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione o tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pdf">PDF</SelectItem>
+                  <SelectItem value="doc">DOC</SelectItem>
+                  <SelectItem value="docx">DOCX</SelectItem>
+                  <SelectItem value="txt">TXT</SelectItem>
+                  <SelectItem value="jpg">JPG</SelectItem>
+                  <SelectItem value="png">PNG</SelectItem>
+                  <SelectItem value="json">JSON</SelectItem>
+                  <SelectItem value="xml">XML</SelectItem>
+                  <SelectItem value="xlsx">XLSX</SelectItem>
+                  <SelectItem value="zip">ZIP</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsEditArtifactModalOpen(false)}
+            >
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleUpdateArtifact}
+              disabled={updateArtifactMutation.isPending || !artifactFormData.name || !artifactFormData.file || !artifactFormData.type}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {updateArtifactMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Salvar Alterações
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 }
