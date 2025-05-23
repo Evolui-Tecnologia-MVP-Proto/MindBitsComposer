@@ -514,7 +514,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     mutationFn: async ({ id, data }: { id: string; data: InsertDocumento }) => {
       console.log("Atualizando documento:", id, data);
       try {
-        const response = await fetch(`/api/update-documento/${id}`, {
+        const response = await fetch(`/api/documentos/${id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
