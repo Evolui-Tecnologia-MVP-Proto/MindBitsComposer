@@ -96,6 +96,7 @@ export const serviceConnections = pgTable("service_connections", {
   serviceName: text("service_name").notNull().unique(),
   token: text("token").notNull(),
   description: text("description").default(""),
+  parameters: text("parameters").array().default([]), // Array para armazenar parâmetros específicos do serviço
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
