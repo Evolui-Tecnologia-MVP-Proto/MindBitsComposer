@@ -1250,6 +1250,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Document Artifacts routes
+  app.get("/api/documentos/:documentoId/artifacts", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const artifacts = await storage.getDocumentArtifactsByDocumento(req.params.documentoId);
+      res.json(artifacts);
+    } catch (error: any) {
+      console.error("Erro ao buscar artefatos:", error);
+      res.status(500).send("Erro ao buscar artefatos");
+    }
+  });
+
+  app.get("/api/artifacts/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const artifact = await storage.getDocumentArtifact(req.params.id);
+      if (!artifact) {
+        return res.status(404).send("Artefato não encontrado");
+      }
+      res.json(artifact);
+    } catch (error: any) {
+      console.error("Erro ao buscar artefato:", error);
+      res.status(500).send("Erro ao buscar artefato");
+    }
+  });
+
+  app.post("/api/documentos/:documentoId/artifacts", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const artifactData = {
+        ...req.body,
+        documentoId: req.params.documentoId
+      };
+      const artifact = await storage.createDocumentArtifact(artifactData);
+      res.status(201).json(artifact);
+    } catch (error: any) {
+      console.error("Erro ao criar artefato:", error);
+      res.status(500).send("Erro ao criar artefato");
+    }
+  });
+
+  app.patch("/api/artifacts/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const artifact = await storage.updateDocumentArtifact(req.params.id, req.body);
+      res.json(artifact);
+    } catch (error: any) {
+      console.error("Erro ao atualizar artefato:", error);
+      res.status(500).send("Erro ao atualizar artefato");
+    }
+  });
+
+  app.delete("/api/artifacts/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      await storage.deleteDocumentArtifact(req.params.id);
+      res.status(204).send();
+    } catch (error: any) {
+      console.error("Erro ao excluir artefato:", error);
+      res.status(500).send("Erro ao excluir artefato");
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 

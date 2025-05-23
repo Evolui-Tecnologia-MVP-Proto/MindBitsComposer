@@ -1209,6 +1209,53 @@ export class MemStorage implements IStorage {
 
   async deleteDocumento(id: string): Promise<void> {
     this.documentos.delete(id);
+    // Remover todos os artefatos relacionados
+    for (const [artifactId, artifact] of this.documentArtifacts) {
+      if (artifact.documentoId === id) {
+        this.documentArtifacts.delete(artifactId);
+      }
+    }
+  }
+
+  // Document Artifact operations
+  async getDocumentArtifact(id: string): Promise<DocumentArtifact | undefined> {
+    return this.documentArtifacts.get(id);
+  }
+
+  async getDocumentArtifactsByDocumento(documentoId: string): Promise<DocumentArtifact[]> {
+    return Array.from(this.documentArtifacts.values()).filter(
+      artifact => artifact.documentoId === documentoId
+    );
+  }
+
+  async createDocumentArtifact(insertArtifact: InsertDocumentArtifact): Promise<DocumentArtifact> {
+    const artifact: DocumentArtifact = {
+      id: crypto.randomUUID(),
+      ...insertArtifact,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.documentArtifacts.set(artifact.id, artifact);
+    return artifact;
+  }
+
+  async updateDocumentArtifact(id: string, data: Partial<DocumentArtifact>): Promise<DocumentArtifact> {
+    const existingArtifact = this.documentArtifacts.get(id);
+    if (!existingArtifact) {
+      throw new Error("Artefato não encontrado");
+    }
+
+    const updatedArtifact: DocumentArtifact = {
+      ...existingArtifact,
+      ...data,
+      updatedAt: new Date()
+    };
+    this.documentArtifacts.set(id, updatedArtifact);
+    return updatedArtifact;
+  }
+
+  async deleteDocumentArtifact(id: string): Promise<void> {
+    this.documentArtifacts.delete(id);
   }
 }
 
