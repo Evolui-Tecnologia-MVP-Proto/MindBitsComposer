@@ -782,7 +782,7 @@ export default function DocumentosPage() {
   function renderAddArtifactModal() {
     return (
       <Dialog open={isAddArtifactModalOpen} onOpenChange={setIsAddArtifactModalOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md fixed top-[15%] left-[55%] transform -translate-x-1/2 -translate-y-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Paperclip className="h-5 w-5 text-blue-500" />
