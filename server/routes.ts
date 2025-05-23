@@ -1278,15 +1278,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.put("/api/documentos/:id", async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    console.log("🚀 PUT ENDPOINT CHAMADO - ID:", req.params.id);
+    if (!req.isAuthenticated()) {
+      console.log("❌ PUT - Não autorizado");
+      return res.status(401).send("Não autorizado");
+    }
     
     try {
-      console.log("PUT - Atualizando documento:", req.params.id, req.body);
+      console.log("✅ PUT - Atualizando documento:", req.params.id, req.body);
       const documento = await storage.updateDocumento(req.params.id, req.body);
-      console.log("PUT - Documento atualizado:", documento);
+      console.log("✅ PUT - Documento atualizado:", documento);
       res.json(documento);
     } catch (error: any) {
-      console.error("Erro ao atualizar documento:", error);
+      console.error("❌ Erro ao atualizar documento:", error);
       res.status(500).send("Erro ao atualizar documento");
     }
   });
