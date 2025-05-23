@@ -68,6 +68,9 @@ export default function DocumentosPage() {
   const [selectedArtifact, setSelectedArtifact] = useState<DocumentArtifact | null>(null);
   const [githubRepoFiles, setGithubRepoFiles] = useState<any[]>([]);
   const [isLoadingRepo, setIsLoadingRepo] = useState(false);
+  const [selectedFolderPath, setSelectedFolderPath] = useState<string>('');
+  const [selectedFolderFiles, setSelectedFolderFiles] = useState<any[]>([]);
+  const [isLoadingFolderFiles, setIsLoadingFolderFiles] = useState(false);
   const [artifactFormData, setArtifactFormData] = useState<InsertDocumentArtifact>({
     documentoId: "",
     name: "",
@@ -201,6 +204,46 @@ export default function DocumentosPage() {
       });
     },
   });
+
+  // Função para buscar arquivos de uma pasta específica no GitHub
+  const fetchFolderFiles = async (folderPath: string) => {
+    if (!folderPath) return;
+    
+    setIsLoadingFolderFiles(true);
+    try {
+      const githubConnection = (serviceConnections as any[])?.find(
+        (conn: any) => conn.serviceName === 'github'
+      );
+      
+      if (!githubConnection) return;
+      
+      const repo = githubConnection.parameters?.[0];
+      if (!repo) return;
+      
+      const response = await fetch(`https://api.github.com/repos/${repo}/contents/${folderPath}`, {
+        headers: {
+          'Authorization': `token ${githubConnection.token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'EVO-MindBits-Composer',
+        },
+      });
+      
+      if (response.ok) {
+        const files = await response.json();
+        // Filtrar apenas arquivos (não pastas)
+        const fileList = Array.isArray(files) ? files.filter((item: any) => item.type === 'file') : [];
+        setSelectedFolderFiles(fileList);
+      } else {
+        console.error('Erro ao buscar arquivos da pasta:', response.status);
+        setSelectedFolderFiles([]);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar arquivos da pasta:', error);
+      setSelectedFolderFiles([]);
+    } finally {
+      setIsLoadingFolderFiles(false);
+    }
+  };
 
   // Função para carregar visualização da estrutura do repositório
   const fetchGithubRepoStructure = async () => {
@@ -1305,6 +1348,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           }}
                           onFolderToggle={(folder, isExpanded) => {
                             console.log('Pasta:', folder.name, 'Expandida:', isExpanded);
+                            if (isExpanded && folder.type === 'folder') {
+                              setSelectedFolderPath(folder.path);
+                              fetchFolderFiles(folder.path);
+                            }
                           }}
                         />
                       ) : !isLoadingRepo ? (
@@ -1338,40 +1385,39 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     </div>
                     
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-4">Últimas Sincronizações</h4>
+                      <h4 className="font-medium text-gray-900 mb-4">
+                        {selectedFolderPath ? `Arquivos em ${selectedFolderPath}` : 'Últimas Sincronizações'}
+                      </h4>
                       <div className="space-y-3">
-                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <div>
-                              <div className="font-medium text-sm">manual-cpx.md</div>
-                              <div className="text-xs text-gray-500">Atualizado há 2 horas</div>
-                            </div>
+                        {isLoadingFolderFiles ? (
+                          <div className="flex items-center justify-center py-8">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                            <span className="ml-2 text-sm text-gray-500">Carregando arquivos...</span>
                           </div>
-                          <Badge variant="secondary" className="text-xs">Sincronizado</Badge>
-                        </div>
-                        
-                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                            <div>
-                              <div className="font-medium text-sm">requisitos.md</div>
-                              <div className="text-xs text-gray-500">Modificado há 1 dia</div>
+                        ) : selectedFolderFiles.length > 0 ? (
+                          selectedFolderFiles.map((file: any, index: number) => (
+                            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <div>
+                                  <div className="font-medium text-sm">{file.name}</div>
+                                  <div className="text-xs text-gray-500">
+                                    Tamanho: {(file.size / 1024).toFixed(1)}KB
+                                  </div>
+                                </div>
+                              </div>
+                              <Badge variant="secondary" className="text-xs">GitHub</Badge>
                             </div>
+                          ))
+                        ) : selectedFolderPath ? (
+                          <div className="text-center py-8">
+                            <div className="text-gray-500 text-sm">Nenhum arquivo encontrado nesta pasta</div>
                           </div>
-                          <Badge variant="outline" className="text-xs">Pendente</Badge>
-                        </div>
-                        
-                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            <div>
-                              <div className="font-medium text-sm">api-docs.md</div>
-                              <div className="text-xs text-gray-500">Sincronizado há 3 dias</div>
-                            </div>
+                        ) : (
+                          <div className="text-center py-8">
+                            <div className="text-gray-500 text-sm">Clique em uma pasta para ver seus arquivos</div>
                           </div>
-                          <Badge variant="secondary" className="text-xs">Sincronizado</Badge>
-                        </div>
+                        )}
                       </div>
                     </div>
                   </div>
