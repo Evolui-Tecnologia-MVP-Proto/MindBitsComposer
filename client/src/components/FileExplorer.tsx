@@ -340,7 +340,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
         return (
           <Badge variant="outline" className="text-xs text-red-600 border-red-200">
             <AlertCircle className="h-3 w-3 mr-1" />
-            Deletada do GitHub
+            Somente Local
           </Badge>
         );
       default:
