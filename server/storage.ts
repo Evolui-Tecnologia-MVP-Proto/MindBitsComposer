@@ -650,7 +650,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllRepoStructures(): Promise<RepoStructure[]> {
-    return await db.select().from(repoStructure);
+    return await db.select().from(repoStructure).orderBy(repoStructure.createdAt);
   }
 
   async getRepoStructureTree(): Promise<RepoStructure[]> {
