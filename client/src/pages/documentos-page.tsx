@@ -146,22 +146,28 @@ export default function DocumentosPage() {
   // Mutation para sincronizar todas as pastas não sincronizadas com GitHub
   const syncAllToGitHubMutation = useMutation({
     mutationFn: async () => {
+      console.log("🔄 INICIANDO SINCRONIZAÇÃO - Botão clicado!");
       const unsyncedFolders = repoStructures.filter((folder: any) => 
         !folder.isSync && 
         (!folder.linkedTo || repoStructures.some((parent: any) => parent.uid === folder.linkedTo))
       );
+      console.log("📁 Pastas para sincronizar:", unsyncedFolders.map(f => f.folderName));
       const results = [];
       
       for (const folder of unsyncedFolders) {
+        console.log(`🚀 Sincronizando pasta: ${folder.folderName} (${folder.uid})`);
         try {
           const res = await apiRequest("POST", `/api/repo-structure/${folder.uid}/sync-github`);
           const result = await res.json();
+          console.log(`✅ Sucesso para ${folder.folderName}:`, result);
           results.push({ folder: folder.folderName, success: true, message: result.message });
         } catch (error: any) {
+          console.log(`❌ Erro para ${folder.folderName}:`, error);
           results.push({ folder: folder.folderName, success: false, message: error.message });
         }
       }
       
+      console.log("🏁 SINCRONIZAÇÃO FINALIZADA - Resultados:", results);
       return results;
     },
     onSuccess: (results) => {
