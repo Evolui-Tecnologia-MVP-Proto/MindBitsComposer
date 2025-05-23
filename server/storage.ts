@@ -653,6 +653,57 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(repoStructure);
   }
 
+  async getRepoStructureTree(): Promise<RepoStructure[]> {
+    // Buscar todas as estruturas
+    const allStructures = await db.select().from(repoStructure);
+    
+    // Construir mapa de estruturas
+    const structureMap = new Map<string, RepoStructure & { children?: RepoStructure[] }>();
+    const rootStructures: (RepoStructure & { children?: RepoStructure[] })[] = [];
+    
+    // Primeiro, criar o mapa de todas as estruturas
+    allStructures.forEach(structure => {
+      structureMap.set(structure.uid, { ...structure, children: [] });
+    });
+    
+    // Depois, organizar hierarquicamente
+    allStructures.forEach(structure => {
+      const structureWithChildren = structureMap.get(structure.uid)!;
+      
+      if (structure.linkedTo) {
+        // É uma subpasta - adicionar ao pai
+        const parent = structureMap.get(structure.linkedTo);
+        if (parent) {
+          parent.children = parent.children || [];
+          parent.children.push(structureWithChildren);
+        }
+      } else {
+        // É uma pasta raiz
+        rootStructures.push(structureWithChildren);
+      }
+    });
+    
+    // Função recursiva para achatar a árvore mantendo a hierarquia
+    function flattenTree(structures: (RepoStructure & { children?: RepoStructure[] })[]): RepoStructure[] {
+      const result: RepoStructure[] = [];
+      
+      structures.forEach(structure => {
+        // Adicionar a estrutura atual
+        const { children, ...structureData } = structure;
+        result.push(structureData);
+        
+        // Adicionar recursivamente os filhos
+        if (children && children.length > 0) {
+          result.push(...flattenTree(children));
+        }
+      });
+      
+      return result;
+    }
+    
+    return flattenTree(rootStructures);
+  }
+
   async getRepoStructureByParent(parentUid?: string): Promise<RepoStructure[]> {
     if (parentUid) {
       return await db.select().from(repoStructure).where(eq(repoStructure.linkedTo, parentUid));

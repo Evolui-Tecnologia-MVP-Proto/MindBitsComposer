@@ -1368,8 +1368,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const structures = await storage.getRepoStructureByParent(parentUid);
         res.json(structures);
       } else {
-        // Se não especificar parent, buscar todas as estruturas
-        const structures = await storage.getAllRepoStructures();
+        // Se não especificar parent, buscar árvore hierárquica completa
+        const structures = await storage.getRepoStructureTree();
         res.json(structures);
       }
     } catch (error: any) {
