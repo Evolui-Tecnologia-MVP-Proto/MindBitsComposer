@@ -531,6 +531,12 @@ export default function ConfiguracoesPage() {
                     <FormControl>
                       <div className="flex space-x-2">
                         <Input {...field} type="password" autoComplete="off" className="flex-1" />
+                        {/* Debug: sempre mostrar para teste */}
+                        {true && (
+                          <div className="text-xs text-gray-500 mb-2">
+                            Debug: selectedServiceName="{selectedServiceName}", formValue="{form.getValues("serviceName")}"
+                          </div>
+                        )}
                         {(selectedServiceName === "github" || form.getValues("serviceName") === "github") && (
                           <Button
                             type="button"
