@@ -229,7 +229,7 @@ export default function DocumentosPage() {
     try {
       const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents`, {
         headers: {
-          'Authorization': `token ${githubConnection.token}`,
+          'Authorization': `Bearer ${githubConnection.token}`,
           'Accept': 'application/vnd.github.v3+json',
           'User-Agent': 'EVO-MindBits-Composer',
         },
@@ -251,7 +251,7 @@ export default function DocumentosPage() {
         // Tentar buscar novamente após criar o arquivo
         const retryResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents`, {
           headers: {
-            'Authorization': `token ${githubConnection.token}`,
+            'Authorization': `Bearer ${githubConnection.token}`,
             'Accept': 'application/vnd.github.v3+json',
             'User-Agent': 'EVO-MindBits-Composer',
           },
