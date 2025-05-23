@@ -20,7 +20,8 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { PlusCircle, Save, RotateCcw, Share2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PlusCircle, Save, RotateCcw, Share2, BookOpen, Edit } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -371,6 +372,131 @@ const FlowCanvas = () => {
   );
 };
 
+// Componente da Biblioteca de Fluxos
+const BibliotecaFluxos = () => {
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Card de template de fluxo */}
+        <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          <CardHeader>
+            <CardTitle className="text-lg">Fluxo de Aprovação Simples</CardTitle>
+            <CardDescription>
+              Processo básico de elaboração, revisão e aprovação de documentos
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-muted-foreground">
+                5 etapas • 3 decisões
+              </div>
+              <Button size="sm" variant="outline">
+                Usar Template
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          <CardHeader>
+            <CardTitle className="text-lg">Fluxo Completo com Revisão</CardTitle>
+            <CardDescription>
+              Processo avançado com múltiplas etapas de revisão e aprovação
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-muted-foreground">
+                8 etapas • 5 decisões
+              </div>
+              <Button size="sm" variant="outline">
+                Usar Template
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          <CardHeader>
+            <CardTitle className="text-lg">Fluxo de Emergência</CardTitle>
+            <CardDescription>
+              Processo simplificado para documentos urgentes
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-muted-foreground">
+                3 etapas • 1 decisão
+              </div>
+              <Button size="sm" variant="outline">
+                Usar Template
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          <CardHeader>
+            <CardTitle className="text-lg">Fluxo Colaborativo</CardTitle>
+            <CardDescription>
+              Processo para documentos com múltiplos colaboradores
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-muted-foreground">
+                6 etapas • 4 decisões
+              </div>
+              <Button size="sm" variant="outline">
+                Usar Template
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          <CardHeader>
+            <CardTitle className="text-lg">Fluxo de Qualidade</CardTitle>
+            <CardDescription>
+              Processo com controle rigoroso de qualidade e conformidade
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-muted-foreground">
+                10 etapas • 6 decisões
+              </div>
+              <Button size="sm" variant="outline">
+                Usar Template
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="hover:shadow-md transition-shadow cursor-pointer">
+          <CardHeader>
+            <CardTitle className="text-lg">Fluxo Personalizado</CardTitle>
+            <CardDescription>
+              Crie um fluxo completamente personalizado do zero
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-muted-foreground">
+                Começar do zero
+              </div>
+              <Button size="sm">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Criar
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
 export default function FluxosPage() {
   return (
     <div className="p-6 h-full">
@@ -383,19 +509,32 @@ export default function FluxosPage() {
                 Defina e gerencie fluxos de trabalho para seus documentos
               </CardDescription>
             </div>
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Novo Fluxo
-            </Button>
           </div>
         </CardHeader>
       </Card>
       
-      <div className="h-[calc(100vh-260px)]">
-        <ReactFlowProvider>
-          <FlowCanvas />
-        </ReactFlowProvider>
-      </div>
+      <Tabs defaultValue="editor" className="h-[calc(100vh-260px)]">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="editor" className="flex items-center space-x-2">
+            <Edit className="h-4 w-4" />
+            <span>Editor</span>
+          </TabsTrigger>
+          <TabsTrigger value="biblioteca" className="flex items-center space-x-2">
+            <BookOpen className="h-4 w-4" />
+            <span>Biblioteca</span>
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="editor" className="h-full mt-4">
+          <ReactFlowProvider>
+            <FlowCanvas />
+          </ReactFlowProvider>
+        </TabsContent>
+        
+        <TabsContent value="biblioteca" className="h-full mt-4 overflow-y-auto">
+          <BibliotecaFluxos />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
