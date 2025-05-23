@@ -380,8 +380,8 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
             {getStatusBadge(item.syncStatus)}
           </div>
           
-          {/* Botão de exclusão que aparece no hover - apenas para pastas sincronizadas */}
-          {item.syncStatus === 'synced' && (
+          {/* Botão de exclusão que aparece no hover - para pastas sincronizadas e não sincronizadas */}
+          {(item.syncStatus === 'synced' || item.syncStatus === 'unsynced') && (
             <Button
               variant="ghost"
               size="sm"
