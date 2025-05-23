@@ -115,7 +115,7 @@ export function CreateFolderModal({ open, onOpenChange, parentFolder }: CreateFo
                 <SelectValue placeholder="Selecione a pasta pai ou deixe vazio para raiz" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">/ (Raiz do repositório)</SelectItem>
+                <SelectItem value="root">/ (Raiz do repositório)</SelectItem>
                 {repoStructures.map((structure) => (
                   <SelectItem key={structure.uid} value={structure.uid}>
                     {buildFolderPath(structure)}
