@@ -191,12 +191,29 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
         const localStructure = repoStructures.find((s: any) => s.folderName === item.name);
         
         if (localStructure) {
-          // Pasta existe no banco - usar status de sincronização
+          // Pasta existe no banco - usar status de sincronização e incluir filhos
           const unifiedItem: FileItem = {
             ...item,
             id: localStructure.uid,
-            syncStatus: localStructure.isSync ? 'synced' : 'unsynced'
+            syncStatus: localStructure.isSync ? 'synced' : 'unsynced',
+            children: [] // Inicializar filhos vazios
           };
+          
+          // Encontrar filhos desta pasta no banco local
+          const childStructures = repoStructures.filter((s: any) => s.linkedTo === localStructure.uid);
+          childStructures.forEach((childStructure: any) => {
+            const childItem: FileItem = {
+              id: childStructure.uid,
+              name: childStructure.folderName,
+              type: 'folder',
+              path: childStructure.folderName,
+              children: [],
+              syncStatus: childStructure.isSync ? 'synced' : 'unsynced'
+            };
+            unifiedItem.children!.push(childItem);
+            processedNames.add(childStructure.folderName); // Marcar como processado
+          });
+          
           processedItems.push(unifiedItem);
         } else {
           // Pasta existe no GitHub mas não no banco local
