@@ -226,6 +226,8 @@ export default function DocumentosPage() {
   };
 
   const getFileTypeIcon = (type: string) => {
+    if (!type) return <File className="h-4 w-4 text-gray-400" />;
+    
     switch (type.toLowerCase()) {
       case "pdf":
         return <File className="h-4 w-4 text-red-500" />;
