@@ -580,6 +580,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateDocumento(id: string, data: Partial<Documento>): Promise<Documento> {
+    console.log("STORAGE - Atualizando documento:", id, data);
     const [updatedDocumento] = await db
       .update(documentos)
       .set({
@@ -590,9 +591,11 @@ export class DatabaseStorage implements IStorage {
       .returning();
     
     if (!updatedDocumento) {
+      console.log("STORAGE - Documento não encontrado:", id);
       throw new Error("Documento não encontrado");
     }
     
+    console.log("STORAGE - Documento atualizado com sucesso:", updatedDocumento);
     return updatedDocumento;
   }
 
