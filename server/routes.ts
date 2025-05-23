@@ -19,27 +19,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.all("/api/doc-update/:id", async (req, res) => {
     console.log("🔥 ENDPOINT DIRETO ACIONADO:", req.method, req.params.id);
     
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // Forçar resposta como texto simples para contornar Vite
+    res.setHeader('Content-Type', 'text/plain');
+    res.setHeader('Cache-Control', 'no-cache');
     
     if (!req.isAuthenticated()) {
-      return res.status(401).json({ error: "Não autorizado" });
+      console.log("🔥 Não autorizado");
+      return res.status(401).send("UNAUTHORIZED");
     }
     
     try {
       const documento = await storage.updateDocumento(req.params.id, req.body);
       console.log("🔥 SUCESSO DIRETO:", documento);
       
-      return res.status(200).json({
+      // Resposta como texto que o frontend pode interpretar
+      return res.status(200).send("SUCCESS:" + JSON.stringify({
         success: true,
         data: documento
-      });
+      }));
     } catch (error: any) {
       console.error("🔥 ERRO DIRETO:", error);
-      return res.status(500).json({
-        success: false,
-        error: error.message
-      });
+      return res.status(500).send("ERROR:" + error.message);
     }
   });
   
