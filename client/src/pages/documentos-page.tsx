@@ -116,7 +116,7 @@ export default function DocumentosPage() {
     onSuccess: (data) => {
       toast({
         title: "Sincronização concluída!",
-        description: `${data.importedCount} pasta(s) foram importadas do GitHub para o banco local.`,
+        description: `${data.importedCount || 0} pasta(s) importadas e ${data.updatedCount || 0} pasta(s) atualizadas.`,
       });
       
       // Atualizar dados locais

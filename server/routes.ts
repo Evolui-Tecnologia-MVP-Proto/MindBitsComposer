@@ -1470,7 +1470,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/repo-structure/sync-from-github", async (req, res) => {
     try {
       // Buscar conexão GitHub
-      const githubConnection = await storage.getServiceConnectionByName("github");
+      const connections = await storage.getAllServiceConnections();
+      const githubConnection = connections.find((c: any) => c.serviceName === "github");
       if (!githubConnection) {
         return res.status(400).json({ error: "Conexão GitHub não configurada" });
       }
