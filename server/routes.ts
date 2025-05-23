@@ -1469,25 +1469,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`Sincronizando pasta: ${structure.folderName} -> caminho: ${folderPath}`);
 
-      // Criar pasta no GitHub
-      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${folderPath}/.gitkeep`, {
-        method: 'PUT',
+      // Primeiro, verificar se a pasta já existe no GitHub
+      const checkResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${folderPath}`, {
+        method: 'GET',
         headers: {
           'Authorization': `token ${githubConnection.token}`,
-          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          message: `Criar pasta ${folderPath}`,
-          content: Buffer.from('# Pasta criada pelo EVO-MindBits Composer').toString('base64')
-        })
       });
 
-      if (response.ok) {
-        // Marcar como sincronizada
+      if (checkResponse.ok) {
+        // Pasta já existe no GitHub, apenas marcar como sincronizada
+        console.log(`Pasta ${folderPath} já existe no GitHub, marcando como sincronizada`);
         await storage.updateRepoStructureSync(uid, true);
-        res.json({ success: true, message: "Pasta criada no GitHub com sucesso" });
+        res.json({ success: true, message: "Pasta já existe no GitHub e foi marcada como sincronizada" });
+      } else if (checkResponse.status === 404) {
+        // Pasta não existe, criar nova
+        console.log(`Pasta ${folderPath} não existe, criando nova`);
+        const createResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${folderPath}/.gitkeep`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${githubConnection.token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message: `Criar pasta ${folderPath}`,
+            content: Buffer.from('# Pasta criada pelo EVO-MindBits Composer').toString('base64')
+          })
+        });
+
+        if (createResponse.ok) {
+          console.log(`Pasta ${folderPath} criada com sucesso no GitHub`);
+          await storage.updateRepoStructureSync(uid, true);
+          res.json({ success: true, message: "Pasta criada no GitHub com sucesso" });
+        } else {
+          const errorData = await createResponse.json();
+          console.log(`Erro ao criar pasta ${folderPath}:`, errorData);
+          res.status(400).json({ success: false, message: errorData.message });
+        }
       } else {
-        const errorData = await response.json();
+        // Outro erro
+        const errorData = await checkResponse.json();
+        console.log(`Erro ao verificar pasta ${folderPath}:`, errorData);
         res.status(400).json({ success: false, message: errorData.message });
       }
     } catch (error: any) {
