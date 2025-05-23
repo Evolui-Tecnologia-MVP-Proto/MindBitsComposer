@@ -723,8 +723,8 @@ export default function DocumentosPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
+    <div className="flex flex-col h-screen">
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 overflow-y-auto">
         <div className="flex items-center justify-between space-y-2">
           <h2 className="text-3xl font-bold tracking-tight">Documentos</h2>
           <Button onClick={() => setIsCreateModalOpen(true)} className="bg-blue-600 hover:bg-blue-700">
