@@ -528,8 +528,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           throw new Error(`Erro ${response.status}: ${errorText}`);
         }
         
-        const result = await response.json();
-        console.log("Documento atualizado com sucesso:", result);
+        const responseText = await response.text();
+        console.log("Resposta em texto:", responseText);
+        
+        let result;
+        try {
+          result = JSON.parse(responseText);
+          console.log("Documento atualizado com sucesso:", result);
+        } catch (jsonError) {
+          console.error("Erro ao fazer parse do JSON:", jsonError);
+          console.log("Texto da resposta que falhou:", responseText);
+          throw new Error("Resposta do servidor não é JSON válido");
+        }
         return result;
       } catch (error) {
         console.error("Erro completo na mutação:", error);
