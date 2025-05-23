@@ -1354,8 +1354,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           onFolderToggle={(folder, isExpanded) => {
                             console.log('Pasta:', folder.name, 'Expandida:', isExpanded);
                             if (isExpanded && folder.type === 'folder') {
-                              // Construir caminho correto para a pasta
-                              const folderPath = folder.name; // Usar apenas o nome da pasta para pastas raiz
+                              // Usar o path completo da pasta, que já está construído corretamente
+                              const folderPath = folder.path;
                               setSelectedFolderPath(folderPath);
                               fetchFolderFiles(folderPath);
                             }

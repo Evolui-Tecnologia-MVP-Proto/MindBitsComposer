@@ -1467,6 +1467,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         parent = parent.linkedTo ? await storage.getRepoStructure(parent.linkedTo) : null;
       }
 
+      console.log(`Sincronizando pasta: ${structure.folderName} -> caminho: ${folderPath}`);
+
       // Criar pasta no GitHub
       const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${folderPath}/.gitkeep`, {
         method: 'PUT',
