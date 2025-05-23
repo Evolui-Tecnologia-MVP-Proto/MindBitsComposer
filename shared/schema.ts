@@ -212,7 +212,10 @@ export const documentsArtifacts = pgTable("documents_artifacts", {
   id: uuid("id").defaultRandom().primaryKey(),
   documentoId: uuid("documento_id").notNull().references(() => documentos.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
-  file: text("file").notNull(), // Armazena caminho/URL do arquivo
+  fileData: text("file_data").notNull(), // Armazena fisicamente o arquivo como Base64
+  fileName: text("file_name").notNull(), // Nome original do arquivo
+  fileSize: text("file_size"), // Tamanho do arquivo em bytes
+  mimeType: text("mime_type").notNull(), // Tipo MIME do arquivo
   type: text("type").notNull(), // doc, pdf, txt, json, imagem, etc.
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

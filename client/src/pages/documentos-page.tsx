@@ -59,7 +59,9 @@ export default function DocumentosPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddArtifactModalOpen, setIsAddArtifactModalOpen] = useState(false);
   const [isEditArtifactModalOpen, setIsEditArtifactModalOpen] = useState(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [editingDocument, setEditingDocument] = useState<Documento | null>(null);
+  const [documentToDelete, setDocumentToDelete] = useState<Documento | null>(null);
   const [selectedArtifact, setSelectedArtifact] = useState<DocumentArtifact | null>(null);
   const [artifactFormData, setArtifactFormData] = useState<InsertDocumentArtifact>({
     documentoId: "",
@@ -370,9 +372,21 @@ export default function DocumentosPage() {
   };
 
   const handleDeleteDocument = (documento: Documento) => {
-    if (window.confirm(`Tem certeza que deseja excluir o documento "${documento.objeto}"?\n\nEsta ação não pode ser desfeita.`)) {
-      deleteDocumentoMutation.mutate(documento.id);
+    setDocumentToDelete(documento);
+    setIsDeleteConfirmOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (documentToDelete) {
+      deleteDocumentoMutation.mutate(documentToDelete.id);
+      setIsDeleteConfirmOpen(false);
+      setDocumentToDelete(null);
     }
+  };
+
+  const cancelDelete = () => {
+    setIsDeleteConfirmOpen(false);
+    setDocumentToDelete(null);
   };
 
   const renderDocumentosTable = (documentos: Documento[]) => (
@@ -1449,4 +1463,106 @@ export default function DocumentosPage() {
       </Dialog>
     );
   }
+
+  return (
+    <div className="p-6">
+      {/* Cabeçalho da página */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold">Documentos</h1>
+        <Button onClick={() => setIsCreateModalOpen(true)}>
+          <Plus className="mr-2 h-4 w-4" />
+          Novo Documento
+        </Button>
+      </div>
+
+      {/* Abas de navegação */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="integrados">Integrados</TabsTrigger>
+          <TabsTrigger value="todos">Todos</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="integrados">
+          {isLoading ? (
+            <div className="text-center py-6">Carregando documentos...</div>
+          ) : (
+            renderDocumentosTable(filteredDocumentos)
+          )}
+        </TabsContent>
+
+        <TabsContent value="todos">
+          {isLoading ? (
+            <div className="text-center py-6">Carregando documentos...</div>
+          ) : (
+            renderDocumentosTable(documentos)
+          )}
+        </TabsContent>
+      </Tabs>
+
+      {/* Modal de visualização */}
+      {renderViewModal()}
+
+      {/* Modal de criação */}
+      {renderCreateModal()}
+
+      {/* Modal de edição */}
+      {renderEditModal()}
+
+      {/* Modal de adição de artefato */}
+      {renderAddArtifactModal()}
+
+      {/* Modal de edição de artefato */}
+      {renderEditArtifactModal()}
+
+      {/* Dialog de confirmação de exclusão */}
+      <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <Trash2 className="h-5 w-5" />
+              Confirmar Exclusão
+            </DialogTitle>
+            <DialogDescription className="pt-2">
+              Tem certeza que deseja excluir o documento{" "}
+              <span className="font-semibold text-gray-900">
+                "{documentToDelete?.objeto}"
+              </span>
+              ?
+              <br />
+              <br />
+              <span className="text-red-600 font-medium">
+                Esta ação não pode ser desfeita.
+              </span>
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex gap-2 sm:gap-2">
+            <Button
+              variant="outline"
+              onClick={cancelDelete}
+              disabled={deleteDocumentoMutation.isPending}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={deleteDocumentoMutation.isPending}
+            >
+              {deleteDocumentoMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Excluindo...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Excluir
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
 }
