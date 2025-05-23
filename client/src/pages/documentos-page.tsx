@@ -1282,7 +1282,7 @@ export default function DocumentosPage() {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => document.getElementById('file-upload')?.click()}
+                    onClick={() => document.getElementById('artifact-file')?.click()}
                     className="px-3"
                   >
                     <Upload className="h-4 w-4 mr-2" />
