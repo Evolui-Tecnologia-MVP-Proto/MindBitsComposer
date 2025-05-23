@@ -2057,6 +2057,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {renderEditArtifactModal()}
 
       {/* Dialog de confirmação de exclusão */}
+      {console.log('Renderizando modal de exclusão:', { isDeleteConfirmOpen, documentToDelete })}
       <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
