@@ -1,5 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -88,6 +90,7 @@ export default function DocumentosPage() {
   });
 
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   // Buscar documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
@@ -97,6 +100,60 @@ export default function DocumentosPage() {
   // Buscar conexões de serviço para obter o repositório GitHub
   const { data: serviceConnections = [] } = useQuery({
     queryKey: ["/api/service-connections"],
+  });
+
+  // Buscar estrutura local do repositório
+  const { data: repoStructures = [] } = useQuery({
+    queryKey: ["/api/repo-structure"],
+  });
+
+  // Mutation para sincronizar todas as pastas não sincronizadas com GitHub
+  const syncAllToGitHubMutation = useMutation({
+    mutationFn: async () => {
+      const unsyncedFolders = repoStructures.filter((folder: any) => !folder.isSync);
+      const results = [];
+      
+      for (const folder of unsyncedFolders) {
+        try {
+          const res = await apiRequest("POST", `/api/repo-structure/${folder.uid}/sync-github`);
+          const result = await res.json();
+          results.push({ folder: folder.folderName, success: true, message: result.message });
+        } catch (error: any) {
+          results.push({ folder: folder.folderName, success: false, message: error.message });
+        }
+      }
+      
+      return results;
+    },
+    onSuccess: (results) => {
+      const successCount = results.filter(r => r.success).length;
+      const errorCount = results.filter(r => !r.success).length;
+      
+      if (successCount > 0) {
+        toast({
+          title: `${successCount} pasta(s) sincronizada(s)!`,
+          description: errorCount > 0 ? `${errorCount} pasta(s) falharam na sincronização.` : "Todas as pastas foram enviadas para o GitHub com sucesso.",
+        });
+      }
+      
+      if (errorCount > 0) {
+        const failedFolders = results.filter(r => !r.success).map(r => r.folder).join(", ");
+        toast({
+          title: "Algumas pastas falharam",
+          description: `Pastas com erro: ${failedFolders}`,
+          variant: "destructive",
+        });
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ["/api/repo-structure"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro na sincronização",
+        description: error.message || "Erro ao sincronizar pastas com GitHub.",
+        variant: "destructive",
+      });
+    },
   });
 
   // Função para buscar estrutura do repositório GitHub
@@ -1171,9 +1228,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       <Download className="h-4 w-4 mr-2" />
                       Sincronizar
                     </Button>
-                    <Button className="bg-green-600 hover:bg-green-700" size="sm">
-                      <Upload className="h-4 w-4 mr-2" />
-                      Enviar para GitHub
+                    <Button 
+                      className="bg-green-600 hover:bg-green-700" 
+                      size="sm"
+                      onClick={() => syncAllToGitHubMutation.mutate()}
+                      disabled={syncAllToGitHubMutation.isPending || repoStructures.filter((folder: any) => !folder.isSync).length === 0}
+                    >
+                      {syncAllToGitHubMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Upload className="h-4 w-4 mr-2" />
+                      )}
+                      {syncAllToGitHubMutation.isPending ? 'Enviando...' : 'Enviar para GitHub'}
                     </Button>
                   </div>
                 </div>
