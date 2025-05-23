@@ -1373,9 +1373,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const structures = await storage.getRepoStructureByParent(parentUid);
         res.json(structures);
       } else {
-        // Se não especificar parent, buscar árvore hierárquica completa
-        const structures = await storage.getRepoStructureTree();
-        res.json(structures);
+        // Forçar busca direta de todas as estruturas sem cache
+        const allStructures = await storage.getAllRepoStructures();
+        console.log("API: Total de estruturas encontradas:", allStructures.length);
+        console.log("API: Estruturas completas:", JSON.stringify(allStructures, null, 2));
+        res.json(allStructures);
       }
     } catch (error: any) {
       console.error("Erro ao buscar estrutura do repositório:", error);

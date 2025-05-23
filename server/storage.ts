@@ -656,7 +656,8 @@ export class DatabaseStorage implements IStorage {
   async getRepoStructureTree(): Promise<RepoStructure[]> {
     // Buscar todas as estruturas
     const allStructures = await db.select().from(repoStructure);
-    console.log("DB: Estruturas encontradas:", allStructures.length, allStructures);
+    console.log("DB: Estruturas encontradas:", allStructures.length);
+    console.log("DB: Lista completa:", JSON.stringify(allStructures, null, 2));
     
     // Construir mapa de estruturas
     const structureMap = new Map<string, RepoStructure & { children?: RepoStructure[] }>();
