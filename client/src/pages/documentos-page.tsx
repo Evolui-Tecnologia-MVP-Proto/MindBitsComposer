@@ -697,9 +697,11 @@ export default function DocumentosPage() {
     <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Criar Novo Documento</DialogTitle>
+          <DialogTitle>
+            {editingDocument ? "Editar Documento" : "Criar Novo Documento"}
+          </DialogTitle>
           <DialogDescription>
-            Preencha os dados do novo documento
+            {editingDocument ? "Edite as informações do documento" : "Preencha os dados do novo documento"}
           </DialogDescription>
         </DialogHeader>
         
@@ -783,9 +785,12 @@ export default function DocumentosPage() {
           </Button>
           <Button 
             onClick={handleCreateDocument} 
-            disabled={createDocumentoMutation.isPending}
+            disabled={createDocumentoMutation.isPending || updateDocumentMutation.isPending}
           >
-            {createDocumentoMutation.isPending ? "Criando..." : "Criar Documento"}
+            {(createDocumentoMutation.isPending || updateDocumentMutation.isPending) 
+              ? (editingDocument ? "Salvando..." : "Criando...") 
+              : (editingDocument ? "Salvar Alterações" : "Criar Documento")
+            }
           </Button>
         </DialogFooter>
       </DialogContent>
