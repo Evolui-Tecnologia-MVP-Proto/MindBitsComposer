@@ -112,6 +112,29 @@ export default function DocumentosPage() {
     queryKey: ["/api/documentos"],
   });
 
+  // Buscar contagem de anexos para todos os documentos
+  const { data: artifactCounts = {} } = useQuery<Record<string, number>>({
+    queryKey: ["/api/documentos/artifacts-count"],
+    queryFn: async () => {
+      const counts: Record<string, number> = {};
+      for (const documento of documentos) {
+        try {
+          const response = await fetch(`/api/documentos/${documento.id}/artifacts`);
+          if (response.ok) {
+            const artifacts = await response.json();
+            counts[documento.id] = artifacts.length;
+          } else {
+            counts[documento.id] = 0;
+          }
+        } catch {
+          counts[documento.id] = 0;
+        }
+      }
+      return counts;
+    },
+    enabled: documentos.length > 0,
+  });
+
   // Buscar conexões de serviço para obter o repositório GitHub
   const { data: serviceConnections = [] } = useQuery({
     queryKey: ["/api/service-connections"],
@@ -531,6 +554,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/documentos", currentDocumentId, "artifacts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos/artifacts-count"] });
       setIsAddArtifactModalOpen(false);
       resetArtifactForm();
     },
@@ -896,7 +920,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline" className="bg-gray-100 text-gray-500">
-                    0 anexos
+                    {artifactCounts[documento.id] || 0} anexos
                   </Badge>
                 </TableCell>
               </>
