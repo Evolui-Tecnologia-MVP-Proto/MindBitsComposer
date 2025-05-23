@@ -445,7 +445,12 @@ export default function DocumentosPage() {
                 >
                   <Eye className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8"
+                  onClick={() => openEditModal(documento)}
+                >
                   <Pencil className="h-4 w-4 text-blue-500" />
                 </Button>
                 <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -863,10 +868,281 @@ export default function DocumentosPage() {
       
       {renderViewModal()}
       {renderCreateModal()}
+      {renderEditModal()}
       {renderAddArtifactModal()}
       {renderEditArtifactModal()}
     </div>
   );
+
+  // Modal para editar documento
+  function renderEditModal() {
+    if (!editingDocument) return null;
+    
+    return (
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Pencil className="h-5 w-5 text-blue-500" />
+              Editar Documento: {editingDocument.objeto}
+            </DialogTitle>
+            <DialogDescription>
+              Edite os dados do documento e gerencie seus anexos
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Tabs defaultValue="dados-gerais" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="dados-gerais">Dados Gerais</TabsTrigger>
+              <TabsTrigger value="anexos">Anexos</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="dados-gerais" className="mt-6">
+              <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="edit-origem">Origem</Label>
+                    <Input
+                      id="edit-origem"
+                      value={formData.origem}
+                      onChange={(e) => setFormData({ ...formData, origem: e.target.value })}
+                      placeholder="Ex: Monday, EVO-CTx"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-cliente">Cliente</Label>
+                    <Input
+                      id="edit-cliente"
+                      value={formData.cliente}
+                      onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
+                      placeholder="Nome do cliente"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="edit-objeto">Objeto/Nome</Label>
+                  <Input
+                    id="edit-objeto"
+                    value={formData.objeto}
+                    onChange={(e) => setFormData({ ...formData, objeto: e.target.value })}
+                    placeholder="Nome do documento"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="edit-responsavel">Responsável</Label>
+                    <Input
+                      id="edit-responsavel"
+                      value={formData.responsavel}
+                      onChange={(e) => setFormData({ ...formData, responsavel: e.target.value })}
+                      placeholder="Responsável"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-sistema">Sistema</Label>
+                    <Input
+                      id="edit-sistema"
+                      value={formData.sistema}
+                      onChange={(e) => setFormData({ ...formData, sistema: e.target.value })}
+                      placeholder="Sistema"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="edit-modulo">Módulo</Label>
+                  <Input
+                    id="edit-modulo"
+                    value={formData.modulo}
+                    onChange={(e) => setFormData({ ...formData, modulo: e.target.value })}
+                    placeholder="Módulo"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="edit-descricao">Descrição</Label>
+                  <Input
+                    id="edit-descricao"
+                    value={formData.descricao}
+                    onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+                    placeholder="Descrição do documento"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="edit-status">Status</Label>
+                    <Select
+                      value={formData.status}
+                      onValueChange={(value) => setFormData({ ...formData, status: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Integrado">Integrado</SelectItem>
+                        <SelectItem value="Processando">Processando</SelectItem>
+                        <SelectItem value="Concluido">Concluído</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-status-origem">Status Origem</Label>
+                    <Select
+                      value={formData.statusOrigem}
+                      onValueChange={(value) => setFormData({ ...formData, statusOrigem: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o status origem" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Incluido">Incluído</SelectItem>
+                        <SelectItem value="Em CRP">Em CRP</SelectItem>
+                        <SelectItem value="Em Aprovação">Em Aprovação</SelectItem>
+                        <SelectItem value="Em DRP">Em DRP</SelectItem>
+                        <SelectItem value="Concluido">Concluído</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="anexos" className="mt-6">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-medium">Anexos do Documento</h3>
+                  <Button 
+                    onClick={() => {
+                      setArtifactFormData({
+                        documentoId: editingDocument.id,
+                        name: "",
+                        file: "",
+                        type: "",
+                      });
+                      setIsAddArtifactModalOpen(true);
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700"
+                    size="sm"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    Adicionar Anexo
+                  </Button>
+                </div>
+                
+                {isLoadingArtifacts ? (
+                  <div className="text-center py-6">
+                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
+                    <p className="text-sm text-gray-500">Carregando anexos...</p>
+                  </div>
+                ) : artifacts.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Tipo</TableHead>
+                        <TableHead>Nome</TableHead>
+                        <TableHead>Arquivo</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {artifacts.map((artifact) => (
+                        <TableRow key={artifact.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              {getFileTypeIcon(artifact.type)}
+                              <span className="text-xs font-medium uppercase">{artifact.type}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-medium">{artifact.name}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-gray-600 truncate max-w-[200px]" title={artifact.file}>
+                                {artifact.file}
+                              </span>
+                              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                <Download className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-7 w-7 p-0"
+                                onClick={() => openEditArtifactModal(artifact)}
+                              >
+                                <Pencil className="h-3 w-3 text-blue-500" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="h-7 w-7 p-0"
+                                onClick={() => handleDeleteArtifact(artifact.id)}
+                              >
+                                <Trash2 className="h-3 w-3 text-red-500" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed">
+                    <Paperclip className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+                    <p className="text-sm text-gray-500 mb-3">Nenhum anexo encontrado</p>
+                    <Button 
+                      onClick={() => {
+                        setArtifactFormData({
+                          documentoId: editingDocument.id,
+                          name: "",
+                          file: "",
+                          type: "",
+                        });
+                        setIsAddArtifactModalOpen(true);
+                      }}
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Adicionar primeiro anexo
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
+          
+          <DialogFooter className="mt-6">
+            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>
+              Cancelar
+            </Button>
+            <Button 
+              onClick={handleUpdateDocument} 
+              disabled={updateDocumentoMutation.isPending}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {updateDocumentoMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Salvar Alterações
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   // Modal para adicionar artefato
   function renderAddArtifactModal() {
