@@ -236,7 +236,7 @@ export type DocumentArtifact = typeof documentsArtifacts.$inferSelect;
 export const repoStructure = pgTable("repo_structure", {
   uid: uuid("uid").defaultRandom().primaryKey(),
   folderName: text("folder_name").notNull(),
-  linkedTo: uuid("linked_to"),
+  linkedTo: uuid("linked_to").references(() => repoStructure.uid, { onDelete: "cascade" }),
   isSync: boolean("is_sync").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
