@@ -52,8 +52,18 @@ import {
   Plus, 
   Key, 
   GitBranchPlus,
-  BrainCircuit
+  BrainCircuit,
+  Loader2,
+  CheckCircle,
+  XCircle
 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -81,6 +91,12 @@ export default function ConfiguracoesPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedConnection, setSelectedConnection] = useState<ServiceConnectionType | null>(null);
   const [selectedServiceName, setSelectedServiceName] = useState<string>("");
+  
+  // Estados para integração GitHub
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [githubRepos, setGithubRepos] = useState<Array<{name: string, full_name: string}>>([]);
+  const [selectedRepo, setSelectedRepo] = useState<string>("");
 
   // Consulta para buscar todas as conexões
   const { data: connections = [], isLoading } = useQuery<ServiceConnectionType[]>({
@@ -181,6 +197,55 @@ export default function ConfiguracoesPage() {
   const confirmDelete = () => {
     if (selectedConnection) {
       deleteConnectionMutation.mutate(selectedConnection.id);
+    }
+  };
+
+  // Função para testar conexão GitHub e buscar repositórios
+  const testGithubConnection = async () => {
+    const token = form.getValues("token");
+    if (!token) {
+      toast({
+        title: "Token obrigatório",
+        description: "Por favor, insira um token GitHub válido.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsConnecting(true);
+    setConnectionStatus('idle');
+    setGithubRepos([]);
+
+    try {
+      // Testar conexão e buscar repositórios
+      const response = await fetch("https://api.github.com/user/repos", {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/vnd.github.v3+json"
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error("Token inválido ou sem permissão");
+      }
+
+      const repos = await response.json();
+      setGithubRepos(repos);
+      setConnectionStatus('success');
+      
+      toast({
+        title: "Conexão bem-sucedida!",
+        description: `${repos.length} repositórios encontrados.`,
+      });
+    } catch (error: any) {
+      setConnectionStatus('error');
+      toast({
+        title: "Erro na conexão",
+        description: error.message || "Não foi possível conectar ao GitHub.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsConnecting(false);
     }
   };
 
@@ -452,15 +517,66 @@ export default function ConfiguracoesPage() {
                   <FormItem>
                     <FormLabel>Token de API</FormLabel>
                     <FormControl>
-                      <Input {...field} type="password" autoComplete="off" />
+                      <div className="flex space-x-2">
+                        <Input {...field} type="password" autoComplete="off" className="flex-1" />
+                        {selectedServiceName === "github" && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={testGithubConnection}
+                            disabled={isConnecting || !field.value}
+                            className={`px-3 ${
+                              connectionStatus === 'success' 
+                                ? 'border-green-500 text-green-700 hover:bg-green-50' 
+                                : connectionStatus === 'error'
+                                ? 'border-red-500 text-red-700 hover:bg-red-50'
+                                : 'border-amber-500 text-amber-700 hover:bg-amber-50'
+                            }`}
+                          >
+                            {isConnecting ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : connectionStatus === 'success' ? (
+                              <CheckCircle className="h-4 w-4" />
+                            ) : connectionStatus === 'error' ? (
+                              <XCircle className="h-4 w-4" />
+                            ) : (
+                              "Conectar"
+                            )}
+                          </Button>
+                        )}
+                      </div>
                     </FormControl>
                     <FormDescription>
                       Token de acesso à API do serviço
+                      {selectedServiceName === "github" && " - Clique em 'Conectar' para testar e buscar repositórios"}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+              
+              {/* Combo de repositórios GitHub */}
+              {selectedServiceName === "github" && connectionStatus === 'success' && githubRepos.length > 0 && (
+                <div className="space-y-2">
+                  <Label>Repositório Padrão</Label>
+                  <Select value={selectedRepo} onValueChange={setSelectedRepo}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um repositório..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {githubRepos.map((repo) => (
+                        <SelectItem key={repo.full_name} value={repo.full_name}>
+                          {repo.full_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-gray-500">
+                    {githubRepos.length} repositório(s) encontrado(s)
+                  </p>
+                </div>
+              )}
               
               <FormField
                 control={form.control}
