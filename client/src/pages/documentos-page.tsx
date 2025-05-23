@@ -143,7 +143,10 @@ export default function DocumentosPage() {
   // Mutation para sincronizar todas as pastas não sincronizadas com GitHub
   const syncAllToGitHubMutation = useMutation({
     mutationFn: async () => {
-      const unsyncedFolders = repoStructures.filter((folder: any) => !folder.isSync);
+      const unsyncedFolders = repoStructures.filter((folder: any) => 
+        !folder.isSync && 
+        (!folder.linkedTo || repoStructures.some((parent: any) => parent.uid === folder.linkedTo))
+      );
       const results = [];
       
       for (const folder of unsyncedFolders) {
@@ -1251,14 +1254,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       className="bg-green-600 hover:bg-green-700" 
                       size="sm"
                       onClick={() => syncAllToGitHubMutation.mutate()}
-                      disabled={syncAllToGitHubMutation.isPending || repoStructures.filter((folder: any) => !folder.isSync).length === 0}
+                      disabled={syncAllToGitHubMutation.isPending || repoStructures.filter((folder: any) => !folder.isSync && (!folder.linkedTo || repoStructures.some((parent: any) => parent.uid === folder.linkedTo))).length === 0}
                     >
                       {syncAllToGitHubMutation.isPending ? (
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       ) : (
                         <Upload className="h-4 w-4 mr-2" />
                       )}
-                      {syncAllToGitHubMutation.isPending ? 'Enviando...' : `Enviar para GitHub (${repoStructures.filter((folder: any) => !folder.isSync).length})`}
+                      {syncAllToGitHubMutation.isPending ? 'Enviando...' : `Enviar para GitHub (${repoStructures.filter((folder: any) => !folder.isSync && (!folder.linkedTo || repoStructures.some((parent: any) => parent.uid === folder.linkedTo))).length})`}
                     </Button>
                   </div>
                 </div>
