@@ -234,49 +234,44 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     
     console.log("Estruturas do repositório:", repoStructures);
 
-    // Primeiro, processar pastas do GitHub
-    data.forEach((item) => {
-      if (item.type === 'folder') {
-        // Verificar se esta pasta do GitHub existe no banco local
-        const localStructure = repoStructures.find((s: any) => s.folderName === item.name);
+    // Primeiro, processar APENAS pastas do GitHub (filtrar arquivos)
+    data.filter(item => item.type === 'folder').forEach((item) => {
+      // Verificar se esta pasta do GitHub existe no banco local
+      const localStructure = repoStructures.find((s: any) => s.folderName === item.name);
+      
+      if (localStructure) {
+        // Pasta existe no banco - usar status de sincronização e incluir filhos
+        const unifiedItem: FileItem = {
+          ...item,
+          id: localStructure.uid,
+          syncStatus: localStructure.isSync ? 'synced' : 'unsynced',
+          children: [] // Inicializar filhos vazios
+        };
         
-        if (localStructure) {
-          // Pasta existe no banco - usar status de sincronização e incluir filhos
-          const unifiedItem: FileItem = {
-            ...item,
-            id: localStructure.uid,
-            syncStatus: localStructure.isSync ? 'synced' : 'unsynced',
-            children: [] // Inicializar filhos vazios
-          };
-          
-          // Construir hierarquia completa recursivamente
-          unifiedItem.children = buildChildrenRecursively(localStructure.uid);
-          
-          // Marcar todos os filhos como processados
-          const markProcessed = (children: FileItem[]) => {
-            children.forEach(child => {
-              processedNames.add(child.name);
-              if (child.children) {
-                markProcessed(child.children);
-              }
-            });
-          };
-          markProcessed(unifiedItem.children);
-          
-          processedItems.push(unifiedItem);
-        } else {
-          // Pasta existe no GitHub mas não no banco local
-          const unifiedItem: FileItem = {
-            ...item,
-            syncStatus: 'github-only'
-          };
-          processedItems.push(unifiedItem);
-        }
-        processedNames.add(item.name);
+        // Construir hierarquia completa recursivamente
+        unifiedItem.children = buildChildrenRecursively(localStructure.uid);
+        
+        // Marcar todos os filhos como processados
+        const markProcessed = (children: FileItem[]) => {
+          children.forEach(child => {
+            processedNames.add(child.name);
+            if (child.children) {
+              markProcessed(child.children);
+            }
+          });
+        };
+        markProcessed(unifiedItem.children);
+        
+        processedItems.push(unifiedItem);
       } else {
-        // Arquivos sempre são incluídos sem modificação
-        processedItems.push(item);
+        // Pasta existe no GitHub mas não no banco local
+        const unifiedItem: FileItem = {
+          ...item,
+          syncStatus: 'github-only'
+        };
+        processedItems.push(unifiedItem);
       }
+      processedNames.add(item.name);
     });
 
     // Depois, adicionar pastas locais que não existem no GitHub
