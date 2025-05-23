@@ -1511,25 +1511,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             
             <TabsContent value="dados-gerais" className="mt-6">
               <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="edit-origem">Origem</Label>
-                    <Input
-                      id="edit-origem"
-                      value={formData.origem}
-                      onChange={(e) => setFormData({ ...formData, origem: e.target.value })}
-                      placeholder="Ex: Monday, EVO-CTx"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-cliente">Cliente</Label>
-                    <Input
-                      id="edit-cliente"
-                      value={formData.cliente}
-                      onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
-                      placeholder="Nome do cliente"
-                    />
-                  </div>
+                <div>
+                  <Label htmlFor="edit-cliente">Cliente</Label>
+                  <Input
+                    id="edit-cliente"
+                    value={formData.cliente}
+                    onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
+                    placeholder="Nome do cliente"
+                  />
                 </div>
                 
                 <div>
@@ -1585,42 +1574,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="edit-status">Status</Label>
-                    <Select
-                      value={formData.status}
-                      onValueChange={(value) => setFormData({ ...formData, status: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Integrado">Integrado</SelectItem>
-                        <SelectItem value="Processando">Processando</SelectItem>
-                        <SelectItem value="Concluido">Concluído</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-status-origem">Status Origem</Label>
-                    <Select
-                      value={formData.statusOrigem}
-                      onValueChange={(value) => setFormData({ ...formData, statusOrigem: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o status origem" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Incluido">Incluído</SelectItem>
-                        <SelectItem value="Em CRP">Em CRP</SelectItem>
-                        <SelectItem value="Em Aprovação">Em Aprovação</SelectItem>
-                        <SelectItem value="Em DRP">Em DRP</SelectItem>
-                        <SelectItem value="Concluido">Concluído</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
+
               </div>
             </TabsContent>
             
