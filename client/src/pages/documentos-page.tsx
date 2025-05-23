@@ -241,9 +241,13 @@ export default function DocumentosPage() {
       
       if (response.ok) {
         const files = await response.json();
-        // Filtrar apenas arquivos (não pastas)
+        // Incluir todos os arquivos, incluindo .gitkeep
         const fileList = Array.isArray(files) ? files.filter((item: any) => item.type === 'file') : [];
         setSelectedFolderFiles(fileList);
+      } else if (response.status === 404) {
+        // Pasta vazia ou não existe - mostrar mensagem apropriada
+        console.log('Pasta vazia ou não encontrada:', folderPath);
+        setSelectedFolderFiles([]);
       } else {
         console.error('Erro ao buscar arquivos da pasta:', response.status);
         setSelectedFolderFiles([]);
@@ -1452,7 +1456,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           ))
                         ) : selectedFolderPath ? (
                           <div className="text-center py-8">
-                            <div className="text-gray-500 text-sm">Nenhum arquivo encontrado nesta pasta</div>
+                            <div className="text-gray-500 text-sm">
+                              📁 Pasta vazia
+                              <br />
+                              <span className="text-xs">Esta pasta foi criada para organização mas ainda não contém arquivos</span>
+                            </div>
                           </div>
                         ) : (
                           <div className="text-center py-8">
