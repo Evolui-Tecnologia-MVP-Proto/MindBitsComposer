@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, ChevronDown, Folder, File, FileText, Image, Archive, Code, FolderPlus, Upload, AlertCircle, Trash2 } from 'lucide-react';
+import { ChevronRight, ChevronDown, Folder, File, FileText, Image, Archive, Code, FolderPlus, Upload, AlertCircle, Trash2, Expand, Minimize } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CreateFolderModal } from './CreateFolderModal';
@@ -314,6 +314,28 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
 
   const unifiedData = buildUnifiedStructure();
 
+  const expandAll = () => {
+    const allFolderIds = new Set<string>();
+    
+    const collectFolderIds = (items: FileItem[]) => {
+      items.forEach(item => {
+        if (item.type === 'folder') {
+          allFolderIds.add(item.id);
+          if (item.children) {
+            collectFolderIds(item.children);
+          }
+        }
+      });
+    };
+    
+    collectFolderIds(unifiedData);
+    setExpandedFolders(allFolderIds);
+  };
+
+  const collapseAll = () => {
+    setExpandedFolders(new Set());
+  };
+
   const getStatusColor = (syncStatus?: string) => {
     switch (syncStatus) {
       case 'synced':
@@ -426,7 +448,27 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
 
   return (
     <div className="border rounded-lg bg-white">
-      <div className="p-3 border-b bg-gray-50 flex items-center justify-end">
+      <div className="p-3 border-b bg-gray-50 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={expandAll}
+            className="text-xs"
+            title="Expandir Tudo"
+          >
+            <Expand className="h-3 w-3" />
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={collapseAll}
+            className="text-xs"
+            title="Colapsar Tudo"
+          >
+            <Minimize className="h-3 w-3" />
+          </Button>
+        </div>
         <Button
           size="sm"
           variant="outline"
