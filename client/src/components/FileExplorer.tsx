@@ -431,8 +431,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
 
   return (
     <div className="border rounded-lg bg-white">
-      <div className="p-3 border-b bg-gray-50 flex items-center justify-between">
-        <h4 className="font-medium text-sm text-gray-900">Estrutura do Repositório</h4>
+      <div className="p-3 border-b bg-gray-50 flex items-center justify-end">
         <Button
           size="sm"
           variant="outline"
