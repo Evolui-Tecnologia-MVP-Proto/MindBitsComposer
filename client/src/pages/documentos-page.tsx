@@ -522,8 +522,24 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos/artifacts-count"] });
       setIsEditModalOpen(false);
       setEditingDocument(null);
+      setFormData({
+        origem: "",
+        objeto: "",
+        cliente: "",
+        responsavel: "",
+        sistema: "",
+        modulo: "",
+        descricao: "",
+        status: "Integrado",
+        statusOrigem: "Incluido",
+      });
+      toast({
+        title: "Sucesso",
+        description: "Documento atualizado com sucesso!",
+      });
     },
   });
 
