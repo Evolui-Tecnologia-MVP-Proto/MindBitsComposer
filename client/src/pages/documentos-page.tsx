@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Table,
   TableBody,
@@ -67,7 +68,7 @@ export default function DocumentosPage() {
     type: "",
   });
   const [formData, setFormData] = useState<InsertDocumento>({
-    origem: "",
+    origem: "CPx", // Sempre CPx para novos documentos
     objeto: "",
     cliente: "",
     responsavel: "",
@@ -94,10 +95,12 @@ export default function DocumentosPage() {
   // Mutation para criar documento
   const createDocumentoMutation = useMutation({
     mutationFn: async (data: InsertDocumento) => {
+      // Sempre define origem como "CPx" para novos documentos
+      const documentoData = { ...data, origem: "CPx" };
       const response = await fetch("/api/documentos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify(documentoData),
       });
       if (!response.ok) throw new Error("Erro ao criar documento");
       return response.json();
@@ -106,7 +109,7 @@ export default function DocumentosPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
       setIsCreateModalOpen(false);
       setFormData({
-        origem: "",
+        origem: "CPx", // Será sempre CPx para novos documentos
         objeto: "",
         cliente: "",
         responsavel: "",
@@ -134,6 +137,20 @@ export default function DocumentosPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
       setIsEditModalOpen(false);
       setEditingDocument(null);
+    },
+  });
+
+  // Mutation para excluir documento
+  const deleteDocumentoMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`/api/documentos/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error("Erro ao excluir documento");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
     },
   });
 
@@ -352,6 +369,12 @@ export default function DocumentosPage() {
     setIsViewModalOpen(true);
   };
 
+  const handleDeleteDocument = (documento: Documento) => {
+    if (window.confirm(`Tem certeza que deseja excluir o documento "${documento.objeto}"?\n\nEsta ação não pode ser desfeita.`)) {
+      deleteDocumentoMutation.mutate(documento.id);
+    }
+  };
+
   const renderDocumentosTable = (documentos: Documento[]) => (
     <Table>
       <TableHeader>
@@ -453,7 +476,13 @@ export default function DocumentosPage() {
                 >
                   <Pencil className="h-4 w-4 text-blue-500" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8"
+                  onClick={() => handleDeleteDocument(documento)}
+                  disabled={deleteDocumentoMutation.isPending}
+                >
                   <Trash2 className="h-4 w-4 text-red-500" />
                 </Button>
               </div>
@@ -683,25 +712,14 @@ export default function DocumentosPage() {
           
           <TabsContent value="dados-gerais" className="mt-6">
             <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="origem">Origem</Label>
-                  <Input
-                    id="origem"
-                    value={formData.origem}
-                    onChange={(e) => setFormData({ ...formData, origem: e.target.value })}
-                    placeholder="Ex: Monday, EVO-CTx"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="cliente">Cliente</Label>
-                  <Input
-                    id="cliente"
-                    value={formData.cliente}
-                    onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
-                    placeholder="Nome do cliente"
-                  />
-                </div>
+              <div>
+                <Label htmlFor="cliente">Cliente</Label>
+                <Input
+                  id="cliente"
+                  value={formData.cliente}
+                  onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
+                  placeholder="Nome do cliente"
+                />
               </div>
               
               <div>
@@ -747,11 +765,13 @@ export default function DocumentosPage() {
               
               <div>
                 <Label htmlFor="descricao">Descrição</Label>
-                <Input
+                <Textarea
                   id="descricao"
                   value={formData.descricao}
                   onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-                  placeholder="Descrição do documento"
+                  placeholder="Descrição detalhada do documento..."
+                  rows={4}
+                  className="resize-none"
                 />
               </div>
             </div>
@@ -963,11 +983,13 @@ export default function DocumentosPage() {
                 
                 <div>
                   <Label htmlFor="edit-descricao">Descrição</Label>
-                  <Input
+                  <Textarea
                     id="edit-descricao"
                     value={formData.descricao}
                     onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-                    placeholder="Descrição do documento"
+                    placeholder="Descrição detalhada do documento..."
+                    rows={4}
+                    className="resize-none"
                   />
                 </div>
 
