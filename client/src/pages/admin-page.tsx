@@ -636,12 +636,48 @@ export default function AdminPage() {
   const openServiceModal = (serviceName: string, connection: ServiceConnection | null = null) => {
     setSelectedService(serviceName);
     setSelectedConnection(connection);
+    
+    // Se for uma conexão GitHub existente, simular estado conectado
+    if (serviceName === "github" && connection?.token) {
+      setConnectionStatus('success');
+      // Buscar repositórios automaticamente com o token existente
+      fetchGithubRepos(connection.token);
+    } else {
+      setConnectionStatus('idle');
+      setGithubRepos([]);
+      setSelectedRepo("");
+    }
+    
     setIsServiceModalOpen(true);
   };
   
   const openServiceDeleteDialog = (connection: ServiceConnection) => {
     setSelectedConnection(connection);
     setIsServiceDeleteDialogOpen(true);
+  };
+
+  // Função auxiliar para buscar repositórios GitHub
+  const fetchGithubRepos = async (token: string) => {
+    try {
+      const response = await fetch('https://api.github.com/user/repos', {
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+        },
+      });
+
+      if (response.ok) {
+        const repos = await response.json();
+        setGithubRepos(repos);
+        return repos;
+      } else {
+        setGithubRepos([]);
+        return [];
+      }
+    } catch (error) {
+      setGithubRepos([]);
+      return [];
+    }
   };
 
   // Função para testar conexão GitHub
@@ -660,16 +696,9 @@ export default function AdminPage() {
     setConnectionStatus('idle');
 
     try {
-      const response = await fetch('https://api.github.com/user/repos', {
-        headers: {
-          'Authorization': `token ${token}`,
-          'Accept': 'application/vnd.github.v3+json',
-        },
-      });
-
-      if (response.ok) {
-        const repos = await response.json();
-        setGithubRepos(repos);
+      const repos = await fetchGithubRepos(token);
+      
+      if (repos.length > 0) {
         setConnectionStatus('success');
         toast({
           title: "Sucesso",
