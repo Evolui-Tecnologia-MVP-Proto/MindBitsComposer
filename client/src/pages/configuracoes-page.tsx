@@ -529,68 +529,7 @@ export default function ConfiguracoesPage() {
                   <FormItem>
                     <FormLabel>Token de API</FormLabel>
                     <FormControl>
-                      <div className="space-y-2">
-                        <div className="flex space-x-2">
-                          <Input {...field} type="password" autoComplete="off" className="flex-1" />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            className="bg-yellow-100 border-yellow-500 text-yellow-700"
-                          >
-                            Conectar
-                          </Button>
-                          {/* Botão Conectar original - teste se aparece */}
-                          {false && (
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={testGithubConnection}
-                              disabled={isConnecting || !field.value}
-                              className={`px-3 ${
-                                connectionStatus === 'success' 
-                                  ? 'border-green-500 text-green-700 hover:bg-green-50' 
-                                  : connectionStatus === 'error'
-                                  ? 'border-red-500 text-red-700 hover:bg-red-50'
-                                  : 'border-amber-500 text-amber-700 hover:bg-amber-50'
-                              }`}
-                            >
-                              {isConnecting ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : connectionStatus === 'success' ? (
-                                <CheckCircle className="h-4 w-4" />
-                              ) : connectionStatus === 'error' ? (
-                                <XCircle className="h-4 w-4" />
-                              ) : (
-                                "Conectar"
-                              )}
-                            </Button>
-                          )}
-                        </div>
-                        
-                        {/* Combo de repositórios GitHub */}
-                        {(selectedServiceName === "github" || form.getValues("serviceName") === "github") && connectionStatus === 'success' && githubRepos.length > 0 && (
-                          <div className="space-y-2">
-                            <Label>Repositório Padrão</Label>
-                            <Select value={selectedRepo} onValueChange={setSelectedRepo}>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Selecione um repositório..." />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {githubRepos.map((repo) => (
-                                  <SelectItem key={repo.full_name} value={repo.full_name}>
-                                    {repo.full_name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <p className="text-sm text-gray-500">
-                              {githubRepos.length} repositório(s) encontrado(s)
-                            </p>
-                          </div>
-                        )}
-                      </div>
+                      <Input {...field} type="password" autoComplete="off" />
                     </FormControl>
                     <FormDescription>
                       Token de acesso à API do serviço

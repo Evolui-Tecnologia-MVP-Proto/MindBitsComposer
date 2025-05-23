@@ -40,7 +40,9 @@ import {
   CalendarDays,
   Plug,
   Github,
-  Lightbulb
+  Lightbulb,
+  CheckCircle,
+  XCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -146,12 +148,17 @@ export default function AdminPage() {
   const [isServiceDeleteDialogOpen, setIsServiceDeleteDialogOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [selectedConnection, setSelectedConnection] = useState<ServiceConnection | null>(null);
-  const [showServiceToken, setShowServiceToken] = useState(false);
-  const [isServiceSubmitting, setIsServiceSubmitting] = useState(false);
+  
+  // Estados para GitHub
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [githubRepos, setGithubRepos] = useState<any[]>([]);
+  const [selectedRepo, setSelectedRepo] = useState<string>("");
   
   // Estado para armazenar o status da conexão com o Monday e controlar cores do botão
-  const [connectionStatus, setConnectionStatus] = useState<"idle" | "success" | "error">("idle");
   const [buttonStyle, setButtonStyle] = useState("bg-yellow-500");
+  const [showServiceToken, setShowServiceToken] = useState(false);
+  const [isServiceSubmitting, setIsServiceSubmitting] = useState(false);
   
   // Formulário para serviços externos
   const serviceForm = useForm<z.infer<typeof serviceConnectionSchema>>({
@@ -506,7 +513,6 @@ export default function AdminPage() {
   // Estado para controle dos botões
   const [isSaveDisabled, setIsSaveDisabled] = useState(true);
   const [isConnectDisabled, setIsConnectDisabled] = useState(true);
-  const [isServiceSaveDisabled, setIsServiceSaveDisabled] = useState(true);
   
   // Função para salvar conexões de serviço
   const onSubmitServiceConnection = async (data: z.infer<typeof serviceConnectionSchema>) => {
@@ -579,7 +585,7 @@ export default function AdminPage() {
   useEffect(() => {
     const serviceName = serviceForm.watch("serviceName");
     const token = serviceForm.watch("token");
-    setIsServiceSaveDisabled(!serviceName || !token);
+    // Este useEffect será usado quando necessário para validações adicionais
   }, [serviceForm.watch("serviceName"), serviceForm.watch("token")]);
 
   // Funções para abrir modal de edição/exclusão
@@ -634,6 +640,57 @@ export default function AdminPage() {
   const openServiceDeleteDialog = (connection: ServiceConnection) => {
     setSelectedConnection(connection);
     setIsServiceDeleteDialogOpen(true);
+  };
+
+  // Função para testar conexão GitHub
+  const testGithubConnection = async () => {
+    const token = serviceForm.getValues("token");
+    if (!token) {
+      toast({
+        title: "Erro",
+        description: "Insira um token antes de testar a conexão",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsConnecting(true);
+    setConnectionStatus('idle');
+
+    try {
+      const response = await fetch('https://api.github.com/user/repos', {
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+        },
+      });
+
+      if (response.ok) {
+        const repos = await response.json();
+        setGithubRepos(repos);
+        setConnectionStatus('success');
+        toast({
+          title: "Sucesso",
+          description: `Conectado! ${repos.length} repositório(s) encontrado(s)`,
+        });
+      } else {
+        setConnectionStatus('error');
+        toast({
+          title: "Erro de conexão",
+          description: "Token inválido ou sem permissões adequadas",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      setConnectionStatus('error');
+      toast({
+        title: "Erro de conexão",
+        description: "Não foi possível conectar ao GitHub",
+        variant: "destructive",
+      });
+    } finally {
+      setIsConnecting(false);
+    }
   };
   
   const deleteServiceConnection = async () => {
@@ -1415,9 +1472,25 @@ export default function AdminPage() {
                             type="button"
                             variant="outline"
                             size="sm"
-                            className="bg-yellow-100 border-yellow-500 text-yellow-700 hover:bg-yellow-50"
+                            onClick={testGithubConnection}
+                            disabled={isConnecting || !field.value}
+                            className={`px-3 ${
+                              connectionStatus === 'success' 
+                                ? 'border-green-500 text-green-700 hover:bg-green-50' 
+                                : connectionStatus === 'error'
+                                ? 'border-red-500 text-red-700 hover:bg-red-50'
+                                : 'border-amber-500 text-amber-700 hover:bg-amber-50'
+                            }`}
                           >
-                            Conectar
+                            {isConnecting ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : connectionStatus === 'success' ? (
+                              <CheckCircle className="h-4 w-4" />
+                            ) : connectionStatus === 'error' ? (
+                              <XCircle className="h-4 w-4" />
+                            ) : (
+                              "Conectar"
+                            )}
                           </Button>
                         )}
                       </div>
@@ -1455,7 +1528,7 @@ export default function AdminPage() {
                 </Button>
                 <Button 
                   type="submit"
-                  disabled={isServiceSubmitting || isServiceSaveDisabled}
+                  disabled={isServiceSubmitting}
                 >
                   {isServiceSubmitting ? (
                     <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando...</>
