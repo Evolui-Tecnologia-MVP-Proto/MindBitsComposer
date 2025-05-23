@@ -11,7 +11,7 @@ import PreferencesPage from "@/pages/preferences-page";
 import ConfiguracoesPage from "@/pages/configuracoes-page";
 import TemplatesPage from "@/pages/templates-page";
 import EditorPage from "@/pages/editor-page";
-import FluxosPage from "@/pages/fluxos-page-new";
+import FluxosPage from "@/pages/fluxos-page";
 import DocumentosPage from "@/pages/documentos-page";
 import PluginsPage from "@/pages/plugins-page";
 import { AuthProvider } from "@/hooks/use-auth";
