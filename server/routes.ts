@@ -1361,6 +1361,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/repo-structure", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
+    // Desabilitar cache para forçar busca nova
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    
     try {
       const parentUid = req.query.parent as string;
       if (parentUid) {

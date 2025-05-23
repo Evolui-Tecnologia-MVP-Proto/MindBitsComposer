@@ -104,7 +104,7 @@ export default function DocumentosPage() {
 
   // Buscar estrutura local do repositório
   const { data: repoStructures = [] } = useQuery({
-    queryKey: ["/api/repo-structure"],
+    queryKey: ["/api/repo-structure", Date.now()], // Adicionar timestamp para evitar cache
   });
 
   // Mutation para sincronizar todas as pastas não sincronizadas com GitHub
