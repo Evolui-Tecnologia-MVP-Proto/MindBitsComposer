@@ -434,36 +434,40 @@ const BibliotecaFluxos = () => {
 
 export default function FluxosPage() {
   return (
-    <div className="p-6 h-full">
-      <div className="mb-6">
+    <div className="flex flex-col h-screen overflow-hidden">
+      {/* Área do título e descrição */}
+      <div className="flex-shrink-0 p-6 pb-4">
         <h1 className="text-3xl font-bold tracking-tight">Fluxos de Documentos</h1>
         <p className="text-muted-foreground">
           Defina e gerencie fluxos de trabalho para seus documentos
         </p>
       </div>
       
-      <Tabs defaultValue="editor" className="h-[calc(100vh-200px)]">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="editor" className="flex items-center space-x-2">
-            <Edit className="h-4 w-4" />
-            <span>Editor</span>
-          </TabsTrigger>
-          <TabsTrigger value="biblioteca" className="flex items-center space-x-2">
-            <BookOpen className="h-4 w-4" />
-            <span>Biblioteca</span>
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="editor" className="h-full mt-4">
-          <ReactFlowProvider>
-            <FlowCanvas />
-          </ReactFlowProvider>
-        </TabsContent>
-        
-        <TabsContent value="biblioteca" className="h-full mt-4 overflow-y-auto">
-          <BibliotecaFluxos />
-        </TabsContent>
-      </Tabs>
+      {/* Área das abas - ocupa todo o espaço restante */}
+      <div className="flex-1 px-6 pb-6 min-h-0">
+        <Tabs defaultValue="editor" className="flex flex-col h-full">
+          <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
+            <TabsTrigger value="editor" className="flex items-center space-x-2">
+              <Edit className="h-4 w-4" />
+              <span>Editor</span>
+            </TabsTrigger>
+            <TabsTrigger value="biblioteca" className="flex items-center space-x-2">
+              <BookOpen className="h-4 w-4" />
+              <span>Biblioteca</span>
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="editor" className="flex-1 mt-4 min-h-0">
+            <ReactFlowProvider>
+              <FlowCanvas />
+            </ReactFlowProvider>
+          </TabsContent>
+          
+          <TabsContent value="biblioteca" className="flex-1 mt-4 min-h-0 overflow-y-auto">
+            <BibliotecaFluxos />
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }
