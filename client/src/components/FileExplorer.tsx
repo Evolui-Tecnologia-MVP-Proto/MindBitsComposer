@@ -181,6 +181,8 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     const rootFolders: FileItem[] = [];
     const folderMap = new Map<string, FileItem>();
 
+    console.log("Estruturas do repositório:", repoStructures);
+
     // Primeiro, criar todos os itens de pasta
     repoStructures.forEach((structure) => {
       const folderItem: FileItem = {
@@ -191,6 +193,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
         children: []
       };
       folderMap.set(structure.uid, folderItem);
+      console.log(`Pasta criada: ${structure.folderName} (${structure.uid})`);
     });
 
     // Depois, organizar hierarquicamente
@@ -200,16 +203,22 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
       if (structure.linkedTo) {
         // É uma subpasta
         const parent = folderMap.get(structure.linkedTo);
+        console.log(`Tentando adicionar ${structure.folderName} como filho de:`, parent?.name);
         if (parent) {
           parent.children = parent.children || [];
           parent.children.push(folderItem);
+          console.log(`${structure.folderName} adicionado como filho de ${parent.name}`);
+        } else {
+          console.log(`Pai não encontrado para ${structure.folderName}`);
         }
       } else {
         // É uma pasta raiz
         rootFolders.push(folderItem);
+        console.log(`${structure.folderName} adicionado como pasta raiz`);
       }
     });
 
+    console.log("Pastas raiz finais:", rootFolders);
     return rootFolders;
   };
 
