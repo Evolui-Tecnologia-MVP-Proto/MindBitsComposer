@@ -103,12 +103,24 @@ export default function DocumentosPage() {
   const fetchGithubRepoStructure = async () => {
     const githubConnection = serviceConnections.find((conn: any) => conn.serviceName === 'github');
     
-    if (!githubConnection || !githubConnection.token || !githubConnection.parameters?.[0]) {
-      console.log('Conexão GitHub não encontrada ou incompleta');
+    console.log('Conexão GitHub encontrada:', githubConnection);
+    console.log('Parameters:', githubConnection?.parameters);
+    
+    if (!githubConnection || !githubConnection.token) {
+      console.log('Conexão GitHub não encontrada ou token ausente');
       return [];
     }
 
-    const [owner, repo] = githubConnection.parameters[0].split('/');
+    // Verificar se o repositório está em parameters[0] ou parameters[1]
+    const repoParam = githubConnection.parameters?.[1] || githubConnection.parameters?.[0];
+    
+    if (!repoParam) {
+      console.log('Repositório não encontrado nos parâmetros');
+      return [];
+    }
+
+    console.log('Repositório encontrado:', repoParam);
+    const [owner, repo] = repoParam.split('/');
     
     setIsLoadingRepo(true);
     try {
