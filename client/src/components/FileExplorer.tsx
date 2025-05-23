@@ -179,35 +179,44 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
 
   // Construir estrutura unificada com status de sincronização
   const buildUnifiedStructure = (): FileItem[] => {
-    const allItems: FileItem[] = [...data];
-    const folderMap = new Map<string, FileItem>();
-
+    const processedItems: FileItem[] = [];
+    const processedNames = new Set<string>();
+    
     console.log("Estruturas do repositório:", repoStructures);
 
-    // Primeiro, processar pastas do GitHub e marcar com status
-    allItems.forEach((item) => {
+    // Primeiro, processar pastas do GitHub
+    data.forEach((item) => {
       if (item.type === 'folder') {
         // Verificar se esta pasta do GitHub existe no banco local
         const localStructure = repoStructures.find((s: any) => s.folderName === item.name);
         
         if (localStructure) {
-          // Pasta existe no banco - usar ID do banco e status de sincronização
-          item.id = localStructure.uid;
-          item.syncStatus = localStructure.isSync ? 'synced' : 'unsynced';
+          // Pasta existe no banco - usar status de sincronização
+          const unifiedItem: FileItem = {
+            ...item,
+            id: localStructure.uid,
+            syncStatus: localStructure.isSync ? 'synced' : 'unsynced'
+          };
+          processedItems.push(unifiedItem);
         } else {
           // Pasta existe no GitHub mas não no banco local
-          item.syncStatus = 'github-only';
+          const unifiedItem: FileItem = {
+            ...item,
+            syncStatus: 'github-only'
+          };
+          processedItems.push(unifiedItem);
         }
+        processedNames.add(item.name);
+      } else {
+        // Arquivos sempre são incluídos sem modificação
+        processedItems.push(item);
       }
-      folderMap.set(item.id, item);
     });
 
     // Depois, adicionar pastas locais que não existem no GitHub
+    const localOnlyFolders: FileItem[] = [];
     repoStructures.forEach((structure: any) => {
-      const existingItem = allItems.find(item => item.name === structure.folderName);
-      
-      if (!existingItem) {
-        // Pasta existe apenas localmente
+      if (!processedNames.has(structure.folderName)) {
         const folderItem: FileItem = {
           id: structure.uid,
           name: structure.folderName,
@@ -217,25 +226,23 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
           syncStatus: structure.isSync ? 'synced' : 'unsynced'
         };
         
-        if (structure.linkedTo) {
-          // É uma subpasta - adicionar ao pai
-          const parent = folderMap.get(structure.linkedTo) || allItems.find(item => 
+        if (!structure.linkedTo) {
+          // É uma pasta raiz local
+          localOnlyFolders.push(folderItem);
+        } else {
+          // É uma subpasta - encontrar o pai na estrutura processada
+          const parent = processedItems.find(item => 
             repoStructures.find((s: any) => s.uid === structure.linkedTo && s.folderName === item.name)
           );
           if (parent) {
             parent.children = parent.children || [];
             parent.children.push(folderItem);
           }
-        } else {
-          // É uma pasta raiz
-          allItems.push(folderItem);
         }
-        
-        folderMap.set(folderItem.id, folderItem);
       }
     });
 
-    return allItems;
+    return [...processedItems, ...localOnlyFolders];
   };
 
   const unifiedData = buildUnifiedStructure();
