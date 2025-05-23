@@ -6,7 +6,7 @@ import { users, templates, mondayMappings, mondayColumns, mappingColumns, servic
   type DocumentArtifact, type InsertDocumentArtifact, type RepoStructure, type InsertRepoStructure,
   UserStatus, UserRole, TemplateType, PluginStatus, PluginType } from "@shared/schema";
 import { db } from "./db";
-import { eq, and } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 import connectPg from "connect-pg-simple";
@@ -642,6 +642,66 @@ export class DatabaseStorage implements IStorage {
       .delete(documentsArtifacts)
       .where(eq(documentsArtifacts.id, id));
   }
+
+  // Repo Structure operations
+  async getRepoStructure(uid: string): Promise<RepoStructure | undefined> {
+    const [structure] = await db.select().from(repoStructure).where(eq(repoStructure.uid, uid));
+    return structure || undefined;
+  }
+
+  async getAllRepoStructures(): Promise<RepoStructure[]> {
+    return await db.select().from(repoStructure);
+  }
+
+  async getRepoStructureByParent(parentUid?: string): Promise<RepoStructure[]> {
+    if (parentUid) {
+      return await db.select().from(repoStructure).where(eq(repoStructure.linkedTo, parentUid));
+    } else {
+      return await db.select().from(repoStructure).where(isNull(repoStructure.linkedTo));
+    }
+  }
+
+  async createRepoStructure(structureData: InsertRepoStructure): Promise<RepoStructure> {
+    const [structure] = await db
+      .insert(repoStructure)
+      .values(structureData)
+      .returning();
+    return structure;
+  }
+
+  async updateRepoStructure(uid: string, data: Partial<RepoStructure>): Promise<RepoStructure> {
+    const [updatedStructure] = await db
+      .update(repoStructure)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(repoStructure.uid, uid))
+      .returning();
+    
+    if (!updatedStructure) {
+      throw new Error("Estrutura do repositório não encontrada");
+    }
+    
+    return updatedStructure;
+  }
+
+  async updateRepoStructureSync(uid: string, isSync: boolean): Promise<RepoStructure> {
+    const [updatedStructure] = await db
+      .update(repoStructure)
+      .set({ isSync, updatedAt: new Date() })
+      .where(eq(repoStructure.uid, uid))
+      .returning();
+    
+    if (!updatedStructure) {
+      throw new Error("Estrutura do repositório não encontrada");
+    }
+    
+    return updatedStructure;
+  }
+
+  async deleteRepoStructure(uid: string): Promise<void> {
+    await db
+      .delete(repoStructure)
+      .where(eq(repoStructure.uid, uid));
+  }
 }
 
 export class MemStorage implements IStorage {
@@ -654,6 +714,7 @@ export class MemStorage implements IStorage {
   private plugins: Map<string, Plugin>;
   private documentos: Map<string, Documento>;
   private documentArtifacts: Map<string, DocumentArtifact>;
+  private repoStructures: Map<string, RepoStructure>;
   private mondayApiKey: string | undefined; // Legado
   sessionStore: session.Store;
   currentId: number;
@@ -668,6 +729,7 @@ export class MemStorage implements IStorage {
     this.plugins = new Map();
     this.documentos = new Map();
     this.documentArtifacts = new Map();
+    this.repoStructures = new Map();
     this.mondayApiKey = undefined;
     this.currentId = 1;
     this.sessionStore = new MemoryStore({
