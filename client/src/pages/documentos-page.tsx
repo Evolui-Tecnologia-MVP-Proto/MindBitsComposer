@@ -66,7 +66,10 @@ export default function DocumentosPage() {
   const [artifactFormData, setArtifactFormData] = useState<InsertDocumentArtifact>({
     documentoId: "",
     name: "",
-    file: "",
+    fileData: "",
+    fileName: "",
+    fileSize: "",
+    mimeType: "",
     type: "",
   });
   const [formData, setFormData] = useState<InsertDocumento>({
@@ -247,7 +250,10 @@ export default function DocumentosPage() {
     setArtifactFormData({
       documentoId: "",
       name: "",
-      file: "",
+      fileData: "",
+      fileName: "",
+      fileSize: "",
+      mimeType: "",
       type: "",
     });
     setSelectedArtifact(null);
@@ -264,7 +270,10 @@ export default function DocumentosPage() {
     setArtifactFormData({
       documentoId: artifact.documentoId,
       name: artifact.name,
-      file: artifact.file,
+      fileData: artifact.fileData,
+      fileName: artifact.fileName,
+      fileSize: artifact.fileSize || "",
+      mimeType: artifact.mimeType,
       type: artifact.type,
     });
     setIsEditArtifactModalOpen(true);
@@ -387,6 +396,51 @@ export default function DocumentosPage() {
   const cancelDelete = () => {
     setIsDeleteConfirmOpen(false);
     setDocumentToDelete(null);
+  };
+
+  // Função para converter arquivo em Base64
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        // Remove o prefixo "data:tipo/mime;base64," para armazenar apenas o Base64
+        const base64 = result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Função para processar upload de arquivo
+  const handleFileUpload = async (file: File) => {
+    try {
+      const base64Data = await convertFileToBase64(file);
+      const fileSizeInBytes = file.size.toString();
+      
+      setArtifactFormData({
+        ...artifactFormData,
+        fileData: base64Data,
+        fileName: file.name,
+        fileSize: fileSizeInBytes,
+        mimeType: file.type,
+        type: getFileTypeFromMime(file.type),
+      });
+    } catch (error) {
+      console.error('Erro ao processar arquivo:', error);
+      alert('Erro ao processar o arquivo');
+    }
+  };
+
+  // Função para determinar tipo do arquivo baseado no MIME type
+  const getFileTypeFromMime = (mimeType: string): string => {
+    if (mimeType.startsWith('image/')) return 'imagem';
+    if (mimeType.includes('pdf')) return 'pdf';
+    if (mimeType.includes('word') || mimeType.includes('document')) return 'doc';
+    if (mimeType.includes('text')) return 'txt';
+    if (mimeType.includes('json')) return 'json';
+    return 'outro';
   };
 
   const renderDocumentosTable = (documentos: Documento[]) => (
@@ -638,7 +692,7 @@ export default function DocumentosPage() {
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Paperclip className="h-4 w-4 text-gray-400" />
-                              <span className="text-sm text-gray-600">{artifact.file}</span>
+                              <span className="text-sm text-gray-600">{artifact.fileName}</span>
                             </div>
                           </TableCell>
                           <TableCell className="text-sm text-gray-500">
