@@ -1439,87 +1439,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/repo-structure/:uid/sync-github", async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
-    
-    try {
-      const { uid } = req.params;
-      console.log(`🔄 ENDPOINT RECEBIDO - Sincronizando UID: ${uid}`);
-      const structure = await storage.getRepoStructure(uid);
-      console.log(`📁 Estrutura encontrada:`, structure);
-      
-      if (!structure) {
-        return res.status(404).send("Estrutura não encontrada");
-      }
-
-      // Buscar conexão GitHub
-      const githubConnection = await storage.getServiceConnection("github");
-      if (!githubConnection) {
-        return res.status(400).send("Conexão GitHub não encontrada");
-      }
-
-      const [owner, repo] = githubConnection.parameters[0].split('/');
-      
-      // Construir caminho da pasta
-      let folderPath = structure.folderName;
-      let parent = structure.linkedTo ? await storage.getRepoStructure(structure.linkedTo) : null;
-      
-      while (parent) {
-        folderPath = `${parent.folderName}/${folderPath}`;
-        parent = parent.linkedTo ? await storage.getRepoStructure(parent.linkedTo) : null;
-      }
-
-      console.log(`Sincronizando pasta: ${structure.folderName} -> caminho: ${folderPath}`);
-
-      // Primeiro, verificar se a pasta já existe no GitHub
-      const checkResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${folderPath}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `token ${githubConnection.token}`,
-        },
-      });
-
-      if (checkResponse.ok) {
-        // Pasta já existe no GitHub, apenas marcar como sincronizada
-        console.log(`Pasta ${folderPath} já existe no GitHub, marcando como sincronizada`);
-        await storage.updateRepoStructureSync(uid, true);
-        res.json({ success: true, message: "Pasta já existe no GitHub e foi marcada como sincronizada" });
-      } else if (checkResponse.status === 404) {
-        // Pasta não existe, criar nova
-        console.log(`Pasta ${folderPath} não existe, criando nova`);
-        const createResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${folderPath}/.gitkeep`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `token ${githubConnection.token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            message: `Criar pasta ${folderPath}`,
-            content: Buffer.from('# Pasta criada pelo EVO-MindBits Composer').toString('base64')
-          })
-        });
-
-        if (createResponse.ok) {
-          console.log(`Pasta ${folderPath} criada com sucesso no GitHub`);
-          await storage.updateRepoStructureSync(uid, true);
-          res.json({ success: true, message: "Pasta criada no GitHub com sucesso" });
-        } else {
-          const errorData = await createResponse.json();
-          console.log(`Erro ao criar pasta ${folderPath}:`, errorData);
-          res.status(400).json({ success: false, message: errorData.message });
-        }
-      } else {
-        // Outro erro
-        const errorData = await checkResponse.json();
-        console.log(`Erro ao verificar pasta ${folderPath}:`, errorData);
-        res.status(400).json({ success: false, message: errorData.message });
-      }
-    } catch (error: any) {
-      console.error("Erro ao sincronizar com GitHub:", error);
-      res.status(500).send("Erro ao sincronizar com GitHub");
-    }
-  });
-
   // Endpoint para sincronizar estrutura do GitHub para o banco local
   app.post("/api/repo-structure/sync-from-github", async (req, res) => {
     try {
@@ -1640,6 +1559,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Erro ao sincronizar do GitHub:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Endpoint para sincronizar pasta individual com GitHub (DEVE vir DEPOIS do sync-from-github)
+  app.post("/api/repo-structure/:uid/sync-github", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { uid } = req.params;
+      console.log(`🔄 ENDPOINT RECEBIDO - Sincronizando UID: ${uid}`);
+      const structure = await storage.getRepoStructure(uid);
+      console.log(`📁 Estrutura encontrada:`, structure);
+      
+      if (!structure) {
+        return res.status(404).send("Estrutura não encontrada");
+      }
+
+      // Buscar conexão GitHub
+      const githubConnection = await storage.getServiceConnection("github");
+      if (!githubConnection) {
+        return res.status(400).send("Conexão GitHub não encontrada");
+      }
+
+      const [owner, repo] = githubConnection.parameters[0].split('/');
+      
+      // Construir caminho da pasta
+      let folderPath = structure.folderName;
+      let parent = structure.linkedTo ? await storage.getRepoStructure(structure.linkedTo) : null;
+      
+      while (parent) {
+        folderPath = `${parent.folderName}/${folderPath}`;
+        parent = parent.linkedTo ? await storage.getRepoStructure(parent.linkedTo) : null;
+      }
+
+      console.log(`Sincronizando pasta: ${structure.folderName} -> caminho: ${folderPath}`);
+
+      // Primeiro, verificar se a pasta já existe no GitHub
+      const checkResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${folderPath}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `token ${githubConnection.token}`,
+        },
+      });
+
+      if (checkResponse.ok) {
+        // Pasta já existe no GitHub, apenas marcar como sincronizada
+        console.log(`Pasta ${folderPath} já existe no GitHub, marcando como sincronizada`);
+        await storage.updateRepoStructureSync(uid, true);
+        res.json({ success: true, message: "Pasta já existe no GitHub e foi marcada como sincronizada" });
+      } else if (checkResponse.status === 404) {
+        // Pasta não existe, criar nova
+        console.log(`Pasta ${folderPath} não existe, criando nova`);
+        const createResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${folderPath}/.gitkeep`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${githubConnection.token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message: `Criar pasta ${folderPath}`,
+            content: Buffer.from('# Pasta criada pelo EVO-MindBits Composer').toString('base64')
+          })
+        });
+
+        if (createResponse.ok) {
+          console.log(`Pasta ${folderPath} criada com sucesso no GitHub`);
+          await storage.updateRepoStructureSync(uid, true);
+          res.json({ success: true, message: "Pasta criada no GitHub com sucesso" });
+        } else {
+          const errorData = await createResponse.json();
+          console.log(`Erro ao criar pasta ${folderPath}:`, errorData);
+          res.status(400).json({ success: false, message: errorData.message });
+        }
+      } else {
+        // Outro erro
+        const errorData = await checkResponse.json();
+        console.log(`Erro ao verificar pasta ${folderPath}:`, errorData);
+        res.status(400).json({ success: false, message: errorData.message });
+      }
+    } catch (error: any) {
+      console.error("Erro ao sincronizar com GitHub:", error);
+      res.status(500).send("Erro ao sincronizar com GitHub");
     }
   });
 
