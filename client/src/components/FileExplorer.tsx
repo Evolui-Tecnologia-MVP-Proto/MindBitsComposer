@@ -15,7 +15,7 @@ interface FileItem {
   size?: string;
   modified?: string;
   children?: FileItem[];
-  syncStatus?: 'synced' | 'unsynced' | 'github-only';
+  syncStatus?: 'synced' | 'unsynced' | 'github-only' | 'local-only';
 }
 
 interface RepoStructure {
@@ -380,8 +380,8 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
             {getStatusBadge(item.syncStatus)}
           </div>
           
-          {/* Botão de exclusão que aparece no hover - para pastas sincronizadas e não sincronizadas */}
-          {(item.syncStatus === 'synced' || item.syncStatus === 'unsynced') && (
+          {/* Botão de exclusão que aparece no hover - para pastas do banco local */}
+          {(item.syncStatus === 'synced' || item.syncStatus === 'unsynced' || item.syncStatus === 'local-only') && (
             <Button
               variant="ghost"
               size="sm"
