@@ -145,7 +145,11 @@ export default function DocumentosPage() {
         });
       }
       
+      // Atualizar estrutura local para refletir as alterações
       queryClient.invalidateQueries({ queryKey: ["/api/repo-structure"] });
+      
+      // Atualizar estrutura do GitHub também para refletir as pastas sincronizadas
+      fetchGithubRepoStructure();
     },
     onError: (error: any) => {
       toast({
