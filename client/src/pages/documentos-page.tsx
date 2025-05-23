@@ -614,97 +614,142 @@ export default function DocumentosPage() {
   // Modal para criar novo documento
   const renderCreateModal = () => (
     <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
-          <DialogTitle>Criar Novo Documento</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Plus className="h-5 w-5 text-blue-500" />
+            Criar Novo Documento
+          </DialogTitle>
           <DialogDescription>
-            Preencha os dados do novo documento
+            Preencha os dados do novo documento e gerencie seus anexos
           </DialogDescription>
         </DialogHeader>
         
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="origem">Origem</Label>
-              <Input
-                id="origem"
-                value={formData.origem}
-                onChange={(e) => setFormData({ ...formData, origem: e.target.value })}
-                placeholder="Ex: Monday, EVO-CTx"
-              />
-            </div>
-            <div>
-              <Label htmlFor="cliente">Cliente</Label>
-              <Input
-                id="cliente"
-                value={formData.cliente}
-                onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
-                placeholder="Nome do cliente"
-              />
-            </div>
-          </div>
+        <Tabs defaultValue="dados-gerais" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="dados-gerais">Dados Gerais</TabsTrigger>
+            <TabsTrigger value="anexos">Anexos</TabsTrigger>
+          </TabsList>
           
-          <div>
-            <Label htmlFor="objeto">Objeto/Nome</Label>
-            <Input
-              id="objeto"
-              value={formData.objeto}
-              onChange={(e) => setFormData({ ...formData, objeto: e.target.value })}
-              placeholder="Nome do documento"
-            />
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="responsavel">Responsável</Label>
-              <Input
-                id="responsavel"
-                value={formData.responsavel}
-                onChange={(e) => setFormData({ ...formData, responsavel: e.target.value })}
-                placeholder="Responsável"
-              />
+          <TabsContent value="dados-gerais" className="mt-6">
+            <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="origem">Origem</Label>
+                  <Input
+                    id="origem"
+                    value={formData.origem}
+                    onChange={(e) => setFormData({ ...formData, origem: e.target.value })}
+                    placeholder="Ex: Monday, EVO-CTx"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="cliente">Cliente</Label>
+                  <Input
+                    id="cliente"
+                    value={formData.cliente}
+                    onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
+                    placeholder="Nome do cliente"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="objeto">Objeto/Nome</Label>
+                <Input
+                  id="objeto"
+                  value={formData.objeto}
+                  onChange={(e) => setFormData({ ...formData, objeto: e.target.value })}
+                  placeholder="Nome do documento"
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="responsavel">Responsável</Label>
+                  <Input
+                    id="responsavel"
+                    value={formData.responsavel}
+                    onChange={(e) => setFormData({ ...formData, responsavel: e.target.value })}
+                    placeholder="Responsável"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="sistema">Sistema</Label>
+                  <Input
+                    id="sistema"
+                    value={formData.sistema}
+                    onChange={(e) => setFormData({ ...formData, sistema: e.target.value })}
+                    placeholder="Sistema"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="modulo">Módulo</Label>
+                <Input
+                  id="modulo"
+                  value={formData.modulo}
+                  onChange={(e) => setFormData({ ...formData, modulo: e.target.value })}
+                  placeholder="Módulo"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="descricao">Descrição</Label>
+                <Input
+                  id="descricao"
+                  value={formData.descricao}
+                  onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+                  placeholder="Descrição do documento"
+                />
+              </div>
             </div>
-            <div>
-              <Label htmlFor="sistema">Sistema</Label>
-              <Input
-                id="sistema"
-                value={formData.sistema}
-                onChange={(e) => setFormData({ ...formData, sistema: e.target.value })}
-                placeholder="Sistema"
-              />
+          </TabsContent>
+          
+          <TabsContent value="anexos" className="mt-6">
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-medium">Anexos do Documento</h3>
+                <Button 
+                  onClick={openAddArtifactModal}
+                  className="bg-blue-600 hover:bg-blue-700"
+                  size="sm"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Adicionar Anexo
+                </Button>
+              </div>
+              
+              <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed">
+                <Paperclip className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+                <p className="text-sm text-gray-500 mb-3">Adicione anexos após criar o documento</p>
+                <p className="text-xs text-gray-400">Os anexos poderão ser gerenciados após a criação</p>
+              </div>
             </div>
-          </div>
-          
-          <div>
-            <Label htmlFor="modulo">Módulo</Label>
-            <Input
-              id="modulo"
-              value={formData.modulo}
-              onChange={(e) => setFormData({ ...formData, modulo: e.target.value })}
-              placeholder="Módulo"
-            />
-          </div>
-          
-          <div>
-            <Label htmlFor="descricao">Descrição</Label>
-            <Input
-              id="descricao"
-              value={formData.descricao}
-              onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-              placeholder="Descrição do documento"
-            />
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
         
-        <DialogFooter>
+        <DialogFooter className="mt-6">
           <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>
             Cancelar
           </Button>
           <Button 
             onClick={handleCreateDocument} 
             disabled={createDocumentoMutation.isPending}
+            className="bg-blue-600 hover:bg-blue-700"
           >
-            {createDocumentoMutation.isPending ? "Criando..." : "Criar Documento"}
+            {createDocumentoMutation.isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Criando...
+              </>
+            ) : (
+              <>
+                <Plus className="mr-2 h-4 w-4" />
+                Criar Documento
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
