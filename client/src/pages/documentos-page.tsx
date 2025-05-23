@@ -143,6 +143,29 @@ export default function DocumentosPage() {
         const fileStructure = await buildFileTree(contents, githubConnection.token, owner, repo);
         setGithubRepoFiles(fileStructure);
         return fileStructure;
+      } else if (response.status === 404) {
+        // Repositório vazio - criar README.md
+        console.log('Repositório vazio, criando README.md...');
+        await createReadmeFile(githubConnection.token, owner, repo);
+        
+        // Tentar buscar novamente após criar o arquivo
+        const retryResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents`, {
+          headers: {
+            'Authorization': `token ${githubConnection.token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'User-Agent': 'EVO-MindBits-Composer',
+          },
+        });
+        
+        if (retryResponse.ok) {
+          const contents = await retryResponse.json();
+          console.log('Conteúdo recebido após criar README:', contents);
+          const fileStructure = await buildFileTree(contents, githubConnection.token, owner, repo);
+          setGithubRepoFiles(fileStructure);
+          return fileStructure;
+        }
+        
+        return [];
       } else {
         const errorText = await response.text();
         console.error('Erro ao buscar repositório:', response.status, errorText);
@@ -216,6 +239,51 @@ export default function DocumentosPage() {
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  };
+
+  // Função para criar arquivo README.md no repositório
+  const createReadmeFile = async (token: string, owner: string, repo: string) => {
+    const readmeContent = `# ${repo}
+
+Este repositório foi criado para armazenar documentação técnica e empresarial do sistema ${repo}.
+
+## Estrutura
+
+- \`docs/\` - Documentação técnica
+- \`specs/\` - Especificações e requisitos
+- \`templates/\` - Templates de documentos
+
+## EVO-MindBits Composer
+
+Este repositório está integrado com o EVO-MindBits Composer para gestão automatizada de documentação.
+`;
+
+    try {
+      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/README.md`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'EVO-MindBits-Composer',
+        },
+        body: JSON.stringify({
+          message: 'Criar README.md inicial via EVO-MindBits Composer',
+          content: btoa(readmeContent), // Base64 encode
+        }),
+      });
+
+      if (response.ok) {
+        console.log('README.md criado com sucesso!');
+        return true;
+      } else {
+        const errorText = await response.text();
+        console.error('Erro ao criar README.md:', response.status, errorText);
+        return false;
+      }
+    } catch (error) {
+      console.error('Erro na criação do README.md:', error);
+      return false;
+    }
   };
 
   // Carregar estrutura do repositório quando houver conexão GitHub
