@@ -241,8 +241,9 @@ export default function DocumentosPage() {
       
       if (response.ok) {
         const files = await response.json();
-        // Incluir todos os arquivos, incluindo .gitkeep
-        const fileList = Array.isArray(files) ? files.filter((item: any) => item.type === 'file') : [];
+        // Filtrar arquivos, excluindo .gitkeep que são apenas para sincronização
+        const fileList = Array.isArray(files) ? 
+          files.filter((item: any) => item.type === 'file' && item.name !== '.gitkeep') : [];
         setSelectedFolderFiles(fileList);
       } else if (response.status === 404) {
         // Pasta vazia ou não existe - mostrar mensagem apropriada
