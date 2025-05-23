@@ -927,6 +927,7 @@ export default function DocumentosPage() {
             <TabsTrigger value="integrados">Integrados</TabsTrigger>
             <TabsTrigger value="em-processo">Em Processo</TabsTrigger>
             <TabsTrigger value="distribuidos">Distribuídos</TabsTrigger>
+            <TabsTrigger value="repositorio">Repositório</TabsTrigger>
           </TabsList>
           
           <TabsContent value="integrados" className="slide-in">
@@ -951,6 +952,84 @@ export default function DocumentosPage() {
             ) : (
               renderDocumentosTable(documentosConcluidos)
             )}
+          </TabsContent>
+          
+          <TabsContent value="repositorio" className="slide-in">
+            <div className="space-y-6">
+              <div className="bg-white rounded-lg border p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">Integração com Repositório GitHub</h3>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Gerencie documentos sincronizados com o repositório configurado
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Button variant="outline" size="sm">
+                      <Download className="h-4 w-4 mr-2" />
+                      Sincronizar
+                    </Button>
+                    <Button className="bg-green-600 hover:bg-green-700" size="sm">
+                      <Upload className="h-4 w-4 mr-2" />
+                      Enviar para GitHub
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  <div className="text-center p-4 bg-blue-50 rounded-lg">
+                    <div className="text-2xl font-bold text-blue-600">15</div>
+                    <div className="text-sm text-gray-600">Documentos Sincronizados</div>
+                  </div>
+                  <div className="text-center p-4 bg-orange-50 rounded-lg">
+                    <div className="text-2xl font-bold text-orange-600">3</div>
+                    <div className="text-sm text-gray-600">Pendentes de Envio</div>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">12</div>
+                    <div className="text-sm text-gray-600">Commits Este Mês</div>
+                  </div>
+                </div>
+                
+                <div className="border-t pt-6">
+                  <h4 className="font-medium text-gray-900 mb-4">Últimas Sincronizações</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                        <div>
+                          <div className="font-medium text-sm">Manual do Sistema CPx</div>
+                          <div className="text-xs text-gray-500">Atualizado há 2 horas</div>
+                        </div>
+                      </div>
+                      <Badge variant="secondary" className="text-xs">Sincronizado</Badge>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                        <div>
+                          <div className="font-medium text-sm">Especificação de Requisitos</div>
+                          <div className="text-xs text-gray-500">Modificado há 1 dia</div>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="text-xs">Pendente</Badge>
+                    </div>
+                    
+                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                        <div>
+                          <div className="font-medium text-sm">Documentação de API</div>
+                          <div className="text-xs text-gray-500">Sincronizado há 3 dias</div>
+                        </div>
+                      </div>
+                      <Badge variant="secondary" className="text-xs">Sincronizado</Badge>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
