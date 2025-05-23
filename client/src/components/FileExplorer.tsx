@@ -15,6 +15,7 @@ interface FileItem {
   size?: string;
   modified?: string;
   children?: FileItem[];
+  syncStatus?: 'synced' | 'unsynced' | 'github-only';
 }
 
 interface RepoStructure {
@@ -176,60 +177,109 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     });
   };
 
-  // Construir estrutura hierárquica das pastas locais
-  const buildLocalHierarchy = (): FileItem[] => {
-    const rootFolders: FileItem[] = [];
+  // Construir estrutura unificada com status de sincronização
+  const buildUnifiedStructure = (): FileItem[] => {
+    const allItems: FileItem[] = [...data];
     const folderMap = new Map<string, FileItem>();
 
     console.log("Estruturas do repositório:", repoStructures);
 
-    // Primeiro, criar todos os itens de pasta
-    repoStructures.forEach((structure) => {
-      const folderItem: FileItem = {
-        id: structure.uid,
-        name: structure.folderName,
-        type: 'folder',
-        path: structure.folderName,
-        children: []
-      };
-      folderMap.set(structure.uid, folderItem);
-      console.log(`Pasta criada: ${structure.folderName} (${structure.uid})`);
+    // Primeiro, processar pastas do GitHub e marcar com status
+    allItems.forEach((item) => {
+      if (item.type === 'folder') {
+        // Verificar se esta pasta do GitHub existe no banco local
+        const localStructure = repoStructures.find((s: any) => s.folderName === item.name);
+        
+        if (localStructure) {
+          // Pasta existe no banco - usar ID do banco e status de sincronização
+          item.id = localStructure.uid;
+          item.syncStatus = localStructure.isSync ? 'synced' : 'unsynced';
+        } else {
+          // Pasta existe no GitHub mas não no banco local
+          item.syncStatus = 'github-only';
+        }
+      }
+      folderMap.set(item.id, item);
     });
 
-    // Depois, organizar hierarquicamente
-    repoStructures.forEach((structure) => {
-      const folderItem = folderMap.get(structure.uid)!;
+    // Depois, adicionar pastas locais que não existem no GitHub
+    repoStructures.forEach((structure: any) => {
+      const existingItem = allItems.find(item => item.name === structure.folderName);
       
-      if (structure.linkedTo) {
-        // É uma subpasta
-        const parent = folderMap.get(structure.linkedTo);
-        console.log(`Tentando adicionar ${structure.folderName} como filho de:`, parent?.name);
-        if (parent) {
-          parent.children = parent.children || [];
-          parent.children.push(folderItem);
-          console.log(`${structure.folderName} adicionado como filho de ${parent.name}`);
+      if (!existingItem) {
+        // Pasta existe apenas localmente
+        const folderItem: FileItem = {
+          id: structure.uid,
+          name: structure.folderName,
+          type: 'folder',
+          path: structure.folderName,
+          children: [],
+          syncStatus: structure.isSync ? 'synced' : 'unsynced'
+        };
+        
+        if (structure.linkedTo) {
+          // É uma subpasta - adicionar ao pai
+          const parent = folderMap.get(structure.linkedTo) || allItems.find(item => 
+            repoStructures.find((s: any) => s.uid === structure.linkedTo && s.folderName === item.name)
+          );
+          if (parent) {
+            parent.children = parent.children || [];
+            parent.children.push(folderItem);
+          }
         } else {
-          console.log(`Pai não encontrado para ${structure.folderName}`);
+          // É uma pasta raiz
+          allItems.push(folderItem);
         }
-      } else {
-        // É uma pasta raiz
-        rootFolders.push(folderItem);
-        console.log(`${structure.folderName} adicionado como pasta raiz`);
+        
+        folderMap.set(folderItem.id, folderItem);
       }
     });
 
-    console.log("Pastas raiz finais:", rootFolders);
-    return rootFolders;
+    return allItems;
   };
 
-  const localFolders = buildLocalHierarchy();
-  
-  // Combinar dados do GitHub com estrutura local hierárquica
-  const combinedData = [...data, ...localFolders];
+  const unifiedData = buildUnifiedStructure();
+
+  const getStatusColor = (syncStatus?: string) => {
+    switch (syncStatus) {
+      case 'synced':
+        return 'text-green-500'; // Verde para sincronizadas
+      case 'unsynced':
+        return 'text-red-500'; // Vermelho para não sincronizadas
+      case 'github-only':
+        return 'text-yellow-500'; // Amarelo para GitHub apenas
+      default:
+        return 'text-blue-500'; // Azul padrão
+    }
+  };
+
+  const getStatusBadge = (syncStatus?: string) => {
+    switch (syncStatus) {
+      case 'synced':
+        return (
+          <Badge variant="outline" className="text-xs text-green-600 border-green-200">
+            ✓ Sincronizada
+          </Badge>
+        );
+      case 'unsynced':
+        return (
+          <Badge variant="outline" className="text-xs text-red-600 border-red-200">
+            <AlertCircle className="h-3 w-3 mr-1" />
+            Não sincronizada
+          </Badge>
+        );
+      case 'github-only':
+        return (
+          <Badge variant="outline" className="text-xs text-yellow-600 border-yellow-200">
+            ⚠ Apenas no GitHub
+          </Badge>
+        );
+      default:
+        return null;
+    }
+  };
 
   const renderFolderWithStatus = (item: FileItem, level: number = 0) => {
-    // Encontrar a estrutura correspondente para mostrar o status
-    const structure = repoStructures.find(s => s.uid === item.id);
     const isExpanded = expandedFolders.has(item.id);
     const paddingLeft = `${level * 20 + 8}px`;
 
@@ -256,20 +306,9 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
                 <ChevronRight className="h-3 w-3" />
               )}
             </Button>
-            <Folder className="h-4 w-4 text-blue-500" />
+            <Folder className={`h-4 w-4 ${getStatusColor(item.syncStatus)}`} />
             <span className="text-sm text-gray-700">{item.name}</span>
-            
-            {structure && !structure.isSync && (
-              <Badge variant="outline" className="text-xs text-orange-600 border-orange-200">
-                <AlertCircle className="h-3 w-3 mr-1" />
-                Não sincronizada
-              </Badge>
-            )}
-            {structure && structure.isSync && (
-              <Badge variant="outline" className="text-xs text-green-600 border-green-200">
-                ✓ Sincronizada
-              </Badge>
-            )}
+            {getStatusBadge(item.syncStatus)}
           </div>
         </div>
         
@@ -302,17 +341,11 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
       </div>
       
       <div className="p-2 max-h-96 overflow-y-auto">
-        {/* Renderizar arquivos/pastas do GitHub */}
-        {renderFileTree(data)}
-        
-        {/* Renderizar pastas locais hierárquicas */}
-        {localFolders.length > 0 && (
-          <div className="mt-3 pt-3 border-t border-gray-100">
-            <div className="text-xs text-gray-500 mb-2 px-2 font-medium">
-              Pastas criadas localmente:
-            </div>
-            {localFolders.map((folder) => renderFolderWithStatus(folder))}
-          </div>
+        {/* Renderizar estrutura unificada com cores de status */}
+        {unifiedData.map((item) => 
+          item.type === 'folder' 
+            ? renderFolderWithStatus(item)
+            : renderFileTree([item])
         )}
       </div>
 
