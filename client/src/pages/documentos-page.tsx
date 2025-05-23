@@ -1243,7 +1243,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       ) : (
                         <Upload className="h-4 w-4 mr-2" />
                       )}
-                      {syncAllToGitHubMutation.isPending ? 'Enviando...' : 'Enviar para GitHub'}
+                      {syncAllToGitHubMutation.isPending ? 'Enviando...' : `Enviar para GitHub (${repoStructures.filter((folder: any) => !folder.isSync).length})`}
                     </Button>
                   </div>
                 </div>
