@@ -91,10 +91,11 @@ export default function DocumentosPage() {
     queryKey: ["/api/documentos"],
   });
 
-  // Buscar artefatos do documento selecionado
+  // Buscar artefatos do documento selecionado (para visualização ou edição)
+  const currentDocumentId = selectedDocument?.id || editingDocument?.id;
   const { data: artifacts = [], isLoading: isLoadingArtifacts } = useQuery<DocumentArtifact[]>({
-    queryKey: ["/api/documentos", selectedDocument?.id, "artifacts"],
-    enabled: !!selectedDocument?.id,
+    queryKey: ["/api/documentos", currentDocumentId, "artifacts"],
+    enabled: !!currentDocumentId,
   });
 
   // Mutation para criar documento
