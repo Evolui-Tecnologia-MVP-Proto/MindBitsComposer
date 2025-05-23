@@ -532,8 +532,16 @@ export default function ConfiguracoesPage() {
                       <div className="space-y-2">
                         <div className="flex space-x-2">
                           <Input {...field} type="password" autoComplete="off" className="flex-1" />
-                          {/* Botão Conectar - sempre mostrar para teste */}
-                          {true && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="bg-yellow-100 border-yellow-500 text-yellow-700"
+                          >
+                            Conectar
+                          </Button>
+                          {/* Botão Conectar original - teste se aparece */}
+                          {false && (
                             <Button
                               type="button"
                               variant="outline"
