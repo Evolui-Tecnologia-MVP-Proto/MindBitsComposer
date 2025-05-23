@@ -231,12 +231,17 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
           localOnlyFolders.push(folderItem);
         } else {
           // É uma subpasta - encontrar o pai na estrutura processada
-          const parent = processedItems.find(item => 
-            repoStructures.find((s: any) => s.uid === structure.linkedTo && s.folderName === item.name)
-          );
-          if (parent) {
-            parent.children = parent.children || [];
-            parent.children.push(folderItem);
+          const parentStructure = repoStructures.find((s: any) => s.uid === structure.linkedTo);
+          if (parentStructure) {
+            const parent = processedItems.find(item => item.name === parentStructure.folderName);
+            if (parent) {
+              parent.children = parent.children || [];
+              // Verificar se já não existe para evitar duplicação
+              const existingChild = parent.children.find(child => child.id === folderItem.id);
+              if (!existingChild) {
+                parent.children.push(folderItem);
+              }
+            }
           }
         }
       }
