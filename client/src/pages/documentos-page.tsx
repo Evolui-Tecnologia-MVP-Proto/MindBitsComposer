@@ -172,7 +172,7 @@ export default function DocumentosPage() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/documentos", selectedDocument?.id, "artifacts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos", currentDocumentId, "artifacts"] });
       setIsAddArtifactModalOpen(false);
       resetArtifactForm();
     },
@@ -190,7 +190,7 @@ export default function DocumentosPage() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/documentos", selectedDocument?.id, "artifacts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos", currentDocumentId, "artifacts"] });
       setIsEditArtifactModalOpen(false);
       resetArtifactForm();
     },
@@ -205,7 +205,7 @@ export default function DocumentosPage() {
       if (!response.ok) throw new Error("Erro ao excluir artefato");
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/documentos", selectedDocument?.id, "artifacts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos", currentDocumentId, "artifacts"] });
     },
   });
 
