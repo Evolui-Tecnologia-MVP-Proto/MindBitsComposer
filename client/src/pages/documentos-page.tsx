@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import FileExplorer from "@/components/FileExplorer";
 import {
   Table,
   TableBody,
@@ -992,39 +993,113 @@ export default function DocumentosPage() {
                 </div>
                 
                 <div className="border-t pt-6">
-                  <h4 className="font-medium text-gray-900 mb-4">Últimas Sincronizações</h4>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                        <div>
-                          <div className="font-medium text-sm">Manual do Sistema CPx</div>
-                          <div className="text-xs text-gray-500">Atualizado há 2 horas</div>
-                        </div>
-                      </div>
-                      <Badge variant="secondary" className="text-xs">Sincronizado</Badge>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-4">Estrutura do Repositório</h4>
+                      <FileExplorer 
+                        data={[
+                          {
+                            id: 'root',
+                            name: 'evoluitecnologia/mindbits-docs',
+                            type: 'folder',
+                            path: '/',
+                            children: [
+                              {
+                                id: 'docs',
+                                name: 'docs',
+                                type: 'folder',
+                                path: '/docs',
+                                children: [
+                                  {
+                                    id: 'manual-cpx.md',
+                                    name: 'manual-cpx.md',
+                                    type: 'file',
+                                    path: '/docs/manual-cpx.md',
+                                    size: '24.5 KB',
+                                    modified: '2 horas atrás'
+                                  },
+                                  {
+                                    id: 'api-docs.md',
+                                    name: 'api-docs.md',
+                                    type: 'file',
+                                    path: '/docs/api-docs.md',
+                                    size: '15.2 KB',
+                                    modified: '3 dias atrás'
+                                  }
+                                ]
+                              },
+                              {
+                                id: 'specs',
+                                name: 'specs',
+                                type: 'folder',
+                                path: '/specs',
+                                children: [
+                                  {
+                                    id: 'requisitos.md',
+                                    name: 'requisitos.md',
+                                    type: 'file',
+                                    path: '/specs/requisitos.md',
+                                    size: '18.7 KB',
+                                    modified: '1 dia atrás'
+                                  }
+                                ]
+                              },
+                              {
+                                id: 'readme.md',
+                                name: 'README.md',
+                                type: 'file',
+                                path: '/README.md',
+                                size: '3.1 KB',
+                                modified: '1 semana atrás'
+                              }
+                            ]
+                          }
+                        ]}
+                        onFileSelect={(file) => {
+                          console.log('Arquivo selecionado:', file);
+                        }}
+                        onFolderToggle={(folder, isExpanded) => {
+                          console.log('Pasta:', folder.name, 'Expandida:', isExpanded);
+                        }}
+                      />
                     </div>
                     
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                        <div>
-                          <div className="font-medium text-sm">Especificação de Requisitos</div>
-                          <div className="text-xs text-gray-500">Modificado há 1 dia</div>
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-4">Últimas Sincronizações</h4>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                            <div>
+                              <div className="font-medium text-sm">manual-cpx.md</div>
+                              <div className="text-xs text-gray-500">Atualizado há 2 horas</div>
+                            </div>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">Sincronizado</Badge>
+                        </div>
+                        
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                            <div>
+                              <div className="font-medium text-sm">requisitos.md</div>
+                              <div className="text-xs text-gray-500">Modificado há 1 dia</div>
+                            </div>
+                          </div>
+                          <Badge variant="outline" className="text-xs">Pendente</Badge>
+                        </div>
+                        
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            <div>
+                              <div className="font-medium text-sm">api-docs.md</div>
+                              <div className="text-xs text-gray-500">Sincronizado há 3 dias</div>
+                            </div>
+                          </div>
+                          <Badge variant="secondary" className="text-xs">Sincronizado</Badge>
                         </div>
                       </div>
-                      <Badge variant="outline" className="text-xs">Pendente</Badge>
-                    </div>
-                    
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                        <div>
-                          <div className="font-medium text-sm">Documentação de API</div>
-                          <div className="text-xs text-gray-500">Sincronizado há 3 dias</div>
-                        </div>
-                      </div>
-                      <Badge variant="secondary" className="text-xs">Sincronizado</Badge>
                     </div>
                   </div>
                 </div>
