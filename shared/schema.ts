@@ -206,3 +206,24 @@ export const insertDocumentoSchema = createInsertSchema(documentos).omit({
 
 export type InsertDocumento = z.infer<typeof insertDocumentoSchema>;
 export type Documento = typeof documentos.$inferSelect;
+
+// Documents Artifacts table
+export const documentsArtifacts = pgTable("documents_artifacts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  documentoId: uuid("documento_id").notNull().references(() => documentos.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  file: text("file").notNull(), // Armazena caminho/URL do arquivo
+  type: text("type").notNull(), // doc, pdf, txt, json, imagem, etc.
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Documents Artifacts schema
+export const insertDocumentArtifactSchema = createInsertSchema(documentsArtifacts).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertDocumentArtifact = z.infer<typeof insertDocumentArtifactSchema>;
+export type DocumentArtifact = typeof documentsArtifacts.$inferSelect;

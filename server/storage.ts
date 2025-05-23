@@ -1,8 +1,9 @@
-import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos,
+import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos, documentsArtifacts,
   type User, type InsertUser, type Template, type InsertTemplate, 
   type MondayMapping, type InsertMondayMapping, type MondayColumn, type InsertMondayColumn, 
   type MappingColumn, type InsertMappingColumn, type ServiceConnection, type InsertServiceConnection,
   type Plugin, type InsertPlugin, type Documento, type InsertDocumento,
+  type DocumentArtifact, type InsertDocumentArtifact,
   UserStatus, UserRole, TemplateType, PluginStatus, PluginType } from "@shared/schema";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
