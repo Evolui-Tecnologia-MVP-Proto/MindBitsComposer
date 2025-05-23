@@ -447,6 +447,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   const currentDocumentId = selectedDocument?.id || editingDocument?.id;
   const { data: artifacts = [], isLoading: isLoadingArtifacts } = useQuery<DocumentArtifact[]>({
     queryKey: ["/api/documentos", currentDocumentId, "artifacts"],
+    queryFn: async () => {
+      if (!currentDocumentId) return [];
+      const response = await fetch(`/api/documentos/${currentDocumentId}/artifacts`);
+      if (!response.ok) throw new Error("Erro ao buscar anexos");
+      return response.json();
+    },
     enabled: !!currentDocumentId,
   });
 
@@ -505,7 +511,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Erro ao excluir documento");
-      return response.json();
+      return { success: true };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
