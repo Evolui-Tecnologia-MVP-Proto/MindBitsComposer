@@ -180,15 +180,6 @@ export default function DocumentosPage() {
       
       // Atualizar estrutura local para refletir as alterações
       queryClient.invalidateQueries({ queryKey: ["/api/repo-structure"] });
-      
-      // Atualizar estrutura do GitHub também para refletir as pastas sincronizadas
-      fetchGithubRepoStructure();
-      
-      // Forçar re-fetch após um pequeno delay para garantir que as mudanças sejam refletidas
-      setTimeout(() => {
-        queryClient.refetchQueries({ queryKey: ["/api/repo-structure"] });
-        fetchGithubRepoStructure();
-      }, 1000);
     },
     onError: (error: any) => {
       toast({
