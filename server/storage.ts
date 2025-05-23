@@ -1,9 +1,9 @@
-import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos, documentsArtifacts,
+import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos, documentsArtifacts, repoStructure,
   type User, type InsertUser, type Template, type InsertTemplate, 
   type MondayMapping, type InsertMondayMapping, type MondayColumn, type InsertMondayColumn, 
   type MappingColumn, type InsertMappingColumn, type ServiceConnection, type InsertServiceConnection,
   type Plugin, type InsertPlugin, type Documento, type InsertDocumento,
-  type DocumentArtifact, type InsertDocumentArtifact,
+  type DocumentArtifact, type InsertDocumentArtifact, type RepoStructure, type InsertRepoStructure,
   UserStatus, UserRole, TemplateType, PluginStatus, PluginType } from "@shared/schema";
 import { db } from "./db";
 import { eq, and } from "drizzle-orm";
@@ -99,6 +99,15 @@ export interface IStorage {
   createDocumentArtifact(artifact: InsertDocumentArtifact): Promise<DocumentArtifact>;
   updateDocumentArtifact(id: string, data: Partial<DocumentArtifact>): Promise<DocumentArtifact>;
   deleteDocumentArtifact(id: string): Promise<void>;
+  
+  // Repo Structure operations
+  getRepoStructure(uid: string): Promise<RepoStructure | undefined>;
+  getAllRepoStructures(): Promise<RepoStructure[]>;
+  getRepoStructureByParent(parentUid?: string): Promise<RepoStructure[]>;
+  createRepoStructure(structure: InsertRepoStructure): Promise<RepoStructure>;
+  updateRepoStructure(uid: string, data: Partial<RepoStructure>): Promise<RepoStructure>;
+  updateRepoStructureSync(uid: string, isSync: boolean): Promise<RepoStructure>;
+  deleteRepoStructure(uid: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {

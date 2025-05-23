@@ -236,7 +236,8 @@ export type DocumentArtifact = typeof documentsArtifacts.$inferSelect;
 export const repoStructure = pgTable("repo_structure", {
   uid: uuid("uid").defaultRandom().primaryKey(),
   folderName: text("folder_name").notNull(),
-  linkedTo: uuid("linked_to").references(() => repoStructure.uid),
+  linkedTo: uuid("linked_to"),
+  isSync: boolean("is_sync").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -250,3 +251,19 @@ export const insertRepoStructureSchema = createInsertSchema(repoStructure).omit(
 
 export type InsertRepoStructure = z.infer<typeof insertRepoStructureSchema>;
 export type RepoStructure = typeof repoStructure.$inferSelect;
+
+// Relations
+export const repoStructureRelations = {
+  parent: {
+    relationName: "parent",
+    referencedTable: repoStructure,
+    referencedColumns: [repoStructure.uid],
+    columns: [repoStructure.linkedTo],
+  },
+  children: {
+    relationName: "children", 
+    referencedTable: repoStructure,
+    referencedColumns: [repoStructure.linkedTo],
+    columns: [repoStructure.uid],
+  },
+};
