@@ -1444,7 +1444,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const { uid } = req.params;
+      console.log(`🔄 ENDPOINT RECEBIDO - Sincronizando UID: ${uid}`);
       const structure = await storage.getRepoStructure(uid);
+      console.log(`📁 Estrutura encontrada:`, structure);
       
       if (!structure) {
         return res.status(404).send("Estrutura não encontrada");
