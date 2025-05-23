@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronRight, ChevronDown, Folder, File, FileText, Image, Archive, Code, FolderPlus, Upload, AlertCircle } from 'lucide-react';
+import { ChevronRight, ChevronDown, Folder, File, FileText, Image, Archive, Code, FolderPlus, Upload, AlertCircle, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { CreateFolderModal } from './CreateFolderModal';
@@ -65,6 +65,28 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
       toast({
         title: "Erro na sincronização",
         description: error.message || "Erro ao sincronizar pasta com GitHub.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation para excluir pasta do banco (não do GitHub)
+  const deleteFolderMutation = useMutation({
+    mutationFn: async (uid: string) => {
+      const res = await apiRequest("DELETE", `/api/repo-structure/${uid}`);
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Pasta removida do banco!",
+        description: "A pasta foi removida do banco local e agora aparecerá em amarelo.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/repo-structure"] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao remover pasta",
+        description: error.message || "Erro ao remover pasta do banco.",
         variant: "destructive",
       });
     },
@@ -325,7 +347,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     return (
       <div key={item.id}>
         <div
-          className={`flex items-center py-1 px-2 hover:bg-gray-50 rounded cursor-pointer`}
+          className={`flex items-center py-1 px-2 hover:bg-gray-50 rounded cursor-pointer group relative`}
           style={{ paddingLeft }}
           onClick={() => toggleFolder(item.id, item)}
         >
@@ -349,6 +371,22 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
             <span className="text-sm text-gray-700">{item.name}</span>
             {getStatusBadge(item.syncStatus)}
           </div>
+          
+          {/* Botão de exclusão que aparece no hover - apenas para pastas sincronizadas */}
+          {item.syncStatus === 'synced' && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 ml-2 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100"
+              onClick={(e) => {
+                e.stopPropagation();
+                deleteFolderMutation.mutate(item.id);
+              }}
+              title="Remover pasta do banco local"
+            >
+              <Trash2 className="h-3 w-3 text-red-600" />
+            </Button>
+          )}
         </div>
         
         {isExpanded && item.children && item.children.length > 0 && (
