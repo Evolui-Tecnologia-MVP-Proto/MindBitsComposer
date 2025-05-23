@@ -1171,13 +1171,64 @@ export default function DocumentosPage() {
             </div>
             
             <div>
-              <Label htmlFor="artifact-file">Arquivo/URL</Label>
-              <Input
-                id="artifact-file"
-                value={artifactFormData.file}
-                onChange={(e) => setArtifactFormData({ ...artifactFormData, file: e.target.value })}
-                placeholder="Ex: /uploads/manual.pdf, https://exemplo.com/doc.pdf"
-              />
+              <Label>Arquivo/URL</Label>
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <Input
+                    id="artifact-file"
+                    value={artifactFormData.file}
+                    onChange={(e) => setArtifactFormData({ ...artifactFormData, file: e.target.value })}
+                    placeholder="Ex: /uploads/manual.pdf, https://exemplo.com/doc.pdf"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => document.getElementById('file-upload')?.click()}
+                    className="px-3"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload
+                  </Button>
+                </div>
+                <input
+                  id="file-upload"
+                  type="file"
+                  className="hidden"
+                  accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.json,.xml,.xlsx,.zip"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      try {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        
+                        const response = await fetch('/api/upload', {
+                          method: 'POST',
+                          body: formData,
+                        });
+                        
+                        if (response.ok) {
+                          const result = await response.json();
+                          setArtifactFormData({ 
+                            ...artifactFormData, 
+                            file: result.path,
+                            type: file.name.split('.').pop()?.toLowerCase() || ''
+                          });
+                        } else {
+                          alert('Erro ao fazer upload do arquivo');
+                        }
+                      } catch (error) {
+                        alert('Erro ao fazer upload do arquivo');
+                      }
+                    }
+                  }}
+                />
+                <p className="text-xs text-gray-500">
+                  Você pode inserir uma URL ou fazer upload de um arquivo local
+                </p>
+              </div>
             </div>
             
             <div>
@@ -1262,13 +1313,64 @@ export default function DocumentosPage() {
             </div>
             
             <div>
-              <Label htmlFor="edit-artifact-file">Arquivo/URL</Label>
-              <Input
-                id="edit-artifact-file"
-                value={artifactFormData.file}
-                onChange={(e) => setArtifactFormData({ ...artifactFormData, file: e.target.value })}
-                placeholder="Ex: /uploads/manual.pdf, https://exemplo.com/doc.pdf"
-              />
+              <Label>Arquivo/URL</Label>
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <Input
+                    id="edit-artifact-file"
+                    value={artifactFormData.file}
+                    onChange={(e) => setArtifactFormData({ ...artifactFormData, file: e.target.value })}
+                    placeholder="Ex: /uploads/manual.pdf, https://exemplo.com/doc.pdf"
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => document.getElementById('edit-file-upload')?.click()}
+                    className="px-3"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload
+                  </Button>
+                </div>
+                <input
+                  id="edit-file-upload"
+                  type="file"
+                  className="hidden"
+                  accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.json,.xml,.xlsx,.zip"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      try {
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        
+                        const response = await fetch('/api/upload', {
+                          method: 'POST',
+                          body: formData,
+                        });
+                        
+                        if (response.ok) {
+                          const result = await response.json();
+                          setArtifactFormData({ 
+                            ...artifactFormData, 
+                            file: result.path,
+                            type: file.name.split('.').pop()?.toLowerCase() || ''
+                          });
+                        } else {
+                          alert('Erro ao fazer upload do arquivo');
+                        }
+                      } catch (error) {
+                        alert('Erro ao fazer upload do arquivo');
+                      }
+                    }
+                  }}
+                />
+                <p className="text-xs text-gray-500">
+                  Você pode inserir uma URL ou fazer upload de um arquivo local
+                </p>
+              </div>
             </div>
             
             <div>

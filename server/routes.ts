@@ -21,6 +21,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
   });
   
+  // File upload route
+  app.post("/api/upload", upload.single('file'), async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    if (!req.file) {
+      return res.status(400).json({ error: "Nenhum arquivo enviado" });
+    }
+    
+    try {
+      // Create uploads directory if it doesn't exist
+      const uploadsDir = path.join(process.cwd(), 'uploads', 'documents');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+      
+      // Generate unique filename
+      const timestamp = Date.now();
+      const fileExtension = path.extname(req.file.originalname);
+      const fileName = `${timestamp}_${req.file.originalname}`;
+      const filePath = path.join(uploadsDir, fileName);
+      
+      // Save file to disk
+      fs.writeFileSync(filePath, req.file.buffer);
+      
+      // Return file path for database storage
+      const relativePath = `/uploads/documents/${fileName}`;
+      
+      res.json({ 
+        path: relativePath,
+        originalName: req.file.originalname,
+        size: req.file.size
+      });
+      
+    } catch (error) {
+      console.error("Erro ao fazer upload do arquivo:", error);
+      res.status(500).json({ error: "Erro ao fazer upload do arquivo" });
+    }
+  });
+  
   // Template routes
   // Get all templates
   app.get("/api/templates", async (req, res) => {
