@@ -1395,21 +1395,31 @@ export default function AdminPage() {
                   <FormItem>
                     <FormLabel>Token/Chave API</FormLabel>
                     <FormControl>
-                      <div className="flex items-center">
+                      <div className="flex items-center space-x-2">
                         <Input 
                           {...field} 
                           type={showServiceToken ? "text" : "password"} 
                           placeholder="Insira o token ou chave API"
+                          className="flex-1"
                         />
                         <Button
                           type="button"
                           variant="ghost"
                           size="icon"
                           onClick={() => setShowServiceToken(!showServiceToken)}
-                          className="ml-2"
                         >
                           {showServiceToken ? <EyeOff size={16} /> : <Eye size={16} />}
                         </Button>
+                        {selectedService === "github" && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="bg-yellow-100 border-yellow-500 text-yellow-700 hover:bg-yellow-50"
+                          >
+                            Conectar
+                          </Button>
+                        )}
                       </div>
                     </FormControl>
                     <FormMessage />
