@@ -184,17 +184,22 @@ export default function DocumentosPage() {
         });
       }
       
-      // Atualizar estrutura local para refletir as alterações
+      // Atualizar imediatamente a estrutura local
       queryClient.invalidateQueries({ queryKey: ["/api/repo-structure"] });
       
-      // Atualizar estrutura do GitHub também
-      fetchGithubRepoStructure();
+      // Forçar múltiplas atualizações para garantir sincronização visual
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ["/api/repo-structure"] });
+      }, 500);
       
-      // Forçar re-fetch após um pequeno delay para garantir que as mudanças sejam refletidas
       setTimeout(() => {
         queryClient.refetchQueries({ queryKey: ["/api/repo-structure"] });
         fetchGithubRepoStructure();
       }, 1500);
+      
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ["/api/repo-structure"] });
+      }, 3500);
     },
     onError: (error: any) => {
       toast({
@@ -1349,8 +1354,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           onFolderToggle={(folder, isExpanded) => {
                             console.log('Pasta:', folder.name, 'Expandida:', isExpanded);
                             if (isExpanded && folder.type === 'folder') {
-                              setSelectedFolderPath(folder.path);
-                              fetchFolderFiles(folder.path);
+                              // Construir caminho correto para a pasta
+                              const folderPath = folder.name; // Usar apenas o nome da pasta para pastas raiz
+                              setSelectedFolderPath(folderPath);
+                              fetchFolderFiles(folderPath);
                             }
                           }}
                         />
