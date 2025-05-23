@@ -55,8 +55,10 @@ export default function DocumentosPage() {
   const [selectedDocument, setSelectedDocument] = useState<Documento | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddArtifactModalOpen, setIsAddArtifactModalOpen] = useState(false);
   const [isEditArtifactModalOpen, setIsEditArtifactModalOpen] = useState(false);
+  const [editingDocument, setEditingDocument] = useState<Documento | null>(null);
   const [selectedArtifact, setSelectedArtifact] = useState<DocumentArtifact | null>(null);
   const [artifactFormData, setArtifactFormData] = useState<InsertDocumentArtifact>({
     documentoId: "",
@@ -114,6 +116,24 @@ export default function DocumentosPage() {
         status: "Integrado",
         statusOrigem: "Incluido",
       });
+    },
+  });
+
+  // Mutation para atualizar documento
+  const updateDocumentoMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: InsertDocumento }) => {
+      const response = await fetch(`/api/documentos/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) throw new Error("Erro ao atualizar documento");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+      setIsEditModalOpen(false);
+      setEditingDocument(null);
     },
   });
 
@@ -176,6 +196,31 @@ export default function DocumentosPage() {
 
   const handleCreateDocument = () => {
     createDocumentoMutation.mutate(formData);
+  };
+
+  const openEditModal = (documento: Documento) => {
+    setEditingDocument(documento);
+    setFormData({
+      origem: documento.origem,
+      objeto: documento.objeto,
+      cliente: documento.cliente,
+      responsavel: documento.responsavel,
+      sistema: documento.sistema,
+      modulo: documento.modulo,
+      descricao: documento.descricao,
+      status: documento.status,
+      statusOrigem: documento.statusOrigem,
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateDocument = () => {
+    if (editingDocument) {
+      updateDocumentoMutation.mutate({
+        id: editingDocument.id,
+        data: formData,
+      });
+    }
   };
 
   // Funções auxiliares para artefatos
