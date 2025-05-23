@@ -435,20 +435,14 @@ const BibliotecaFluxos = () => {
 export default function FluxosPage() {
   return (
     <div className="p-6 h-full">
-      <Card className="mb-6">
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle className="text-2xl">Fluxos de Documentos</CardTitle>
-              <CardDescription>
-                Defina e gerencie fluxos de trabalho para seus documentos
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold tracking-tight">Fluxos de Documentos</h1>
+        <p className="text-muted-foreground">
+          Defina e gerencie fluxos de trabalho para seus documentos
+        </p>
+      </div>
       
-      <Tabs defaultValue="editor" className="h-[calc(100vh-260px)]">
+      <Tabs defaultValue="editor" className="h-[calc(100vh-200px)]">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="editor" className="flex items-center space-x-2">
             <Edit className="h-4 w-4" />
