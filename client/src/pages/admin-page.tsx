@@ -57,6 +57,8 @@ import { useForm } from "react-hook-form";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 // Definições de tipos
 type BoardMapping = {
@@ -1499,6 +1501,28 @@ export default function AdminPage() {
                   </FormItem>
                 )}
               />
+              
+              {/* Dropdown de repositórios GitHub - aparece após conexão bem-sucedida */}
+              {selectedService === "github" && connectionStatus === 'success' && githubRepos.length > 0 && (
+                <div className="space-y-2">
+                  <Label>Repositório Padrão</Label>
+                  <Select value={selectedRepo} onValueChange={setSelectedRepo}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um repositório..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {githubRepos.map((repo) => (
+                        <SelectItem key={repo.full_name} value={repo.full_name}>
+                          {repo.full_name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-gray-500">
+                    {githubRepos.length} repositório(s) encontrado(s)
+                  </p>
+                </div>
+              )}
               
               <FormField
                 control={serviceForm.control}
