@@ -1491,12 +1491,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       });
 
+      console.log('Content-Type da resposta:', githubResponse.headers.get('content-type'));
+      console.log('Status da resposta:', githubResponse.status);
+
       if (!githubResponse.ok) {
         const errorText = await githubResponse.text();
         console.error('Erro na resposta do GitHub:', errorText);
         return res.status(400).json({ 
           error: "Erro ao buscar estrutura do GitHub",
           details: `Status: ${githubResponse.status}` 
+        });
+      }
+
+      const contentType = githubResponse.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await githubResponse.text();
+        console.error('Resposta não é JSON:', responseText.substring(0, 200));
+        return res.status(500).json({ 
+          error: "GitHub retornou HTML em vez de JSON",
+          details: "Possível problema de autenticação ou rate limit"
         });
       }
 
