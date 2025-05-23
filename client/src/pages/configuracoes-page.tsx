@@ -533,7 +533,7 @@ export default function ConfiguracoesPage() {
                         <div className="flex space-x-2">
                           <Input {...field} type="password" autoComplete="off" className="flex-1" />
                           {/* Botão Conectar para GitHub */}
-                          {(selectedServiceName === "github" || form.getValues("serviceName") === "github" || (selectedConnection && selectedConnection.serviceName === "github")) && (
+                          {(form.getValues("serviceName") === "github") && (
                             <Button
                               type="button"
                               variant="outline"
