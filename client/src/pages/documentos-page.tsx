@@ -199,80 +199,18 @@ export default function DocumentosPage() {
     },
   });
 
-  // Função para buscar estrutura do repositório GitHub
+  // Função simplificada que usa apenas a API do backend que já funciona
   const fetchGithubRepoStructure = async () => {
-    const githubConnection = serviceConnections.find((conn: any) => conn.serviceName === 'github');
-    
-    console.log('Conexão GitHub encontrada:', githubConnection);
-    console.log('Parameters:', githubConnection?.parameters);
-    
-    if (!githubConnection || !githubConnection.token) {
-      console.log('Conexão GitHub não encontrada ou token ausente');
-      return [];
-    }
-
-    // O repositório está em parameters[0]
-    const repoParam = githubConnection.parameters?.[0];
-    
-    if (!repoParam) {
-      console.log('Repositório não encontrado nos parâmetros');
-      return [];
-    }
-
-    console.log('Repositório encontrado:', repoParam);
-    const [owner, repo] = repoParam.split('/');
-    
-    console.log('Owner:', owner, 'Repo:', repo);
-    console.log('URL da API:', `https://api.github.com/repos/${owner}/${repo}/contents`);
-    
+    console.log('Carregando estrutura do repositório via backend...');
     setIsLoadingRepo(true);
+    
     try {
-      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents`, {
-        headers: {
-          'Authorization': `Bearer ${githubConnection.token}`,
-          'Accept': 'application/vnd.github.v3+json',
-          'User-Agent': 'EVO-MindBits-Composer',
-        },
-      });
-
-      console.log('Status da resposta:', response.status);
-
-      if (response.ok) {
-        const contents = await response.json();
-        console.log('Conteúdo recebido:', contents);
-        const fileStructure = await buildFileTree(contents, githubConnection.token, owner, repo);
-        setGithubRepoFiles(fileStructure);
-        return fileStructure;
-      } else if (response.status === 404) {
-        // Repositório vazio - criar README.md
-        console.log('Repositório vazio, criando README.md...');
-        await createReadmeFile(githubConnection.token, owner, repo);
-        
-        // Tentar buscar novamente após criar o arquivo
-        const retryResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents`, {
-          headers: {
-            'Authorization': `Bearer ${githubConnection.token}`,
-            'Accept': 'application/vnd.github.v3+json',
-            'User-Agent': 'EVO-MindBits-Composer',
-          },
-        });
-        
-        if (retryResponse.ok) {
-          const contents = await retryResponse.json();
-          console.log('Conteúdo recebido após criar README:', contents);
-          const fileStructure = await buildFileTree(contents, githubConnection.token, owner, repo);
-          setGithubRepoFiles(fileStructure);
-          return fileStructure;
-        }
-        
-        return [];
-      } else {
-        const errorText = await response.text();
-        console.error('Erro ao buscar repositório:', response.status, errorText);
-        return [];
-      }
+      // Usa a API do backend que já está funcionando perfeitamente
+      await refetchRepoStructure();
+      setGithubRepoFiles([]); // Limpa estrutura antiga
+      return [];
     } catch (error) {
-      console.error('Erro na requisição:', error);
+      console.error('Erro ao buscar estrutura:', error);
       return [];
     } finally {
       setIsLoadingRepo(false);
