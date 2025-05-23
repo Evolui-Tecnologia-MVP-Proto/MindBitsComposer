@@ -38,6 +38,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Eye,
   Pencil,
   Trash2,
@@ -2092,6 +2102,30 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Modal de confirmação para exclusão de anexo */}
+      <AlertDialog open={isDeleteArtifactConfirmOpen} onOpenChange={setIsDeleteArtifactConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir este anexo? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelDeleteArtifact}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDeleteArtifact}
+              disabled={deleteArtifactMutation.isPending}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {deleteArtifactMutation.isPending ? "Excluindo..." : "Excluir"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
