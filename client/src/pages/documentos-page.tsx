@@ -1421,7 +1421,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     
                     <div>
                       <h4 className="font-medium text-gray-900 mb-4">
-                        {selectedFolderPath ? `Arquivos em: ${selectedFolderPath}` : 'Últimas Sincronizações'}
+                        {selectedFolderPath ? (
+                          <span>
+                            Arquivos em: <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono">{selectedFolderPath}</code>
+                          </span>
+                        ) : (
+                          'Últimas Sincronizações'
+                        )}
                       </h4>
                       <div className="space-y-3">
                         {isLoadingFolderFiles ? (
