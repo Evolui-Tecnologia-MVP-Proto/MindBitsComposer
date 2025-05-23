@@ -74,7 +74,7 @@ export function CreateFolderModal({ open, onOpenChange, parentFolder }: CreateFo
 
     createFolderMutation.mutate({
       folderName: folderName.trim(),
-      linkedTo: selectedParent || undefined,
+      linkedTo: selectedParent === "root" ? undefined : selectedParent || undefined,
     });
   };
 
