@@ -199,22 +199,60 @@ export default function DocumentosPage() {
     },
   });
 
-  // Função simplificada que usa apenas a API do backend que já funciona
+  // Função para carregar visualização da estrutura do repositório
   const fetchGithubRepoStructure = async () => {
-    console.log('Carregando estrutura do repositório via backend...');
-    setIsLoadingRepo(true);
+    const githubConnection = serviceConnections.find((conn: any) => conn.serviceName === 'github');
     
-    try {
-      // Usa a API do backend que já está funcionando perfeitamente
-      await refetchRepoStructure();
-      setGithubRepoFiles([]); // Limpa estrutura antiga
+    if (!githubConnection || !githubConnection.token) {
+      console.log('Conexão GitHub não encontrada');
       return [];
+    }
+
+    const repoParam = githubConnection.parameters?.[0];
+    if (!repoParam) {
+      console.log('Repositório não configurado');
+      return [];
+    }
+
+    const [owner, repo] = repoParam.split('/');
+    console.log('Carregando visualização do repositório:', repoParam);
+    
+    setIsLoadingRepo(true);
+    try {
+      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents`, {
+        headers: {
+          'Authorization': `Bearer ${githubConnection.token}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'EVO-MindBits-Composer',
+        },
+      });
+
+      if (response.ok) {
+        const contents = await response.json();
+        const fileStructure = await buildSimpleFileTree(contents);
+        setGithubRepoFiles(fileStructure);
+        return fileStructure;
+      } else {
+        console.error('Erro ao carregar repositório:', response.status);
+        return [];
+      }
     } catch (error) {
-      console.error('Erro ao buscar estrutura:', error);
+      console.error('Erro na requisição:', error);
       return [];
     } finally {
       setIsLoadingRepo(false);
     }
+  };
+
+  // Função simples para criar estrutura de visualização
+  const buildSimpleFileTree = async (items: any[]) => {
+    return items.map(item => ({
+      name: item.name,
+      path: item.path,
+      type: item.type === 'dir' ? 'folder' : 'file',
+      size: item.size || 0,
+      children: []
+    }));
   };
 
   // Função para construir estrutura hierárquica
