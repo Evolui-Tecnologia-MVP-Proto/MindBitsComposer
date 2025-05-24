@@ -1522,14 +1522,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               variant="outline"
                               size="sm"
                               onClick={() => {
-                                console.log("🎯 CLICOU EM EXCLUIR ANEXO:", artifact.id);
-                                setArtifactToDelete(artifact.id);
-                                setIsDeleteArtifactConfirmOpen(true);
-                                console.log("📝 Modal de confirmação deve abrir agora");
+                                console.log("🗑️ EXCLUINDO ANEXO DIRETAMENTE:", artifact.id);
+                                deleteArtifactMutation.mutate(artifact.id);
                               }}
                               title="Excluir anexo"
+                              disabled={deleteArtifactMutation.isPending}
                             >
-                              <Trash2 className="h-4 w-4 text-red-500" />
+                              {deleteArtifactMutation.isPending ? (
+                                <Loader2 className="h-4 w-4 animate-spin text-red-500" />
+                              ) : (
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                              )}
                             </Button>
 
                           </div>
@@ -2540,39 +2543,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         </div>
       )}
 
-      {/* Modal de confirmação para exclusão de anexo */}
-      <AlertDialog open={isDeleteArtifactConfirmOpen} onOpenChange={setIsDeleteArtifactConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja excluir este anexo? Esta ação não pode ser desfeita.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={cancelDeleteArtifact}>
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={() => {
-                console.log("🔥 CLICOU EM CONFIRMAR EXCLUSÃO!");
-                confirmDeleteArtifact();
-              }}
-              disabled={deleteArtifactMutation.isPending}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              {deleteArtifactMutation.isPending ? "Excluindo..." : "Excluir"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      
-      {/* Debug: Estado do modal */}
-      {isDeleteArtifactConfirmOpen && (
-        <div style={{ position: 'fixed', top: '10px', right: '10px', zIndex: 9999, background: 'red', color: 'white', padding: '5px' }}>
-          MODAL ABERTO - ID: {artifactToDelete}
-        </div>
-      )}
+
     </div>
   );
 }
