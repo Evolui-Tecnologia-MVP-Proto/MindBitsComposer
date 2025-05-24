@@ -1,0 +1,106 @@
+Conteúdo recebido: <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script type="module">
+import { createHotContext } from "/@vite/client";
+const hot = createHotContext("/__dummy__runtime-error-plugin");
+
+function sendError(error) {
+  if (!(error instanceof Error)) {
+    error = new Error("(unknown runtime error)");
+  }
+  const serialized = {
+    message: error.message,
+    stack: error.stack,
+  };
+  hot.send("runtime-error-plugin:error", serialized);
+}
+
+window.addEventListener("error", (evt) => {
+  sendError(evt.error);
+});
+
+window.addEventListener("unhandledrejection", (evt) => {
+  sendError(evt.reason);
+});
+</script>
+
+    <script type="module">
+import RefreshRuntime from "/@react-refresh"
+RefreshRuntime.injectIntoGlobalHook(window)
+window.$RefreshReg$ = () => {}
+window.$RefreshSig$ = () => (type) => type
+window.__vite_plugin_react_preamble_installed__ = true
+</script>
+
+    <script type="module" src="/@vite/client"></script>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <script type="module">"use strict";(()=>{var R="0.2.0";var T={HIGHLIGHT_COLOR:"#0079F2",HIGHLIGHT_BG:"#0079F210",ALLOWED_DOMAIN:".replit.dev"},J=`
+  [contenteditable] {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  
+  [contenteditable]:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  
+  .beacon-highlighter {
+    content: '';
+    position: absolute;
+    z-index: ${Number.MAX_SAFE_INTEGER-3};
+    box-sizing: border-box;
+    pointer-events: none;
+    outline: 2px dashed ${T.HIGHLIGHT_COLOR} !important;
+    background: ${T.HIGHLIGHT_BG} !important;
+    opacity: 0;
+  }
+  
+  .beacon-hover-highlighter {
+    position: fixed;
+    z-index: ${Number.MAX_SAFE_INTEGER};
+  }
+  
+  .beacon-selected-highlighter {
+    position: fixed;
+    pointer-events: none;
+    outline: 2px solid ${T.HIGHLIGHT_COLOR} !important;
+    outline-offset: 3px !important;
+    background: none !important;
+  }
+  
+  .beacon-label {
+    position: absolute;
+    background-color: ${T.HIGHLIGHT_COLOR};
+    color: #FFFFFF;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: monospace;
+    line-height: 1;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transform: translateY(-100%);
+    margin-top: -4px;
+    left: 0;
+    z-index: ${Number.MAX_SAFE_INTEGER-2};
+    pointer-events: none;
+    opacity: 0;
+  }
+  
+  .beacon-hover-label {
+    position: fixed;
+    z-index: ${Number.MAX_SAFE_INTEGER};
+  }
+  
+  .beacon-selected-label {
+    position: fixed;
+    pointer-events: none;
+  }
+`;function Le(e,n){return e[13]=1,e[14]=n>>8,e[15]=n&255,e[16]=n>>8,e[17]=n&255,e}var re=112,ie=72,oe=89,se=115,B;function Ne(){let e=new Int32Array(256);for(let n=0;n<256;n++){let t=n;for(let r=0;r<8;r++)t=t&1?3988292384^t>>>1:t>>>1;e[n]=t}return e}function De(e){let n=-1;B||(B=Ne());for(let t=0;t<e.length;t++)n=B[(n^e[t])&255]^n>>>8;return n^-1}function Ie(e){let n=e.length-1;for(let t=n;t>=4;t--)if(e[t-4]===9&&e[t-3]===re&&e[t-2]===ie&&e[t-1]===oe&&e[t]===se)return t-3;return 0}function He(e,n,t=!1){let r=new Uint8Array(13);n*=39.3701,r[0]=re,r[1]=ie,r[2]=oe,r[3]=se,r[4]=n>>>24,r[5]=n>>>16,r[6]=n>>>8,r[7]=n&255,r[8]=r[4],r[9]=r[5],r[10]=r[6],r[11]=r[7],r[12]=1;let s=De(r),o=new Uint8Array(4);if(o[0]=s>>>24,o[1]=s>>>16,o[2]=s>>>8,o[3]=s&255,t){let a=Ie(e);return e.set(r,a),e.set(o,a+13),e}else{let a=new Uint8Array(4);a[0]=0,a[1]=0,a[2]=0,a[3]=9;let i=new Uint8Array(54);return i.set(e,0),i.set(a,33),i.set(r,37),i.set(o,50),i}}var ae="[modern-screenshot]",A=typeof window<"u",Me=A&&"Worker"in window,_e=A&&"atob"in window,Gt=A&&"btoa"in window,W=A?window.navigator?.userAgent:"",le=W.includes("Chrome"),O=W.includes("AppleWebKit")&&!le,G=W.includes("Firefox"),Re=e=>e&&"__CONTEXT__"in e,Oe=e=>e.constructor.name==="CSSFontFaceRule",Pe=e=>e.constructor.name==="CSSImportRule",v=e=>e.nodeType===1,H=e=>typeof e.className=="object",ce=e=>e.tagName==="image",Fe=e=>e.tagName==="use",N=e=>v(e)&&typeof…
+Erro ao executar ma
