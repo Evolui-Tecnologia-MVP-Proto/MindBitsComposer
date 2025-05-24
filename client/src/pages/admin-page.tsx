@@ -1599,16 +1599,6 @@ export default function AdminPage() {
                     </TableBody>
                   </Table>
                 </div>
-                
-                <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mt-4">
-                  <h4 className="text-sm font-medium text-blue-800 mb-2">💡 Como funciona:</h4>
-                  <ul className="text-xs text-blue-700 space-y-1">
-                    <li>• <strong>Campos obrigatórios</strong> devem sempre ter valor - use defaults para evitar erros</li>
-                    <li>• Os valores padrão são aplicados quando a API Monday não retorna dados</li>
-                    <li>• Campos opcionais podem ficar em branco se não precisar de valor padrão</li>
-                    <li>• Use valores consistentes para facilitar futuras análises e filtros</li>
-                  </ul>
-                </div>
               </div>
             </TabsContent>
             
