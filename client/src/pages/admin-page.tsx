@@ -342,6 +342,7 @@ export default function AdminPage() {
         description: data.description || "",
         statusColumn: "",
         responsibleColumn: "",
+        mappingFilter: data.mappingFilter || "",
         defaultValues: data.defaultValues || {},
         lastSync: null
       };
