@@ -910,8 +910,8 @@ export default function AdminPage() {
                         <TableBody>
                           {mappingsData.map((mapping: BoardMapping) => (
                             <TableRow key={mapping.id}>
-                              <TableCell className="font-medium">{mapping.name}</TableCell>
-                              <TableCell>{mapping.boardId}</TableCell>
+                              <TableCell className="font-mono font-bold text-blue-700">{mapping.name}</TableCell>
+                              <TableCell className="font-mono font-bold text-blue-700">{mapping.boardId}</TableCell>
                               <TableCell>{mapping.lastSync ? new Date(mapping.lastSync).toLocaleString() : "Nunca"}</TableCell>
                               <TableCell>
                                 <Badge variant="secondary" className="text-xs">
@@ -1262,7 +1262,7 @@ export default function AdminPage() {
                             placeholder="Nome do quadro no Monday (preenchido automaticamente)" 
                             {...field} 
                             readOnly={true}
-                            className="bg-gray-50"
+                            className="bg-gray-50 font-mono font-bold text-blue-700"
                           />
                         </FormControl>
                         <FormMessage />
