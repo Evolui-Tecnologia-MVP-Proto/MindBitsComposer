@@ -1643,7 +1643,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 <TableBody>
                   {documentos?.filter(doc => doc.status === "Incluido").map((documento) => (
                     <TableRow key={documento.id}>
-                      <TableCell>{documento.origem}</TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant="secondary" 
+                          className="bg-purple-100 text-purple-800 border-purple-200"
+                        >
+                          {documento.origem}
+                        </Badge>
+                      </TableCell>
                       <TableCell>{documento.objeto}</TableCell>
                       <TableCell>
                         <Badge 
