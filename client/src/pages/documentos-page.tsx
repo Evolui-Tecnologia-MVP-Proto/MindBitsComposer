@@ -831,8 +831,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   const confirmDelete = () => {
     if (documentToDelete) {
       deleteDocumentoMutation.mutate(documentToDelete.id);
-      setIsDeleteConfirmOpen(false);
-      setDocumentToDelete(null);
     }
   };
 
