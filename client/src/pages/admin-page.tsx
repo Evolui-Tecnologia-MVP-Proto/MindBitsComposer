@@ -1469,6 +1469,12 @@ export default function AdminPage() {
                                     : column.cpxField
                                   }
                                 </span>
+                                {/* Tag f(x) verde para função de transformação */}
+                                {column.transformFunction && column.transformFunction.trim() && (
+                                  <Badge variant="outline" className="text-xs font-mono bg-green-50 text-green-700 border-green-200">
+                                    f(x)
+                                  </Badge>
+                                )}
                                 <Badge variant="outline" className="text-xs font-mono bg-blue-50 text-blue-700 border-blue-200">
                                   {column.cpxField === 'objeto' ? 'texto' :
                                    column.cpxField === 'tipo' ? 'seleção' :
