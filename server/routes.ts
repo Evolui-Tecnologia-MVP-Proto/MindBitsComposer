@@ -865,8 +865,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         mondayData = JSON.parse(responseText);
         console.log("Resposta da API Monday:", JSON.stringify(mondayData, null, 2));
       } catch (parseError) {
-        console.error("Erro ao parsear resposta da API Monday:", responseText.substring(0, 500));
-        throw new Error("API do Monday retornou resposta inválida. Verifique se o token está correto.");
+        console.error("=== CONTEÚDO COMPLETO RETORNADO PELA API MONDAY ===");
+        console.error(responseText);
+        console.error("=== FIM DO CONTEÚDO ===");
+        throw new Error(`API do Monday retornou HTML em vez de JSON. Conteúdo: ${responseText.substring(0, 200)}...`);
       }
       
       if (mondayData.errors) {
