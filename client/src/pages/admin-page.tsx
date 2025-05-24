@@ -929,11 +929,11 @@ export default function AdminPage() {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead>Nome</TableHead>
-                            <TableHead>ID do Quadro</TableHead>
-                            <TableHead>Última Sincronização</TableHead>
-                            <TableHead>Colunas</TableHead>
-                            <TableHead className="w-[100px] text-right">Ações</TableHead>
+                            <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">NOME</TableHead>
+                            <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ID DO QUADRO</TableHead>
+                            <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ÚLTIMA SINCRONIZAÇÃO</TableHead>
+                            <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">COLUNAS</TableHead>
+                            <TableHead className="w-[100px] text-center text-xs font-medium text-gray-500 uppercase tracking-wider">AÇÕES</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -1437,9 +1437,9 @@ export default function AdminPage() {
                       <Table>
                         <TableHeader className="sticky top-0 bg-background z-10">
                           <TableRow>
-                            <TableHead>Coluna Monday</TableHead>
-                            <TableHead>Campo CPX</TableHead>
-                            <TableHead className="w-[100px]">Ações</TableHead>
+                            <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">COLUNA MONDAY</TableHead>
+                            <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">CAMPO CPX</TableHead>
+                            <TableHead className="w-[100px] text-center text-xs font-medium text-gray-500 uppercase tracking-wider">AÇÕES</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
