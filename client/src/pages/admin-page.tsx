@@ -1161,7 +1161,7 @@ export default function AdminPage() {
                         <FormLabel>ID do Quadro</FormLabel>
                         <div className="flex gap-2">
                           <FormControl>
-                            <Input placeholder="ID do quadro no Monday.com" {...field} />
+                            <Input placeholder="ID do quadro no Monday.com" {...field} className="font-mono font-bold text-blue-700" />
                           </FormControl>
                           <Button 
                             type="button"
