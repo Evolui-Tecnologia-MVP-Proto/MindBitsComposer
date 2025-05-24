@@ -827,10 +827,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   };
 
   const confirmDeleteArtifact = () => {
+    console.log("🗑️ CONFIRMANDO EXCLUSÃO DE ANEXO:", artifactToDelete);
     if (artifactToDelete) {
+      console.log("✅ Executando exclusão via mutation...");
       deleteArtifactMutation.mutate(artifactToDelete);
-      setIsDeleteArtifactConfirmOpen(false);
-      setArtifactToDelete(null);
+    } else {
+      console.log("❌ Nenhum anexo selecionado para exclusão");
     }
   };
 
