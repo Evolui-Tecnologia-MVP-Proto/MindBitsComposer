@@ -956,7 +956,7 @@ export default function AdminPage() {
                     <div className="flex items-center space-x-4">
                       <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
                       <div className="flex-1">
-                        <h3 className="font-medium text-blue-900">🚀 Executando Sincronização Monday.com</h3>
+                        <h3 className="font-medium text-blue-900">Executando Sincronização Monday.com</h3>
                         <p className="text-sm text-blue-700">{executionProgress}</p>
                         <div className="mt-2 w-full bg-blue-200 rounded-full h-2">
                           <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{width: '60%'}}></div>
@@ -1442,7 +1442,28 @@ export default function AdminPage() {
                           <FormItem>
                             <FormLabel>Campo CPX</FormLabel>
                             <FormControl>
-                              <Input placeholder="Nome do campo no CPX" {...field} />
+                              <select
+                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-mono"
+                                {...field}
+                              >
+                                <option value="">Selecione o campo</option>
+                                {getDocumentosColumns().filter(column => {
+                                  // Se estamos editando, permitir o campo atual
+                                  if (selectedColumn && selectedColumn.cpxField === column.field) {
+                                    return true;
+                                  }
+                                  // Os campos generalColumns e descricao sempre devem estar disponíveis (podem receber múltiplas colunas)
+                                  if (column.field === "generalColumns" || column.field === "descricao") {
+                                    return true;
+                                  }
+                                  // Filtrar campos que já estão mapeados
+                                  return !mappingColumns.some(mapping => mapping.cpxField === column.field);
+                                }).map((column) => (
+                                  <option key={column.field} value={column.field} className="font-mono">
+                                    {column.label} ({column.type})
+                                  </option>
+                                ))}
+                              </select>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
