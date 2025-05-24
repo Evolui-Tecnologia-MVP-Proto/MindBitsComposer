@@ -626,17 +626,19 @@ export class DatabaseStorage implements IStorage {
       return [];
     }
 
-    // Para o campo id_origem, usar consulta SQL direta para evitar problemas de tipo
+    // Para o campo id_origem, usar comparação numérica direta
     if (keyFields.includes('id_origem')) {
       const idOrigemValue = documentData.idOrigem || documentData.id_origem;
       if (idOrigemValue) {
-        console.log(`✅ DUPLICATA CHECK: Buscando id_origem = ${idOrigemValue}`);
+        // Converter para número para comparação correta
+        const idOrigemNum = Number(idOrigemValue);
+        console.log(`✅ DUPLICATA CHECK: Buscando id_origem = ${idOrigemNum} (número)`);
         
-        // Usar consulta SQL direta para buscar por id_origem
+        // Usar SQL direto com comparação numérica
         const results = await db
           .select()
           .from(documentos)
-          .where(sql`id_origem = ${idOrigemValue}`);
+          .where(sql`id_origem = ${idOrigemNum}`);
           
         console.log(`📊 DUPLICATA RESULT: Encontrados ${results.length} documentos com mesmo id_origem`);
         return results;
