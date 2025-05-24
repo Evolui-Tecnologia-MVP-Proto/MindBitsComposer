@@ -1360,7 +1360,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Plus className="h-5 w-5 text-blue-500" />
-            {currentCreatedDocumentId ? "Editar Documento" : "Criar Novo Documento"}
+            {currentCreatedDocumentId ? "Criar Novo Documento" : "Criar Novo Documento"}
           </DialogTitle>
           <DialogDescription>
             {currentCreatedDocumentId 
