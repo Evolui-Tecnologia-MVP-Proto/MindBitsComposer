@@ -107,13 +107,7 @@ export default function DocumentosPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Debug para modal de exclusão
-  useEffect(() => {
-    console.log("🔄 Estado do modal de exclusão mudou:", {
-      isDeleteConfirmOpen,
-      documentToDelete: documentToDelete?.objeto
-    });
-  }, [isDeleteConfirmOpen, documentToDelete]);
+
 
   // Buscar documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
@@ -2141,18 +2135,19 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {/* Modal de edição de artefato */}
       {renderEditArtifactModal()}
 
-      {/* Modal de confirmação de exclusão de documento */}
-      <AlertDialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+      {/* Modal de confirmação de exclusão simples */}
+      {isDeleteConfirmOpen && documentToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+            <div className="flex items-center gap-2 text-red-600 mb-4">
               <Trash2 className="h-5 w-5" />
-              Confirmar Exclusão
-            </AlertDialogTitle>
-            <AlertDialogDescription>
+              <h3 className="font-semibold text-lg">Confirmar Exclusão</h3>
+            </div>
+            
+            <p className="text-gray-700 mb-6">
               Tem certeza que deseja excluir o documento{" "}
               <span className="font-semibold text-gray-900">
-                "{documentToDelete?.objeto}"
+                "{documentToDelete.objeto}"
               </span>
               ?
               <br />
@@ -2160,32 +2155,38 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               <span className="text-red-600 font-medium">
                 Esta ação não pode ser desfeita.
               </span>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={cancelDelete} disabled={deleteDocumentoMutation.isPending}>
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={confirmDelete}
-              disabled={deleteDocumentoMutation.isPending}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              {deleteDocumentoMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Excluindo...
-                </>
-              ) : (
-                <>
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Excluir
-                </>
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            </p>
+            
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={cancelDelete}
+                disabled={deleteDocumentoMutation.isPending}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmDelete}
+                disabled={deleteDocumentoMutation.isPending}
+                className="bg-red-600 hover:bg-red-700"
+              >
+                {deleteDocumentoMutation.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Excluindo...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Excluir
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal de confirmação para exclusão de anexo */}
       <AlertDialog open={isDeleteArtifactConfirmOpen} onOpenChange={setIsDeleteArtifactConfirmOpen}>
