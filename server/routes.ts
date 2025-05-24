@@ -897,36 +897,79 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Coletar IDs das colunas já mapeadas
           const mappedColumnIds = new Set(mappingColumns.map(m => m.mondayColumnId));
           
-          // Mapear cada coluna do Monday para o campo correspondente
-          for (const mapping of mappingColumns) {
-            let value = "";
-            
-            // Verificar se o mapeamento é para o campo "name" (título do item)
-            if (mapping.mondayColumnId === "name") {
-              value = item.name || "";
-            } else {
-              // Buscar valor na coluna específica
-              const columnValue = item.column_values.find((cv: any) => cv.id === mapping.mondayColumnId);
-              value = columnValue?.text || "";
+          // Agrupar mapeamentos por campo para tratar múltiplas colunas
+          const fieldMappings: Record<string, any[]> = {};
+          mappingColumns.forEach(mapping => {
+            if (!fieldMappings[mapping.cpxField]) {
+              fieldMappings[mapping.cpxField] = [];
             }
+            fieldMappings[mapping.cpxField].push(mapping);
+          });
+
+          // Processar cada campo com seus mapeamentos
+          for (const [fieldName, mappings] of Object.entries(fieldMappings)) {
+            const values: string[] = [];
             
-            // Aplicar função de transformação se existir
-            if (mapping.transformFunction && mapping.transformFunction.trim()) {
-              try {
-                // Implementar funções básicas de transformação
-                if (mapping.transformFunction === "uppercase") {
-                  value = value.toUpperCase();
-                } else if (mapping.transformFunction === "lowercase") {
-                  value = value.toLowerCase();
-                } else if (mapping.transformFunction === "trim") {
-                  value = value.trim();
+            // Processar cada mapeamento do campo
+            for (const mapping of mappings) {
+              let value = "";
+              
+              // Verificar se o mapeamento é para o campo "name" (título do item)
+              if (mapping.mondayColumnId === "name") {
+                value = item.name || "";
+              } else {
+                // Buscar valor na coluna específica
+                const columnValue = item.column_values.find((cv: any) => cv.id === mapping.mondayColumnId);
+                value = columnValue?.text || "";
+              }
+              
+              // Aplicar função de transformação se existir
+              if (mapping.transformFunction && mapping.transformFunction.trim()) {
+                try {
+                  // Implementar funções básicas de transformação
+                  if (mapping.transformFunction === "uppercase") {
+                    value = value.toUpperCase();
+                  } else if (mapping.transformFunction === "lowercase") {
+                    value = value.toLowerCase();
+                  } else if (mapping.transformFunction === "trim") {
+                    value = value.trim();
+                  } else {
+                    // Executar função JavaScript personalizada
+                    const func = new Function('value', mapping.transformFunction);
+                    const result = func(value);
+                    value = result !== undefined ? String(result) : value;
+                    console.log(`Função de transformação aplicada no campo '${fieldName}':`, {
+                      original: value,
+                      transformed: result,
+                      function: mapping.transformFunction
+                    });
+                  }
+                } catch (transformError) {
+                  console.warn(`Erro na transformação da coluna ${mapping.cpxField}:`, transformError);
+                  // Manter valor original em caso de erro
                 }
-              } catch (transformError) {
-                console.warn(`Erro na transformação da coluna ${mapping.cpxField}:`, transformError);
+              }
+              
+              // Adicionar valor processado se não estiver vazio
+              if (value && value.trim()) {
+                values.push(value);
               }
             }
             
-            documentData[mapping.cpxField] = value;
+            // Mesclar valores para campos que permitem múltiplas colunas
+            if (fieldName === 'descricao' || fieldName === 'generalColumns') {
+              // Para campos de texto longo, mesclar com quebras de linha
+              documentData[fieldName] = values.join('\n\n');
+            } else {
+              // Para outros campos, usar apenas o primeiro valor
+              documentData[fieldName] = values[0] || "";
+            }
+            
+            console.log(`Campo '${fieldName}' processado:`, {
+              mappingsCount: mappings.length,
+              valuesCount: values.length,
+              finalValue: documentData[fieldName]
+            });
           }
 
           // Capturar dados extras das colunas não mapeadas para general_columns
