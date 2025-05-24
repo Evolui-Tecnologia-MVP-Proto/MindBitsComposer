@@ -101,6 +101,7 @@ export default function DocumentosPage() {
     setFormData({
       origem: "CPx", // Sempre CPx para novos documentos
       objeto: "",
+      tipo: "",
       cliente: "",
       responsavel: "",
       sistema: "",
@@ -779,6 +780,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     setFormData({
       origem: documento.origem,
       objeto: documento.objeto,
+      tipo: documento.tipo || "",
       cliente: documento.cliente,
       responsavel: documento.responsavel,
       sistema: documento.sistema,
@@ -786,6 +788,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       descricao: documento.descricao,
       status: documento.status,
       statusOrigem: documento.statusOrigem,
+      solicitante: documento.solicitante || "",
+      aprovador: documento.aprovador || "",
+      agente: documento.agente || "",
     });
     setIsEditModalOpen(true);
   };
