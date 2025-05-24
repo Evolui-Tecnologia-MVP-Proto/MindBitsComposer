@@ -565,27 +565,40 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         throw error;
       }
     },
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       console.log("OnSuccess disparado:", data);
       queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
       queryClient.invalidateQueries({ queryKey: ["/api/documentos/artifacts-count"] });
-      setIsEditModalOpen(false);
-      setEditingDocument(null);
-      setFormData({
-        origem: "",
-        objeto: "",
-        cliente: "",
-        responsavel: "",
-        sistema: "",
-        modulo: "",
-        descricao: "",
-        status: "Integrado",
-        statusOrigem: "Incluido",
-      });
-      toast({
-        title: "Sucesso",
-        description: "Documento atualizado com sucesso!",
-      });
+      
+      // Se está salvando um documento criado no modal de criação, fechar o modal de criação
+      if (currentCreatedDocumentId && variables.id === currentCreatedDocumentId) {
+        setIsCreateModalOpen(false);
+        setCurrentCreatedDocumentId(null);
+        resetFormData();
+        toast({
+          title: "Documento salvo!",
+          description: "As alterações foram salvas com sucesso.",
+        });
+      } else {
+        // Modal de edição normal
+        setIsEditModalOpen(false);
+        setEditingDocument(null);
+        setFormData({
+          origem: "",
+          objeto: "",
+          cliente: "",
+          responsavel: "",
+          sistema: "",
+          modulo: "",
+          descricao: "",
+          status: "Integrado",
+          statusOrigem: "Incluido",
+        });
+        toast({
+          title: "Sucesso",
+          description: "Documento atualizado com sucesso!",
+        });
+      }
       console.log("Modal deve estar fechada agora");
     },
     onError: (error) => {
