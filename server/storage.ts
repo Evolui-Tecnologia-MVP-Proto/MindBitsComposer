@@ -92,6 +92,7 @@ export interface IStorage {
   getAllDocumentos(): Promise<Documento[]>;
   updateDocumento(id: string, data: Partial<Documento>): Promise<Documento>;
   deleteDocumento(id: string): Promise<void>;
+  getDocumentosByKeyFields(keyFields: string[], documentData: any): Promise<Documento[]>;
   
   // Document Artifact operations
   getDocumentArtifact(id: string): Promise<DocumentArtifact | undefined>;
@@ -603,6 +604,55 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(documentos)
       .where(eq(documentos.id, id));
+  }
+
+  async getDocumentosByKeyFields(keyFields: string[], documentData: any): Promise<Documento[]> {
+    // Se não há campos chave, retorna array vazio
+    if (keyFields.length === 0) {
+      return [];
+    }
+
+    // Construir condições WHERE para cada campo chave
+    const conditions = keyFields.map(field => {
+      const value = documentData[field];
+      if (value === undefined || value === null || value === '') {
+        return null; // Ignorar campos vazios
+      }
+      
+      // Mapear campo para coluna da tabela
+      switch (field) {
+        case 'objeto': return eq(documentos.objeto, value);
+        case 'cliente': return eq(documentos.cliente, value);
+        case 'sistema': return eq(documentos.sistema, value);
+        case 'modulo': return eq(documentos.modulo, value);
+        case 'responsavel': return eq(documentos.responsavel, value);
+        case 'solicitante': return eq(documentos.solicitante, value);
+        case 'aprovador': return eq(documentos.aprovador, value);
+        case 'agente': return eq(documentos.agente, value);
+        case 'tipo': return eq(documentos.tipo, value);
+        case 'status': return eq(documentos.status, value);
+        case 'statusOrigem': return eq(documentos.statusOrigem, value);
+        case 'id_origem': return eq(documentos.idOrigem, value);
+        default: return null;
+      }
+    }).filter(condition => condition !== null);
+
+    // Se não há condições válidas, retorna array vazio
+    if (conditions.length === 0) {
+      return [];
+    }
+
+    // Executar consulta com condições AND
+    const query = db.select().from(documentos);
+    
+    // Aplicar todas as condições com AND
+    let finalQuery = query;
+    for (const condition of conditions) {
+      finalQuery = finalQuery.where(condition);
+    }
+
+    const results = await finalQuery;
+    return results;
   }
 
   // Document Artifact operations
@@ -1351,6 +1401,31 @@ export class MemStorage implements IStorage {
         this.documentArtifacts.delete(artifactId);
       }
     }
+  }
+
+  async getDocumentosByKeyFields(keyFields: string[], documentData: any): Promise<Documento[]> {
+    // Se não há campos chave, retorna array vazio
+    if (keyFields.length === 0) {
+      return [];
+    }
+
+    // Filtrar documentos que tenham todos os valores dos campos chave iguais
+    const allDocumentos = Array.from(this.documentos.values());
+    
+    return allDocumentos.filter(doc => {
+      return keyFields.every(field => {
+        const expectedValue = documentData[field];
+        
+        // Se o valor esperado está vazio, pular verificação
+        if (expectedValue === undefined || expectedValue === null || expectedValue === '') {
+          return true;
+        }
+        
+        // Comparar valor do documento com valor esperado
+        const docValue = (doc as any)[field];
+        return docValue === expectedValue;
+      });
+    });
   }
 
   // Document Artifact operations
