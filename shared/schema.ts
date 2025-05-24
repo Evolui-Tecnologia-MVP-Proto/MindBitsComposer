@@ -66,6 +66,7 @@ export const mondayMappings = pgTable("monday_mappings", {
   statusColumn: text("status_column").default(""),
   responsibleColumn: text("responsible_column").default(""),
   mappingFilter: text("mapping_filter").default(""),
+  defaultValues: json("default_values").$type<Record<string, string>>().default({}),
   lastSync: timestamp("last_sync"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

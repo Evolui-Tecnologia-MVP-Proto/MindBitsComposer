@@ -1111,9 +1111,10 @@ export default function AdminPage() {
           <Form {...mappingForm}>
             <form id="mappingForm" onSubmit={mappingForm.handleSubmit(onSubmitMapping)} className="space-y-4">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
+                <TabsList className="grid w-full grid-cols-4">
                   <TabsTrigger value="quadro">Quadro</TabsTrigger>
                   <TabsTrigger value="colunas" disabled={!selectedMapping}>Colunas</TabsTrigger>
+                  <TabsTrigger value="defaults" disabled={!selectedMapping}>Defaults</TabsTrigger>
                   <TabsTrigger value="filtros" disabled={!selectedMapping}>Filtros</TabsTrigger>
                 </TabsList>
                 
@@ -1481,6 +1482,72 @@ export default function AdminPage() {
                 </div>
               )
             }
+            </TabsContent>
+            
+            {/* Aba de valores padrão */}
+            <TabsContent value="defaults" className="py-4">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <h3 className="text-lg font-semibold">Valores Padrão</h3>
+                  <p className="text-sm text-gray-500">
+                    Configure valores padrão para campos quando não há mapeamento ou a API não retorna valor
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Campos de texto da tabela documentos */}
+                  {[
+                    { field: "origem", label: "Origem", type: "text" },
+                    { field: "objeto", label: "Objeto da Task", type: "text" },
+                    { field: "tipo", label: "Tipo", type: "text" },
+                    { field: "cliente", label: "Cliente", type: "text" },
+                    { field: "responsavel", label: "Responsável", type: "text" },
+                    { field: "sistema", label: "Sistema", type: "text" },
+                    { field: "modulo", label: "Módulo", type: "text" },
+                    { field: "descricao", label: "Detalhamento", type: "text" },
+                    { field: "status", label: "Status", type: "text" },
+                    { field: "statusOrigem", label: "Status Origem", type: "text" },
+                    { field: "solicitante", label: "Solicitante", type: "text" },
+                    { field: "aprovador", label: "Aprovador", type: "text" },
+                    { field: "agente", label: "Agente", type: "text" }
+                  ].map((fieldInfo) => (
+                    <div key={fieldInfo.field} className="space-y-2">
+                      <Label htmlFor={`default-${fieldInfo.field}`} className="text-sm font-medium">
+                        {fieldInfo.label}
+                      </Label>
+                      <Input
+                        id={`default-${fieldInfo.field}`}
+                        placeholder={`Valor padrão para ${fieldInfo.label}`}
+                        value={selectedMapping?.defaultValues?.[fieldInfo.field] || ""}
+                        onChange={(e) => {
+                          if (selectedMapping) {
+                            const newDefaults = {
+                              ...selectedMapping.defaultValues,
+                              [fieldInfo.field]: e.target.value
+                            };
+                            setSelectedMapping({
+                              ...selectedMapping,
+                              defaultValues: newDefaults
+                            });
+                            mappingForm.setValue("defaultValues", newDefaults);
+                          }
+                        }}
+                        className="text-sm"
+                      />
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mt-4">
+                  <h4 className="text-sm font-medium text-blue-800 mb-2">💡 Como funciona:</h4>
+                  <ul className="text-xs text-blue-700 space-y-1">
+                    <li>• Os valores padrão são usados quando um campo não tem mapeamento definido</li>
+                    <li>• Também são aplicados quando a API Monday não retorna valor para o campo mapeado</li>
+                    <li>• Deixe em branco se não quiser valor padrão para o campo</li>
+                    <li>• Use valores consistentes para facilitar futuras análises e filtros</li>
+                  </ul>
+                </div>
+              </div>
             </TabsContent>
             
             {/* Aba de filtros */}
