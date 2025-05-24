@@ -501,6 +501,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     enabled: !!currentDocumentId,
   });
 
+  // Buscar anexos para o documento criado no modal (modal de criação)
+  const { data: createdDocumentArtifacts = [] } = useQuery<DocumentArtifact[]>({
+    queryKey: ["/api/documentos", currentCreatedDocumentId, "artifacts"],
+    queryFn: async () => {
+      if (!currentCreatedDocumentId) return [];
+      const response = await fetch(`/api/documentos/${currentCreatedDocumentId}/artifacts`);
+      if (!response.ok) throw new Error("Erro ao buscar anexos");
+      return response.json();
+    },
+    enabled: !!currentCreatedDocumentId,
+  });
+
   // Mutation para criar documento
   const createDocumentoMutation = useMutation({
     mutationFn: async (data: InsertDocumento) => {
@@ -617,11 +629,23 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       if (!response.ok) throw new Error("Erro ao criar artefato");
       return response.json();
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/documentos", currentDocumentId, "artifacts"] });
+    onSuccess: (newArtifact, variables) => {
+      // Invalidar cache para o documento atual (edição)
+      if (currentDocumentId) {
+        queryClient.invalidateQueries({ queryKey: ["/api/documentos", currentDocumentId, "artifacts"] });
+      }
+      // Invalidar cache para o documento criado (modal de criação)
+      if (currentCreatedDocumentId) {
+        queryClient.invalidateQueries({ queryKey: ["/api/documentos", currentCreatedDocumentId, "artifacts"] });
+      }
+      // Invalidar contagem de anexos
       queryClient.invalidateQueries({ queryKey: ["/api/documentos/artifacts-count"] });
       setIsAddArtifactModalOpen(false);
       resetArtifactForm();
+      toast({
+        title: "Anexo adicionado!",
+        description: "O anexo foi criado com sucesso.",
+      });
     },
   });
 
@@ -1393,11 +1417,47 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     </Button>
                   </div>
                   
-                  <div className="text-center py-8 bg-green-50 rounded-lg border border-green-200">
-                    <Paperclip className="h-8 w-8 text-green-500 mx-auto mb-3" />
-                    <p className="text-sm text-green-700 mb-3">✅ Documento criado com sucesso!</p>
-                    <p className="text-xs text-green-600">Agora você pode adicionar anexos</p>
-                  </div>
+                  {/* Lista de anexos */}
+                  {createdDocumentArtifacts && createdDocumentArtifacts.length > 0 ? (
+                    <div className="space-y-2">
+                      {createdDocumentArtifacts.map((artifact) => (
+                        <div
+                          key={artifact.id}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border"
+                        >
+                          <div className="flex items-center gap-3">
+                            <File className="h-4 w-4 text-blue-500" />
+                            <div>
+                              <p className="text-sm font-medium">{artifact.name}</p>
+                              <p className="text-xs text-gray-500">
+                                {artifact.fileName} • {artifact.mimeType}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const link = document.createElement('a');
+                                link.href = `data:${artifact.mimeType};base64,${artifact.fileData}`;
+                                link.download = artifact.fileName;
+                                link.click();
+                              }}
+                            >
+                              <Download className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 bg-green-50 rounded-lg border border-green-200">
+                      <Paperclip className="h-8 w-8 text-green-500 mx-auto mb-3" />
+                      <p className="text-sm text-green-700 mb-3">✅ Documento criado com sucesso!</p>
+                      <p className="text-xs text-green-600">Adicione anexos clicando no botão acima</p>
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed">
