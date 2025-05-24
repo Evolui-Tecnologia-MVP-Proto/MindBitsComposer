@@ -959,7 +959,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           documentData.origem = "monday";
           
           // Verificar e preencher campos obrigatórios em branco
-          const requiredFields = ["objeto", "cliente", "responsavel", "sistema", "modulo", "descricao"];
+          const requiredFields = ["objeto", "cliente", "responsavel", "sistema", "modulo", "descricao", "solicitante", "aprovador", "agente"];
           requiredFields.forEach(field => {
             if (!documentData[field] || documentData[field].trim() === "") {
               documentData[field] = "Valor não retornado pela API";

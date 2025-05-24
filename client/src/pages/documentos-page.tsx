@@ -108,6 +108,9 @@ export default function DocumentosPage() {
       descricao: "",
       status: "Incluido", // Sempre "Incluido" para novos documentos
       statusOrigem: "Manual", // Sempre "Manual" para novos documentos
+      solicitante: "",
+      aprovador: "",
+      agente: "",
     });
     setCurrentCreatedDocumentId(null); // Reset do documento criado
     setCreateModalActiveTab("dados-gerais"); // Resetar aba para dados-gerais
@@ -1463,6 +1466,36 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 </div>
               </div>
               
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="solicitante">Solicitante</Label>
+                  <Input
+                    id="solicitante"
+                    value={formData.solicitante}
+                    onChange={(e) => setFormData({ ...formData, solicitante: e.target.value })}
+                    placeholder="Solicitante"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="aprovador">Aprovador</Label>
+                  <Input
+                    id="aprovador"
+                    value={formData.aprovador}
+                    onChange={(e) => setFormData({ ...formData, aprovador: e.target.value })}
+                    placeholder="Aprovador"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="agente">Agente</Label>
+                  <Input
+                    id="agente"
+                    value={formData.agente}
+                    onChange={(e) => setFormData({ ...formData, agente: e.target.value })}
+                    placeholder="Agente"
+                  />
+                </div>
+              </div>
+              
               <div>
                 <Label htmlFor="modulo">Módulo</Label>
                 <Input
@@ -2048,6 +2081,36 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       value={formData.sistema}
                       onChange={(e) => setFormData({ ...formData, sistema: e.target.value })}
                       placeholder="Sistema"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="edit-solicitante">Solicitante</Label>
+                    <Input
+                      id="edit-solicitante"
+                      value={formData.solicitante}
+                      onChange={(e) => setFormData({ ...formData, solicitante: e.target.value })}
+                      placeholder="Solicitante"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-aprovador">Aprovador</Label>
+                    <Input
+                      id="edit-aprovador"
+                      value={formData.aprovador}
+                      onChange={(e) => setFormData({ ...formData, aprovador: e.target.value })}
+                      placeholder="Aprovador"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-agente">Agente</Label>
+                    <Input
+                      id="edit-agente"
+                      value={formData.agente}
+                      onChange={(e) => setFormData({ ...formData, agente: e.target.value })}
+                      placeholder="Agente"
                     />
                   </div>
                 </div>
