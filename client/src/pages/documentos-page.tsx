@@ -112,6 +112,39 @@ export default function DocumentosPage() {
     console.log("✅ Campos limpos!");
   };
 
+  // Função para verificar se o MIME type é suportado pelo browser para visualização
+  const isMimeTypeViewable = (mimeType: string): boolean => {
+    const viewableMimeTypes = [
+      // Imagens
+      'image/jpeg',
+      'image/jpg', 
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'image/svg+xml',
+      // PDFs
+      'application/pdf',
+      // Texto
+      'text/plain',
+      'text/html',
+      'text/css',
+      'text/javascript',
+      'text/xml',
+      'application/json',
+      'application/xml',
+      // Vídeos (alguns browsers)
+      'video/mp4',
+      'video/webm',
+      'video/ogg',
+      // Áudios (alguns browsers)
+      'audio/mp3',
+      'audio/wav',
+      'audio/ogg'
+    ];
+    
+    return viewableMimeTypes.includes(mimeType.toLowerCase());
+  };
+
   const [formData, setFormData] = useState<InsertDocumento>({
     origem: "CPx", // Sempre CPx para novos documentos
     objeto: "",
@@ -1251,20 +1284,22 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               >
                                 <Download className="h-4 w-4 text-blue-500" />
                               </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                className="h-8 w-8"
-                                onClick={() => {
-                                  const link = document.createElement('a');
-                                  link.href = `data:${artifact.mimeType};base64,${artifact.fileData}`;
-                                  link.target = '_blank';
-                                  link.click();
-                                }}
-                                title="Visualizar"
-                              >
-                                <Eye className="h-4 w-4 text-blue-500" />
-                              </Button>
+                              {isMimeTypeViewable(artifact.mimeType) && (
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-8 w-8"
+                                  onClick={() => {
+                                    const link = document.createElement('a');
+                                    link.href = `data:${artifact.mimeType};base64,${artifact.fileData}`;
+                                    link.target = '_blank';
+                                    link.click();
+                                  }}
+                                  title="Visualizar"
+                                >
+                                  <Eye className="h-4 w-4 text-blue-500" />
+                                </Button>
+                              )}
                             </div>
                           </TableCell>
                         </TableRow>
