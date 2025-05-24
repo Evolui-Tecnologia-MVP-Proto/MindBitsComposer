@@ -621,8 +621,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getDocumentosByKeyFields(keyFields: string[], documentData: any): Promise<Documento[]> {
+    console.log(`🔍 STORAGE - Verificando duplicatas:`, {
+      keyFields,
+      documentDataKeys: Object.keys(documentData),
+      idOrigem: documentData.idOrigem,
+      id_origem: documentData.id_origem
+    });
+
     // Se não há campos chave, retorna array vazio
     if (keyFields.length === 0) {
+      console.log(`❌ STORAGE - Nenhum campo chave fornecido`);
       return [];
     }
 
@@ -631,7 +639,10 @@ export class DatabaseStorage implements IStorage {
     
     for (const field of keyFields) {
       const value = documentData[field];
+      console.log(`🔍 STORAGE - Campo chave '${field}': ${value} (tipo: ${typeof value})`);
+      
       if (value === undefined || value === null || value === '') {
+        console.log(`⚠️ STORAGE - Campo '${field}' está vazio - ignorando`);
         continue; // Ignorar campos vazios
       }
       
@@ -652,27 +663,46 @@ export class DatabaseStorage implements IStorage {
         case 'id_origem': 
           // Verificar tanto id_origem quanto idOrigem no documentData
           const idOrigemValue = documentData.idOrigem || documentData.id_origem;
+          console.log(`🎯 STORAGE - Processando id_origem: documentData.idOrigem=${documentData.idOrigem}, documentData.id_origem=${documentData.id_origem}, final=${idOrigemValue}`);
           if (idOrigemValue !== undefined && idOrigemValue !== null && idOrigemValue !== '') {
             condition = eq(documentos.idOrigem, idOrigemValue);
+            console.log(`✅ STORAGE - Condição id_origem criada com valor: ${idOrigemValue}`);
+          } else {
+            console.log(`❌ STORAGE - id_origem está vazio ou inválido`);
           }
           break;
       }
       
       if (condition) {
         conditions.push(condition);
+        console.log(`✅ STORAGE - Condição adicionada para campo '${field}' com valor '${value}'`);
+      } else {
+        console.log(`❌ STORAGE - Nenhuma condição criada para campo '${field}'`);
       }
     }
 
     // Se não há condições válidas, retorna array vazio
     if (conditions.length === 0) {
+      console.log(`❌ STORAGE - Nenhuma condição válida criada`);
       return [];
     }
 
+    console.log(`🚀 STORAGE - Executando consulta com ${conditions.length} condições`);
+    
     // Executar consulta com condições AND usando and()
     const results = await db
       .select()
       .from(documentos)
       .where(and(...conditions));
+      
+    console.log(`📊 STORAGE - Encontrados ${results.length} documentos duplicados`);
+    if (results.length > 0) {
+      console.log(`📋 STORAGE - Primeiro documento duplicado:`, {
+        id: results[0].id,
+        idOrigem: results[0].idOrigem,
+        objeto: results[0].objeto
+      });
+    }
       
     return results;
   }
