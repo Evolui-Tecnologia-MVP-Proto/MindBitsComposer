@@ -389,21 +389,10 @@ export default function AdminPage() {
       // Atualizar a lista de mapeamentos
       queryClient.invalidateQueries({ queryKey: ['/api/monday/mappings'] });
       
-      // Se estiver em modo de edição, fechar a modal
+      // Em modo de edição, manter a modal aberta após salvar
       if (selectedMapping) {
-        console.log("Modo edição detectado - fechando modal");
-        setIsModalOpen(false);
-        // Limpar a seleção após edição
-        setSelectedMapping(null);
-        // Resetar o formulário
-        mappingForm.reset({
-          name: "",
-          boardId: "",
-          quadroMonday: "",
-          description: "",
-        });
-        // Voltar para a aba do quadro
-        setActiveTab("quadro");
+        console.log("Modo edição - modal permanece aberta");
+        // Não fechar a modal, apenas mostrar que foi salvo
       } else {
         // Se for inclusão (novo mapeamento), manter aberto e mudar para a aba de colunas
         console.log("Modo criação - mantendo modal aberto e mudando para aba colunas");
