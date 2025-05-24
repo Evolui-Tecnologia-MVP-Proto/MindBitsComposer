@@ -905,6 +905,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
             try {
               console.log(`✅ APLICANDO FILTRO para item ${item.id}`);
               
+              // DEBUG: Mostrar estrutura completa do primeiro item
+              if (item.id === items[0].id) {
+                console.log(`🔍 ESTRUTURA COMPLETA DO PRIMEIRO ITEM:`, JSON.stringify(item, null, 2));
+                console.log(`📊 COLUNAS DISPONÍVEIS:`);
+                item.column_values.forEach((col: any) => {
+                  console.log(`  - Coluna: "${col.column?.title}" | Texto: "${col.text}" | Valor: ${JSON.stringify(col.value)}`);
+                });
+              }
+              
               // Criar função de filtro e executar
               const filterFunction = new Function('item', existingMapping.mappingFilter);
               const shouldInclude = filterFunction(item);
