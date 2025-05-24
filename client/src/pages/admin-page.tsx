@@ -1431,21 +1431,7 @@ export default function AdminPage() {
                                 <span className="text-sm">
                                   {column.cpxField}
                                 </span>
-                                <Badge variant="outline" className={`text-xs font-mono ${
-                                  column.cpxField === 'objeto' ? 'bg-gray-50 text-gray-700 border-gray-200' :
-                                  column.cpxField === 'tipo' ? 'bg-purple-50 text-purple-700 border-purple-200' :
-                                  column.cpxField === 'cliente' ? 'bg-gray-50 text-gray-700 border-gray-200' :
-                                  column.cpxField === 'sistema' ? 'bg-gray-50 text-gray-700 border-gray-200' :
-                                  column.cpxField === 'modulo' ? 'bg-gray-50 text-gray-700 border-gray-200' :
-                                  column.cpxField === 'responsavel' ? 'bg-green-50 text-green-700 border-green-200' :
-                                  column.cpxField === 'solicitante' ? 'bg-green-50 text-green-700 border-green-200' :
-                                  column.cpxField === 'aprovador' ? 'bg-green-50 text-green-700 border-green-200' :
-                                  column.cpxField === 'agente' ? 'bg-green-50 text-green-700 border-green-200' :
-                                  column.cpxField === 'descricao' ? 'bg-orange-50 text-orange-700 border-orange-200' :
-                                  column.cpxField === 'status' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' :
-                                  column.cpxField === 'statusOrigem' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
-                                  'bg-gray-50 text-gray-700 border-gray-200'
-                                }`}>
+                                <Badge variant="outline" className="text-xs font-mono bg-blue-50 text-blue-700 border-blue-200">
                                   {column.cpxField === 'objeto' ? 'texto' :
                                    column.cpxField === 'tipo' ? 'seleção' :
                                    column.cpxField === 'cliente' ? 'texto' :
