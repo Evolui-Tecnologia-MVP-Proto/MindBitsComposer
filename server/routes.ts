@@ -824,13 +824,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const query = `
         query {
           boards(ids: [${existingMapping.boardId}]) {
-            items {
-              id
-              name
-              column_values(ids: [${mondayColumns.map(id => `"${id}"`).join(", ")}]) {
+            items_page(limit: 500) {
+              items {
                 id
-                text
-                value
+                name
+                column_values(ids: [${mondayColumns.map(id => `"${id}"`).join(", ")}]) {
+                  id
+                  title
+                  text
+                  value
+                }
               }
             }
           }
@@ -843,7 +846,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": apiKey
+          "Authorization": apiKey,
+          "API-Version": "2023-10"
         },
         body: JSON.stringify({ query })
       });
@@ -870,7 +874,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(mondayData.errors)}`);
       }
 
-      const items = mondayData.data?.boards?.[0]?.items || [];
+      const items = mondayData.data?.boards?.[0]?.items_page?.items || [];
       let documentsCreated = 0;
       let documentsSkipped = 0;
 
