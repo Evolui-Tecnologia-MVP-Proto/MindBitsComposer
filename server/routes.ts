@@ -915,15 +915,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
             documentData[mapping.cpxField] = value;
           }
 
-          // Verificar se todos os campos obrigatórios estão preenchidos
-          const requiredFields = ["origem", "objeto", "cliente", "responsavel", "sistema", "modulo", "descricao"];
-          const missingFields = requiredFields.filter(field => !documentData[field] || documentData[field].trim() === "");
+          // Definir origem sempre como "monday"
+          documentData.origem = "monday";
           
-          if (missingFields.length > 0) {
-            console.warn(`Item ${item.id} pulado - campos obrigatórios em branco: ${missingFields.join(", ")}`);
-            documentsSkipped++;
-            continue;
-          }
+          // Verificar e preencher campos obrigatórios em branco
+          const requiredFields = ["objeto", "cliente", "responsavel", "sistema", "modulo", "descricao"];
+          requiredFields.forEach(field => {
+            if (!documentData[field] || documentData[field].trim() === "") {
+              documentData[field] = "Valor não retornado pela API";
+            }
+          });
 
           // Definir valores padrão se não mapeados
           if (!documentData.status) {
