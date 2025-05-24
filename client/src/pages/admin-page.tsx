@@ -68,6 +68,7 @@ type BoardMapping = {
   boardId: string;
   quadroMonday: string;
   description: string;
+  mappingFilter: string;
   lastSync: string | null;
   columnCount?: number;
 };
@@ -105,6 +106,7 @@ const mappingFormSchema = z.object({
   boardId: z.string().min(1, { message: "ID do quadro é obrigatório" }),
   quadroMonday: z.string().optional(),
   description: z.string().optional(),
+  mappingFilter: z.string().optional(),
 });
 
 const columnMappingFormSchema = z.object({
@@ -188,6 +190,7 @@ export default function AdminPage() {
       boardId: "",
       quadroMonday: "",
       description: "",
+      mappingFilter: "",
     },
   });
   
@@ -209,6 +212,7 @@ export default function AdminPage() {
         boardId: selectedMapping.boardId,
         quadroMonday: selectedMapping.quadroMonday,
         description: selectedMapping.description,
+        mappingFilter: selectedMapping.mappingFilter || "",
       });
       
       // Se o campo quadroMonday estiver preenchido, muda a cor do botão para verde
@@ -1482,37 +1486,47 @@ export default function AdminPage() {
             
             {/* Aba de filtros */}
             <TabsContent value="filtros" className="py-4">
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="filterCondition" className="text-sm font-medium">
-                    Condição de Filtragem (JavaScript)
-                  </Label>
-                  <p className="text-xs text-gray-500 mb-2">
-                    Defina uma função JavaScript para filtrar os itens do quadro Monday. 
-                    Use a variável 'item' para acessar os dados de cada linha.
-                  </p>
-                  <Textarea
-                    id="filterCondition"
-                    placeholder="Insira sua condição de filtragem..."
-                    className="font-mono text-sm min-h-[120px] resize-none"
-                    defaultValue={`// Exemplo: Filtrar por status específicos
+              <Form {...mappingForm}>
+                <div className="space-y-4">
+                  <FormField
+                    control={mappingForm.control}
+                    name="mappingFilter"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">
+                          Condição de Filtragem (JavaScript)
+                        </FormLabel>
+                        <p className="text-xs text-gray-500 mb-2">
+                          Defina uma função JavaScript para filtrar os itens do quadro Monday. 
+                          Use a variável 'item' para acessar os dados de cada linha.
+                        </p>
+                        <FormControl>
+                          <Textarea
+                            placeholder={`// Exemplo: Filtrar por status específicos
 return item.column_values.some(col => 
   col.column.title === "Status do processo" && 
   (col.text === "Em Análise Preliminar" || col.text === "Em Detalhamento Técnico")
 );`}
+                            className="font-mono text-sm min-h-[120px] resize-none"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
+                  
+                  <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                    <h4 className="text-sm font-medium text-blue-800 mb-2">💡 Dicas de uso:</h4>
+                    <ul className="text-xs text-blue-700 space-y-1">
+                      <li>• Use <code className="bg-blue-100 px-1 rounded">item.column_values</code> para acessar os valores das colunas</li>
+                      <li>• Acesse o título da coluna com <code className="bg-blue-100 px-1 rounded">col.column.title</code></li>
+                      <li>• Use <code className="bg-blue-100 px-1 rounded">col.text</code> para o valor em texto da coluna</li>
+                      <li>• A função deve retornar <code className="bg-blue-100 px-1 rounded">true</code> para incluir o item ou <code className="bg-blue-100 px-1 rounded">false</code> para excluí-lo</li>
+                    </ul>
+                  </div>
                 </div>
-                
-                <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
-                  <h4 className="text-sm font-medium text-blue-800 mb-2">💡 Dicas de uso:</h4>
-                  <ul className="text-xs text-blue-700 space-y-1">
-                    <li>• Use <code className="bg-blue-100 px-1 rounded">item.column_values</code> para acessar os valores das colunas</li>
-                    <li>• Acesse o título da coluna com <code className="bg-blue-100 px-1 rounded">col.column.title</code></li>
-                    <li>• Use <code className="bg-blue-100 px-1 rounded">col.text</code> para o valor em texto da coluna</li>
-                    <li>• A função deve retornar <code className="bg-blue-100 px-1 rounded">true</code> para incluir o item ou <code className="bg-blue-100 px-1 rounded">false</code> para excluí-lo</li>
-                  </ul>
-                </div>
-              </div>
+              </Form>
             </TabsContent>
             
             {/* Botões que ficam abaixo do TabContent, condicionais por aba */}

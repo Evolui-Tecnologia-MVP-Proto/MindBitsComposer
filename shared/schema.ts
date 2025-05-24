@@ -65,6 +65,7 @@ export const mondayMappings = pgTable("monday_mappings", {
   quadroMonday: text("quadro_monday").default(""),
   statusColumn: text("status_column").default(""),
   responsibleColumn: text("responsible_column").default(""),
+  mappingFilter: text("mapping_filter").default(""),
   lastSync: timestamp("last_sync"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
