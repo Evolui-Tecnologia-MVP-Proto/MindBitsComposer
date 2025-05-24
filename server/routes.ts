@@ -965,11 +965,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
               }
               
-              // ESTE BLOCO NUNCA SERÁ EXECUTADO (if false)
+              // Criar função de filtro e executar
               const filterFunction = new Function('item', existingMapping.mappingFilter);
-              shouldInclude = filterFunction(item);
+              const shouldInclude = filterFunction(item);
               
               console.log(`🎯 RESULTADO DO FILTRO para item ${item.id}:`, shouldInclude);
+              
+              if (!shouldInclude) {
+                console.log(`❌ Item ${item.id} foi FILTRADO (excluído) - não atende às condições`);
+                documentsSkipped++;
+                continue; // Pular este item
+              }
+              
+              console.log(`✅ Item ${item.id} PASSOU no filtro - será processado`);
               
             } catch (filterError) {
               console.error(`💥 ERRO ao aplicar filtro no item ${item.id}:`, filterError);
