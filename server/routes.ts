@@ -894,6 +894,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Construir o documento baseado no mapeamento de colunas
           const documentData: any = {};
           
+          // Coletar IDs das colunas já mapeadas
+          const mappedColumnIds = new Set(mappingColumns.map(m => m.mondayColumnId));
+          
           // Mapear cada coluna do Monday para o campo correspondente
           for (const mapping of mappingColumns) {
             let value = "";

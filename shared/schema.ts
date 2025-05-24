@@ -194,6 +194,7 @@ export const documentos = pgTable("documentos", {
   descricao: text("descricao").notNull(),
   status: text("status").notNull().default("Processando"),
   statusOrigem: text("status_origem").notNull().default("Incluido"),
+  generalColumns: json("general_columns").$type<Record<string, any>>().default({}), // Armazena dados extras do sistema de origem
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
