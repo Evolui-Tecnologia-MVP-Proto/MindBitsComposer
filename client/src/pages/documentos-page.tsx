@@ -1433,7 +1433,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               </div>
               
               <div>
-                <Label htmlFor="objeto">Objeto/Nome</Label>
+                <Label htmlFor="objeto">Objeto da Task</Label>
                 <Input
                   id="objeto"
                   value={formData.objeto}
@@ -2022,7 +2022,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 </div>
                 
                 <div>
-                  <Label htmlFor="edit-objeto">Objeto/Nome</Label>
+                  <Label htmlFor="edit-objeto">Objeto da Task</Label>
                   <Input
                     id="edit-objeto"
                     value={formData.objeto}
