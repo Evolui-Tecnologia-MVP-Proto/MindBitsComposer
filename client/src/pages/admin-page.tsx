@@ -662,7 +662,7 @@ export default function AdminPage() {
       
       toast({
         title: "Sincronização concluída",
-        description: `Mapeamento "${mapping.name}" executado com sucesso!`,
+        description: `Processados: ${result.itemsProcessed} itens | Criados: ${result.documentsCreated} documentos | Ignorados: ${result.documentsSkipped}`,
       });
 
       // Atualizar a lista de mapeamentos para refletir mudanças

@@ -814,6 +814,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (mappingColumns.length === 0) {
         return res.status(400).send("Nenhuma coluna mapeada encontrada para este mapeamento");
       }
+
+      // Obter dados do quadro Monday
+      const mondayColumns = mappingColumns.map(col => col.mondayColumnId);
+      const query = `
+        query {
+          boards(ids: [${existingMapping.boardId}]) {
+            items_page {
+              items {
+                id
+                name
+                column_values(ids: [${mondayColumns.map(id => `"${id}"`).join(", ")}]) {
+                  id
+                  text
+                  value
+                }
+              }
+            }
+          }
+        }
+      `;
+
+      const mondayResponse = await fetch("https://api.monday.com/v2", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": apiKey
+        },
+        body: JSON.stringify({ query })
+      });
+
+      if (!mondayResponse.ok) {
+        throw new Error(`Erro na API do Monday: ${mondayResponse.status} ${mondayResponse.statusText}`);
+      }
+
+      const mondayData = await mondayResponse.json();
+      
+      if (mondayData.errors) {
+        throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(mondayData.errors)}`);
+      }
+
+      const items = mondayData.data?.boards?.[0]?.items_page?.items || [];
+      let documentsCreated = 0;
+      let documentsSkipped = 0;
+
+      // Processar cada item (linha) do Monday
+      for (const item of items) {
+        try {
+          // Construir o documento baseado no mapeamento de colunas
+          const documentData: any = {};
+          
+          // Mapear cada coluna do Monday para o campo correspondente
+          for (const mapping of mappingColumns) {
+            const columnValue = item.column_values.find((cv: any) => cv.id === mapping.mondayColumnId);
+            let value = columnValue?.text || "";
+            
+            // Aplicar função de transformação se existir
+            if (mapping.transformFunction && mapping.transformFunction.trim()) {
+              try {
+                // Implementar funções básicas de transformação
+                if (mapping.transformFunction === "uppercase") {
+                  value = value.toUpperCase();
+                } else if (mapping.transformFunction === "lowercase") {
+                  value = value.toLowerCase();
+                } else if (mapping.transformFunction === "trim") {
+                  value = value.trim();
+                }
+              } catch (transformError) {
+                console.warn(`Erro na transformação da coluna ${mapping.cpxField}:`, transformError);
+              }
+            }
+            
+            documentData[mapping.cpxField] = value;
+          }
+
+          // Verificar se todos os campos obrigatórios estão preenchidos
+          const requiredFields = ["origem", "objeto", "cliente", "responsavel", "sistema", "modulo", "descricao"];
+          const missingFields = requiredFields.filter(field => !documentData[field] || documentData[field].trim() === "");
+          
+          if (missingFields.length > 0) {
+            console.warn(`Item ${item.id} pulado - campos obrigatórios em branco: ${missingFields.join(", ")}`);
+            documentsSkipped++;
+            continue;
+          }
+
+          // Definir valores padrão se não mapeados
+          if (!documentData.status) {
+            documentData.status = "Processando";
+          }
+          if (!documentData.statusOrigem) {
+            documentData.statusOrigem = "Monday.com";
+          }
+
+          // Criar o documento
+          const newDocument = await storage.createDocumento(documentData);
+          documentsCreated++;
+          
+        } catch (itemError) {
+          console.error(`Erro ao processar item ${item.id}:`, itemError);
+          documentsSkipped++;
+        }
+      }
       
       // Atualizar a data de última sincronização
       await storage.updateMondayMappingLastSync(id);
@@ -822,13 +923,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         message: "Sincronização executada com sucesso",
         mapping: existingMapping,
-        columnsProcessed: mappingColumns.length,
+        itemsProcessed: items.length,
+        documentsCreated,
+        documentsSkipped,
+        columnsMapping: mappingColumns.length,
         timestamp: new Date().toISOString()
       });
       
     } catch (error) {
       console.error("Erro ao executar sincronização:", error);
-      res.status(500).send("Erro ao executar sincronização");
+      res.status(500).send(`Erro ao executar sincronização: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
   });
 
