@@ -940,6 +940,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (existingMapping.mappingFilter && existingMapping.mappingFilter.trim()) {
             try {
               console.log(`✅ APLICANDO FILTRO para item ${item.id}`);
+              console.log(`📋 FILTRO JAVASCRIPT:`, existingMapping.mappingFilter);
               
               // DEBUG: Mostrar estrutura completa do primeiro item
               if (item.id === items[0].id) {
