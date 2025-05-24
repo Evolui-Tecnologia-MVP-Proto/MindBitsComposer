@@ -742,10 +742,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       if (!response.ok) throw new Error("Erro ao excluir artefato");
     },
     onSuccess: () => {
+      // Invalidar cache para todos os possíveis documentos
       queryClient.invalidateQueries({ queryKey: ["/api/documentos", currentDocumentId, "artifacts"] });
       queryClient.invalidateQueries({ queryKey: ["/api/documentos", currentCreatedDocumentId, "artifacts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos", selectedDocument?.id, "artifacts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos", editingDocument?.id, "artifacts"] });
+      
       setIsDeleteArtifactConfirmOpen(false);
       setArtifactToDelete(null);
+      
       toast({
         title: "Anexo excluído!",
         description: "O anexo foi removido com sucesso.",
