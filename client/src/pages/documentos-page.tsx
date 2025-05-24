@@ -61,6 +61,8 @@ import {
   Paperclip,
   Upload,
   Download,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import { type Documento, type InsertDocumento, type DocumentArtifact, type InsertDocumentArtifact } from "@shared/schema";
 
@@ -84,6 +86,8 @@ export default function DocumentosPage() {
   const [selectedFolderFiles, setSelectedFolderFiles] = useState<any[]>([]);
   const [isLoadingFolderFiles, setIsLoadingFolderFiles] = useState(false);
   const [currentCreatedDocumentId, setCurrentCreatedDocumentId] = useState<string | null>(null);
+  const [isEscopoExpanded, setIsEscopoExpanded] = useState(true);
+  const [isPessoasExpanded, setIsPessoasExpanded] = useState(true);
   const [createModalActiveTab, setCreateModalActiveTab] = useState("dados-gerais");
   const [artifactFormData, setArtifactFormData] = useState<InsertDocumentArtifact>({
     documentoId: "",
@@ -1457,80 +1461,112 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               </div>
               
               <div className="border rounded-lg p-4 bg-blue-50 border-blue-200">
-                <h3 className="text-sm font-medium text-blue-700 mb-3">Escopo</h3>
-                <div className="grid gap-4">
-                  <div>
-                    <Label htmlFor="cliente">Cliente</Label>
-                    <Input
-                      id="cliente"
-                      value={formData.cliente}
-                      onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
-                      placeholder="Nome do cliente"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="sistema">Sistema</Label>
-                      <Input
-                        id="sistema"
-                        value={formData.sistema}
-                        onChange={(e) => setFormData({ ...formData, sistema: e.target.value })}
-                        placeholder="Sistema"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="modulo">Módulo</Label>
-                      <Input
-                        id="modulo"
-                        value={formData.modulo}
-                        onChange={(e) => setFormData({ ...formData, modulo: e.target.value })}
-                        placeholder="Módulo"
-                      />
-                    </div>
-                  </div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-medium text-blue-700">Escopo</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsEscopoExpanded(!isEscopoExpanded)}
+                    className="h-6 w-6 p-0 hover:bg-blue-100"
+                  >
+                    {isEscopoExpanded ? (
+                      <ChevronUp className="h-4 w-4 text-blue-600" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-blue-600" />
+                    )}
+                  </Button>
                 </div>
+                {isEscopoExpanded && (
+                  <div className="grid gap-4">
+                    <div>
+                      <Label htmlFor="cliente">Cliente</Label>
+                      <Input
+                        id="cliente"
+                        value={formData.cliente}
+                        onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
+                        placeholder="Nome do cliente"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="sistema">Sistema</Label>
+                        <Input
+                          id="sistema"
+                          value={formData.sistema}
+                          onChange={(e) => setFormData({ ...formData, sistema: e.target.value })}
+                          placeholder="Sistema"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="modulo">Módulo</Label>
+                        <Input
+                          id="modulo"
+                          value={formData.modulo}
+                          onChange={(e) => setFormData({ ...formData, modulo: e.target.value })}
+                          placeholder="Módulo"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
               
               <div className="border rounded-lg p-4 bg-gray-50">
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Pessoas</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="responsavel">Responsável</Label>
-                    <Input
-                      id="responsavel"
-                      value={formData.responsavel}
-                      onChange={(e) => setFormData({ ...formData, responsavel: e.target.value })}
-                      placeholder="Responsável"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="solicitante">Solicitante</Label>
-                    <Input
-                      id="solicitante"
-                      value={formData.solicitante}
-                      onChange={(e) => setFormData({ ...formData, solicitante: e.target.value })}
-                      placeholder="Solicitante"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="aprovador">Aprovador</Label>
-                    <Input
-                      id="aprovador"
-                      value={formData.aprovador}
-                      onChange={(e) => setFormData({ ...formData, aprovador: e.target.value })}
-                      placeholder="Aprovador"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="agente">Agente</Label>
-                    <Input
-                      id="agente"
-                      value={formData.agente}
-                      onChange={(e) => setFormData({ ...formData, agente: e.target.value })}
-                      placeholder="Agente"
-                    />
-                  </div>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-medium text-gray-700">Pessoas</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsPessoasExpanded(!isPessoasExpanded)}
+                    className="h-6 w-6 p-0 hover:bg-gray-200"
+                  >
+                    {isPessoasExpanded ? (
+                      <ChevronUp className="h-4 w-4 text-gray-600" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-gray-600" />
+                    )}
+                  </Button>
                 </div>
+                {isPessoasExpanded && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="responsavel">Responsável</Label>
+                      <Input
+                        id="responsavel"
+                        value={formData.responsavel}
+                        onChange={(e) => setFormData({ ...formData, responsavel: e.target.value })}
+                        placeholder="Responsável"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="solicitante">Solicitante</Label>
+                      <Input
+                        id="solicitante"
+                        value={formData.solicitante}
+                        onChange={(e) => setFormData({ ...formData, solicitante: e.target.value })}
+                        placeholder="Solicitante"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="aprovador">Aprovador</Label>
+                      <Input
+                        id="aprovador"
+                        value={formData.aprovador}
+                        onChange={(e) => setFormData({ ...formData, aprovador: e.target.value })}
+                        placeholder="Aprovador"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="agente">Agente</Label>
+                      <Input
+                        id="agente"
+                        value={formData.agente}
+                        onChange={(e) => setFormData({ ...formData, agente: e.target.value })}
+                        placeholder="Agente"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
               
               <div>
@@ -2097,80 +2133,112 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 </div>
                 
                 <div className="border rounded-lg p-4 bg-blue-50 border-blue-200">
-                  <h3 className="text-sm font-medium text-blue-700 mb-3">Escopo</h3>
-                  <div className="grid gap-4">
-                    <div>
-                      <Label htmlFor="edit-cliente">Cliente</Label>
-                      <Input
-                        id="edit-cliente"
-                        value={formData.cliente}
-                        onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
-                        placeholder="Nome do cliente"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="edit-sistema">Sistema</Label>
-                        <Input
-                          id="edit-sistema"
-                          value={formData.sistema}
-                          onChange={(e) => setFormData({ ...formData, sistema: e.target.value })}
-                          placeholder="Sistema"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="edit-modulo">Módulo</Label>
-                        <Input
-                          id="edit-modulo"
-                          value={formData.modulo}
-                          onChange={(e) => setFormData({ ...formData, modulo: e.target.value })}
-                          placeholder="Módulo"
-                        />
-                      </div>
-                    </div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-medium text-blue-700">Escopo</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsEscopoExpanded(!isEscopoExpanded)}
+                      className="h-6 w-6 p-0 hover:bg-blue-100"
+                    >
+                      {isEscopoExpanded ? (
+                        <ChevronUp className="h-4 w-4 text-blue-600" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-blue-600" />
+                      )}
+                    </Button>
                   </div>
+                  {isEscopoExpanded && (
+                    <div className="grid gap-4">
+                      <div>
+                        <Label htmlFor="edit-cliente">Cliente</Label>
+                        <Input
+                          id="edit-cliente"
+                          value={formData.cliente}
+                          onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
+                          placeholder="Nome do cliente"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="edit-sistema">Sistema</Label>
+                          <Input
+                            id="edit-sistema"
+                            value={formData.sistema}
+                            onChange={(e) => setFormData({ ...formData, sistema: e.target.value })}
+                            placeholder="Sistema"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="edit-modulo">Módulo</Label>
+                          <Input
+                            id="edit-modulo"
+                            value={formData.modulo}
+                            onChange={(e) => setFormData({ ...formData, modulo: e.target.value })}
+                            placeholder="Módulo"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 <div className="border rounded-lg p-4 bg-gray-50">
-                  <h3 className="text-sm font-medium text-gray-700 mb-3">Pessoas</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="edit-responsavel">Responsável</Label>
-                      <Input
-                        id="edit-responsavel"
-                        value={formData.responsavel}
-                        onChange={(e) => setFormData({ ...formData, responsavel: e.target.value })}
-                        placeholder="Responsável"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="edit-solicitante">Solicitante</Label>
-                      <Input
-                        id="edit-solicitante"
-                        value={formData.solicitante}
-                        onChange={(e) => setFormData({ ...formData, solicitante: e.target.value })}
-                        placeholder="Solicitante"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="edit-aprovador">Aprovador</Label>
-                      <Input
-                        id="edit-aprovador"
-                        value={formData.aprovador}
-                        onChange={(e) => setFormData({ ...formData, aprovador: e.target.value })}
-                        placeholder="Aprovador"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="edit-agente">Agente</Label>
-                      <Input
-                        id="edit-agente"
-                        value={formData.agente}
-                        onChange={(e) => setFormData({ ...formData, agente: e.target.value })}
-                        placeholder="Agente"
-                      />
-                    </div>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-medium text-gray-700">Pessoas</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsPessoasExpanded(!isPessoasExpanded)}
+                      className="h-6 w-6 p-0 hover:bg-gray-200"
+                    >
+                      {isPessoasExpanded ? (
+                        <ChevronUp className="h-4 w-4 text-gray-600" />
+                      ) : (
+                        <ChevronDown className="h-4 w-4 text-gray-600" />
+                      )}
+                    </Button>
                   </div>
+                  {isPessoasExpanded && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="edit-responsavel">Responsável</Label>
+                        <Input
+                          id="edit-responsavel"
+                          value={formData.responsavel}
+                          onChange={(e) => setFormData({ ...formData, responsavel: e.target.value })}
+                          placeholder="Responsável"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="edit-solicitante">Solicitante</Label>
+                        <Input
+                          id="edit-solicitante"
+                          value={formData.solicitante}
+                          onChange={(e) => setFormData({ ...formData, solicitante: e.target.value })}
+                          placeholder="Solicitante"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="edit-aprovador">Aprovador</Label>
+                        <Input
+                          id="edit-aprovador"
+                          value={formData.aprovador}
+                          onChange={(e) => setFormData({ ...formData, aprovador: e.target.value })}
+                          placeholder="Aprovador"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="edit-agente">Agente</Label>
+                        <Input
+                          id="edit-agente"
+                          value={formData.agente}
+                          onChange={(e) => setFormData({ ...formData, agente: e.target.value })}
+                          placeholder="Agente"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 <div>
