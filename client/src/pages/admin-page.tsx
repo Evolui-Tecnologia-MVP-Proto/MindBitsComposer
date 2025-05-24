@@ -1410,7 +1410,6 @@ export default function AdminPage() {
                         <TableRow>
                           <TableHead>Coluna Monday</TableHead>
                           <TableHead>Campo CPX</TableHead>
-                          <TableHead>Função de Transformação</TableHead>
                           <TableHead className="w-[100px]">Ações</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -1428,7 +1427,6 @@ export default function AdminPage() {
                               </div>
                             </TableCell>
                             <TableCell className="py-2 text-sm">{column.cpxField}</TableCell>
-                            <TableCell className="py-2 text-sm">{column.transformFunction || "-"}</TableCell>
                             <TableCell className="py-2">
                               <div className="flex space-x-2">
                                 <Button
