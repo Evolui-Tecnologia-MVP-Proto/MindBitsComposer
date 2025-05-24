@@ -107,6 +107,14 @@ export default function DocumentosPage() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
+  // Debug para modal de exclusão
+  useEffect(() => {
+    console.log("🔄 Estado do modal de exclusão mudou:", {
+      isDeleteConfirmOpen,
+      documentToDelete: documentToDelete?.objeto
+    });
+  }, [isDeleteConfirmOpen, documentToDelete]);
+
   // Buscar documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
     queryKey: ["/api/documentos"],
