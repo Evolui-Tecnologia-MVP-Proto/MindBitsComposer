@@ -1216,8 +1216,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           </DialogHeader>
           
           <Tabs defaultValue="dados-gerais" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="dados-gerais">Dados Gerais</TabsTrigger>
+              <TabsTrigger value="general-fields">General Fields</TabsTrigger>
               <TabsTrigger value="anexos">
                 Anexos ({artifacts.length})
               </TabsTrigger>
@@ -1275,6 +1276,44 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     {selectedDocument.descricao}
                   </p>
                 </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="general-fields" className="mt-6">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <h3 className="text-lg font-medium">Campos Gerais</h3>
+                  <Badge variant="outline" className="text-xs">
+                    {selectedDocument.generalColumns ? 'JSON' : 'Vazio'}
+                  </Badge>
+                </div>
+                
+                {selectedDocument.generalColumns && Object.keys(selectedDocument.generalColumns).length > 0 ? (
+                  <div className="grid gap-4">
+                    {Object.entries(selectedDocument.generalColumns).map(([key, value]) => (
+                      <div key={key} className="grid grid-cols-3 gap-4 items-center">
+                        <div className="bg-gray-50 p-2 rounded border">
+                          <p className="text-xs font-medium text-gray-500 mb-1">Campo</p>
+                          <p className="text-sm font-mono text-gray-800">{key}</p>
+                        </div>
+                        <div className="col-span-2">
+                          <p className="text-xs font-medium text-gray-500 mb-1">Valor</p>
+                          <div className="bg-white border rounded p-2 min-h-[40px] flex items-center">
+                            <p className="text-sm text-gray-700 break-words">
+                              {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed">
+                    <Database className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+                    <p className="text-sm text-gray-500">Nenhum campo geral encontrado</p>
+                    <p className="text-xs text-gray-400 mt-1">Os campos gerais são armazenados no formato JSON</p>
+                  </div>
+                )}
               </div>
             </TabsContent>
             
