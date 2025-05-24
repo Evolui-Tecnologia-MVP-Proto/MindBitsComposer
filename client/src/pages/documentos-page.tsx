@@ -826,12 +826,32 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   };
 
   const handleDeleteDocument = (documento: Documento) => {
-    console.log("🗑️ Clicou para excluir documento:", documento.objeto);
-    console.log("🗑️ Setando documentToDelete:", documento);
-    setDocumentToDelete(documento);
-    console.log("🗑️ Setando isDeleteConfirmOpen para true");
-    setIsDeleteConfirmOpen(true);
-    console.log("🗑️ Estados atualizados, modal deve aparecer");
+    toast({
+      title: "⚠️ Confirmar Exclusão",
+      description: `Tem certeza que deseja excluir "${documento.objeto}"? Esta ação não pode ser desfeita.`,
+      action: (
+        <div className="flex gap-2">
+          <button
+            onClick={() => deleteDocumentoMutation.mutate(documento.id)}
+            disabled={deleteDocumentoMutation.isPending}
+            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm flex items-center gap-1"
+          >
+            {deleteDocumentoMutation.isPending ? (
+              <>
+                <Loader2 className="h-3 w-3 animate-spin" />
+                Excluindo...
+              </>
+            ) : (
+              <>
+                <Trash2 className="h-3 w-3" />
+                Excluir
+              </>
+            )}
+          </button>
+        </div>
+      ),
+      duration: 8000,
+    });
   };
 
   const confirmDelete = () => {
