@@ -1188,12 +1188,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           // Verificar se já existe um documento com os mesmos valores dos campos chave
           if (keyFields.length > 0) {
-            console.log(`🔍 VERIFICANDO DUPLICATAS para item ${item.id} usando campos chave:`, keyFields);
-            console.log(`📊 DADOS DO DOCUMENTO para verificação:`, {
-              idOrigem: documentData.idOrigem,
-              objeto: documentData.objeto,
-              cliente: documentData.cliente
-            });
+            console.log(`🔍 ITEM ${item.id}: Verificando duplicatas com idOrigem=${documentData.idOrigem}`);
             
             // Buscar documentos existentes com os mesmos valores dos campos chave
             const existingDocuments = await storage.getDocumentosByKeyFields(keyFields, documentData);
