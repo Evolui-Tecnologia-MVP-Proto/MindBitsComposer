@@ -1415,7 +1415,7 @@ export default function AdminPage() {
                           <TableRow key={column.id} className="h-6">
                             <TableCell className="py-0">
                               <div className="flex items-center gap-2">
-                                <span className="text-sm">
+                                <span className="text-sm font-mono">
                                   {column.mondayColumnTitle}
                                 </span>
                                 <Badge variant="outline" className="text-xs font-mono bg-blue-50 text-blue-700 border-blue-200">
