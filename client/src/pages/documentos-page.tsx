@@ -2076,14 +2076,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           </TableCell>
                           <TableCell className="font-medium">{artifact.name}</TableCell>
                           <TableCell>
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-gray-600 truncate max-w-[200px]" title={artifact.fileName}>
-                                {artifact.fileName}
-                              </span>
-                              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-                                <Download className="h-3 w-3" />
-                              </Button>
-                            </div>
+                            <span className="text-sm text-gray-600 truncate max-w-[200px]" title={artifact.fileName}>
+                              {artifact.fileName}
+                            </span>
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-1">
