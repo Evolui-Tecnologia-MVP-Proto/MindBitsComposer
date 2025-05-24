@@ -568,6 +568,12 @@ export class DatabaseStorage implements IStorage {
     return documento || undefined;
   }
 
+  async getDocumentoByIdOrigem(idOrigem: string | number): Promise<Documento | undefined> {
+    const idNum = typeof idOrigem === 'string' ? parseInt(idOrigem) : idOrigem;
+    const [documento] = await db.select().from(documentos).where(eq(documentos.idOrigem, idNum));
+    return documento || undefined;
+  }
+
   async createDocumento(documentoData: InsertDocumento): Promise<Documento> {
     // Debug: verificar dados antes de inserir no banco
     console.log(`🎯 DADOS SENDO INSERIDOS NO BANCO:`, {

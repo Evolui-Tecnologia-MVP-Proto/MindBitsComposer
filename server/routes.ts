@@ -790,6 +790,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // TESTE DE VERIFICAÇÃO DE DUPLICATAS
+  app.get("/api/test-duplicates", async (req, res) => {
+    try {
+      const testId = 8333044806; // ID que sabemos que existe
+      
+      // Teste 1: Verificação SQL direta
+      const duplicateCheck = await storage.db
+        .select({ count: storage.sql`count(*)` })
+        .from(storage.documentos)
+        .where(storage.sql`id_origem = ${testId}`);
+        
+      const duplicateCount = Number(duplicateCheck[0].count);
+      
+      res.json({
+        testId,
+        duplicateCount,
+        exists: duplicateCount > 0,
+        message: `Teste de duplicata: ID ${testId} encontrado ${duplicateCount} vezes`
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+  
   // Execute Monday mapping synchronization
   app.post("/api/monday/mappings/:id/execute", async (req, res) => {
     if (!req.isAuthenticated()) {
@@ -1186,24 +1210,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
             documentData.statusOrigem = "Monday.com";
           }
 
-          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - SUPER SIMPLES E DIRETA
+          // VERIFICAÇÃO SIMPLES E EFICAZ DE DUPLICATAS
           if (documentData.idOrigem) {
-            const idNum = Number(documentData.idOrigem);
+            const existingDoc = await storage.getDocumentoByIdOrigem(documentData.idOrigem);
             
-            // Consulta SQL direta no banco para verificar duplicatas
-            const duplicateCheck = await db
-              .select({ count: sql`count(*)` })
-              .from(documentos)
-              .where(sql`id_origem = ${idNum}`);
-              
-            const duplicateCount = Number(duplicateCheck[0].count);
-            
-            // Log ÚNICO e CLARO que não pode ser truncado
-            console.log(`🚨 DUPLICATA_CHECK_ITEM_${item.id}: id=${idNum} existe=${duplicateCount > 0 ? 'SIM' : 'NAO'} count=${duplicateCount}`);
-            
-            if (duplicateCount > 0) {
+            if (existingDoc) {
+              console.log(`❌ DUPLICATA: Item ${item.id} já existe como documento ${existingDoc.id}`);
               documentsPreExisting++;
-              continue; // PULAR - JÁ EXISTE
+              continue; // Pular item duplicado
             }
           }
 
