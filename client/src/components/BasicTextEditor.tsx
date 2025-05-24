@@ -526,7 +526,7 @@ export default function BasicTextEditor() {
       </div>
 
       {/* Editor Area */}
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-4 max-h-full overflow-y-auto">
         {isMarkdownView ? (
           /* Visualização Markdown */
           <div className="bg-white border border-gray-200 rounded-lg p-6">
