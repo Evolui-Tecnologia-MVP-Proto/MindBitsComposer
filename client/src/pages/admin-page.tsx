@@ -1529,9 +1529,9 @@ export default function AdminPage() {
                   <Table>
                     <TableHeader className="sticky top-0 bg-white z-10">
                       <TableRow>
-                        <TableHead className="w-[200px] text-center uppercase">CAMPO</TableHead>
-                        <TableHead className="text-center uppercase">VALOR PADRÃO</TableHead>
-                        <TableHead className="w-[100px] text-center uppercase">OBG-MAP</TableHead>
+                        <TableHead className="w-[200px] text-center text-xs font-medium text-gray-500 uppercase tracking-wider">CAMPO</TableHead>
+                        <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">VALOR PADRÃO</TableHead>
+                        <TableHead className="w-[100px] text-center text-xs font-medium text-gray-500 uppercase tracking-wider">OBG-MAP</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
