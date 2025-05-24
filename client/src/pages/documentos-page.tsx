@@ -1426,16 +1426,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           <TabsContent value="dados-gerais" className="mt-6">
             <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto">
               <div>
-                <Label htmlFor="cliente">Cliente</Label>
-                <Input
-                  id="cliente"
-                  value={formData.cliente}
-                  onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
-                  placeholder="Nome do cliente"
-                />
-              </div>
-              
-              <div>
                 <Label htmlFor="objeto">Objeto da Task</Label>
                 <Input
                   id="objeto"
@@ -1445,14 +1435,39 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 />
               </div>
               
-              <div>
-                <Label htmlFor="sistema">Sistema</Label>
-                <Input
-                  id="sistema"
-                  value={formData.sistema}
-                  onChange={(e) => setFormData({ ...formData, sistema: e.target.value })}
-                  placeholder="Sistema"
-                />
+              <div className="border rounded-lg p-4 bg-blue-50 border-blue-200">
+                <h3 className="text-sm font-medium text-blue-700 mb-3">Escopo</h3>
+                <div className="grid gap-4">
+                  <div>
+                    <Label htmlFor="cliente">Cliente</Label>
+                    <Input
+                      id="cliente"
+                      value={formData.cliente}
+                      onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
+                      placeholder="Nome do cliente"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="sistema">Sistema</Label>
+                      <Input
+                        id="sistema"
+                        value={formData.sistema}
+                        onChange={(e) => setFormData({ ...formData, sistema: e.target.value })}
+                        placeholder="Sistema"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="modulo">Módulo</Label>
+                      <Input
+                        id="modulo"
+                        value={formData.modulo}
+                        onChange={(e) => setFormData({ ...formData, modulo: e.target.value })}
+                        placeholder="Módulo"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
               
               <div className="border rounded-lg p-4 bg-gray-50">
@@ -1495,16 +1510,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     />
                   </div>
                 </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="modulo">Módulo</Label>
-                <Input
-                  id="modulo"
-                  value={formData.modulo}
-                  onChange={(e) => setFormData({ ...formData, modulo: e.target.value })}
-                  placeholder="Módulo"
-                />
               </div>
               
               <div>
@@ -2046,16 +2051,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             <TabsContent value="dados-gerais" className="mt-6">
               <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto">
                 <div>
-                  <Label htmlFor="edit-cliente">Cliente</Label>
-                  <Input
-                    id="edit-cliente"
-                    value={formData.cliente}
-                    onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
-                    placeholder="Nome do cliente"
-                  />
-                </div>
-                
-                <div>
                   <Label htmlFor="edit-objeto">Objeto da Task</Label>
                   <Input
                     id="edit-objeto"
@@ -2065,14 +2060,39 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   />
                 </div>
                 
-                <div>
-                  <Label htmlFor="edit-sistema">Sistema</Label>
-                  <Input
-                    id="edit-sistema"
-                    value={formData.sistema}
-                    onChange={(e) => setFormData({ ...formData, sistema: e.target.value })}
-                    placeholder="Sistema"
-                  />
+                <div className="border rounded-lg p-4 bg-blue-50 border-blue-200">
+                  <h3 className="text-sm font-medium text-blue-700 mb-3">Escopo</h3>
+                  <div className="grid gap-4">
+                    <div>
+                      <Label htmlFor="edit-cliente">Cliente</Label>
+                      <Input
+                        id="edit-cliente"
+                        value={formData.cliente}
+                        onChange={(e) => setFormData({ ...formData, cliente: e.target.value })}
+                        placeholder="Nome do cliente"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="edit-sistema">Sistema</Label>
+                        <Input
+                          id="edit-sistema"
+                          value={formData.sistema}
+                          onChange={(e) => setFormData({ ...formData, sistema: e.target.value })}
+                          placeholder="Sistema"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="edit-modulo">Módulo</Label>
+                        <Input
+                          id="edit-modulo"
+                          value={formData.modulo}
+                          onChange={(e) => setFormData({ ...formData, modulo: e.target.value })}
+                          placeholder="Módulo"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
                 <div className="border rounded-lg p-4 bg-gray-50">
@@ -2115,16 +2135,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       />
                     </div>
                   </div>
-                </div>
-                
-                <div>
-                  <Label htmlFor="edit-modulo">Módulo</Label>
-                  <Input
-                    id="edit-modulo"
-                    value={formData.modulo}
-                    onChange={(e) => setFormData({ ...formData, modulo: e.target.value })}
-                    placeholder="Módulo"
-                  />
                 </div>
                 
                 <div>
