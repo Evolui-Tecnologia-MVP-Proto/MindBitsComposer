@@ -957,9 +957,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
             
             // Mesclar valores para campos que permitem múltiplas colunas
-            if (fieldName === 'descricao' || fieldName === 'generalColumns') {
-              // Para campos de texto longo, mesclar com quebras de linha
+            if (fieldName === 'descricao') {
+              // Para descrição, mesclar com quebras de linha
               documentData[fieldName] = values.join('\n\n');
+            } else if (fieldName === 'generalColumns') {
+              // Para generalColumns mapeadas, criar objeto JSON com nome_coluna: valor
+              const generalColumnsObj: Record<string, string> = {};
+              mappings.forEach((mapping, index) => {
+                if (values[index]) {
+                  // Usar o título da coluna Monday como chave
+                  const columnTitle = mapping.mondayColumnTitle || `coluna_${mapping.mondayColumnId}`;
+                  generalColumnsObj[columnTitle] = values[index];
+                }
+              });
+              documentData[fieldName] = generalColumnsObj;
             } else {
               // Para outros campos, usar apenas o primeiro valor
               documentData[fieldName] = values[0] || "";
@@ -973,11 +984,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
 
           // Capturar dados extras das colunas não mapeadas para general_columns
-          const generalColumns: Record<string, any> = {};
+          const unmappedColumns: Record<string, any> = {};
           
           // Adicionar dados básicos do item
-          generalColumns.monday_item_id = item.id;
-          generalColumns.monday_item_name = item.name;
+          unmappedColumns.monday_item_id = item.id;
+          unmappedColumns.monday_item_name = item.name;
           
           // Capturar todas as colunas não mapeadas
           if (item.column_values && Array.isArray(item.column_values)) {
@@ -985,18 +996,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
               // Se a coluna não está mapeada, incluir nos dados extras
               if (!mappedColumnIds.has(columnValue.id)) {
                 const columnTitle = columnValue.title || `coluna_${columnValue.id}`;
-                generalColumns[columnTitle] = {
-                  id: columnValue.id,
-                  text: columnValue.text || "",
-                  value: columnValue.value || null,
-                  type: columnValue.type || "unknown"
-                };
+                unmappedColumns[columnTitle] = columnValue.text || "";
               }
             });
           }
           
-          // Adicionar general_columns ao documento
-          documentData.generalColumns = generalColumns;
+          // Combinar generalColumns mapeadas com colunas não mapeadas
+          if (documentData.generalColumns && typeof documentData.generalColumns === 'object') {
+            // Se já existem generalColumns mapeadas, combinar com as não mapeadas
+            documentData.generalColumns = {
+              ...documentData.generalColumns,
+              ...unmappedColumns
+            };
+          } else {
+            // Se não há generalColumns mapeadas, usar apenas as não mapeadas
+            documentData.generalColumns = unmappedColumns;
+          }
+          
+          console.log("generalColumns final:", documentData.generalColumns);
 
           // Aplicar valores padrão configurados no mapeamento
           console.log("Valores padrão do mapeamento:", existingMapping.defaultValues);
