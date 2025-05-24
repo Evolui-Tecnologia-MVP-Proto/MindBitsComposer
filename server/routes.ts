@@ -1186,22 +1186,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
             documentData.statusOrigem = "Monday.com";
           }
 
-          // Verificação direta por id_origem usando storage
+          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - SUPER SIMPLES E DIRETA
           if (documentData.idOrigem) {
-            const idOrigemStr = String(documentData.idOrigem);
-            const existingDocs = await storage.getDocumentosByKeyFields(['id_origem'], { idOrigem: idOrigemStr });
-              
-            console.log(`🔍 ITEM ${item.id}: Verificando id_origem='${idOrigemStr}' - Encontrados: ${existingDocs.length}`);
+            const idNum = Number(documentData.idOrigem);
             
-            if (existingDocs.length > 0) {
-              console.log(`❌ DUPLICATA DETECTADA! Item ${item.id} já existe como documento ${existingDocs[0].id}`);
+            // Consulta SQL direta no banco para verificar duplicatas
+            const duplicateCheck = await db
+              .select({ count: sql`count(*)` })
+              .from(documentos)
+              .where(sql`id_origem = ${idNum}`);
+              
+            const duplicateCount = Number(duplicateCheck[0].count);
+            
+            // Log ÚNICO e CLARO que não pode ser truncado
+            console.log(`🚨 DUPLICATA_CHECK_ITEM_${item.id}: id=${idNum} existe=${duplicateCount > 0 ? 'SIM' : 'NAO'} count=${duplicateCount}`);
+            
+            if (duplicateCount > 0) {
               documentsPreExisting++;
-              continue; // Pular item duplicado
-            } else {
-              console.log(`✅ Item ${item.id} é novo - criando documento`);
+              continue; // PULAR - JÁ EXISTE
             }
-          } else {
-            console.log(`⚠️ Item ${item.id} sem id_origem - criando sem verificação`);
           }
 
           // DEBUG: Verificar dados finais antes de criar documento
