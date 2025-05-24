@@ -1793,9 +1793,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           </TabsContent>
           
           <TabsContent value="repositorio" className="slide-in">
-            <div className="space-y-6">
-              <div className="bg-white rounded-lg border p-6">
-                <div className="flex items-center justify-between mb-6">
+            <div className="space-y-6 h-full overflow-hidden">
+              <div className="bg-white rounded-lg border p-6 h-full flex flex-col">
+                <div className="flex items-center justify-between mb-6 flex-shrink-0">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">Integração com Repositório GitHub</h3>
                     <p className="text-sm text-gray-600 mt-1">
@@ -1832,10 +1832,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 </div>
                 
-                <div className="border-t pt-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div>
-                      <div className="flex items-center justify-between mb-4">
+                <div className="border-t pt-6 flex-1 min-h-0">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+                    <div className="flex flex-col overflow-hidden">
+                      <div className="flex items-center justify-between mb-4 flex-shrink-0">
                         <h4 className="font-medium text-gray-900">Estrutura do Repositório</h4>
                         {isLoadingRepo && (
                           <div className="flex items-center text-sm text-gray-500">
@@ -1854,76 +1854,75 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         )}
                       </div>
                       
-                      {githubRepoFiles.length > 0 ? (
-                        <FileExplorer 
-                          data={githubRepoFiles}
-                          onFileSelect={(file) => {
-                            console.log('Arquivo selecionado:', file);
-                          }}
-                          onFolderToggle={(folder, isExpanded) => {
-                            console.log('Pasta:', folder.name, 'Expandida:', isExpanded);
-                            if (isExpanded && folder.type === 'folder') {
-                              // Construir caminho completo hierárquico
-                              const buildFullPath = (folderName: string) => {
-                                // Encontrar a estrutura correspondente
-                                const structure = repoStructures.find((s: any) => s.folderName === folderName);
-                                if (!structure) return `/${folderName}/`;
-                                
-                                // Construir caminho recursivamente
-                                let path = structure.folderName;
-                                let current = structure;
-                                
-                                while (current.linkedTo) {
-                                  const parent = repoStructures.find((s: any) => s.uid === current.linkedTo);
-                                  if (parent) {
-                                    path = `${parent.folderName}/${path}`;
-                                    current = parent;
-                                  } else {
-                                    break;
+                      <div className="flex-1 overflow-y-auto">
+                        {githubRepoFiles.length > 0 ? (
+                          <FileExplorer 
+                            data={githubRepoFiles}
+                            onFileSelect={(file) => {
+                              console.log('Arquivo selecionado:', file);
+                            }}
+                            onFolderToggle={(folder, isExpanded) => {
+                              console.log('Pasta:', folder.name, 'Expandida:', isExpanded);
+                              if (isExpanded && folder.type === 'folder') {
+                                const buildFullPath = (folderName: string) => {
+                                  const structure = repoStructures.find((s: any) => s.folderName === folderName);
+                                  if (!structure) return `/${folderName}/`;
+                                  
+                                  let path = structure.folderName;
+                                  let current = structure;
+                                  
+                                  while (current.linkedTo) {
+                                    const parent = repoStructures.find((s: any) => s.uid === current.linkedTo);
+                                    if (parent) {
+                                      path = `${parent.folderName}/${path}`;
+                                      current = parent;
+                                    } else {
+                                      break;
+                                    }
                                   }
-                                }
+                                  
+                                  return `/${path}/`;
+                                };
                                 
-                                return `/${path}/`;
-                              };
-                              
-                              const fullPath = buildFullPath(folder.name);
-                              setSelectedFolderPath(fullPath);
-                              fetchFolderFiles(folder.path); // Usar o path original para a API
-                            }
-                          }}
-                        />
-                      ) : !isLoadingRepo ? (
-                        <div className="border rounded-lg bg-gray-50 p-6 text-center">
-                          <div className="text-gray-500 mb-2">
-                            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
+                                const fullPath = buildFullPath(folder.name);
+                                setSelectedFolderPath(fullPath);
+                                fetchFolderFiles(folder.path);
+                              }
+                            }}
+                          />
+                        ) : !isLoadingRepo ? (
+                          <div className="border rounded-lg bg-gray-50 p-6 text-center">
+                            <div className="text-gray-500 mb-2">
+                              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                            </div>
+                            <h3 className="text-sm font-medium text-gray-900 mb-1">Nenhum repositório conectado</h3>
+                            <p className="text-sm text-gray-500 mb-4">
+                              Configure uma conexão GitHub nas configurações para ver a estrutura do repositório aqui.
+                            </p>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={fetchGithubRepoStructure}
+                            >
+                              Tentar Conectar
+                            </Button>
                           </div>
-                          <h3 className="text-sm font-medium text-gray-900 mb-1">Nenhum repositório conectado</h3>
-                          <p className="text-sm text-gray-500 mb-4">
-                            Configure uma conexão GitHub nas configurações para ver a estrutura do repositório aqui.
-                          </p>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={fetchGithubRepoStructure}
-                          >
-                            Tentar Conectar
-                          </Button>
-                        </div>
-                      ) : (
-                        <div className="border rounded-lg bg-white p-6">
-                          <div className="animate-pulse space-y-3">
-                            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                        ) : (
+                          <div className="border rounded-lg bg-white p-6">
+                            <div className="animate-pulse space-y-3">
+                              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                              <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
+                      </div>
                     </div>
                     
-                    <div>
-                      <h4 className="font-medium text-gray-900 mb-4">
+                    <div className="flex flex-col overflow-hidden">
+                      <h4 className="font-medium text-gray-900 mb-4 flex-shrink-0">
                         {selectedFolderPath ? (
                           <span>
                             Arquivos em: <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono">{selectedFolderPath}</code>
@@ -1932,7 +1931,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           'Arquivos na pasta'
                         )}
                       </h4>
-                      <div className="space-y-3">
+                      <div className="flex-1 overflow-y-auto space-y-3">
                         {isLoadingFolderFiles ? (
                           <div className="flex items-center justify-center py-8">
                             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
