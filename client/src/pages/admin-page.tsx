@@ -1539,14 +1539,9 @@ export default function AdminPage() {
                       {getDefaultableFields().map((fieldInfo) => (
                         <TableRow key={fieldInfo.field} className="h-12">
                           <TableCell className="py-2">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium font-mono">
-                                {fieldInfo.field}
-                              </span>
-                              <span className="text-xs text-gray-500">
-                                ({fieldInfo.label})
-                              </span>
-                            </div>
+                            <span className="text-sm font-medium font-mono">
+                              {fieldInfo.field}
+                            </span>
                           </TableCell>
                           <TableCell className="py-2">
                             <Input
