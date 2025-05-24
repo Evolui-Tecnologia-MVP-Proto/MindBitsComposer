@@ -1770,7 +1770,7 @@ export default function AdminPage() {
                       >
                         <option value="">Selecione a coluna</option>
                         {mondayColumns?.map((column) => (
-                          <option key={column.id} value={column.columnId}>
+                          <option key={column.id} value={column.columnId} className="font-mono">
                             {column.title} [{column.type}]
                           </option>
                         ))}
@@ -1794,7 +1794,7 @@ export default function AdminPage() {
                       >
                         <option value="">Selecione o campo</option>
                         {DOCUMENTOS_COLUMNS.map((column) => (
-                          <option key={column.field} value={column.field}>
+                          <option key={column.field} value={column.field} className="font-mono">
                             {column.label} ({column.type})
                           </option>
                         ))}
@@ -1814,7 +1814,7 @@ export default function AdminPage() {
                     <FormControl>
                       <Textarea 
                         placeholder="Função de transformação de dados (JavaScript)" 
-                        className="resize-none h-24"
+                        className="resize-none h-24 font-mono"
                         {...field} 
                       />
                     </FormControl>
