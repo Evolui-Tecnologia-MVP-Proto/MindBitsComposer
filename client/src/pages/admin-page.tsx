@@ -1119,17 +1119,17 @@ export default function AdminPage() {
             </DialogDescription>
           </DialogHeader>
           
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="quadro">Quadro</TabsTrigger>
-              <TabsTrigger value="colunas" disabled={!selectedMapping}>Colunas</TabsTrigger>
-              <TabsTrigger value="filtros" disabled={!selectedMapping}>Filtros</TabsTrigger>
-            </TabsList>
-            
-            {/* Aba de informações do quadro */}
-            <TabsContent value="quadro" className="space-y-4 py-4">
-              <Form {...mappingForm}>
-                <form id="mappingForm" onSubmit={mappingForm.handleSubmit(onSubmitMapping)} className="space-y-4">
+          <Form {...mappingForm}>
+            <form id="mappingForm" onSubmit={mappingForm.handleSubmit(onSubmitMapping)} className="space-y-4">
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="quadro">Quadro</TabsTrigger>
+                  <TabsTrigger value="colunas" disabled={!selectedMapping}>Colunas</TabsTrigger>
+                  <TabsTrigger value="filtros" disabled={!selectedMapping}>Filtros</TabsTrigger>
+                </TabsList>
+                
+                {/* Aba de informações do quadro */}
+                <TabsContent value="quadro" className="space-y-4 py-4">
                   <FormField
                     control={mappingForm.control}
                     name="name"
@@ -1278,8 +1278,6 @@ export default function AdminPage() {
                       </FormItem>
                     )}
                   />
-                </form>
-              </Form>
             </TabsContent>
             
             {/* Aba de colunas mapeadas */}
@@ -1553,7 +1551,9 @@ return item.column_values.some(col =>
                 </Button>
               </div>
             </div>
-          </Tabs>
+              </Tabs>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
       
