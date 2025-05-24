@@ -711,9 +711,25 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       return response.json();
     },
     onSuccess: () => {
+      // Invalidar cache para todos os possíveis documentos
       queryClient.invalidateQueries({ queryKey: ["/api/documentos", currentDocumentId, "artifacts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos", currentCreatedDocumentId, "artifacts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos", selectedDocument?.id, "artifacts"] });
+      
       setIsEditArtifactModalOpen(false);
       resetArtifactForm();
+      
+      toast({
+        title: "Anexo atualizado!",
+        description: "As alterações foram salvas com sucesso.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao salvar",
+        description: "Não foi possível salvar as alterações do anexo.",
+        variant: "destructive",
+      });
     },
   });
 
