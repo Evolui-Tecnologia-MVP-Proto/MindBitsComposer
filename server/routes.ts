@@ -1072,12 +1072,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               });
               documentData[fieldName] = generalColumnsObj;
             } else if (fieldName === 'id_origem') {
-              // Para id_origem (integer), garantir que seja um número válido
+              // Para id_origem (bigint), garantir que seja um número válido
               const rawValue = values[0] || "";
               const numericValue = parseInt(rawValue, 10);
               if (!isNaN(numericValue)) {
-                documentData[fieldName] = numericValue;
-                console.log(`✅ Campo id_origem convertido: "${rawValue}" -> ${numericValue}`);
+                // O banco usa 'idOrigem' (camelCase), não 'id_origem'
+                documentData.idOrigem = numericValue;
+                console.log(`✅ Campo id_origem convertido: "${rawValue}" -> ${numericValue} (salvo como idOrigem)`);
               } else {
                 console.warn(`⚠️ Valor inválido para id_origem: "${rawValue}" - será ignorado`);
                 // Não definir o campo se não for um número válido
