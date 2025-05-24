@@ -936,11 +936,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`- mappingFilter existe?`, !!existingMapping.mappingFilter);
           console.log(`- mappingFilter não está vazio?`, existingMapping.mappingFilter && existingMapping.mappingFilter.trim());
           
-          // TESTE: Temporariamente desabilitar filtro para diagnóstico
-          console.log(`🚫 FILTRO TEMPORARIAMENTE DESABILITADO - PROCESSANDO TODOS OS ITENS`);
-          console.log(`✅ Item ${item.id} será PROCESSADO (filtro desabilitado)`);
-          
-          if (false) { // Desabilitar completamente o bloco do filtro
+          // Aplicar filtro JavaScript se configurado
+          if (existingMapping.mappingFilter && existingMapping.mappingFilter.trim()) {
             try {
               console.log(`✅ APLICANDO FILTRO para item ${item.id}`);
               

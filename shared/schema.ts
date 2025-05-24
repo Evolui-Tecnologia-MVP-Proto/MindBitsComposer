@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp, boolean, json, uuid, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, boolean, json, uuid, integer, bigint } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -201,7 +201,7 @@ export const documentos = pgTable("documentos", {
   solicitante: text("solicitante").notNull().default(""),
   aprovador: text("aprovador").notNull().default(""),
   agente: text("agente").notNull().default(""),
-  idOrigem: integer("id_origem"), // Campo para mapeamento com Monday.com
+  idOrigem: bigint("id_origem", { mode: "number" }), // Campo para mapeamento com Monday.com
   generalColumns: json("general_columns").$type<Record<string, any>>().default({}), // Armazena dados extras do sistema de origem
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
