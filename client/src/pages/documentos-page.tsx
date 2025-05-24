@@ -1521,8 +1521,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               variant="outline"
                               size="sm"
                               onClick={() => {
+                                console.log("🎯 CLICOU EM EXCLUIR ANEXO:", artifact.id);
                                 setArtifactToDelete(artifact.id);
                                 setIsDeleteArtifactConfirmOpen(true);
+                                console.log("📝 Modal de confirmação deve abrir agora");
                               }}
                               title="Excluir anexo"
                             >
