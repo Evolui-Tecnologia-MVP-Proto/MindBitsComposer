@@ -2110,7 +2110,21 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {/* Cabeçalho da página */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Documentos</h1>
-        <Button onClick={() => setIsCreateModalOpen(true)}>
+        <Button onClick={() => {
+          // Limpar os campos do formulário
+          setFormData({
+            origem: "CPx",
+            objeto: "",
+            cliente: "",
+            responsavel: "",
+            sistema: "",
+            modulo: "",
+            descricao: "",
+            status: "Integrado",
+            statusOrigem: "Incluido",
+          });
+          setIsCreateModalOpen(true);
+        }}>
           <Plus className="mr-2 h-4 w-4" />
           Novo Documento
         </Button>
