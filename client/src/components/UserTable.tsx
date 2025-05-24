@@ -222,10 +222,10 @@ export default function UserTable() {
         </Button>
       </div>
 
-      <div className="mt-2 flex flex-col">
-        <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-            <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+      <div className="mt-2">
+        <div className="overflow-hidden">
+          <div className="border rounded-lg">
+            <div className="overflow-x-auto">
               {isLoading ? (
                 <div className="bg-white px-4 py-5 text-center">
                   <div className="animate-pulse flex space-x-4 justify-center">
