@@ -658,7 +658,18 @@ export default function AdminPage() {
         throw new Error(errorText || 'Erro na sincronização');
       }
 
-      const result = await response.json();
+      // Debug: verificar o conteúdo da resposta
+      const responseText = await response.text();
+      console.log("Resposta do servidor:", responseText);
+      
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error("Erro ao parsear JSON:", parseError);
+        console.error("Conteúdo recebido:", responseText);
+        throw new Error("Resposta inválida do servidor");
+      }
       
       toast({
         title: "Sincronização concluída",
