@@ -901,10 +901,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             // Verificar se o mapeamento é para o campo "name" (título do item)
             if (mapping.mondayColumnId === "name") {
               value = item.name || "";
+              console.log(`🔵 Campo ${mapping.cpxField} mapeado para "name": "${value}"`);
             } else {
               // Buscar valor na coluna específica
               const columnValue = item.column_values.find((cv: any) => cv.id === mapping.mondayColumnId);
               value = columnValue?.text || "";
+              console.log(`🟡 Campo ${mapping.cpxField} mapeado para "${mapping.mondayColumnId}": "${value}"`);
             }
             
             // Aplicar função de transformação se existir
