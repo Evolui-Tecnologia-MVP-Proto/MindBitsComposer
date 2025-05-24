@@ -894,6 +894,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Identificar campos marcados como chave para verificação de duplicatas
       const keyFields = mappingColumns.filter(col => col.isKey).map(col => col.cpxField);
       console.log(`🔑 CAMPOS CHAVE IDENTIFICADOS:`, keyFields);
+      console.log(`📊 TOTAL DE COLUNAS MAPEADAS:`, mappingColumns.length);
+      console.log(`🔑 COLUNAS COM is_key=true:`, mappingColumns.filter(col => col.isKey));
 
       // Processar cada item (linha) do Monday
       console.log(`🚀 INICIANDO PROCESSAMENTO DE ${items.length} ITENS`);
