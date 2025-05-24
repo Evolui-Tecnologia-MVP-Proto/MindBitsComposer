@@ -569,10 +569,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createDocumento(documentoData: InsertDocumento): Promise<Documento> {
+    // Debug: verificar dados antes de inserir no banco
+    console.log(`🎯 DADOS SENDO INSERIDOS NO BANCO:`, {
+      idOrigem: documentoData.idOrigem,
+      objeto: documentoData.objeto,
+      tipoIdOrigem: typeof documentoData.idOrigem
+    });
+    
     const [documento] = await db
       .insert(documentos)
       .values(documentoData)
       .returning();
+      
+    console.log(`✅ DOCUMENTO CRIADO NO BANCO:`, {
+      id: documento.id,
+      idOrigem: documento.idOrigem,
+      objeto: documento.objeto
+    });
+    
     return documento;
   }
 
