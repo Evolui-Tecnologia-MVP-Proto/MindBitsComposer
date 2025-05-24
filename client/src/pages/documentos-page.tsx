@@ -1943,10 +1943,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Pencil className="h-5 w-5 text-blue-500" />
-              Editar Documento: {editingDocument.objeto}
+              {currentCreatedDocumentId ? "Criar Novo Documento" : `Editar Documento: ${editingDocument.objeto}`}
             </DialogTitle>
             <DialogDescription>
-              Edite os dados do documento e gerencie seus anexos
+              {currentCreatedDocumentId 
+                ? "Complete os dados do documento e adicione anexos conforme necessário" 
+                : "Edite os dados do documento e gerencie seus anexos"
+              }
             </DialogDescription>
           </DialogHeader>
           
