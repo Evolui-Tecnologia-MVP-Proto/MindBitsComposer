@@ -893,6 +893,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Processar cada item (linha) do Monday
       for (const item of items) {
         try {
+          // APLICAR FILTRO PRIMEIRO - antes de processar os dados
+          console.log(`🔍 VERIFICANDO FILTRO para item ${item.id}:`);
+          console.log(`- mappingFilter existe?`, !!existingMapping.mappingFilter);
+          console.log(`- mappingFilter não está vazio?`, existingMapping.mappingFilter && existingMapping.mappingFilter.trim());
+          
+          if (existingMapping.mappingFilter && existingMapping.mappingFilter.trim()) {
+            try {
+              console.log(`✅ APLICANDO FILTRO para item ${item.id}`);
+              
+              // Criar função de filtro e executar
+              const filterFunction = new Function('item', existingMapping.mappingFilter);
+              const shouldInclude = filterFunction(item);
+              
+              console.log(`🎯 RESULTADO DO FILTRO para item ${item.id}:`, shouldInclude);
+              
+              if (!shouldInclude) {
+                console.log(`❌ Item ${item.id} foi FILTRADO (excluído) - não atende às condições`);
+                documentsSkipped++;
+                continue; // Pular este item
+              }
+              
+              console.log(`✅ Item ${item.id} PASSOU no filtro - será processado`);
+              
+            } catch (filterError) {
+              console.error(`💥 ERRO ao aplicar filtro no item ${item.id}:`, filterError);
+              console.log(`⚠️ Item ${item.id} será processado devido ao erro no filtro`);
+              // Em caso de erro no filtro, processar o item (comportamento seguro)
+            }
+          } else {
+            console.log(`⏭️ NENHUM FILTRO configurado - processando item ${item.id}`);
+          }
+
           // Construir o documento baseado no mapeamento de colunas
           const documentData: any = {};
           
@@ -1017,39 +1049,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           console.log("generalColumns final:", documentData.generalColumns);
 
-          // Aplicar filtro se configurado
-          console.log(`🔍 VERIFICANDO FILTRO para item ${item.id}:`);
-          console.log(`- mappingFilter existe?`, !!existingMapping.mappingFilter);
-          console.log(`- mappingFilter não está vazio?`, existingMapping.mappingFilter && existingMapping.mappingFilter.trim());
-          console.log(`- conteúdo do filtro:`, existingMapping.mappingFilter);
-          
-          if (existingMapping.mappingFilter && existingMapping.mappingFilter.trim()) {
-            try {
-              console.log(`✅ APLICANDO FILTRO para item ${item.id}`);
-              console.log(`📄 Estrutura do item:`, JSON.stringify(item, null, 2));
-              
-              // Criar função de filtro e executar
-              const filterFunction = new Function('item', existingMapping.mappingFilter);
-              const shouldInclude = filterFunction(item);
-              
-              console.log(`🎯 RESULTADO DO FILTRO para item ${item.id}:`, shouldInclude);
-              
-              if (!shouldInclude) {
-                console.log(`❌ Item ${item.id} foi FILTRADO (excluído) - não atende às condições`);
-                documentsSkipped++;
-                continue; // Pular este item
-              }
-              
-              console.log(`✅ Item ${item.id} PASSOU no filtro - será processado`);
-              
-            } catch (filterError) {
-              console.error(`💥 ERRO ao aplicar filtro no item ${item.id}:`, filterError);
-              console.log(`⚠️ Item ${item.id} será processado devido ao erro no filtro`);
-              // Em caso de erro no filtro, processar o item (comportamento seguro)
-            }
-          } else {
-            console.log(`⏭️ NENHUM FILTRO configurado - processando item ${item.id}`);
-          }
+
 
           // Aplicar valores padrão configurados no mapeamento
           console.log("Valores padrão do mapeamento:", existingMapping.defaultValues);
