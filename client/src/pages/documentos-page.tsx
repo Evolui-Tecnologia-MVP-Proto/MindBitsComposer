@@ -1168,23 +1168,27 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 >
                   <Eye className="h-4 w-4" />
                 </Button>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8"
-                  onClick={() => openEditModal(documento)}
-                >
-                  <Pencil className="h-4 w-4 text-blue-500" />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8"
-                  onClick={() => handleDeleteDocument(documento)}
-                  disabled={deleteDocumentoMutation.isPending}
-                >
-                  <Trash2 className="h-4 w-4 text-red-500" />
-                </Button>
+                {activeTab !== "integrados" && (
+                  <>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8"
+                      onClick={() => openEditModal(documento)}
+                    >
+                      <Pencil className="h-4 w-4 text-blue-500" />
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8"
+                      onClick={() => handleDeleteDocument(documento)}
+                      disabled={deleteDocumentoMutation.isPending}
+                    >
+                      <Trash2 className="h-4 w-4 text-red-500" />
+                    </Button>
+                  </>
+                )}
               </div>
             </TableCell>
           </TableRow>
