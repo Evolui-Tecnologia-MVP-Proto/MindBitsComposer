@@ -1015,6 +1015,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           console.log("generalColumns final:", documentData.generalColumns);
 
+          // Aplicar filtro se configurado
+          if (existingMapping.mappingFilter && existingMapping.mappingFilter.trim()) {
+            try {
+              console.log(`Aplicando filtro para item ${item.id}:`, existingMapping.mappingFilter);
+              
+              // Criar função de filtro e executar
+              const filterFunction = new Function('item', existingMapping.mappingFilter);
+              const shouldInclude = filterFunction(item);
+              
+              console.log(`Resultado do filtro para item ${item.id}:`, shouldInclude);
+              
+              if (!shouldInclude) {
+                console.log(`Item ${item.id} foi filtrado (excluído) - não atende às condições`);
+                documentsSkipped++;
+                continue; // Pular este item
+              }
+              
+              console.log(`Item ${item.id} passou no filtro - será processado`);
+              
+            } catch (filterError) {
+              console.warn(`Erro ao aplicar filtro no item ${item.id}:`, filterError);
+              console.log(`Item ${item.id} será processado devido ao erro no filtro`);
+              // Em caso de erro no filtro, processar o item (comportamento seguro)
+            }
+          }
+
           // Aplicar valores padrão configurados no mapeamento
           console.log("Valores padrão do mapeamento:", existingMapping.defaultValues);
           
