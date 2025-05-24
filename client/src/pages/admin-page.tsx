@@ -1537,7 +1537,7 @@ export default function AdminPage() {
                     </TableHeader>
                     <TableBody>
                       {getDefaultableFields().map((fieldInfo) => (
-                        <TableRow key={fieldInfo.field} className="h-6">
+                        <TableRow key={fieldInfo.field} className="h-9">
                           <TableCell className="py-0">
                             <span className="text-xs font-medium font-mono">
                               {fieldInfo.field}
