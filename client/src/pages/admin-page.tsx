@@ -1212,7 +1212,7 @@ export default function AdminPage() {
       
       {/* Modal para edição/inclusão de mapeamento de quadros do Monday */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-[700px]">
+        <DialogContent className="sm:max-w-[770px]">
           <DialogHeader>
             <DialogTitle>
               {selectedMapping ? "Editar Mapeamento" : "Novo Mapeamento"}
