@@ -1537,13 +1537,13 @@ export default function AdminPage() {
                     </TableHeader>
                     <TableBody>
                       {getDefaultableFields().map((fieldInfo) => (
-                        <TableRow key={fieldInfo.field} className="h-12">
-                          <TableCell className="py-2">
+                        <TableRow key={fieldInfo.field} className="h-8">
+                          <TableCell className="py-1">
                             <span className="text-sm font-medium font-mono">
                               {fieldInfo.field}
                             </span>
                           </TableCell>
-                          <TableCell className="py-2">
+                          <TableCell className="py-1">
                             <Input
                               placeholder={`Valor padrão para ${fieldInfo.label}`}
                               value={selectedMapping?.defaultValues?.[fieldInfo.field] || ""}
@@ -1560,10 +1560,10 @@ export default function AdminPage() {
                                   mappingForm.setValue("defaultValues", newDefaults);
                                 }
                               }}
-                              className="text-sm"
+                              className="text-sm h-8"
                             />
                           </TableCell>
-                          <TableCell className="py-2">
+                          <TableCell className="py-1">
                             <Badge 
                               variant={fieldInfo.required ? "default" : "secondary"}
                               className={`text-xs ${fieldInfo.required 
