@@ -1455,7 +1455,7 @@ export default function AdminPage() {
               )}
             </TabsContent>
             
-            {/* Botões que ficam abaixo do TabContent, visíveis em ambas as abas */}
+            {/* Botões que ficam abaixo do TabContent, condicionais por aba */}
             <div className="pt-4 border-t mt-4">
               <div className="flex justify-end gap-2">
                 <Button 
@@ -1465,18 +1465,27 @@ export default function AdminPage() {
                 >
                   Cancelar
                 </Button>
-                <Button 
-                  type="submit" 
-                  form="mappingForm"
-                  disabled={isSubmitting || isSaveDisabled}
-                >
-                  {isSubmitting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Salvando...
-                    </>
-                  ) : "Salvar"}
-                </Button>
+                {activeTab === "quadro" ? (
+                  <Button 
+                    type="submit" 
+                    form="mappingForm"
+                    disabled={isSubmitting || isSaveDisabled}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Salvando...
+                      </>
+                    ) : "Salvar"}
+                  </Button>
+                ) : (
+                  <Button 
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                  >
+                    Concluir
+                  </Button>
+                )}
               </div>
             </div>
           </Tabs>
