@@ -824,6 +824,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Board ID:", existingMapping.boardId);
       console.log("Colunas mapeadas:", mappingColumns.length);
       console.log("Status da API Key:", apiKey ? "EXISTE" : "NÃO EXISTE");
+      console.log("FILTRO CONFIGURADO:", existingMapping.mappingFilter || "NENHUM FILTRO");
+      console.log("FILTRO ESTÁ VAZIO?", !existingMapping.mappingFilter || !existingMapping.mappingFilter.trim());
 
       // Obter dados do quadro Monday
       const mondayColumns = mappingColumns.map(col => col.mondayColumnId);
