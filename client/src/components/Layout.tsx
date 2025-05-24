@@ -40,13 +40,13 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1">
         <Sidebar 
           isMobileOpen={isMobileMenuOpen} 
           setIsMobileOpen={setIsMobileMenuOpen} 
         />
         
-        <main className="flex-1 relative z-0 overflow-hidden focus:outline-none bg-gray-50 p-5">
+        <main className="flex-1 relative z-0 focus:outline-none bg-gray-50 p-5">
           {children}
         </main>
       </div>
