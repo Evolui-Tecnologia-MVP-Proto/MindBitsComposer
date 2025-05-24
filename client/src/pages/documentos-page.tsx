@@ -1513,12 +1513,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               </div>
               
               <div>
-                <Label htmlFor="descricao">Descrição</Label>
+                <Label htmlFor="descricao">Detalhamento</Label>
                 <Textarea
                   id="descricao"
                   value={formData.descricao}
                   onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-                  placeholder="Descrição detalhada do documento..."
+                  placeholder="Detalhamento completo do documento..."
                   rows={4}
                   className="resize-none"
                 />
@@ -2138,12 +2138,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 </div>
                 
                 <div>
-                  <Label htmlFor="edit-descricao">Descrição</Label>
+                  <Label htmlFor="edit-descricao">Detalhamento</Label>
                   <Textarea
                     id="edit-descricao"
                     value={formData.descricao}
                     onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-                    placeholder="Descrição detalhada do documento..."
+                    placeholder="Detalhamento completo do documento..."
                     rows={4}
                     className="resize-none"
                   />
