@@ -1518,8 +1518,7 @@ export default function AdminPage() {
             {/* Aba de valores padrão */}
             <TabsContent value="defaults" className="py-4">
               <div className="space-y-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <h3 className="text-lg font-semibold">Valores Padrão</h3>
+                <div className="mb-4">
                   <p className="text-sm text-gray-500">
                     Configure valores padrão para campos quando não há mapeamento ou a API não retorna valor
                   </p>
