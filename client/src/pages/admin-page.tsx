@@ -1537,13 +1537,13 @@ export default function AdminPage() {
                     </TableHeader>
                     <TableBody>
                       {getDefaultableFields().map((fieldInfo) => (
-                        <TableRow key={fieldInfo.field} className="h-8">
-                          <TableCell className="py-1">
+                        <TableRow key={fieldInfo.field} className="h-6">
+                          <TableCell className="py-0">
                             <span className="text-xs font-medium font-mono">
                               {fieldInfo.field}
                             </span>
                           </TableCell>
-                          <TableCell className="py-1">
+                          <TableCell className="py-0">
                             <Input
                               value={selectedMapping?.defaultValues?.[fieldInfo.field] || ""}
                               onChange={(e) => {
@@ -1559,10 +1559,10 @@ export default function AdminPage() {
                                   mappingForm.setValue("defaultValues", newDefaults);
                                 }
                               }}
-                              className="text-xs h-8 font-mono"
+                              className="text-xs h-6 font-mono"
                             />
                           </TableCell>
-                          <TableCell className="py-1">
+                          <TableCell className="py-0">
                             {(() => {
                               // Verifica se o campo está mapeado em alguma coluna
                               const isMapped = mappingColumns?.some((mapping: any) => 
