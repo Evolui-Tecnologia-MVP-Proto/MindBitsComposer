@@ -1532,7 +1532,7 @@ export default function AdminPage() {
                       <TableRow>
                         <TableHead className="w-[200px]">Campo</TableHead>
                         <TableHead>Valor Padrão</TableHead>
-                        <TableHead className="w-[100px]">Obrigatório</TableHead>
+                        <TableHead className="w-[100px]">Obg-Map</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1564,15 +1564,35 @@ export default function AdminPage() {
                             />
                           </TableCell>
                           <TableCell className="py-1">
-                            <Badge 
-                              variant={fieldInfo.required ? "default" : "secondary"}
-                              className={`text-xs ${fieldInfo.required 
-                                ? "bg-red-100 text-red-700 border-red-200" 
-                                : "bg-gray-100 text-gray-600 border-gray-200"
-                              }`}
-                            >
-                              {fieldInfo.required ? "SIM" : "NÃO"}
-                            </Badge>
+                            {(() => {
+                              // Verifica se o campo está mapeado em alguma coluna
+                              const isMapped = mappingColumns?.some((mapping: any) => 
+                                mapping.cpxField === fieldInfo.field
+                              ) || false;
+                              
+                              const obligatoryLetter = fieldInfo.required ? "S" : "N";
+                              const mappedLetter = isMapped ? "S" : "N";
+                              const badgeText = `${obligatoryLetter}-${mappedLetter}`;
+                              
+                              // Define cor baseada no status
+                              let badgeColor = "bg-gray-100 text-gray-600 border-gray-200";
+                              if (fieldInfo.required && isMapped) {
+                                badgeColor = "bg-green-100 text-green-700 border-green-200";
+                              } else if (fieldInfo.required && !isMapped) {
+                                badgeColor = "bg-red-100 text-red-700 border-red-200";
+                              } else if (!fieldInfo.required && isMapped) {
+                                badgeColor = "bg-blue-100 text-blue-700 border-blue-200";
+                              }
+                              
+                              return (
+                                <Badge 
+                                  variant="secondary"
+                                  className={`text-xs font-mono ${badgeColor}`}
+                                >
+                                  {badgeText}
+                                </Badge>
+                              );
+                            })()}
                           </TableCell>
                         </TableRow>
                       ))}
