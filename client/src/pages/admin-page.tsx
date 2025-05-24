@@ -1462,7 +1462,7 @@ export default function AdminPage() {
                                   size="icon"
                                   onClick={() => deleteColumn(column.id)}
                                 >
-                                  <Trash className="h-4 w-4" />
+                                  <Trash className="h-4 w-4 text-red-600" />
                                 </Button>
                               </div>
                             </TableCell>
