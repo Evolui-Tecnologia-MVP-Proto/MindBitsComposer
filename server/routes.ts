@@ -838,6 +838,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   id
                   text
                   value
+                  column {
+                    title
+                  }
                 }
               }
             }
@@ -893,8 +896,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Mapear cada coluna do Monday para o campo correspondente
           for (const mapping of mappingColumns) {
-            const columnValue = item.column_values.find((cv: any) => cv.id === mapping.mondayColumnId);
-            let value = columnValue?.text || "";
+            let value = "";
+            
+            // Verificar se o mapeamento é para o campo "name" (título do item)
+            if (mapping.mondayColumnId === "name") {
+              value = item.name || "";
+            } else {
+              // Buscar valor na coluna específica
+              const columnValue = item.column_values.find((cv: any) => cv.id === mapping.mondayColumnId);
+              value = columnValue?.text || "";
+            }
             
             // Aplicar função de transformação se existir
             if (mapping.transformFunction && mapping.transformFunction.trim()) {
