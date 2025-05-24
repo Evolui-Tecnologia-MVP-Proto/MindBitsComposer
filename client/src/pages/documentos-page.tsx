@@ -2141,15 +2141,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {/* Modal de edição de artefato */}
       {renderEditArtifactModal()}
 
-      {/* Dialog de confirmação de exclusão */}
-      <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-red-600">
+      {/* Modal de confirmação de exclusão de documento */}
+      <AlertDialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600">
               <Trash2 className="h-5 w-5" />
               Confirmar Exclusão
-            </DialogTitle>
-            <DialogDescription className="pt-2">
+            </AlertDialogTitle>
+            <AlertDialogDescription>
               Tem certeza que deseja excluir o documento{" "}
               <span className="font-semibold text-gray-900">
                 "{documentToDelete?.objeto}"
@@ -2160,20 +2160,16 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               <span className="text-red-600 font-medium">
                 Esta ação não pode ser desfeita.
               </span>
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="flex gap-2 sm:gap-2">
-            <Button
-              variant="outline"
-              onClick={cancelDelete}
-              disabled={deleteDocumentoMutation.isPending}
-            >
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelDelete} disabled={deleteDocumentoMutation.isPending}>
               Cancelar
-            </Button>
-            <Button
-              variant="destructive"
+            </AlertDialogCancel>
+            <AlertDialogAction 
               onClick={confirmDelete}
               disabled={deleteDocumentoMutation.isPending}
+              className="bg-red-600 hover:bg-red-700"
             >
               {deleteDocumentoMutation.isPending ? (
                 <>
@@ -2186,10 +2182,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   Excluir
                 </>
               )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Modal de confirmação para exclusão de anexo */}
       <AlertDialog open={isDeleteArtifactConfirmOpen} onOpenChange={setIsDeleteArtifactConfirmOpen}>
