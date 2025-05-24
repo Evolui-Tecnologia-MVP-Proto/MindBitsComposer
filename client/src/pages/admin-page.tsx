@@ -1747,7 +1747,7 @@ export default function AdminPage() {
           offset={true}
         >
           <DialogHeader>
-            <DialogTitle>{selectedColumn ? "Editar Coluna" : "Nova Coluna"}</DialogTitle>
+            <DialogTitle>{selectedColumn ? "Editar Mapeamento" : "Novo Mapeamento"}</DialogTitle>
             <DialogDescription>
               {selectedColumn 
                 ? "Edite o mapeamento entre a coluna do Monday e o campo na aplicação." 
