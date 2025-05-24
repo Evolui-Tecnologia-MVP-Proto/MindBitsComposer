@@ -1269,23 +1269,59 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             {formatDate(artifact.createdAt)}
                           </TableCell>
                           <TableCell className="text-right">
-                            <div className="flex justify-end gap-1">
+                            <div className="flex justify-end space-x-2">
                               <Button 
                                 variant="ghost" 
-                                size="sm" 
-                                className="h-7 w-7 p-0"
-                                onClick={() => openEditArtifactModal(artifact)}
+                                size="icon" 
+                                className="h-8 w-8"
+                                onClick={() => {
+                                  const link = document.createElement('a');
+                                  link.href = `data:${artifact.mimeType};base64,${artifact.fileData}`;
+                                  link.download = artifact.fileName;
+                                  link.click();
+                                }}
+                                title="Baixar cópia"
                               >
-                                <Pencil className="h-3 w-3 text-blue-500" />
+                                <Download className="h-4 w-4 text-blue-500" />
                               </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                className="h-7 w-7 p-0"
-                                onClick={() => handleDeleteArtifact(artifact.id)}
-                              >
-                                <Trash2 className="h-3 w-3 text-red-500" />
-                              </Button>
+                              {isMimeTypeViewable(artifact.mimeType) && (
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="h-8 w-8"
+                                  onClick={() => {
+                                    try {
+                                      // Converter base64 para blob
+                                      const byteCharacters = atob(artifact.fileData);
+                                      const byteNumbers = new Array(byteCharacters.length);
+                                      for (let i = 0; i < byteCharacters.length; i++) {
+                                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                                      }
+                                      const byteArray = new Uint8Array(byteNumbers);
+                                      const blob = new Blob([byteArray], { type: artifact.mimeType });
+                                      
+                                      // Criar URL temporária e abrir em nova aba
+                                      const blobUrl = URL.createObjectURL(blob);
+                                      const newWindow = window.open(blobUrl, '_blank');
+                                      
+                                      // Limpar URL após um tempo para liberar memória
+                                      setTimeout(() => {
+                                        URL.revokeObjectURL(blobUrl);
+                                      }, 5000);
+                                    } catch (error) {
+                                      console.error('Erro ao visualizar arquivo:', error);
+                                      toast({
+                                        title: "Erro",
+                                        description: "Não foi possível visualizar o arquivo",
+                                        variant: "destructive",
+                                      });
+                                    }
+                                  }}
+                                  title="Visualizar"
+                                >
+                                  <Eye className="h-4 w-4 text-blue-500" />
+                                </Button>
+                              )}
                             </div>
                           </TableCell>
                         </TableRow>
@@ -2040,9 +2076,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           </TableCell>
                           <TableCell className="font-medium">{artifact.name}</TableCell>
                           <TableCell>
-                            <span className="text-sm text-gray-600 truncate max-w-[200px]" title={artifact.fileName}>
-                              {artifact.fileName}
-                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-gray-600 truncate max-w-[200px]" title={artifact.fileName}>
+                                {artifact.fileName}
+                              </span>
+                              <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+                                <Download className="h-3 w-3" />
+                              </Button>
+                            </div>
                           </TableCell>
                           <TableCell className="text-right">
                             <div className="flex justify-end gap-1">
