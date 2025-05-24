@@ -128,6 +128,7 @@ const serviceConnectionSchema = z.object({
 // Função para gerar dinamicamente as colunas da tabela documentos
 const getDocumentosColumns = () => {
   return [
+    { field: "id_origem", label: "ID Origem", type: "text" },
     { field: "origem", label: "Origem", type: "text" },
     { field: "objeto", label: "Objeto da Task", type: "text" },
     { field: "tipo", label: "Tipo", type: "text" },
