@@ -83,6 +83,7 @@ export default function DocumentosPage() {
   const [selectedFolderPath, setSelectedFolderPath] = useState<string>('');
   const [selectedFolderFiles, setSelectedFolderFiles] = useState<any[]>([]);
   const [isLoadingFolderFiles, setIsLoadingFolderFiles] = useState(false);
+  const [currentCreatedDocumentId, setCurrentCreatedDocumentId] = useState<string | null>(null);
   const [artifactFormData, setArtifactFormData] = useState<InsertDocumentArtifact>({
     documentoId: "",
     name: "",
@@ -107,6 +108,7 @@ export default function DocumentosPage() {
       status: "Integrado",
       statusOrigem: "Incluido",
     });
+    setCurrentCreatedDocumentId(null); // Reset do documento criado
     console.log("✅ Campos limpos!");
   };
 
@@ -512,19 +514,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       if (!response.ok) throw new Error("Erro ao criar documento");
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (createdDocument) => {
       queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
-      setIsCreateModalOpen(false);
-      setFormData({
-        origem: "CPx", // Será sempre CPx para novos documentos
-        objeto: "",
-        cliente: "",
-        responsavel: "",
-        sistema: "",
-        modulo: "",
-        descricao: "",
-        status: "Integrado",
-        statusOrigem: "Incluido",
+      // Armazenar o ID do documento criado e NÃO fechar o modal
+      setCurrentCreatedDocumentId(createdDocument.id);
+      // Manter os dados do formulário para permitir edições
+      toast({
+        title: "Documento criado!",
+        description: "Agora você pode adicionar anexos.",
       });
     },
   });
@@ -1427,14 +1424,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           <h2 className="text-3xl font-bold tracking-tight">Documentos</h2>
           <Button 
             onClick={() => {
-              console.log("🔥 BOTÃO INCLUIR CLICADO!");
               resetFormData();
               setIsCreateModalOpen(true);
             }} 
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-blue-600 hover:bg-blue-700"
           >
             <Plus className="mr-2 h-4 w-4" />
-            🆕 INCLUIR
+            Incluir Documento
           </Button>
         </div>
         
