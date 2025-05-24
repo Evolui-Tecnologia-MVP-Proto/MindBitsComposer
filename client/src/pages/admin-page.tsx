@@ -674,23 +674,23 @@ export default function AdminPage() {
   const executeMondayMapping = async (mapping: BoardMapping) => {
     try {
       setIsExecutingMapping(true);
-      setExecutionProgress("🚀 Iniciando sincronização...");
+      setExecutionProgress("Iniciando sincronização...");
       
       toast({
-        title: "🚀 Executando sincronização",
+        title: "Executando sincronização",
         description: `Iniciando sincronização do mapeamento "${mapping.name}"...`,
       });
 
       // Etapa 1: Conectando
-      setExecutionProgress("🔗 Conectando com API do Monday.com...");
+      setExecutionProgress("Conectando com API do Monday.com...");
       await new Promise(resolve => setTimeout(resolve, 500));
       
       // Etapa 2: Autenticando
-      setExecutionProgress("🔐 Autenticando com Monday.com...");
+      setExecutionProgress("Autenticando com Monday.com...");
       await new Promise(resolve => setTimeout(resolve, 300));
       
       // Etapa 3: Buscando dados
-      setExecutionProgress("📊 Obtendo dados do quadro...");
+      setExecutionProgress("Obtendo dados do quadro...");
       await new Promise(resolve => setTimeout(resolve, 400));
       
       const startTime = Date.now();
@@ -703,14 +703,14 @@ export default function AdminPage() {
       });
 
       // Etapa 4: Processando com simulação de progresso
-      setExecutionProgress("⚙️ Processando registros...");
+      setExecutionProgress("Processando registros...");
       
       // Simular progresso durante o processamento
       const progressInterval = setInterval(() => {
         const elapsed = Date.now() - startTime;
         const estimatedTotal = 8000; // Estimativa de 8 segundos para completar
         const progress = Math.min(Math.round((elapsed / estimatedTotal) * 100), 95);
-        setExecutionProgress(`⚙️ Processando registros... ${progress}%`);
+        setExecutionProgress(`Processando registros... ${progress}%`);
       }, 200);
 
       if (!response.ok) {
@@ -733,19 +733,19 @@ export default function AdminPage() {
       }
       
       clearInterval(progressInterval);
-      setExecutionProgress("✅ Finalizando sincronização...");
+      setExecutionProgress("Finalizando sincronização...");
       await new Promise(resolve => setTimeout(resolve, 300));
       
       toast({
-        title: "✅ Sincronização concluída com sucesso!",
+        title: "Sincronização concluída com sucesso!",
         description: (
           <div className="space-y-1">
-            <div className="font-medium">📊 Resumo da Importação:</div>
-            <div>📥 <strong>{result.itemsProcessed}</strong> registros importados da API</div>
-            <div>💾 <strong>{result.documentsCreated}</strong> documentos gravados no banco</div>
-            <div>🚫 <strong>{result.documentsSkipped}</strong> registros filtrados/ignorados</div>
+            <div className="font-medium">Resumo da Importação:</div>
+            <div><strong>{result.itemsProcessed}</strong> registros importados da API</div>
+            <div><strong>{result.documentsCreated}</strong> documentos gravados no banco</div>
+            <div><strong>{result.documentsSkipped}</strong> registros filtrados/ignorados</div>
             <div className="text-xs text-gray-600 mt-2">
-              📋 {result.columnsMapping} colunas mapeadas • ⏰ {new Date().toLocaleTimeString()}
+              {result.columnsMapping} colunas mapeadas • {new Date().toLocaleTimeString()}
             </div>
           </div>
         ),
@@ -758,7 +758,7 @@ export default function AdminPage() {
     } catch (error) {
       console.error('Erro ao executar mapeamento:', error);
       toast({
-        title: "❌ Erro na execução",
+        title: "Erro na execução",
         description: error instanceof Error ? error.message : "Não foi possível executar a sincronização",
         variant: "destructive",
         duration: 6000,
