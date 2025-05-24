@@ -1526,9 +1526,9 @@ export default function AdminPage() {
                 </div>
                 
                 {/* Tabela de valores padrão */}
-                <div className="border rounded-md">
+                <div className="border rounded-md max-h-96 overflow-y-auto">
                   <Table>
-                    <TableHeader>
+                    <TableHeader className="sticky top-0 bg-white z-10">
                       <TableRow>
                         <TableHead className="w-[200px]">Campo</TableHead>
                         <TableHead>Valor Padrão</TableHead>
