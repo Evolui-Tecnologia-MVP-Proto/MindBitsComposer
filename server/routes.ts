@@ -792,7 +792,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Execute Monday mapping synchronization
   app.post("/api/monday/mappings/:id/execute", async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    console.log("🚀 INICIANDO EXECUÇÃO DO MAPEAMENTO:", id);
+    
+    if (!req.isAuthenticated()) {
+      console.log("❌ USUÁRIO NÃO AUTORIZADO");
+      return res.status(401).send("Não autorizado");
+    }
     
     const { id } = req.params;
     
