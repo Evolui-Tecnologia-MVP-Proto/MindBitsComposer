@@ -2169,9 +2169,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                 variant="ghost" 
                                 size="sm" 
                                 className="h-7 w-7 p-0"
-                                onClick={() => handleDeleteArtifact(artifact.id)}
+                                onClick={() => {
+                                  console.log("🗑️ EXCLUINDO ANEXO DIRETAMENTE NO MODAL DE EDIÇÃO:", artifact.id);
+                                  deleteArtifactMutation.mutate(artifact.id);
+                                }}
+                                title="Excluir anexo"
+                                disabled={deleteArtifactMutation.isPending}
                               >
-                                <Trash2 className="h-3 w-3 text-red-500" />
+                                {deleteArtifactMutation.isPending ? (
+                                  <Loader2 className="h-3 w-3 animate-spin text-red-500" />
+                                ) : (
+                                  <Trash2 className="h-3 w-3 text-red-500" />
+                                )}
                               </Button>
                             </div>
                           </TableCell>
