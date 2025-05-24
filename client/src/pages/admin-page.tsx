@@ -199,6 +199,8 @@ export default function AdminPage() {
   const [buttonStyle, setButtonStyle] = useState("bg-yellow-500");
   const [showServiceToken, setShowServiceToken] = useState(false);
   const [isServiceSubmitting, setIsServiceSubmitting] = useState(false);
+  const [isExecutingMapping, setIsExecutingMapping] = useState(false);
+  const [executionProgress, setExecutionProgress] = useState<string>("");
   
   // Formulário para serviços externos
   const serviceForm = useForm<z.infer<typeof serviceConnectionSchema>>({
@@ -670,17 +672,24 @@ export default function AdminPage() {
   // Função para executar sincronização do mapeamento Monday
   const executeMondayMapping = async (mapping: BoardMapping) => {
     try {
+      setIsExecutingMapping(true);
+      setExecutionProgress("Iniciando sincronização...");
+      
       toast({
-        title: "Executando sincronização",
+        title: "🚀 Executando sincronização",
         description: `Iniciando sincronização do mapeamento "${mapping.name}"...`,
       });
 
+      setExecutionProgress("Conectando com API do Monday...");
+      
       const response = await fetch(`/api/monday/mappings/${mapping.id}/execute`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
       });
+
+      setExecutionProgress("Processando dados recebidos...");
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -700,9 +709,22 @@ export default function AdminPage() {
         throw new Error("Resposta inválida do servidor");
       }
       
+      setExecutionProgress("Sincronização finalizada!");
+      
       toast({
-        title: "Sincronização concluída",
-        description: `Processados: ${result.itemsProcessed} itens | Criados: ${result.documentsCreated} documentos | Ignorados: ${result.documentsSkipped}`,
+        title: "✅ Sincronização concluída com sucesso!",
+        description: (
+          <div className="space-y-1">
+            <div className="font-medium">📊 Resumo da Importação:</div>
+            <div>📥 <strong>{result.itemsProcessed}</strong> registros importados da API</div>
+            <div>💾 <strong>{result.documentsCreated}</strong> documentos gravados no banco</div>
+            <div>🚫 <strong>{result.documentsSkipped}</strong> registros filtrados/ignorados</div>
+            <div className="text-xs text-gray-600 mt-2">
+              📋 {result.columnsMapping} colunas mapeadas • ⏰ {new Date().toLocaleTimeString()}
+            </div>
+          </div>
+        ),
+        duration: 8000,
       });
 
       // Atualizar a lista de mapeamentos para refletir mudanças
@@ -711,10 +733,14 @@ export default function AdminPage() {
     } catch (error) {
       console.error('Erro ao executar mapeamento:', error);
       toast({
-        title: "Erro na execução",
+        title: "❌ Erro na execução",
         description: error instanceof Error ? error.message : "Não foi possível executar a sincronização",
         variant: "destructive",
+        duration: 6000,
       });
+    } finally {
+      setIsExecutingMapping(false);
+      setExecutionProgress("");
     }
   };
   
@@ -898,6 +924,24 @@ export default function AdminPage() {
           
           <TabsContent value="monday" className="slide-in">
             <div className="space-y-4">
+              {/* Indicador de progresso durante execução */}
+              {isExecutingMapping && (
+                <Card className="border-blue-200 bg-blue-50">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center space-x-4">
+                      <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
+                      <div className="flex-1">
+                        <h3 className="font-medium text-blue-900">🚀 Executando Sincronização Monday.com</h3>
+                        <p className="text-sm text-blue-700">{executionProgress}</p>
+                        <div className="mt-2 w-full bg-blue-200 rounded-full h-2">
+                          <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{width: '60%'}}></div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+              
               <Card>
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
@@ -954,8 +998,15 @@ export default function AdminPage() {
                                     size="icon"
                                     onClick={() => executeMondayMapping(mapping)}
                                     title="Executar sincronização"
+                                    disabled={isExecutingMapping}
                                   >
-                                    <Play className="h-4 w-4 text-green-600" />
+                                    {isExecutingMapping ? (
+                                      <div className="flex items-center space-x-1">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
+                                      </div>
+                                    ) : (
+                                      <Play className="h-4 w-4 text-green-600" />
+                                    )}
                                   </Button>
                                   <Button
                                     variant="ghost"
