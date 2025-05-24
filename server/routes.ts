@@ -955,10 +955,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Adicionar general_columns ao documento
           documentData.generalColumns = generalColumns;
 
-          // Definir origem sempre como "monday"
-          documentData.origem = "monday";
+          // Aplicar valores padrão configurados no mapeamento
+          console.log("Valores padrão do mapeamento:", existingMapping.defaultValues);
           
-          // Verificar e preencher campos obrigatórios em branco
+          if (existingMapping.defaultValues) {
+            for (const [field, defaultValue] of Object.entries(existingMapping.defaultValues)) {
+              // Se o campo não está mapeado ou está vazio, aplicar valor padrão
+              if (!documentData[field] || documentData[field].trim() === "") {
+                // Remover aspas duplas se existirem no valor padrão
+                const cleanValue = typeof defaultValue === 'string' 
+                  ? defaultValue.replace(/^"(.*)"$/, '$1') 
+                  : defaultValue;
+                documentData[field] = cleanValue;
+                console.log(`Campo '${field}' preenchido com valor padrão: '${cleanValue}'`);
+              }
+            }
+          }
+
+          // Definir origem sempre como "monday" se não configurado
+          if (!documentData.origem) {
+            documentData.origem = "monday";
+          }
+          
+          // Verificar e preencher campos obrigatórios ainda em branco
           const requiredFields = ["objeto", "cliente", "responsavel", "sistema", "modulo", "descricao", "solicitante", "aprovador", "agente"];
           requiredFields.forEach(field => {
             if (!documentData[field] || documentData[field].trim() === "") {
@@ -966,7 +985,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           });
 
-          // Definir valores padrão se não mapeados
+          // Definir valores padrão básicos se ainda não preenchidos
           if (!documentData.status) {
             documentData.status = "Processando";
           }
