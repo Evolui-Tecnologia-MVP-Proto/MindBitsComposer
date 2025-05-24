@@ -790,6 +790,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Execute Monday mapping synchronization
+  app.post("/api/monday/mappings/:id/execute", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      // Verificar se o mapeamento existe
+      const existingMapping = await storage.getMondayMapping(id);
+      if (!existingMapping) {
+        return res.status(404).send("Mapeamento não encontrado");
+      }
+      
+      // Obter a chave da API
+      const apiKey = await storage.getMondayApiKey();
+      if (!apiKey) {
+        return res.status(400).send("Chave da API do Monday não configurada");
+      }
+      
+      // Buscar as colunas mapeadas para este mapeamento
+      const mappingColumns = await storage.getMappingColumns(id);
+      if (mappingColumns.length === 0) {
+        return res.status(400).send("Nenhuma coluna mapeada encontrada para este mapeamento");
+      }
+      
+      // Atualizar a data de última sincronização
+      await storage.updateMondayMappingLastSync(id);
+      
+      res.json({
+        success: true,
+        message: "Sincronização executada com sucesso",
+        mapping: existingMapping,
+        columnsProcessed: mappingColumns.length,
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error) {
+      console.error("Erro ao executar sincronização:", error);
+      res.status(500).send("Erro ao executar sincronização");
+    }
+  });
+
   // Fetch columns from Monday.com API and save them
   app.post("/api/monday/mappings/:id/fetch-columns", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
