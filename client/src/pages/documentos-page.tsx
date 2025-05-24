@@ -1277,17 +1277,26 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Plus className="h-5 w-5 text-blue-500" />
-            Criar Novo Documento
+            {currentCreatedDocumentId ? "Editar Documento" : "Criar Novo Documento"}
           </DialogTitle>
           <DialogDescription>
-            Preencha os dados do novo documento e gerencie seus anexos
+            {currentCreatedDocumentId 
+              ? "Documento criado com sucesso! Gerencie os dados e anexos"
+              : "Preencha os dados do novo documento"
+            }
           </DialogDescription>
         </DialogHeader>
         
         <Tabs defaultValue="dados-gerais" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="dados-gerais">Dados Gerais</TabsTrigger>
-            <TabsTrigger value="anexos">Anexos</TabsTrigger>
+            <TabsTrigger 
+              value="anexos" 
+              disabled={!currentCreatedDocumentId}
+              className={!currentCreatedDocumentId ? "opacity-50 cursor-not-allowed" : ""}
+            >
+              Anexos {currentCreatedDocumentId ? "✅" : "🔒"}
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="dados-gerais" className="mt-6">
@@ -1359,48 +1368,97 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           
           <TabsContent value="anexos" className="mt-6">
             <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium">Anexos do Documento</h3>
-                <Button 
-                  onClick={openAddArtifactModal}
-                  className="bg-blue-600 hover:bg-blue-700"
-                  size="sm"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Adicionar Anexo
-                </Button>
-              </div>
-              
-              <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed">
-                <Paperclip className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-                <p className="text-sm text-gray-500 mb-3">Adicione anexos após criar o documento</p>
-                <p className="text-xs text-gray-400">Os anexos poderão ser gerenciados após a criação</p>
-              </div>
+              {currentCreatedDocumentId ? (
+                <>
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-medium">Anexos do Documento</h3>
+                    <Button 
+                      onClick={() => {
+                        setArtifactFormData({
+                          documentoId: currentCreatedDocumentId,
+                          name: "",
+                          fileData: "",
+                          fileName: "",
+                          fileSize: "",
+                          mimeType: "",
+                          type: "",
+                        });
+                        setIsAddArtifactModalOpen(true);
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700"
+                      size="sm"
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Adicionar Anexo
+                    </Button>
+                  </div>
+                  
+                  <div className="text-center py-8 bg-green-50 rounded-lg border border-green-200">
+                    <Paperclip className="h-8 w-8 text-green-500 mx-auto mb-3" />
+                    <p className="text-sm text-green-700 mb-3">✅ Documento criado com sucesso!</p>
+                    <p className="text-xs text-green-600">Agora você pode adicionar anexos</p>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed">
+                  <Paperclip className="h-8 w-8 text-gray-400 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500 mb-3">Adicione anexos após criar o documento</p>
+                  <p className="text-xs text-gray-400">Os anexos poderão ser gerenciados após a criação</p>
+                </div>
+              )}
             </div>
           </TabsContent>
         </Tabs>
         
         <DialogFooter className="mt-6">
           <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>
-            Cancelar
+            {currentCreatedDocumentId ? "Fechar" : "Cancelar"}
           </Button>
-          <Button 
-            onClick={handleCreateDocument} 
-            disabled={createDocumentoMutation.isPending}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            {createDocumentoMutation.isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Criando...
-              </>
-            ) : (
-              <>
-                <Plus className="mr-2 h-4 w-4" />
-                Criar Documento
-              </>
-            )}
-          </Button>
+          {!currentCreatedDocumentId ? (
+            <Button 
+              onClick={handleCreateDocument} 
+              disabled={createDocumentoMutation.isPending}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {createDocumentoMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Criando...
+                </>
+              ) : (
+                <>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Criar Documento
+                </>
+              )}
+            </Button>
+          ) : (
+            <Button 
+              onClick={() => {
+                // Salvar alterações no documento existente
+                if (currentCreatedDocumentId) {
+                  updateDocumentoMutation.mutate({
+                    id: currentCreatedDocumentId,
+                    data: formData,
+                  });
+                }
+              }} 
+              disabled={updateDocumentoMutation.isPending}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {updateDocumentoMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Salvando...
+                </>
+              ) : (
+                <>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Salvar Alterações
+                </>
+              )}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
