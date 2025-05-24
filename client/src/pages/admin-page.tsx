@@ -43,7 +43,8 @@ import {
   Lightbulb,
   CheckCircle,
   XCircle,
-  Play
+  Play,
+  Key
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -1583,6 +1584,10 @@ export default function AdminPage() {
                             </TableCell>
                             <TableCell className="py-0">
                               <div className="flex items-center gap-2">
+                                {/* Ícone de chave vermelho se for campo chave */}
+                                {column.isKey && (
+                                  <Key className="h-3 w-3 text-red-600" />
+                                )}
                                 <span className="text-xs font-mono">
                                   {column.cpxField === 'generalColumns' 
                                     ? `generalColumns [${mappingColumns
