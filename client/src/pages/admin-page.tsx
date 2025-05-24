@@ -1426,7 +1426,12 @@ export default function AdminPage() {
                             <TableCell className="py-0">
                               <div className="flex items-center gap-2">
                                 <span className="text-sm">
-                                  {column.cpxField}
+                                  {column.cpxField === 'generalColumns' 
+                                    ? `generalColumns [${mappingColumns
+                                        .filter(col => col.cpxField === 'generalColumns')
+                                        .findIndex(col => col.id === column.id) + 1}]`
+                                    : column.cpxField
+                                  }
                                 </span>
                                 <Badge variant="outline" className="text-xs font-mono bg-blue-50 text-blue-700 border-blue-200">
                                   {column.cpxField === 'objeto' ? 'texto' :
