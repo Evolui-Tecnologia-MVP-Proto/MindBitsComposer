@@ -1501,12 +1501,32 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             <Button
                               variant="outline"
                               size="sm"
+                              onClick={() => openEditArtifactModal(artifact)}
+                              title="Editar anexo"
+                            >
+                              <Pencil className="h-4 w-4 text-green-500" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setArtifactToDelete(artifact.id);
+                                setIsDeleteArtifactConfirmOpen(true);
+                              }}
+                              title="Excluir anexo"
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
                               onClick={() => {
                                 const link = document.createElement('a');
                                 link.href = `data:${artifact.mimeType};base64,${artifact.fileData}`;
                                 link.download = artifact.fileName;
                                 link.click();
                               }}
+                              title="Baixar anexo"
                             >
                               <Download className="h-4 w-4" />
                             </Button>
