@@ -1430,6 +1430,10 @@ export default function AdminPage() {
                                     ? `generalColumns [${mappingColumns
                                         .filter(col => col.cpxField === 'generalColumns')
                                         .findIndex(col => col.id === column.id) + 1}]`
+                                    : column.cpxField === 'descricao'
+                                    ? `descricao [${mappingColumns
+                                        .filter(col => col.cpxField === 'descricao')
+                                        .findIndex(col => col.id === column.id) + 1}]`
                                     : column.cpxField
                                   }
                                 </span>
@@ -1848,8 +1852,8 @@ return item.column_values.some(col =>
                           if (selectedColumn && selectedColumn.cpxField === column.field) {
                             return true;
                           }
-                          // O campo generalColumns sempre deve estar disponível (pode receber múltiplas colunas)
-                          if (column.field === "generalColumns") {
+                          // Os campos generalColumns e descricao sempre devem estar disponíveis (podem receber múltiplas colunas)
+                          if (column.field === "generalColumns" || column.field === "descricao") {
                             return true;
                           }
                           // Filtrar campos que já estão mapeados
