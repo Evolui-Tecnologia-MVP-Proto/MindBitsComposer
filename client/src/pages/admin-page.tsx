@@ -1539,7 +1539,7 @@ export default function AdminPage() {
                       {getDefaultableFields().map((fieldInfo) => (
                         <TableRow key={fieldInfo.field} className="h-8">
                           <TableCell className="py-1">
-                            <span className="text-sm font-medium font-mono">
+                            <span className="text-xs font-medium font-mono">
                               {fieldInfo.field}
                             </span>
                           </TableCell>
@@ -1560,7 +1560,7 @@ export default function AdminPage() {
                                   mappingForm.setValue("defaultValues", newDefaults);
                                 }
                               }}
-                              className="text-sm h-8"
+                              className="text-xs h-8 font-mono"
                             />
                           </TableCell>
                           <TableCell className="py-1">
