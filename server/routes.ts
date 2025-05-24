@@ -1739,7 +1739,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const documentos = await storage.getAllDocumentos();
-      res.json(documentos);
+      
+      // Converter BigInt para string para serialização JSON
+      const documentosSerializados = documentos.map(doc => ({
+        ...doc,
+        idOrigem: doc.idOrigem ? doc.idOrigem.toString() : null
+      }));
+      
+      res.json(documentosSerializados);
     } catch (error: any) {
       console.error("Erro ao buscar documentos:", error);
       res.status(500).send("Erro ao buscar documentos");
@@ -1754,7 +1761,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!documento) {
         return res.status(404).send("Documento não encontrado");
       }
-      res.json(documento);
+      
+      // Converter BigInt para string para serialização JSON
+      const documentoSerializado = {
+        ...documento,
+        idOrigem: documento.idOrigem ? documento.idOrigem.toString() : null
+      };
+      
+      res.json(documentoSerializado);
     } catch (error: any) {
       console.error("Erro ao buscar documento:", error);
       res.status(500).send("Erro ao buscar documento");
