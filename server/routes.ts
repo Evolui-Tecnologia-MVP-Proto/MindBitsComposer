@@ -836,7 +836,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 name
                 column_values(ids: [${mondayColumns.map(id => `"${id}"`).join(", ")}]) {
                   id
-                  title
                   text
                   value
                 }
