@@ -1401,15 +1401,16 @@ export default function AdminPage() {
                       </p>
                     </div>
                   ) : (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Coluna Monday</TableHead>
-                          <TableHead>Campo CPX</TableHead>
-                          <TableHead className="w-[100px]">Ações</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
+                    <div className="max-h-[300px] overflow-y-auto border rounded-md">
+                      <Table>
+                        <TableHeader className="sticky top-0 bg-background z-10">
+                          <TableRow>
+                            <TableHead>Coluna Monday</TableHead>
+                            <TableHead>Campo CPX</TableHead>
+                            <TableHead className="w-[100px]">Ações</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
                         {mappingColumns.map((column) => (
                           <TableRow key={column.id} className="h-6">
                             <TableCell className="py-0">
@@ -1464,11 +1465,13 @@ export default function AdminPage() {
                             </TableCell>
                           </TableRow>
                         ))}
-                      </TableBody>
-                    </Table>
+                        </TableBody>
+                      </Table>
+                    </div>
                   )}
                 </div>
-              )}
+              )
+            }
             </TabsContent>
             
             {/* Aba de filtros */}
@@ -1838,6 +1841,10 @@ return item.column_values.some(col =>
                         {getDocumentosColumns().filter(column => {
                           // Se estamos editando, permitir o campo atual
                           if (selectedColumn && selectedColumn.cpxField === column.field) {
+                            return true;
+                          }
+                          // O campo generalColumns sempre deve estar disponível (pode receber múltiplas colunas)
+                          if (column.field === "generalColumns") {
                             return true;
                           }
                           // Filtrar campos que já estão mapeados
