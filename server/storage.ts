@@ -665,8 +665,10 @@ export class DatabaseStorage implements IStorage {
           const idOrigemValue = documentData.idOrigem || documentData.id_origem;
           console.log(`🎯 STORAGE - Processando id_origem: documentData.idOrigem=${documentData.idOrigem}, documentData.id_origem=${documentData.id_origem}, final=${idOrigemValue}`);
           if (idOrigemValue !== undefined && idOrigemValue !== null && idOrigemValue !== '') {
-            condition = eq(documentos.idOrigem, idOrigemValue);
-            console.log(`✅ STORAGE - Condição id_origem criada com valor: ${idOrigemValue}`);
+            // Converter para string para garantir compatibilidade com bigint
+            const idOrigemString = String(idOrigemValue);
+            condition = eq(documentos.idOrigem, idOrigemString);
+            console.log(`✅ STORAGE - Condição id_origem criada com valor: ${idOrigemString} (convertido para string)`);
           } else {
             console.log(`❌ STORAGE - id_origem está vazio ou inválido`);
           }
