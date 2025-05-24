@@ -921,8 +921,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 console.log(`🔍 ESTRUTURA COMPLETA DO PRIMEIRO ITEM:`, JSON.stringify(item, null, 2));
                 console.log(`📊 COLUNAS DISPONÍVEIS:`);
                 item.column_values.forEach((col: any) => {
-                  console.log(`  - Coluna: "${col.column?.title}" | Texto: "${col.text}" | Valor: ${JSON.stringify(col.value)}`);
+                  console.log(`  - ID: "${col.id}" | Coluna: "${col.column?.title}" | Texto: "${col.text}" | Valor: ${JSON.stringify(col.value)}`);
                 });
+                
+                // DEBUG: Verificar especificamente a coluna status6
+                const status6Column = item.column_values.find((col: any) => col.id === 'status6');
+                console.log(`🎯 COLUNA STATUS6 ESPECÍFICA:`, JSON.stringify(status6Column, null, 2));
+                
+                // DEBUG: Testar o filtro manualmente
+                console.log(`🧪 TESTE MANUAL DO FILTRO:`);
+                const hasStatus6 = item.column_values.some((col: any) => col.id === 'status6');
+                console.log(`   - Tem coluna status6?`, hasStatus6);
+                if (hasStatus6) {
+                  const status6Value = item.column_values.find((col: any) => col.id === 'status6');
+                  console.log(`   - Valor da coluna status6:`, status6Value?.text);
+                  console.log(`   - É 'Em Análise Preliminar'?`, status6Value?.text === 'Em Análise Preliminar');
+                  console.log(`   - É 'Em Detalhamento Técnico'?`, status6Value?.text === 'Em Detalhamento Técnico');
+                }
               }
               
               // Criar função de filtro e executar
