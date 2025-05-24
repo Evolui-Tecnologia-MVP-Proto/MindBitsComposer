@@ -580,6 +580,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+      setIsDeleteConfirmOpen(false);
+      setDocumentToDelete(null);
+      toast({
+        title: "Documento excluído",
+        description: "O documento foi excluído com sucesso.",
+      });
     },
   });
 
@@ -818,9 +824,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   };
 
   const handleDeleteDocument = (documento: Documento) => {
-    if (confirm(`Tem certeza que deseja excluir o documento "${documento.objeto}"? Esta ação não pode ser desfeita.`)) {
-      deleteDocumentoMutation.mutate(documento.id);
-    }
+    setDocumentToDelete(documento);
+    setIsDeleteConfirmOpen(true);
   };
 
   const confirmDelete = () => {
