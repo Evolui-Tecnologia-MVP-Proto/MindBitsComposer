@@ -894,7 +894,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`🚀 INICIANDO PROCESSAMENTO DE ${items.length} ITENS`);
       console.log(`📋 FILTRO CONFIGURADO:`, existingMapping.mappingFilter);
       
-      for (const item of items) {
+      for (let index = 0; index < items.length; index++) {
+        const item = items[index];
+        
+        // Enviar progresso em tempo real (a cada 10 itens para não sobrecarregar)
+        if (index % 10 === 0 || index === items.length - 1) {
+          console.log(`📊 PROGRESSO: ${index + 1}/${items.length} itens processados | Criados: ${documentsCreated} | Filtrados: ${documentsSkipped}`);
+        }
         try {
           // APLICAR FILTRO PRIMEIRO - antes de processar os dados
           console.log(`🔍 VERIFICANDO FILTRO para item ${item.id}:`);
