@@ -617,7 +617,7 @@ export default function BasicTextEditor() {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Comece a escrever seu documento ou selecione um template..."
-            className="w-full h-full resize-none border-none outline-none text-gray-900 placeholder-gray-400"
+            className="w-full min-h-[300px] resize-none border-none outline-none text-gray-900 placeholder-gray-400"
             style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
           />
         )}
