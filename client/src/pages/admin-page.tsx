@@ -1545,7 +1545,6 @@ export default function AdminPage() {
                           </TableCell>
                           <TableCell className="py-1">
                             <Input
-                              placeholder={`Valor padrão para ${fieldInfo.label}`}
                               value={selectedMapping?.defaultValues?.[fieldInfo.field] || ""}
                               onChange={(e) => {
                                 if (selectedMapping) {
