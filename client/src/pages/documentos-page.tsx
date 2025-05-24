@@ -86,8 +86,8 @@ export default function DocumentosPage() {
   const [selectedFolderFiles, setSelectedFolderFiles] = useState<any[]>([]);
   const [isLoadingFolderFiles, setIsLoadingFolderFiles] = useState(false);
   const [currentCreatedDocumentId, setCurrentCreatedDocumentId] = useState<string | null>(null);
-  const [isEscopoExpanded, setIsEscopoExpanded] = useState(true);
-  const [isPessoasExpanded, setIsPessoasExpanded] = useState(true);
+  const [isEscopoExpanded, setIsEscopoExpanded] = useState(false);
+  const [isPessoasExpanded, setIsPessoasExpanded] = useState(false);
   const [createModalActiveTab, setCreateModalActiveTab] = useState("dados-gerais");
   const [artifactFormData, setArtifactFormData] = useState<InsertDocumentArtifact>({
     documentoId: "",
@@ -119,6 +119,8 @@ export default function DocumentosPage() {
     });
     setCurrentCreatedDocumentId(null); // Reset do documento criado
     setCreateModalActiveTab("dados-gerais"); // Resetar aba para dados-gerais
+    setIsEscopoExpanded(false); // Frames sempre recolhidos
+    setIsPessoasExpanded(false); // Frames sempre recolhidos
     console.log("✅ Campos limpos!");
   };
 
@@ -796,6 +798,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       aprovador: documento.aprovador || "",
       agente: documento.agente || "",
     });
+    setIsEscopoExpanded(false); // Frames sempre recolhidos
+    setIsPessoasExpanded(false); // Frames sempre recolhidos
     setIsEditModalOpen(true);
   };
 
