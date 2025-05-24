@@ -1021,6 +1021,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 // Buscar valor na coluna específica
                 const columnValue = item.column_values.find((cv: any) => cv.id === mapping.mondayColumnId);
                 value = columnValue?.text || "";
+                
+                // Log específico para ID Triagem
+                if (mapping.cpxField === 'id_origem') {
+                  console.log(`🎯 EXTRAINDO ID TRIAGEM:`, {
+                    mondayColumnId: mapping.mondayColumnId,
+                    columnValue: columnValue,
+                    extractedValue: value,
+                    itemId: item.id
+                  });
+                }
               }
               
               // Aplicar função de transformação se existir
