@@ -815,9 +815,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).send("Nenhuma coluna mapeada encontrada para este mapeamento");
       }
       
-      console.log("Token Monday encontrado:", apiKey ? apiKey.substring(0, 10) + "..." : "NENHUM");
+      console.log("=== DIAGNÓSTICO DETALHADO ===");
+      console.log("Token Monday encontrado:", apiKey ? `${apiKey.substring(0, 10)}... (${apiKey.length} chars)` : "NENHUM TOKEN");
       console.log("Board ID:", existingMapping.boardId);
       console.log("Colunas mapeadas:", mappingColumns.length);
+      console.log("Status da API Key:", apiKey ? "EXISTE" : "NÃO EXISTE");
 
       // Obter dados do quadro Monday
       const mondayColumns = mappingColumns.map(col => col.mondayColumnId);
