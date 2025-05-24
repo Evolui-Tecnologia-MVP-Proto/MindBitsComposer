@@ -84,6 +84,7 @@ export default function DocumentosPage() {
   const [selectedFolderFiles, setSelectedFolderFiles] = useState<any[]>([]);
   const [isLoadingFolderFiles, setIsLoadingFolderFiles] = useState(false);
   const [currentCreatedDocumentId, setCurrentCreatedDocumentId] = useState<string | null>(null);
+  const [createModalActiveTab, setCreateModalActiveTab] = useState("dados-gerais");
   const [artifactFormData, setArtifactFormData] = useState<InsertDocumentArtifact>({
     documentoId: "",
     name: "",
@@ -563,6 +564,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
       // Armazenar o ID do documento criado e NÃO fechar o modal
       setCurrentCreatedDocumentId(createdDocument.id);
+      // Mudar automaticamente para a aba de anexos
+      setCreateModalActiveTab("anexos");
       // Manter os dados do formulário para permitir edições
       toast({
         title: "Documento criado!",
@@ -1370,7 +1373,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs defaultValue="dados-gerais" className="w-full">
+        <Tabs value={createModalActiveTab} onValueChange={setCreateModalActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="dados-gerais">Dados Gerais</TabsTrigger>
             <TabsTrigger 
