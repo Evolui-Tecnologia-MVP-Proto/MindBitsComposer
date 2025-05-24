@@ -121,20 +121,25 @@ const serviceConnectionSchema = z.object({
   parameters: z.array(z.string()).optional(),
 });
 
-// Lista das colunas da tabela documentos com seus tipos
-const DOCUMENTOS_COLUMNS = [
-  { field: "origem", label: "Origem", type: "text" },
-  { field: "objeto", label: "Objeto/Nome", type: "text" },
-  { field: "cliente", label: "Cliente", type: "text" },
-  { field: "responsavel", label: "Responsável", type: "text" },
-  { field: "sistema", label: "Sistema", type: "text" },
-  { field: "modulo", label: "Módulo", type: "text" },
-  { field: "descricao", label: "Descrição", type: "text" },
-  { field: "status", label: "Status", type: "text" },
-  { field: "statusOrigem", label: "Status Origem", type: "text" },
-  { field: "createdAt", label: "Data Criação", type: "timestamp" },
-  { field: "updatedAt", label: "Data Atualização", type: "timestamp" },
-];
+// Função para gerar dinamicamente as colunas da tabela documentos
+const getDocumentosColumns = () => {
+  return [
+    { field: "origem", label: "Origem", type: "text" },
+    { field: "objeto", label: "Objeto da Task", type: "text" },
+    { field: "tipo", label: "Tipo", type: "text" },
+    { field: "cliente", label: "Cliente", type: "text" },
+    { field: "responsavel", label: "Responsável", type: "text" },
+    { field: "sistema", label: "Sistema", type: "text" },
+    { field: "modulo", label: "Módulo", type: "text" },
+    { field: "descricao", label: "Detalhamento", type: "text" },
+    { field: "status", label: "Status", type: "text" },
+    { field: "statusOrigem", label: "Status Origem", type: "text" },
+    { field: "solicitante", label: "Solicitante", type: "text" },
+    { field: "aprovador", label: "Aprovador", type: "text" },
+    { field: "agente", label: "Agente", type: "text" },
+    { field: "generalColumns", label: "Colunas Gerais", type: "json" },
+  ];
+};
 
 export default function AdminPage() {
   const { toast } = useToast();
@@ -1806,7 +1811,7 @@ export default function AdminPage() {
                         {...field}
                       >
                         <option value="">Selecione o campo</option>
-                        {DOCUMENTOS_COLUMNS.filter(column => {
+                        {getDocumentosColumns().filter(column => {
                           // Se estamos editando, permitir o campo atual
                           if (selectedColumn && selectedColumn.cpxField === column.field) {
                             return true;
