@@ -727,6 +727,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/documentos", currentDocumentId, "artifacts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos", currentCreatedDocumentId, "artifacts"] });
+      setIsDeleteArtifactConfirmOpen(false);
+      setArtifactToDelete(null);
+      toast({
+        title: "Anexo excluído!",
+        description: "O anexo foi removido com sucesso.",
+      });
     },
   });
 
@@ -942,6 +949,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       duration: 8000,
     });
   };
+
+
 
   const confirmDelete = () => {
     if (documentToDelete) {
