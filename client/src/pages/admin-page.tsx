@@ -674,14 +674,26 @@ export default function AdminPage() {
   const executeMondayMapping = async (mapping: BoardMapping) => {
     try {
       setIsExecutingMapping(true);
-      setExecutionProgress("Iniciando sincronização...");
+      setExecutionProgress("🚀 Iniciando sincronização...");
       
       toast({
         title: "🚀 Executando sincronização",
         description: `Iniciando sincronização do mapeamento "${mapping.name}"...`,
       });
 
-      setExecutionProgress("Conectando com API do Monday...");
+      // Etapa 1: Conectando
+      setExecutionProgress("🔗 Conectando com API do Monday.com...");
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Etapa 2: Autenticando
+      setExecutionProgress("🔐 Autenticando com Monday.com...");
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Etapa 3: Buscando dados
+      setExecutionProgress("📊 Obtendo dados do quadro...");
+      await new Promise(resolve => setTimeout(resolve, 400));
+      
+      const startTime = Date.now();
       
       const response = await fetch(`/api/monday/mappings/${mapping.id}/execute`, {
         method: 'POST',
@@ -690,9 +702,19 @@ export default function AdminPage() {
         },
       });
 
-      setExecutionProgress("Processando dados recebidos...");
+      // Etapa 4: Processando com simulação de progresso
+      setExecutionProgress("⚙️ Processando registros...");
+      
+      // Simular progresso durante o processamento
+      const progressInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const estimatedTotal = 8000; // Estimativa de 8 segundos para completar
+        const progress = Math.min(Math.round((elapsed / estimatedTotal) * 100), 95);
+        setExecutionProgress(`⚙️ Processando registros... ${progress}%`);
+      }, 200);
 
       if (!response.ok) {
+        clearInterval(progressInterval);
         const errorText = await response.text();
         throw new Error(errorText || 'Erro na sincronização');
       }
@@ -710,7 +732,9 @@ export default function AdminPage() {
         throw new Error("Resposta inválida do servidor");
       }
       
-      setExecutionProgress("Sincronização finalizada!");
+      clearInterval(progressInterval);
+      setExecutionProgress("✅ Finalizando sincronização...");
+      await new Promise(resolve => setTimeout(resolve, 300));
       
       toast({
         title: "✅ Sincronização concluída com sucesso!",
