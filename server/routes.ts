@@ -1076,9 +1076,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const rawValue = values[0] || "";
               const numericValue = parseInt(rawValue, 10);
               if (!isNaN(numericValue)) {
-                // O banco usa 'idOrigem' (camelCase), não 'id_origem'
-                documentData.idOrigem = numericValue;
-                console.log(`✅ Campo id_origem convertido: "${rawValue}" -> ${numericValue} (salvo como idOrigem)`);
+                // Mapear para o campo correto do schema: idOrigem
+                documentData['idOrigem'] = numericValue;
+                console.log(`✅ Campo id_origem convertido: "${rawValue}" -> ${numericValue} (mapeado para idOrigem)`);
               } else {
                 console.warn(`⚠️ Valor inválido para id_origem: "${rawValue}" - será ignorado`);
                 // Não definir o campo se não for um número válido
@@ -1171,7 +1171,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (keyFields.length > 0) {
             console.log(`🔍 VERIFICANDO DUPLICATAS para item ${item.id} usando campos chave:`, keyFields);
             console.log(`📊 DADOS DO DOCUMENTO para verificação:`, {
-              id_origem: documentData.id_origem,
+              idOrigem: documentData.idOrigem,
               objeto: documentData.objeto,
               cliente: documentData.cliente
             });
@@ -1197,7 +1197,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           // DEBUG: Verificar dados finais antes de criar documento
           console.log(`📋 DADOS FINAIS DO DOCUMENTO ANTES DA CRIAÇÃO:`, {
-            id_origem: documentData.id_origem,
             idOrigem: documentData.idOrigem,
             objeto: documentData.objeto,
             cliente: documentData.cliente
