@@ -187,6 +187,7 @@ export const documentos = pgTable("documentos", {
   id: uuid("id").defaultRandom().primaryKey(),
   origem: text("origem").notNull(),
   objeto: text("objeto").notNull(),
+  tipo: text("tipo").notNull().default(""),
   cliente: text("cliente").notNull(),
   responsavel: text("responsavel").notNull(),
   sistema: text("sistema").notNull(),

@@ -153,6 +153,7 @@ export default function DocumentosPage() {
   const [formData, setFormData] = useState<InsertDocumento>({
     origem: "CPx", // Sempre CPx para novos documentos
     objeto: "",
+    tipo: "",
     cliente: "",
     responsavel: "",
     sistema: "",
@@ -1425,14 +1426,29 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           
           <TabsContent value="dados-gerais" className="mt-6">
             <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto">
-              <div>
-                <Label htmlFor="objeto">Objeto da Task</Label>
-                <Input
-                  id="objeto"
-                  value={formData.objeto}
-                  onChange={(e) => setFormData({ ...formData, objeto: e.target.value })}
-                  placeholder="Nome do documento"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="objeto">Objeto da Task</Label>
+                  <Input
+                    id="objeto"
+                    value={formData.objeto}
+                    onChange={(e) => setFormData({ ...formData, objeto: e.target.value })}
+                    placeholder="Nome do documento"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="tipo">Tipo</Label>
+                  <Select value={formData.tipo} onValueChange={(value) => setFormData({ ...formData, tipo: value })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="CRP-Req.Cliente">CRP-Req.Cliente</SelectItem>
+                      <SelectItem value="RRP-Impl.Roadmap">RRP-Impl.Roadmap</SelectItem>
+                      <SelectItem value="ODI-Instr.Oper.">ODI-Instr.Oper.</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               
               <div className="border rounded-lg p-4 bg-blue-50 border-blue-200">
@@ -2050,14 +2066,29 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             
             <TabsContent value="dados-gerais" className="mt-6">
               <div className="grid gap-4 py-4 max-h-[60vh] overflow-y-auto">
-                <div>
-                  <Label htmlFor="edit-objeto">Objeto da Task</Label>
-                  <Input
-                    id="edit-objeto"
-                    value={formData.objeto}
-                    onChange={(e) => setFormData({ ...formData, objeto: e.target.value })}
-                    placeholder="Nome do documento"
-                  />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="edit-objeto">Objeto da Task</Label>
+                    <Input
+                      id="edit-objeto"
+                      value={formData.objeto}
+                      onChange={(e) => setFormData({ ...formData, objeto: e.target.value })}
+                      placeholder="Nome do documento"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-tipo">Tipo</Label>
+                    <Select value={formData.tipo} onValueChange={(value) => setFormData({ ...formData, tipo: value })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="CRP-Req.Cliente">CRP-Req.Cliente</SelectItem>
+                        <SelectItem value="RRP-Impl.Roadmap">RRP-Impl.Roadmap</SelectItem>
+                        <SelectItem value="ODI-Instr.Oper.">ODI-Instr.Oper.</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 
                 <div className="border rounded-lg p-4 bg-blue-50 border-blue-200">
