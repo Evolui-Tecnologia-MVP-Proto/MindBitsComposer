@@ -89,6 +89,7 @@ export const mappingColumns = pgTable("mapping_columns", {
   mondayColumnTitle: text("monday_column_title").notNull(),
   cpxField: text("cpx_field").notNull(),
   transformFunction: text("transform_function").default(""),
+  isKey: boolean("is_key").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

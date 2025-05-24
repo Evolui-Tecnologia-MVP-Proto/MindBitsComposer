@@ -115,6 +115,7 @@ const columnMappingFormSchema = z.object({
   mondayColumnId: z.string().min(1, { message: "Coluna do Monday é obrigatória" }),
   cpxField: z.string().min(1, { message: "Campo CPX é obrigatório" }),
   transformFunction: z.string().optional(),
+  isKey: z.boolean().default(false),
 });
 
 // Schema para conexões de serviço
