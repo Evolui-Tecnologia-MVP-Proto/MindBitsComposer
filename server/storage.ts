@@ -613,45 +613,47 @@ export class DatabaseStorage implements IStorage {
     }
 
     // Construir condições WHERE para cada campo chave
-    const conditions = keyFields.map(field => {
+    const conditions = [];
+    
+    for (const field of keyFields) {
       const value = documentData[field];
       if (value === undefined || value === null || value === '') {
-        return null; // Ignorar campos vazios
+        continue; // Ignorar campos vazios
       }
       
       // Mapear campo para coluna da tabela
+      let condition = null;
       switch (field) {
-        case 'objeto': return eq(documentos.objeto, value);
-        case 'cliente': return eq(documentos.cliente, value);
-        case 'sistema': return eq(documentos.sistema, value);
-        case 'modulo': return eq(documentos.modulo, value);
-        case 'responsavel': return eq(documentos.responsavel, value);
-        case 'solicitante': return eq(documentos.solicitante, value);
-        case 'aprovador': return eq(documentos.aprovador, value);
-        case 'agente': return eq(documentos.agente, value);
-        case 'tipo': return eq(documentos.tipo, value);
-        case 'status': return eq(documentos.status, value);
-        case 'statusOrigem': return eq(documentos.statusOrigem, value);
-        case 'id_origem': return eq(documentos.idOrigem, value);
-        default: return null;
+        case 'objeto': condition = eq(documentos.objeto, value); break;
+        case 'cliente': condition = eq(documentos.cliente, value); break;
+        case 'sistema': condition = eq(documentos.sistema, value); break;
+        case 'modulo': condition = eq(documentos.modulo, value); break;
+        case 'responsavel': condition = eq(documentos.responsavel, value); break;
+        case 'solicitante': condition = eq(documentos.solicitante, value); break;
+        case 'aprovador': condition = eq(documentos.aprovador, value); break;
+        case 'agente': condition = eq(documentos.agente, value); break;
+        case 'tipo': condition = eq(documentos.tipo, value); break;
+        case 'status': condition = eq(documentos.status, value); break;
+        case 'statusOrigem': condition = eq(documentos.statusOrigem, value); break;
+        case 'id_origem': condition = eq(documentos.idOrigem, value); break;
       }
-    }).filter(condition => condition !== null);
+      
+      if (condition) {
+        conditions.push(condition);
+      }
+    }
 
     // Se não há condições válidas, retorna array vazio
     if (conditions.length === 0) {
       return [];
     }
 
-    // Executar consulta com condições AND
-    const query = db.select().from(documentos);
-    
-    // Aplicar todas as condições com AND
-    let finalQuery = query;
-    for (const condition of conditions) {
-      finalQuery = finalQuery.where(condition);
-    }
-
-    const results = await finalQuery;
+    // Executar consulta com condições AND usando and()
+    const results = await db
+      .select()
+      .from(documentos)
+      .where(and(...conditions));
+      
     return results;
   }
 
