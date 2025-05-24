@@ -1186,27 +1186,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
             documentData.statusOrigem = "Monday.com";
           }
 
-          // Verificar se já existe um documento com os mesmos valores dos campos chave
-          if (keyFields.length > 0) {
-            console.log(`🔍 ITEM ${item.id}: Verificando duplicatas com idOrigem=${documentData.idOrigem}`);
+          // Verificação simples e direta por id_origem
+          if (documentData.idOrigem) {
+            // Consulta SQL direta para verificar se já existe
+            const existingCheck = await db
+              .select({ count: sql`count(*)` })
+              .from(documentos)
+              .where(sql`id_origem = ${documentData.idOrigem}`);
+              
+            const existingCount = Number(existingCheck[0].count);
+            console.log(`🔍 ITEM ${item.id}: id_origem=${documentData.idOrigem} - Duplicatas existentes: ${existingCount}`);
             
-            // Buscar documentos existentes com os mesmos valores dos campos chave
-            const existingDocuments = await storage.getDocumentosByKeyFields(keyFields, documentData);
-            
-            console.log(`📋 DOCUMENTOS EXISTENTES ENCONTRADOS:`, existingDocuments.length);
-            if (existingDocuments.length > 0) {
-              console.log(`⚠️ DOCUMENTO JÁ EXISTE para item ${item.id}:`, existingDocuments[0].id);
-              console.log(`📊 DOCUMENTO EXISTENTE:`, {
-                id_origem: existingDocuments[0].idOrigem,
-                objeto: existingDocuments[0].objeto
-              });
+            if (existingCount > 0) {
+              console.log(`❌ DUPLICATA DETECTADA! Item ${item.id} já existe no banco`);
               documentsPreExisting++;
-              continue; // Pular para o próximo item
+              continue; // Pular item duplicado
             } else {
-              console.log(`✅ NENHUM DOCUMENTO DUPLICADO - criando novo documento`);
+              console.log(`✅ Item ${item.id} é novo - pode criar documento`);
             }
           } else {
-            console.log(`⚠️ NENHUM CAMPO CHAVE CONFIGURADO - não há verificação de duplicatas`);
+            console.log(`⚠️ Item ${item.id} não tem id_origem - criando sem verificação`);
           }
 
           // DEBUG: Verificar dados finais antes de criar documento
