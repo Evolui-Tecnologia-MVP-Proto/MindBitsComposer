@@ -1536,7 +1536,7 @@ return item.column_values.some(col =>
                   variant="outline" 
                   onClick={() => setIsModalOpen(false)}
                 >
-                  Cancelar
+                  Fechar
                 </Button>
                 <Button 
                   type="submit" 
