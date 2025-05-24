@@ -94,6 +94,8 @@ export default function DocumentosPage() {
   });
   // Função para resetar o formulário
   const resetFormData = () => {
+    console.log("🧹 LIMPANDO CAMPOS DO FORMULÁRIO");
+    console.log("📋 Dados antes da limpeza:", formData);
     setFormData({
       origem: "CPx", // Sempre CPx para novos documentos
       objeto: "",
@@ -105,6 +107,7 @@ export default function DocumentosPage() {
       status: "Integrado",
       statusOrigem: "Incluido",
     });
+    console.log("✅ Campos limpos!");
   };
 
   const [formData, setFormData] = useState<InsertDocumento>({
