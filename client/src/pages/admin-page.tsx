@@ -1769,7 +1769,14 @@ export default function AdminPage() {
                         {...field}
                       >
                         <option value="">Selecione a coluna</option>
-                        {mondayColumns?.map((column) => (
+                        {mondayColumns?.filter(column => {
+                          // Se estamos editando, permitir a coluna atual
+                          if (selectedColumn && selectedColumn.mondayColumnId === column.columnId) {
+                            return true;
+                          }
+                          // Filtrar colunas que já estão mapeadas
+                          return !mappingColumns.some(mapping => mapping.mondayColumnId === column.columnId);
+                        }).map((column) => (
                           <option key={column.id} value={column.columnId} className="font-mono">
                             {column.title} [{column.type}]
                           </option>
@@ -1793,7 +1800,14 @@ export default function AdminPage() {
                         {...field}
                       >
                         <option value="">Selecione o campo</option>
-                        {DOCUMENTOS_COLUMNS.map((column) => (
+                        {DOCUMENTOS_COLUMNS.filter(column => {
+                          // Se estamos editando, permitir o campo atual
+                          if (selectedColumn && selectedColumn.cpxField === column.field) {
+                            return true;
+                          }
+                          // Filtrar campos que já estão mapeados
+                          return !mappingColumns.some(mapping => mapping.cpxField === column.field);
+                        }).map((column) => (
                           <option key={column.field} value={column.field} className="font-mono">
                             {column.label} ({column.type})
                           </option>
