@@ -824,20 +824,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const query = `
         query {
           boards(ids: [${existingMapping.boardId}]) {
-            items_page {
-              items {
+            items {
+              id
+              name
+              column_values(ids: [${mondayColumns.map(id => `"${id}"`).join(", ")}]) {
                 id
-                name
-                column_values(ids: [${mondayColumns.map(id => `"${id}"`).join(", ")}]) {
-                  id
-                  text
-                  value
-                }
+                text
+                value
               }
             }
           }
         }
       `;
+      
+      console.log("Query GraphQL:", query);
 
       const mondayResponse = await fetch("https://api.monday.com/v2", {
         method: "POST",
@@ -859,16 +859,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       try {
         mondayData = JSON.parse(responseText);
+        console.log("Resposta da API Monday:", JSON.stringify(mondayData, null, 2));
       } catch (parseError) {
         console.error("Erro ao parsear resposta da API Monday:", responseText.substring(0, 500));
         throw new Error("API do Monday retornou resposta inválida. Verifique se o token está correto.");
       }
       
       if (mondayData.errors) {
+        console.error("Erros GraphQL:", mondayData.errors);
         throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(mondayData.errors)}`);
       }
 
-      const items = mondayData.data?.boards?.[0]?.items_page?.items || [];
+      const items = mondayData.data?.boards?.[0]?.items || [];
       let documentsCreated = 0;
       let documentsSkipped = 0;
 
