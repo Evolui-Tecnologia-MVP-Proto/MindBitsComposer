@@ -105,8 +105,8 @@ export default function DocumentosPage() {
       sistema: "",
       modulo: "",
       descricao: "",
-      status: "Integrado",
-      statusOrigem: "Incluido",
+      status: "Incluido", // Sempre "Incluido" para novos documentos
+      statusOrigem: "Manual", // Sempre "Manual" para novos documentos
     });
     setCurrentCreatedDocumentId(null); // Reset do documento criado
     console.log("✅ Campos limpos!");
@@ -153,8 +153,8 @@ export default function DocumentosPage() {
     sistema: "",
     modulo: "",
     descricao: "",
-    status: "Integrado",
-    statusOrigem: "Incluido",
+    status: "Incluido", // Sempre "Incluido" para novos documentos
+    statusOrigem: "Manual", // Sempre "Manual" para novos documentos
   });
 
   const queryClient = useQueryClient();
