@@ -1619,6 +1619,7 @@ export default function AdminPage() {
                                    column.cpxField === 'descricao' ? 'texto longo' :
                                    column.cpxField === 'status' ? 'status' :
                                    column.cpxField === 'statusOrigem' ? 'origem' :
+                                   column.cpxField === 'id_origem' ? 'integer' :
                                    'texto'}
                                 </Badge>
                               </div>
