@@ -1186,26 +1186,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
             documentData.statusOrigem = "Monday.com";
           }
 
-          // Verificação simples e direta por id_origem
+          // Verificação direta por id_origem usando storage
           if (documentData.idOrigem) {
-            // Consulta SQL direta para verificar se já existe
-            const existingCheck = await db
-              .select({ count: sql`count(*)` })
-              .from(documentos)
-              .where(sql`id_origem = ${documentData.idOrigem}`);
+            const idOrigemStr = String(documentData.idOrigem);
+            const existingDocs = await storage.getDocumentosByKeyFields(['id_origem'], { idOrigem: idOrigemStr });
               
-            const existingCount = Number(existingCheck[0].count);
-            console.log(`🔍 ITEM ${item.id}: id_origem=${documentData.idOrigem} - Duplicatas existentes: ${existingCount}`);
+            console.log(`🔍 ITEM ${item.id}: Verificando id_origem='${idOrigemStr}' - Encontrados: ${existingDocs.length}`);
             
-            if (existingCount > 0) {
-              console.log(`❌ DUPLICATA DETECTADA! Item ${item.id} já existe no banco`);
+            if (existingDocs.length > 0) {
+              console.log(`❌ DUPLICATA DETECTADA! Item ${item.id} já existe como documento ${existingDocs[0].id}`);
               documentsPreExisting++;
               continue; // Pular item duplicado
             } else {
-              console.log(`✅ Item ${item.id} é novo - pode criar documento`);
+              console.log(`✅ Item ${item.id} é novo - criando documento`);
             }
           } else {
-            console.log(`⚠️ Item ${item.id} não tem id_origem - criando sem verificação`);
+            console.log(`⚠️ Item ${item.id} sem id_origem - criando sem verificação`);
           }
 
           // DEBUG: Verificar dados finais antes de criar documento
