@@ -1075,91 +1075,118 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     return 'outros';
   };
 
-  const renderDocumentosTable = (documentos: Documento[]) => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          {activeTab === "integrados" ? (
-            <>
-              <TableHead>Origem</TableHead>
-              <TableHead>Nome</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Data Origem</TableHead>
-              <TableHead>Data Integração</TableHead>
-              <TableHead>Status Origem</TableHead>
-              <TableHead>Anexos</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </>
-          ) : (
-            <>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Nome</TableHead>
-              <TableHead>Data</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
-            </>
-          )}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {documentos.map((documento) => (
-          <TableRow key={documento.id}>
-            {activeTab === "integrados" ? (
-              <>
-                <TableCell>
-                  <div className="flex items-center">
-                    {documento.origem === "Monday" ? (
-                      <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">Monday</div>
-                    ) : (
-                      <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-medium">{documento.origem}</div>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="font-medium">{documento.objeto}</TableCell>
-                <TableCell>
-                  <Badge variant={getStatusBadgeVariant(documento.status) as any} className="flex items-center gap-1 whitespace-nowrap">
-                    {getStatusIcon(documento.status)}
-                    {documento.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-sm text-gray-500">{formatDate(documento.createdAt)}</TableCell>
-                <TableCell className="text-sm text-gray-500">{formatDate(documento.updatedAt)}</TableCell>
-                <TableCell>
-                  <Badge variant={getStatusOrigemBadgeVariant(documento.statusOrigem) as any} className="flex items-center gap-1 whitespace-nowrap">
-                    {documento.statusOrigem}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="bg-gray-100 text-gray-500">
-                    {artifactCounts[documento.id] || 0} anexos
-                  </Badge>
-                </TableCell>
-              </>
-            ) : (
-              <>
-                <TableCell>
-                  <div className="flex items-center">
-                    <File className="h-5 w-5 text-blue-500" />
-                    <span className="ml-2 text-xs text-gray-500">DOC</span>
-                  </div>
-                </TableCell>
-                <TableCell className="font-medium">{documento.objeto}</TableCell>
-                <TableCell>
-                  <div className="flex items-center text-gray-500 text-sm">
-                    <Clock className="mr-1.5 h-3.5 w-3.5" />
-                    {formatDate(documento.createdAt)}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={getStatusBadgeVariant(documento.status) as any} className="flex items-center gap-1 whitespace-nowrap">
-                    {getStatusIcon(documento.status)}
-                    {documento.status}
-                  </Badge>
-                </TableCell>
-              </>
-            )}
-            <TableCell className="text-right">
-              <div className="flex justify-end space-x-2">
+  const renderDocumentosTable = (documentos: Documento[]) => {
+    if (activeTab === "integrados") {
+      return (
+        <div className="border rounded-lg overflow-hidden">
+          <div className="max-h-[600px] overflow-y-auto">
+            <Table>
+              <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
+                <TableRow>
+                  <TableHead className="bg-gray-50 border-b">Origem</TableHead>
+                  <TableHead className="bg-gray-50 border-b">Nome</TableHead>
+                  <TableHead className="bg-gray-50 border-b">Status</TableHead>
+                  <TableHead className="bg-gray-50 border-b">Data Origem</TableHead>
+                  <TableHead className="bg-gray-50 border-b">Data Integração</TableHead>
+                  <TableHead className="bg-gray-50 border-b">Status Origem</TableHead>
+                  <TableHead className="bg-gray-50 border-b">Anexos</TableHead>
+                  <TableHead className="bg-gray-50 border-b text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {documentos.map((documento) => (
+                  <TableRow key={documento.id}>
+                    <TableCell>
+                      <div className="flex items-center">
+                        {documento.origem === "Monday" ? (
+                          <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">Monday</div>
+                        ) : (
+                          <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-medium">{documento.origem}</div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="font-medium">{documento.objeto}</TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusBadgeVariant(documento.status) as any} className="flex items-center gap-1 whitespace-nowrap">
+                        {getStatusIcon(documento.status)}
+                        {documento.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm text-gray-500">{formatDate(documento.createdAt)}</TableCell>
+                    <TableCell className="text-sm text-gray-500">{formatDate(documento.updatedAt)}</TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusOrigemBadgeVariant(documento.statusOrigem) as any} className="flex items-center gap-1 whitespace-nowrap">
+                        {documento.statusOrigem}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="bg-gray-100 text-gray-500">
+                        {artifactCounts[documento.id] || 0} anexos
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end space-x-2">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8"
+                          onClick={() => openViewModal(documento)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {documentos.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={8} className="text-center py-6 text-gray-500">
+                      Nenhum documento encontrado nesta categoria.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Tipo</TableHead>
+            <TableHead>Nome</TableHead>
+            <TableHead>Data</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Ações</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {documentos.map((documento) => (
+            <TableRow key={documento.id}>
+              <TableCell>
+                <div className="flex items-center">
+                  <File className="h-5 w-5 text-blue-500" />
+                  <span className="ml-2 text-xs text-gray-500">DOC</span>
+                </div>
+              </TableCell>
+              <TableCell className="font-medium">{documento.objeto}</TableCell>
+              <TableCell>
+                <div className="flex items-center text-gray-500 text-sm">
+                  <Clock className="mr-1.5 h-3.5 w-3.5" />
+                  {formatDate(documento.createdAt)}
+                </div>
+              </TableCell>
+              <TableCell>
+                <Badge variant={getStatusBadgeVariant(documento.status) as any} className="flex items-center gap-1 whitespace-nowrap">
+                  {getStatusIcon(documento.status)}
+                  {documento.status}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-right">
+                <div className="flex justify-end space-x-2">
                 <Button 
                   variant="ghost" 
                   size="icon" 
@@ -1200,9 +1227,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             </TableCell>
           </TableRow>
         )}
-      </TableBody>
-    </Table>
-  );
+        </TableBody>
+      </Table>
+    );
+  };
 
   const renderViewModal = () => {
     if (!selectedDocument) return null;
@@ -2799,7 +2827,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           </div>
         </div>
       )}
-
 
     </div>
   );
