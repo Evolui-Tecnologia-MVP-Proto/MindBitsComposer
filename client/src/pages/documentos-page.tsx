@@ -92,6 +92,21 @@ export default function DocumentosPage() {
     mimeType: "",
     type: "",
   });
+  // Função para resetar o formulário
+  const resetFormData = () => {
+    setFormData({
+      origem: "CPx", // Sempre CPx para novos documentos
+      objeto: "",
+      cliente: "",
+      responsavel: "",
+      sistema: "",
+      modulo: "",
+      descricao: "",
+      status: "Integrado",
+      statusOrigem: "Incluido",
+    });
+  };
+
   const [formData, setFormData] = useState<InsertDocumento>({
     origem: "CPx", // Sempre CPx para novos documentos
     objeto: "",
@@ -1254,18 +1269,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   const renderCreateModal = () => (
     <Dialog open={isCreateModalOpen} onOpenChange={(open) => {
       if (!open) {
-        // Limpar os campos quando o modal for fechado
-        setFormData({
-          origem: "CPx",
-          objeto: "",
-          cliente: "",
-          responsavel: "",
-          sistema: "",
-          modulo: "",
-          descricao: "",
-          status: "Integrado",
-          statusOrigem: "Incluido",
-        });
+        resetFormData();
       }
       setIsCreateModalOpen(open);
     }}>
@@ -2127,18 +2131,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Documentos</h1>
         <Button onClick={() => {
-          // Limpar os campos do formulário
-          setFormData({
-            origem: "CPx",
-            objeto: "",
-            cliente: "",
-            responsavel: "",
-            sistema: "",
-            modulo: "",
-            descricao: "",
-            status: "Integrado",
-            statusOrigem: "Incluido",
-          });
+          resetFormData();
           setIsCreateModalOpen(true);
         }}>
           <Plus className="mr-2 h-4 w-4" />
