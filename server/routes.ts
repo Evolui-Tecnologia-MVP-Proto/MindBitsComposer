@@ -938,9 +938,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // TESTE: Temporariamente desabilitar filtro para diagnóstico
           console.log(`🚫 FILTRO TEMPORARIAMENTE DESABILITADO - PROCESSANDO TODOS OS ITENS`);
-          let shouldInclude = true;
+          console.log(`✅ Item ${item.id} será PROCESSADO (filtro desabilitado)`);
           
-          if (false && existingMapping.mappingFilter && existingMapping.mappingFilter.trim()) {
+          if (false) { // Desabilitar completamente o bloco do filtro
             try {
               console.log(`✅ APLICANDO FILTRO para item ${item.id}`);
               
@@ -968,19 +968,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
               }
               
-              // Criar função de filtro e executar
+              // ESTE BLOCO NUNCA SERÁ EXECUTADO (if false)
               const filterFunction = new Function('item', existingMapping.mappingFilter);
-              const shouldInclude = filterFunction(item);
+              shouldInclude = filterFunction(item);
               
               console.log(`🎯 RESULTADO DO FILTRO para item ${item.id}:`, shouldInclude);
-              
-              if (!shouldInclude) {
-                console.log(`❌ Item ${item.id} foi FILTRADO (excluído) - não atende às condições`);
-                documentsSkipped++;
-                continue; // Pular este item
-              }
-              
-              console.log(`✅ Item ${item.id} PASSOU no filtro - será processado`);
               
             } catch (filterError) {
               console.error(`💥 ERRO ao aplicar filtro no item ${item.id}:`, filterError);
