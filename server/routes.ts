@@ -1082,7 +1082,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               });
               documentData[fieldName] = generalColumnsObj;
             } else if (fieldName === 'id_origem') {
-              // Para id_origem (bigint), garantir que seja um número válido
+              // Para id_origem (bigint), trabalhar com string para IDs grandes
               const rawValue = values[0] || "";
               console.log(`🔍 PROCESSANDO CAMPO ID_ORIGEM:`, {
                 fieldName,
@@ -1091,11 +1091,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 valuesLength: values.length
               });
               
-              const numericValue = parseInt(rawValue, 10);
-              if (!isNaN(numericValue)) {
-                // Mapear para o campo correto do schema: idOrigem
-                documentData['idOrigem'] = numericValue;
-                console.log(`✅ Campo id_origem convertido: "${rawValue}" -> ${numericValue} (mapeado para idOrigem)`);
+              // Verificar se é um número válido (mesmo que como string)
+              const numericValue = BigInt(rawValue);
+              if (rawValue && !isNaN(Number(rawValue))) {
+                // Mapear para o campo correto do schema: idOrigem (como string para bigint)
+                documentData['idOrigem'] = rawValue;
+                console.log(`✅ Campo id_origem definido: "${rawValue}" (bigint como string)`);
               } else {
                 console.warn(`⚠️ Valor inválido para id_origem: "${rawValue}" - será ignorado`);
                 console.log(`🔍 DEBUG VALUES:`, JSON.stringify(values, null, 2));
