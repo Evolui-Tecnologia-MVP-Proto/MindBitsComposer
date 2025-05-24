@@ -110,6 +110,7 @@ export default function DocumentosPage() {
       statusOrigem: "Manual", // Sempre "Manual" para novos documentos
     });
     setCurrentCreatedDocumentId(null); // Reset do documento criado
+    setCreateModalActiveTab("dados-gerais"); // Resetar aba para dados-gerais
     console.log("✅ Campos limpos!");
   };
 
