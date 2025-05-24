@@ -635,7 +635,13 @@ export class DatabaseStorage implements IStorage {
         case 'tipo': condition = eq(documentos.tipo, value); break;
         case 'status': condition = eq(documentos.status, value); break;
         case 'statusOrigem': condition = eq(documentos.statusOrigem, value); break;
-        case 'id_origem': condition = eq(documentos.idOrigem, value); break;
+        case 'id_origem': 
+          // Verificar tanto id_origem quanto idOrigem no documentData
+          const idOrigemValue = documentData.idOrigem || documentData.id_origem;
+          if (idOrigemValue !== undefined && idOrigemValue !== null && idOrigemValue !== '') {
+            condition = eq(documentos.idOrigem, idOrigemValue);
+          }
+          break;
       }
       
       if (condition) {
