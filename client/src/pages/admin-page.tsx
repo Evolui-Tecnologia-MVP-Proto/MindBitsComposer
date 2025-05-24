@@ -1770,6 +1770,12 @@ export default function AdminPage() {
                       >
                         <option value="">Selecione a coluna</option>
                         {mondayColumns?.filter(column => {
+                          // Filtrar tipos de colunas não suportadas
+                          const unsupportedTypes = ['subtasks', 'file', 'board_relation', 'mirror', 'button'];
+                          if (unsupportedTypes.includes(column.type?.toLowerCase())) {
+                            return false;
+                          }
+                          
                           // Se estamos editando, permitir a coluna atual
                           if (selectedColumn && selectedColumn.mondayColumnId === column.columnId) {
                             return true;
