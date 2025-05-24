@@ -1252,7 +1252,23 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   // Modal para criar novo documento
   const renderCreateModal = () => (
-    <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+    <Dialog open={isCreateModalOpen} onOpenChange={(open) => {
+      if (!open) {
+        // Limpar os campos quando o modal for fechado
+        setFormData({
+          origem: "CPx",
+          objeto: "",
+          cliente: "",
+          responsavel: "",
+          sistema: "",
+          modulo: "",
+          descricao: "",
+          status: "Integrado",
+          statusOrigem: "Incluido",
+        });
+      }
+      setIsCreateModalOpen(open);
+    }}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
