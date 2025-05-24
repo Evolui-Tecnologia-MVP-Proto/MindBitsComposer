@@ -1543,12 +1543,9 @@ export default function AdminPage() {
                               <span className="text-sm font-medium font-mono">
                                 {fieldInfo.field}
                               </span>
-                              <Badge 
-                                variant="outline" 
-                                className="text-xs bg-gray-50 text-gray-600 border-gray-200"
-                              >
-                                {fieldInfo.label}
-                              </Badge>
+                              <span className="text-xs text-gray-500">
+                                ({fieldInfo.label})
+                              </span>
                             </div>
                           </TableCell>
                           <TableCell className="py-2">
