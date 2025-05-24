@@ -891,6 +891,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let documentsSkipped = 0;
 
       // Processar cada item (linha) do Monday
+      console.log(`🚀 INICIANDO PROCESSAMENTO DE ${items.length} ITENS`);
+      console.log(`📋 FILTRO CONFIGURADO:`, existingMapping.mappingFilter);
+      
       for (const item of items) {
         try {
           // APLICAR FILTRO PRIMEIRO - antes de processar os dados
