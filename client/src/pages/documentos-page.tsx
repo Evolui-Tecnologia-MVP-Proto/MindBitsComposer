@@ -1195,14 +1195,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-medium">Anexos do Documento</h3>
-                  <Button 
-                    onClick={openAddArtifactModal}
-                    className="bg-blue-600 hover:bg-blue-700"
-                    size="sm"
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Adicionar Anexo
-                  </Button>
+                  {/* Modal de visualização - sem botão de adicionar anexo */}
                 </div>
                 
                 {isLoadingArtifacts ? (
@@ -1248,7 +1241,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                 variant="ghost" 
                                 size="icon" 
                                 className="h-8 w-8"
-                                onClick={() => window.open(artifact.file, '_blank')}
+                                onClick={() => {
+                                  const link = document.createElement('a');
+                                  link.href = `data:${artifact.mimeType};base64,${artifact.fileData}`;
+                                  link.download = artifact.fileName;
+                                  link.click();
+                                }}
+                                title="Baixar cópia"
                               >
                                 <Download className="h-4 w-4 text-blue-500" />
                               </Button>
@@ -1256,17 +1255,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                 variant="ghost" 
                                 size="icon" 
                                 className="h-8 w-8"
-                                onClick={() => openEditArtifactModal(artifact)}
+                                onClick={() => {
+                                  const link = document.createElement('a');
+                                  link.href = `data:${artifact.mimeType};base64,${artifact.fileData}`;
+                                  link.target = '_blank';
+                                  link.click();
+                                }}
+                                title="Visualizar"
                               >
-                                <Pencil className="h-4 w-4 text-blue-500" />
-                              </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                className="h-8 w-8"
-                                onClick={() => handleDeleteArtifact(artifact.id)}
-                              >
-                                <Trash2 className="h-4 w-4 text-red-500" />
+                                <Eye className="h-4 w-4 text-blue-500" />
                               </Button>
                             </div>
                           </TableCell>
@@ -1277,15 +1274,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 ) : (
                   <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed">
                     <Paperclip className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-                    <p className="text-sm text-gray-500 mb-3">Nenhum anexo encontrado</p>
-                    <Button 
-                      onClick={openAddArtifactModal}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Plus className="mr-2 h-4 w-4" />
-                      Adicionar primeiro anexo
-                    </Button>
+                    <p className="text-sm text-gray-500">Nenhum anexo encontrado</p>
                   </div>
                 )}
               </div>
