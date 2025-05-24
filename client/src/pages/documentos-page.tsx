@@ -1690,7 +1690,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             onClick={() => openEditModal(documento)}
                             title="Editar"
                           >
-                            <Edit className="h-4 w-4 text-green-500" />
+                            <Pencil className="h-4 w-4 text-green-500" />
                           </Button>
                           <Button
                             variant="ghost"
@@ -1711,7 +1711,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             
             {documentos?.filter(doc => doc.status === "Incluido").length === 0 && !isLoading && (
               <div className="text-center py-12">
-                <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                <File className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum documento incluído</h3>
                 <p className="text-gray-500">Documentos com status "Incluído" aparecerão aqui.</p>
               </div>
