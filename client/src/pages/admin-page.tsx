@@ -1415,8 +1415,8 @@ export default function AdminPage() {
                       </TableHeader>
                       <TableBody>
                         {mappingColumns.map((column) => (
-                          <TableRow key={column.id} className="h-12">
-                            <TableCell className="py-2">
+                          <TableRow key={column.id} className="h-8">
+                            <TableCell className="py-1">
                               <div className="flex items-center gap-2">
                                 <span className="font-medium text-sm">
                                   {column.mondayColumnTitle}
@@ -1426,7 +1426,7 @@ export default function AdminPage() {
                                 </Badge>
                               </div>
                             </TableCell>
-                            <TableCell className="py-2">
+                            <TableCell className="py-1">
                               <div className="flex items-center gap-2">
                                 <span className="font-medium text-sm">
                                   {column.cpxField}
@@ -1448,7 +1448,7 @@ export default function AdminPage() {
                                 </Badge>
                               </div>
                             </TableCell>
-                            <TableCell className="py-2">
+                            <TableCell className="py-1">
                               <div className="flex space-x-2">
                                 <Button
                                   variant="ghost"
