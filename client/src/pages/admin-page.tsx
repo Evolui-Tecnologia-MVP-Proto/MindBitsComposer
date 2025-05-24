@@ -1425,7 +1425,7 @@ export default function AdminPage() {
                             </TableCell>
                             <TableCell className="py-0">
                               <div className="flex items-center gap-2">
-                                <span className="text-sm">
+                                <span className="text-sm font-mono">
                                   {column.cpxField === 'generalColumns' 
                                     ? `generalColumns [${mappingColumns
                                         .filter(col => col.cpxField === 'generalColumns')
