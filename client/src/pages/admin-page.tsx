@@ -1539,27 +1539,18 @@ return item.column_values.some(col =>
                 >
                   Cancelar
                 </Button>
-                {activeTab === "quadro" ? (
-                  <Button 
-                    type="submit" 
-                    form="mappingForm"
-                    disabled={isSubmitting || isSaveDisabled}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Salvando...
-                      </>
-                    ) : "Salvar"}
-                  </Button>
-                ) : (
-                  <Button 
-                    type="button"
-                    onClick={() => setIsModalOpen(false)}
-                  >
-                    Concluir
-                  </Button>
-                )}
+                <Button 
+                  type="submit" 
+                  form="mappingForm"
+                  disabled={isSubmitting || isSaveDisabled}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Salvando...
+                    </>
+                  ) : "Salvar"}
+                </Button>
               </div>
             </div>
           </Tabs>
