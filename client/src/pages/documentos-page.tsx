@@ -1793,8 +1793,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           </TabsContent>
           
           <TabsContent value="repositorio" className="slide-in flex-1 overflow-y-auto">
-            <div className="h-full overflow-hidden">
-              <div className="bg-white rounded-lg border p-6 h-full flex flex-col">
+            <div className="space-y-6">
+              <div className="bg-white rounded-lg border p-6">
                 <div className="flex items-center justify-between mb-6 flex-shrink-0">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">Integração com Repositório GitHub</h3>
@@ -1832,10 +1832,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 </div>
                 
-                <div className="border-t pt-6 flex-1 min-h-0">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
-                    <div className="flex flex-col overflow-hidden">
-                      <div className="flex items-center justify-between mb-4 flex-shrink-0">
+                <div className="border-t pt-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between mb-4">
                         <h4 className="font-medium text-gray-900">Estrutura do Repositório</h4>
                         {isLoadingRepo && (
                           <div className="flex items-center text-sm text-gray-500">
@@ -1854,7 +1854,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         )}
                       </div>
                       
-                      <div className="flex-1 overflow-y-auto">
+                      <div className="min-h-[400px]">
                         {githubRepoFiles.length > 0 ? (
                           <FileExplorer 
                             data={githubRepoFiles}
@@ -1921,8 +1921,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       </div>
                     </div>
                     
-                    <div className="flex flex-col overflow-hidden">
-                      <h4 className="font-medium text-gray-900 mb-4 flex-shrink-0">
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-gray-900">
                         {selectedFolderPath ? (
                           <span>
                             Arquivos em: <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono">{selectedFolderPath}</code>
@@ -1931,7 +1931,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           'Arquivos na pasta'
                         )}
                       </h4>
-                      <div className="flex-1 overflow-y-auto space-y-3">
+                      <div className="min-h-[400px] space-y-3">
                         {isLoadingFolderFiles ? (
                           <div className="flex items-center justify-center py-8">
                             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
