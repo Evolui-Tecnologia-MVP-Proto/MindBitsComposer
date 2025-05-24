@@ -2,9 +2,10 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { PluginStatus, PluginType } from "@shared/schema";
+import { PluginStatus, PluginType, documentos } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
+import { eq, sql } from "drizzle-orm";
 import { ZodError } from "zod";
 import fetch from "node-fetch";
 import path from "path";
@@ -1210,14 +1211,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
             documentData.statusOrigem = "Monday.com";
           }
 
-          // VERIFICAÇÃO SIMPLES E EFICAZ DE DUPLICATAS
+          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - SQL DIRETO
           if (documentData.idOrigem) {
-            const existingDoc = await storage.getDocumentoByIdOrigem(documentData.idOrigem);
-            
-            if (existingDoc) {
-              console.log(`❌ DUPLICATA: Item ${item.id} já existe como documento ${existingDoc.id}`);
-              documentsPreExisting++;
-              continue; // Pular item duplicado
+            try {
+              const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem = ${documentData.idOrigem} LIMIT 1`);
+              
+              if (duplicateCheck.rows.length > 0) {
+                console.log(`❌ DUPLICATA: Item ${item.id} já existe como documento ${duplicateCheck.rows[0].id}`);
+                documentsPreExisting++;
+                continue; // Pular item duplicado
+              }
+            } catch (error) {
+              console.log(`⚠️ Erro na verificação de duplicata para item ${item.id}:`, error);
+              // Continuar mesmo com erro na verificação
             }
           }
 
