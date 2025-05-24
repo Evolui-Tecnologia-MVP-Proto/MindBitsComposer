@@ -1530,9 +1530,9 @@ export default function AdminPage() {
                   <Table>
                     <TableHeader className="sticky top-0 bg-white z-10">
                       <TableRow>
-                        <TableHead className="w-[200px]">Campo</TableHead>
-                        <TableHead>Valor Padrão</TableHead>
-                        <TableHead className="w-[100px]">Obg-Map</TableHead>
+                        <TableHead className="w-[200px] text-xs">Campo</TableHead>
+                        <TableHead className="text-xs">Valor Padrão</TableHead>
+                        <TableHead className="w-[100px] text-xs">Obg-Map</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
