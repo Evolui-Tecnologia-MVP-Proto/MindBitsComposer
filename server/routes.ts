@@ -899,6 +899,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`🚀 INICIANDO PROCESSAMENTO DE ${items.length} ITENS`);
       console.log(`📋 FILTRO CONFIGURADO:`, existingMapping.mappingFilter);
       
+      // DEBUG: Verificar se há itens para processar
+      if (items.length === 0) {
+        console.log(`❌ NENHUM ITEM ENCONTRADO NO QUADRO`);
+        return res.json({
+          success: false,
+          message: "Nenhum item encontrado no quadro",
+          itemsProcessed: 0,
+          documentsCreated: 0,
+          documentsSkipped: 0,
+          documentsPreExisting: 0
+        });
+      }
+      
+      // DEBUG: Mostrar o primeiro item ANTES do loop
+      console.log(`🔍 PRIMEIRO ITEM (ID: ${items[0].id}):`);
+      console.log(`📝 NOME: ${items[0].name}`);
+      console.log(`📊 TOTAL DE COLUNAS: ${items[0].column_values?.length || 0}`);
+      if (items[0].column_values && items[0].column_values.length > 0) {
+        console.log(`🎯 PRIMEIRAS 3 COLUNAS:`);
+        items[0].column_values.slice(0, 3).forEach((col: any, idx: number) => {
+          console.log(`  ${idx + 1}. ID: "${col.id}" | Título: "${col.column?.title}" | Texto: "${col.text}"`);
+        });
+      }
+      
       for (let index = 0; index < items.length; index++) {
         const item = items[index];
         
