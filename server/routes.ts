@@ -814,6 +814,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (mappingColumns.length === 0) {
         return res.status(400).send("Nenhuma coluna mapeada encontrada para este mapeamento");
       }
+      
+      console.log("Token Monday encontrado:", apiKey ? apiKey.substring(0, 10) + "..." : "NENHUM");
+      console.log("Board ID:", existingMapping.boardId);
+      console.log("Colunas mapeadas:", mappingColumns.length);
 
       // Obter dados do quadro Monday
       const mondayColumns = mappingColumns.map(col => col.mondayColumnId);
@@ -845,10 +849,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       if (!mondayResponse.ok) {
-        throw new Error(`Erro na API do Monday: ${mondayResponse.status} ${mondayResponse.statusText}`);
+        const errorText = await mondayResponse.text();
+        throw new Error(`Erro na API do Monday (${mondayResponse.status}): ${errorText}`);
       }
 
-      const mondayData = await mondayResponse.json();
+      // Verificar se a resposta é JSON válido
+      const responseText = await mondayResponse.text();
+      let mondayData;
+      
+      try {
+        mondayData = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error("Erro ao parsear resposta da API Monday:", responseText.substring(0, 500));
+        throw new Error("API do Monday retornou resposta inválida. Verifique se o token está correto.");
+      }
       
       if (mondayData.errors) {
         throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(mondayData.errors)}`);
