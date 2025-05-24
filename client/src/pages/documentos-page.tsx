@@ -1290,10 +1290,32 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   size="icon" 
                                   className="h-8 w-8"
                                   onClick={() => {
-                                    const link = document.createElement('a');
-                                    link.href = `data:${artifact.mimeType};base64,${artifact.fileData}`;
-                                    link.target = '_blank';
-                                    link.click();
+                                    try {
+                                      // Converter base64 para blob
+                                      const byteCharacters = atob(artifact.fileData);
+                                      const byteNumbers = new Array(byteCharacters.length);
+                                      for (let i = 0; i < byteCharacters.length; i++) {
+                                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                                      }
+                                      const byteArray = new Uint8Array(byteNumbers);
+                                      const blob = new Blob([byteArray], { type: artifact.mimeType });
+                                      
+                                      // Criar URL temporária e abrir em nova aba
+                                      const blobUrl = URL.createObjectURL(blob);
+                                      const newWindow = window.open(blobUrl, '_blank');
+                                      
+                                      // Limpar URL após um tempo para liberar memória
+                                      setTimeout(() => {
+                                        URL.revokeObjectURL(blobUrl);
+                                      }, 5000);
+                                    } catch (error) {
+                                      console.error('Erro ao visualizar arquivo:', error);
+                                      toast({
+                                        title: "Erro",
+                                        description: "Não foi possível visualizar o arquivo",
+                                        variant: "destructive",
+                                      });
+                                    }
                                   }}
                                   title="Visualizar"
                                 >
