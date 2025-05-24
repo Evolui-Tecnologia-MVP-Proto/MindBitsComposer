@@ -910,7 +910,7 @@ export default function AdminPage() {
                         <TableBody>
                           {mappingsData.map((mapping: BoardMapping) => (
                             <TableRow key={mapping.id}>
-                              <TableCell className="font-mono font-bold text-blue-700">{mapping.name}</TableCell>
+                              <TableCell className="font-medium">{mapping.name}</TableCell>
                               <TableCell className="font-mono font-bold text-blue-700">{mapping.boardId}</TableCell>
                               <TableCell>{mapping.lastSync ? new Date(mapping.lastSync).toLocaleString() : "Nunca"}</TableCell>
                               <TableCell>
