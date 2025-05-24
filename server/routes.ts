@@ -1194,10 +1194,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
             console.log(`⚠️ NENHUM CAMPO CHAVE CONFIGURADO - não há verificação de duplicatas`);
           }
 
+          // DEBUG: Verificar dados finais antes de criar documento
+          console.log(`📋 DADOS FINAIS DO DOCUMENTO ANTES DA CRIAÇÃO:`, {
+            id_origem: documentData.id_origem,
+            idOrigem: documentData.idOrigem,
+            objeto: documentData.objeto,
+            cliente: documentData.cliente
+          });
+
           // Criar o documento
           const newDocument = await storage.createDocumento(documentData);
           documentsCreated++;
           console.log(`✅ DOCUMENTO CRIADO:`, newDocument.id);
+          console.log(`📊 DOCUMENTO SALVO NO BANCO:`, {
+            id_origem_salvo: newDocument.idOrigem,
+            objeto_salvo: newDocument.objeto
+          });
           
         } catch (itemError) {
           console.error(`Erro ao processar item ${item.id}:`, itemError);
