@@ -55,10 +55,11 @@ import { queryClient } from "@/lib/queryClient";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
 // Definições de tipos
@@ -80,6 +81,7 @@ type MappingColumn = {
   mondayColumnId: string;
   cpxField: string;
   transformFunction: string | null;
+  isKey: boolean;
   createdAt: string;
   mondayColumnTitle?: string;
 };
@@ -298,12 +300,14 @@ export default function AdminPage() {
         mondayColumnId: selectedColumn.mondayColumnId,
         cpxField: selectedColumn.cpxField,
         transformFunction: selectedColumn.transformFunction || "",
+        isKey: selectedColumn.isKey || false,
       });
     } else {
       columnForm.reset({
         mondayColumnId: "",
         cpxField: "",
         transformFunction: "",
+        isKey: false,
       });
     }
   }, [selectedColumn, columnForm]);
@@ -1482,6 +1486,29 @@ export default function AdminPage() {
                               <Input placeholder="Função para transformar dados" {...field} />
                             </FormControl>
                             <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={columnForm.control}
+                        name="isKey"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                            <FormControl>
+                              <Checkbox
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                            <div className="space-y-1 leading-none">
+                              <FormLabel>
+                                Chave
+                              </FormLabel>
+                              <FormDescription>
+                                Marque se este campo é uma chave primária ou identificador único
+                              </FormDescription>
+                            </div>
                           </FormItem>
                         )}
                       />
