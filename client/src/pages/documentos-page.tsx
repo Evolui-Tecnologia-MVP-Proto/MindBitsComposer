@@ -1646,8 +1646,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="p-4 md:p-8 pt-6">
+    <div>
+      <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-3xl font-bold tracking-tight">Documentos</h2>
           <Button 
