@@ -1633,10 +1633,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   <TableRow>
                     <TableHead>Origem</TableHead>
                     <TableHead>Objeto</TableHead>
-                    <TableHead>Cliente</TableHead>
-                    <TableHead>Responsável</TableHead>
-                    <TableHead>Sistema</TableHead>
-                    <TableHead>Módulo</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Status Origem</TableHead>
                     <TableHead>Anexos</TableHead>
@@ -1649,10 +1645,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     <TableRow key={documento.id}>
                       <TableCell>{documento.origem}</TableCell>
                       <TableCell>{documento.objeto}</TableCell>
-                      <TableCell>{documento.cliente}</TableCell>
-                      <TableCell>{documento.responsavel}</TableCell>
-                      <TableCell>{documento.sistema}</TableCell>
-                      <TableCell>{documento.modulo}</TableCell>
                       <TableCell>
                         <Badge 
                           variant="secondary" 
