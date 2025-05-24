@@ -1426,7 +1426,28 @@ export default function AdminPage() {
                                 </Badge>
                               </div>
                             </TableCell>
-                            <TableCell className="py-2 text-sm">{column.cpxField}</TableCell>
+                            <TableCell className="py-2">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-sm">
+                                  {column.cpxField}
+                                </span>
+                                <Badge variant="outline" className="text-xs">
+                                  {column.cpxField === 'objeto' ? 'texto' :
+                                   column.cpxField === 'tipo' ? 'seleção' :
+                                   column.cpxField === 'cliente' ? 'texto' :
+                                   column.cpxField === 'sistema' ? 'texto' :
+                                   column.cpxField === 'modulo' ? 'texto' :
+                                   column.cpxField === 'responsavel' ? 'pessoa' :
+                                   column.cpxField === 'solicitante' ? 'pessoa' :
+                                   column.cpxField === 'aprovador' ? 'pessoa' :
+                                   column.cpxField === 'agente' ? 'pessoa' :
+                                   column.cpxField === 'descricao' ? 'texto longo' :
+                                   column.cpxField === 'status' ? 'status' :
+                                   column.cpxField === 'statusOrigem' ? 'origem' :
+                                   'texto'}
+                                </Badge>
+                              </div>
+                            </TableCell>
                             <TableCell className="py-2">
                               <div className="flex space-x-2">
                                 <Button
