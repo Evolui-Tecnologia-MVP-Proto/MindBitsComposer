@@ -42,7 +42,8 @@ import {
   Github,
   Lightbulb,
   CheckCircle,
-  XCircle
+  XCircle,
+  Play
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -636,6 +637,46 @@ export default function AdminPage() {
     setSelectedMapping(mapping);
     setIsDeleteDialogOpen(true);
   };
+
+  // Função para executar sincronização do mapeamento Monday
+  const executeMondayMapping = async (mapping: BoardMapping) => {
+    try {
+      toast({
+        title: "Executando sincronização",
+        description: `Iniciando sincronização do mapeamento "${mapping.name}"...`,
+      });
+
+      const response = await fetch(`/api/monday/mappings/${mapping.id}/execute`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Erro na sincronização');
+      }
+
+      const result = await response.json();
+      
+      toast({
+        title: "Sincronização concluída",
+        description: `Mapeamento "${mapping.name}" executado com sucesso!`,
+      });
+
+      // Atualizar a lista de mapeamentos para refletir mudanças
+      queryClient.invalidateQueries({ queryKey: ['/api/monday/mappings'] });
+
+    } catch (error) {
+      console.error('Erro ao executar mapeamento:', error);
+      toast({
+        title: "Erro na execução",
+        description: error instanceof Error ? error.message : "Não foi possível executar a sincronização",
+        variant: "destructive",
+      });
+    }
+  };
   
   const editColumn = (column: MappingColumn) => {
     // Definir a coluna selecionada
@@ -868,6 +909,14 @@ export default function AdminPage() {
                               </TableCell>
                               <TableCell className="text-right">
                                 <div className="flex items-center justify-end space-x-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => executeMondayMapping(mapping)}
+                                    title="Executar sincronização"
+                                  >
+                                    <Play className="h-4 w-4 text-green-600" />
+                                  </Button>
                                   <Button
                                     variant="ghost"
                                     size="icon"
