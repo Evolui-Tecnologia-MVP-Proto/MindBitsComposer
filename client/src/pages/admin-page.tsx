@@ -1559,7 +1559,7 @@ export default function AdminPage() {
                                   mappingForm.setValue("defaultValues", newDefaults);
                                 }
                               }}
-                              className="text-xs h-6 font-mono"
+                              className="text-xs h-6 font-mono !text-xs"
                             />
                           </TableCell>
                           <TableCell className="py-0">
