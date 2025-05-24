@@ -889,6 +889,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const items = mondayData.data?.boards?.[0]?.items_page?.items || [];
       let documentsCreated = 0;
       let documentsSkipped = 0;
+      let documentsPreExisting = 0;
+
+      // Identificar campos marcados como chave para verificação de duplicatas
+      const keyFields = mappingColumns.filter(col => col.isKey).map(col => col.cpxField);
+      console.log(`🔑 CAMPOS CHAVE IDENTIFICADOS:`, keyFields);
 
       // Processar cada item (linha) do Monday
       console.log(`🚀 INICIANDO PROCESSAMENTO DE ${items.length} ITENS`);
@@ -1107,9 +1112,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
             documentData.statusOrigem = "Monday.com";
           }
 
+          // Verificar se já existe um documento com os mesmos valores dos campos chave
+          if (keyFields.length > 0) {
+            console.log(`🔍 VERIFICANDO DUPLICATAS para item ${item.id} usando campos chave:`, keyFields);
+            
+            // Buscar documentos existentes com os mesmos valores dos campos chave
+            const existingDocuments = await storage.getDocumentosByKeyFields(keyFields, documentData);
+            
+            if (existingDocuments.length > 0) {
+              console.log(`⚠️ DOCUMENTO JÁ EXISTE para item ${item.id}:`, existingDocuments[0].id);
+              documentsPreExisting++;
+              continue; // Pular para o próximo item
+            }
+          }
+
           // Criar o documento
           const newDocument = await storage.createDocumento(documentData);
           documentsCreated++;
+          console.log(`✅ DOCUMENTO CRIADO:`, newDocument.id);
           
         } catch (itemError) {
           console.error(`Erro ao processar item ${item.id}:`, itemError);
@@ -1127,6 +1147,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         itemsProcessed: items.length,
         documentsCreated,
         documentsSkipped,
+        documentsPreExisting,
         columnsMapping: mappingColumns.length,
         timestamp: new Date().toISOString()
       });
