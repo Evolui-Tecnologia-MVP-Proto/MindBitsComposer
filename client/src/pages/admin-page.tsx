@@ -145,6 +145,32 @@ const getDocumentosColumns = () => {
   ];
 };
 
+// Função para obter campos válidos para valores padrão (somente obrigatórios e de tipo texto/numérico/data)
+const getDefaultableFields = () => {
+  // Campos obrigatórios da tabela documentos que podem ter valores padrão
+  const requiredFields = [
+    { field: "origem", label: "Origem", type: "text", required: true },
+    { field: "objeto", label: "Objeto da Task", type: "text", required: true },
+    { field: "cliente", label: "Cliente", type: "text", required: true },
+    { field: "responsavel", label: "Responsável", type: "text", required: true },
+    { field: "sistema", label: "Sistema", type: "text", required: true },
+    { field: "modulo", label: "Módulo", type: "text", required: true },
+    { field: "descricao", label: "Detalhamento", type: "text", required: true },
+  ];
+  
+  // Campos opcionais que também podem ter valores padrão
+  const optionalFields = [
+    { field: "tipo", label: "Tipo", type: "text", required: false },
+    { field: "status", label: "Status", type: "text", required: false },
+    { field: "statusOrigem", label: "Status Origem", type: "text", required: false },
+    { field: "solicitante", label: "Solicitante", type: "text", required: false },
+    { field: "aprovador", label: "Aprovador", type: "text", required: false },
+    { field: "agente", label: "Agente", type: "text", required: false },
+  ];
+  
+  return [...requiredFields, ...optionalFields];
+};
+
 export default function AdminPage() {
   const { toast } = useToast();
   
@@ -1499,56 +1525,75 @@ export default function AdminPage() {
                   </p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Campos de texto da tabela documentos */}
-                  {[
-                    { field: "origem", label: "Origem", type: "text" },
-                    { field: "objeto", label: "Objeto da Task", type: "text" },
-                    { field: "tipo", label: "Tipo", type: "text" },
-                    { field: "cliente", label: "Cliente", type: "text" },
-                    { field: "responsavel", label: "Responsável", type: "text" },
-                    { field: "sistema", label: "Sistema", type: "text" },
-                    { field: "modulo", label: "Módulo", type: "text" },
-                    { field: "descricao", label: "Detalhamento", type: "text" },
-                    { field: "status", label: "Status", type: "text" },
-                    { field: "statusOrigem", label: "Status Origem", type: "text" },
-                    { field: "solicitante", label: "Solicitante", type: "text" },
-                    { field: "aprovador", label: "Aprovador", type: "text" },
-                    { field: "agente", label: "Agente", type: "text" }
-                  ].map((fieldInfo) => (
-                    <div key={fieldInfo.field} className="space-y-2">
-                      <Label htmlFor={`default-${fieldInfo.field}`} className="text-sm font-medium">
-                        {fieldInfo.label}
-                      </Label>
-                      <Input
-                        id={`default-${fieldInfo.field}`}
-                        placeholder={`Valor padrão para ${fieldInfo.label}`}
-                        value={selectedMapping?.defaultValues?.[fieldInfo.field] || ""}
-                        onChange={(e) => {
-                          if (selectedMapping) {
-                            const newDefaults = {
-                              ...selectedMapping.defaultValues,
-                              [fieldInfo.field]: e.target.value
-                            };
-                            setSelectedMapping({
-                              ...selectedMapping,
-                              defaultValues: newDefaults
-                            });
-                            mappingForm.setValue("defaultValues", newDefaults);
-                          }
-                        }}
-                        className="text-sm"
-                      />
-                    </div>
-                  ))}
+                {/* Tabela de valores padrão */}
+                <div className="border rounded-md">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[200px]">Campo</TableHead>
+                        <TableHead>Valor Padrão</TableHead>
+                        <TableHead className="w-[100px]">Obrigatório</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {getDefaultableFields().map((fieldInfo) => (
+                        <TableRow key={fieldInfo.field} className="h-12">
+                          <TableCell className="py-2">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium font-mono">
+                                {fieldInfo.field}
+                              </span>
+                              <Badge 
+                                variant="outline" 
+                                className="text-xs bg-gray-50 text-gray-600 border-gray-200"
+                              >
+                                {fieldInfo.label}
+                              </Badge>
+                            </div>
+                          </TableCell>
+                          <TableCell className="py-2">
+                            <Input
+                              placeholder={`Valor padrão para ${fieldInfo.label}`}
+                              value={selectedMapping?.defaultValues?.[fieldInfo.field] || ""}
+                              onChange={(e) => {
+                                if (selectedMapping) {
+                                  const newDefaults = {
+                                    ...selectedMapping.defaultValues,
+                                    [fieldInfo.field]: e.target.value
+                                  };
+                                  setSelectedMapping({
+                                    ...selectedMapping,
+                                    defaultValues: newDefaults
+                                  });
+                                  mappingForm.setValue("defaultValues", newDefaults);
+                                }
+                              }}
+                              className="text-sm"
+                            />
+                          </TableCell>
+                          <TableCell className="py-2">
+                            <Badge 
+                              variant={fieldInfo.required ? "default" : "secondary"}
+                              className={`text-xs ${fieldInfo.required 
+                                ? "bg-red-100 text-red-700 border-red-200" 
+                                : "bg-gray-100 text-gray-600 border-gray-200"
+                              }`}
+                            >
+                              {fieldInfo.required ? "SIM" : "NÃO"}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
                 
                 <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mt-4">
                   <h4 className="text-sm font-medium text-blue-800 mb-2">💡 Como funciona:</h4>
                   <ul className="text-xs text-blue-700 space-y-1">
-                    <li>• Os valores padrão são usados quando um campo não tem mapeamento definido</li>
-                    <li>• Também são aplicados quando a API Monday não retorna valor para o campo mapeado</li>
-                    <li>• Deixe em branco se não quiser valor padrão para o campo</li>
+                    <li>• <strong>Campos obrigatórios</strong> devem sempre ter valor - use defaults para evitar erros</li>
+                    <li>• Os valores padrão são aplicados quando a API Monday não retorna dados</li>
+                    <li>• Campos opcionais podem ficar em branco se não precisar de valor padrão</li>
                     <li>• Use valores consistentes para facilitar futuras análises e filtros</li>
                   </ul>
                 </div>
