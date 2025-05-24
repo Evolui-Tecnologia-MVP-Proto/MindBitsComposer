@@ -69,6 +69,7 @@ type BoardMapping = {
   quadroMonday: string;
   description: string;
   mappingFilter: string;
+  defaultValues?: Record<string, string>;
   lastSync: string | null;
   columnCount?: number;
 };
@@ -107,6 +108,7 @@ const mappingFormSchema = z.object({
   quadroMonday: z.string().optional(),
   description: z.string().optional(),
   mappingFilter: z.string().optional(),
+  defaultValues: z.record(z.string()).optional(),
 });
 
 const columnMappingFormSchema = z.object({
@@ -191,6 +193,7 @@ export default function AdminPage() {
       quadroMonday: "",
       description: "",
       mappingFilter: "",
+      defaultValues: {},
     },
   });
   
@@ -213,6 +216,7 @@ export default function AdminPage() {
         quadroMonday: selectedMapping.quadroMonday,
         description: selectedMapping.description,
         mappingFilter: selectedMapping.mappingFilter || "",
+        defaultValues: selectedMapping.defaultValues || {},
       });
       
       // Se o campo quadroMonday estiver preenchido, muda a cor do botão para verde
@@ -310,6 +314,7 @@ export default function AdminPage() {
         description: data.description || "",
         statusColumn: "",
         responsibleColumn: "",
+        defaultValues: data.defaultValues || {},
         lastSync: null
       };
       
