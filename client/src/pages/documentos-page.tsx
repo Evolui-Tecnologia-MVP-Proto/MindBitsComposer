@@ -2295,7 +2295,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   function renderEditArtifactModal() {
     return (
       <Dialog open={isEditArtifactModalOpen} onOpenChange={setIsEditArtifactModalOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md fixed top-[15%] left-[55%] transform -translate-x-1/2 -translate-y-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Pencil className="h-5 w-5 text-blue-500" />
@@ -2412,7 +2412,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             </Button>
             <Button 
               onClick={handleUpdateArtifact}
-              disabled={updateArtifactMutation.isPending || !artifactFormData.name || !artifactFormData.file || !artifactFormData.type}
+              disabled={updateArtifactMutation.isPending || !artifactFormData.name}
               className="bg-blue-600 hover:bg-blue-700"
             >
               {updateArtifactMutation.isPending ? (
