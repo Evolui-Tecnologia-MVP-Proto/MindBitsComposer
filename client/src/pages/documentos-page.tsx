@@ -837,6 +837,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   };
 
   const cancelDeleteArtifact = () => {
+    console.log("❌ CANCELANDO EXCLUSÃO DE ANEXO");
     setIsDeleteArtifactConfirmOpen(false);
     setArtifactToDelete(null);
   };
@@ -2553,7 +2554,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               Cancelar
             </AlertDialogCancel>
             <AlertDialogAction 
-              onClick={confirmDeleteArtifact}
+              onClick={() => {
+                console.log("🔥 CLICOU EM CONFIRMAR EXCLUSÃO!");
+                confirmDeleteArtifact();
+              }}
               disabled={deleteArtifactMutation.isPending}
               className="bg-red-600 hover:bg-red-700"
             >
@@ -2562,6 +2566,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      {/* Debug: Estado do modal */}
+      {isDeleteArtifactConfirmOpen && (
+        <div style={{ position: 'fixed', top: '10px', right: '10px', zIndex: 9999, background: 'red', color: 'white', padding: '5px' }}>
+          MODAL ABERTO - ID: {artifactToDelete}
+        </div>
+      )}
     </div>
   );
 }
