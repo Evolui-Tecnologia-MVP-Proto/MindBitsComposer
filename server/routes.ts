@@ -1169,15 +1169,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Verificar se já existe um documento com os mesmos valores dos campos chave
           if (keyFields.length > 0) {
             console.log(`🔍 VERIFICANDO DUPLICATAS para item ${item.id} usando campos chave:`, keyFields);
+            console.log(`📊 DADOS DO DOCUMENTO para verificação:`, {
+              id_origem: documentData.id_origem,
+              objeto: documentData.objeto,
+              cliente: documentData.cliente
+            });
             
             // Buscar documentos existentes com os mesmos valores dos campos chave
             const existingDocuments = await storage.getDocumentosByKeyFields(keyFields, documentData);
             
+            console.log(`📋 DOCUMENTOS EXISTENTES ENCONTRADOS:`, existingDocuments.length);
             if (existingDocuments.length > 0) {
               console.log(`⚠️ DOCUMENTO JÁ EXISTE para item ${item.id}:`, existingDocuments[0].id);
+              console.log(`📊 DOCUMENTO EXISTENTE:`, {
+                id_origem: existingDocuments[0].idOrigem,
+                objeto: existingDocuments[0].objeto
+              });
               documentsPreExisting++;
               continue; // Pular para o próximo item
+            } else {
+              console.log(`✅ NENHUM DOCUMENTO DUPLICADO - criando novo documento`);
             }
+          } else {
+            console.log(`⚠️ NENHUM CAMPO CHAVE CONFIGURADO - não há verificação de duplicatas`);
           }
 
           // Criar o documento
