@@ -63,6 +63,7 @@ import {
   Download,
   ChevronUp,
   ChevronDown,
+  Database,
 } from "lucide-react";
 import { type Documento, type InsertDocumento, type DocumentArtifact, type InsertDocumentArtifact } from "@shared/schema";
 
