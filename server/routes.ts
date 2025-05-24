@@ -929,6 +929,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
             documentData[mapping.cpxField] = value;
           }
 
+          // Capturar dados extras das colunas não mapeadas para general_columns
+          const generalColumns: Record<string, any> = {};
+          
+          // Adicionar dados básicos do item
+          generalColumns.monday_item_id = item.id;
+          generalColumns.monday_item_name = item.name;
+          
+          // Capturar todas as colunas não mapeadas
+          if (item.column_values && Array.isArray(item.column_values)) {
+            item.column_values.forEach((columnValue: any) => {
+              // Se a coluna não está mapeada, incluir nos dados extras
+              if (!mappedColumnIds.has(columnValue.id)) {
+                const columnTitle = columnValue.title || `coluna_${columnValue.id}`;
+                generalColumns[columnTitle] = {
+                  id: columnValue.id,
+                  text: columnValue.text || "",
+                  value: columnValue.value || null,
+                  type: columnValue.type || "unknown"
+                };
+              }
+            });
+          }
+          
+          // Adicionar general_columns ao documento
+          documentData.generalColumns = generalColumns;
+
           // Definir origem sempre como "monday"
           documentData.origem = "monday";
           
