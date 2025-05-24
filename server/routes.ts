@@ -1018,29 +1018,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log("generalColumns final:", documentData.generalColumns);
 
           // Aplicar filtro se configurado
+          console.log(`🔍 VERIFICANDO FILTRO para item ${item.id}:`);
+          console.log(`- mappingFilter existe?`, !!existingMapping.mappingFilter);
+          console.log(`- mappingFilter não está vazio?`, existingMapping.mappingFilter && existingMapping.mappingFilter.trim());
+          console.log(`- conteúdo do filtro:`, existingMapping.mappingFilter);
+          
           if (existingMapping.mappingFilter && existingMapping.mappingFilter.trim()) {
             try {
-              console.log(`Aplicando filtro para item ${item.id}:`, existingMapping.mappingFilter);
+              console.log(`✅ APLICANDO FILTRO para item ${item.id}`);
+              console.log(`📄 Estrutura do item:`, JSON.stringify(item, null, 2));
               
               // Criar função de filtro e executar
               const filterFunction = new Function('item', existingMapping.mappingFilter);
               const shouldInclude = filterFunction(item);
               
-              console.log(`Resultado do filtro para item ${item.id}:`, shouldInclude);
+              console.log(`🎯 RESULTADO DO FILTRO para item ${item.id}:`, shouldInclude);
               
               if (!shouldInclude) {
-                console.log(`Item ${item.id} foi filtrado (excluído) - não atende às condições`);
+                console.log(`❌ Item ${item.id} foi FILTRADO (excluído) - não atende às condições`);
                 documentsSkipped++;
                 continue; // Pular este item
               }
               
-              console.log(`Item ${item.id} passou no filtro - será processado`);
+              console.log(`✅ Item ${item.id} PASSOU no filtro - será processado`);
               
             } catch (filterError) {
-              console.warn(`Erro ao aplicar filtro no item ${item.id}:`, filterError);
-              console.log(`Item ${item.id} será processado devido ao erro no filtro`);
+              console.error(`💥 ERRO ao aplicar filtro no item ${item.id}:`, filterError);
+              console.log(`⚠️ Item ${item.id} será processado devido ao erro no filtro`);
               // Em caso de erro no filtro, processar o item (comportamento seguro)
             }
+          } else {
+            console.log(`⏭️ NENHUM FILTRO configurado - processando item ${item.id}`);
           }
 
           // Aplicar valores padrão configurados no mapeamento
