@@ -749,7 +749,8 @@ export default function AdminPage() {
           <div className="space-y-1">
             <div className="font-medium">Resumo da Importação:</div>
             <div><strong>{result.itemsProcessed}</strong> registros importados da API</div>
-            <div><strong>{result.documentsCreated}</strong> documentos gravados no banco</div>
+            <div><strong>{result.documentsCreated}</strong> documentos novos gravados</div>
+            <div><strong>{result.documentsPreExisting || 0}</strong> registros já existentes</div>
             <div><strong>{result.documentsSkipped}</strong> registros filtrados/ignorados</div>
             <div className="text-xs text-gray-600 mt-2">
               {result.columnsMapping} colunas mapeadas • {new Date().toLocaleTimeString()}
