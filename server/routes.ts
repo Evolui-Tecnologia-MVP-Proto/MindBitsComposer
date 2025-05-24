@@ -1074,6 +1074,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             } else if (fieldName === 'id_origem') {
               // Para id_origem (bigint), garantir que seja um número válido
               const rawValue = values[0] || "";
+              console.log(`🔍 PROCESSANDO CAMPO ID_ORIGEM:`, {
+                fieldName,
+                values: values,
+                rawValue: rawValue,
+                valuesLength: values.length
+              });
+              
               const numericValue = parseInt(rawValue, 10);
               if (!isNaN(numericValue)) {
                 // Mapear para o campo correto do schema: idOrigem
@@ -1081,6 +1088,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 console.log(`✅ Campo id_origem convertido: "${rawValue}" -> ${numericValue} (mapeado para idOrigem)`);
               } else {
                 console.warn(`⚠️ Valor inválido para id_origem: "${rawValue}" - será ignorado`);
+                console.log(`🔍 DEBUG VALUES:`, JSON.stringify(values, null, 2));
                 // Não definir o campo se não for um número válido
               }
             } else {
