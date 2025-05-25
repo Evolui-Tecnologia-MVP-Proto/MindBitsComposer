@@ -2556,6 +2556,41 @@ return item.column_values.some(col =>
                         }
                       </Button>
                     </div>
+                    
+                    {/* Botão de Teste */}
+                    <div className="pt-3 border-t border-blue-200">
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          if (selectedMapping) {
+                            // Chamar o endpoint de teste
+                            fetch('/api/jobs/test-sync', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ mappingId: selectedMapping.id })
+                            })
+                            .then(res => res.json())
+                            .then(data => {
+                              toast({
+                                title: "Teste Executado",
+                                description: `Processados: ${data.result?.itemsProcessed || 0}, Criados: ${data.result?.documentsCreated || 0}`,
+                              });
+                            })
+                            .catch(() => {
+                              toast({
+                                title: "Erro",
+                                description: "Erro ao executar teste de sincronização.",
+                                variant: "destructive",
+                              });
+                            });
+                          }
+                        }}
+                        variant="outline"
+                        className="w-full bg-blue-50 border-blue-300 text-blue-700 hover:bg-blue-100"
+                      >
+                        🧪 Testar Sync
+                      </Button>
+                    </div>
                   </div>
                 )}
                 
