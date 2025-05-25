@@ -17,9 +17,9 @@ export async function executeMonadayMappingSync(mappingId: string): Promise<Mond
     throw new Error('Mapeamento não encontrado');
   }
 
-  // Buscar token do Monday usando a mesma lógica da execução manual
-  const mondayToken = await storage.getMondayApiKey();
-  if (!mondayToken) {
+  // Buscar conexão do Monday
+  const mondayConnection = await storage.getServiceConnection('monday');
+  if (!mondayConnection?.token) {
     throw new Error('Token Monday.com não configurado');
   }
 
@@ -32,7 +32,7 @@ export async function executeMonadayMappingSync(mappingId: string): Promise<Mond
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': mondayToken
+        'Authorization': mondayConnection.token
       },
       body: JSON.stringify({ query, variables })
     });
