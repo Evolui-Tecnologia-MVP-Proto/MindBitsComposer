@@ -17,24 +17,8 @@ export async function executeMonadayMappingSync(mappingId: string): Promise<Mond
     throw new Error('Mapeamento não encontrado');
   }
 
-  // Buscar conexão do Monday (compatibilidade com estrutura antiga)
-  let mondayToken: string | null = null;
-  
-  try {
-    // Tentar buscar da nova estrutura
-    const mondayConnection = await storage.getServiceConnection('monday');
-    if (mondayConnection?.token) {
-      mondayToken = mondayConnection.token;
-    }
-  } catch (error) {
-    console.log('Estrutura nova não encontrada, tentando estrutura antiga...');
-  }
-  
-  // Se não encontrou na nova estrutura, tentar na antiga
-  if (!mondayToken) {
-    mondayToken = await storage.getMondayApiKey();
-  }
-  
+  // Buscar token do Monday usando a mesma lógica da execução manual
+  const mondayToken = await storage.getMondayApiKey();
   if (!mondayToken) {
     throw new Error('Token Monday.com não configurado');
   }
