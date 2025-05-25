@@ -1020,6 +1020,29 @@ export default function AdminPage() {
       setIsExecutingMapping(true);
       setExecutionProgress("Iniciando sincronização...");
       
+      // Registrar log de início da execução manual
+      try {
+        await fetch('/api/logs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            eventType: 'MONDAY_SYNC_MANUAL',
+            message: `Execução manual iniciada para mapeamento "${mapping.name}"`,
+            parameters: {
+              mappingId: mapping.id,
+              mappingName: mapping.name,
+              boardId: mapping.boardId,
+              executionType: 'manual',
+              initiatedBy: 'user_interface'
+            }
+          })
+        });
+      } catch (logError) {
+        console.warn('Erro ao registrar log de início:', logError);
+      }
+      
       toast({
         title: "Executando sincronização",
         description: `Iniciando sincronização do mapeamento "${mapping.name}"...`,
@@ -1097,11 +1120,66 @@ export default function AdminPage() {
         duration: 8000,
       });
 
+      // Registrar log de conclusão da execução manual
+      try {
+        await fetch('/api/logs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            eventType: 'MONDAY_SYNC_MANUAL',
+            message: `Execução manual concluída para mapeamento "${mapping.name}" - ${result.documentsCreated} documentos criados`,
+            parameters: {
+              mappingId: mapping.id,
+              mappingName: mapping.name,
+              boardId: mapping.boardId,
+              executionType: 'manual',
+              completedBy: 'user_interface',
+              itemsProcessed: result.itemsProcessed,
+              documentsCreated: result.documentsCreated,
+              documentsPreExisting: result.documentsPreExisting || 0,
+              documentsSkipped: result.documentsSkipped,
+              columnsMapping: result.columnsMapping,
+              executionTime: Date.now() - startTime
+            }
+          })
+        });
+      } catch (logError) {
+        console.warn('Erro ao registrar log de conclusão:', logError);
+      }
+
       // Atualizar a lista de mapeamentos para refletir mudanças
       queryClient.invalidateQueries({ queryKey: ['/api/monday/mappings'] });
 
     } catch (error) {
       console.error('Erro ao executar mapeamento:', error);
+      
+      // Registrar log de erro da execução manual
+      try {
+        await fetch('/api/logs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            eventType: 'MONDAY_SYNC_MANUAL',
+            message: `Erro na execução manual do mapeamento "${mapping.name}": ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
+            parameters: {
+              mappingId: mapping.id,
+              mappingName: mapping.name,
+              boardId: mapping.boardId,
+              executionType: 'manual',
+              errorType: 'execution_failure',
+              errorMessage: error instanceof Error ? error.message : 'Erro desconhecido',
+              failedBy: 'user_interface'
+            }
+          })
+        });
+      } catch (logError) {
+        console.warn('Erro ao registrar log de erro:', logError);
+      }
+      
       toast({
         title: "Erro na execução",
         description: error instanceof Error ? error.message : "Não foi possível executar a sincronização",
