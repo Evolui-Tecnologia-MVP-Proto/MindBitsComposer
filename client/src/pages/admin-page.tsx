@@ -1985,9 +1985,6 @@ return item.column_values.some(col =>
                         <div key={mapping.id} className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-md p-2">
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-mono font-bold">documents_artifacts</span>
-                            <Badge variant="outline" className="text-xs border-blue-500 text-blue-700 bg-blue-50">
-                              one-to-many
-                            </Badge>
                             <span className="text-xs text-gray-500">→</span>
                             <span className="text-sm font-mono">
                               {mapping.columnId === "documents_item" 
