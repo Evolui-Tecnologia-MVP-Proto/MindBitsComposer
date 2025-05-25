@@ -132,18 +132,12 @@ class JobManager {
         executionType: 'automatic'
       });
 
-      // Executar a sincronização real do Monday
+      // Executar a sincronização real do Monday usando a mesma lógica da execução manual
       console.log(`[JOB] Executando sincronização para ${mapping.name}`);
       
-      // Fazer requisição para a API real de execução
-      const response = await fetch(`http://localhost:5000/api/monday/mappings/${mappingId}/execute`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      const result = await response.json();
+      // Importar e executar a lógica de sincronização diretamente
+      const { executeMonadayMappingSync } = await import('./monday-sync');
+      const result = await executeMonadayMappingSync(mappingId);
       
       const stats = {
         itemsProcessed: result.itemsProcessed || 0,
