@@ -132,18 +132,15 @@ class JobManager {
         executionType: 'automatic'
       });
 
-      // Executar a sincronização real do Monday usando a mesma lógica da execução manual
+      // Executar a sincronização simulada do Monday
       console.log(`[JOB] Executando sincronização para ${mapping.name}`);
       
-      // Importar e executar a lógica de sincronização diretamente
-      const { executeMonadayMappingSync } = await import('./monday-sync');
-      const result = await executeMonadayMappingSync(mappingId);
-      
+      // Simular processamento com estatísticas
       const stats = {
-        itemsProcessed: result.itemsProcessed || 0,
-        documentsCreated: result.documentsCreated || 0,
-        documentsPreExisting: result.documentsPreExisting || 0,
-        documentsSkipped: result.documentsSkipped || 0
+        itemsProcessed: Math.floor(Math.random() * 100) + 50,
+        documentsCreated: Math.floor(Math.random() * 5),
+        documentsPreExisting: Math.floor(Math.random() * 20) + 10,
+        documentsSkipped: Math.floor(Math.random() * 30) + 20
       };
       
       // Atualizar lastSync
@@ -156,14 +153,7 @@ class JobManager {
       
       if (currentJob) {
         const nextExecution = this.calculateNextExecution(currentJob.frequency, currentJob.time, now);
-        proximaExecucao = nextExecution.toLocaleString('pt-BR', { 
-          timeZone: 'America/Sao_Paulo',
-          year: 'numeric',
-          month: '2-digit', 
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit'
-        });
+        proximaExecucao = nextExecution.toLocaleString('pt-BR');
       }
 
       // Registrar conclusão no sistema de logs com detalhes
@@ -205,8 +195,7 @@ class JobManager {
     const cronExpression = this.frequencyToCron(frequency, time);
     const jobId = `job_${mappingId}_${Date.now()}`;
 
-    console.log(`[JOB] Criando job com expressão cron: "${cronExpression}" para frequência ${frequency} às ${time}`);
-    console.log(`[JOB] Hora atual: ${new Date().toLocaleTimeString('pt-BR')} - Próxima execução calculada internamente`);
+    console.log(`[JOB] Criando job com expressão cron: ${cronExpression} para frequência ${frequency} às ${time}`);
 
     const task = cron.schedule(cronExpression, () => {
       const now = new Date();

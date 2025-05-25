@@ -826,7 +826,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     const { id } = req.params;
-    console.log("🚀 INICIANDO EXECUÇÃO MANUAL DO MAPEAMENTO:", id);
+    console.log("🚀 INICIANDO EXECUÇÃO DO MAPEAMENTO:", id);
     
     try {
       // Verificar se o mapeamento existe
@@ -834,10 +834,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!existingMapping) {
         return res.status(404).send("Mapeamento não encontrado");
       }
+      
+      // Obter a chave da API
+      const apiKey = await storage.getMondayApiKey();
+      if (!apiKey) {
+        return res.status(400).send("Chave da API do Monday não configurada");
+      }
+      
+      // Buscar as colunas mapeadas para este mapeamento
+      const mappingColumns = await storage.getMappingColumns(id);
+      if (mappingColumns.length === 0) {
+        return res.status(400).send("Nenhuma coluna mapeada encontrada para este mapeamento");
+      }
+      
+      console.log("=== DIAGNÓSTICO DETALHADO ===");
+      console.log("Token Monday encontrado:", apiKey ? `${apiKey.substring(0, 10)}... (${apiKey.length} chars)` : "NENHUM TOKEN");
+      console.log("Board ID:", existingMapping.boardId);
+      console.log("Colunas mapeadas:", mappingColumns.length);
+      console.log("Status da API Key:", apiKey ? "EXISTE" : "NÃO EXISTE");
+      console.log("FILTRO CONFIGURADO:", existingMapping.mappingFilter || "NENHUM FILTRO");
+      console.log("FILTRO ESTÁ VAZIO?", !existingMapping.mappingFilter || !existingMapping.mappingFilter.trim());
 
-      // Usar a função unificada de sincronização
-      const { executeMonadayMappingSync } = await import('./monday-sync');
-      const result = await executeMonadayMappingSync(id);
+      // Obter dados do quadro Monday
+      const mondayColumns = mappingColumns.map(col => col.mondayColumnId);
+      const query = `
+        query {
+          boards(ids: [${existingMapping.boardId}]) {
+            items_page(limit: 500) {
+              items {
+                id
+                name
+                column_values(ids: [${mondayColumns.map(id => `"${id}"`).join(", ")}]) {
+                  id
+                  text
+                  value
+                  column {
+                    title
+                  }
+                }
+              }
+            }
+          }
+        }
+      `;
+      
+      console.log("Query GraphQL:", query);
+
+      const mondayResponse = await fetch("https://api.monday.com/v2", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": apiKey,
+          "API-Version": "2023-10"
+        },
+        body: JSON.stringify({ query })
+      });
+
+      if (!mondayResponse.ok) {
+        const errorText = await mondayResponse.text();
+        throw new Error(`Erro na API do Monday (${mondayResponse.status}): ${errorText}`);
+      }
+
+      // Verificar se a resposta é JSON válido
+      const responseText = await mondayResponse.text();
+      let mondayData;
+      
+      try {
+        mondayData = JSON.parse(responseText);
+        console.log("Resposta da API Monday:", JSON.stringify(mondayData, null, 2));
+      } catch (parseError) {
+        console.error("=== CONTEÚDO COMPLETO RETORNADO PELA API MONDAY ===");
+        console.error(responseText);
+        console.error("=== FIM DO CONTEÚDO ===");
+        throw new Error(`API do Monday retornou HTML em vez de JSON. Conteúdo: ${responseText.substring(0, 200)}...`);
+      }
+      
+      if (mondayData.errors) {
+        console.error("Erros GraphQL:", mondayData.errors);
+        throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(mondayData.errors)}`);
+      }
+
+      const items = mondayData.data?.boards?.[0]?.items_page?.items || [];
+      let documentsCreated = 0;
+      let documentsSkipped = 0;
+      let documentsPreExisting = 0;
 
       // Identificar campos marcados como chave para verificação de duplicatas
       const keyFields = mappingColumns.filter(col => col.isKey).map(col => col.cpxField);
@@ -2347,14 +2427,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         eventType: `MONDAY_SYNC_${mapping.name.replace(/\s+/g, '_').toUpperCase()}`,
         message: "JOB de sincronização agendado",
         parameters: {
-          proximaExecucao: nextExecution.toLocaleString('pt-BR', { 
-            timeZone: 'America/Sao_Paulo',
-            year: 'numeric',
-            month: '2-digit', 
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
-          }),
+          proximaExecucao: nextExecution.toLocaleString('pt-BR'),
           intervalo: frequencyMap[frequency] || frequency,
           mapeamento: mapping.name,
           quadroMonday: mapping.quadroMonday || 'N/A'
