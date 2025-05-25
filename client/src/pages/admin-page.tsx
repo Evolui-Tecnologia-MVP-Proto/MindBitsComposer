@@ -337,6 +337,14 @@ export default function AdminPage() {
     columnId: string;
     columnTitle: string;
   }>>([]);
+
+  // Estados para agendamento
+  const [schedulingEnabled, setSchedulingEnabled] = useState(false);
+  const [schedulingFrequency, setSchedulingFrequency] = useState("daily");
+  const [schedulingTime, setSchedulingTime] = useState("09:00");
+  const [schedulingDays, setSchedulingDays] = useState<string[]>([]);
+  const [syncWeekends, setSyncWeekends] = useState(false);
+  const [notifyErrors, setNotifyErrors] = useState(true);
   
   // Formulário para serviços externos
   const serviceForm = useForm<z.infer<typeof serviceConnectionSchema>>({

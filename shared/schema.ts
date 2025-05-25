@@ -68,6 +68,7 @@ export const mondayMappings = pgTable("monday_mappings", {
   mappingFilter: text("mapping_filter").default(""),
   defaultValues: json("default_values").$type<Record<string, string>>().default({}),
   assetsMappings: json("assets_mappings").$type<Array<{id: string, columnId: string, columnTitle: string}>>().default([]),
+  schedulesParams: json("schedules_params").$type<{enabled: boolean, frequency: string, time: string, days: string[]}>().default({enabled: false, frequency: "daily", time: "09:00", days: []}),
   lastSync: timestamp("last_sync"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
