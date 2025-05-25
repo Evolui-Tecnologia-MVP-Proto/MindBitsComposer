@@ -1226,11 +1226,13 @@ export default function AdminPage() {
           <Form {...mappingForm}>
             <form id="mappingForm" onSubmit={mappingForm.handleSubmit(onSubmitMapping)} className="space-y-4">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
+                <TabsList className="grid w-full grid-cols-6">
                   <TabsTrigger value="quadro">Quadro</TabsTrigger>
                   <TabsTrigger value="colunas" disabled={!selectedMapping}>Colunas</TabsTrigger>
                   <TabsTrigger value="defaults" disabled={!selectedMapping}>Defaults</TabsTrigger>
                   <TabsTrigger value="filtros" disabled={!selectedMapping}>Filtros</TabsTrigger>
+                  <TabsTrigger value="assets-map" disabled={!selectedMapping}>Assets Map</TabsTrigger>
+                  <TabsTrigger value="agendamento" disabled={!selectedMapping}>Agendamento</TabsTrigger>
                 </TabsList>
                 
                 {/* Aba de informações do quadro */}
@@ -1782,6 +1784,123 @@ return item.column_values.some(col =>
                   </div>
                 </div>
               </Form>
+            </TabsContent>
+
+            {/* Aba Assets Map */}
+            <TabsContent value="assets-map" className="py-4">
+              <div className="space-y-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                  <h4 className="text-sm font-medium text-blue-800 mb-2">📋 Mapeamento de Assets</h4>
+                  <p className="text-sm text-blue-700">
+                    Configure como os anexos e arquivos do Monday.com serão sincronizados com o sistema.
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium">Sincronização de Anexos</label>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="sync-attachments" className="rounded" />
+                        <label htmlFor="sync-attachments" className="text-sm">Sincronizar anexos automaticamente</label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="download-assets" className="rounded" />
+                        <label htmlFor="download-assets" className="text-sm">Baixar arquivos localmente</label>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium">Tipos de Arquivo</label>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="allow-images" className="rounded" defaultChecked />
+                        <label htmlFor="allow-images" className="text-sm">Imagens (JPG, PNG, GIF)</label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input type="checkbox" id="allow-docs" className="rounded" defaultChecked />
+                        <label htmlFor="allow-docs" className="text-sm">Documentos (PDF, DOC, XLS)</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="border-t pt-4">
+                  <label className="text-sm font-medium">Pasta de Destino</label>
+                  <input 
+                    type="text" 
+                    placeholder="/uploads/monday-assets" 
+                    className="mt-2 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Caminho onde os arquivos serão armazenados no servidor
+                  </p>
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Aba Agendamento */}
+            <TabsContent value="agendamento" className="py-4">
+              <div className="space-y-4">
+                <div className="bg-green-50 border border-green-200 rounded-md p-4">
+                  <h4 className="text-sm font-medium text-green-800 mb-2">⏰ Sincronização Automática</h4>
+                  <p className="text-sm text-green-700">
+                    Configure quando e como a sincronização com o Monday.com deve ocorrer automaticamente.
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium">Frequência de Sincronização</label>
+                    <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                      <option value="manual">Manual</option>
+                      <option value="15min">A cada 15 minutos</option>
+                      <option value="30min">A cada 30 minutos</option>
+                      <option value="1hour">A cada hora</option>
+                      <option value="6hours">A cada 6 horas</option>
+                      <option value="daily">Diariamente</option>
+                    </select>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <label className="text-sm font-medium">Horário Preferido</label>
+                    <input 
+                      type="time" 
+                      defaultValue="09:00"
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                    />
+                    <p className="text-xs text-gray-500">
+                      Para sincronizações diárias ou com intervalo fixo
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <label className="text-sm font-medium">Opções Avançadas</label>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <input type="checkbox" id="sync-weekends" className="rounded" />
+                      <label htmlFor="sync-weekends" className="text-sm">Sincronizar aos finais de semana</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input type="checkbox" id="notify-errors" className="rounded" defaultChecked />
+                      <label htmlFor="notify-errors" className="text-sm">Notificar em caso de erro na sincronização</label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input type="checkbox" id="log-activity" className="rounded" defaultChecked />
+                      <label htmlFor="log-activity" className="text-sm">Registrar log de atividades</label>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+                  <p className="text-sm text-yellow-800">
+                    <strong>Atenção:</strong> A sincronização automática pode gerar muitas requisições à API do Monday.com. 
+                    Verifique os limites da sua conta antes de configurar intervalos muito curtos.
+                  </p>
+                </div>
+              </div>
             </TabsContent>
             
             {/* Botões que ficam abaixo do TabContent, condicionais por aba */}
