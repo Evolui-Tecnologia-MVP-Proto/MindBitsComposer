@@ -5,7 +5,7 @@ import { storage } from "./storage";
 import { PluginStatus, PluginType, documentos } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
-import { eq, sql, desc } from "drizzle-orm";
+import { eq, sql, desc, and, gte, lte, isNull } from "drizzle-orm";
 import { systemLogs } from "@shared/schema";
 import { ZodError } from "zod";
 import fetch from "node-fetch";
