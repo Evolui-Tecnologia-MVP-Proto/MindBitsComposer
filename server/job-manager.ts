@@ -44,16 +44,36 @@ class JobManager {
         throw new Error(`Mapeamento ${mappingId} não encontrado`);
       }
 
+      // Registrar início no sistema de logs
+      const { SystemLogger } = await import('./logger');
+      await SystemLogger.logMondaySync(0, mappingId, 'started', {
+        mappingName: mapping.name,
+        executionType: 'automatic'
+      });
+
       // Simular execução da sincronização
       console.log(`[JOB] Executando sincronização para ${mapping.name}`);
       
       // Atualizar lastSync
       await storage.updateMondayMapping(mappingId, { lastSync: new Date() });
 
+      // Registrar conclusão no sistema de logs
+      await SystemLogger.logMondaySync(0, mappingId, 'completed', {
+        mappingName: mapping.name,
+        executionType: 'automatic'
+      });
+
       console.log(`[JOB] Sincronização concluída para mapeamento ${mappingId}`);
 
     } catch (error) {
       console.error(`[JOB] Erro na sincronização automática:`, error);
+      
+      // Registrar erro no sistema de logs
+      const { SystemLogger } = await import('./logger');
+      await SystemLogger.logMondaySync(0, mappingId, 'error', {
+        error: error.message,
+        executionType: 'automatic'
+      });
     }
   }
 
