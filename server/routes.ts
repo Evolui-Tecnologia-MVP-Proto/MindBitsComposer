@@ -2303,6 +2303,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rotas para gerenciamento de jobs de agendamento
+  
+  // Criar/Ativar job de agendamento
+  app.post("/api/jobs/activate", async (req: Request, res: Response) => {
+    try {
+      const { mappingId, frequency, time } = req.body;
+      
+      if (!mappingId || !frequency || !time) {
+        return res.status(400).send("Parâmetros obrigatórios: mappingId, frequency, time");
+      }
+
+      const jobId = jobManager.createJob(mappingId, frequency, time);
+      
+      res.json({ 
+        success: true, 
+        jobId,
+        message: "Job ativado com sucesso"
+      });
+    } catch (error) {
+      console.error("Erro ao ativar job:", error);
+      res.status(500).send("Erro ao ativar job");
+    }
+  });
+
+  // Cancelar job de agendamento
+  app.post("/api/jobs/cancel", async (req: Request, res: Response) => {
+    try {
+      const { mappingId } = req.body;
+      
+      if (!mappingId) {
+        return res.status(400).send("Parâmetro obrigatório: mappingId");
+      }
+
+      const success = jobManager.cancelJob(mappingId);
+      
+      res.json({ 
+        success,
+        message: success ? "Job cancelado com sucesso" : "Job não encontrado"
+      });
+    } catch (error) {
+      console.error("Erro ao cancelar job:", error);
+      res.status(500).send("Erro ao cancelar job");
+    }
+  });
+
+  // Verificar status do job
+  app.get("/api/jobs/status/:mappingId", async (req: Request, res: Response) => {
+    try {
+      const { mappingId } = req.params;
+      
+      const hasActiveJob = jobManager.hasActiveJob(mappingId);
+      const activeJob = jobManager.getActiveJob(mappingId);
+      
+      res.json({ 
+        hasActiveJob,
+        activeJob: activeJob ? {
+          id: activeJob.id,
+          frequency: activeJob.frequency,
+          time: activeJob.time,
+          createdAt: activeJob.createdAt
+        } : null
+      });
+    } catch (error) {
+      console.error("Erro ao verificar status do job:", error);
+      res.status(500).send("Erro ao verificar status do job");
+    }
+  });
+
+  // Listar todos os jobs ativos
+  app.get("/api/jobs", async (req: Request, res: Response) => {
+    try {
+      const activeJobs = jobManager.getActiveJobs();
+      
+      res.json(activeJobs.map(job => ({
+        id: job.id,
+        mappingId: job.mappingId,
+        frequency: job.frequency,
+        time: job.time,
+        createdAt: job.createdAt
+      })));
+    } catch (error) {
+      console.error("Erro ao listar jobs:", error);
+      res.status(500).send("Erro ao listar jobs");
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 

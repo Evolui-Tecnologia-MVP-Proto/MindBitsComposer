@@ -104,6 +104,16 @@ type ServiceConnection = {
   createdAt: string;
 };
 
+type JobStatus = {
+  hasActiveJob: boolean;
+  activeJob: {
+    id: string;
+    frequency: string;
+    time: string;
+    createdAt: string;
+  } | null;
+};
+
 // Schemas para validação de formulários
 const mappingFormSchema = z.object({
   name: z.string().min(3, { message: "Nome deve ter pelo menos 3 caracteres" }),
