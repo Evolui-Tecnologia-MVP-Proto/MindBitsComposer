@@ -2569,17 +2569,24 @@ return item.column_values.some(col =>
                               headers: { 'Content-Type': 'application/json' },
                               body: JSON.stringify({ mappingId: selectedMapping.id })
                             })
-                            .then(res => res.json())
+                            .then(async res => {
+                              if (!res.ok) {
+                                const errorData = await res.json();
+                                throw new Error(errorData.message || 'Erro na requisição');
+                              }
+                              return res.json();
+                            })
                             .then(data => {
                               toast({
                                 title: "Teste Executado",
                                 description: `Processados: ${data.result?.itemsProcessed || 0}, Criados: ${data.result?.documentsCreated || 0}`,
                               });
                             })
-                            .catch(() => {
+                            .catch(error => {
+                              console.error('Erro no teste:', error);
                               toast({
                                 title: "Erro",
-                                description: "Erro ao executar teste de sincronização.",
+                                description: `Erro ao executar teste: ${error.message}`,
                                 variant: "destructive",
                               });
                             });

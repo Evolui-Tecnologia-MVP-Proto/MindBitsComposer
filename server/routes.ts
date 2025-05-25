@@ -2536,14 +2536,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`[TEST] Executando teste de sincronização para mapeamento ${mappingId}`);
       const result = await jobManager.executeRealMondayIntegration(mappingId);
+      console.log(`[TEST] Resultado:`, result);
       
       res.json({
         success: true,
         result: result
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao executar teste de sincronização:", error);
-      res.status(500).json({ error: "Erro interno do servidor" });
+      console.error("Stack trace:", error.stack);
+      res.status(500).json({ 
+        error: "Erro interno do servidor",
+        message: error.message,
+        details: error.stack
+      });
     }
   });
 
