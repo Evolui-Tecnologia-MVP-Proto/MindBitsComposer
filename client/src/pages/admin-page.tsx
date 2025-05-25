@@ -260,7 +260,6 @@ const DocumentRelationshipSelect = ({
                 
                 {/* Combo de colunas de arquivo e botão + */}
                 <div className="pt-2 border-t border-gray-300">
-                  <label className="text-xs font-medium text-gray-700 mb-2 block">Mapeamento de Anexos</label>
                   <div className="flex items-center gap-2">
                     <select
                       value={selectedFileColumn}
@@ -1969,7 +1968,7 @@ return item.column_values.some(col =>
                 {/* Lista de mapeamentos de anexos */}
                 {attachmentMappings.length > 0 && (
                   <div className="space-y-2 pt-4 border-t">
-                    <label className="text-xs font-medium text-gray-600">Anexos Mapeados</label>
+                    <label className="text-sm font-medium">Anexos Mapeados</label>
                     <div className="space-y-1">
                       {attachmentMappings.map((mapping) => (
                         <div key={mapping.id} className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-md p-2">
