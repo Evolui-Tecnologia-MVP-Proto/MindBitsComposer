@@ -9,6 +9,7 @@ import { eq, sql } from "drizzle-orm";
 import { ZodError } from "zod";
 import fetch from "node-fetch";
 import { jobManager } from "./job-manager";
+import { SystemLogger } from "./logger";
 import path from "path";
 import fs from "fs";
 import multer from "multer";
@@ -2314,7 +2315,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).send("Parâmetros obrigatórios: mappingId, frequency, time");
       }
 
+      // Buscar informações do mapeamento para o log
+      const mapping = await storage.getBoardMapping(mappingId);
+      if (!mapping) {
+        return res.status(404).send("Mapeamento não encontrado");
+      }
+
       const jobId = jobManager.createJob(mappingId, frequency, time);
+      
+      // Calcular próxima execução
+      const now = new Date();
+      const [hours, minutes] = time.split(':');
+      const nextExecution = new Date();
+      nextExecution.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+      
+      // Se o horário já passou hoje, agendar para amanhã
+      if (nextExecution <= now) {
+        nextExecution.setDate(nextExecution.getDate() + 1);
+      }
+      
+      // Converter frequência para texto legível
+      const frequencyMap: Record<string, string> = {
+        '15min': '15 minutos',
+        '30min': '30 minutos', 
+        '1hour': '1 hora',
+        '6hours': '6 horas',
+        'daily': '24 horas'
+      };
+      
+      // Criar log do sistema
+      await SystemLogger.log({
+        eventType: `MONDAY_SYNC_${mapping.name.replace(/\s+/g, '_').toUpperCase()}`,
+        message: "JOB de sincronização agendado",
+        parameters: {
+          proximaExecucao: nextExecution.toLocaleString('pt-BR'),
+          intervalo: frequencyMap[frequency] || frequency,
+          mapeamento: mapping.name,
+          quadroMonday: mapping.quadroMonday || 'N/A'
+        },
+        userId: req.user?.id
+      });
       
       res.json({ 
         success: true, 
@@ -2336,7 +2376,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).send("Parâmetro obrigatório: mappingId");
       }
 
+      // Buscar informações do mapeamento para o log
+      const mapping = await storage.getBoardMapping(mappingId);
+      
       const success = jobManager.cancelJob(mappingId);
+      
+      // Criar log do cancelamento se o job foi encontrado e cancelado
+      if (success && mapping) {
+        await SystemLogger.log({
+          eventType: `MONDAY_SYNC_${mapping.name.replace(/\s+/g, '_').toUpperCase()}`,
+          message: "JOB de sincronização cancelado",
+          parameters: {
+            mapeamento: mapping.name,
+            quadroMonday: mapping.quadroMonday || 'N/A',
+            canceladoEm: new Date().toLocaleString('pt-BR')
+          },
+          userId: req.user?.id
+        });
+      }
       
       res.json({ 
         success,
