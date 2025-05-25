@@ -835,15 +835,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).send("Mapeamento não encontrado");
       }
 
-      // Usar a função unificada de sincronização
-      const { executeMonadayMappingSync } = await import('./monday-sync');
-      const result = await executeMonadayMappingSync(id);
+      // Usar o módulo unificado (só para jobs automáticos)
+      // A execução manual continua usando a lógica original abaixo
+      
+      // Buscar token da API Monday.com
+      const mondayApiKey = await storage.getMondayApiKey();
+      if (!mondayApiKey) {
+        return res.status(400).send("Token Monday.com não configurado");
+      }
+
+      // Buscar colunas mapeadas
+      const mappingColumns = await storage.getMappingColumns(id);
+
+      // Buscar dados do Monday.com
+      const query = `
+        query {
+          boards(ids: [${existingMapping.boardId}]) {
+            items_page {
+              items {
+                id
+                name
+                column_values {
+                  id
+                  title
+                  text
+                  value
+                }
+              }
+            }
+          }
+        }
+      `;
+
+      const response = await fetch('https://api.monday.com/v2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': mondayApiKey
+        },
+        body: JSON.stringify({ query })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro na API Monday: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("📥 RESPOSTA DA API MONDAY:", JSON.stringify(data, null, 2));
+
+      if (data.errors) {
+        throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(data.errors)}`);
+      }
+
+      const items = data.data?.boards[0]?.items_page?.items || [];
+      console.log(`📊 TOTAL DE ITENS ENCONTRADOS:`, items.length);
 
       // Identificar campos marcados como chave para verificação de duplicatas
-      const keyFields = mappingColumns.filter(col => col.isKey).map(col => col.cpxField);
+      const keyFields = mappingColumns.filter((col: any) => col.isKey).map((col: any) => col.cpxField);
       console.log(`🔑 CAMPOS CHAVE IDENTIFICADOS:`, keyFields);
       console.log(`📊 TOTAL DE COLUNAS MAPEADAS:`, mappingColumns.length);
-      console.log(`🔑 COLUNAS COM is_key=true:`, mappingColumns.filter(col => col.isKey));
+      console.log(`🔑 COLUNAS COM is_key=true:`, mappingColumns.filter((col: any) => col.isKey));
+
+      // Inicializar contadores
+      let documentsCreated = 0;
+      let documentsPreExisting = 0;
+      let documentsSkipped = 0;
 
       // Processar cada item (linha) do Monday
       console.log(`🚀 INICIANDO PROCESSAMENTO DE ${items.length} ITENS`);
