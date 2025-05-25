@@ -194,6 +194,9 @@ const DocumentRelationshipSelect = ({ selectedMapping, onRelationshipChange }: {
     queryKey: ["/api/documentos-relationships"],
     enabled: !!selectedMapping
   });
+
+  // Debug: verificar o que está chegando
+  console.log("Relacionamentos recebidos:", relationships);
   
   const handleRelationshipChange = (relationshipId: string) => {
     setSelectedRelationship(relationshipId);
