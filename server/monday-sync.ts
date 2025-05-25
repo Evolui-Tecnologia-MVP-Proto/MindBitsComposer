@@ -155,7 +155,7 @@ export async function executeMonadayMappingSync(mappingId: string): Promise<Mond
     }
 
     // Verificar se já existe documento com este id_origem
-    const existingDoc = await storage.getDocumentoByIdOrigem(BigInt(item.id));
+    const existingDoc = await storage.getDocumentoByIdOrigem(parseInt(item.id));
     if (existingDoc) {
       console.log(`⚠️ DOCUMENTO JÁ EXISTE para item ${item.id} - pulando`);
       documentsPreExisting++;

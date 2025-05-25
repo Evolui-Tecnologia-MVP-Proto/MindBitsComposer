@@ -2322,14 +2322,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const jobId = await jobManager.createJob(mappingId, frequency, time);
       
-      // Calcular próxima execução
+      // Calcular próxima execução no horário brasileiro
       const now = new Date();
       const [hours, minutes] = time.split(':');
-      const nextExecution = new Date();
+      
+      // Criar data no fuso horário brasileiro
+      const brazilTime = new Date(now.toLocaleString("en-US", {timeZone: "America/Sao_Paulo"}));
+      const nextExecution = new Date(brazilTime);
       nextExecution.setHours(parseInt(hours), parseInt(minutes), 0, 0);
       
       // Se o horário já passou hoje, agendar para amanhã
-      if (nextExecution <= now) {
+      if (nextExecution <= brazilTime) {
         nextExecution.setDate(nextExecution.getDate() + 1);
       }
       
