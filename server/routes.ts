@@ -2279,6 +2279,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get unique event types from logs
+  app.get("/api/logs/event-types", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const eventTypes = await db
+        .selectDistinct({ eventType: systemLogs.eventType })
+        .from(systemLogs)
+        .orderBy(systemLogs.eventType);
+      
+      const types = eventTypes.map(row => row.eventType).filter(Boolean);
+      res.json(types);
+    } catch (error) {
+      console.error("Erro ao buscar tipos de eventos:", error);
+      res.status(500).send("Erro ao buscar tipos de eventos");
+    }
+  });
+
   // Get system logs
   app.get("/api/logs", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");

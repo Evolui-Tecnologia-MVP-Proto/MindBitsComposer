@@ -558,6 +558,11 @@ export default function AdminPage() {
     queryKey: ['/api/users'],
   });
 
+  // Query para buscar tipos de eventos únicos da base de dados
+  const { data: eventTypes = [] } = useQuery<string[]>({
+    queryKey: ['/api/logs/event-types'],
+  });
+
   const { data: systemLogs = [], isLoading: logsLoading } = useQuery<SystemLog[]>({
     queryKey: ['/api/logs', logFilters],
     refetchInterval: 10000, // Atualiza a cada 10 segundos
@@ -1682,17 +1687,11 @@ export default function AdminPage() {
                       onChange={(e) => setLogFilters(prev => ({ ...prev, eventType: e.target.value }))}
                     >
                       <option value="">Todos os tipos</option>
-                      <option value="USER_LOGIN">Login de usuário</option>
-                      <option value="USER_LOGOUT">Logout de usuário</option>
-                      <option value="DOCUMENT_CREATED">Documento criado</option>
-                      <option value="DOCUMENT_UPDATED">Documento atualizado</option>
-                      <option value="MONDAY_SYNC_STARTED">Sincronização Monday iniciada</option>
-                      <option value="MONDAY_SYNC_COMPLETED">Sincronização Monday concluída</option>
-                      <option value="MONDAY_SYNC_MANUAL">Execução manual Monday</option>
-                      <option value="MONDAY_SYNC_ERROR">Erro na sincronização Monday</option>
-                      <option value="JOB_ACTIVATED">Job ativado</option>
-                      <option value="JOB_CANCELLED">Job cancelado</option>
-                      <option value="SYSTEM_ERROR">Erro do sistema</option>
+                      {eventTypes.map((eventType) => (
+                        <option key={eventType} value={eventType}>
+                          {eventType}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   
