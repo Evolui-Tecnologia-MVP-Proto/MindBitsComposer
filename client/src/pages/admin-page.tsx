@@ -512,9 +512,68 @@ export default function AdminPage() {
     queryKey: [`/api/monday/mappings/${selectedMapping?.id}/column-mappings`],
     enabled: !!selectedMapping,
   });
+
+  // Query para verificar status do job de agendamento
+  const { data: jobStatus, refetch: refetchJobStatus } = useQuery<JobStatus>({
+    queryKey: [`/api/jobs/status/${selectedMapping?.id}`],
+    enabled: !!selectedMapping,
+  });
   
   // Estado para armazenar as colunas recebidas da API do Monday
   const [mondayColumnsData, setMondayColumnsData] = useState<any[]>([]);
+
+  // Mutations para gerenciar jobs de agendamento
+  const activateJobMutation = useMutation({
+    mutationFn: async ({ mappingId, frequency, time }: { mappingId: string; frequency: string; time: string }) => {
+      const response = await fetch('/api/jobs/activate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mappingId, frequency, time })
+      });
+      if (!response.ok) throw new Error('Erro ao ativar job');
+      return response.json();
+    },
+    onSuccess: () => {
+      refetchJobStatus();
+      toast({
+        title: "Job Ativado",
+        description: "O agendamento automático foi ativado com sucesso.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Erro ao ativar o agendamento automático.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const cancelJobMutation = useMutation({
+    mutationFn: async (mappingId: string) => {
+      const response = await fetch('/api/jobs/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mappingId })
+      });
+      if (!response.ok) throw new Error('Erro ao cancelar job');
+      return response.json();
+    },
+    onSuccess: () => {
+      refetchJobStatus();
+      toast({
+        title: "Job Cancelado",
+        description: "O agendamento automático foi cancelado.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Erro ao cancelar o agendamento automático.",
+        variant: "destructive",
+      });
+    }
+  });
   
   // Handler para salvar o mapeamento do Monday
   const onSubmitMapping = async (data: z.infer<typeof mappingFormSchema>) => {
