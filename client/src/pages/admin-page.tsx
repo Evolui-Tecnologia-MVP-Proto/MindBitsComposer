@@ -2107,9 +2107,6 @@ return item.column_values.some(col =>
                       disabled={!schedulingEnabled}
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:bg-gray-50 disabled:text-gray-500"
                     />
-                    <p className="text-xs text-gray-500">
-                      Para sincronizações diárias ou com intervalo fixo
-                    </p>
                   </div>
                 </div>
                 
