@@ -6,7 +6,7 @@ import { PluginStatus, PluginType, documentos } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc } from "drizzle-orm";
-import { appLogs } from "@shared/schema";
+import { systemLogs } from "@shared/schema";
 import { ZodError } from "zod";
 import fetch from "node-fetch";
 import { jobManager } from "./job-manager";
@@ -2289,15 +2289,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const eventType = req.query.eventType as string;
       const userId = req.query.userId ? parseInt(req.query.userId as string) : undefined;
       
-      let logs;
+      let query = db
+        .select()
+        .from(systemLogs)
+        .orderBy(desc(systemLogs.timestamp))
+        .limit(limit);
+      
       if (eventType) {
-        logs = await storage.getSystemLogsByEventType(eventType, limit);
-      } else if (userId) {
-        logs = await storage.getSystemLogsByUser(userId, limit);
-      } else {
-        logs = await storage.getSystemLogs(limit);
+        query = query.where(eq(systemLogs.eventType, eventType));
       }
       
+      if (userId) {
+        query = query.where(eq(systemLogs.userId, userId));
+      }
+      
+      const logs = await query;
       res.json(logs);
     } catch (error) {
       console.error("Erro ao buscar logs do sistema:", error);
