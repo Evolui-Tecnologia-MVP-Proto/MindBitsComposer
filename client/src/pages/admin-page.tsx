@@ -2156,7 +2156,7 @@ return item.column_values.some(col =>
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:bg-gray-50 disabled:text-gray-500"
                       value={schedulingFrequency}
                       onChange={(e) => setSchedulingFrequency(e.target.value)}
-                      disabled={!schedulingEnabled}
+                      disabled={!schedulingEnabled || jobStatus?.hasActiveJob}
                     >
                       <option value="15min">A cada 15 minutos</option>
                       <option value="30min">A cada 30 minutos</option>
@@ -2172,7 +2172,7 @@ return item.column_values.some(col =>
                       type="time" 
                       value={schedulingTime}
                       onChange={(e) => setSchedulingTime(e.target.value)}
-                      disabled={!schedulingEnabled}
+                      disabled={!schedulingEnabled || jobStatus?.hasActiveJob}
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:bg-gray-50 disabled:text-gray-500"
                     />
                   </div>
