@@ -238,10 +238,10 @@ const DocumentRelationshipSelect = ({ selectedMapping, onRelationshipChange }: {
             return (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium font-mono">{relationship.name}</span>
                   <Badge variant="outline" className="text-xs">
                     {relationship.type}
                   </Badge>
-                  <span className="text-sm font-medium">{relationship.name}</span>
                 </div>
                 <p className="text-xs text-gray-600">{relationship.description}</p>
                 <div className="grid grid-cols-2 gap-2 text-xs">
