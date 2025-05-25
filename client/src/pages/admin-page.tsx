@@ -2089,7 +2089,6 @@ return item.column_values.some(col =>
                       onChange={(e) => setSchedulingFrequency(e.target.value)}
                       disabled={!schedulingEnabled}
                     >
-                      <option value="manual">Manual</option>
                       <option value="15min">A cada 15 minutos</option>
                       <option value="30min">A cada 30 minutos</option>
                       <option value="1hour">A cada hora</option>
