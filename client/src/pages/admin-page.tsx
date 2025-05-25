@@ -367,6 +367,9 @@ export default function AdminPage() {
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [selectedConnection, setSelectedConnection] = useState<ServiceConnection | null>(null);
   
+  // Estado para controlar o dialog de confirmação de limpar logs
+  const [showClearLogsDialog, setShowClearLogsDialog] = useState(false);
+  
   // Estados para GitHub
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -1153,6 +1156,29 @@ export default function AdminPage() {
   const openServiceDeleteDialog = (connection: ServiceConnection) => {
     setSelectedConnection(connection);
     setIsServiceDeleteDialogOpen(true);
+  };
+
+  // Função para limpar todos os logs
+  const handleClearLogs = async () => {
+    try {
+      const response = await fetch('/api/logs', { method: 'DELETE' });
+      if (response.ok) {
+        queryClient.invalidateQueries({ queryKey: ['/api/logs'] });
+        toast({
+          title: "Logs limpos",
+          description: "Todos os logs do sistema foram removidos com sucesso.",
+        });
+      } else {
+        throw new Error('Erro ao limpar logs');
+      }
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível limpar os logs do sistema.",
+        variant: "destructive",
+      });
+    }
+    setShowClearLogsDialog(false);
   };
 
   // Função auxiliar para buscar repositórios GitHub
@@ -2757,6 +2783,28 @@ return item.column_values.some(col =>
           </Form>
         </DialogContent>
       </Dialog>
+
+      {/* AlertDialog para confirmação de limpar logs */}
+      <AlertDialog open={showClearLogsDialog} onOpenChange={setShowClearLogsDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Limpeza de Logs</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja limpar todos os logs do sistema? Esta ação removerá permanentemente
+              todos os registros de eventos e não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleClearLogs}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Limpar Logs
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
