@@ -553,8 +553,13 @@ export default function AdminPage() {
     queryKey: ['/api/service-connections'],
   });
 
+  // Query para usuários (necessário para filtros de logs)
+  const { data: usersData = [] } = useQuery<any[]>({
+    queryKey: ['/api/users'],
+  });
+
   const { data: systemLogs = [], isLoading: logsLoading } = useQuery<SystemLog[]>({
-    queryKey: ['/api/logs'],
+    queryKey: ['/api/logs', logFilters],
     refetchInterval: 10000, // Atualiza a cada 10 segundos
   });
   

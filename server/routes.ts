@@ -2286,7 +2286,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const limit = parseInt(req.query.limit as string) || 100;
       const eventType = req.query.eventType as string;
-      const userId = req.query.userId ? parseInt(req.query.userId as string) : undefined;
+      const userId = req.query.userId as string;
+      const startDate = req.query.startDate as string;
+      const endDate = req.query.endDate as string;
       
       let query = db
         .select()
@@ -2294,12 +2296,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .orderBy(desc(systemLogs.timestamp))
         .limit(limit);
       
-      if (eventType) {
-        query = query.where(eq(systemLogs.eventType, eventType));
+      // Aplicar filtros
+      const conditions = [];
+      
+      if (eventType && eventType.trim()) {
+        conditions.push(eq(systemLogs.eventType, eventType));
       }
       
-      if (userId) {
-        query = query.where(eq(systemLogs.userId, userId));
+      if (userId && userId.trim()) {
+        if (userId === "null") {
+          conditions.push(isNull(systemLogs.userId));
+        } else {
+          const userIdNum = parseInt(userId);
+          if (!isNaN(userIdNum)) {
+            conditions.push(eq(systemLogs.userId, userIdNum));
+          }
+        }
+      }
+      
+      if (startDate && startDate.trim()) {
+        conditions.push(gte(systemLogs.timestamp, new Date(startDate)));
+      }
+      
+      if (endDate && endDate.trim()) {
+        conditions.push(lte(systemLogs.timestamp, new Date(endDate)));
+      }
+      
+      // Aplicar todas as condições se existirem
+      if (conditions.length > 0) {
+        query = query.where(and(...conditions));
       }
       
       const logs = await query;
