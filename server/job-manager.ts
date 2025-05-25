@@ -115,6 +115,196 @@ class JobManager {
     return nextExecution;
   }
 
+  // Função dedicada para executar integração real do Monday (apenas para jobs automáticos)
+  private async executeRealMondayIntegration(mappingId: string): Promise<{
+    itemsProcessed: number;
+    documentsCreated: number;
+    documentsPreExisting: number;
+    documentsSkipped: number;
+  }> {
+    const { storage } = await import('./storage');
+    
+    // Buscar o mapeamento
+    const existingMapping = await storage.getMondayMapping(mappingId);
+    if (!existingMapping) {
+      throw new Error(`Mapeamento ${mappingId} não encontrado`);
+    }
+
+    // Obter a chave da API
+    const apiConnection = await storage.getServiceConnection("monday");
+    if (!apiConnection) {
+      throw new Error("Conexão com Monday.com não configurada");
+    }
+    const apiKey = apiConnection.token;
+
+    // Obter as colunas do mapeamento
+    const mappingColumns = await storage.getMappingColumns(mappingId);
+
+    // Obter dados do quadro Monday
+    const mondayColumns = mappingColumns.map(col => col.mondayColumnId);
+    const query = `
+      query {
+        boards(ids: [${existingMapping.boardId}]) {
+          items_page(limit: 500) {
+            items {
+              id
+              name
+              column_values(ids: [${mondayColumns.map(id => `"${id}"`).join(", ")}]) {
+                id
+                text
+                value
+                column {
+                  title
+                }
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const mondayResponse = await fetch("https://api.monday.com/v2", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": apiKey,
+        "API-Version": "2023-10"
+      },
+      body: JSON.stringify({ query })
+    });
+
+    if (!mondayResponse.ok) {
+      const errorText = await mondayResponse.text();
+      throw new Error(`Erro na API do Monday (${mondayResponse.status}): ${errorText}`);
+    }
+
+    const responseText = await mondayResponse.text();
+    let mondayData;
+    
+    try {
+      mondayData = JSON.parse(responseText);
+    } catch (parseError) {
+      throw new Error(`API do Monday retornou HTML em vez de JSON`);
+    }
+    
+    if (mondayData.errors) {
+      throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(mondayData.errors)}`);
+    }
+
+    const items = mondayData.data?.boards?.[0]?.items_page?.items || [];
+    let documentsCreated = 0;
+    let documentsSkipped = 0;
+    let documentsPreExisting = 0;
+
+    // Identificar campos marcados como chave para verificação de duplicatas
+    const keyFields = mappingColumns.filter(col => col.isKey).map(col => col.cpxField);
+    
+    // Processar cada item
+    for (let index = 0; index < items.length; index++) {
+      const item = items[index];
+      
+      try {
+        // Aplicar filtro se existir
+        if (existingMapping.mappingFilter && existingMapping.mappingFilter.trim()) {
+          try {
+            const filterFunction = new Function('item', existingMapping.mappingFilter);
+            const shouldProcess = filterFunction(item);
+            if (!shouldProcess) {
+              documentsSkipped++;
+              continue;
+            }
+          } catch (filterError) {
+            console.error(`Erro no filtro para item ${item.id}:`, filterError);
+            documentsSkipped++;
+            continue;
+          }
+        }
+
+        // Criar objeto para o documento
+        const documentData: any = {
+          origem: "Monday.com",
+          objeto: item.name || `Item ${item.id}`,
+          cliente: "",
+          responsavel: "",
+          sistema: "",
+          modulo: "",
+          descricao: "",
+          status: "Rascunho",
+          idOrigem: BigInt(item.id),
+          generalColumns: {}
+        };
+
+        // Aplicar valores padrão
+        if (existingMapping.defaultValues) {
+          try {
+            const defaults = JSON.parse(existingMapping.defaultValues);
+            Object.keys(defaults).forEach(key => {
+              if (defaults[key]) {
+                try {
+                  documentData[key] = JSON.parse(defaults[key]);
+                } catch {
+                  documentData[key] = defaults[key];
+                }
+              }
+            });
+          } catch (error) {
+            console.error("Erro ao aplicar valores padrão:", error);
+          }
+        }
+
+        // Mapear colunas
+        for (const mapping of mappingColumns) {
+          const mondayColumn = item.column_values?.find((col: any) => col.id === mapping.mondayColumnId);
+          let value = mondayColumn?.text || "";
+
+          // Aplicar transformação se existir
+          if (mapping.transformFunction && mapping.transformFunction.trim()) {
+            try {
+              const transformFunction = new Function('value', 'item', mapping.transformFunction);
+              value = transformFunction(value, item);
+            } catch (error) {
+              console.error(`Erro na transformação para campo ${mapping.cpxField}:`, error);
+            }
+          }
+
+          // Atribuir valor ao campo correspondente
+          if (mapping.cpxField.startsWith('general_columns')) {
+            const match = mapping.cpxField.match(/general_columns(?:\[(\d+)\])?/);
+            const suffix = match?.[1] ? `[${match[1]}]` : '';
+            const fieldName = `${mapping.mondayColumnTitle}${suffix}`;
+            documentData.generalColumns[fieldName] = value;
+          } else {
+            documentData[mapping.cpxField] = value;
+          }
+        }
+
+        // Verificar duplicatas se há campos chave
+        if (keyFields.length > 0) {
+          const existingDoc = await storage.checkDocumentExists(BigInt(item.id));
+          if (existingDoc) {
+            documentsPreExisting++;
+            continue;
+          }
+        }
+
+        // Criar o documento
+        await storage.createDocumento(documentData);
+        documentsCreated++;
+        
+      } catch (itemError) {
+        console.error(`Erro ao processar item ${item.id}:`, itemError);
+        documentsSkipped++;
+      }
+    }
+
+    return {
+      itemsProcessed: items.length,
+      documentsCreated,
+      documentsPreExisting,
+      documentsSkipped
+    };
+  }
+
   // Executa a sincronização do Monday para um mapeamento
   private async executeMondaySync(mappingId: string): Promise<void> {
     try {
@@ -132,16 +322,11 @@ class JobManager {
         executionType: 'automatic'
       });
 
-      // Executar a sincronização simulada do Monday
+      // Executar a sincronização real do Monday
       console.log(`[JOB] Executando sincronização para ${mapping.name}`);
       
-      // Simular processamento com estatísticas
-      const stats = {
-        itemsProcessed: Math.floor(Math.random() * 100) + 50,
-        documentsCreated: Math.floor(Math.random() * 5),
-        documentsPreExisting: Math.floor(Math.random() * 20) + 10,
-        documentsSkipped: Math.floor(Math.random() * 30) + 20
-      };
+      // Chamar a função de integração real
+      const stats = await this.executeRealMondayIntegration(mappingId);
       
       // Atualizar lastSync
       await storage.updateMondayMapping(mappingId, { lastSync: new Date() });
