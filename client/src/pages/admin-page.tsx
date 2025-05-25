@@ -2178,7 +2178,48 @@ return item.column_values.some(col =>
                   </div>
                 </div>
                 
-
+                {/* Botão para ativar/parar job */}
+                {schedulingEnabled && selectedMapping && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-md p-4">
+                      <div>
+                        <h5 className="text-sm font-medium text-blue-800">
+                          {jobStatus?.hasActiveJob ? '🟢 Job Ativo' : '⚪ Job Inativo'}
+                        </h5>
+                        <p className="text-xs text-blue-700 mt-1">
+                          {jobStatus?.hasActiveJob 
+                            ? `Sincronização automática ativa (${jobStatus.activeJob?.frequency} às ${jobStatus.activeJob?.time})`
+                            : 'Clique em "Ativar Job" para iniciar a sincronização automática'
+                          }
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          if (jobStatus?.hasActiveJob) {
+                            cancelJobMutation.mutate(selectedMapping.id);
+                          } else {
+                            activateJobMutation.mutate({
+                              mappingId: selectedMapping.id,
+                              frequency: schedulingFrequency,
+                              time: schedulingTime
+                            });
+                          }
+                        }}
+                        disabled={activateJobMutation.isPending || cancelJobMutation.isPending}
+                        variant={jobStatus?.hasActiveJob ? "destructive" : "default"}
+                        className={jobStatus?.hasActiveJob ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"}
+                      >
+                        {activateJobMutation.isPending || cancelJobMutation.isPending 
+                          ? "Processando..." 
+                          : jobStatus?.hasActiveJob 
+                            ? "Parar Job" 
+                            : "Ativar Job"
+                        }
+                      </Button>
+                    </div>
+                  </div>
+                )}
                 
                 <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
                   <p className="text-sm text-yellow-800">
