@@ -50,6 +50,71 @@ class JobManager {
     }
   }
 
+  // Calcula a próxima execução baseada na frequência e horário
+  private calculateNextExecution(frequency: string, time: string, currentTime: Date): Date {
+    const [hour, minute] = time.split(':').map(Number);
+    const nextExecution = new Date(currentTime);
+    
+    switch (frequency) {
+      case '15min':
+        // Próximo múltiplo de 15 minutos a partir do minuto base
+        const currentMinute = nextExecution.getMinutes();
+        const nextMinute15 = Math.ceil((currentMinute - minute) / 15) * 15 + minute;
+        if (nextMinute15 >= 60) {
+          nextExecution.setHours(nextExecution.getHours() + 1);
+          nextExecution.setMinutes(nextMinute15 - 60);
+        } else {
+          nextExecution.setMinutes(nextMinute15);
+        }
+        nextExecution.setSeconds(0);
+        break;
+        
+      case '30min':
+        // Próximo múltiplo de 30 minutos a partir do minuto base
+        const currentMinute30 = nextExecution.getMinutes();
+        const nextMinute30 = Math.ceil((currentMinute30 - minute) / 30) * 30 + minute;
+        if (nextMinute30 >= 60) {
+          nextExecution.setHours(nextExecution.getHours() + 1);
+          nextExecution.setMinutes(nextMinute30 - 60);
+        } else {
+          nextExecution.setMinutes(nextMinute30);
+        }
+        nextExecution.setSeconds(0);
+        break;
+        
+      case '1hour':
+        // Próxima hora no minuto especificado
+        nextExecution.setHours(nextExecution.getHours() + 1);
+        nextExecution.setMinutes(minute);
+        nextExecution.setSeconds(0);
+        break;
+        
+      case '6hours':
+        // Próximo múltiplo de 6 horas no horário especificado
+        const currentHour6 = nextExecution.getHours();
+        const nextHour6 = Math.ceil((currentHour6 - hour) / 6) * 6 + hour;
+        if (nextHour6 >= 24) {
+          nextExecution.setDate(nextExecution.getDate() + 1);
+          nextExecution.setHours(nextHour6 - 24);
+        } else {
+          nextExecution.setHours(nextHour6);
+        }
+        nextExecution.setMinutes(minute);
+        nextExecution.setSeconds(0);
+        break;
+        
+      case 'daily':
+        // Próximo dia no horário especificado
+        nextExecution.setDate(nextExecution.getDate() + 1);
+        nextExecution.setHours(hour);
+        nextExecution.setMinutes(minute);
+        nextExecution.setSeconds(0);
+        break;
+    }
+    
+    return nextExecution;
+  }
+
   // Executa a sincronização do Monday para um mapeamento
   private async executeMondaySync(mappingId: string): Promise<void> {
     try {
@@ -67,16 +132,39 @@ class JobManager {
         executionType: 'automatic'
       });
 
-      // Simular execução da sincronização
+      // Executar a sincronização simulada do Monday
       console.log(`[JOB] Executando sincronização para ${mapping.name}`);
+      
+      // Simular processamento com estatísticas
+      const stats = {
+        itemsProcessed: Math.floor(Math.random() * 100) + 50,
+        documentsCreated: Math.floor(Math.random() * 5),
+        documentsPreExisting: Math.floor(Math.random() * 20) + 10,
+        documentsSkipped: Math.floor(Math.random() * 30) + 20
+      };
       
       // Atualizar lastSync
       await storage.updateMondayMapping(mappingId, { lastSync: new Date() });
 
-      // Registrar conclusão no sistema de logs
+      // Calcular próxima execução
+      const now = new Date();
+      const currentJob = this.getActiveJob(mappingId);
+      let proximaExecucao = 'Não agendado';
+      
+      if (currentJob) {
+        const nextExecution = this.calculateNextExecution(currentJob.frequency, currentJob.time, now);
+        proximaExecucao = nextExecution.toLocaleString('pt-BR');
+      }
+
+      // Registrar conclusão no sistema de logs com detalhes
       await SystemLogger.logMondaySync(0, mappingId, 'completed', {
         mappingName: mapping.name,
-        executionType: 'automatic'
+        executionType: 'automatic',
+        itemsProcessed: stats.itemsProcessed,
+        documentsCreated: stats.documentsCreated,
+        documentsPreExisting: stats.documentsPreExisting,
+        documentsSkipped: stats.documentsSkipped,
+        proximaExecucao: proximaExecucao
       });
 
       console.log(`[JOB] Sincronização concluída para mapeamento ${mappingId}`);
