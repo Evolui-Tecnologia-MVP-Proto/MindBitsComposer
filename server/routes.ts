@@ -2285,8 +2285,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const eventTypes = await db
-        .selectDistinct({ eventType: systemLogs.eventType })
+        .select({ eventType: systemLogs.eventType })
         .from(systemLogs)
+        .groupBy(systemLogs.eventType)
         .orderBy(systemLogs.eventType);
       
       console.log("Event types encontrados:", eventTypes);
