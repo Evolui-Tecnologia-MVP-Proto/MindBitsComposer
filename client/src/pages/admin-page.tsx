@@ -284,6 +284,15 @@ export default function AdminPage() {
   const [isExecutingMapping, setIsExecutingMapping] = useState(false);
   const [executionProgress, setExecutionProgress] = useState<string>("");
   
+  // Estados para mapeamento de anexos
+  const [selectedFileColumn, setSelectedFileColumn] = useState<string>("");
+  const [attachmentMappings, setAttachmentMappings] = useState<Array<{
+    id: string;
+    relationshipId: string;
+    columnId: string;
+    columnTitle: string;
+  }>>([]);
+  
   // Formulário para serviços externos
   const serviceForm = useForm<z.infer<typeof serviceConnectionSchema>>({
     resolver: zodResolver(serviceConnectionSchema),
