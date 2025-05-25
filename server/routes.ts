@@ -1768,7 +1768,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         {
           id: "documents_artifacts",
           name: "documents_artifacts",
-          description: "Relacionamento com a tabela de anexos e artefatos dos documentos",
+          description: "documentos.id(PK) -> documents_artifacts.documento_id(FK)",
           type: "one-to-many",
           targetTable: "documents_artifacts",
           foreignKey: "documento_id",

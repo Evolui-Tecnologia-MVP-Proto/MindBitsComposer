@@ -243,7 +243,7 @@ const DocumentRelationshipSelect = ({ selectedMapping, onRelationshipChange }: {
                     {relationship.type}
                   </Badge>
                 </div>
-                <p className="text-xs text-gray-600">{relationship.description}</p>
+                <p className="text-xs text-gray-600 font-mono">{relationship.description}</p>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div>
                     <span className="font-medium">Tabela destino:</span>
