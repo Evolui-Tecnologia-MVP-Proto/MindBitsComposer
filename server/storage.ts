@@ -42,6 +42,7 @@ export interface IStorage {
   
   // Monday Mapping operations
   getMondayMapping(id: string): Promise<MondayMapping | undefined>;
+  getBoardMapping(id: string): Promise<BoardMapping | undefined>;
   getMondayMappingByBoardId(boardId: string): Promise<MondayMapping | undefined>;
   createMondayMapping(mapping: InsertMondayMapping): Promise<MondayMapping>;
   getAllMondayMappings(): Promise<MondayMapping[]>;
@@ -1075,6 +1076,14 @@ export class MemStorage implements IStorage {
   async getMondayMapping(id: string): Promise<MondayMapping | undefined> {
     return this.mondayMappings.get(id);
   }
+
+  async getBoardMapping(id: string): Promise<BoardMapping | undefined> {
+    const [mapping] = await db
+      .select()
+      .from(mondayMappings)
+      .where(eq(mondayMappings.id, id));
+    return mapping || undefined;
+  }
   
   async getMondayMappingByBoardId(boardId: string): Promise<MondayMapping | undefined> {
     return Array.from(this.mondayMappings.values()).find(
@@ -1570,6 +1579,45 @@ export class MemStorage implements IStorage {
     const [newLog] = await db
       .insert(systemLogs)
       .values(log)
+      .returning();
+    return newLog;
+  }
+
+  async getSystemLogs(limit: number = 100): Promise<SystemLog[]> {
+    return await db
+      .select()
+      .from(systemLogs)
+      .orderBy(sql`${systemLogs.timestamp} DESC`)
+      .limit(limit);
+  }
+
+  async getSystemLogsByEventType(eventType: string, limit: number = 100): Promise<SystemLog[]> {
+    return await db
+      .select()
+      .from(systemLogs)
+      .where(eq(systemLogs.eventType, eventType))
+      .orderBy(sql`${systemLogs.timestamp} DESC`)
+      .limit(limit);
+  }
+
+  async getSystemLogsByUser(userId: number, limit: number = 100): Promise<SystemLog[]> {
+    return await db
+      .select()
+      .from(systemLogs)
+      .where(eq(systemLogs.userId, userId))
+      .orderBy(sql`${systemLogs.timestamp} DESC`)
+      .limit(limit);
+  }
+
+  // Métodos de sistema de logs
+  async createSystemLog(log: InsertSystemLog): Promise<SystemLog> {
+    const [newLog] = await db
+      .insert(systemLogs)
+      .values({
+        ...log,
+        id: crypto.randomUUID(),
+        timestamp: new Date(),
+      })
       .returning();
     return newLog;
   }
