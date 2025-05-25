@@ -183,6 +183,13 @@ const DocumentRelationshipSelect = ({ selectedMapping, onRelationshipChange }: {
 }) => {
   const [selectedRelationship, setSelectedRelationship] = useState<string>("");
   
+  // Invalidar cache quando componente monta
+  React.useEffect(() => {
+    if (selectedMapping) {
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos-relationships"] });
+    }
+  }, [selectedMapping]);
+  
   const { data: relationships, isLoading } = useQuery({
     queryKey: ["/api/documentos-relationships"],
     enabled: !!selectedMapping
