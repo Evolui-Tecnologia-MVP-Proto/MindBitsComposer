@@ -238,24 +238,12 @@ const DocumentRelationshipSelect = ({ selectedMapping, onRelationshipChange }: {
             return (
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium font-mono">{relationship.name}</span>
-                  <Badge variant="outline" className="text-xs">
+                  <span className="text-sm font-bold font-mono">{relationship.name}</span>
+                  <Badge variant="outline" className="text-xs border-blue-500 text-blue-700 bg-blue-50">
                     {relationship.type}
                   </Badge>
                 </div>
                 <p className="text-xs text-gray-600 font-mono">{relationship.description}</p>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div>
-                    <span className="font-medium">Tabela destino:</span>
-                    <br />
-                    <code className="bg-gray-100 px-1 rounded font-mono">{relationship.targetTable}</code>
-                  </div>
-                  <div>
-                    <span className="font-medium">Chave estrangeira:</span>
-                    <br />
-                    <code className="bg-gray-100 px-1 rounded font-mono">{relationship.foreignKey}</code>
-                  </div>
-                </div>
               </div>
             );
           })()}
