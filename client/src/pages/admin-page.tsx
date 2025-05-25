@@ -1989,7 +1989,12 @@ return item.column_values.some(col =>
                               one-to-many
                             </Badge>
                             <span className="text-xs text-gray-500">→</span>
-                            <span className="text-sm font-mono">{mapping.columnTitle}</span>
+                            <span className="text-sm font-mono">
+                              {mapping.columnId === "documents_item" 
+                                ? mapping.columnTitle 
+                                : `${mapping.columnTitle} [file]`
+                              }
+                            </span>
                           </div>
                           <Button
                             type="button"
