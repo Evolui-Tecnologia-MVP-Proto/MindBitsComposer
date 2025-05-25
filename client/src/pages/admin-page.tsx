@@ -114,6 +114,36 @@ type JobStatus = {
   } | null;
 };
 
+// Componente para exibir status do job
+function JobStatusBadge({ mappingId }: { mappingId: string }) {
+  const { data: jobStatus, isLoading } = useQuery<JobStatus>({
+    queryKey: [`/api/jobs/status/${mappingId}`],
+    refetchInterval: 5000, // Atualiza a cada 5 segundos
+  });
+
+  if (isLoading) {
+    return (
+      <Badge variant="outline" className="text-xs">
+        Carregando...
+      </Badge>
+    );
+  }
+
+  if (jobStatus?.hasActiveJob) {
+    return (
+      <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+        Job Ativo
+      </Badge>
+    );
+  }
+
+  return (
+    <Badge variant="outline" className="text-xs bg-red-50 text-red-700 border-red-200">
+      Nenhum
+    </Badge>
+  );
+}
+
 // Schemas para validação de formulários
 const mappingFormSchema = z.object({
   name: z.string().min(3, { message: "Nome deve ter pelo menos 3 caracteres" }),
@@ -1296,7 +1326,7 @@ export default function AdminPage() {
                           <TableRow>
                             <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">NOME</TableHead>
                             <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ID DO QUADRO</TableHead>
-                            <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ÚLTIMA SINCRONIZAÇÃO</TableHead>
+                            <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">SYNC JOBS</TableHead>
                             <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">COLUNAS</TableHead>
                             <TableHead className="w-[100px] text-center text-xs font-medium text-gray-500 uppercase tracking-wider">AÇÕES</TableHead>
                           </TableRow>
@@ -1306,7 +1336,9 @@ export default function AdminPage() {
                             <TableRow key={mapping.id}>
                               <TableCell className="font-medium">{mapping.name}</TableCell>
                               <TableCell className="font-mono font-bold text-blue-700">{mapping.boardId}</TableCell>
-                              <TableCell>{mapping.lastSync ? new Date(mapping.lastSync).toLocaleString() : "Nunca"}</TableCell>
+                              <TableCell>
+                                <JobStatusBadge mappingId={mapping.id} />
+                              </TableCell>
                               <TableCell>
                                 <Badge variant="secondary" className="text-xs">
                                   {mapping.columnCount || 0} cols
