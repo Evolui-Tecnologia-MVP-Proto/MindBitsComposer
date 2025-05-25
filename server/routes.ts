@@ -2284,8 +2284,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      const logs = await storage.getSystemLogs();
-      const uniqueTypes = [...new Set(logs.map(log => log.eventType))].filter(Boolean).sort();
+      const eventTypesResult = await db
+        .selectDistinct({ eventType: systemLogs.eventType })
+        .from(systemLogs)
+        .where(isNull(systemLogs.eventType).not())
+        .orderBy(systemLogs.eventType);
+      
+      const uniqueTypes = eventTypesResult.map(row => row.eventType);
       
       res.json(uniqueTypes);
     } catch (error) {

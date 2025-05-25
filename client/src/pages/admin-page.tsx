@@ -561,6 +561,7 @@ export default function AdminPage() {
   // Query para buscar tipos de eventos únicos da base de dados
   const { data: eventTypes = [] } = useQuery<string[]>({
     queryKey: ['/api/logs/event-types'],
+    enabled: true,
   });
 
   const { data: systemLogs = [], isLoading: logsLoading } = useQuery<SystemLog[]>({
