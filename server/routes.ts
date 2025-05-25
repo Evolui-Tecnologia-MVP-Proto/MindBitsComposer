@@ -1753,8 +1753,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Endpoint para buscar relacionamentos da tabela documentos (deve vir antes da rota dinâmica)
-  app.get("/api/documentos/relationships", async (req, res) => {
+  // Endpoint para buscar relacionamentos da tabela documentos
+  app.get("/api/documentos-relationships", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
