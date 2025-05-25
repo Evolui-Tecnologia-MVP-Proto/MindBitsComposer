@@ -2331,11 +2331,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       if (startDate && startDate.trim()) {
-        conditions.push(gte(systemLogs.timestamp, new Date(startDate)));
+        // Ajustar para compensar diferença de fuso horário
+        // O input datetime-local envia no formato "YYYY-MM-DDTHH:MM" em hora local
+        const localStartDate = new Date(startDate + ':00'); // Adiciona segundos se necessário
+        // Ajustar para UTC considerando o offset do timezone local
+        const offsetMinutes = localStartDate.getTimezoneOffset();
+        const utcStartDate = new Date(localStartDate.getTime() - (offsetMinutes * 60000));
+        conditions.push(gte(systemLogs.timestamp, utcStartDate));
       }
       
       if (endDate && endDate.trim()) {
-        conditions.push(lte(systemLogs.timestamp, new Date(endDate)));
+        // Ajustar para compensar diferença de fuso horário
+        const localEndDate = new Date(endDate + ':00'); // Adiciona segundos se necessário
+        // Ajustar para UTC considerando o offset do timezone local
+        const offsetMinutes = localEndDate.getTimezoneOffset();
+        const utcEndDate = new Date(localEndDate.getTime() - (offsetMinutes * 60000));
+        conditions.push(lte(systemLogs.timestamp, utcEndDate));
       }
       
       // Aplicar todas as condições se existirem

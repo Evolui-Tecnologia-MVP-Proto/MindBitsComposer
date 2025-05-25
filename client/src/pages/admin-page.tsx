@@ -1708,13 +1708,13 @@ export default function AdminPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">Tipo de Evento</label>
                     <select
-                      className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm"
+                      className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm font-mono"
                       value={logFilters.eventType}
                       onChange={(e) => setLogFilters(prev => ({ ...prev, eventType: e.target.value }))}
                     >
                       <option value="">Todos os tipos</option>
                       {eventTypes.map((eventType) => (
-                        <option key={eventType} value={eventType}>
+                        <option key={eventType} value={eventType} className="font-mono">
                           {eventType}
                         </option>
                       ))}
