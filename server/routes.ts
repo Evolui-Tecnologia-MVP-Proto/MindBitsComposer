@@ -2230,5 +2230,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 
+  // Endpoint para buscar relacionamentos da tabela documentos
+  app.get("/api/documentos/relationships", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      // Lista dos relacionamentos da tabela documentos
+      const relationships = [
+        {
+          id: "documents_artifacts",
+          name: "Anexos/Artefatos",
+          description: "Relacionamento com a tabela de anexos e artefatos dos documentos",
+          type: "one-to-many",
+          targetTable: "documents_artifacts",
+          foreignKey: "documento_id",
+          primaryKey: "id"
+        },
+        {
+          id: "monday_mappings", 
+          name: "Mapeamentos Monday",
+          description: "Relacionamento indireto com mapeamentos do Monday.com através do campo id_origem",
+          type: "many-to-one",
+          targetTable: "monday_mappings",
+          foreignKey: "id_origem",
+          primaryKey: "board_id"
+        },
+        {
+          id: "repo_structure",
+          name: "Estrutura de Repositório",
+          description: "Relacionamento potencial com estrutura de pastas do repositório",
+          type: "many-to-many",
+          targetTable: "repo_structure",
+          foreignKey: "linked_to",
+          primaryKey: "uid"
+        }
+      ];
+      
+      res.json(relationships);
+    } catch (error) {
+      console.error("Erro ao buscar relacionamentos:", error);
+      res.status(500).send("Erro ao buscar relacionamentos da tabela documentos");
+    }
+  });
+
   return httpServer;
 }
