@@ -2257,6 +2257,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // System Logs endpoints
+  
+  // Create a system log entry
+  app.post("/api/logs", async (req, res) => {
+    try {
+      const logData = {
+        eventType: req.body.eventType,
+        message: req.body.message,
+        parameters: req.body.parameters || {},
+        userId: req.user?.id || null
+      };
+      
+      const newLog = await storage.createSystemLog(logData);
+      res.status(201).json(newLog);
+    } catch (error) {
+      console.error("Erro ao criar log do sistema:", error);
+      res.status(500).send("Erro ao criar log do sistema");
+    }
+  });
+
+  // Get system logs
+  app.get("/api/logs", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const limit = parseInt(req.query.limit as string) || 100;
+      const eventType = req.query.eventType as string;
+      const userId = req.query.userId ? parseInt(req.query.userId as string) : undefined;
+      
+      let logs;
+      if (eventType) {
+        logs = await storage.getSystemLogsByEventType(eventType, limit);
+      } else if (userId) {
+        logs = await storage.getSystemLogsByUser(userId, limit);
+      } else {
+        logs = await storage.getSystemLogs(limit);
+      }
+      
+      res.json(logs);
+    } catch (error) {
+      console.error("Erro ao buscar logs do sistema:", error);
+      res.status(500).send("Erro ao buscar logs do sistema");
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 

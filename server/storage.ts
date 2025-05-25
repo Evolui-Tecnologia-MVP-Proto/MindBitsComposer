@@ -1564,6 +1564,41 @@ export class MemStorage implements IStorage {
   async deleteRepoStructure(uid: string): Promise<void> {
     this.repoStructures.delete(uid);
   }
+
+  // System Log implementations
+  async createSystemLog(log: InsertSystemLog): Promise<SystemLog> {
+    const [newLog] = await db
+      .insert(systemLogs)
+      .values(log)
+      .returning();
+    return newLog;
+  }
+
+  async getSystemLogs(limit: number = 100): Promise<SystemLog[]> {
+    return await db
+      .select()
+      .from(systemLogs)
+      .orderBy(sql`${systemLogs.timestamp} DESC`)
+      .limit(limit);
+  }
+
+  async getSystemLogsByEventType(eventType: string, limit: number = 100): Promise<SystemLog[]> {
+    return await db
+      .select()
+      .from(systemLogs)
+      .where(eq(systemLogs.eventType, eventType))
+      .orderBy(sql`${systemLogs.timestamp} DESC`)
+      .limit(limit);
+  }
+
+  async getSystemLogsByUser(userId: number, limit: number = 100): Promise<SystemLog[]> {
+    return await db
+      .select()
+      .from(systemLogs)
+      .where(eq(systemLogs.userId, userId))
+      .orderBy(sql`${systemLogs.timestamp} DESC`)
+      .limit(limit);
+  }
 }
 
 // Always use DatabaseStorage to ensure data persistence
