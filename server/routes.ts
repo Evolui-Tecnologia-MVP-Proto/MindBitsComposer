@@ -2265,15 +2265,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a system log entry
   app.post("/api/logs", async (req, res) => {
     try {
-      const logData = {
+      await SystemLogger.log({
         eventType: req.body.eventType,
         message: req.body.message,
         parameters: req.body.parameters || {},
         userId: req.user?.id || null
-      };
+      });
       
-      const newLog = await storage.createSystemLog(logData);
-      res.status(201).json(newLog);
+      res.status(201).json({ success: true, message: "Log criado com sucesso" });
     } catch (error) {
       console.error("Erro ao criar log do sistema:", error);
       res.status(500).send("Erro ao criar log do sistema");
