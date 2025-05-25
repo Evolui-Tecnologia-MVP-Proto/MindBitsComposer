@@ -2284,21 +2284,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      console.log("Buscando tipos de eventos...");
+      const logs = await storage.getSystemLogs();
+      const uniqueTypes = [...new Set(logs.map(log => log.eventType))].filter(Boolean).sort();
       
-      const result = await db.execute(sql`
-        SELECT DISTINCT event_type 
-        FROM app_logs 
-        WHERE event_type IS NOT NULL 
-        ORDER BY event_type
-      `);
-      
-      console.log("Resultado da query:", result);
-      
-      const types = result.rows.map((row: any) => row.event_type).filter(Boolean);
-      console.log("Tipos de eventos encontrados:", types);
-      
-      res.json(types);
+      res.json(uniqueTypes);
     } catch (error) {
       console.error("Erro ao buscar tipos de eventos:", error);
       res.status(500).send("Erro ao buscar tipos de eventos");
