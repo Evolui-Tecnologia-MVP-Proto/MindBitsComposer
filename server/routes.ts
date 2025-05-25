@@ -2287,7 +2287,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const eventTypesResult = await db
         .selectDistinct({ eventType: systemLogs.eventType })
         .from(systemLogs)
-        .where(isNull(systemLogs.eventType).not())
+        .where(sql`${systemLogs.eventType} IS NOT NULL`)
         .orderBy(systemLogs.eventType);
       
       const uniqueTypes = eventTypesResult.map(row => row.eventType);
