@@ -2284,16 +2284,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      const eventTypes = await db
-        .select({ eventType: systemLogs.eventType })
-        .from(systemLogs)
-        .groupBy(systemLogs.eventType)
-        .orderBy(systemLogs.eventType);
+      console.log("Buscando tipos de eventos...");
       
-      console.log("Event types encontrados:", eventTypes);
+      const result = await db.execute(sql`
+        SELECT DISTINCT event_type 
+        FROM app_logs 
+        WHERE event_type IS NOT NULL 
+        ORDER BY event_type
+      `);
       
-      const types = eventTypes.map(row => row.eventType).filter(Boolean);
-      console.log("Tipos filtrados:", types);
+      console.log("Resultado da query:", result);
+      
+      const types = result.rows.map((row: any) => row.event_type).filter(Boolean);
+      console.log("Tipos de eventos encontrados:", types);
       
       res.json(types);
     } catch (error) {
