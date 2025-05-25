@@ -232,6 +232,17 @@ export const documentsArtifacts = pgTable("documents_artifacts", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// System Logs table
+export const systemLogs = pgTable("app_logs", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  eventType: text("event_type").notNull(), // Identificador do tipo de evento
+  message: text("message").notNull(), // Mensagem descritiva do log
+  parameters: json("parameters").$type<Record<string, any>>().default({}), // Parâmetros em formato JSON
+  timestamp: timestamp("timestamp").defaultNow().notNull(), // Horário do evento
+  userId: integer("user_id").references(() => users.id), // Usuário que executou a ação (opcional)
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Documents Artifacts schema
 export const insertDocumentArtifactSchema = createInsertSchema(documentsArtifacts).omit({
   id: true,
@@ -239,8 +250,17 @@ export const insertDocumentArtifactSchema = createInsertSchema(documentsArtifact
   updatedAt: true,
 });
 
+// System Logs schema
+export const insertSystemLogSchema = createInsertSchema(systemLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertDocumentArtifact = z.infer<typeof insertDocumentArtifactSchema>;
 export type DocumentArtifact = typeof documentsArtifacts.$inferSelect;
+
+export type InsertSystemLog = z.infer<typeof insertSystemLogSchema>;
+export type SystemLog = typeof systemLogs.$inferSelect;
 
 // Repo Structure table
 export const repoStructure = pgTable("repo_structure", {
