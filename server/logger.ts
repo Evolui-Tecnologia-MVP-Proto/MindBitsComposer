@@ -33,6 +33,10 @@ export const EventTypes = {
   API_ERROR: "API_ERROR",
   AUTH_ERROR: "AUTH_ERROR",
   
+  // Job events
+  JOB_ACTIVATED: "JOB_ACTIVATED",
+  JOB_CANCELLED: "JOB_CANCELLED",
+  
   // Template events
   TEMPLATE_CREATED: "TEMPLATE_CREATED",
   TEMPLATE_UPDATED: "TEMPLATE_UPDATED",
@@ -129,4 +133,19 @@ export class SystemLogger {
       userId
     });
   }
+}
+
+// Função de conveniência para logging de eventos do sistema
+export async function logSystemEvent(
+  eventType: EventType,
+  message: string,
+  parameters?: Record<string, any>,
+  userId?: number
+): Promise<void> {
+  await SystemLogger.log({
+    eventType,
+    message,
+    parameters,
+    userId
+  });
 }

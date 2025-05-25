@@ -2321,7 +2321,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).send("Mapeamento não encontrado");
       }
 
-      const jobId = jobManager.createJob(mappingId, frequency, time);
+      const jobId = await jobManager.createJob(mappingId, frequency, time);
       
       // Calcular próxima execução
       const now = new Date();

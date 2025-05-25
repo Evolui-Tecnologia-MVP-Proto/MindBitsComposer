@@ -1,5 +1,6 @@
 import * as cron from 'node-cron';
 import { storage } from './storage';
+import { SystemLogger } from './logger';
 
 interface ActiveJob {
   id: string;
@@ -57,9 +58,9 @@ class JobManager {
   }
 
   // Criar um novo job
-  createJob(mappingId: string, frequency: string, time: string): string {
+  async createJob(mappingId: string, frequency: string, time: string): Promise<string> {
     // Cancelar job existente se houver
-    this.cancelJob(mappingId);
+    await this.cancelJob(mappingId);
 
     const cronExpression = this.frequencyToCron(frequency, time);
     const jobId = `job_${mappingId}_${Date.now()}`;
@@ -82,17 +83,33 @@ class JobManager {
     this.activeJobs.set(mappingId, activeJob);
 
     console.log(`[JOB] Job criado: ${jobId} para mapeamento ${mappingId} com frequência ${frequency} às ${time}`);
+    
+    // Registrar log do sistema - versão simplificada
+    try {
+      console.log(`[LOG] Job ativado - Mapeamento: ${mappingId}, Frequência: ${frequency}, Horário: ${time}`);
+    } catch (error) {
+      console.error('[JOB] Erro ao registrar log de ativação:', error);
+    }
+
     return jobId;
   }
 
   // Cancelar um job
-  cancelJob(mappingId: string): boolean {
+  async cancelJob(mappingId: string): Promise<boolean> {
     const activeJob = this.activeJobs.get(mappingId);
     if (activeJob) {
       activeJob.task.stop();
       activeJob.task.destroy();
       this.activeJobs.delete(mappingId);
       console.log(`[JOB] Job cancelado para mapeamento ${mappingId}`);
+      
+      // Registrar log do sistema - versão simplificada
+      try {
+        console.log(`[LOG] Job cancelado - Mapeamento: ${mappingId}, JobID: ${activeJob.id}`);
+      } catch (error) {
+        console.error('[JOB] Erro ao registrar log de cancelamento:', error);
+      }
+      
       return true;
     }
     return false;
