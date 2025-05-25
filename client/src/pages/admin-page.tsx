@@ -460,6 +460,27 @@ export default function AdminPage() {
       });
     }
   }, [selectedColumn, columnForm]);
+
+  // Carrega dados de agendamento quando um mapeamento é selecionado
+  useEffect(() => {
+    if (selectedMapping?.schedulesParams) {
+      const schedules = selectedMapping.schedulesParams;
+      setSchedulingEnabled(schedules.enabled || false);
+      setSchedulingFrequency(schedules.frequency || "daily");
+      setSchedulingTime(schedules.time || "09:00");
+      setSchedulingDays(schedules.days || []);
+      setSyncWeekends(schedules.syncWeekends || false);
+      setNotifyErrors(schedules.notifyErrors !== false); // default true
+    } else {
+      // Reset para valores padrão
+      setSchedulingEnabled(false);
+      setSchedulingFrequency("daily");
+      setSchedulingTime("09:00");
+      setSchedulingDays([]);
+      setSyncWeekends(false);
+      setNotifyErrors(true);
+    }
+  }, [selectedMapping]);
   
   // Queries
   const { data: mappingsData = [], isLoading: mappingsIsLoading, error: mappingsError } = useQuery<BoardMapping[]>({
@@ -500,6 +521,14 @@ export default function AdminPage() {
         mappingFilter: data.mappingFilter || "",
         defaultValues: data.defaultValues || {},
         assetsMappings: attachmentMappings,
+        schedulesParams: {
+          enabled: schedulingEnabled,
+          frequency: schedulingFrequency,
+          time: schedulingTime,
+          days: schedulingDays,
+          syncWeekends: syncWeekends,
+          notifyErrors: notifyErrors
+        },
         lastSync: null
       };
       
@@ -2038,10 +2067,28 @@ return item.column_values.some(col =>
                   </p>
                 </div>
                 
+                <div className="space-y-3 mb-4">
+                  <div className="flex items-center space-x-2">
+                    <input 
+                      type="checkbox" 
+                      id="enable-scheduling" 
+                      className="rounded" 
+                      checked={schedulingEnabled}
+                      onChange={(e) => setSchedulingEnabled(e.target.checked)}
+                    />
+                    <label htmlFor="enable-scheduling" className="text-sm font-medium">Ativar agendamento automático</label>
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-3">
                     <label className="text-sm font-medium">Frequência de Sincronização</label>
-                    <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                    <select 
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:bg-gray-50 disabled:text-gray-500"
+                      value={schedulingFrequency}
+                      onChange={(e) => setSchedulingFrequency(e.target.value)}
+                      disabled={!schedulingEnabled}
+                    >
                       <option value="manual">Manual</option>
                       <option value="15min">A cada 15 minutos</option>
                       <option value="30min">A cada 30 minutos</option>
@@ -2055,8 +2102,10 @@ return item.column_values.some(col =>
                     <label className="text-sm font-medium">Horário Preferido</label>
                     <input 
                       type="time" 
-                      defaultValue="09:00"
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                      value={schedulingTime}
+                      onChange={(e) => setSchedulingTime(e.target.value)}
+                      disabled={!schedulingEnabled}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:bg-gray-50 disabled:text-gray-500"
                     />
                     <p className="text-xs text-gray-500">
                       Para sincronizações diárias ou com intervalo fixo
@@ -2068,11 +2117,25 @@ return item.column_values.some(col =>
                   <label className="text-sm font-medium">Opções Avançadas</label>
                   <div className="space-y-2">
                     <div className="flex items-center space-x-2">
-                      <input type="checkbox" id="sync-weekends" className="rounded" />
+                      <input 
+                        type="checkbox" 
+                        id="sync-weekends" 
+                        className="rounded" 
+                        checked={syncWeekends}
+                        onChange={(e) => setSyncWeekends(e.target.checked)}
+                        disabled={!schedulingEnabled}
+                      />
                       <label htmlFor="sync-weekends" className="text-sm">Sincronizar aos finais de semana</label>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <input type="checkbox" id="notify-errors" className="rounded" defaultChecked />
+                      <input 
+                        type="checkbox" 
+                        id="notify-errors" 
+                        className="rounded" 
+                        checked={notifyErrors}
+                        onChange={(e) => setNotifyErrors(e.target.checked)}
+                        disabled={!schedulingEnabled}
+                      />
                       <label htmlFor="notify-errors" className="text-sm">Notificar em caso de erro na sincronização</label>
                     </div>
                     <div className="flex items-center space-x-2">
