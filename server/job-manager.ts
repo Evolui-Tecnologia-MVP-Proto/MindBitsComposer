@@ -84,9 +84,21 @@ class JobManager {
 
     console.log(`[JOB] Job criado: ${jobId} para mapeamento ${mappingId} com frequência ${frequency} às ${time}`);
     
-    // Registrar log do sistema - versão simplificada
+    // Registrar log do sistema
     try {
-      console.log(`[LOG] Job ativado - Mapeamento: ${mappingId}, Frequência: ${frequency}, Horário: ${time}`);
+      const mapping = await storage.getBoardMapping(mappingId);
+      await SystemLogger.log({
+        eventType: 'JOB_ACTIVATED',
+        message: `Job ativado para mapeamento "${mapping?.name || mappingId}"`,
+        parameters: {
+          mappingId,
+          jobId,
+          frequency,
+          time,
+          cronExpression
+        }
+      });
+      console.log(`[LOG] Job ativado registrado no banco - Mapeamento: ${mappingId}`);
     } catch (error) {
       console.error('[JOB] Erro ao registrar log de ativação:', error);
     }
@@ -103,9 +115,20 @@ class JobManager {
       this.activeJobs.delete(mappingId);
       console.log(`[JOB] Job cancelado para mapeamento ${mappingId}`);
       
-      // Registrar log do sistema - versão simplificada
+      // Registrar log do sistema
       try {
-        console.log(`[LOG] Job cancelado - Mapeamento: ${mappingId}, JobID: ${activeJob.id}`);
+        const mapping = await storage.getBoardMapping(mappingId);
+        await SystemLogger.log({
+          eventType: 'JOB_CANCELLED',
+          message: `Job cancelado para mapeamento "${mapping?.name || mappingId}"`,
+          parameters: {
+            mappingId,
+            jobId: activeJob.id,
+            frequency: activeJob.frequency,
+            time: activeJob.time
+          }
+        });
+        console.log(`[LOG] Job cancelado registrado no banco - Mapeamento: ${mappingId}`);
       } catch (error) {
         console.error('[JOB] Erro ao registrar log de cancelamento:', error);
       }

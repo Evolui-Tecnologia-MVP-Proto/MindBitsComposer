@@ -1574,13 +1574,52 @@ export class MemStorage implements IStorage {
     this.repoStructures.delete(uid);
   }
 
+  // Método getBoardMapping que estava faltando
+  async getBoardMapping(id: string): Promise<any> {
+    const [mapping] = await db
+      .select()
+      .from(mondayMappings)
+      .where(eq(mondayMappings.id, id));
+    return mapping || null;
+  }
+
   // System Log implementations
   async createSystemLog(log: InsertSystemLog): Promise<SystemLog> {
     const [newLog] = await db
       .insert(systemLogs)
-      .values(log)
+      .values({
+        ...log,
+        id: crypto.randomUUID(),
+        timestamp: new Date(),
+      })
       .returning();
     return newLog;
+  }
+
+  async getSystemLogs(limit: number = 100): Promise<SystemLog[]> {
+    return await db
+      .select()
+      .from(systemLogs)
+      .orderBy(sql`${systemLogs.timestamp} DESC`)
+      .limit(limit);
+  }
+
+  async getSystemLogsByEventType(eventType: string, limit: number = 100): Promise<SystemLog[]> {
+    return await db
+      .select()
+      .from(systemLogs)
+      .where(eq(systemLogs.eventType, eventType))
+      .orderBy(sql`${systemLogs.timestamp} DESC`)
+      .limit(limit);
+  }
+
+  async getSystemLogsByUser(userId: number, limit: number = 100): Promise<SystemLog[]> {
+    return await db
+      .select()
+      .from(systemLogs)
+      .where(eq(systemLogs.userId, userId))
+      .orderBy(sql`${systemLogs.timestamp} DESC`)
+      .limit(limit);
   }
 
   async getSystemLogs(limit: number = 100): Promise<SystemLog[]> {
