@@ -2099,7 +2099,7 @@ return item.column_values.some(col =>
                   </div>
                   
                   <div className="space-y-3">
-                    <label className="text-sm font-medium">Horário Preferido</label>
+                    <label className="text-sm font-medium">Horário de Início</label>
                     <input 
                       type="time" 
                       value={schedulingTime}
@@ -2113,37 +2113,7 @@ return item.column_values.some(col =>
                   </div>
                 </div>
                 
-                <div className="space-y-3">
-                  <label className="text-sm font-medium">Opções Avançadas</label>
-                  <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <input 
-                        type="checkbox" 
-                        id="sync-weekends" 
-                        className="rounded" 
-                        checked={syncWeekends}
-                        onChange={(e) => setSyncWeekends(e.target.checked)}
-                        disabled={!schedulingEnabled}
-                      />
-                      <label htmlFor="sync-weekends" className="text-sm">Sincronizar aos finais de semana</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input 
-                        type="checkbox" 
-                        id="notify-errors" 
-                        className="rounded" 
-                        checked={notifyErrors}
-                        onChange={(e) => setNotifyErrors(e.target.checked)}
-                        disabled={!schedulingEnabled}
-                      />
-                      <label htmlFor="notify-errors" className="text-sm">Notificar em caso de erro na sincronização</label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <input type="checkbox" id="log-activity" className="rounded" defaultChecked />
-                      <label htmlFor="log-activity" className="text-sm">Registrar log de atividades</label>
-                    </div>
-                  </div>
-                </div>
+
                 
                 <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
                   <p className="text-sm text-yellow-800">
