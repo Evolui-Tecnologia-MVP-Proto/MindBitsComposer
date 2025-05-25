@@ -279,15 +279,18 @@ class JobManager {
           }
         }
 
-        // Verificar duplicatas através do id_origem
-        try {
-          const duplicateCheck = await storage.getDocumentoByIdOrigem(BigInt(item.id));
-          if (duplicateCheck) {
-            documentsPreExisting++;
-            continue;
+        // Verificar duplicatas usando a mesma lógica do processo manual
+        if (keyFields.length > 0) {
+          try {
+            const existingDocs = await storage.getDocumentosByKeyFields(keyFields, documentData);
+            if (existingDocs && existingDocs.length > 0) {
+              console.log(`🔍 [JOB] Documento duplicado encontrado para item ${item.id}`);
+              documentsPreExisting++;
+              continue;
+            }
+          } catch (error) {
+            console.error(`[JOB] Erro na verificação de duplicatas para item ${item.id}:`, error);
           }
-        } catch (error) {
-          // Se houver erro na verificação, continua tentando criar
         }
 
         // Criar o documento
