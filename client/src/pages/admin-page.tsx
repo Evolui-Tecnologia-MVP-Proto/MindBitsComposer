@@ -114,6 +114,16 @@ type JobStatus = {
   } | null;
 };
 
+type SystemLog = {
+  id: string;
+  eventType: string;
+  message: string;
+  parameters: Record<string, any> | null;
+  timestamp: string;
+  userId: number | null;
+  createdAt: string;
+};
+
 // Componente para exibir status do job
 function JobStatusBadge({ mappingId }: { mappingId: string }) {
   const { data: jobStatus, isLoading } = useQuery<JobStatus>({
@@ -529,6 +539,11 @@ export default function AdminPage() {
   
   const { data: connections = [] } = useQuery<ServiceConnection[]>({
     queryKey: ['/api/service-connections'],
+  });
+
+  const { data: systemLogs = [], isLoading: logsLoading } = useQuery<SystemLog[]>({
+    queryKey: ['/api/logs'],
+    refetchInterval: 10000, // Atualiza a cada 10 segundos
   });
   
   // Query para colunas do Monday de um mapeamento específico
@@ -1249,7 +1264,7 @@ export default function AdminPage() {
         </div>
         
         <Tabs defaultValue="usuarios" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="usuarios" className="text-center">
               <Users className="h-4 w-4 mr-2" />
               Usuários
@@ -1261,6 +1276,10 @@ export default function AdminPage() {
             <TabsTrigger value="servicos" className="text-center">
               <Plug className="h-4 w-4 mr-2" />
               Integrações de Serviços
+            </TabsTrigger>
+            <TabsTrigger value="logs" className="text-center">
+              <Database className="h-4 w-4 mr-2" />
+              Logs
             </TabsTrigger>
             <TabsTrigger value="configuracao" className="text-center">
               <Settings className="h-4 w-4 mr-2" />
