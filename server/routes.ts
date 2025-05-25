@@ -2284,13 +2284,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      const eventTypesResult = await db
-        .selectDistinct({ eventType: systemLogs.eventType })
-        .from(systemLogs)
-        .where(sql`${systemLogs.eventType} IS NOT NULL`)
-        .orderBy(systemLogs.eventType);
-      
-      const uniqueTypes = eventTypesResult.map(row => row.eventType);
+      // Buscar todos os logs e extrair tipos únicos
+      const allLogs = await db.select().from(systemLogs);
+      const uniqueTypes = [...new Set(allLogs.map(log => log.eventType).filter(Boolean))].sort();
       
       res.json(uniqueTypes);
     } catch (error) {
