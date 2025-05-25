@@ -280,22 +280,27 @@ class JobManager {
         }
 
         // Verificar duplicatas usando a mesma lógica do processo manual
+        let shouldCreateDocument = true;
+        
         if (keyFields.length > 0) {
           try {
             const existingDocs = await storage.getDocumentosByKeyFields(keyFields, documentData);
             if (existingDocs && existingDocs.length > 0) {
               console.log(`🔍 [JOB] Documento duplicado encontrado para item ${item.id}`);
               documentsPreExisting++;
-              continue;
+              shouldCreateDocument = false;
             }
           } catch (error) {
             console.error(`[JOB] Erro na verificação de duplicatas para item ${item.id}:`, error);
+            shouldCreateDocument = false;
           }
         }
 
-        // Criar o documento (mantendo lógica original)
-        await storage.createDocumento(documentData);
-        documentsCreated++;
+        // Só criar se não for duplicata
+        if (shouldCreateDocument) {
+          await storage.createDocumento(documentData);
+          documentsCreated++;
+        }
         
       } catch (itemError) {
         console.error(`❌ [JOB] Erro ao processar item ${item.id}:`, itemError);
