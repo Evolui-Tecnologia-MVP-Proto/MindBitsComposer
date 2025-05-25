@@ -1546,29 +1546,7 @@ export default function AdminPage() {
                 <Button
                   variant="destructive"
                   size="sm"
-                  onClick={() => {
-                    if (window.confirm("Tem certeza que deseja limpar todos os logs? Esta ação não pode ser desfeita.")) {
-                      fetch('/api/logs', { method: 'DELETE' })
-                        .then(response => {
-                          if (response.ok) {
-                            queryClient.invalidateQueries({ queryKey: ['/api/logs'] });
-                            toast({
-                              title: "Logs limpos",
-                              description: "Todos os logs do sistema foram removidos com sucesso.",
-                            });
-                          } else {
-                            throw new Error('Erro ao limpar logs');
-                          }
-                        })
-                        .catch(error => {
-                          toast({
-                            title: "Erro",
-                            description: "Não foi possível limpar os logs do sistema.",
-                            variant: "destructive",
-                          });
-                        });
-                    }
-                  }}
+                  onClick={() => setShowClearLogsDialog(true)}
                   disabled={logsLoading || systemLogs.length === 0}
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
