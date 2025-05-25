@@ -370,6 +370,14 @@ export default function AdminPage() {
   // Estado para controlar o dialog de confirmação de limpar logs
   const [showClearLogsDialog, setShowClearLogsDialog] = useState(false);
   
+  // Estados para filtros de logs
+  const [logFilters, setLogFilters] = useState({
+    eventType: "",
+    userId: "",
+    startDate: "",
+    endDate: ""
+  });
+  
   // Estados para GitHub
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -1640,22 +1648,86 @@ export default function AdminPage() {
           
           <TabsContent value="logs" className="slide-in">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-                <div>
-                  <CardTitle>Logs do Sistema</CardTitle>
-                  <CardDescription>
-                    Histórico de eventos e atividades do sistema EVO-MindBits Composer.
-                  </CardDescription>
+              <CardHeader className="space-y-4 pb-4">
+                <div className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle>Logs do Sistema</CardTitle>
+                    <CardDescription>
+                      Histórico de eventos e atividades do sistema EVO-MindBits Composer.
+                    </CardDescription>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => setShowClearLogsDialog(true)}
+                    disabled={logsLoading || systemLogs.length === 0}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Limpar Logs
+                  </Button>
                 </div>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => setShowClearLogsDialog(true)}
-                  disabled={logsLoading || systemLogs.length === 0}
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Limpar Logs
-                </Button>
+                
+                {/* Filtros para logs */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Tipo de Evento</label>
+                    <select
+                      className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm"
+                      value={logFilters.eventType}
+                      onChange={(e) => setLogFilters(prev => ({ ...prev, eventType: e.target.value }))}
+                    >
+                      <option value="">Todos os tipos</option>
+                      <option value="USER_LOGIN">Login de usuário</option>
+                      <option value="USER_LOGOUT">Logout de usuário</option>
+                      <option value="DOCUMENT_CREATED">Documento criado</option>
+                      <option value="DOCUMENT_UPDATED">Documento atualizado</option>
+                      <option value="MONDAY_SYNC_STARTED">Sincronização Monday iniciada</option>
+                      <option value="MONDAY_SYNC_COMPLETED">Sincronização Monday concluída</option>
+                      <option value="MONDAY_SYNC_MANUAL">Execução manual Monday</option>
+                      <option value="MONDAY_SYNC_ERROR">Erro na sincronização Monday</option>
+                      <option value="JOB_ACTIVATED">Job ativado</option>
+                      <option value="JOB_CANCELLED">Job cancelado</option>
+                      <option value="SYSTEM_ERROR">Erro do sistema</option>
+                    </select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Usuário</label>
+                    <select
+                      className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm"
+                      value={logFilters.userId}
+                      onChange={(e) => setLogFilters(prev => ({ ...prev, userId: e.target.value }))}
+                    >
+                      <option value="">Todos os usuários</option>
+                      <option value="null">Sistema</option>
+                      {usersData?.map((user) => (
+                        <option key={user.id} value={user.id.toString()}>
+                          {user.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Data Inicial</label>
+                    <input
+                      type="datetime-local"
+                      className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm"
+                      value={logFilters.startDate}
+                      onChange={(e) => setLogFilters(prev => ({ ...prev, startDate: e.target.value }))}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-gray-700">Data Final</label>
+                    <input
+                      type="datetime-local"
+                      className="w-full h-9 px-3 rounded-md border border-input bg-background text-sm"
+                      value={logFilters.endDate}
+                      onChange={(e) => setLogFilters(prev => ({ ...prev, endDate: e.target.value }))}
+                    />
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 {logsLoading ? (
