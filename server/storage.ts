@@ -1615,32 +1615,6 @@ export class MemStorage implements IStorage {
       .limit(limit);
   }
 
-  async getSystemLogs(limit: number = 100): Promise<SystemLog[]> {
-    return await db
-      .select()
-      .from(systemLogs)
-      .orderBy(sql`${systemLogs.timestamp} DESC`)
-      .limit(limit);
-  }
-
-  async getSystemLogsByEventType(eventType: string, limit: number = 100): Promise<SystemLog[]> {
-    return await db
-      .select()
-      .from(systemLogs)
-      .where(eq(systemLogs.eventType, eventType))
-      .orderBy(sql`${systemLogs.timestamp} DESC`)
-      .limit(limit);
-  }
-
-  async getSystemLogsByUser(userId: number, limit: number = 100): Promise<SystemLog[]> {
-    return await db
-      .select()
-      .from(systemLogs)
-      .where(eq(systemLogs.userId, userId))
-      .orderBy(sql`${systemLogs.timestamp} DESC`)
-      .limit(limit);
-  }
-
 
 }
 
