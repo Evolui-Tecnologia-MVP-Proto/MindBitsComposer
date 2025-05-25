@@ -157,14 +157,20 @@ class JobManager {
       }
 
       // Registrar conclusão no sistema de logs com detalhes
-      await SystemLogger.logMondaySync(0, mappingId, 'completed', {
-        mappingName: mapping.name,
-        executionType: 'automatic',
-        itemsProcessed: stats.itemsProcessed,
-        documentsCreated: stats.documentsCreated,
-        documentsPreExisting: stats.documentsPreExisting,
-        documentsSkipped: stats.documentsSkipped,
-        proximaExecucao: proximaExecucao
+      await SystemLogger.log({
+        eventType: 'MONDAY_SYNC_COMPLETED' as any,
+        message: `Sincronização Monday.com automática concluída para ${mapping.name}`,
+        parameters: {
+          mappingId,
+          mappingName: mapping.name,
+          executionType: 'automatic',
+          itemsProcessed: stats.itemsProcessed,
+          documentsCreated: stats.documentsCreated,
+          documentsPreExisting: stats.documentsPreExisting,
+          documentsSkipped: stats.documentsSkipped,
+          proximaExecucao: proximaExecucao
+        },
+        userId: 0
       });
 
       console.log(`[JOB] Sincronização concluída para mapeamento ${mappingId}`);
