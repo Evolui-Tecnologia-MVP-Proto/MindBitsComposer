@@ -400,6 +400,15 @@ export default function AdminPage() {
       setButtonStyle("bg-yellow-500");
     }
   }, [selectedMapping, mappingForm]);
+
+  // Carrega os mapeamentos de anexos salvos quando um mapeamento é selecionado
+  useEffect(() => {
+    if (selectedMapping && selectedMapping.assetsMappings) {
+      setAttachmentMappings(selectedMapping.assetsMappings);
+    } else {
+      setAttachmentMappings([]);
+    }
+  }, [selectedMapping]);
   
   // Atualiza o formulário quando uma conexão de serviço é selecionada
   useEffect(() => {
@@ -482,6 +491,7 @@ export default function AdminPage() {
         responsibleColumn: "",
         mappingFilter: data.mappingFilter || "",
         defaultValues: data.defaultValues || {},
+        assetsMappings: attachmentMappings,
         lastSync: null
       };
       
