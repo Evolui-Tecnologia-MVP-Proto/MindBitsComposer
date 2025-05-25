@@ -2136,18 +2136,7 @@ return item.column_values.some(col =>
                   </p>
                 </div>
                 
-                <div className="space-y-3 mb-4">
-                  <div className="flex items-center space-x-2">
-                    <input 
-                      type="checkbox" 
-                      id="enable-scheduling" 
-                      className="rounded" 
-                      checked={schedulingEnabled}
-                      onChange={(e) => setSchedulingEnabled(e.target.checked)}
-                    />
-                    <label htmlFor="enable-scheduling" className="text-sm font-medium">Ativar agendamento automático</label>
-                  </div>
-                </div>
+
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-3">
@@ -2156,7 +2145,7 @@ return item.column_values.some(col =>
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:bg-gray-50 disabled:text-gray-500"
                       value={schedulingFrequency}
                       onChange={(e) => setSchedulingFrequency(e.target.value)}
-                      disabled={!schedulingEnabled || jobStatus?.hasActiveJob}
+                      disabled={jobStatus?.hasActiveJob}
                     >
                       <option value="15min">A cada 15 minutos</option>
                       <option value="30min">A cada 30 minutos</option>
@@ -2172,14 +2161,14 @@ return item.column_values.some(col =>
                       type="time" 
                       value={schedulingTime}
                       onChange={(e) => setSchedulingTime(e.target.value)}
-                      disabled={!schedulingEnabled || jobStatus?.hasActiveJob}
+                      disabled={jobStatus?.hasActiveJob}
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:bg-gray-50 disabled:text-gray-500"
                     />
                   </div>
                 </div>
                 
                 {/* Botão para ativar/parar job */}
-                {schedulingEnabled && selectedMapping && (
+                {selectedMapping && (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-md p-4">
                       <div>
