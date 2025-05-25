@@ -1,9 +1,10 @@
-import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos, documentsArtifacts, repoStructure,
+import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos, documentsArtifacts, repoStructure, systemLogs,
   type User, type InsertUser, type Template, type InsertTemplate, 
   type MondayMapping, type InsertMondayMapping, type MondayColumn, type InsertMondayColumn, 
   type MappingColumn, type InsertMappingColumn, type ServiceConnection, type InsertServiceConnection,
   type Plugin, type InsertPlugin, type Documento, type InsertDocumento,
   type DocumentArtifact, type InsertDocumentArtifact, type RepoStructure, type InsertRepoStructure,
+  type SystemLog, type InsertSystemLog,
   UserStatus, UserRole, TemplateType, PluginStatus, PluginType } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, isNull, sql } from "drizzle-orm";
@@ -109,6 +110,12 @@ export interface IStorage {
   updateRepoStructure(uid: string, data: Partial<RepoStructure>): Promise<RepoStructure>;
   updateRepoStructureSync(uid: string, isSync: boolean): Promise<RepoStructure>;
   deleteRepoStructure(uid: string): Promise<void>;
+  
+  // System Log operations
+  createSystemLog(log: InsertSystemLog): Promise<SystemLog>;
+  getSystemLogs(limit?: number): Promise<SystemLog[]>;
+  getSystemLogsByEventType(eventType: string, limit?: number): Promise<SystemLog[]>;
+  getSystemLogsByUser(userId: number, limit?: number): Promise<SystemLog[]>;
 }
 
 export class DatabaseStorage implements IStorage {
