@@ -1762,7 +1762,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const relationships = [
         {
           id: "documents_artifacts",
-          name: "Anexos/Artefatos",
+          name: "documents_artifacts",
           description: "Relacionamento com a tabela de anexos e artefatos dos documentos",
           type: "one-to-many",
           targetTable: "documents_artifacts",
