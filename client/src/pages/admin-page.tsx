@@ -214,7 +214,7 @@ const DocumentRelationshipSelect = ({ selectedMapping, onRelationshipChange }: {
         <option value="">Selecione um relacionamento</option>
         {relationships?.map((relationship: any) => (
           <option key={relationship.id} value={relationship.id}>
-            {relationship.name} ({relationship.type})
+            {relationship.name}
           </option>
         ))}
       </select>
