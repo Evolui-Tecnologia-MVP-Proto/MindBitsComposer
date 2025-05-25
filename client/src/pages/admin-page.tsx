@@ -1878,13 +1878,6 @@ return item.column_values.some(col =>
             {/* Aba Assets Map */}
             <TabsContent value="assets-map" className="py-4">
               <div className="space-y-4">
-                <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                  <h4 className="text-sm font-medium text-blue-800 mb-2">🔗 Relacionamentos da Tabela Documentos</h4>
-                  <p className="text-sm text-blue-700">
-                    Selecione um relacionamento da tabela documentos para configurar o mapeamento.
-                  </p>
-                </div>
-                
                 <div className="space-y-3">
                   <label className="text-sm font-medium">Relacionamento de Tabela</label>
                   <DocumentRelationshipSelect 
@@ -1893,13 +1886,6 @@ return item.column_values.some(col =>
                       console.log("Relacionamento selecionado:", relationship);
                     }}
                   />
-                </div>
-                
-                <div className="bg-gray-50 border border-gray-200 rounded-md p-3">
-                  <p className="text-sm text-gray-600">
-                    💡 <strong>Dica:</strong> Os relacionamentos são carregados dinamicamente do esquema da base de dados. 
-                    Novos relacionamentos adicionados à tabela documentos aparecerão automaticamente nesta lista.
-                  </p>
                 </div>
               </div>
             </TabsContent>
