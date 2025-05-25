@@ -2377,7 +2377,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Buscar informações do mapeamento para o log
-      const mapping = await storage.getBoardMapping(mappingId);
+      const mapping = await storage.getMondayMapping(mappingId);
       
       const success = jobManager.cancelJob(mappingId);
       
