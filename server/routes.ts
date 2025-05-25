@@ -2289,7 +2289,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .from(systemLogs)
         .orderBy(systemLogs.eventType);
       
+      console.log("Event types encontrados:", eventTypes);
+      
       const types = eventTypes.map(row => row.eventType).filter(Boolean);
+      console.log("Tipos filtrados:", types);
+      
       res.json(types);
     } catch (error) {
       console.error("Erro ao buscar tipos de eventos:", error);
