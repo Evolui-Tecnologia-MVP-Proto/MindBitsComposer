@@ -311,8 +311,10 @@ class JobManager {
     // Ajustar as estatísticas para corresponder ao processo manual
     const finalDocumentsSkipped = filteredCount + documentsSkipped;
 
+    console.log(`[DEBUG] Estatísticas finais - API retornou: ${items.length} itens, Processados após filtros: ${filteredItems.length}`);
+    
     return {
-      itemsProcessed: items.length,
+      itemsProcessed: filteredItems.length,
       documentsCreated,
       documentsPreExisting,
       documentsSkipped: finalDocumentsSkipped
