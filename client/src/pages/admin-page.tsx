@@ -267,6 +267,9 @@ const DocumentRelationshipSelect = ({
                       className="flex-1 h-8 rounded-md border border-gray-300 bg-white px-2 py-1 text-xs font-mono"
                     >
                       <option value="">Selecione uma coluna de arquivo...</option>
+                      <option value="documents_item" className="font-mono text-green-700">
+                        Item documents [no columns linked]
+                      </option>
                       {mondayColumns?.filter(column => column.type?.toLowerCase() === 'file')
                         .filter(column => !attachmentMappings.some(mapping => mapping.columnId === column.columnId))
                         .map((column) => (
@@ -654,14 +657,22 @@ export default function AdminPage() {
   const addAttachmentMapping = () => {
     if (!selectedFileColumn || !selectedMapping) return;
     
-    const fileColumn = mondayColumns?.find(col => col.columnId === selectedFileColumn);
-    if (!fileColumn) return;
+    let columnTitle = "";
+    
+    // Verificar se é o item especial "documents_item"
+    if (selectedFileColumn === "documents_item") {
+      columnTitle = "Item documents [no columns linked]";
+    } else {
+      const fileColumn = mondayColumns?.find(col => col.columnId === selectedFileColumn);
+      if (!fileColumn) return;
+      columnTitle = fileColumn.title;
+    }
     
     const newMapping = {
       id: `attachment-${Date.now()}`,
       relationshipId: "documents_artifacts",
       columnId: selectedFileColumn,
-      columnTitle: fileColumn.title
+      columnTitle: columnTitle
     };
     
     setAttachmentMappings(prev => [...prev, newMapping]);
@@ -669,7 +680,7 @@ export default function AdminPage() {
     
     toast({
       title: "Mapeamento adicionado",
-      description: `Coluna "${fileColumn.title}" mapeada para anexos.`,
+      description: `Coluna "${columnTitle}" mapeada para anexos.`,
     });
   };
   
