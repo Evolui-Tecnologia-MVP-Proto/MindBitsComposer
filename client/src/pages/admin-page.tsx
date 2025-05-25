@@ -184,10 +184,12 @@ const DocumentRelationshipSelect = ({ selectedMapping, onRelationshipChange }: {
   const [selectedRelationship, setSelectedRelationship] = useState<string>("");
   
   const { data: relationships, isLoading } = useQuery({
-    queryKey: ["/api/documentos-relationships"],
+    queryKey: ["/api/documentos-relationships", Date.now()],
     enabled: !!selectedMapping,
     staleTime: 0,
-    cacheTime: 0
+    cacheTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true
   });
   
   const handleRelationshipChange = (relationshipId: string) => {
