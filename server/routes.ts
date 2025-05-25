@@ -2311,6 +2311,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Clear system logs
+  app.delete("/api/logs", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      await db.delete(systemLogs);
+      
+      // Log the clear action
+      await SystemLogger.logUserAction(
+        req.user!.id,
+        "CLEAR_LOGS",
+        { message: "Todos os logs do sistema foram removidos" }
+      );
+      
+      res.json({ message: "Logs limpos com sucesso" });
+    } catch (error) {
+      console.error("Erro ao limpar logs do sistema:", error);
+      res.status(500).send("Erro ao limpar logs do sistema");
+    }
+  });
+
   // Rotas para gerenciamento de jobs de agendamento
   
   // Criar/Ativar job de agendamento
