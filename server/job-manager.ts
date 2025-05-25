@@ -132,15 +132,24 @@ class JobManager {
         executionType: 'automatic'
       });
 
-      // Executar a sincronização simulada do Monday
+      // Executar a sincronização real do Monday
       console.log(`[JOB] Executando sincronização para ${mapping.name}`);
       
-      // Simular processamento com estatísticas realistas
+      // Fazer requisição para a API real de execução
+      const response = await fetch(`http://localhost:5000/api/monday/mappings/${mappingId}/execute`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const result = await response.json();
+      
       const stats = {
-        itemsProcessed: Math.floor(Math.random() * 500) + 100,
-        documentsCreated: Math.floor(Math.random() * 10) + 2,
-        documentsPreExisting: Math.floor(Math.random() * 50) + 20,
-        documentsSkipped: Math.floor(Math.random() * 100) + 50
+        itemsProcessed: result.itemsProcessed || 0,
+        documentsCreated: result.documentsCreated || 0,
+        documentsPreExisting: result.documentsPreExisting || 0,
+        documentsSkipped: result.documentsSkipped || 0
       };
       
       // Atualizar lastSync
