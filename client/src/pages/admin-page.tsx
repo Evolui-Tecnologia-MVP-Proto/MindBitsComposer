@@ -176,6 +176,85 @@ const getDefaultableFields = () => {
   return [...requiredFields, ...optionalFields];
 };
 
+// Componente para selecionar relacionamentos de documentos
+const DocumentRelationshipSelect = ({ selectedMapping, onRelationshipChange }: {
+  selectedMapping: any;
+  onRelationshipChange: (relationship: any) => void;
+}) => {
+  const [selectedRelationship, setSelectedRelationship] = useState<string>("");
+  
+  const { data: relationships, isLoading } = useQuery({
+    queryKey: ["/api/documentos/relationships"],
+    enabled: !!selectedMapping
+  });
+  
+  const handleRelationshipChange = (relationshipId: string) => {
+    setSelectedRelationship(relationshipId);
+    const relationship = relationships?.find((r: any) => r.id === relationshipId);
+    if (relationship) {
+      onRelationshipChange(relationship);
+    }
+  };
+  
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-4">
+        <div className="text-sm text-gray-500">Carregando relacionamentos...</div>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="space-y-3">
+      <select
+        value={selectedRelationship}
+        onChange={(e) => handleRelationshipChange(e.target.value)}
+        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      >
+        <option value="">Selecione um relacionamento</option>
+        {relationships?.map((relationship: any) => (
+          <option key={relationship.id} value={relationship.id}>
+            {relationship.name} ({relationship.type})
+          </option>
+        ))}
+      </select>
+      
+      {selectedRelationship && relationships && (
+        <div className="mt-3 p-3 bg-gray-50 border border-gray-200 rounded-md">
+          {(() => {
+            const relationship = relationships.find((r: any) => r.id === selectedRelationship);
+            if (!relationship) return null;
+            
+            return (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-xs">
+                    {relationship.type}
+                  </Badge>
+                  <span className="text-sm font-medium">{relationship.name}</span>
+                </div>
+                <p className="text-xs text-gray-600">{relationship.description}</p>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className="font-medium">Tabela destino:</span>
+                    <br />
+                    <code className="bg-gray-100 px-1 rounded font-mono">{relationship.targetTable}</code>
+                  </div>
+                  <div>
+                    <span className="font-medium">Chave estrangeira:</span>
+                    <br />
+                    <code className="bg-gray-100 px-1 rounded font-mono">{relationship.foreignKey}</code>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function AdminPage() {
   const { toast } = useToast();
   
