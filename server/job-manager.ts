@@ -16,17 +16,33 @@ class JobManager {
 
   // Converte frequência em expressão cron
   private frequencyToCron(frequency: string, time: string): string {
-    const [hour, minute] = time.split(':');
+    const [hour, minute] = time.split(':').map(Number);
     
     switch (frequency) {
       case '15min':
-        return '*/15 * * * *';
+        // A cada 15 minutos a partir do minuto especificado
+        const minutes15 = [];
+        for (let i = minute; i < 60; i += 15) {
+          minutes15.push(i);
+        }
+        return `${minutes15.join(',')} * * * *`;
       case '30min':
-        return '*/30 * * * *';
+        // A cada 30 minutos a partir do minuto especificado
+        const minutes30 = [];
+        for (let i = minute; i < 60; i += 30) {
+          minutes30.push(i);
+        }
+        return `${minutes30.join(',')} * * * *`;
       case '1hour':
-        return '0 * * * *';
+        // A cada hora no minuto especificado
+        return `${minute} * * * *`;
       case '6hours':
-        return '0 */6 * * *';
+        // A cada 6 horas no horário especificado
+        const hours6 = [];
+        for (let i = hour; i < 24; i += 6) {
+          hours6.push(i);
+        }
+        return `${minute} ${hours6.join(',')} * * *`;
       case 'daily':
         return `${minute} ${hour} * * *`;
       default:
@@ -84,6 +100,8 @@ class JobManager {
 
     const cronExpression = this.frequencyToCron(frequency, time);
     const jobId = `job_${mappingId}_${Date.now()}`;
+
+    console.log(`[JOB] Criando job com expressão cron: ${cronExpression} para frequência ${frequency} às ${time}`);
 
     const task = cron.schedule(cronExpression, () => {
       const now = new Date();
