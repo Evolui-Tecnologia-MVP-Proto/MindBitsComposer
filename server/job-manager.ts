@@ -116,7 +116,7 @@ class JobManager {
   }
 
   // Função dedicada para executar integração real do Monday (apenas para jobs automáticos)
-  private async executeRealMondayIntegration(mappingId: string): Promise<{
+  async executeRealMondayIntegration(mappingId: string): Promise<{
     itemsProcessed: number;
     documentsCreated: number;
     documentsPreExisting: number;
