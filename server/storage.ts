@@ -1077,12 +1077,12 @@ export class MemStorage implements IStorage {
     return this.mondayMappings.get(id);
   }
 
-  async getBoardMapping(id: string): Promise<BoardMapping | undefined> {
+  async getBoardMapping(id: string): Promise<any> {
     const [mapping] = await db
       .select()
       .from(mondayMappings)
       .where(eq(mondayMappings.id, id));
-    return mapping || undefined;
+    return mapping || null;
   }
   
   async getMondayMappingByBoardId(boardId: string): Promise<MondayMapping | undefined> {
@@ -1574,14 +1574,7 @@ export class MemStorage implements IStorage {
     this.repoStructures.delete(uid);
   }
 
-  // Método getBoardMapping que estava faltando
-  async getBoardMapping(id: string): Promise<any> {
-    const [mapping] = await db
-      .select()
-      .from(mondayMappings)
-      .where(eq(mondayMappings.id, id));
-    return mapping || null;
-  }
+
 
   // System Log implementations
   async createSystemLog(log: InsertSystemLog): Promise<SystemLog> {
