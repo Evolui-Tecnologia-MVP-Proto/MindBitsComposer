@@ -12,7 +12,7 @@ export async function executeMonadayMappingSync(mappingId: string): Promise<Mond
   console.log(`🚀 INICIANDO SINCRONIZAÇÃO para mapeamento ${mappingId}`);
 
   // Buscar o mapeamento
-  const mapping = await storage.getBoardMapping(mappingId);
+  const mapping = await storage.getMondayMapping(mappingId);
   if (!mapping) {
     throw new Error('Mapeamento não encontrado');
   }
@@ -103,7 +103,7 @@ export async function executeMonadayMappingSync(mappingId: string): Promise<Mond
   console.log(`📊 TOTAL DE ITENS: ${allItems.length}`);
 
   // Buscar colunas mapeadas
-  const columnMappings = await storage.getColumnMappingsByMappingId(mappingId);
+  const columnMappings = await storage.getMappingColumns(mappingId);
   console.log(`🗂️ COLUNAS MAPEADAS: ${columnMappings.length}`);
 
   // Contadores para estatísticas
@@ -155,7 +155,7 @@ export async function executeMonadayMappingSync(mappingId: string): Promise<Mond
     }
 
     // Verificar se já existe documento com este id_origem
-    const existingDoc = await storage.getDocumentoByOrigemId(BigInt(item.id));
+    const existingDoc = await storage.getDocumentoByIdOrigem(BigInt(item.id));
     if (existingDoc) {
       console.log(`⚠️ DOCUMENTO JÁ EXISTE para item ${item.id} - pulando`);
       documentsPreExisting++;
