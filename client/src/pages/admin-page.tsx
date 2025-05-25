@@ -1533,6 +1533,86 @@ export default function AdminPage() {
             </div>
           </TabsContent>
           
+          <TabsContent value="logs" className="slide-in">
+            <Card>
+              <CardHeader>
+                <CardTitle>Logs do Sistema</CardTitle>
+                <CardDescription>
+                  Histórico de eventos e atividades do sistema EVO-MindBits Composer.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {logsLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-border" />
+                  </div>
+                ) : systemLogs.length > 0 ? (
+                  <div className="max-h-[500px] overflow-y-auto border rounded-md">
+                    <Table>
+                      <TableHeader className="sticky top-0 bg-background z-10">
+                        <TableRow>
+                          <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">TIMESTAMP</TableHead>
+                          <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">TIPO DE EVENTO</TableHead>
+                          <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">MENSAGEM</TableHead>
+                          <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">USUÁRIO</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {systemLogs.map((log) => (
+                          <TableRow key={log.id}>
+                            <TableCell className="font-mono text-xs">
+                              {new Date(log.timestamp).toLocaleString('pt-BR')}
+                            </TableCell>
+                            <TableCell>
+                              <Badge 
+                                variant="outline" 
+                                className={`text-xs font-mono ${
+                                  log.eventType.includes('ERROR') || log.eventType.includes('FAILED') 
+                                    ? 'bg-red-50 text-red-700 border-red-200'
+                                    : log.eventType.includes('SUCCESS') || log.eventType.includes('COMPLETED')
+                                    ? 'bg-green-50 text-green-700 border-green-200'
+                                    : log.eventType.includes('JOB')
+                                    ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                    : 'bg-gray-50 text-gray-700 border-gray-200'
+                                }`}
+                              >
+                                {log.eventType}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="max-w-md">
+                              <span className="text-sm">{log.message}</span>
+                              {log.parameters && Object.keys(log.parameters).length > 0 && (
+                                <details className="mt-1">
+                                  <summary className="text-xs text-gray-500 cursor-pointer hover:text-gray-700">
+                                    Ver parâmetros
+                                  </summary>
+                                  <pre className="text-xs bg-gray-50 p-2 rounded mt-1 font-mono overflow-x-auto">
+                                    {JSON.stringify(log.parameters, null, 2)}
+                                  </pre>
+                                </details>
+                              )}
+                            </TableCell>
+                            <TableCell className="font-mono text-xs">
+                              {log.userId ? `ID: ${log.userId}` : 'Sistema'}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <Database className="h-12 w-12 mx-auto mb-3 text-gray-300" />
+                    <p>Nenhum log encontrado</p>
+                    <p className="text-sm mt-1">
+                      Os logs do sistema aparecerão aqui conforme as atividades são executadas.
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
           <TabsContent value="configuracao" className="slide-in">
             <div className="bg-white shadow-sm rounded-lg p-6">
               <h3 className="text-lg font-medium text-gray-900 mb-4">Configurações Gerais</h3>
