@@ -135,12 +135,12 @@ class JobManager {
       // Executar a sincronização simulada do Monday
       console.log(`[JOB] Executando sincronização para ${mapping.name}`);
       
-      // Simular processamento com estatísticas
+      // Simular processamento com estatísticas realistas
       const stats = {
-        itemsProcessed: Math.floor(Math.random() * 100) + 50,
-        documentsCreated: Math.floor(Math.random() * 5),
-        documentsPreExisting: Math.floor(Math.random() * 20) + 10,
-        documentsSkipped: Math.floor(Math.random() * 30) + 20
+        itemsProcessed: Math.floor(Math.random() * 500) + 100,
+        documentsCreated: Math.floor(Math.random() * 10) + 2,
+        documentsPreExisting: Math.floor(Math.random() * 50) + 20,
+        documentsSkipped: Math.floor(Math.random() * 100) + 50
       };
       
       // Atualizar lastSync
