@@ -8,6 +8,7 @@ import { db } from "./db";
 import { eq, sql } from "drizzle-orm";
 import { ZodError } from "zod";
 import fetch from "node-fetch";
+import { jobManager } from "./job-manager";
 import path from "path";
 import fs from "fs";
 import multer from "multer";
