@@ -1758,7 +1758,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      // Lista dos relacionamentos da tabela documentos
+      // Lista apenas o relacionamento real que existe na tabela documentos
       const relationships = [
         {
           id: "documents_artifacts",
@@ -1768,24 +1768,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           targetTable: "documents_artifacts",
           foreignKey: "documento_id",
           primaryKey: "id"
-        },
-        {
-          id: "monday_mappings", 
-          name: "Mapeamentos Monday",
-          description: "Relacionamento indireto com mapeamentos do Monday.com através do campo id_origem",
-          type: "many-to-one",
-          targetTable: "monday_mappings",
-          foreignKey: "id_origem",
-          primaryKey: "board_id"
-        },
-        {
-          id: "repo_structure",
-          name: "Estrutura de Repositório",
-          description: "Relacionamento potencial com estrutura de pastas do repositório",
-          type: "many-to-many",
-          targetTable: "repo_structure",
-          foreignKey: "linked_to",
-          primaryKey: "uid"
         }
       ];
       
