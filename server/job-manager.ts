@@ -195,6 +195,7 @@ class JobManager {
     let documentsCreated = 0;
     let documentsSkipped = 0;
     let documentsPreExisting = 0;
+    let filteredCount = 0;
 
     // Identificar campos marcados como chave para verificação de duplicatas
     const keyFields = mappingColumns.filter(col => col.isKey).map(col => col.cpxField);
@@ -210,12 +211,12 @@ class JobManager {
             const filterFunction = new Function('item', existingMapping.mappingFilter);
             const shouldProcess = filterFunction(item);
             if (!shouldProcess) {
-              documentsSkipped++;
+              filteredCount++;
               continue;
             }
           } catch (filterError) {
             console.error(`Erro no filtro para item ${item.id}:`, filterError);
-            documentsSkipped++;
+            filteredCount++;
             continue;
           }
         }
@@ -278,13 +279,15 @@ class JobManager {
           }
         }
 
-        // Verificar duplicatas se há campos chave
-        if (keyFields.length > 0) {
-          const existingDoc = await storage.checkDocumentExists(BigInt(item.id));
-          if (existingDoc) {
+        // Verificar duplicatas através do id_origem
+        try {
+          const duplicateCheck = await storage.getDocumentoByIdOrigem(BigInt(item.id));
+          if (duplicateCheck) {
             documentsPreExisting++;
             continue;
           }
+        } catch (error) {
+          // Se houver erro na verificação, continua tentando criar
         }
 
         // Criar o documento
@@ -297,11 +300,14 @@ class JobManager {
       }
     }
 
+    // Ajustar as estatísticas para corresponder ao processo manual
+    const finalDocumentsSkipped = filteredCount + documentsSkipped;
+
     return {
       itemsProcessed: items.length,
       documentsCreated,
       documentsPreExisting,
-      documentsSkipped
+      documentsSkipped: finalDocumentsSkipped
     };
   }
 
