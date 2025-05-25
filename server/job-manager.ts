@@ -66,6 +66,8 @@ class JobManager {
     const jobId = `job_${mappingId}_${Date.now()}`;
 
     const task = cron.schedule(cronExpression, () => {
+      const now = new Date();
+      console.log(`[JOB] Executando job às ${now.toLocaleString('pt-BR')} (horário local)`);
       this.executeMondaySync(mappingId);
     }, {
       scheduled: true
