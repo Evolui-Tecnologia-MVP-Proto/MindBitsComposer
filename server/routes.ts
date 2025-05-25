@@ -2427,7 +2427,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         eventType: `MONDAY_SYNC_${mapping.name.replace(/\s+/g, '_').toUpperCase()}`,
         message: "JOB de sincronização agendado",
         parameters: {
-          proximaExecucao: nextExecution.toLocaleString('pt-BR'),
+          proximaExecucao: nextExecution.toLocaleString('pt-BR', { 
+            timeZone: 'America/Sao_Paulo',
+            year: 'numeric',
+            month: '2-digit', 
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+          }),
           intervalo: frequencyMap[frequency] || frequency,
           mapeamento: mapping.name,
           quadroMonday: mapping.quadroMonday || 'N/A'

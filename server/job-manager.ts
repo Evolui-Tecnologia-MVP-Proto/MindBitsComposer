@@ -162,7 +162,14 @@ class JobManager {
       
       if (currentJob) {
         const nextExecution = this.calculateNextExecution(currentJob.frequency, currentJob.time, now);
-        proximaExecucao = nextExecution.toLocaleString('pt-BR');
+        proximaExecucao = nextExecution.toLocaleString('pt-BR', { 
+          timeZone: 'America/Sao_Paulo',
+          year: 'numeric',
+          month: '2-digit', 
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
       }
 
       // Registrar conclusão no sistema de logs com detalhes
