@@ -1,5 +1,8 @@
 import { storage } from "./storage";
 import type { InsertSystemLog } from "@shared/schema";
+import { db } from "./db";
+import { systemLogs } from "@shared/schema";
+import crypto from "crypto";
 
 // Event types for better organization and consistency
 export const EventTypes = {
@@ -63,7 +66,15 @@ export class SystemLogger {
         timestamp: new Date()
       };
 
-      await storage.createSystemLog(logData);
+      // Inserir log diretamente no banco
+      await db.insert(systemLogs).values({
+        id: crypto.randomUUID(),
+        eventType: logData.eventType,
+        message: logData.message,
+        parameters: logData.parameters,
+        userId: logData.userId,
+        timestamp: new Date()
+      });
     } catch (error) {
       // Avoid infinite loops by not logging log errors
       console.error("Erro ao criar log do sistema:", error);
