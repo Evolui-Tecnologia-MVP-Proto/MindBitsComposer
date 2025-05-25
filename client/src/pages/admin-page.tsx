@@ -177,9 +177,22 @@ const getDefaultableFields = () => {
 };
 
 // Componente para selecionar relacionamentos de documentos
-const DocumentRelationshipSelect = ({ selectedMapping, onRelationshipChange }: {
+const DocumentRelationshipSelect = ({ 
+  selectedMapping, 
+  onRelationshipChange,
+  mondayColumns,
+  selectedFileColumn,
+  setSelectedFileColumn,
+  attachmentMappings,
+  addAttachmentMapping
+}: {
   selectedMapping: any;
   onRelationshipChange: (relationship: any) => void;
+  mondayColumns: any[];
+  selectedFileColumn: string;
+  setSelectedFileColumn: (value: string) => void;
+  attachmentMappings: any[];
+  addAttachmentMapping: () => void;
 }) => {
   const [selectedRelationship, setSelectedRelationship] = useState<string>("");
   
@@ -236,7 +249,7 @@ const DocumentRelationshipSelect = ({ selectedMapping, onRelationshipChange }: {
             if (!relationship) return null;
             
             return (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-bold font-mono">{relationship.name}</span>
                   <Badge variant="outline" className="text-xs border-blue-500 text-blue-700 bg-blue-50">
@@ -244,6 +257,36 @@ const DocumentRelationshipSelect = ({ selectedMapping, onRelationshipChange }: {
                   </Badge>
                 </div>
                 <p className="text-xs text-gray-600 font-mono">{relationship.description}</p>
+                
+                {/* Combo de colunas de arquivo e botão + */}
+                <div className="pt-2 border-t border-gray-300">
+                  <label className="text-xs font-medium text-gray-700 mb-2 block">Mapeamento de Anexos</label>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={selectedFileColumn}
+                      onChange={(e) => setSelectedFileColumn(e.target.value)}
+                      className="flex-1 h-8 rounded-md border border-gray-300 bg-white px-2 py-1 text-xs font-mono"
+                    >
+                      <option value="">Selecione uma coluna de arquivo...</option>
+                      {mondayColumns?.filter(column => column.type?.toLowerCase() === 'file')
+                        .filter(column => !attachmentMappings.some(mapping => mapping.columnId === column.columnId))
+                        .map((column) => (
+                          <option key={column.id} value={column.columnId} className="font-mono">
+                            {column.title} [file]
+                          </option>
+                        ))}
+                    </select>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={addAttachmentMapping}
+                      disabled={!selectedFileColumn}
+                      className="h-8 w-8 p-0"
+                    >
+                      +
+                    </Button>
+                  </div>
+                </div>
               </div>
             );
           })()}
@@ -1915,68 +1958,43 @@ return item.column_values.some(col =>
                     onRelationshipChange={(relationship) => {
                       console.log("Relacionamento selecionado:", relationship);
                     }}
+                    mondayColumns={mondayColumns}
+                    selectedFileColumn={selectedFileColumn}
+                    setSelectedFileColumn={setSelectedFileColumn}
+                    attachmentMappings={attachmentMappings}
+                    addAttachmentMapping={addAttachmentMapping}
                   />
                 </div>
                 
-                {/* Seção de mapeamento de anexos */}
-                <div className="space-y-3 pt-4 border-t">
-                  <label className="text-sm font-medium">Mapeamento de Anexos</label>
-                  <div className="flex items-center gap-2">
-                    <select
-                      value={selectedFileColumn}
-                      onChange={(e) => setSelectedFileColumn(e.target.value)}
-                      className="flex-1 h-10 rounded-md border border-input bg-background px-3 py-2 text-sm font-mono"
-                    >
-                      <option value="">Selecione uma coluna de arquivo...</option>
-                      {mondayColumns?.filter(column => column.type?.toLowerCase() === 'file')
-                        .filter(column => !attachmentMappings.some(mapping => mapping.columnId === column.columnId))
-                        .map((column) => (
-                          <option key={column.id} value={column.columnId} className="font-mono">
-                            {column.title} [file]
-                          </option>
-                        ))}
-                    </select>
-                    <Button
-                      type="button"
-                      size="sm"
-                      onClick={addAttachmentMapping}
-                      disabled={!selectedFileColumn}
-                      className="px-3"
-                    >
-                      +
-                    </Button>
-                  </div>
-                  
-                  {/* Lista de mapeamentos de anexos */}
-                  {attachmentMappings.length > 0 && (
-                    <div className="space-y-2">
-                      <label className="text-xs font-medium text-gray-600">Anexos Mapeados</label>
-                      <div className="space-y-1">
-                        {attachmentMappings.map((mapping) => (
-                          <div key={mapping.id} className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-md p-2">
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-mono font-bold">documents_artifacts</span>
-                              <Badge variant="outline" className="text-xs border-blue-500 text-blue-700 bg-blue-50">
-                                one-to-many
-                              </Badge>
-                              <span className="text-xs text-gray-500">→</span>
-                              <span className="text-sm font-mono">{mapping.columnTitle}</span>
-                            </div>
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => removeAttachmentMapping(mapping.id)}
-                              className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
-                            >
-                              ×
-                            </Button>
+                {/* Lista de mapeamentos de anexos */}
+                {attachmentMappings.length > 0 && (
+                  <div className="space-y-2 pt-4 border-t">
+                    <label className="text-xs font-medium text-gray-600">Anexos Mapeados</label>
+                    <div className="space-y-1">
+                      {attachmentMappings.map((mapping) => (
+                        <div key={mapping.id} className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-md p-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-mono font-bold">documents_artifacts</span>
+                            <Badge variant="outline" className="text-xs border-blue-500 text-blue-700 bg-blue-50">
+                              one-to-many
+                            </Badge>
+                            <span className="text-xs text-gray-500">→</span>
+                            <span className="text-sm font-mono">{mapping.columnTitle}</span>
                           </div>
-                        ))}
-                      </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeAttachmentMapping(mapping.id)}
+                            className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                          >
+                            ×
+                          </Button>
+                        </div>
+                      ))}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             </TabsContent>
 
