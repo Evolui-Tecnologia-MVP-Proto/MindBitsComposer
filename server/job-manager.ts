@@ -86,7 +86,7 @@ class JobManager {
     
     // Registrar log do sistema
     try {
-      const mapping = await storage.getBoardMapping(mappingId);
+      const mapping = await storage.getMondayMapping(mappingId);
       await SystemLogger.log({
         eventType: 'JOB_ACTIVATED',
         message: `Job ativado para mapeamento "${mapping?.name || mappingId}"`,
@@ -117,7 +117,7 @@ class JobManager {
       
       // Registrar log do sistema
       try {
-        const mapping = await storage.getBoardMapping(mappingId);
+        const mapping = await storage.getMondayMapping(mappingId);
         await SystemLogger.log({
           eventType: 'JOB_CANCELLED',
           message: `Job cancelado para mapeamento "${mapping?.name || mappingId}"`,
