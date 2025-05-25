@@ -195,7 +195,8 @@ class JobManager {
     const cronExpression = this.frequencyToCron(frequency, time);
     const jobId = `job_${mappingId}_${Date.now()}`;
 
-    console.log(`[JOB] Criando job com expressão cron: ${cronExpression} para frequência ${frequency} às ${time}`);
+    console.log(`[JOB] Criando job com expressão cron: "${cronExpression}" para frequência ${frequency} às ${time}`);
+    console.log(`[JOB] Hora atual: ${new Date().toLocaleTimeString('pt-BR')} - Próxima execução calculada internamente`);
 
     const task = cron.schedule(cronExpression, () => {
       const now = new Date();
