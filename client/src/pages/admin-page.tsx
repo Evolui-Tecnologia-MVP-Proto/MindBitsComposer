@@ -566,6 +566,31 @@ export default function AdminPage() {
 
   const { data: systemLogs = [], isLoading: logsLoading } = useQuery<SystemLog[]>({
     queryKey: ['/api/logs', logFilters],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      
+      if (logFilters.eventType) {
+        params.append('eventType', logFilters.eventType);
+      }
+      if (logFilters.userId) {
+        params.append('userId', logFilters.userId);
+      }
+      if (logFilters.startDate) {
+        params.append('startDate', logFilters.startDate);
+      }
+      if (logFilters.endDate) {
+        params.append('endDate', logFilters.endDate);
+      }
+      
+      const url = `/api/logs${params.toString() ? '?' + params.toString() : ''}`;
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error('Erro ao buscar logs');
+      }
+      
+      return response.json();
+    },
     refetchInterval: 10000, // Atualiza a cada 10 segundos
   });
   
