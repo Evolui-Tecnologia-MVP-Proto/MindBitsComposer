@@ -1757,6 +1757,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/documentos-relationships", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
+    // Forçar cache bust
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.set('Pragma', 'no-cache');
+    res.set('Expires', '0');
+    
     try {
       // Lista apenas o relacionamento real que existe na tabela documentos
       const relationships = [
