@@ -293,15 +293,9 @@ class JobManager {
           }
         }
 
-        // Tentar criar o documento
-        try {
-          await storage.createDocumento(documentData);
-          documentsCreated++;
-          console.log(`✅ [JOB] Documento criado com sucesso para item ${item.id}`);
-        } catch (createError) {
-          console.error(`❌ [JOB] Erro ao criar documento para item ${item.id}:`, createError);
-          documentsSkipped++;
-        }
+        // Criar o documento (mantendo lógica original)
+        await storage.createDocumento(documentData);
+        documentsCreated++;
         
       } catch (itemError) {
         console.error(`❌ [JOB] Erro ao processar item ${item.id}:`, itemError);
