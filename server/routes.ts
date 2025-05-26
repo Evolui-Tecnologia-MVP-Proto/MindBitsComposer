@@ -1071,6 +1071,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       `;
       
+      console.log("📤 Query GraphQL para Monday.com:", query);
+      
       const mondayResponse = await fetch("https://api.monday.com/v2", {
         method: "POST",
         headers: {
@@ -1080,15 +1082,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         body: JSON.stringify({ query })
       });
       
+      console.log("📥 Status da resposta Monday:", mondayResponse.status, mondayResponse.statusText);
+      
       if (!mondayResponse.ok) {
+        const errorText = await mondayResponse.text();
+        console.error("❌ Erro na API Monday:", errorText);
         return res.status(500).json({
           success: false,
-          message: `Erro na API do Monday: ${mondayResponse.status}`
+          message: `Erro na API do Monday: ${mondayResponse.status}`,
+          details: errorText
         });
       }
       
-      const data = await mondayResponse.json();
-      console.log("🔍 Resposta do Monday.com:", JSON.stringify(data, null, 2));
+      const responseText = await mondayResponse.text();
+      console.log("📦 Resposta raw do Monday.com:", responseText);
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+        console.log("🔍 Resposta do Monday.com parseada:", JSON.stringify(data, null, 2));
+      } catch (parseError) {
+        console.error("❌ Erro ao fazer parse da resposta Monday:", parseError);
+        console.error("📄 Conteúdo que causou o erro:", responseText);
+        return res.status(500).json({
+          success: false,
+          message: "Erro ao processar resposta do Monday.com",
+          details: responseText
+        });
+      }
       
       if (data.errors) {
         console.error("Erros da API Monday:", data.errors);
