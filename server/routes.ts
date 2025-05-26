@@ -1010,6 +1010,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      console.log("🔥 FINALIZANDO rota GET - retornando:", attachments.length, "anexos");
       res.json(attachments);
     } catch (error) {
       console.error("Erro ao buscar anexos do Monday:", error);
@@ -1021,8 +1022,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Buscar anexos de colunas específicas baseado no Assets Map
-  app.post("/api/monday/attachments/:itemId", async (req, res) => {
-    console.log("🚀 INÍCIO endpoint Monday attachments");
+  app.post("/api/monday/assets-map/:itemId", async (req, res) => {
+    console.log("🚀 INÍCIO endpoint Monday assets-map");
     console.log("📋 Dados recebidos:", { 
       itemId: req.params.itemId, 
       body: req.body,

@@ -1423,7 +1423,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             boardId: mapping.boardId
                           });
                           
-                          const response = await fetch(`/api/monday/attachments/${selectedDocument.idOrigemTxt}`, {
+                          const response = await fetch(`/api/monday/assets-map/${selectedDocument.idOrigemTxt}`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ 
