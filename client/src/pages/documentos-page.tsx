@@ -1356,21 +1356,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-medium">Anexos do Documento</h3>
                   {/* Botão para carregar anexos do Monday.com para documentos integrados */}
-                  {(() => {
-                    console.log("🔍 Debug documento selecionado:", {
-                      id: selectedDocument?.id,
-                      origem: selectedDocument?.origem,
-                      statusOrigem: selectedDocument?.statusOrigem,
-                      idOrigem: selectedDocument?.idOrigem,
-                      tipo: typeof selectedDocument?.idOrigem
-                    });
-                    return selectedDocument?.origem?.includes("Monday") && selectedDocument?.idOrigem;
-                  })() && (
+                  {selectedDocument?.idOrigemTxt && (
                     <Button 
                       onClick={async () => {
                         try {
                           setIsLoadingMondayAttachments(true);
-                          const response = await fetch(`/api/monday/attachments/${selectedDocument.idOrigem}`);
+                          const response = await fetch(`/api/monday/attachments/${selectedDocument.idOrigemTxt}`);
                           
                           if (response.ok) {
                             const attachments = await response.json();
