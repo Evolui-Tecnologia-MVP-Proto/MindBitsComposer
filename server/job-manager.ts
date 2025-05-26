@@ -266,9 +266,12 @@ class JobManager {
           
           // Registrar sucesso no log do sistema
           try {
+            console.log(`[DEBUG] Tentando registrar log para mapeamento: ${mappingId}`);
             const mapping = await storage.getMondayMapping(mappingId);
+            console.log(`[DEBUG] Mapeamento encontrado:`, mapping?.name);
+            
             await SystemLogger.log({
-              eventType: 'MONDAY_SYNC_SCHEDULED',
+              eventType: 'MONDAY_SYNC_COMPLETED',
               message: `Execução automática concluída para mapeamento "${mapping?.name || mappingId}"`,
               parameters: {
                 mappingId,
