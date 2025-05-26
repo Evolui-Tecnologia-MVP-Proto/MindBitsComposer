@@ -1161,7 +1161,7 @@ export default function AdminPage() {
           description: (
             <div className="space-y-1">
               <div className="font-medium">Resumo da Importação:</div>
-              <div><strong>{result.itemsProcessed}</strong> registros importados da API</div>
+              <div><strong>{result.itemsProcessed}</strong> registros processados da API</div>
               <div><strong>{result.documentsCreated}</strong> documentos novos gravados</div>
               <div><strong>{result.documentsPreExisting || 0}</strong> registros já existentes</div>
               <div><strong>{result.documentsSkipped}</strong> registros filtrados/ignorados</div>

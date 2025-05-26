@@ -1215,66 +1215,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("FILTRO CONFIGURADO:", existingMapping.mappingFilter || "NENHUM FILTRO");
       console.log("FILTRO ESTÁ VAZIO?", !existingMapping.mappingFilter || !existingMapping.mappingFilter.trim());
 
-      // Obter dados do quadro Monday
+      // Obter TODOS os dados do quadro Monday com paginação completa
       const mondayColumns = mappingColumns.map(col => col.mondayColumnId);
-      const query = `
-        query {
-          boards(ids: [${existingMapping.boardId}]) {
-            items_page(limit: 500) {
-              items {
-                id
-                name
-                column_values(ids: [${mondayColumns.map(id => `"${id}"`).join(", ")}]) {
+      
+      console.log("👤 📄 INICIANDO BUSCA PAGINADA - coletando todos os itens do quadro");
+      let allItems: any[] = [];
+      let cursor: string | null = null;
+      let pageCount = 0;
+      
+      do {
+        pageCount++;
+        console.log(`👤 📄 PÁGINA ${pageCount} - Cursor: ${cursor || 'PRIMEIRA PÁGINA'}`);
+        
+        const query = `
+          query {
+            boards(ids: [${existingMapping.boardId}]) {
+              items_page(limit: 500${cursor ? `, cursor: "${cursor}"` : ''}) {
+                cursor
+                items {
                   id
-                  text
-                  value
-                  column {
-                    title
+                  name
+                  column_values(ids: [${mondayColumns.map(id => `"${id}"`).join(", ")}]) {
+                    id
+                    text
+                    value
+                    column {
+                      title
+                    }
                   }
                 }
               }
             }
           }
+        `;
+        
+        console.log(`👤 🚀 EXECUTANDO QUERY DA PÁGINA ${pageCount}`);
+
+        const mondayResponse = await fetch("https://api.monday.com/v2", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": apiKey,
+            "API-Version": "2023-10"
+          },
+          body: JSON.stringify({ query })
+        });
+
+        if (!mondayResponse.ok) {
+          const errorText = await mondayResponse.text();
+          throw new Error(`Erro na API do Monday (${mondayResponse.status}): ${errorText}`);
         }
-      `;
+
+        const responseText = await mondayResponse.text();
+        let mondayData;
+        
+        try {
+          mondayData = JSON.parse(responseText);
+        } catch (parseError) {
+          throw new Error(`API do Monday retornou conteúdo inválido`);
+        }
+        
+        if (mondayData.errors) {
+          throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(mondayData.errors)}`);
+        }
+
+        const pageItems = mondayData.data?.boards?.[0]?.items_page?.items || [];
+        cursor = mondayData.data?.boards?.[0]?.items_page?.cursor;
+        
+        allItems = allItems.concat(pageItems);
+        console.log(`👤 ✅ PÁGINA ${pageCount} CONCLUÍDA: ${pageItems.length} itens | Total acumulado: ${allItems.length}`);
+        
+      } while (cursor);
       
-      console.log("Query GraphQL:", query);
-
-      const mondayResponse = await fetch("https://api.monday.com/v2", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": apiKey,
-          "API-Version": "2023-10"
-        },
-        body: JSON.stringify({ query })
-      });
-
-      if (!mondayResponse.ok) {
-        const errorText = await mondayResponse.text();
-        throw new Error(`Erro na API do Monday (${mondayResponse.status}): ${errorText}`);
-      }
-
-      // Verificar se a resposta é JSON válido
-      const responseText = await mondayResponse.text();
-      let mondayData;
-      
-      try {
-        mondayData = JSON.parse(responseText);
-        console.log("Resposta da API Monday:", JSON.stringify(mondayData, null, 2));
-      } catch (parseError) {
-        console.error("=== CONTEÚDO COMPLETO RETORNADO PELA API MONDAY ===");
-        console.error(responseText);
-        console.error("=== FIM DO CONTEÚDO ===");
-        throw new Error(`API do Monday retornou HTML em vez de JSON. Conteúdo: ${responseText.substring(0, 200)}...`);
-      }
-      
-      if (mondayData.errors) {
-        console.error("Erros GraphQL:", mondayData.errors);
-        throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(mondayData.errors)}`);
-      }
-
-      const items = mondayData.data?.boards?.[0]?.items_page?.items || [];
+      console.log(`👤 🎯 PAGINAÇÃO COMPLETA! Total de itens coletados: ${allItems.length}`);
+      const items = allItems;
       let documentsCreated = 0;
       let documentsSkipped = 0;
       let documentsPreExisting = 0;
