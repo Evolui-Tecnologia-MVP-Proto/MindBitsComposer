@@ -118,25 +118,33 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     
     // Verificar se já existe um documento com este id_origem
     const idOrigem = BigInt(item.id);
-    const existingDocs = await db.select().from(documentos).where(eq(documentos.idOrigem, idOrigem)).limit(1);
     
-    if (existingDocs.length > 0) {
-      console.log(`⚠️ Documento já existe para item ${item.id}, pulando...`);
-      documentsPreExisting++;
-      continue;
+    // Usar verificação através do storage para manter compatibilidade
+    try {
+      const existingDoc = await storage.getDocumento(String(idOrigem));
+      if (existingDoc) {
+        console.log(`⚠️ Documento já existe para item ${item.id}, pulando...`);
+        documentsPreExisting++;
+        continue;
+      }
+    } catch (error) {
+      // Se não encontrar por ID, continuar com criação do documento
+      console.log(`🔍 Item ${item.id} não encontrado - será criado`);
     }
     
     // Mapear dados do item para campos do documento
     const documentData: any = {
-      titulo: item.name || `Item ${item.id}`,
-      id_origem: idOrigem,
+      objeto: item.name || `Item ${item.id}`,
+      idOrigem: idOrigem,
       status: "Integrado"
     };
     
     // Aplicar valores padrão
     if (existingMapping.defaultValues) {
       try {
-        const defaults = JSON.parse(existingMapping.defaultValues);
+        const defaults = typeof existingMapping.defaultValues === 'string' 
+          ? JSON.parse(existingMapping.defaultValues) 
+          : existingMapping.defaultValues;
         Object.assign(documentData, defaults);
       } catch (e) {
         console.warn("Erro ao parsear valores padrão:", e);
@@ -150,23 +158,23 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
         let value = columnValue.text;
         
         // Aplicar transformação se configurada
-        if (mapping.transformation && mapping.transformation.trim()) {
+        if (mapping.transformFunction && mapping.transformFunction.trim()) {
           try {
-            const transformFunction = new Function('value', mapping.transformation);
+            const transformFunction = new Function('value', mapping.transformFunction);
             value = transformFunction(value);
           } catch (transformError) {
-            console.warn(`Erro na transformação para coluna ${mapping.documentField}:`, transformError);
+            console.warn(`Erro na transformação para coluna ${mapping.cpxField}:`, transformError);
           }
         }
         
-        documentData[mapping.documentField] = value;
+        documentData[mapping.cpxField] = value;
       }
     }
     
     try {
       // Criar o documento
       const createdDocument = await storage.createDocumento(documentData);
-      console.log(`✅ Documento criado: ${createdDocument.id} - ${createdDocument.titulo}`);
+      console.log(`✅ Documento criado: ${createdDocument.id} - ${createdDocument.objeto}`);
       documentsCreated++;
       
       // Processar anexos se configurados
