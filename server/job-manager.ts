@@ -243,7 +243,7 @@ class JobManager {
       }
 
       // Fazer uma requisição para o endpoint de execução (simulando o que o botão laranja faz)
-      const response = await fetch(`http://localhost:${process.env.PORT || 3000}/api/monday/mappings/execute-headless`, {
+      const response = await fetch(`http://localhost:5000/api/monday/mappings/execute-headless`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
