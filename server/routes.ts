@@ -1460,6 +1460,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
 
           // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - USAR CAMPOS MARCADOS COMO CHAVE
+          console.log(`👤 🔍 INICIANDO VERIFICAÇÃO DE DUPLICATAS para item ${item.id}`);
           let isDuplicate = false;
           const keyFields = mappingColumns.filter(col => col.isKey);
           console.log(`👤 DEBUG - Campos chave encontrados: ${keyFields.length}`, keyFields.map(k => `${k.cpxField}(isKey:${k.isKey})`));
