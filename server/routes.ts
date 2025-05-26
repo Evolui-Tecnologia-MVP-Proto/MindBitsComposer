@@ -1765,6 +1765,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`🤖 EXECUÇÃO AUTOMÁTICA CONCLUÍDA - Criados: ${documentsCreated} | Filtrados: ${documentsSkipped} | Pré-existentes: ${documentsPreExisting}`);
 
+      // SEMPRE registrar log para execuções automáticas
+      try {
+        await SystemLogger.log({
+          eventType: 'MONDAY_SYNC_COMPLETED',
+          message: `Execução automática concluída para mapeamento "${existingMapping?.name || mappingId}"`,
+          parameters: {
+            mappingId,
+            executionType: 'automatic',
+            documentsCreated,
+            documentsFiltered: documentsSkipped,
+            documentsPreExisting,
+            itemsProcessed: items.length,
+            executedBy: 'scheduler'
+          }
+        });
+        console.log(`🤖 LOG REGISTRADO NO BANCO para execução automática - Mapeamento: ${mappingId}`);
+      } catch (logError) {
+        console.error('🤖 ERRO ao registrar log de execução automática:', logError);
+      }
+
       res.json({
         success: true,
         message: "Execução automática concluída com sucesso",
