@@ -1156,9 +1156,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Se é uma coluna de arquivo (tipo 'file') e tem valor
           if (column.type === 'file' && column.value) {
             try {
+              console.log("🔧 Valor bruto da coluna:", column.value);
+              console.log("🔧 Tipo do valor:", typeof column.value);
+              
               // Parse do JSON que contém os arquivos serializados
               const fileData = JSON.parse(column.value);
-              console.log("📁 Dados do arquivo parseados:", fileData);
+              console.log("📁 Dados do arquivo parseados:", JSON.stringify(fileData, null, 2));
               
               if (fileData.files && Array.isArray(fileData.files)) {
                 for (const file of fileData.files) {
