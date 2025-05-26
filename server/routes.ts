@@ -1136,38 +1136,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     });
                   }
                 } catch (downloadError) {
-                  console.error(`Erro ao baixar anexo ${file.name}:`, downloadError);
-                  // Baixar o arquivo da URL e converter para base64
-                  try {
-                    const fileUrl = file.public_url || file.url;
-                    console.log(`📥 Baixando arquivo: ${file.name} de ${fileUrl}`);
-                    
-                    const fileResponse = await fetch(fileUrl);
-                    
-                    if (fileResponse.ok) {
-                      const arrayBuffer = await fileResponse.arrayBuffer();
-                      const base64Data = Buffer.from(arrayBuffer).toString('base64');
-                      
-                      console.log(`✅ Arquivo ${file.name} baixado com sucesso (${arrayBuffer.byteLength} bytes)`);
-                      
-                      attachments.push({
-                        id: file.id,
-                        name: file.name,
-                        fileName: file.name,
-                        fileData: base64Data, // Arquivo em base64
-                        mimeType: file.name?.split('.').pop() || 'application/octet-stream',
-                        fileSize: file.file_size?.toString(),
-                        url: file.url,
-                        public_url: file.public_url,
-                        columnId: columnId,
-                        itemId: itemId
-                      });
-                    } else {
-                      console.error(`❌ Erro ao baixar arquivo ${file.name}: ${fileResponse.status}`);
-                    }
-                  } catch (downloadError) {
-                    console.error(`❌ Erro ao processar arquivo ${file.name}:`, downloadError);
-                  }
+                  console.error(`❌ Erro ao processar arquivo ${file.name}:`, downloadError);
                 }
               }
             }
