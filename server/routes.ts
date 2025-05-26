@@ -1462,6 +1462,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - USAR CAMPOS MARCADOS COMO CHAVE
           let isDuplicate = false;
           const keyFields = mappingColumns.filter(col => col.isKey);
+          console.log(`👤 DEBUG - Campos chave encontrados: ${keyFields.length}`, keyFields.map(k => `${k.cpxField}(isKey:${k.isKey})`));
           
           if (keyFields.length > 0) {
             try {
@@ -1472,6 +1473,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               for (const keyField of keyFields) {
                 const fieldValue = documentData[keyField.cpxField];
+                console.log(`👤 DEBUG - Campo ${keyField.cpxField}: valor = "${fieldValue}"`);
+                
                 if (fieldValue !== undefined && fieldValue !== null && fieldValue !== '') {
                   // Converter campo do documento para nome da coluna do banco
                   let dbColumnName = keyField.cpxField;
@@ -1481,14 +1484,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   conditions.push(`${dbColumnName} = $${paramIndex}`);
                   values.push(fieldValue);
                   paramIndex++;
+                  console.log(`👤 DEBUG - Adicionada condição: ${dbColumnName} = "${fieldValue}"`);
                 }
               }
               
               if (conditions.length > 0) {
                 const whereClause = conditions.join(' AND ');
-                console.log(`👤 VERIFICANDO DUPLICATA com campos chave: ${whereClause}`, values);
+                console.log(`👤 VERIFICANDO DUPLICATA SQL: SELECT id FROM documentos WHERE ${whereClause}`, values);
                 
                 const duplicateCheck = await db.execute(sql.raw(`SELECT id FROM documentos WHERE ${whereClause} LIMIT 1`, values));
+                console.log(`👤 DEBUG - Resultado da consulta: ${duplicateCheck.rows.length} registros encontrados`);
                 
                 if (duplicateCheck.rows.length > 0) {
                   console.log(`👤 ❌ DUPLICATA DETECTADA: Item ${item.id} já existe como documento ${duplicateCheck.rows[0].id}`);
@@ -1497,6 +1502,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 } else {
                   console.log(`👤 ✅ NOVO DOCUMENTO: Item ${item.id} será criado`);
                 }
+              } else {
+                console.log(`👤 ⚠️ ATENÇÃO: Nenhuma condição de verificação foi criada (valores vazios)`);
               }
             } catch (error) {
               console.log(`👤 ⚠️ Erro na verificação de duplicata para item ${item.id}:`, error);
