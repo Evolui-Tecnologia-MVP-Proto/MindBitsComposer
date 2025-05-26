@@ -1711,17 +1711,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           let isDuplicate = false;
           if (documentData.idOrigem) {
             try {
+              console.log(`🤖 VERIFICANDO DUPLICATA para idOrigem: ${documentData.idOrigem} (tipo: ${typeof documentData.idOrigem})`);
               const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem = ${documentData.idOrigem} LIMIT 1`);
               
               if (duplicateCheck.rows.length > 0) {
-                console.log(`🤖 DUPLICATA DETECTADA: Item ${item.id} já existe como documento ${duplicateCheck.rows[0].id}`);
+                console.log(`🤖 ❌ DUPLICATA DETECTADA: Item ${item.id} (idOrigem: ${documentData.idOrigem}) já existe como documento ${duplicateCheck.rows[0].id}`);
                 isDuplicate = true;
                 documentsPreExisting++;
+              } else {
+                console.log(`🤖 ✅ NOVO DOCUMENTO: Item ${item.id} (idOrigem: ${documentData.idOrigem}) será criado`);
               }
             } catch (error) {
-              console.log(`🤖 Erro na verificação de duplicata para item ${item.id}:`, error);
+              console.log(`🤖 ⚠️ Erro na verificação de duplicata para item ${item.id}:`, error);
               // Continuar mesmo com erro na verificação
             }
+          } else {
+            console.log(`🤖 ⚠️ ATENÇÃO: Item ${item.id} não tem idOrigem definido!`);
           }
 
           if (!isDuplicate) {
