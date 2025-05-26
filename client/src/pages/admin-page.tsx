@@ -116,6 +116,12 @@ type JobStatus = {
   } | null;
 };
 
+type DocumentColumn = {
+  name: string;
+  type: string;
+  description: string;
+};
+
 type SystemLog = {
   id: string;
   eventType: string;
@@ -181,25 +187,12 @@ const serviceConnectionSchema = z.object({
   parameters: z.array(z.string()).optional(),
 });
 
-// Função para gerar dinamicamente as colunas da tabela documentos
-const getDocumentosColumns = () => {
-  return [
-    { field: "id_origem", label: "ID Origem", type: "integer" },
-    { field: "origem", label: "Origem", type: "text" },
-    { field: "objeto", label: "Objeto da Task", type: "text" },
-    { field: "tipo", label: "Tipo", type: "text" },
-    { field: "cliente", label: "Cliente", type: "text" },
-    { field: "responsavel", label: "Responsável", type: "text" },
-    { field: "sistema", label: "Sistema", type: "text" },
-    { field: "modulo", label: "Módulo", type: "text" },
-    { field: "descricao", label: "Detalhamento", type: "text" },
-    { field: "status", label: "Status", type: "text" },
-    { field: "statusOrigem", label: "Status Origem", type: "text" },
-    { field: "solicitante", label: "Solicitante", type: "text" },
-    { field: "aprovador", label: "Aprovador", type: "text" },
-    { field: "agente", label: "Agente", type: "text" },
-    { field: "generalColumns", label: "Colunas Gerais", type: "json" },
-  ];
+// Hook para carregar dinamicamente as colunas da tabela documentos
+const useDocumentosColumns = () => {
+  return useQuery<DocumentColumn[]>({
+    queryKey: ["/api/documentos-columns"],
+    staleTime: 5 * 60 * 1000, // Cache por 5 minutos
+  });
 };
 
 // Função para obter campos válidos para valores padrão (somente obrigatórios e de tipo texto/numérico/data)
