@@ -1054,18 +1054,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const apiKey = mondayConnection.token;
       
-      // Buscar item com valores das colunas (onde estão os anexos serializados)
+      // Buscar item específico no board usando a query correta
       const query = `
         query {
-          items(ids: [${itemId}]) {
-            id
-            name
-            column_values {
+          boards(ids: [${boardId}]) {
+            items(ids: [${itemId}]) {
               id
-              title
-              text
-              value
-              type
+              name
+              column_values {
+                id
+                title
+                text
+                value
+                type
+              }
             }
           }
         }
@@ -1122,12 +1124,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const items = data.data?.items || [];
-      if (items.length === 0) {
+      const boards = data.data?.boards || [];
+      if (boards.length === 0 || !boards[0].items || boards[0].items.length === 0) {
+        console.log("❌ Nenhum item encontrado no board");
         return res.json([]);
       }
       
-      const item = items[0];
+      const item = boards[0].items[0];
+      console.log("✅ Item encontrado:", {
+        id: item.id,
+        name: item.name,
+        totalColumns: item.column_values?.length || 0
+      });
       const attachments: any[] = [];
       
       // Processar cada coluna especificada no Assets Map
