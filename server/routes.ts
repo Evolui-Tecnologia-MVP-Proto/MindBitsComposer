@@ -39,19 +39,17 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
   const boardId = existingMapping.boardId;
   console.log(`🎯 Buscando TODOS os dados do quadro ${boardId}...`);
   
-  // Buscar TODOS os itens usando paginação ROBUSTA
+  // PAGINAÇÃO CORRIGIDA - BUSCAR TODOS OS ITENS
   console.log(`${isHeadless ? '🤖' : '👤'} 📄 INICIANDO BUSCA PAGINADA COMPLETA`);
   
   const mondayColumns = mappingColumns.map(col => col.mondayColumnId);
   let allItems: any[] = [];
   let cursor: string | null = null;
   let pageCount = 0;
-  let totalItemsFound = 0;
   
-  // Loop de paginação até encontrar TODOS os itens
-  while (true) {
+  do {
     pageCount++;
-    console.log(`${isHeadless ? '🤖' : '👤'} 🔍 PÁGINA ${pageCount} ${cursor ? `[cursor: ${cursor.substring(0, 20)}...]` : '[PRIMEIRA PÁGINA]'}`);
+    console.log(`${isHeadless ? '🤖' : '👤'} 🔍 PÁGINA ${pageCount} - Cursor: ${cursor || 'PRIMEIRA PÁGINA'}`);
     
     const query = `
       query {
@@ -75,6 +73,8 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       }
     `;
     
+    console.log(`${isHeadless ? '🤖' : '👤'} 🚀 EXECUTANDO QUERY DA PÁGINA ${pageCount}`);
+    
     const mondayResponse = await fetch("https://api.monday.com/v2", {
       method: "POST",
       headers: {
@@ -96,29 +96,20 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     }
     
     const pageItems = mondayData.data?.boards?.[0]?.items_page?.items || [];
-    const nextCursor = mondayData.data?.boards?.[0]?.items_page?.cursor;
+    cursor = mondayData.data?.boards?.[0]?.items_page?.cursor;
     
-    allItems = [...allItems, ...pageItems];
-    totalItemsFound = allItems.length;
+    allItems = allItems.concat(pageItems);
+    console.log(`${isHeadless ? '🤖' : '👤'} ✅ PÁGINA ${pageCount} CONCLUÍDA: ${pageItems.length} itens | TOTAL ACUMULADO: ${allItems.length}`);
+    console.log(`${isHeadless ? '🤖' : '👤'} 🔗 CURSOR ATUAL: ${cursor || 'NULL (fim)'}`);
     
-    console.log(`${isHeadless ? '🤖' : '👤'} ✅ PÁGINA ${pageCount}: ${pageItems.length} itens | TOTAL: ${totalItemsFound}`);
-    
-    // Verificar se há mais páginas
-    if (!nextCursor) {
-      console.log(`${isHeadless ? '🤖' : '👤'} 🏁 PAGINAÇÃO COMPLETA - sem cursor`);
+    if (!cursor) {
+      console.log(`${isHeadless ? '🤖' : '👤'} 🏁 FIM DA PAGINAÇÃO - sem mais páginas`);
       break;
     }
-    
-    if (pageItems.length === 0) {
-      console.log(`${isHeadless ? '🤖' : '👤'} 🏁 PAGINAÇÃO COMPLETA - página vazia`);
-      break;
-    }
-    
-    cursor = nextCursor;
-  }
+  } while (cursor);
 
   const items = allItems;
-  console.log(`${isHeadless ? '🤖' : '👤'} 🎯 BUSCA FINALIZADA: ${items.length} itens em ${pageCount} páginas`);
+  console.log(`${isHeadless ? '🤖' : '👤'} 🎯 BUSCA COMPLETA FINALIZADA: ${items.length} itens em ${pageCount} páginas`);
   
   let documentsCreated = 0;
   let documentsSkipped = 0;
