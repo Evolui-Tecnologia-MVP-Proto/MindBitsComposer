@@ -1,0 +1,198 @@
+// Função compartilhada para executar mapeamento Monday
+async function executeMondayMapping(mappingId: string, userId?: number, isHeadless: boolean = false) {
+  console.log(`${isHeadless ? '🤖' : '👤'} INICIANDO EXECUÇÃO DO MAPEAMENTO:`, mappingId);
+
+  const existingMapping = await storage.getMondayMapping(mappingId);
+  if (!existingMapping) throw new Error("Mapeamento não encontrado");
+
+  const apiKey = await storage.getMondayApiKey();
+  if (!apiKey) throw new Error("Chave da API do Monday não configurada");
+
+  const mappingColumns = await storage.getMappingColumns(mappingId);
+  console.log(`📊 ${mappingColumns.length} colunas mapeadas encontradas`);
+
+  const boardId = existingMapping.boardId;
+  console.log(`🎯 Buscando dados do quadro ${boardId}...`);
+
+  // Buscar todos os itens com paginação por cursor
+  let items: any[] = [];
+  let cursor: string | null = null;
+
+  do {
+    const query = `
+      query GetBoardItems($boardId: ID!, $cursor: String) {
+        boards(ids: [$boardId]) {
+          items_page(limit: 500, cursor: $cursor) {
+            cursor
+            items {
+              id
+              name
+              column_values {
+                id
+                text
+                value
+                type
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const variables = { boardId, cursor };
+
+    const response = await fetch("https://api.monday.com/v2", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": apiKey
+      },
+      body: JSON.stringify({ query, variables })
+    });
+
+    if (!response.ok) throw new Error(`Erro na API do Monday: ${response.status}`);
+
+    const data: any = await response.json();
+
+    if (data.errors) {
+      throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(data.errors)}`);
+    }
+
+    const page = data.data.boards[0]?.items_page;
+    if (page?.items) {
+      items.push(...page.items);
+    }
+
+    cursor = page?.cursor || null;
+  } while (cursor);
+
+  console.log(`📋 ${items.length} itens encontrados no quadro`);
+
+  let documentsCreated = 0;
+  let documentsSkipped = 0;
+  let documentsPreExisting = 0;
+
+  for (let index = 0; index < items.length; index++) {
+    const item = items[index];
+
+    // Filtro (JavaScript string)
+    if (existingMapping.mappingFilter?.trim()) {
+      try {
+        const filterFunction = new Function('item', existingMapping.mappingFilter);
+        const passesFilter = filterFunction(item);
+        if (!passesFilter) {
+          console.log(`❌ Item ${item.id} filtrado`);
+          documentsSkipped++;
+          continue;
+        }
+      } catch (filterError) {
+        console.error(`❌ Erro no filtro para item ${item.id}:`, filterError);
+        documentsSkipped++;
+        continue;
+      }
+    }
+
+    // Verificação de duplicatas
+    try {
+      const duplicateCheck = await db.execute(sql`
+        SELECT id FROM documentos WHERE id_origem_txt = ${item.id} LIMIT 1
+      `);
+
+      if (duplicateCheck.rows.length > 0) {
+        console.log(`❌ DUPLICATA: Item ${item.id} já existe`);
+        documentsPreExisting++;
+        continue;
+      }
+    } catch (error) {
+      console.log(`⚠️ Erro na verificação de duplicata:`, error);
+    }
+
+    const idOrigem = BigInt(item.id);
+    const documentData: any = {
+      objeto: item.name || `Item ${item.id}`,
+      idOrigem: idOrigem,
+      status: "Integrado"
+    };
+
+    // Valores padrão
+    if (existingMapping.defaultValues) {
+      try {
+        const defaults = typeof existingMapping.defaultValues === 'string'
+          ? JSON.parse(existingMapping.defaultValues)
+          : existingMapping.defaultValues;
+        Object.assign(documentData, defaults);
+      } catch (e) {
+        console.warn("Erro ao parsear valores padrão:", e);
+      }
+    }
+
+    // Mapear colunas configuradas
+    for (const mapping of mappingColumns) {
+      const columnValue = item.column_values.find((cv: any) => cv.id === mapping.mondayColumnId);
+      if (columnValue?.text) {
+        let value = columnValue.text;
+        if (mapping.transformFunction?.trim()) {
+          try {
+            const transformFunction = new Function('value', mapping.transformFunction);
+            value = transformFunction(value);
+          } catch (transformError) {
+            console.warn(`Erro na transformação da coluna ${mapping.cpxField}:`, transformError);
+          }
+        }
+        documentData[mapping.cpxField] = value;
+      }
+    }
+
+    try {
+      const createdDocument = await storage.createDocumento(documentData);
+      console.log(`✅ Documento criado: ${createdDocument.id} - ${createdDocument.objeto}`);
+      documentsCreated++;
+
+      // Anexos (colunas de arquivos)
+      if (existingMapping.assetsMappings) {
+        const assetsMappings = typeof existingMapping.assetsMappings === 'string'
+          ? JSON.parse(existingMapping.assetsMappings)
+          : existingMapping.assetsMappings;
+
+        for (const assetMapping of assetsMappings) {
+          const columnValue = item.column_values.find((cv: any) => cv.id === assetMapping.columnId);
+          if (columnValue?.value) {
+            try {
+              const files = JSON.parse(columnValue.value);
+              if (Array.isArray(files?.files)) {
+                for (const file of files.files) {
+                  await storage.createDocumentArtifact({
+                    documentoId: createdDocument.id,
+                    filename: file.name,
+                    fileUrl: file.url,
+                    fileSize: file.size || 0,
+                    uploadedAt: new Date()
+                  });
+                }
+              }
+            } catch (fileError) {
+              console.warn(`Erro ao processar anexos do item ${item.id}:`, fileError);
+            }
+          }
+        }
+      }
+    } catch (docError) {
+      console.error(`❌ Erro ao criar documento para item ${item.id}:`, docError);
+      documentsSkipped++;
+    }
+
+    if ((index + 1) % 100 === 0) {
+      console.log(`📊 PROGRESSO: ${index + 1}/${items.length}`);
+    }
+  }
+
+  console.log(`🎉 CONCLUÍDO: ${documentsCreated} criados, ${documentsSkipped} filtrados, ${documentsPreExisting} duplicados`);
+
+  return {
+    itemsProcessed: items.length,
+    documentsCreated,
+    documentsSkipped,
+    documentsPreExisting,
+    columnsMapping: mappingColumns.length
+  };
+}

@@ -18,197 +18,165 @@ import multer from "multer";
 // Função compartilhada para executar mapeamento Monday
 async function executeMondayMapping(mappingId: string, userId?: number, isHeadless: boolean = false) {
   console.log(`${isHeadless ? '🤖' : '👤'} INICIANDO EXECUÇÃO DO MAPEAMENTO:`, mappingId);
-  
-  // Verificar se o mapeamento existe
+
   const existingMapping = await storage.getMondayMapping(mappingId);
-  if (!existingMapping) {
-    throw new Error("Mapeamento não encontrado");
-  }
-  
-  // Obter a chave da API
+  if (!existingMapping) throw new Error("Mapeamento não encontrado");
+
   const apiKey = await storage.getMondayApiKey();
-  if (!apiKey) {
-    throw new Error("Chave da API do Monday não configurada");
-  }
-  
-  // Buscar colunas mapeadas para este mapeamento
+  if (!apiKey) throw new Error("Chave da API do Monday não configurada");
+
   const mappingColumns = await storage.getMappingColumns(mappingId);
   console.log(`📊 ${mappingColumns.length} colunas mapeadas encontradas`);
-  
-  // Buscar dados do quadro Monday.com
+
   const boardId = existingMapping.boardId;
   console.log(`🎯 Buscando dados do quadro ${boardId}...`);
-  
-  const query = `
-    query GetBoardItems($boardId: ID!) {
-      boards(ids: [$boardId]) {
-        items_page(limit: 500) {
-          items {
-            id
-            name
-            column_values {
+
+  // Buscar todos os itens com paginação por cursor
+  let items: any[] = [];
+  let cursor: string | null = null;
+
+  do {
+    const query = `
+      query GetBoardItems($boardId: ID!, $cursor: String) {
+        boards(ids: [$boardId]) {
+          items_page(limit: 500, cursor: $cursor) {
+            cursor
+            items {
               id
-              text
-              value
-              type
+              name
+              column_values {
+                id
+                text
+                value
+                type
+              }
             }
           }
         }
       }
+    `;
+
+    const variables = { boardId, cursor };
+
+    const response = await fetch("https://api.monday.com/v2", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": apiKey
+      },
+      body: JSON.stringify({ query, variables })
+    });
+
+    if (!response.ok) throw new Error(`Erro na API do Monday: ${response.status}`);
+
+    const data: any = await response.json();
+
+    if (data.errors) {
+      throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(data.errors)}`);
     }
-  `;
-  
-  const mondayResponse = await fetch("https://api.monday.com/v2", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": apiKey
-    },
-    body: JSON.stringify({ query, variables: { boardId } })
-  });
-  
-  if (!mondayResponse.ok) {
-    throw new Error(`Erro na API do Monday: ${mondayResponse.status}`);
-  }
-  
-  const mondayData: any = await mondayResponse.json();
-  if (mondayData.errors) {
-    throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(mondayData.errors)}`);
-  }
-  
-  const items = mondayData.data.boards[0]?.items_page?.items || [];
+
+    const page = data.data.boards[0]?.items_page;
+    if (page?.items) {
+      items.push(...page.items);
+    }
+
+    cursor = page?.cursor || null;
+  } while (cursor);
+
   console.log(`📋 ${items.length} itens encontrados no quadro`);
-  
+
   let documentsCreated = 0;
   let documentsSkipped = 0;
   let documentsPreExisting = 0;
-  
-  // Processar cada item
+
   for (let index = 0; index < items.length; index++) {
     const item = items[index];
-    
-    // Aplicar filtro se configurado
-    if (existingMapping.mappingFilter && existingMapping.mappingFilter.trim()) {
-      console.log(`🔍 VERIFICANDO FILTRO para item ${item.id}:`);
-      console.log(`- mappingFilter existe? ${!!existingMapping.mappingFilter}`);
-      console.log(`- mappingFilter não está vazio? ${existingMapping.mappingFilter}`);
-      
+
+    // Filtro (JavaScript string)
+    if (existingMapping.mappingFilter?.trim()) {
       try {
-        console.log(`✅ APLICANDO FILTRO para item ${item.id}`);
-        console.log(`📋 FILTRO JAVASCRIPT: ${existingMapping.mappingFilter}`);
-        
         const filterFunction = new Function('item', existingMapping.mappingFilter);
         const passesFilter = filterFunction(item);
-        
-        console.log(`🎯 RESULTADO DO FILTRO para item ${item.id}: ${passesFilter}`);
-        
         if (!passesFilter) {
-          console.log(`❌ Item ${item.id} foi FILTRADO (excluído) - não atende às condições`);
+          console.log(`❌ Item ${item.id} filtrado`);
           documentsSkipped++;
           continue;
-        } else {
-          console.log(`✅ Item ${item.id} PASSOU no filtro - será processado`);
         }
       } catch (filterError) {
-        console.error(`❌ ERRO no filtro para item ${item.id}:`, filterError);
+        console.error(`❌ Erro no filtro para item ${item.id}:`, filterError);
         documentsSkipped++;
         continue;
       }
     }
-    
-    // VERIFICAÇÃO DE DUPLICATAS - APLICAR ANTES DE PROCESSAR
-    console.log(`${isHeadless ? '🤖' : '👤'} 🔍 VERIFICANDO DUPLICATAS para item ${item.id}`);
+
+    // Verificação de duplicatas
     try {
-      const itemId = item.id; // ID do Monday como string
-      const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem_txt = ${itemId} LIMIT 1`);
-      
+      const duplicateCheck = await db.execute(sql`
+        SELECT id FROM documentos WHERE id_origem_txt = ${item.id} LIMIT 1
+      `);
+
       if (duplicateCheck.rows.length > 0) {
-        console.log(`${isHeadless ? '🤖' : '👤'} ❌ DUPLICATA DETECTADA: Item ${item.id} já existe como documento ${duplicateCheck.rows[0].id}`);
+        console.log(`❌ DUPLICATA: Item ${item.id} já existe`);
         documentsPreExisting++;
-        continue; // Pular este item
-      } else {
-        console.log(`${isHeadless ? '🤖' : '👤'} ✅ NOVO DOCUMENTO: Item ${item.id} será criado`);
+        continue;
       }
     } catch (error) {
-      console.log(`${isHeadless ? '🤖' : '👤'} ⚠️ Erro na verificação de duplicata:`, error);
+      console.log(`⚠️ Erro na verificação de duplicata:`, error);
     }
 
     const idOrigem = BigInt(item.id);
-    console.log(`🔍 Processando item ${item.id} (ID origem: ${idOrigem})`);
-    
-    // Mapear dados do item para campos do documento
     const documentData: any = {
       objeto: item.name || `Item ${item.id}`,
       idOrigem: idOrigem,
       status: "Integrado"
     };
-    
-    // Aplicar valores padrão
+
+    // Valores padrão
     if (existingMapping.defaultValues) {
       try {
-        const defaults = typeof existingMapping.defaultValues === 'string' 
-          ? JSON.parse(existingMapping.defaultValues) 
+        const defaults = typeof existingMapping.defaultValues === 'string'
+          ? JSON.parse(existingMapping.defaultValues)
           : existingMapping.defaultValues;
         Object.assign(documentData, defaults);
       } catch (e) {
         console.warn("Erro ao parsear valores padrão:", e);
       }
     }
-    
-    // Mapear colunas específicas
+
+    // Mapear colunas configuradas
     for (const mapping of mappingColumns) {
       const columnValue = item.column_values.find((cv: any) => cv.id === mapping.mondayColumnId);
-      if (columnValue && columnValue.text) {
+      if (columnValue?.text) {
         let value = columnValue.text;
-        
-        // Aplicar transformação se configurada
-        if (mapping.transformFunction && mapping.transformFunction.trim()) {
+        if (mapping.transformFunction?.trim()) {
           try {
             const transformFunction = new Function('value', mapping.transformFunction);
             value = transformFunction(value);
           } catch (transformError) {
-            console.warn(`Erro na transformação para coluna ${mapping.cpxField}:`, transformError);
+            console.warn(`Erro na transformação da coluna ${mapping.cpxField}:`, transformError);
           }
         }
-        
         documentData[mapping.cpxField] = value;
       }
     }
-    
-    // VERIFICAÇÃO DE DUPLICATAS - MESMA LÓGICA DO PROCESSO MANUAL
-    console.log(`${isHeadless ? '🤖' : '👤'} 🔍 VERIFICANDO DUPLICATAS para item ${item.id}`);
+
     try {
-      const itemId = item.id; // ID do Monday
-      const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem_txt = ${itemId} LIMIT 1`);
-      
-      if (duplicateCheck.rows.length > 0) {
-        console.log(`${isHeadless ? '🤖' : '👤'} ❌ DUPLICATA DETECTADA: Item ${item.id} já existe como documento ${duplicateCheck.rows[0].id}`);
-        documentsPreExisting++;
-        return; // Pular este item
-      } else {
-        console.log(`${isHeadless ? '🤖' : '👤'} ✅ NOVO DOCUMENTO: Item ${item.id} será criado`);
-      }
-    } catch (error) {
-      console.log(`${isHeadless ? '🤖' : '👤'} ⚠️ Erro na verificação de duplicata:`, error);
-    }
-    
-    try {
-      // Criar o documento
       const createdDocument = await storage.createDocumento(documentData);
       console.log(`✅ Documento criado: ${createdDocument.id} - ${createdDocument.objeto}`);
       documentsCreated++;
-      
-      // Processar anexos se configurados
+
+      // Anexos (colunas de arquivos)
       if (existingMapping.assetsMappings) {
-        const assetsMappings = typeof existingMapping.assetsMappings === 'string' 
-          ? JSON.parse(existingMapping.assetsMappings) 
+        const assetsMappings = typeof existingMapping.assetsMappings === 'string'
+          ? JSON.parse(existingMapping.assetsMappings)
           : existingMapping.assetsMappings;
+
         for (const assetMapping of assetsMappings) {
           const columnValue = item.column_values.find((cv: any) => cv.id === assetMapping.columnId);
-          if (columnValue && columnValue.value) {
+          if (columnValue?.value) {
             try {
               const files = JSON.parse(columnValue.value);
-              if (files && files.files && Array.isArray(files.files)) {
+              if (Array.isArray(files?.files)) {
                 for (const file of files.files) {
                   await storage.createDocumentArtifact({
                     documentoId: createdDocument.id,
@@ -220,25 +188,24 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
                 }
               }
             } catch (fileError) {
-              console.warn(`Erro ao processar anexos para item ${item.id}:`, fileError);
+              console.warn(`Erro ao processar anexos do item ${item.id}:`, fileError);
             }
           }
         }
       }
-      
     } catch (docError) {
       console.error(`❌ Erro ao criar documento para item ${item.id}:`, docError);
       documentsSkipped++;
     }
-    
-    // Log de progresso a cada 100 itens
+
     if ((index + 1) % 100 === 0) {
-      console.log(`📊 PROGRESSO: ${index + 1}/${items.length} itens processados | Criados: ${documentsCreated} | Filtrados: ${documentsSkipped}`);
+      console.log(`📊 PROGRESSO: ${index + 1}/${items.length}`);
     }
   }
-  
-  console.log(`🎉 EXECUÇÃO CONCLUÍDA: ${documentsCreated} documentos criados, ${documentsSkipped} filtrados, ${documentsPreExisting} já existentes`);
-  
+
+  console.log(`🎉 CONCLUÍDO: ${documentsCreated} criados, ${documentsSkipped} filtrados, ${documentsPreExisting} duplicados`);
+  console.log(`🧪 TOTAL REAL DE ITENS NO ARRAY: ${items.length}`);
+
   return {
     itemsProcessed: items.length,
     documentsCreated,
@@ -247,6 +214,7 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     columnsMapping: mappingColumns.length
   };
 }
+
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Endpoint para execução automática de jobs (sem autenticação)
