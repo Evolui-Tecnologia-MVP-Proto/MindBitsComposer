@@ -277,12 +277,14 @@ class JobManager {
               console.log(`[LOG] 🎯 GERANDO LOG ESPECÍFICO PARA TRIAGEM DE REQUISIÇÕES!`);
               
               // Buscar dados do job ativo para obter configurações reais
-              const activeJob = this.getActiveJob(mappingId);
+              const activeJob = jobManager.getActiveJob(mappingId);
+              console.log(`[DEBUG] Job ativo encontrado:`, activeJob);
               const frequency = activeJob?.frequency || '1min';
               const time = activeJob?.time || '00:00';
+              console.log(`[DEBUG] Frequency: ${frequency}, Time: ${time}`);
               
               // Calcular próxima execução baseada na configuração real
-              const nextExecution = this.calculateNextExecution(frequency, time, new Date());
+              const nextExecution = jobManager.calculateNextExecution(frequency, time, new Date());
               const proximaExecucao = nextExecution.toLocaleString('pt-BR', {
                 day: '2-digit',
                 month: '2-digit', 
@@ -291,6 +293,7 @@ class JobManager {
                 minute: '2-digit',
                 second: '2-digit'
               });
+              console.log(`[DEBUG] Próxima execução calculada: ${proximaExecucao}`);
 
               await SystemLogger.log({
                 eventType: 'MONDAY_SYNC_TRIAGEM_DE_REQUISIÇÕES_DE_CLIENTES',
