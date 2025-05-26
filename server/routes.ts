@@ -151,8 +151,8 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     // VERIFICAÇÃO DE DUPLICATAS - APLICAR ANTES DE PROCESSAR
     console.log(`${isHeadless ? '🤖' : '👤'} 🔍 VERIFICANDO DUPLICATAS para item ${item.id}`);
     try {
-      const itemId = item.id; // ID do Monday como string
-      const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem_txt = ${itemId} LIMIT 1`);
+      const itemIdBigInt = BigInt(item.id); // Converter para BigInt como o campo idOrigem
+      const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem = ${itemIdBigInt} LIMIT 1`);
       
       if (duplicateCheck.rows.length > 0) {
         console.log(`${isHeadless ? '🤖' : '👤'} ❌ DUPLICATA DETECTADA: Item ${item.id} já existe como documento ${duplicateCheck.rows[0].id}`);
