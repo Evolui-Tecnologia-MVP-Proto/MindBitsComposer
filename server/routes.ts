@@ -1266,11 +1266,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
           // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - LOGO APÓS O FILTRO
           console.log(`👤 🔍 VERIFICANDO DUPLICATAS para item ${item.id}`);
-          let isDuplicate = false;
-          const keyFields = mappingColumns.filter(col => col.isKey);
-          console.log(`👤 Campos chave encontrados: ${keyFields.length}`);
+          let itemIsDuplicate = false;
+          const itemKeyFields = mappingColumns.filter(col => col.isKey);
+          console.log(`👤 Campos chave encontrados: ${itemKeyFields.length}`);
           
-          if (keyFields.length > 0) {
+          if (itemKeyFields.length > 0) {
             // Assumir que o primeiro campo chave é idOrigemTxt mapeado para id_de_elemento
             const itemId = item.id; // ID do Monday
             console.log(`👤 Verificando duplicata para Monday ID: ${itemId}`);
@@ -1280,7 +1280,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               if (duplicateCheck.rows.length > 0) {
                 console.log(`👤 ❌ DUPLICATA DETECTADA: Item ${item.id} já existe como documento ${duplicateCheck.rows[0].id}`);
-                isDuplicate = true;
+                itemIsDuplicate = true;
                 documentsPreExisting++;
               } else {
                 console.log(`👤 ✅ NOVO DOCUMENTO: Item ${item.id} será criado`);
@@ -1290,7 +1290,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           }
           
-          if (isDuplicate) {
+          if (itemIsDuplicate) {
             console.log(`👤 ⏭️ PULANDO item duplicado ${item.id}`);
             continue;
           }
@@ -1490,65 +1490,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             documentData.statusOrigem = "Monday.com";
           }
 
-          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - USAR CAMPOS MARCADOS COMO CHAVE
-          console.log(`👤 🔍 INICIANDO VERIFICAÇÃO DE DUPLICATAS para item ${item.id}`);
-          let isDuplicate = false;
-          const keyFields = mappingColumns.filter(col => col.isKey);
-          console.log(`👤 DEBUG - Campos chave encontrados: ${keyFields.length}`, keyFields.map(k => `${k.cpxField}(isKey:${k.isKey})`));
-          
-          if (keyFields.length > 0) {
-            try {
-              // Construir condições WHERE baseadas nos campos chave
-              const conditions = [];
-              const values = [];
-              let paramIndex = 1;
-              
-              for (const keyField of keyFields) {
-                const fieldValue = documentData[keyField.cpxField];
-                console.log(`👤 DEBUG - Campo ${keyField.cpxField}: valor = "${fieldValue}"`);
-                
-                if (fieldValue !== undefined && fieldValue !== null && fieldValue !== '') {
-                  // Converter campo do documento para nome da coluna do banco
-                  let dbColumnName = keyField.cpxField;
-                  if (keyField.cpxField === 'idOrigem') dbColumnName = 'id_origem';
-                  if (keyField.cpxField === 'idOrigemTxt') dbColumnName = 'id_origem_txt';
-                  
-                  conditions.push(`${dbColumnName} = $${paramIndex}`);
-                  values.push(fieldValue);
-                  paramIndex++;
-                  console.log(`👤 DEBUG - Adicionada condição: ${dbColumnName} = "${fieldValue}"`);
-                }
-              }
-              
-              if (conditions.length > 0) {
-                // Para simplicidade, verificar apenas o primeiro campo chave (que deve ser idOrigemTxt)
-                const firstValue = values[0];
-                console.log(`👤 VERIFICANDO DUPLICATA para id_origem_txt = "${firstValue}"`);
-                
-                const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem_txt = ${firstValue} LIMIT 1`);
-                console.log(`👤 DEBUG - Resultado da consulta: ${duplicateCheck.rows.length} registros encontrados`);
-                
-                if (duplicateCheck.rows.length > 0) {
-                  console.log(`👤 ❌ DUPLICATA DETECTADA: Item ${item.id} já existe como documento ${duplicateCheck.rows[0].id}`);
-                  isDuplicate = true;
-                  documentsPreExisting++;
-                } else {
-                  console.log(`👤 ✅ NOVO DOCUMENTO: Item ${item.id} será criado`);
-                }
-              } else {
-                console.log(`👤 ⚠️ ATENÇÃO: Nenhuma condição de verificação foi criada (valores vazios)`);
-              }
-            } catch (error) {
-              console.log(`👤 ⚠️ Erro na verificação de duplicata para item ${item.id}:`, error);
-              // Continuar mesmo com erro na verificação
-            }
-          } else {
-            console.log(`👤 ⚠️ ATENÇÃO: Nenhum campo marcado como chave no mapeamento!`);
-          }
-
-          if (isDuplicate) {
-            continue; // Pular item duplicado
-          }
+          // Verificação de duplicatas já foi feita no início do loop
 
           // DEBUG: Verificar dados finais antes de criar documento
           console.log(`📋 DADOS FINAIS DO DOCUMENTO ANTES DA CRIAÇÃO:`, {
