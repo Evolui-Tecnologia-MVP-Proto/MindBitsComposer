@@ -1136,7 +1136,7 @@ export default function AdminPage() {
 
       // Debug: verificar o conteúdo da resposta
       const responseText = await response.text();
-      console.log("🔍 DEBUG - URL chamada:", `/api/monday/mappings/${mapping.id}/execute`);
+      console.log("🔍 DEBUG - URL chamada:", `/api/monday/mappings/${mapping.id}/execute-new`);
       console.log("🔍 DEBUG - Status da resposta:", response.status);
       console.log("🔍 DEBUG - Resposta do servidor:", responseText);
       
