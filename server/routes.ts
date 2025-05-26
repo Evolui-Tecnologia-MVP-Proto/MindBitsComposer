@@ -3059,7 +3059,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-
+  // Endpoint para buscar colunas da tabela documentos dinamicamente
+  app.get("/api/documentos-columns", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const columns = [
+        { name: "id", type: "uuid", description: "ID único do documento" },
+        { name: "origem", type: "text", description: "Origem do documento" },
+        { name: "objeto", type: "text", description: "Objeto/título do documento" },
+        { name: "tipo", type: "text", description: "Tipo do documento" },
+        { name: "cliente", type: "text", description: "Cliente relacionado" },
+        { name: "responsavel", type: "text", description: "Responsável pelo documento" },
+        { name: "sistema", type: "text", description: "Sistema relacionado" },
+        { name: "modulo", type: "text", description: "Módulo do sistema" },
+        { name: "descricao", type: "text", description: "Descrição detalhada" },
+        { name: "status", type: "text", description: "Status atual do documento" },
+        { name: "statusOrigem", type: "text", description: "Status na origem" },
+        { name: "solicitante", type: "text", description: "Solicitante do documento" },
+        { name: "aprovador", type: "text", description: "Aprovador do documento" },
+        { name: "agente", type: "text", description: "Agente responsável" },
+        { name: "idOrigem", type: "bigint", description: "ID na origem (numérico)" },
+        { name: "idOrigemTxt", type: "text", description: "ID na origem (texto)" },
+        { name: "generalColumns", type: "json", description: "Colunas gerais (JSON)" },
+        { name: "createdAt", type: "timestamp", description: "Data de criação" },
+        { name: "updatedAt", type: "timestamp", description: "Data de atualização" }
+      ];
+      
+      res.json(columns);
+    } catch (error) {
+      console.error('Erro ao buscar colunas:', error);
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
 
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
