@@ -1364,7 +1364,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       idOrigem: selectedDocument?.idOrigem,
                       tipo: typeof selectedDocument?.idOrigem
                     });
-                    return selectedDocument?.idOrigem && selectedDocument?.idOrigem !== 0n;
+                    return selectedDocument?.origem?.includes("Monday") && selectedDocument?.idOrigem;
                   })() && (
                     <Button 
                       onClick={async () => {
