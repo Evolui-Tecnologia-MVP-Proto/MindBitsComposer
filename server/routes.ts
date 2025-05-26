@@ -1489,10 +1489,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }
               
               if (conditions.length > 0) {
-                const whereClause = conditions.join(' AND ');
-                console.log(`👤 VERIFICANDO DUPLICATA SQL: SELECT id FROM documentos WHERE ${whereClause}`, values);
+                // Para simplicidade, verificar apenas o primeiro campo chave (que deve ser idOrigemTxt)
+                const firstValue = values[0];
+                console.log(`👤 VERIFICANDO DUPLICATA para id_origem_txt = "${firstValue}"`);
                 
-                const duplicateCheck = await db.execute(sql.raw(`SELECT id FROM documentos WHERE ${whereClause} LIMIT 1`, values));
+                const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem_txt = ${firstValue} LIMIT 1`);
                 console.log(`👤 DEBUG - Resultado da consulta: ${duplicateCheck.rows.length} registros encontrados`);
                 
                 if (duplicateCheck.rows.length > 0) {
@@ -1772,10 +1773,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
               }
               
               if (conditions.length > 0) {
-                const whereClause = conditions.join(' AND ');
-                console.log(`🤖 VERIFICANDO DUPLICATA com campos chave: ${whereClause}`, values);
+                // Para simplicidade, verificar apenas o primeiro campo chave (que deve ser idOrigemTxt)
+                const firstValue = values[0];
+                console.log(`🤖 VERIFICANDO DUPLICATA para id_origem_txt = "${firstValue}"`);
                 
-                const duplicateCheck = await db.execute(sql.raw(`SELECT id FROM documentos WHERE ${whereClause} LIMIT 1`, values));
+                const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem_txt = ${firstValue} LIMIT 1`);
                 
                 if (duplicateCheck.rows.length > 0) {
                   console.log(`🤖 ❌ DUPLICATA DETECTADA: Item ${item.id} já existe como documento ${duplicateCheck.rows[0].id}`);
