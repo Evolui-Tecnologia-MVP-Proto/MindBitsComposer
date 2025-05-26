@@ -1054,19 +1054,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const apiKey = mondayConnection.token;
       
-      // Query exata conforme solicitado
+      // Query corrigida para buscar item específico com suas colunas
       const query = `
-        query GetItemFiles($boardId: Int!) {
-          boards(ids: [$boardId]) {
-            items {
+        query {
+          items(ids: [${itemId}]) {
+            id
+            name
+            column_values {
               id
-              name
-              column_values {
-                id
-                type
-                value
-                text
-              }
+              type
+              value
+              text
             }
           }
         }
@@ -1080,10 +1078,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           "Content-Type": "application/json",
           "Authorization": apiKey
         },
-        body: JSON.stringify({ 
-          query,
-          variables: { boardId: parseInt(boardId) }
-        })
+        body: JSON.stringify({ query })
       });
       
       console.log("📥 Status da resposta Monday:", mondayResponse.status, mondayResponse.statusText);
