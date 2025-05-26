@@ -273,18 +273,39 @@ class JobManager {
             const mapping = await storage.getMondayMapping(mappingId);
             console.log(`[DEBUG] Mapeamento encontrado:`, mapping?.name);
             
-            await SystemLogger.log({
-              eventType: 'MONDAY_SYNC_COMPLETED',
-              message: `Execução automática concluída para mapeamento "${mapping?.name || mappingId}"`,
-              parameters: {
-                mappingId,
-                executionType: 'automatic',
-                documentsCreated: result.documentsCreated || 0,
-                documentsFiltered: result.documentsFiltered || 0,
-                itemsProcessed: result.itemsProcessed || 0,
-                executedBy: 'scheduler'
-              }
-            });
+            // Log específico para Triagem de requisições de clientes
+            if (mapping?.name === 'Triagem de requisições de clientes') {
+              await SystemLogger.log({
+                eventType: 'MONDAY_SYNC_TRIAGEM_DE_REQUISIÇÕES_DE_CLIENTES',
+                message: `Agendamento automático executado - ${mapping.name}: ${result.itemsProcessed || 0} itens processados, ${result.documentsCreated || 0} criados, ${result.documentsFiltered || 0} filtrados`,
+                parameters: {
+                  mappingId,
+                  mappingName: mapping.name,
+                  executionType: 'scheduled',
+                  itemsProcessed: result.itemsProcessed || 0,
+                  documentsCreated: result.documentsCreated || 0,
+                  documentsFiltered: result.documentsFiltered || 0,
+                  executedBy: 'scheduler',
+                  agendamento: 'ativo',
+                  boardId: mapping.boardId,
+                  timestamp: new Date().toISOString()
+                }
+              });
+            } else {
+              // Log padrão para outros mapeamentos
+              await SystemLogger.log({
+                eventType: 'MONDAY_SYNC_COMPLETED',
+                message: `Execução automática concluída para mapeamento "${mapping?.name || mappingId}"`,
+                parameters: {
+                  mappingId,
+                  executionType: 'automatic',
+                  documentsCreated: result.documentsCreated || 0,
+                  documentsFiltered: result.documentsFiltered || 0,
+                  itemsProcessed: result.itemsProcessed || 0,
+                  executedBy: 'scheduler'
+                }
+              });
+            }
             console.log(`[LOG] Execução automática registrada no banco - Mapeamento: ${mappingId}`);
           } catch (logError) {
             console.error('[JOB] Erro ao registrar log de sucesso:', logError);
