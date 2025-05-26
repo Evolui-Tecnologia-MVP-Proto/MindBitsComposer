@@ -1354,7 +1354,85 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-medium">Anexos do Documento</h3>
-                  {/* Modal de visualização - sem botão de adicionar anexo */}
+                  {/* Botão para carregar anexos do Monday.com para documentos integrados */}
+                  {selectedDocument?.origem === "Monday.com" && selectedDocument?.idOrigem && (
+                    <Button 
+                      onClick={async () => {
+                        try {
+                          setIsLoadingArtifacts(true);
+                          const response = await fetch(`/api/monday/attachments/${selectedDocument.idOrigem}`);
+                          
+                          if (response.ok) {
+                            const attachments = await response.json();
+                            
+                            if (attachments.length > 0) {
+                              // Salvar anexos do Monday no banco
+                              for (const attachment of attachments) {
+                                await fetch('/api/documentos/artifacts', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({
+                                    documentoId: selectedDocument.id,
+                                    name: attachment.name,
+                                    type: "monday-attachment",
+                                    fileData: attachment.fileData,
+                                    fileName: attachment.fileName,
+                                    mimeType: attachment.mimeType,
+                                    fileSize: attachment.fileSize
+                                  })
+                                });
+                              }
+                              
+                              // Recarregar lista de anexos
+                              queryClient.invalidateQueries(["/api/documentos", selectedDocument.id, "artifacts"]);
+                              
+                              toast({
+                                title: "Anexos carregados",
+                                description: `${attachments.length} anexo(s) importado(s) do Monday.com`,
+                              });
+                            } else {
+                              toast({
+                                title: "Nenhum anexo",
+                                description: "Este item não possui anexos no Monday.com",
+                              });
+                            }
+                          } else {
+                            toast({
+                              title: "Erro",
+                              description: "Falha ao buscar anexos do Monday.com",
+                              variant: "destructive"
+                            });
+                          }
+                        } catch (error) {
+                          console.error("Erro ao carregar anexos:", error);
+                          toast({
+                            title: "Erro",
+                            description: "Ocorreu um erro ao carregar os anexos",
+                            variant: "destructive"
+                          });
+                        } finally {
+                          setIsLoadingArtifacts(false);
+                        }
+                      }}
+                      className="bg-blue-600 hover:bg-blue-700"
+                      size="sm"
+                      disabled={isLoadingArtifacts}
+                    >
+                      {isLoadingArtifacts ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Carregando...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="mr-2 h-4 w-4" />
+                          Carregar Anexos
+                        </>
+                      )}
+                    </Button>
+                  )}
                 </div>
                 
                 {isLoadingArtifacts ? (
