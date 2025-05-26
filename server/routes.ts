@@ -1132,7 +1132,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Execute Monday mapping synchronization (MANUAL)
+  // Execute Monday mapping synchronization (MANUAL) - NOVA ROTA CORRIGIDA
   app.post("/api/monday/mappings/:id/execute", async (req, res) => {
     if (!req.isAuthenticated()) {
       console.log("❌ USUÁRIO NÃO AUTORIZADO");
@@ -1140,21 +1140,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     const { id } = req.params;
-    console.log("👤 INICIANDO EXECUÇÃO MANUAL DO MAPEAMENTO:", id);
+    console.log("🚀 NOVA ROTA - INICIANDO EXECUÇÃO MANUAL DO MAPEAMENTO:", id);
     
     try {
-      console.log("🚀 INÍCIO DA EXECUÇÃO DO ENDPOINT:", id);
-      
       // Usar a função unificada com isHeadless = false para execução manual
       const result = await executeMondayMapping(id, req.user?.id, false);
       
-      console.log("📊 RESULTADO FINAL PARA FRONTEND:", JSON.stringify(result, null, 2));
+      console.log("🎯 NOVA ROTA - RESULTADO FINAL:", JSON.stringify(result, null, 2));
       
-      res.json(result);
+      // Garantir que sempre retornamos os dados corretos
+      const finalResponse = {
+        success: true,
+        message: "Sincronização concluída com sucesso!",
+        itemsProcessed: result.itemsProcessed || 0,
+        documentsCreated: result.documentsCreated || 0,
+        documentsSkipped: result.documentsSkipped || 0,
+        documentsPreExisting: result.documentsPreExisting || 0,
+        columnsMapping: result.columnsMapping || 0,
+        timestamp: new Date().toISOString()
+      };
       
-      console.log("✅ RESPOSTA ENVIADA PARA FRONTEND");
+      console.log("✅ NOVA ROTA - ENVIANDO RESPOSTA:", JSON.stringify(finalResponse, null, 2));
+      
+      res.json(finalResponse);
     } catch (error) {
-      console.error("Erro ao executar mapeamento manual:", error);
+      console.error("❌ NOVA ROTA - Erro ao executar mapeamento manual:", error);
       res.status(500).send(`Erro ao executar mapeamento: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
   });
