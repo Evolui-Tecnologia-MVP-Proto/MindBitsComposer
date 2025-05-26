@@ -19,6 +19,9 @@ class JobManager {
     const [hour, minute] = time.split(':').map(Number);
     
     switch (frequency) {
+      case '1min':
+        // A cada minuto (apenas para testes)
+        return '* * * * *';
       case '15min':
         // A cada 15 minutos a partir do minuto especificado
         const minutes15 = [];
