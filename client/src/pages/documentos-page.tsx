@@ -90,6 +90,7 @@ export default function DocumentosPage() {
   const [isEscopoExpanded, setIsEscopoExpanded] = useState(false);
   const [isPessoasExpanded, setIsPessoasExpanded] = useState(false);
   const [createModalActiveTab, setCreateModalActiveTab] = useState("dados-gerais");
+  const [isLoadingMondayAttachments, setIsLoadingMondayAttachments] = useState(false);
   const [artifactFormData, setArtifactFormData] = useState<InsertDocumentArtifact>({
     documentoId: "",
     name: "",
@@ -1355,11 +1356,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-medium">Anexos do Documento</h3>
                   {/* Botão para carregar anexos do Monday.com para documentos integrados */}
-                  {selectedDocument?.origem === "Monday.com" && selectedDocument?.idOrigem && (
+                  {selectedDocument?.statusOrigem === "Integrado" && selectedDocument?.idOrigem && (
                     <Button 
                       onClick={async () => {
                         try {
-                          setIsLoadingArtifacts(true);
+                          setIsLoadingMondayAttachments(true);
                           const response = await fetch(`/api/monday/attachments/${selectedDocument.idOrigem}`);
                           
                           if (response.ok) {
@@ -1386,7 +1387,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               }
                               
                               // Recarregar lista de anexos
-                              queryClient.invalidateQueries(["/api/documentos", selectedDocument.id, "artifacts"]);
+                              queryClient.invalidateQueries({ queryKey: ["/api/documentos", selectedDocument.id, "artifacts"] });
                               
                               toast({
                                 title: "Anexos carregados",
@@ -1413,14 +1414,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             variant: "destructive"
                           });
                         } finally {
-                          setIsLoadingArtifacts(false);
+                          setIsLoadingMondayAttachments(false);
                         }
                       }}
                       className="bg-blue-600 hover:bg-blue-700"
                       size="sm"
-                      disabled={isLoadingArtifacts}
+                      disabled={isLoadingMondayAttachments}
                     >
-                      {isLoadingArtifacts ? (
+                      {isLoadingMondayAttachments ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Carregando...
