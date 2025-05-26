@@ -1059,10 +1059,12 @@ export default function AdminPage() {
   };
 
   // Função para executar sincronização do mapeamento Monday
-  const executeMondayMapping = async (mapping: BoardMapping) => {
+  const executeMondayMapping = async (mapping: BoardMapping, isHeadless: boolean = false) => {
     try {
-      setIsExecutingMapping(true);
-      setExecutionProgress("Iniciando sincronização...");
+      if (!isHeadless) {
+        setIsExecutingMapping(true);
+        setExecutionProgress("Iniciando sincronização...");
+      }
       
       // Registrar log de início da execução manual
       try {
@@ -1087,22 +1089,24 @@ export default function AdminPage() {
         console.warn('Erro ao registrar log de início:', logError);
       }
       
-      toast({
-        title: "Executando sincronização",
-        description: `Iniciando sincronização do mapeamento "${mapping.name}"...`,
-      });
+      if (!isHeadless) {
+        toast({
+          title: "Executando sincronização",
+          description: `Iniciando sincronização do mapeamento "${mapping.name}"...`,
+        });
 
-      // Etapa 1: Conectando
-      setExecutionProgress("Conectando com API do Monday.com...");
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Etapa 2: Autenticando
-      setExecutionProgress("Autenticando com Monday.com...");
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      // Etapa 3: Buscando dados
-      setExecutionProgress("Obtendo dados do quadro...");
-      await new Promise(resolve => setTimeout(resolve, 400));
+        // Etapa 1: Conectando
+        setExecutionProgress("Conectando com API do Monday.com...");
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Etapa 2: Autenticando
+        setExecutionProgress("Autenticando com Monday.com...");
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        // Etapa 3: Buscando dados
+        setExecutionProgress("Obtendo dados do quadro...");
+        await new Promise(resolve => setTimeout(resolve, 400));
+      }
       
       const startTime = Date.now();
       
@@ -1114,18 +1118,21 @@ export default function AdminPage() {
       });
 
       // Etapa 4: Processando com simulação de progresso
-      setExecutionProgress("Processando registros...");
-      
-      // Simular progresso durante o processamento
-      const progressInterval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const estimatedTotal = 8000; // Estimativa de 8 segundos para completar
-        const progress = Math.min(Math.round((elapsed / estimatedTotal) * 100), 95);
-        setExecutionProgress(`Processando registros... ${progress}%`);
-      }, 200);
+      let progressInterval: NodeJS.Timeout | null = null;
+      if (!isHeadless) {
+        setExecutionProgress("Processando registros...");
+        
+        // Simular progresso durante o processamento
+        progressInterval = setInterval(() => {
+          const elapsed = Date.now() - startTime;
+          const estimatedTotal = 8000; // Estimativa de 8 segundos para completar
+          const progress = Math.min(Math.round((elapsed / estimatedTotal) * 100), 95);
+          setExecutionProgress(`Processando registros... ${progress}%`);
+        }, 200);
+      }
 
       if (!response.ok) {
-        clearInterval(progressInterval);
+        if (progressInterval) clearInterval(progressInterval);
         const errorText = await response.text();
         throw new Error(errorText || 'Erro na sincronização');
       }
