@@ -1187,6 +1187,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     const { id } = req.params;
     console.log("👤 EXECUÇÃO LEGACY DO MAPEAMENTO:", id);
+    console.log("👤 🚀 VERIFICANDO SE A PAGINAÇÃO VAI SER EXECUTADA...");
     
     try {
       // Verificar se o mapeamento existe
