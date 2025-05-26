@@ -269,25 +269,25 @@ class JobManager {
           
           // Registrar sucesso no log do sistema
           try {
-            console.log(`[DEBUG] Tentando registrar log para mapeamento: ${mappingId}`);
+            console.log(`[DEBUG] 🔧 EXECUTANDO NOVA LÓGICA DE LOG - ID: ${mappingId}`);
             const mapping = await storage.getMondayMapping(mappingId);
-            console.log(`[DEBUG] Mapeamento encontrado:`, mapping?.name);
             
-            // Log específico para Triagem de requisições de clientes
-            if (mapping?.name === 'Triagem de requisições de clientes') {
+            // SEMPRE gerar log específico para Triagem de requisições de clientes
+            if (mappingId === 'd08420f2-219c-495f-816d-5e4ebe68c7e6') {
+              console.log(`[LOG] 🎯 GERANDO LOG ESPECÍFICO PARA TRIAGEM DE REQUISIÇÕES!`);
               await SystemLogger.log({
                 eventType: 'MONDAY_SYNC_TRIAGEM_DE_REQUISIÇÕES_DE_CLIENTES',
-                message: `Agendamento automático executado - ${mapping.name}: ${result.itemsProcessed || 0} itens processados, ${result.documentsCreated || 0} criados, ${result.documentsFiltered || 0} filtrados`,
+                message: `Agendamento automático executado - Triagem de requisições de clientes: ${result.itemsProcessed || 0} itens processados, ${result.documentsCreated || 0} criados, ${result.documentsFiltered || 0} filtrados`,
                 parameters: {
                   mappingId,
-                  mappingName: mapping.name,
+                  mappingName: 'Triagem de requisições de clientes',
                   executionType: 'scheduled',
                   itemsProcessed: result.itemsProcessed || 0,
                   documentsCreated: result.documentsCreated || 0,
                   documentsFiltered: result.documentsFiltered || 0,
                   executedBy: 'scheduler',
                   agendamento: 'ativo',
-                  boardId: mapping.boardId,
+                  boardId: '4197389343',
                   timestamp: new Date().toISOString()
                 }
               });

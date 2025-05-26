@@ -58,16 +58,42 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
 
     const variables = { boardId, cursor };
 
-    const response = await fetch("https://api.monday.com/v2", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": apiKey
-      },
-      body: JSON.stringify({ query, variables })
-    });
+    // Retry com delay para tratar erros temporários
+    let response;
+    let lastError;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        response = await fetch("https://api.monday.com/v2", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": apiKey
+          },
+          body: JSON.stringify({ query, variables })
+        });
 
-    if (!response.ok) throw new Error(`Erro na API do Monday: ${response.status}`);
+        if (response.ok) break; // Sucesso, sair do loop
+        
+        // Se erro 500/502/503 (temporários), tentar novamente
+        if (response.status >= 500 && response.status < 600 && attempt < 3) {
+          console.log(`[MONDAY] Erro ${response.status} na tentativa ${attempt}/3, aguardando 2s...`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          continue;
+        }
+        
+        throw new Error(`Erro na API do Monday: ${response.status}`);
+      } catch (error) {
+        lastError = error;
+        if (attempt < 3) {
+          console.log(`[MONDAY] Erro de rede na tentativa ${attempt}/3, aguardando 2s...`);
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          continue;
+        }
+        throw error;
+      }
+    }
+
+    if (!response?.ok) throw lastError || new Error(`Erro na API do Monday`);
 
     const data: any = await response.json();
 
