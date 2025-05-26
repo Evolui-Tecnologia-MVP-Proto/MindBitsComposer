@@ -1772,6 +1772,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           let isDuplicate = false;
           const keyFields = mappingColumns.filter(col => col.isKey);
           
+          // Adicionar log de depuração
+          console.log(`${isHeadless ? '🤖' : '👤'} 🔍 VERIFICANDO DUPLICATAS para item ${item.id}`);
+          console.log(`${isHeadless ? '🤖' : '👤'} Campos chave encontrados:`, keyFields.map(k => k.cpxField));
+          
           if (keyFields.length > 0) {
             try {
               // Construir condições WHERE baseadas nos campos chave
