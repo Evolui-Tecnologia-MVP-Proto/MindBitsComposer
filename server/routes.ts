@@ -39,16 +39,19 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
   const boardId = existingMapping.boardId;
   console.log(`🎯 Buscando TODOS os dados do quadro ${boardId}...`);
   
+  // Buscar TODOS os itens usando paginação
   console.log(`${isHeadless ? '🤖' : '👤'} 📄 INICIANDO BUSCA PAGINADA - coletando todos os itens do quadro`);
+  
+  const mondayColumns = mappingColumns.map(col => col.mondayColumnId);
   let allItems: any[] = [];
   let cursor: string | null = null;
   let pageCount = 0;
+  let hasMorePages = true;
   
-  do {
+  while (hasMorePages) {
     pageCount++;
-    console.log(`${isHeadless ? '🤖' : '👤'} 📄 PÁGINA ${pageCount} - Cursor: ${cursor || 'PRIMEIRA PÁGINA'}`);
+    console.log(`${isHeadless ? '🤖' : '👤'} 📄 BUSCANDO PÁGINA ${pageCount} - Cursor: ${cursor || 'PRIMEIRA PÁGINA'}`);
     
-    const mondayColumns = mappingColumns.map(col => col.mondayColumnId);
     const query = `
       query {
         boards(ids: [${boardId}]) {
@@ -71,6 +74,8 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       }
     `;
     
+    console.log(`${isHeadless ? '🤖' : '👤'} 🔍 EXECUTANDO QUERY GRAPHQL PÁGINA ${pageCount}`);
+    
     const mondayResponse = await fetch("https://api.monday.com/v2", {
       method: "POST",
       headers: {
@@ -87,24 +92,29 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     
     const mondayData: any = await mondayResponse.json();
     if (mondayData.errors) {
+      console.error(`${isHeadless ? '🤖' : '👤'} ❌ ERRO GRAPHQL:`, mondayData.errors);
       throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(mondayData.errors)}`);
     }
     
     const pageItems = mondayData.data?.boards?.[0]?.items_page?.items || [];
-    cursor = mondayData.data?.boards?.[0]?.items_page?.cursor || null;
+    const newCursor = mondayData.data?.boards?.[0]?.items_page?.cursor;
     
     allItems = allItems.concat(pageItems);
-    console.log(`${isHeadless ? '🤖' : '👤'} 📄 PÁGINA ${pageCount} - ${pageItems.length} itens coletados, total acumulado: ${allItems.length}, cursor: ${cursor || 'NULL'}`);
+    console.log(`${isHeadless ? '🤖' : '👤'} ✅ PÁGINA ${pageCount} CONCLUÍDA - ${pageItems.length} itens coletados, total acumulado: ${allItems.length}`);
+    console.log(`${isHeadless ? '🤖' : '👤'} 🔄 CURSOR RETORNADO: ${newCursor || 'NULL (fim das páginas)'}`);
     
-    // Se cursor for null, significa que chegamos ao fim
-    if (!cursor) {
-      console.log(`${isHeadless ? '🤖' : '👤'} ✅ PAGINAÇÃO CONCLUÍDA - sem mais páginas`);
-      break;
+    // Verificar se há mais páginas
+    if (!newCursor || newCursor === cursor) {
+      console.log(`${isHeadless ? '🤖' : '👤'} 🏁 FIM DA PAGINAÇÃO - não há mais páginas`);
+      hasMorePages = false;
+    } else {
+      cursor = newCursor;
+      console.log(`${isHeadless ? '🤖' : '👤'} ➡️ PRÓXIMA PÁGINA - cursor: ${cursor}`);
     }
-  } while (cursor);
+  }
 
   const items = allItems;
-  console.log(`${isHeadless ? '🤖' : '👤'} 🎯 BUSCA TOTAL CONCLUÍDA: ${items.length} itens coletados em ${pageCount} páginas`);
+  console.log(`${isHeadless ? '🤖' : '👤'} 🎯 BUSCA PAGINADA FINALIZADA: ${items.length} itens coletados em ${pageCount} páginas`);
   
   let documentsCreated = 0;
   let documentsSkipped = 0;
