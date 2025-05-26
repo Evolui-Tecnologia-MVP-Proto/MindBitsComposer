@@ -1691,24 +1691,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Garantir que idOrigem seja definido (crítico para detecção de duplicatas)
           documentData.idOrigem = BigInt(item.id);
           
-          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS ANTES DE CRIAR
-          let isDuplicate = false;
-          try {
-            console.log(`🤖 VERIFICANDO DUPLICATA para idOrigem: ${documentData.idOrigem} (tipo: ${typeof documentData.idOrigem})`);
-            const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem = ${documentData.idOrigem} LIMIT 1`);
-            
-            if (duplicateCheck.rows.length > 0) {
-              console.log(`🤖 ❌ DUPLICATA DETECTADA: Item ${item.id} (idOrigem: ${documentData.idOrigem}) já existe como documento ${duplicateCheck.rows[0].id}`);
-              isDuplicate = true;
-              documentsPreExisting++;
-              continue; // Pular para o próximo item
-            } else {
-              console.log(`🤖 ✅ NOVO DOCUMENTO: Item ${item.id} (idOrigem: ${documentData.idOrigem}) será criado`);
-            }
-          } catch (error) {
-            console.log(`🤖 ⚠️ Erro na verificação de duplicata para item ${item.id}:`, error);
-          }
-          
           // Aplicar valores padrão se configurados
           if (existingMapping.defaultValues) {
             try {
