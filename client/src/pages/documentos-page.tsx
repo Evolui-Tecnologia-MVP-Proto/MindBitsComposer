@@ -1369,7 +1369,48 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       onClick={async () => {
                         try {
                           setIsLoadingMondayAttachments(true);
-                          const response = await fetch(`/api/monday/attachments/${selectedDocument.idOrigemTxt}`);
+                          
+                          // Buscar mapeamentos Monday ativos
+                          const mappingsResponse = await fetch('/api/monday/mappings');
+                          if (!mappingsResponse.ok) {
+                            throw new Error('Erro ao buscar mapeamentos');
+                          }
+                          
+                          const mappings = await mappingsResponse.json();
+                          const activeMappings = mappings.filter((m: any) => 
+                            m.lastSync && new Date(m.lastSync) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+                          );
+                          
+                          if (activeMappings.length === 0) {
+                            toast({
+                              title: "Nenhum mapeamento ativo",
+                              description: "É necessário ter um mapeamento Monday ativo com Assets Map configurado",
+                              variant: "destructive"
+                            });
+                            return;
+                          }
+                          
+                          // Usar o primeiro mapeamento ativo
+                          const mapping = activeMappings[0];
+                          
+                          if (!mapping.assetsMappings || mapping.assetsMappings.length === 0) {
+                            toast({
+                              title: "Assets Map não configurado",
+                              description: "Este mapeamento não possui configuração de Assets Map para colunas de arquivo",
+                              variant: "destructive"
+                            });
+                            return;
+                          }
+                          
+                          // Buscar anexos das colunas específicas do Assets Map
+                          const response = await fetch(`/api/monday/attachments/${selectedDocument.idOrigemTxt}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ 
+                              columnIds: mapping.assetsMappings.map((am: any) => am.mondayColumnId),
+                              boardId: mapping.boardId 
+                            })
+                          });
                           
                           if (response.ok) {
                             const attachments = await response.json();
@@ -1384,7 +1425,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   },
                                   body: JSON.stringify({
                                     documentoId: selectedDocument.id,
-                                    name: attachment.name,
+                                    name: attachment.name || attachment.fileName,
                                     type: "monday-attachment",
                                     fileData: attachment.fileData,
                                     fileName: attachment.fileName,
@@ -1398,19 +1439,20 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               queryClient.invalidateQueries({ queryKey: ["/api/documentos", selectedDocument.id, "artifacts"] });
                               
                               toast({
-                                title: "Anexos carregados",
-                                description: `${attachments.length} anexo(s) importado(s) do Monday.com`,
+                                title: "Anexos importados",
+                                description: `${attachments.length} anexo(s) importado(s) das colunas configuradas no Assets Map`,
                               });
                             } else {
                               toast({
-                                title: "Nenhum anexo",
-                                description: "Este item não possui anexos no Monday.com",
+                                title: "Nenhum anexo encontrado",
+                                description: "Este item não possui arquivos nas colunas configuradas no Assets Map",
                               });
                             }
                           } else {
+                            const errorData = await response.text();
                             toast({
-                              title: "Erro",
-                              description: "Falha ao buscar anexos do Monday.com",
+                              title: "Erro ao carregar anexos",
+                              description: errorData || "Não foi possível buscar anexos das colunas do Assets Map",
                               variant: "destructive"
                             });
                           }
@@ -1418,7 +1460,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           console.error("Erro ao carregar anexos:", error);
                           toast({
                             title: "Erro",
-                            description: "Ocorreu um erro ao carregar os anexos",
+                            description: "Erro interno ao carregar anexos",
                             variant: "destructive"
                           });
                         } finally {

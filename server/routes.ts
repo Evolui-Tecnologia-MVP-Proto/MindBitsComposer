@@ -1017,6 +1017,156 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Buscar anexos de colunas específicas baseado no Assets Map
+  app.post("/api/monday/attachments/:itemId", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { itemId } = req.params;
+    const { columnIds, boardId } = req.body;
+    
+    if (!columnIds || !Array.isArray(columnIds) || columnIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "columnIds é obrigatório e deve conter as colunas do Assets Map"
+      });
+    }
+    
+    try {
+      // Buscar a API key do Monday
+      const mondayConnection = await storage.getServiceConnection("monday");
+      if (!mondayConnection || !mondayConnection.token) {
+        return res.status(400).json({
+          success: false,
+          message: "API key do Monday não configurada"
+        });
+      }
+      
+      const apiKey = mondayConnection.token;
+      
+      // Criar query dinâmica para buscar arquivos das colunas específicas
+      const columnQueries = columnIds.map((columnId: string) => `
+        ${columnId.replace(/[^a-zA-Z0-9_]/g, '_')}: column_values(ids: ["${columnId}"]) {
+          id
+          text
+          value
+          ... on FileValue {
+            files {
+              id
+              name
+              url
+              file_size
+              public_url
+            }
+          }
+        }
+      `).join('\n');
+
+      const query = `
+        query {
+          items(ids: [${itemId}]) {
+            id
+            name
+            ${columnQueries}
+          }
+        }
+      `;
+      
+      const mondayResponse = await fetch("https://api.monday.com/v2", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": apiKey
+        },
+        body: JSON.stringify({ query })
+      });
+      
+      if (!mondayResponse.ok) {
+        return res.status(500).json({
+          success: false,
+          message: `Erro na API do Monday: ${mondayResponse.status}`
+        });
+      }
+      
+      const data = await mondayResponse.json();
+      
+      if (data.errors) {
+        console.error("Erros da API Monday:", data.errors);
+        return res.status(500).json({
+          success: false,
+          message: "Erro na consulta do Monday",
+          errors: data.errors
+        });
+      }
+      
+      const items = data.data?.items || [];
+      if (items.length === 0) {
+        return res.json([]);
+      }
+      
+      const item = items[0];
+      const attachments: any[] = [];
+      
+      // Extrair arquivos de cada coluna do Assets Map
+      for (const columnId of columnIds) {
+        const sanitizedColumnId = columnId.replace(/[^a-zA-Z0-9_]/g, '_');
+        const columnData = item[sanitizedColumnId];
+        
+        if (columnData && Array.isArray(columnData)) {
+          for (const column of columnData) {
+            if (column.files && Array.isArray(column.files)) {
+              for (const file of column.files) {
+                // Baixar o arquivo e converter para base64
+                try {
+                  const fileResponse = await fetch(file.public_url || file.url);
+                  if (fileResponse.ok) {
+                    const arrayBuffer = await fileResponse.arrayBuffer();
+                    const base64 = Buffer.from(arrayBuffer).toString('base64');
+                    
+                    attachments.push({
+                      id: file.id,
+                      name: file.name,
+                      fileName: file.name,
+                      fileData: base64,
+                      mimeType: file.name?.split('.').pop() || 'application/octet-stream',
+                      fileSize: file.file_size?.toString(),
+                      url: file.url,
+                      public_url: file.public_url,
+                      columnId: columnId,
+                      itemId: itemId
+                    });
+                  }
+                } catch (downloadError) {
+                  console.error(`Erro ao baixar anexo ${file.name}:`, downloadError);
+                  // Adiciona o anexo mesmo sem o download, caso o usuário queira tentar depois
+                  attachments.push({
+                    id: file.id,
+                    name: file.name,
+                    fileName: file.name,
+                    fileData: file.public_url || file.url, // URL como fallback
+                    mimeType: file.name?.split('.').pop() || 'application/octet-stream',
+                    fileSize: file.file_size?.toString(),
+                    url: file.url,
+                    public_url: file.public_url,
+                    columnId: columnId,
+                    itemId: itemId
+                  });
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      res.json(attachments);
+    } catch (error) {
+      console.error("Erro ao buscar anexos de colunas do Monday:", error);
+      res.status(500).json({
+        success: false,
+        message: "Erro ao buscar anexos das colunas do Assets Map"
+      });
+    }
+  });
+
   // Debug: Verificar documentos com idOrigemTxt
   app.get("/api/debug/documentos-monday", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
