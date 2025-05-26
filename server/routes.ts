@@ -35,49 +35,77 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
   const mappingColumns = await storage.getMappingColumns(mappingId);
   console.log(`📊 ${mappingColumns.length} colunas mapeadas encontradas`);
   
-  // Buscar dados do quadro Monday.com
+  // Buscar TODOS os dados do quadro Monday.com com paginação
   const boardId = existingMapping.boardId;
-  console.log(`🎯 Buscando dados do quadro ${boardId}...`);
+  console.log(`🎯 Buscando TODOS os dados do quadro ${boardId}...`);
   
-  const query = `
-    query GetBoardItems($boardId: ID!) {
-      boards(ids: [$boardId]) {
-        items_page(limit: 500) {
-          items {
-            id
-            name
-            column_values {
+  console.log(`${isHeadless ? '🤖' : '👤'} 📄 INICIANDO BUSCA PAGINADA - coletando todos os itens do quadro`);
+  let allItems: any[] = [];
+  let cursor: string | null = null;
+  let pageCount = 0;
+  
+  do {
+    pageCount++;
+    console.log(`${isHeadless ? '🤖' : '👤'} 📄 PÁGINA ${pageCount} - Cursor: ${cursor || 'PRIMEIRA PÁGINA'}`);
+    
+    const query = `
+      query GetBoardItems($boardId: ID!, $cursor: String) {
+        boards(ids: [$boardId]) {
+          items_page(limit: 500${cursor ? ', cursor: $cursor' : ''}) {
+            cursor
+            items {
               id
-              text
-              value
-              type
+              name
+              column_values {
+                id
+                text
+                value
+                type
+              }
             }
           }
         }
       }
+    `;
+    
+    const variables: any = { boardId };
+    if (cursor) {
+      variables.cursor = cursor;
     }
-  `;
-  
-  const mondayResponse = await fetch("https://api.monday.com/v2", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": apiKey
-    },
-    body: JSON.stringify({ query, variables: { boardId } })
-  });
-  
-  if (!mondayResponse.ok) {
-    throw new Error(`Erro na API do Monday: ${mondayResponse.status}`);
-  }
-  
-  const mondayData: any = await mondayResponse.json();
-  if (mondayData.errors) {
-    throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(mondayData.errors)}`);
-  }
-  
-  const items = mondayData.data.boards[0]?.items_page?.items || [];
-  console.log(`📋 ${items.length} itens encontrados no quadro`);
+    
+    const mondayResponse = await fetch("https://api.monday.com/v2", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": apiKey
+      },
+      body: JSON.stringify({ query, variables })
+    });
+    
+    if (!mondayResponse.ok) {
+      throw new Error(`Erro na API do Monday: ${mondayResponse.status}`);
+    }
+    
+    const mondayData: any = await mondayResponse.json();
+    if (mondayData.errors) {
+      throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(mondayData.errors)}`);
+    }
+    
+    const pageItems = mondayData.data?.boards?.[0]?.items_page?.items || [];
+    cursor = mondayData.data?.boards?.[0]?.items_page?.cursor || null;
+    
+    allItems = allItems.concat(pageItems);
+    console.log(`${isHeadless ? '🤖' : '👤'} 📄 PÁGINA ${pageCount} - ${pageItems.length} itens coletados, total acumulado: ${allItems.length}`);
+    
+    // Se cursor for null, significa que chegamos ao fim
+    if (!cursor) {
+      console.log(`${isHeadless ? '🤖' : '👤'} ✅ PAGINAÇÃO CONCLUÍDA - sem mais páginas`);
+      break;
+    }
+  } while (cursor);
+
+  const items = allItems;
+  console.log(`${isHeadless ? '🤖' : '👤'} 🎯 BUSCA TOTAL CONCLUÍDA: ${items.length} itens coletados em ${pageCount} páginas`);
   
   let documentsCreated = 0;
   let documentsSkipped = 0;
