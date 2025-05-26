@@ -130,10 +130,10 @@ class JobManager {
 
     console.log(`[JOB] Criando job com expressão cron: ${cronExpression} para frequência ${frequency} às ${time}`);
 
-    const task = cron.schedule(cronExpression, () => {
+    const task = cron.schedule(cronExpression, async () => {
       const now = new Date();
       console.log(`[JOB] Executando job às ${now.toLocaleString('pt-BR')} (horário local)`);
-      this.executeMondaySync(mappingId);
+      await this.executeMondayMappingHeadless(mappingId);
     }, {
       scheduled: true
     });
@@ -228,6 +228,57 @@ class JobManager {
     }
     this.activeJobs.clear();
     console.log('[JOB] Todos os jobs foram parados');
+  }
+
+  // Executar sincronização Monday em modo headless (para jobs automáticos)
+  async executeMondayMappingHeadless(mappingId: string): Promise<void> {
+    try {
+      console.log(`[JOB] Iniciando execução automática para mapeamento: ${mappingId}`);
+      
+      // Buscar o mapeamento
+      const mapping = await storage.getMondayMapping(mappingId);
+      if (!mapping) {
+        console.error(`[JOB] Mapeamento não encontrado: ${mappingId}`);
+        return;
+      }
+
+      // Fazer uma requisição para o endpoint de execução (simulando o que o botão laranja faz)
+      const response = await fetch(`http://localhost:${process.env.PORT || 3000}/api/monday/mappings/execute-headless`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          mappingId: mappingId
+        })
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log(`[JOB] Execução automática concluída - ${result.documentsCreated || 0} documentos criados`);
+      } else {
+        console.error(`[JOB] Erro na execução automática: ${response.status} ${response.statusText}`);
+      }
+    } catch (error) {
+      console.error(`[JOB] Erro fatal na execução automática:`, error);
+      
+      // Registrar erro no log do sistema
+      try {
+        await SystemLogger.log({
+          eventType: 'MONDAY_SYNC_SCHEDULED',
+          message: `Erro na execução automática do mapeamento ${mappingId}: ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
+          parameters: {
+            mappingId,
+            executionType: 'automatic',
+            errorType: 'job_execution_failure',
+            errorMessage: error instanceof Error ? error.message : 'Erro desconhecido',
+            failedBy: 'scheduler'
+          }
+        });
+      } catch (logError) {
+        console.error('[JOB] Erro ao registrar log de erro:', logError);
+      }
+    }
   }
 }
 
