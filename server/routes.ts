@@ -1121,19 +1121,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // Armazenar o JSON completo retornado pela API
-      console.log("📄 JSON COMPLETO RETORNADO PELA API MONDAY.COM:");
-      console.log(JSON.stringify(data, null, 2));
+      const item = data.data.items[0];
+      if (!item) {
+        return res.status(404).json({
+          success: false,
+          message: "Item não encontrado no Monday.com"
+        });
+      }
+
+      console.log("📄 Item encontrado:", item.name);
+      console.log("🔍 Total de colunas no item:", item.column_values?.length);
       
-      return res.json({
-        success: true,
-        data: data,
-        message: "JSON capturado com sucesso - aguardando próximas instruções"
-      });
+      const attachments = [];
       
       // Processar cada coluna especificada no Assets Map
       for (const targetColumnId of columnIds) {
-        console.log("🔍 Procurando coluna:", targetColumnId);
+        console.log(`\n🔍 Procurando coluna: ${targetColumnId}`);
         
         // Encontrar a coluna correspondente nos dados retornados
         const column = item.column_values?.find((col: any) => col.id === targetColumnId);
@@ -1141,24 +1144,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (column) {
           console.log("✅ Coluna encontrada:", {
             id: column.id,
-            title: column.title,
             type: column.type,
-            hasValue: !!column.value
+            hasValue: !!column.value,
+            valueLength: column.value ? column.value.length : 0
           });
           
-          // Se é uma coluna de arquivo (tipo 'file') e tem valor
-          if (column.type === 'file' && column.value) {
+          // Se a coluna tem valor e é do tipo file
+          if (column.value && column.type === 'file') {
             try {
-              console.log("🔧 Valor bruto da coluna:", column.value);
-              console.log("🔧 Tipo do valor:", typeof column.value);
-              
-              // Parse do JSON que contém os arquivos serializados
               const fileData = JSON.parse(column.value);
-              console.log("📁 Dados do arquivo parseados:", JSON.stringify(fileData, null, 2));
+              console.log("📁 Estrutura do arquivo na coluna:", Object.keys(fileData));
               
+              // Monday.com retorna arrays de arquivos para colunas do tipo file
               if (fileData.files && Array.isArray(fileData.files)) {
+                console.log(`📁 Encontrados ${fileData.files.length} arquivo(s) na coluna ${column.id}`);
+                
                 for (const file of fileData.files) {
-                  console.log("⬇️ Baixando arquivo:", file.name, "de", file.url);
+                  console.log("📎 Processando arquivo:", {
+                    name: file.name,
+                    url: file.url,
+                    id: file.id
+                  });
+                  
+                  // Baixar o arquivo do Monday.com
+                  try {
+                    const fileResponse = await fetch(file.url);
+                    if (fileResponse.ok) {
+                      const arrayBuffer = await fileResponse.arrayBuffer();
+                      const buffer = Buffer.from(arrayBuffer);
+                      const base64Data = buffer.toString('base64');
+                      
+                      // Determinar MIME type
+                      const mimeType = getMimeType(file.extension || 'txt');
+                      
+                      attachments.push({
+                        id: file.id || `${column.id}-${Date.now()}`,
+                        name: file.name,
+                        fileName: file.name,
+                        fileData: base64Data,
+                        mimeType: mimeType,
+                        fileSize: file.size ? `${file.size} bytes` : null,
+                        source: `Monday.com - Coluna: ${column.id}`
+                      });
+                      
+                      console.log("✅ Arquivo baixado e convertido:", file.name);
+                    } else {
+                      console.log(`❌ Erro HTTP ao baixar ${file.name}: ${fileResponse.status}`);
+                    }
+                  } catch (downloadError) {
+                    console.error(`❌ Erro ao baixar arquivo ${file.name}:`, downloadError);
+                  }
+                }
+              } else {
+                console.log(`ℹ️ Coluna ${targetColumnId} não possui array 'files' ou está vazio`);
+              }
+            } catch (parseError) {
+              console.error(`❌ Erro ao processar JSON da coluna ${targetColumnId}:`, parseError);
+              console.log("❌ Valor bruto da coluna:", column.value);
+            }
+          } else {
+            console.log(`ℹ️ Coluna ${targetColumnId} não contém arquivos (tipo: ${column.type}, valor: ${!!column.value})`);
+          }
+        } else {
+          console.log(`❌ Coluna ${targetColumnId} não encontrada no item`);
+        }
+      }
+      
+      console.log(`\n📊 Total de anexos encontrados: ${attachments.length}`);
+      
+      return res.json({
+        success: true,
+        attachments: attachments,
+        itemName: item.name,
+        message: `${attachments.length} anexo(s) encontrado(s) nas colunas do Assets Map`
+      }
+    } catch (error) {
+      console.error("Erro ao buscar anexos do Monday:", error);
+      res.status(500).json({
+        success: false,
+        message: "Erro ao buscar anexos do Monday"
+      });
+    }
+  });
                   
                   try {
                     // Baixar o arquivo
