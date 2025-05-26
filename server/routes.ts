@@ -1584,11 +1584,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Atualizar a data de última sincronização
       await storage.updateMondayMappingLastSync(id);
       
+      // Log final com números corretos
+      console.log(`${isHeadless ? '🤖' : '👤'} 📈 ESTATÍSTICAS FINAIS:`);
+      console.log(`${isHeadless ? '🤖' : '👤'} - Total de itens buscados: ${items.length}`);
+      console.log(`${isHeadless ? '🤖' : '👤'} - Documentos criados: ${documentsCreated}`);
+      console.log(`${isHeadless ? '🤖' : '👤'} - Itens filtrados/pulados: ${documentsSkipped}`);
+      console.log(`${isHeadless ? '🤖' : '👤'} - Duplicatas encontradas: ${documentsPreExisting}`);
+      
       res.json({
         success: true,
         message: "Sincronização executada com sucesso",
         mapping: existingMapping,
-        itemsProcessed: items.length,
+        itemsProcessed: items.length, // Agora reflete o total real após paginação
         documentsCreated,
         documentsSkipped,
         documentsPreExisting,
