@@ -2566,10 +2566,6 @@ return item.column_values.some(col =>
                               frequency: schedulingFrequency,
                               time: schedulingTime
                             });
-                            // Executar imediatamente ao ativar o job
-                            if (selectedMapping) {
-                              executeMondayMapping(selectedMapping, true);
-                            }
                           }
                         }}
                         disabled={activateJobMutation.isPending || cancelJobMutation.isPending}
