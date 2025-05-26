@@ -253,11 +253,23 @@ class JobManager {
         })
       });
 
+      console.log(`[JOB] Status da resposta: ${response.status} ${response.statusText}`);
+      console.log(`[JOB] Headers da resposta:`, Object.fromEntries(response.headers));
+      
+      const responseText = await response.text();
+      console.log(`[JOB] Conteúdo da resposta (primeiros 500 chars):`, responseText.substring(0, 500));
+      
       if (response.ok) {
-        const result = await response.json();
-        console.log(`[JOB] Execução automática concluída - ${result.documentsCreated || 0} documentos criados`);
+        try {
+          const result = JSON.parse(responseText);
+          console.log(`[JOB] Execução automática concluída - ${result.documentsCreated || 0} documentos criados`);
+        } catch (parseError) {
+          console.error(`[JOB] Erro ao parsear JSON da resposta:`, parseError);
+          console.log(`[JOB] Resposta completa:`, responseText);
+        }
       } else {
         console.error(`[JOB] Erro na execução automática: ${response.status} ${response.statusText}`);
+        console.log(`[JOB] Resposta de erro:`, responseText);
       }
     } catch (error) {
       console.error(`[JOB] Erro fatal na execução automática:`, error);
