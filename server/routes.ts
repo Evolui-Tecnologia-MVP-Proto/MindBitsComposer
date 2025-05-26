@@ -1616,7 +1616,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`👤 - Itens filtrados/pulados: ${documentsSkipped}`);
       console.log(`👤 - Duplicatas encontradas: ${documentsPreExisting}`);
       
-      res.json({
+      const legacyResult = {
         success: true,
         message: "Sincronização executada com sucesso",
         mapping: existingMapping,
@@ -1626,7 +1626,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         documentsPreExisting,
         columnsMapping: mappingColumns.length,
         timestamp: new Date().toISOString()
-      });
+      };
+      
+      console.log("📊 RESULTADO FINAL LEGACY PARA FRONTEND:", JSON.stringify(legacyResult, null, 2));
+      
+      res.json(legacyResult);
       
     } catch (error) {
       console.error("Erro ao executar sincronização:", error);
