@@ -116,11 +116,24 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       }
     }
     
-    // Verificar se já existe um documento com este id_origem
+    // VERIFICAÇÃO DE DUPLICATAS - APLICAR ANTES DE PROCESSAR
+    console.log(`${isHeadless ? '🤖' : '👤'} 🔍 VERIFICANDO DUPLICATAS para item ${item.id}`);
+    try {
+      const itemId = item.id; // ID do Monday como string
+      const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem_txt = ${itemId} LIMIT 1`);
+      
+      if (duplicateCheck.rows.length > 0) {
+        console.log(`${isHeadless ? '🤖' : '👤'} ❌ DUPLICATA DETECTADA: Item ${item.id} já existe como documento ${duplicateCheck.rows[0].id}`);
+        documentsPreExisting++;
+        continue; // Pular este item
+      } else {
+        console.log(`${isHeadless ? '🤖' : '👤'} ✅ NOVO DOCUMENTO: Item ${item.id} será criado`);
+      }
+    } catch (error) {
+      console.log(`${isHeadless ? '🤖' : '👤'} ⚠️ Erro na verificação de duplicata:`, error);
+    }
+
     const idOrigem = BigInt(item.id);
-    
-    // Para execução automática, vamos pular a verificação de duplicatas por enquanto
-    // e permitir que o banco de dados gerencie via constraints únicas
     console.log(`🔍 Processando item ${item.id} (ID origem: ${idOrigem})`);
     
     // Mapear dados do item para campos do documento
@@ -160,6 +173,23 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
         
         documentData[mapping.cpxField] = value;
       }
+    }
+    
+    // VERIFICAÇÃO DE DUPLICATAS - MESMA LÓGICA DO PROCESSO MANUAL
+    console.log(`${isHeadless ? '🤖' : '👤'} 🔍 VERIFICANDO DUPLICATAS para item ${item.id}`);
+    try {
+      const itemId = item.id; // ID do Monday
+      const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem_txt = ${itemId} LIMIT 1`);
+      
+      if (duplicateCheck.rows.length > 0) {
+        console.log(`${isHeadless ? '🤖' : '👤'} ❌ DUPLICATA DETECTADA: Item ${item.id} já existe como documento ${duplicateCheck.rows[0].id}`);
+        documentsPreExisting++;
+        return; // Pular este item
+      } else {
+        console.log(`${isHeadless ? '🤖' : '👤'} ✅ NOVO DOCUMENTO: Item ${item.id} será criado`);
+      }
+    } catch (error) {
+      console.log(`${isHeadless ? '🤖' : '👤'} ⚠️ Erro na verificação de duplicata:`, error);
     }
     
     try {
