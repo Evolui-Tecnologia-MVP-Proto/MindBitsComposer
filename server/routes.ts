@@ -1054,30 +1054,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const apiKey = mondayConnection.token;
       
-      // Criar query dinâmica para buscar arquivos das colunas específicas
-      const columnQueries = columnIds.map((columnId: string) => `
-        ${columnId.replace(/[^a-zA-Z0-9_]/g, '_')}: column_values(ids: ["${columnId}"]) {
-          id
-          text
-          value
-          ... on FileValue {
-            files {
+      // Buscar item com todos os assets anexados
+      const query = `
+        query {
+          items(ids: [${itemId}]) {
+            id
+            name
+            assets {
               id
               name
               url
               file_size
               public_url
             }
-          }
-        }
-      `).join('\n');
-
-      const query = `
-        query {
-          items(ids: [${itemId}]) {
-            id
-            name
-            ${columnQueries}
+            column_values {
+              id
+              text
+              value
+              type
+            }
           }
         }
       `;
