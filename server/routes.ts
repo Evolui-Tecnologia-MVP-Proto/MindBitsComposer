@@ -98,7 +98,6 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
         const filterFunction = new Function('item', existingMapping.mappingFilter);
         const passesFilter = filterFunction(item);
         if (!passesFilter) {
-          console.log(`❌ Item ${item.id} filtrado`);
           documentsSkipped++;
           continue;
         }
@@ -116,7 +115,6 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       `);
 
       if (duplicateCheck.rows.length > 0) {
-        console.log(`❌ DUPLICATA: Item ${item.id} já existe`);
         documentsPreExisting++;
         continue;
       }
@@ -162,7 +160,6 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
 
     try {
       const createdDocument = await storage.createDocumento(documentData);
-      console.log(`✅ Documento criado: ${createdDocument.id} - ${createdDocument.objeto}`);
       documentsCreated++;
 
       // Anexos (colunas de arquivos)
@@ -198,9 +195,7 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       documentsSkipped++;
     }
 
-    if ((index + 1) % 100 === 0) {
-      console.log(`📊 PROGRESSO: ${index + 1}/${items.length}`);
-    }
+    // Log de progresso removido para logs mais limpos
   }
 
   console.log(`🎉 CONCLUÍDO: ${documentsCreated} criados, ${documentsSkipped} filtrados, ${documentsPreExisting} duplicados`);
