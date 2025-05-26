@@ -1688,6 +1688,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           }
 
+          // Garantir que idOrigem seja definido (crítico para detecção de duplicatas)
+          documentData.idOrigem = parseInt(item.id);
+          
           // Aplicar valores padrão se configurados
           if (existingMapping.defaultValues) {
             try {
@@ -1701,6 +1704,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               console.warn('🤖 Erro ao aplicar valores padrão:', error);
             }
           }
+          
+          console.log(`🤖 DEBUG - Item ${item.id} - idOrigem definido como: ${documentData.idOrigem}`);
 
           // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - MESMA LÓGICA DA EXECUÇÃO MANUAL
           let isDuplicate = false;
