@@ -1151,9 +1151,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Se a coluna tem valor e é do tipo file
           if (column.value && column.type === 'file') {
+            console.log(`🔥 PROCESSANDO COLUNA ${column.id} COM ARQUIVOS`);
             try {
               const fileData = JSON.parse(column.value);
               console.log("📁 Estrutura do arquivo na coluna:", Object.keys(fileData));
+              console.log("📁 Dados completos:", fileData);
               
               // Monday.com retorna arrays de arquivos para colunas do tipo file
               if (fileData.files && Array.isArray(fileData.files)) {
