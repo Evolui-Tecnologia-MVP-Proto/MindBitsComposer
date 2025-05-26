@@ -1390,8 +1390,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             return;
                           }
                           
-                          // Usar o primeiro mapeamento ativo
-                          const mapping = activeMappings[0];
+                          // Priorizar mapeamentos que tenham Assets Map configurado
+                          const mappingsWithAssets = activeMappings.filter((m: any) => 
+                            m.assetsMappings && m.assetsMappings.length > 0
+                          );
+                          
+                          let mapping;
+                          if (mappingsWithAssets.length > 0) {
+                            mapping = mappingsWithAssets[0]; // Usar o primeiro com Assets Map
+                          } else {
+                            mapping = activeMappings[0]; // Fallback para o primeiro ativo
+                          }
                           console.log("🔧 Mapeamento selecionado:", {
                             nome: mapping.name,
                             id: mapping.id,
