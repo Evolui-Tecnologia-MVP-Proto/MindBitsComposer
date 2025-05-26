@@ -1702,23 +1702,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           }
 
-          // Verificar duplicatas usando campos chave
+          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - MESMA LÓGICA DA EXECUÇÃO MANUAL
           let isDuplicate = false;
-          if (keyFields.length > 0) {
-            const conditions = keyFields.map(field => {
-              const value = documentData[field];
-              return value ? { field, value: String(value) } : null;
-            }).filter(Boolean);
-
-            if (conditions.length > 0) {
-              for (const condition of conditions) {
-                const existingDocs = await db.select().from(documentos).where(eq(documentos[condition.field], condition.value)).limit(1);
-                if (existingDocs.length > 0) {
-                  isDuplicate = true;
-                  documentsPreExisting++;
-                  break;
-                }
+          if (documentData.idOrigem) {
+            try {
+              const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem = ${documentData.idOrigem} LIMIT 1`);
+              
+              if (duplicateCheck.rows.length > 0) {
+                console.log(`🤖 DUPLICATA DETECTADA: Item ${item.id} já existe como documento ${duplicateCheck.rows[0].id}`);
+                isDuplicate = true;
+                documentsPreExisting++;
               }
+            } catch (error) {
+              console.log(`🤖 Erro na verificação de duplicata para item ${item.id}:`, error);
+              // Continuar mesmo com erro na verificação
             }
           }
 
