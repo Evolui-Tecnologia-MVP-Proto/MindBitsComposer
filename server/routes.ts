@@ -1459,38 +1459,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
             documentData.statusOrigem = "Monday.com";
           }
 
-          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - USAR CAMPO MAPEADO
+          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - USAR CAMPOS MARCADOS COMO CHAVE
           let isDuplicate = false;
-          let duplicateCheckField = null;
-          let duplicateCheckValue = null;
+          const keyFields = mappingColumns.filter(col => col.isKey);
           
-          // Determinar qual campo ID usar para verificação baseado no mapeamento
-          if (documentData.idOrigemTxt) {
-            duplicateCheckField = 'id_origem_txt';
-            duplicateCheckValue = documentData.idOrigemTxt;
-          } else if (documentData.idOrigem) {
-            duplicateCheckField = 'id_origem';
-            duplicateCheckValue = documentData.idOrigem;
-          }
-          
-          if (duplicateCheckField && duplicateCheckValue) {
+          if (keyFields.length > 0) {
             try {
-              console.log(`👤 VERIFICANDO DUPLICATA para ${duplicateCheckField}: ${duplicateCheckValue}`);
-              const duplicateCheck = await db.execute(sql.raw(`SELECT id FROM documentos WHERE ${duplicateCheckField} = $1 LIMIT 1`, [duplicateCheckValue]));
+              // Construir condições WHERE baseadas nos campos chave
+              const conditions = [];
+              const values = [];
+              let paramIndex = 1;
               
-              if (duplicateCheck.rows.length > 0) {
-                console.log(`👤 ❌ DUPLICATA DETECTADA: Item ${item.id} (${duplicateCheckField}: ${duplicateCheckValue}) já existe como documento ${duplicateCheck.rows[0].id}`);
-                isDuplicate = true;
-                documentsPreExisting++;
-              } else {
-                console.log(`👤 ✅ NOVO DOCUMENTO: Item ${item.id} (${duplicateCheckField}: ${duplicateCheckValue}) será criado`);
+              for (const keyField of keyFields) {
+                const fieldValue = documentData[keyField.cpxField];
+                if (fieldValue !== undefined && fieldValue !== null && fieldValue !== '') {
+                  // Converter campo do documento para nome da coluna do banco
+                  let dbColumnName = keyField.cpxField;
+                  if (keyField.cpxField === 'idOrigem') dbColumnName = 'id_origem';
+                  if (keyField.cpxField === 'idOrigemTxt') dbColumnName = 'id_origem_txt';
+                  
+                  conditions.push(`${dbColumnName} = $${paramIndex}`);
+                  values.push(fieldValue);
+                  paramIndex++;
+                }
+              }
+              
+              if (conditions.length > 0) {
+                const whereClause = conditions.join(' AND ');
+                console.log(`👤 VERIFICANDO DUPLICATA com campos chave: ${whereClause}`, values);
+                
+                const duplicateCheck = await db.execute(sql.raw(`SELECT id FROM documentos WHERE ${whereClause} LIMIT 1`, values));
+                
+                if (duplicateCheck.rows.length > 0) {
+                  console.log(`👤 ❌ DUPLICATA DETECTADA: Item ${item.id} já existe como documento ${duplicateCheck.rows[0].id}`);
+                  isDuplicate = true;
+                  documentsPreExisting++;
+                } else {
+                  console.log(`👤 ✅ NOVO DOCUMENTO: Item ${item.id} será criado`);
+                }
               }
             } catch (error) {
               console.log(`👤 ⚠️ Erro na verificação de duplicata para item ${item.id}:`, error);
               // Continuar mesmo com erro na verificação
             }
           } else {
-            console.log(`👤 ⚠️ ATENÇÃO: Item ${item.id} não tem campo ID mapeado para verificação de duplicatas!`);
+            console.log(`👤 ⚠️ ATENÇÃO: Nenhum campo marcado como chave no mapeamento!`);
           }
 
           if (isDuplicate) {
@@ -1726,38 +1739,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           }
           
-          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - USAR CAMPO MAPEADO
+          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - USAR CAMPOS MARCADOS COMO CHAVE
           let isDuplicate = false;
-          let duplicateCheckField = null;
-          let duplicateCheckValue = null;
+          const keyFields = mappingColumns.filter(col => col.isKey);
           
-          // Determinar qual campo ID usar para verificação baseado no mapeamento
-          if (documentData.idOrigemTxt) {
-            duplicateCheckField = 'id_origem_txt';
-            duplicateCheckValue = documentData.idOrigemTxt;
-          } else if (documentData.idOrigem) {
-            duplicateCheckField = 'id_origem';
-            duplicateCheckValue = documentData.idOrigem;
-          }
-          
-          if (duplicateCheckField && duplicateCheckValue) {
+          if (keyFields.length > 0) {
             try {
-              console.log(`🤖 VERIFICANDO DUPLICATA para ${duplicateCheckField}: ${duplicateCheckValue}`);
-              const duplicateCheck = await db.execute(sql.raw(`SELECT id FROM documentos WHERE ${duplicateCheckField} = $1 LIMIT 1`, [duplicateCheckValue]));
+              // Construir condições WHERE baseadas nos campos chave
+              const conditions = [];
+              const values = [];
+              let paramIndex = 1;
               
-              if (duplicateCheck.rows.length > 0) {
-                console.log(`🤖 ❌ DUPLICATA DETECTADA: Item ${item.id} (${duplicateCheckField}: ${duplicateCheckValue}) já existe como documento ${duplicateCheck.rows[0].id}`);
-                isDuplicate = true;
-                documentsPreExisting++;
-              } else {
-                console.log(`🤖 ✅ NOVO DOCUMENTO: Item ${item.id} (${duplicateCheckField}: ${duplicateCheckValue}) será criado`);
+              for (const keyField of keyFields) {
+                const fieldValue = documentData[keyField.cpxField];
+                if (fieldValue !== undefined && fieldValue !== null && fieldValue !== '') {
+                  // Converter campo do documento para nome da coluna do banco
+                  let dbColumnName = keyField.cpxField;
+                  if (keyField.cpxField === 'idOrigem') dbColumnName = 'id_origem';
+                  if (keyField.cpxField === 'idOrigemTxt') dbColumnName = 'id_origem_txt';
+                  
+                  conditions.push(`${dbColumnName} = $${paramIndex}`);
+                  values.push(fieldValue);
+                  paramIndex++;
+                }
+              }
+              
+              if (conditions.length > 0) {
+                const whereClause = conditions.join(' AND ');
+                console.log(`🤖 VERIFICANDO DUPLICATA com campos chave: ${whereClause}`, values);
+                
+                const duplicateCheck = await db.execute(sql.raw(`SELECT id FROM documentos WHERE ${whereClause} LIMIT 1`, values));
+                
+                if (duplicateCheck.rows.length > 0) {
+                  console.log(`🤖 ❌ DUPLICATA DETECTADA: Item ${item.id} já existe como documento ${duplicateCheck.rows[0].id}`);
+                  isDuplicate = true;
+                  documentsPreExisting++;
+                } else {
+                  console.log(`🤖 ✅ NOVO DOCUMENTO: Item ${item.id} será criado`);
+                }
               }
             } catch (error) {
               console.log(`🤖 ⚠️ Erro na verificação de duplicata para item ${item.id}:`, error);
               // Continuar mesmo com erro na verificação
             }
           } else {
-            console.log(`🤖 ⚠️ ATENÇÃO: Item ${item.id} não tem campo ID mapeado para verificação de duplicatas!`);
+            console.log(`🤖 ⚠️ ATENÇÃO: Nenhum campo marcado como chave no mapeamento!`);
           }
 
           if (!isDuplicate) {
