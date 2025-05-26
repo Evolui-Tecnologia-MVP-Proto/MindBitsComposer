@@ -2525,33 +2525,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Endpoint para testar execução da sincronização automática (DEBUG)
-  app.post("/api/jobs/test-sync", async (req: Request, res: Response) => {
-    try {
-      const { mappingId } = req.body;
-      
-      if (!mappingId) {
-        return res.status(400).json({ error: "mappingId é obrigatório" });
-      }
 
-      console.log(`[TEST] Executando teste de sincronização para mapeamento ${mappingId}`);
-      const result = await jobManager.executeRealMondayIntegration(mappingId);
-      console.log(`[TEST] Resultado:`, result);
-      
-      res.json({
-        success: true,
-        result: result
-      });
-    } catch (error: any) {
-      console.error("Erro ao executar teste de sincronização:", error);
-      console.error("Stack trace:", error.stack);
-      res.status(500).json({ 
-        error: "Erro interno do servidor",
-        message: error.message,
-        details: error.stack
-      });
-    }
-  });
 
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
