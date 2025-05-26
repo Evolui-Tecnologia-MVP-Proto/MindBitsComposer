@@ -1107,7 +1107,7 @@ export default function AdminPage() {
       
       const startTime = Date.now();
       
-      const response = await fetch(`/api/monday/mappings/${mapping.id}/execute`, {
+      const response = await fetch(`/api/monday/mappings/${mapping.id}/execute-new`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1132,21 +1132,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Execute Monday mapping synchronization (MANUAL) - NOVA ROTA CORRIGIDA
-  app.post("/api/monday/mappings/:id/execute", async (req, res) => {
+  // Execute Monday mapping synchronization (MANUAL) - VERSÃO DEFINITIVA
+  app.post("/api/monday/mappings/:id/execute-new", async (req, res) => {
     if (!req.isAuthenticated()) {
       console.log("❌ USUÁRIO NÃO AUTORIZADO");
       return res.status(401).send("Não autorizado");
     }
     
     const { id } = req.params;
-    console.log("🚀 NOVA ROTA - INICIANDO EXECUÇÃO MANUAL DO MAPEAMENTO:", id);
+    console.log("🚀 ROTA DEFINITIVA - INICIANDO EXECUÇÃO MANUAL:", id);
     
     try {
       // Usar a função unificada com isHeadless = false para execução manual
       const result = await executeMondayMapping(id, req.user?.id, false);
       
-      console.log("🎯 NOVA ROTA - RESULTADO FINAL:", JSON.stringify(result, null, 2));
+      console.log("🎯 ROTA DEFINITIVA - RESULTADO:", JSON.stringify(result, null, 2));
       
       // Garantir que sempre retornamos os dados corretos
       const finalResponse = {
@@ -1160,11 +1160,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         timestamp: new Date().toISOString()
       };
       
-      console.log("✅ NOVA ROTA - ENVIANDO RESPOSTA:", JSON.stringify(finalResponse, null, 2));
+      console.log("✅ ROTA DEFINITIVA - ENVIANDO:", JSON.stringify(finalResponse, null, 2));
       
       res.json(finalResponse);
     } catch (error) {
-      console.error("❌ NOVA ROTA - Erro ao executar mapeamento manual:", error);
+      console.error("❌ ROTA DEFINITIVA - Erro:", error);
       res.status(500).send(`Erro ao executar mapeamento: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
   });
