@@ -1356,7 +1356,16 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-medium">Anexos do Documento</h3>
                   {/* Botão para carregar anexos do Monday.com para documentos integrados */}
-                  {selectedDocument?.statusOrigem === "Integrado" && selectedDocument?.idOrigem && (
+                  {(() => {
+                    console.log("🔍 Debug documento selecionado:", {
+                      id: selectedDocument?.id,
+                      origem: selectedDocument?.origem,
+                      statusOrigem: selectedDocument?.statusOrigem,
+                      idOrigem: selectedDocument?.idOrigem,
+                      tipo: typeof selectedDocument?.idOrigem
+                    });
+                    return selectedDocument?.idOrigem && selectedDocument?.idOrigem !== 0n;
+                  })() && (
                     <Button 
                       onClick={async () => {
                         try {
