@@ -908,6 +908,139 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Buscar anexos de um item do Monday.com
+  app.get("/api/monday/attachments/:itemId", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { itemId } = req.params;
+    
+    try {
+      // Buscar a API key do Monday
+      const mondayConnection = await storage.getServiceConnection("monday");
+      if (!mondayConnection || !mondayConnection.token) {
+        return res.status(400).json({
+          success: false,
+          message: "API key do Monday não configurada"
+        });
+      }
+      
+      const apiKey = mondayConnection.token;
+      
+      // Query para buscar anexos do item
+      const query = `
+        query {
+          items(ids: [${itemId}]) {
+            id
+            name
+            assets {
+              id
+              name
+              url
+              file_extension
+              file_size
+            }
+          }
+        }
+      `;
+      
+      const mondayResponse = await fetch("https://api.monday.com/v2", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": apiKey
+        },
+        body: JSON.stringify({ query })
+      });
+      
+      if (!mondayResponse.ok) {
+        return res.status(500).json({
+          success: false,
+          message: `Erro na API do Monday: ${mondayResponse.status} ${mondayResponse.statusText}`
+        });
+      }
+      
+      const data = await mondayResponse.json();
+      
+      if (data.errors) {
+        return res.status(400).json({
+          success: false,
+          message: `Erro na consulta GraphQL: ${JSON.stringify(data.errors)}`
+        });
+      }
+      
+      // Verifica se o item existe
+      if (!data.data?.items || data.data.items.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "Item não encontrado"
+        });
+      }
+      
+      const item = data.data.items[0];
+      const attachments = [];
+      
+      // Processar cada anexo
+      for (const asset of item.assets || []) {
+        try {
+          // Baixar o arquivo
+          const fileResponse = await fetch(asset.url);
+          if (fileResponse.ok) {
+            const arrayBuffer = await fileResponse.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            const base64Data = buffer.toString('base64');
+            
+            // Determinar MIME type baseado na extensão
+            const mimeType = getMimeType(asset.file_extension);
+            
+            attachments.push({
+              id: asset.id,
+              name: asset.name,
+              fileName: asset.name,
+              fileData: base64Data,
+              mimeType: mimeType,
+              fileSize: asset.file_size ? `${asset.file_size} bytes` : null
+            });
+          }
+        } catch (downloadError) {
+          console.error(`Erro ao baixar anexo ${asset.name}:`, downloadError);
+          // Continua com os outros anexos mesmo se um falhar
+        }
+      }
+      
+      res.json(attachments);
+    } catch (error) {
+      console.error("Erro ao buscar anexos do Monday:", error);
+      res.status(500).json({
+        success: false,
+        message: "Erro ao buscar anexos do Monday"
+      });
+    }
+  });
+
+  // Função auxiliar para determinar MIME type baseado na extensão
+  function getMimeType(extension: string): string {
+    const mimeTypes: Record<string, string> = {
+      'pdf': 'application/pdf',
+      'doc': 'application/msword',
+      'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'xls': 'application/vnd.ms-excel',
+      'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'ppt': 'application/vnd.ms-powerpoint',
+      'pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'jpg': 'image/jpeg',
+      'jpeg': 'image/jpeg',
+      'png': 'image/png',
+      'gif': 'image/gif',
+      'txt': 'text/plain',
+      'csv': 'text/csv',
+      'zip': 'application/zip',
+      'rar': 'application/x-rar-compressed',
+      '7z': 'application/x-7z-compressed'
+    };
+    
+    return mimeTypes[extension?.toLowerCase()] || 'application/octet-stream';
+  }
+
   // Rotas para mapeamento de colunas
   // Obter mapeamentos de colunas para um mapeamento
   app.get("/api/monday/mappings/:id/column-mappings", async (req, res) => {
