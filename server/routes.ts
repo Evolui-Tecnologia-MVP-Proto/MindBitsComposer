@@ -1264,6 +1264,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
             console.log(`⏭️ NENHUM FILTRO configurado - processando item ${item.id}`);
           }
 
+          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - LOGO APÓS O FILTRO
+          console.log(`👤 🔍 VERIFICANDO DUPLICATAS para item ${item.id}`);
+          let isDuplicate = false;
+          const keyFields = mappingColumns.filter(col => col.isKey);
+          console.log(`👤 Campos chave encontrados: ${keyFields.length}`);
+          
+          if (keyFields.length > 0) {
+            // Assumir que o primeiro campo chave é idOrigemTxt mapeado para id_de_elemento
+            const itemId = item.id; // ID do Monday
+            console.log(`👤 Verificando duplicata para Monday ID: ${itemId}`);
+            
+            try {
+              const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem_txt = ${itemId} LIMIT 1`);
+              
+              if (duplicateCheck.rows.length > 0) {
+                console.log(`👤 ❌ DUPLICATA DETECTADA: Item ${item.id} já existe como documento ${duplicateCheck.rows[0].id}`);
+                isDuplicate = true;
+                documentsPreExisting++;
+              } else {
+                console.log(`👤 ✅ NOVO DOCUMENTO: Item ${item.id} será criado`);
+              }
+            } catch (error) {
+              console.log(`👤 ⚠️ Erro na verificação: ${error}`);
+            }
+          }
+          
+          if (isDuplicate) {
+            console.log(`👤 ⏭️ PULANDO item duplicado ${item.id}`);
+            continue;
+          }
+
           // Construir o documento baseado no mapeamento de colunas
           const documentData: any = {};
           
