@@ -1132,8 +1132,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Execute Monday mapping synchronization (MANUAL) - VERSÃO DEFINITIVA
-  app.post("/api/monday/mappings/:id/execute-new", async (req, res) => {
+  // Execute Monday mapping synchronization with totals - NOVA ROTA ÚNICA
+  app.post("/api/monday/mappings/:id/sync-with-totals", async (req, res) => {
     if (!req.isAuthenticated()) {
       console.log("❌ USUÁRIO NÃO AUTORIZADO");
       return res.status(401).send("Não autorizado");

@@ -1107,7 +1107,7 @@ export default function AdminPage() {
       
       const startTime = Date.now();
       
-      const response = await fetch(`/api/monday/mappings/${mapping.id}/execute-new`, {
+      const response = await fetch(`/api/monday/mappings/${mapping.id}/sync-with-totals`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1136,7 +1136,7 @@ export default function AdminPage() {
 
       // Debug: verificar o conteúdo da resposta
       const responseText = await response.text();
-      console.log("🔍 DEBUG - URL chamada:", `/api/monday/mappings/${mapping.id}/execute-new`);
+      console.log("🔍 DEBUG - URL chamada:", `/api/monday/mappings/${mapping.id}/sync-with-totals`);
       console.log("🔍 DEBUG - Status da resposta:", response.status);
       console.log("🔍 DEBUG - Resposta do servidor:", responseText);
       
