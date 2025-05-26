@@ -170,7 +170,9 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       
       // Processar anexos se configurados
       if (existingMapping.assetsMappings) {
-        const assetsMappings = JSON.parse(existingMapping.assetsMappings);
+        const assetsMappings = typeof existingMapping.assetsMappings === 'string' 
+          ? JSON.parse(existingMapping.assetsMappings) 
+          : existingMapping.assetsMappings;
         for (const assetMapping of assetsMappings) {
           const columnValue = item.column_values.find((cv: any) => cv.id === assetMapping.columnId);
           if (columnValue && columnValue.value) {
@@ -179,7 +181,7 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
               if (files && files.files && Array.isArray(files.files)) {
                 for (const file of files.files) {
                   await storage.createDocumentArtifact({
-                    documentId: createdDocument.id,
+                    documentoId: createdDocument.id,
                     filename: file.name,
                     fileUrl: file.url,
                     fileSize: file.size || 0,
