@@ -48,19 +48,22 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     pageCount++;
     console.log(`${isHeadless ? '🤖' : '👤'} 📄 PÁGINA ${pageCount} - Cursor: ${cursor || 'PRIMEIRA PÁGINA'}`);
     
+    const mondayColumns = mappingColumns.map(col => col.mondayColumnId);
     const query = `
-      query GetBoardItems($boardId: ID!) {
-        boards(ids: [$boardId]) {
+      query {
+        boards(ids: [${boardId}]) {
           items_page(limit: 500${cursor ? `, cursor: "${cursor}"` : ''}) {
             cursor
             items {
               id
               name
-              column_values {
+              column_values(ids: [${mondayColumns.map(id => `"${id}"`).join(", ")}]) {
                 id
                 text
                 value
-                type
+                column {
+                  title
+                }
               }
             }
           }
@@ -68,15 +71,14 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       }
     `;
     
-    const variables: any = { boardId };
-    
     const mondayResponse = await fetch("https://api.monday.com/v2", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": apiKey
+        "Authorization": apiKey,
+        "API-Version": "2023-10"
       },
-      body: JSON.stringify({ query, variables })
+      body: JSON.stringify({ query })
     });
     
     if (!mondayResponse.ok) {
@@ -92,7 +94,7 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     cursor = mondayData.data?.boards?.[0]?.items_page?.cursor || null;
     
     allItems = allItems.concat(pageItems);
-    console.log(`${isHeadless ? '🤖' : '👤'} 📄 PÁGINA ${pageCount} - ${pageItems.length} itens coletados, total acumulado: ${allItems.length}`);
+    console.log(`${isHeadless ? '🤖' : '👤'} 📄 PÁGINA ${pageCount} - ${pageItems.length} itens coletados, total acumulado: ${allItems.length}, cursor: ${cursor || 'NULL'}`);
     
     // Se cursor for null, significa que chegamos ao fim
     if (!cursor) {
