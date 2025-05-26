@@ -119,18 +119,9 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     // Verificar se já existe um documento com este id_origem
     const idOrigem = BigInt(item.id);
     
-    // Usar verificação através do storage para manter compatibilidade
-    try {
-      const existingDoc = await storage.getDocumento(String(idOrigem));
-      if (existingDoc) {
-        console.log(`⚠️ Documento já existe para item ${item.id}, pulando...`);
-        documentsPreExisting++;
-        continue;
-      }
-    } catch (error) {
-      // Se não encontrar por ID, continuar com criação do documento
-      console.log(`🔍 Item ${item.id} não encontrado - será criado`);
-    }
+    // Para execução automática, vamos pular a verificação de duplicatas por enquanto
+    // e permitir que o banco de dados gerencie via constraints únicas
+    console.log(`🔍 Processando item ${item.id} (ID origem: ${idOrigem})`);
     
     // Mapear dados do item para campos do documento
     const documentData: any = {
