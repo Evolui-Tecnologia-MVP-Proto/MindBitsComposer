@@ -1526,34 +1526,141 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(400).send("mappingId é obrigatório");
     }
     
-    console.log("🤖 INICIANDO EXECUÇÃO AUTOMÁTICA DO MAPEAMENTO:", mappingId);
+    console.log("🤖 EXECUÇÃO AUTOMÁTICA - Usando mesma lógica da manual:", mappingId);
     
     try {
-      // Verificar se o mapeamento existe
-      const existingMapping = await storage.getMondayMapping(mappingId);
-      if (!existingMapping) {
-        return res.status(404).send("Mapeamento não encontrado");
-      }
+      // Usar a mesma função da execução manual que funciona perfeitamente
+      const result = await executeMondayMapping(mappingId, undefined, true);
       
-      // Obter a chave da API
-      const apiKey = await storage.getMondayApiKey();
-      if (!apiKey) {
-        return res.status(400).send("Chave da API do Monday não configurada");
-      }
-      
-      // Buscar as colunas mapeadas para este mapeamento
-      const mappingColumns = await storage.getMappingColumns(mappingId);
-      if (mappingColumns.length === 0) {
-        return res.status(400).send("Nenhuma coluna mapeada encontrada para este mapeamento");
-      }
-      
-      console.log("🤖 EXECUÇÃO AUTOMÁTICA - Token Monday:", apiKey ? `${apiKey.substring(0, 10)}...` : "NENHUM TOKEN");
+      res.json({
+        success: true,
+        message: "Sincronização executada com sucesso",
+        documentsCreated: result.documentsCreated,
+        documentsFiltered: result.documentsSkipped,
+        itemsProcessed: result.itemsProcessed
+      });
+    } catch (error) {
+      console.error('🤖 Erro na execução automática:', error);
+      res.status(500).json({ 
+        error: "Erro interno do servidor",
+        details: (error as Error).message 
+      });
+    }
+  });
 
-      // Obter dados do quadro Monday (reutilizando lógica do endpoint manual)
-      const mondayColumns = mappingColumns.map(col => col.mondayColumnId);
-      const query = `
-        query {
-          boards(ids: [${existingMapping.boardId}]) {
+  // Clear logs endpoint
+  app.delete("/api/logs", async (req: Request, res: Response) => {
+    try {
+      await storage.clearAllLogs();
+      res.json({ success: true, message: "Logs limpos com sucesso" });
+    } catch (error) {
+      console.error("Erro ao limpar logs:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
+  // Job management endpoints
+  app.post("/api/jobs/activate", async (req: Request, res: Response) => {
+    const { mappingId, frequency, time } = req.body;
+    
+    if (!mappingId || !frequency || !time) {
+      return res.status(400).json({ error: "mappingId, frequency e time são obrigatórios" });
+    }
+
+    try {
+      const jobId = await jobManager.createJob(mappingId, frequency, time);
+      
+      await SystemLogger.log({
+        eventType: 'JOB_ACTIVATED',
+        message: `Job ativado para mapeamento ${mappingId}`,
+        parameters: {
+          mappingId,
+          frequency,
+          time,
+          jobId
+        }
+      });
+
+      res.json({
+        success: true,
+        jobId,
+        message: "Job ativado com sucesso"
+      });
+    } catch (error) {
+      console.error('Erro ao ativar job:', error);
+      res.status(500).json({ 
+        error: "Erro interno do servidor",
+        details: (error as Error).message 
+      });
+    }
+  });
+
+  app.post("/api/jobs/cancel", async (req: Request, res: Response) => {
+    const { mappingId } = req.body;
+    
+    if (!mappingId) {
+      return res.status(400).json({ error: "mappingId é obrigatório" });
+    }
+
+    try {
+      const cancelled = await jobManager.cancelJob(mappingId);
+      
+      if (cancelled) {
+        await SystemLogger.log({
+          eventType: 'JOB_CANCELLED',
+          message: `Job cancelado para mapeamento ${mappingId}`,
+          parameters: { mappingId }
+        });
+
+        res.json({
+          success: true,
+          message: "Job cancelado com sucesso"
+        });
+      } else {
+        res.status(404).json({
+          error: "Job não encontrado"
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao cancelar job:', error);
+      res.status(500).json({ 
+        error: "Erro interno do servidor",
+        details: (error as Error).message 
+      });
+    }
+  });
+
+  app.get("/api/jobs/status/:mappingId", async (req: Request, res: Response) => {
+    const { mappingId } = req.params;
+    
+    try {
+      const activeJob = jobManager.getActiveJob(mappingId);
+      
+      res.json({
+        isActive: !!activeJob,
+        job: activeJob || null
+      });
+    } catch (error) {
+      console.error('Erro ao verificar status do job:', error);
+      res.status(500).json({ 
+        error: "Erro interno do servidor",
+        details: (error as Error).message 
+      });
+    }
+  });
+
+  app.get("/api/jobs", async (req: Request, res: Response) => {
+    try {
+      const activeJobs = jobManager.getActiveJobs();
+      res.json(activeJobs);
+    } catch (error) {
+      console.error('Erro ao listar jobs:', error);
+      res.status(500).json({ 
+        error: "Erro interno do servidor",
+        details: (error as Error).message 
+      });
+    }
+  });
             items_page(limit: 500) {
               items {
                 id
