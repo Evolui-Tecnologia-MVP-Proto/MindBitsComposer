@@ -118,7 +118,7 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     
     // Verificar se já existe um documento com este id_origem
     const idOrigem = BigInt(item.id);
-    const existingDocs = await db.select().from(documentos).where(eq(documentos.id_origem, idOrigem)).limit(1);
+    const existingDocs = await db.select().from(documentos).where(eq(documentos.idOrigem, idOrigem)).limit(1);
     
     if (existingDocs.length > 0) {
       console.log(`⚠️ Documento já existe para item ${item.id}, pulando...`);
@@ -1711,8 +1711,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
             if (conditions.length > 0) {
               for (const condition of conditions) {
-                const existing = await storage.findDocumentByField(condition.field, condition.value);
-                if (existing) {
+                const existingDocs = await db.select().from(documentos).where(eq(documentos[condition.field], condition.value)).limit(1);
+                if (existingDocs.length > 0) {
                   isDuplicate = true;
                   documentsPreExisting++;
                   break;
