@@ -275,6 +275,23 @@ class JobManager {
             // SEMPRE gerar log específico para Triagem de requisições de clientes
             if (mappingId === 'd08420f2-219c-495f-816d-5e4ebe68c7e6') {
               console.log(`[LOG] 🎯 GERANDO LOG ESPECÍFICO PARA TRIAGEM DE REQUISIÇÕES!`);
+              
+              // Buscar dados do job ativo para obter configurações reais
+              const activeJob = this.getActiveJob(mappingId);
+              const frequency = activeJob?.frequency || '1min';
+              const time = activeJob?.time || '00:00';
+              
+              // Calcular próxima execução baseada na configuração real
+              const nextExecution = this.calculateNextExecution(frequency, time, new Date());
+              const proximaExecucao = nextExecution.toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit', 
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+              });
+
               await SystemLogger.log({
                 eventType: 'MONDAY_SYNC_TRIAGEM_DE_REQUISIÇÕES_DE_CLIENTES',
                 message: `Agendamento automático executado - Triagem de requisições de clientes: ${result.itemsProcessed || 0} itens processados, ${result.documentsCreated || 0} criados, ${result.documentsFiltered || 0} filtrados`,
@@ -288,6 +305,9 @@ class JobManager {
                   executedBy: 'scheduler',
                   agendamento: 'ativo',
                   boardId: '4197389343',
+                  proximaExecucao: proximaExecucao,
+                  intervalo: frequency,
+                  horarioConfiguracao: time,
                   timestamp: new Date().toISOString()
                 }
               });
