@@ -1392,11 +1392,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           
                           // Usar o primeiro mapeamento ativo
                           const mapping = activeMappings[0];
+                          console.log("🔧 Mapeamento selecionado:", {
+                            nome: mapping.name,
+                            id: mapping.id,
+                            assetsMappings: mapping.assetsMappings,
+                            hasAssetsMappings: mapping.assetsMappings && mapping.assetsMappings.length > 0
+                          });
                           
                           if (!mapping.assetsMappings || mapping.assetsMappings.length === 0) {
                             toast({
                               title: "Assets Map não configurado",
-                              description: "Este mapeamento não possui configuração de Assets Map para colunas de arquivo",
+                              description: `O mapeamento "${mapping.name}" não possui configuração de Assets Map para colunas de arquivo`,
                               variant: "destructive"
                             });
                             return;
