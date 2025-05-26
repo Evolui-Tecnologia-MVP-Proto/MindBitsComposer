@@ -910,6 +910,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Buscar anexos de um item do Monday.com
   app.get("/api/monday/attachments/:itemId", async (req, res) => {
+    console.log("🔥 ROTA GET sendo executada para:", req.params.itemId);
+    console.log("🔥 Método da requisição:", req.method);
+    
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { itemId } = req.params;
