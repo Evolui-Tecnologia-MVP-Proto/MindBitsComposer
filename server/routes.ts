@@ -1497,8 +1497,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Execute Monday mapping synchronization (headless mode for automation)
-  app.post("/api/monday/mappings/execute-headless", async (req, res) => {
+  // FUNÇÃO DUPLICADA COMENTADA - usando apenas a versão otimizada com paginação
+  /*app.post("/api/monday/mappings/execute-headless", async (req, res) => {
     const { mappingId } = req.body;
     
     if (!mappingId) {
@@ -1828,7 +1828,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("🤖 Erro na execução automática:", error);
       res.status(500).send(`Erro na execução automática: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
-  });
+  });*/
 
   // Fetch columns from Monday.com API and save them
   app.post("/api/monday/mappings/:id/fetch-columns", async (req, res) => {
