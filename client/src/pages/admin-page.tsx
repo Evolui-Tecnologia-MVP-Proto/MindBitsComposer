@@ -1136,11 +1136,14 @@ export default function AdminPage() {
 
       // Debug: verificar o conteúdo da resposta
       const responseText = await response.text();
-      console.log("Resposta do servidor:", responseText);
+      console.log("🔍 DEBUG - URL chamada:", `/api/monday/mappings/${mapping.id}/execute`);
+      console.log("🔍 DEBUG - Status da resposta:", response.status);
+      console.log("🔍 DEBUG - Resposta do servidor:", responseText);
       
       let result;
       try {
         result = JSON.parse(responseText);
+        console.log("🔍 DEBUG - Objeto parseado:", result);
       } catch (parseError) {
         console.error("Erro ao parsear JSON:", parseError);
         console.error("Conteúdo recebido:", responseText);
