@@ -1134,7 +1134,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // Execute Monday mapping synchronization
+  // Execute Monday mapping synchronization (MANUAL)
   app.post("/api/monday/mappings/:id/execute", async (req, res) => {
     if (!req.isAuthenticated()) {
       console.log("❌ USUÁRIO NÃO AUTORIZADO");
@@ -1142,7 +1142,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     const { id } = req.params;
-    console.log("🚀 INICIANDO EXECUÇÃO DO MAPEAMENTO:", id);
+    console.log("👤 INICIANDO EXECUÇÃO MANUAL DO MAPEAMENTO:", id);
+    
+    try {
+      // Usar a função unificada com isHeadless = false para execução manual
+      await executeMondayMapping(id, req.user?.id, false);
+      
+      res.json({
+        success: true,
+        message: "Execução manual iniciada com sucesso"
+      });
+    } catch (error) {
+      console.error("Erro ao executar mapeamento manual:", error);
+      res.status(500).send(`Erro ao executar mapeamento: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+    }
+  });
+
+  // Execute Monday mapping synchronization (LEGACY - manter por compatibilidade)
+  app.post("/api/monday/mappings/:id/execute-legacy", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      console.log("❌ USUÁRIO NÃO AUTORIZADO");
+      return res.status(401).send("Não autorizado");
+    }
+    
+    const { id } = req.params;
+    console.log("👤 EXECUÇÃO LEGACY DO MAPEAMENTO:", id);
     
     try {
       // Verificar se o mapeamento existe
