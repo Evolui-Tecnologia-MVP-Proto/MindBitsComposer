@@ -1175,6 +1175,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      console.log("📤 Enviando resposta com anexos:", {
+        totalAttachments: attachments.length,
+        attachmentNames: attachments.map(a => a.name || 'sem nome'),
+        responseType: 'JSON'
+      });
+      
       res.json(attachments);
     } catch (error) {
       console.error("Erro ao buscar anexos de colunas do Monday:", error);
