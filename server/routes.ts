@@ -1589,11 +1589,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       await storage.updateMondayMappingLastSync(id);
       
       // Log final com números corretos
-      console.log(`${isHeadless ? '🤖' : '👤'} 📈 ESTATÍSTICAS FINAIS:`);
-      console.log(`${isHeadless ? '🤖' : '👤'} - Total de itens buscados: ${items.length}`);
-      console.log(`${isHeadless ? '🤖' : '👤'} - Documentos criados: ${documentsCreated}`);
-      console.log(`${isHeadless ? '🤖' : '👤'} - Itens filtrados/pulados: ${documentsSkipped}`);
-      console.log(`${isHeadless ? '🤖' : '👤'} - Duplicatas encontradas: ${documentsPreExisting}`);
+      console.log(`👤 📈 ESTATÍSTICAS FINAIS:`);
+      console.log(`👤 - Total de itens buscados: ${items.length}`);
+      console.log(`👤 - Documentos criados: ${documentsCreated}`);
+      console.log(`👤 - Itens filtrados/pulados: ${documentsSkipped}`);
+      console.log(`👤 - Duplicatas encontradas: ${documentsPreExisting}`);
       
       res.json({
         success: true,
