@@ -15,6 +15,208 @@ import path from "path";
 import fs from "fs";
 import multer from "multer";
 
+// Função compartilhada para executar mapeamento Monday
+async function executeMondayMapping(mappingId: string, userId?: number, isHeadless: boolean = false) {
+  console.log(`${isHeadless ? '🤖' : '👤'} INICIANDO EXECUÇÃO DO MAPEAMENTO:`, mappingId);
+  
+  // Verificar se o mapeamento existe
+  const existingMapping = await storage.getMondayMapping(mappingId);
+  if (!existingMapping) {
+    throw new Error("Mapeamento não encontrado");
+  }
+  
+  // Obter a chave da API
+  const apiKey = await storage.getMondayApiKey();
+  if (!apiKey) {
+    throw new Error("Chave da API do Monday não configurada");
+  }
+  
+  // Buscar colunas mapeadas para este mapeamento
+  const mappingColumns = await storage.getMappingColumns(mappingId);
+  console.log(`📊 ${mappingColumns.length} colunas mapeadas encontradas`);
+  
+  // Buscar dados do quadro Monday.com
+  const boardId = existingMapping.boardId;
+  console.log(`🎯 Buscando dados do quadro ${boardId}...`);
+  
+  const query = `
+    query GetBoardItems($boardId: ID!) {
+      boards(ids: [$boardId]) {
+        items_page(limit: 500) {
+          items {
+            id
+            name
+            column_values {
+              id
+              text
+              value
+              type
+            }
+          }
+        }
+      }
+    }
+  `;
+  
+  const mondayResponse = await fetch("https://api.monday.com/v2", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": apiKey
+    },
+    body: JSON.stringify({ query, variables: { boardId } })
+  });
+  
+  if (!mondayResponse.ok) {
+    throw new Error(`Erro na API do Monday: ${mondayResponse.status}`);
+  }
+  
+  const mondayData: any = await mondayResponse.json();
+  if (mondayData.errors) {
+    throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(mondayData.errors)}`);
+  }
+  
+  const items = mondayData.data.boards[0]?.items_page?.items || [];
+  console.log(`📋 ${items.length} itens encontrados no quadro`);
+  
+  let documentsCreated = 0;
+  let documentsSkipped = 0;
+  let documentsPreExisting = 0;
+  
+  // Processar cada item
+  for (let index = 0; index < items.length; index++) {
+    const item = items[index];
+    
+    // Aplicar filtro se configurado
+    if (existingMapping.mappingFilter && existingMapping.mappingFilter.trim()) {
+      console.log(`🔍 VERIFICANDO FILTRO para item ${item.id}:`);
+      console.log(`- mappingFilter existe? ${!!existingMapping.mappingFilter}`);
+      console.log(`- mappingFilter não está vazio? ${existingMapping.mappingFilter}`);
+      
+      try {
+        console.log(`✅ APLICANDO FILTRO para item ${item.id}`);
+        console.log(`📋 FILTRO JAVASCRIPT: ${existingMapping.mappingFilter}`);
+        
+        const filterFunction = new Function('item', existingMapping.mappingFilter);
+        const passesFilter = filterFunction(item);
+        
+        console.log(`🎯 RESULTADO DO FILTRO para item ${item.id}: ${passesFilter}`);
+        
+        if (!passesFilter) {
+          console.log(`❌ Item ${item.id} foi FILTRADO (excluído) - não atende às condições`);
+          documentsSkipped++;
+          continue;
+        } else {
+          console.log(`✅ Item ${item.id} PASSOU no filtro - será processado`);
+        }
+      } catch (filterError) {
+        console.error(`❌ ERRO no filtro para item ${item.id}:`, filterError);
+        documentsSkipped++;
+        continue;
+      }
+    }
+    
+    // Verificar se já existe um documento com este id_origem
+    const idOrigem = BigInt(item.id);
+    const existingDoc = await storage.findDocumentByField('id_origem', idOrigem);
+    
+    if (existingDoc) {
+      console.log(`⚠️ Documento já existe para item ${item.id}, pulando...`);
+      documentsPreExisting++;
+      continue;
+    }
+    
+    // Mapear dados do item para campos do documento
+    const documentData: any = {
+      titulo: item.name || `Item ${item.id}`,
+      id_origem: idOrigem,
+      status: "Integrado"
+    };
+    
+    // Aplicar valores padrão
+    if (existingMapping.defaultValues) {
+      try {
+        const defaults = JSON.parse(existingMapping.defaultValues);
+        Object.assign(documentData, defaults);
+      } catch (e) {
+        console.warn("Erro ao parsear valores padrão:", e);
+      }
+    }
+    
+    // Mapear colunas específicas
+    for (const mapping of mappingColumns) {
+      const columnValue = item.column_values.find((cv: any) => cv.id === mapping.mondayColumnId);
+      if (columnValue && columnValue.text) {
+        let value = columnValue.text;
+        
+        // Aplicar transformação se configurada
+        if (mapping.transformation && mapping.transformation.trim()) {
+          try {
+            const transformFunction = new Function('value', mapping.transformation);
+            value = transformFunction(value);
+          } catch (transformError) {
+            console.warn(`Erro na transformação para coluna ${mapping.documentField}:`, transformError);
+          }
+        }
+        
+        documentData[mapping.documentField] = value;
+      }
+    }
+    
+    try {
+      // Criar o documento
+      const createdDocument = await storage.createDocumento(documentData);
+      console.log(`✅ Documento criado: ${createdDocument.id} - ${createdDocument.titulo}`);
+      documentsCreated++;
+      
+      // Processar anexos se configurados
+      if (existingMapping.assetsMappings) {
+        const assetsMappings = JSON.parse(existingMapping.assetsMappings);
+        for (const assetMapping of assetsMappings) {
+          const columnValue = item.column_values.find((cv: any) => cv.id === assetMapping.columnId);
+          if (columnValue && columnValue.value) {
+            try {
+              const files = JSON.parse(columnValue.value);
+              if (files && files.files && Array.isArray(files.files)) {
+                for (const file of files.files) {
+                  await storage.createDocumentArtifact({
+                    documentId: createdDocument.id,
+                    filename: file.name,
+                    fileUrl: file.url,
+                    fileSize: file.size || 0,
+                    uploadedAt: new Date()
+                  });
+                }
+              }
+            } catch (fileError) {
+              console.warn(`Erro ao processar anexos para item ${item.id}:`, fileError);
+            }
+          }
+        }
+      }
+      
+    } catch (docError) {
+      console.error(`❌ Erro ao criar documento para item ${item.id}:`, docError);
+      documentsSkipped++;
+    }
+    
+    // Log de progresso a cada 100 itens
+    if ((index + 1) % 100 === 0) {
+      console.log(`📊 PROGRESSO: ${index + 1}/${items.length} itens processados | Criados: ${documentsCreated} | Filtrados: ${documentsSkipped}`);
+    }
+  }
+  
+  console.log(`🎉 EXECUÇÃO CONCLUÍDA: ${documentsCreated} documentos criados, ${documentsSkipped} filtrados, ${documentsPreExisting} já existentes`);
+  
+  return {
+    itemsProcessed: items.length,
+    documentsCreated,
+    documentsSkipped,
+    documentsPreExisting,
+    columnsMapping: mappingColumns.length
+  };
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Endpoint para execução automática de jobs (sem autenticação)
   app.post("/api/monday/mappings/execute-headless", async (req: Request, res: Response) => {
@@ -29,14 +231,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`🤖 Executando mapeamento headless: ${mappingId}`);
 
-      // Buscar o mapeamento
-      const mapping = await storage.getMondayMapping(mappingId);
-      if (!mapping) {
-        return res.status(404).json({ error: "Mapeamento não encontrado" });
-      }
-
-      // Executar a sincronização (usando a mesma lógica do endpoint manual)
-      const result = await executeMondayMapping(mappingId, null, true); // isHeadless = true
+      // Executar a sincronização
+      const result = await executeMondayMapping(mappingId, undefined, true);
       
       console.log(`🤖 Resultado headless:`, result);
       
@@ -44,8 +240,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         message: "Sincronização executada com sucesso",
         documentsCreated: result.documentsCreated || 0,
-        documentsFiltered: result.documentsFiltered || 0,
-        mapping: mapping
+        documentsFiltered: result.documentsSkipped || 0,
+        itemsProcessed: result.itemsProcessed || 0
       });
 
     } catch (error: any) {
