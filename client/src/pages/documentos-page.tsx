@@ -1434,6 +1434,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           
                           if (response.ok) {
                             const attachments = await response.json();
+                            console.log("📥 Anexos recebidos do Monday:", attachments);
                             
                             if (attachments.length > 0) {
                               // Salvar anexos do Monday no banco
