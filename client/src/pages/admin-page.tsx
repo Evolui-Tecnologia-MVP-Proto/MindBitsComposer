@@ -1532,7 +1532,7 @@ export default function AdminPage() {
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => executeMondayMapping(mapping)}
-                                    title="Executar sincronização"
+                                    title="Executar sincronização com interface"
                                     disabled={isExecutingMapping}
                                   >
                                     {isExecutingMapping ? (
@@ -1542,6 +1542,15 @@ export default function AdminPage() {
                                     ) : (
                                       <Play className="h-4 w-4 text-green-600" />
                                     )}
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => executeMondayMapping(mapping, true)}
+                                    title="Executar sincronização silenciosa (headless)"
+                                    disabled={isExecutingMapping}
+                                  >
+                                    <PlayCircle className="h-4 w-4 text-orange-600" />
                                   </Button>
                                   <Button
                                     variant="ghost"
