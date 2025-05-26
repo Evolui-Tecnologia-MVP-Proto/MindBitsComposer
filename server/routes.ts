@@ -49,9 +49,9 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     console.log(`${isHeadless ? '🤖' : '👤'} 📄 PÁGINA ${pageCount} - Cursor: ${cursor || 'PRIMEIRA PÁGINA'}`);
     
     const query = `
-      query GetBoardItems($boardId: ID!, $cursor: String) {
+      query GetBoardItems($boardId: ID!) {
         boards(ids: [$boardId]) {
-          items_page(limit: 500${cursor ? ', cursor: $cursor' : ''}) {
+          items_page(limit: 500${cursor ? `, cursor: "${cursor}"` : ''}) {
             cursor
             items {
               id
@@ -69,9 +69,6 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     `;
     
     const variables: any = { boardId };
-    if (cursor) {
-      variables.cursor = cursor;
-    }
     
     const mondayResponse = await fetch("https://api.monday.com/v2", {
       method: "POST",
