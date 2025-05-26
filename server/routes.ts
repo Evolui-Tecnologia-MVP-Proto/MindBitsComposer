@@ -2985,6 +2985,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const jobId = await jobManager.createJob(mappingId, frequency, time);
       
+      // Salvar as configurações de agendamento no banco
+      await storage.updateMondayMapping(mappingId, {
+        schedulesParams: {
+          enabled: true,
+          frequency: frequency,
+          time: time,
+          days: []
+        }
+      });
+      
       // Calcular próxima execução
       const now = new Date();
       const [hours, minutes] = time.split(':');
@@ -3042,6 +3052,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const mapping = await storage.getMondayMapping(mappingId);
       
       const success = jobManager.cancelJob(mappingId);
+      
+      // Atualizar as configurações de agendamento no banco (desativar)
+      if (success && mapping) {
+        await storage.updateMondayMapping(mappingId, {
+          schedulesParams: {
+            enabled: false,
+            frequency: mapping.schedulesParams?.frequency || 'daily',
+            time: mapping.schedulesParams?.time || '09:00',
+            days: mapping.schedulesParams?.days || []
+          }
+        });
+      }
       
       // Criar log do cancelamento se o job foi encontrado e cancelado
       if (success && mapping) {
