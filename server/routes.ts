@@ -1088,6 +1088,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const data = await mondayResponse.json();
+      console.log("🔍 Resposta do Monday.com:", JSON.stringify(data, null, 2));
       
       if (data.errors) {
         console.error("Erros da API Monday:", data.errors);
