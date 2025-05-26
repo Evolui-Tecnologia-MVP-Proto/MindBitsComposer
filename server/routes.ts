@@ -1112,11 +1112,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       if (data.errors) {
-        console.error("Erros da API Monday:", data.errors);
+        console.error("❌ Erros GraphQL da API Monday:", JSON.stringify(data.errors, null, 2));
+        console.error("📤 Query que causou erro:", query);
         return res.status(500).json({
           success: false,
           message: "Erro na consulta do Monday",
-          errors: data.errors
+          errors: data.errors,
+          query: query
         });
       }
       
