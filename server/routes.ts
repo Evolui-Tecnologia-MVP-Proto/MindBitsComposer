@@ -1017,6 +1017,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Debug: Verificar documentos com idOrigemTxt
+  app.get("/api/debug/documentos-monday", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const allDocuments = await storage.getAllDocumentos();
+      const documentosComMondayId = allDocuments.filter(doc => doc.idOrigemTxt && doc.idOrigemTxt.trim() !== '');
+      
+      res.json({
+        total: documentosComMondayId.length,
+        documentos: documentosComMondayId.map(doc => ({
+          id: doc.id,
+          objeto: doc.objeto,
+          origem: doc.origem,
+          statusOrigem: doc.statusOrigem,
+          idOrigemTxt: doc.idOrigemTxt
+        }))
+      });
+    } catch (error) {
+      console.error("Erro ao buscar documentos do Monday:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   // Função auxiliar para determinar MIME type baseado na extensão
   function getMimeType(extension: string): string {
     const mimeTypes: Record<string, string> = {

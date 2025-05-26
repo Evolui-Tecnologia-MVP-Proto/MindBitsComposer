@@ -95,6 +95,7 @@ export interface IStorage {
   updateDocumento(id: string, data: Partial<Documento>): Promise<Documento>;
   deleteDocumento(id: string): Promise<void>;
   getDocumentosByKeyFields(keyFields: string[], documentData: any): Promise<Documento[]>;
+  getDocumentosWithMondayId(): Promise<Documento[]>;
   
   // Document Artifact operations
   getDocumentArtifact(id: string): Promise<DocumentArtifact | undefined>;
