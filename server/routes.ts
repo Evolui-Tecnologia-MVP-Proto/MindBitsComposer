@@ -1019,6 +1019,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Buscar anexos de colunas específicas baseado no Assets Map
   app.post("/api/monday/attachments/:itemId", async (req, res) => {
+    console.log("🚀 INÍCIO endpoint Monday attachments");
+    console.log("📋 Dados recebidos:", { 
+      itemId: req.params.itemId, 
+      body: req.body,
+      isAuthenticated: req.isAuthenticated?.() 
+    });
+    
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { itemId } = req.params;
