@@ -263,6 +263,26 @@ class JobManager {
         try {
           const result = JSON.parse(responseText);
           console.log(`[JOB] Execução automática concluída - ${result.documentsCreated || 0} documentos criados`);
+          
+          // Registrar sucesso no log do sistema
+          try {
+            const mapping = await storage.getMondayMapping(mappingId);
+            await SystemLogger.log({
+              eventType: 'MONDAY_SYNC_SCHEDULED',
+              message: `Execução automática concluída para mapeamento "${mapping?.name || mappingId}"`,
+              parameters: {
+                mappingId,
+                executionType: 'automatic',
+                documentsCreated: result.documentsCreated || 0,
+                documentsFiltered: result.documentsFiltered || 0,
+                itemsProcessed: result.itemsProcessed || 0,
+                executedBy: 'scheduler'
+              }
+            });
+            console.log(`[LOG] Execução automática registrada no banco - Mapeamento: ${mappingId}`);
+          } catch (logError) {
+            console.error('[JOB] Erro ao registrar log de sucesso:', logError);
+          }
         } catch (parseError) {
           console.error(`[JOB] Erro ao parsear JSON da resposta:`, parseError);
           console.log(`[JOB] Resposta completa:`, responseText);
