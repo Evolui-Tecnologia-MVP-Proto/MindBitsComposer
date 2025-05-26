@@ -1107,7 +1107,7 @@ export default function AdminPage() {
       
       const startTime = Date.now();
       
-      const response = await fetch(`/api/monday/mappings/${mapping.id}/execute-legacy`, {
+      const response = await fetch(`/api/monday/mappings/${mapping.id}/execute`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1136,14 +1136,11 @@ export default function AdminPage() {
 
       // Debug: verificar o conteúdo da resposta
       const responseText = await response.text();
-      console.log("🔍 DEBUG - URL chamada:", `/api/monday/mappings/${mapping.id}/execute-legacy`);
-      console.log("🔍 DEBUG - Status da resposta:", response.status);
-      console.log("🔍 DEBUG - Resposta do servidor:", responseText);
+      console.log("Resposta do servidor:", responseText);
       
       let result;
       try {
         result = JSON.parse(responseText);
-        console.log("🔍 DEBUG - Objeto parseado:", result);
       } catch (parseError) {
         console.error("Erro ao parsear JSON:", parseError);
         console.error("Conteúdo recebido:", responseText);
@@ -1161,7 +1158,7 @@ export default function AdminPage() {
           description: (
             <div className="space-y-1">
               <div className="font-medium">Resumo da Importação:</div>
-              <div><strong>{result.itemsProcessed}</strong> registros processados da API</div>
+              <div><strong>{result.itemsProcessed}</strong> registros importados da API</div>
               <div><strong>{result.documentsCreated}</strong> documentos novos gravados</div>
               <div><strong>{result.documentsPreExisting || 0}</strong> registros já existentes</div>
               <div><strong>{result.documentsSkipped}</strong> registros filtrados/ignorados</div>
@@ -1532,7 +1529,7 @@ export default function AdminPage() {
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => executeMondayMapping(mapping)}
-                                    title="Executar Agora"
+                                    title="Executar sincronização com interface"
                                     disabled={isExecutingMapping}
                                   >
                                     {isExecutingMapping ? (
@@ -1542,6 +1539,15 @@ export default function AdminPage() {
                                     ) : (
                                       <Play className="h-4 w-4 text-green-600" />
                                     )}
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => executeMondayMapping(mapping, true)}
+                                    title="Executar sincronização silenciosa (headless)"
+                                    disabled={isExecutingMapping}
+                                  >
+                                    <PlayCircle className="h-4 w-4 text-orange-600" />
                                   </Button>
                                   <Button
                                     variant="ghost"
