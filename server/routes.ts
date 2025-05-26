@@ -1160,31 +1160,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 console.log(`📁 Encontrados ${fileData.files.length} arquivo(s) na coluna ${column.id}`);
                 
                 for (const file of fileData.files) {
+                  // A URL do arquivo está no campo 'text' da coluna, não no objeto file
+                  const fileUrl = column.text || file.url;
+                  
                   console.log("📎 Processando arquivo:", {
                     name: file.name,
-                    url: file.url,
-                    id: file.id
+                    assetId: file.assetId,
+                    url: fileUrl,
+                    columnText: column.text
                   });
+                  
+                  if (!fileUrl) {
+                    console.log(`❌ URL não encontrada para arquivo ${file.name}`);
+                    continue;
+                  }
                   
                   // Baixar o arquivo do Monday.com
                   try {
-                    const fileResponse = await fetch(file.url);
+                    const fileResponse = await fetch(fileUrl);
                     if (fileResponse.ok) {
                       const arrayBuffer = await fileResponse.arrayBuffer();
                       const buffer = Buffer.from(arrayBuffer);
                       const base64Data = buffer.toString('base64');
                       
-                      // Determinar MIME type
-                      const mimeType = getMimeType(file.extension || 'txt');
+                      // Determinar MIME type baseado na extensão do nome do arquivo
+                      const extension = file.name.split('.').pop() || 'txt';
+                      const mimeType = getMimeType(extension);
                       
                       attachments.push({
-                        id: file.id || `${column.id}-${Date.now()}`,
+                        id: file.assetId || `${column.id}-${Date.now()}`,
                         name: file.name,
                         fileName: file.name,
                         fileData: base64Data,
                         mimeType: mimeType,
-                        fileSize: file.size ? `${file.size} bytes` : null,
-                        source: `Monday.com - Coluna: ${column.id}`
+                        fileSize: null, // Monday.com não retorna tamanho neste formato
+                        source: `Monday.com - Coluna: ${column.id}`,
+                        mondayAssetId: file.assetId
                       });
                       
                       console.log("✅ Arquivo baixado e convertido:", file.name);
