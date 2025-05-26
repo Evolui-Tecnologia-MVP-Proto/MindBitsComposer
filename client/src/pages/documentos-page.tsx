@@ -1432,6 +1432,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             })
                           });
                           
+                          console.log("🔍 Response status:", response.status, response.ok);
+                          
                           if (response.ok) {
                             const attachments = await response.json();
                             console.log("📥 Anexos recebidos do Monday:", attachments);
