@@ -1054,21 +1054,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const apiKey = mondayConnection.token;
       
-      // Buscar item com todos os assets anexados
+      // Buscar item com valores das colunas (onde estão os anexos serializados)
       const query = `
         query {
           items(ids: [${itemId}]) {
             id
             name
-            assets {
-              id
-              name
-              url
-              file_size
-              public_url
-            }
             column_values {
               id
+              title
               text
               value
               type
@@ -1134,41 +1128,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const item = items[0];
       const attachments: any[] = [];
       
-      // Extrair arquivos de cada coluna do Assets Map
-      for (const columnId of columnIds) {
-        const sanitizedColumnId = columnId.replace(/[^a-zA-Z0-9_]/g, '_');
-        const columnData = item[sanitizedColumnId];
+      // Processar cada coluna especificada no Assets Map
+      for (const targetColumnId of columnIds) {
+        console.log("🔍 Procurando coluna:", targetColumnId);
         
-        if (columnData && Array.isArray(columnData)) {
-          for (const column of columnData) {
-            if (column.files && Array.isArray(column.files)) {
-              for (const file of column.files) {
-                // Baixar o arquivo e converter para base64
-                try {
-                  const fileResponse = await fetch(file.public_url || file.url);
-                  if (fileResponse.ok) {
-                    const arrayBuffer = await fileResponse.arrayBuffer();
-                    const base64 = Buffer.from(arrayBuffer).toString('base64');
-                    
-                    attachments.push({
-                      id: file.id,
-                      name: file.name,
-                      fileName: file.name,
-                      fileData: base64,
-                      mimeType: file.name?.split('.').pop() || 'application/octet-stream',
-                      fileSize: file.file_size?.toString(),
-                      url: file.url,
-                      public_url: file.public_url,
-                      columnId: columnId,
-                      itemId: itemId
-                    });
+        // Encontrar a coluna correspondente nos dados retornados
+        const column = item.column_values?.find((col: any) => col.id === targetColumnId);
+        
+        if (column) {
+          console.log("✅ Coluna encontrada:", {
+            id: column.id,
+            title: column.title,
+            type: column.type,
+            hasValue: !!column.value
+          });
+          
+          // Se é uma coluna de arquivo (tipo 'file') e tem valor
+          if (column.type === 'file' && column.value) {
+            try {
+              // Parse do JSON que contém os arquivos serializados
+              const fileData = JSON.parse(column.value);
+              console.log("📁 Dados do arquivo parseados:", fileData);
+              
+              if (fileData.files && Array.isArray(fileData.files)) {
+                for (const file of fileData.files) {
+                  console.log("⬇️ Baixando arquivo:", file.name, "de", file.url);
+                  
+                  try {
+                    // Baixar o arquivo
+                    const fileResponse = await fetch(file.url);
+                    if (fileResponse.ok) {
+                      const arrayBuffer = await fileResponse.arrayBuffer();
+                      const base64 = Buffer.from(arrayBuffer).toString('base64');
+                      
+                      // Determinar MIME type baseado na extensão
+                      const extension = file.name?.split('.').pop()?.toLowerCase();
+                      let mimeType = 'application/octet-stream';
+                      if (extension) {
+                        const mimeTypes: any = {
+                          'pdf': 'application/pdf',
+                          'jpg': 'image/jpeg',
+                          'jpeg': 'image/jpeg',
+                          'png': 'image/png',
+                          'gif': 'image/gif',
+                          'doc': 'application/msword',
+                          'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                          'xls': 'application/vnd.ms-excel',
+                          'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                          'txt': 'text/plain'
+                        };
+                        mimeType = mimeTypes[extension] || 'application/octet-stream';
+                      }
+                      
+                      attachments.push({
+                        id: file.assetId || `monday-${Date.now()}`,
+                        name: file.name,
+                        fileName: file.name,
+                        fileData: base64,
+                        mimeType: mimeType,
+                        fileSize: file.size ? `${file.size} bytes` : null,
+                        columnId: targetColumnId,
+                        columnTitle: column.title
+                      });
+                      
+                      console.log("✅ Arquivo baixado com sucesso:", file.name);
+                    } else {
+                      console.error("❌ Erro ao baixar arquivo:", file.name, "Status:", fileResponse.status);
+                    }
+                  } catch (downloadError) {
+                    console.error(`❌ Erro ao baixar arquivo ${file.name}:`, downloadError);
                   }
-                } catch (downloadError) {
-                  console.error(`❌ Erro ao processar arquivo ${file.name}:`, downloadError);
                 }
+              } else {
+                console.log("ℹ️ Coluna não contém arquivos ou array vazio");
               }
+            } catch (parseError) {
+              console.error(`❌ Erro ao fazer parse do valor da coluna ${targetColumnId}:`, parseError);
+              console.error("📄 Valor que causou erro:", column.value);
             }
+          } else {
+            console.log("ℹ️ Coluna não é do tipo 'file' ou não tem valor:", {
+              type: column.type,
+              hasValue: !!column.value
+            });
           }
+        } else {
+          console.log("❌ Coluna não encontrada:", targetColumnId);
         }
       }
       
