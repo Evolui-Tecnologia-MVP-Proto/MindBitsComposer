@@ -16,6 +16,54 @@ import fs from "fs";
 import multer from "multer";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Endpoint para execução automática de jobs (sem autenticação)
+  app.post("/api/monday/mappings/execute-headless", async (req: Request, res: Response) => {
+    console.log("🤖 ENDPOINT HEADLESS ACIONADO");
+    
+    try {
+      const { mappingId } = req.body;
+      
+      if (!mappingId) {
+        return res.status(400).json({ error: "mappingId é obrigatório" });
+      }
+
+      console.log(`🤖 Executando mapeamento headless: ${mappingId}`);
+
+      // Buscar o mapeamento
+      const mapping = await storage.getMondayMapping(mappingId);
+      if (!mapping) {
+        return res.status(404).json({ error: "Mapeamento não encontrado" });
+      }
+
+      // Executar a sincronização (usando a mesma lógica do endpoint manual)
+      const result = await executeMondayMapping(mappingId, null, true); // isHeadless = true
+      
+      console.log(`🤖 Resultado headless:`, result);
+      
+      return res.json({
+        success: true,
+        message: "Sincronização executada com sucesso",
+        documentsCreated: result.documentsCreated || 0,
+        documentsFiltered: result.documentsFiltered || 0,
+        mapping: mapping
+      });
+
+    } catch (error: any) {
+      console.error("🤖 Erro no endpoint headless:", error);
+      
+      // Log de erro
+      await SystemLogger.logError(error, "monday_headless_execution", undefined, {
+        mappingId: req.body.mappingId,
+        executionType: "automatic"
+      });
+      
+      return res.status(500).json({
+        error: "Erro interno do servidor",
+        message: error.message
+      });
+    }
+  });
+
   // Setup authentication and user management routes
   setupAuth(app);
 
