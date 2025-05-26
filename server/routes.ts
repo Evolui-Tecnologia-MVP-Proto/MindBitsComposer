@@ -1143,12 +1143,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log("👤 INICIANDO EXECUÇÃO MANUAL DO MAPEAMENTO:", id);
     
     try {
+      console.log("🚀 INÍCIO DA EXECUÇÃO DO ENDPOINT:", id);
+      
       // Usar a função unificada com isHeadless = false para execução manual
       const result = await executeMondayMapping(id, req.user?.id, false);
       
       console.log("📊 RESULTADO FINAL PARA FRONTEND:", JSON.stringify(result, null, 2));
       
       res.json(result);
+      
+      console.log("✅ RESPOSTA ENVIADA PARA FRONTEND");
     } catch (error) {
       console.error("Erro ao executar mapeamento manual:", error);
       res.status(500).send(`Erro ao executar mapeamento: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
