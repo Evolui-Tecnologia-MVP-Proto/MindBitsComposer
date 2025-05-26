@@ -204,6 +204,7 @@ export const documentos = pgTable("documentos", {
   aprovador: text("aprovador").notNull().default(""),
   agente: text("agente").notNull().default(""),
   idOrigem: bigint("id_origem", { mode: "bigint" }), // Campo para mapeamento com Monday.com
+  idOrigemTxt: text("id_origem_txt"), // Campo texto para IDs externos (evita problemas de conversão)
   generalColumns: json("general_columns").$type<Record<string, any>>().default({}), // Armazena dados extras do sistema de origem
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

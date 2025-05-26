@@ -1689,7 +1689,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
 
           // Garantir que idOrigem seja definido (crítico para detecção de duplicatas)
-          documentData.idOrigem = BigInt(item.id);
+          documentData.idOrigemTxt = item.id; // Usar campo texto para evitar problemas de conversão
           
           // Aplicar valores padrão se configurados
           if (existingMapping.defaultValues) {
@@ -1705,28 +1705,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           }
           
-          console.log(`🤖 DEBUG - Item ${item.id} - idOrigem definido como: ${documentData.idOrigem}`);
+          console.log(`🤖 DEBUG - Item ${item.id} - idOrigemTxt definido como: ${documentData.idOrigemTxt}`);
 
-          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - MESMA LÓGICA DA EXECUÇÃO MANUAL
+          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - USANDO CAMPO TEXTO
           let isDuplicate = false;
-          if (documentData.idOrigem) {
+          if (documentData.idOrigemTxt) {
             try {
-              console.log(`🤖 VERIFICANDO DUPLICATA para idOrigem: ${documentData.idOrigem} (tipo: ${typeof documentData.idOrigem})`);
-              const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem = ${documentData.idOrigem} LIMIT 1`);
+              console.log(`🤖 VERIFICANDO DUPLICATA para idOrigemTxt: ${documentData.idOrigemTxt}`);
+              const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem_txt = ${documentData.idOrigemTxt} LIMIT 1`);
               
               if (duplicateCheck.rows.length > 0) {
-                console.log(`🤖 ❌ DUPLICATA DETECTADA: Item ${item.id} (idOrigem: ${documentData.idOrigem}) já existe como documento ${duplicateCheck.rows[0].id}`);
+                console.log(`🤖 ❌ DUPLICATA DETECTADA: Item ${item.id} (idOrigemTxt: ${documentData.idOrigemTxt}) já existe como documento ${duplicateCheck.rows[0].id}`);
                 isDuplicate = true;
                 documentsPreExisting++;
               } else {
-                console.log(`🤖 ✅ NOVO DOCUMENTO: Item ${item.id} (idOrigem: ${documentData.idOrigem}) será criado`);
+                console.log(`🤖 ✅ NOVO DOCUMENTO: Item ${item.id} (idOrigemTxt: ${documentData.idOrigemTxt}) será criado`);
               }
             } catch (error) {
               console.log(`🤖 ⚠️ Erro na verificação de duplicata para item ${item.id}:`, error);
               // Continuar mesmo com erro na verificação
             }
           } else {
-            console.log(`🤖 ⚠️ ATENÇÃO: Item ${item.id} não tem idOrigem definido!`);
+            console.log(`🤖 ⚠️ ATENÇÃO: Item ${item.id} não tem idOrigemTxt definido!`);
           }
 
           if (!isDuplicate) {
