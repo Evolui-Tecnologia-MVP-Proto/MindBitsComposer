@@ -1150,26 +1150,29 @@ export default function AdminPage() {
         throw new Error("Resposta inválida do servidor");
       }
       
-      clearInterval(progressInterval);
-      setExecutionProgress("Finalizando sincronização...");
-      await new Promise(resolve => setTimeout(resolve, 300));
+      if (progressInterval) clearInterval(progressInterval);
       
-      toast({
-        title: "Sincronização concluída com sucesso!",
-        description: (
-          <div className="space-y-1">
-            <div className="font-medium">Resumo da Importação:</div>
-            <div><strong>{result.itemsProcessed}</strong> registros importados da API</div>
-            <div><strong>{result.documentsCreated}</strong> documentos novos gravados</div>
-            <div><strong>{result.documentsPreExisting || 0}</strong> registros já existentes</div>
-            <div><strong>{result.documentsSkipped}</strong> registros filtrados/ignorados</div>
-            <div className="text-xs text-gray-600 mt-2">
-              {result.columnsMapping} colunas mapeadas • {new Date().toLocaleTimeString()}
+      if (!isHeadless) {
+        setExecutionProgress("Finalizando sincronização...");
+        await new Promise(resolve => setTimeout(resolve, 300));
+        
+        toast({
+          title: "Sincronização concluída com sucesso!",
+          description: (
+            <div className="space-y-1">
+              <div className="font-medium">Resumo da Importação:</div>
+              <div><strong>{result.itemsProcessed}</strong> registros importados da API</div>
+              <div><strong>{result.documentsCreated}</strong> documentos novos gravados</div>
+              <div><strong>{result.documentsPreExisting || 0}</strong> registros já existentes</div>
+              <div><strong>{result.documentsSkipped}</strong> registros filtrados/ignorados</div>
+              <div className="text-xs text-gray-600 mt-2">
+                {result.columnsMapping} colunas mapeadas • {new Date().toLocaleTimeString()}
+              </div>
             </div>
-          </div>
-        ),
-        duration: 8000,
-      });
+          ),
+          duration: 8000,
+        });
+      }
 
       // Registrar log de conclusão da execução manual
       try {
@@ -1231,15 +1234,19 @@ export default function AdminPage() {
         console.warn('Erro ao registrar log de erro:', logError);
       }
       
-      toast({
-        title: "Erro na execução",
-        description: error instanceof Error ? error.message : "Não foi possível executar a sincronização",
-        variant: "destructive",
-        duration: 6000,
-      });
+      if (!isHeadless) {
+        toast({
+          title: "Erro na execução",
+          description: error instanceof Error ? error.message : "Não foi possível executar a sincronização",
+          variant: "destructive",
+          duration: 6000,
+        });
+      }
     } finally {
-      setIsExecutingMapping(false);
-      setExecutionProgress("");
+      if (!isHeadless) {
+        setIsExecutingMapping(false);
+        setExecutionProgress("");
+      }
     }
   };
   
