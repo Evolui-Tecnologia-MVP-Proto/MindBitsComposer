@@ -434,6 +434,9 @@ export default function AdminPage() {
       transformFunction: "",
     },
   });
+
+  // Carregamento dinâmico das colunas da tabela documentos
+  const { data: documentColumns, isLoading: documentColumnsLoading } = useDocumentosColumns();
   
   // Atualiza o formulário quando um mapeamento é selecionado
   useEffect(() => {
@@ -2111,20 +2114,22 @@ export default function AdminPage() {
                                 {...field}
                               >
                                 <option value="">Selecione o campo</option>
-                                {getDocumentosColumns().filter(column => {
+                                {documentColumnsLoading ? (
+                                  <option disabled>Carregando campos...</option>
+                                ) : documentColumns?.filter(column => {
                                   // Se estamos editando, permitir o campo atual
-                                  if (selectedColumn && selectedColumn.cpxField === column.field) {
+                                  if (selectedColumn && selectedColumn.cpxField === column.name) {
                                     return true;
                                   }
                                   // Os campos generalColumns e descricao sempre devem estar disponíveis (podem receber múltiplas colunas)
-                                  if (column.field === "generalColumns" || column.field === "descricao") {
+                                  if (column.name === "generalColumns" || column.name === "descricao") {
                                     return true;
                                   }
                                   // Filtrar campos que já estão mapeados
-                                  return !mappingColumns.some(mapping => mapping.cpxField === column.field);
+                                  return !mappingColumns.some(mapping => mapping.cpxField === column.name);
                                 }).map((column) => (
-                                  <option key={column.field} value={column.field} className="font-mono">
-                                    {column.label} ({column.type})
+                                  <option key={column.name} value={column.name} className="font-mono">
+                                    {column.description} ({column.type})
                                   </option>
                                 ))}
                               </select>
@@ -2905,20 +2910,22 @@ return item.column_values.some(col =>
                         {...field}
                       >
                         <option value="">Selecione o campo</option>
-                        {getDocumentosColumns().filter(column => {
+                        {documentColumnsLoading ? (
+                          <option disabled>Carregando campos...</option>
+                        ) : documentColumns?.filter(column => {
                           // Se estamos editando, permitir o campo atual
-                          if (selectedColumn && selectedColumn.cpxField === column.field) {
+                          if (selectedColumn && selectedColumn.cpxField === column.name) {
                             return true;
                           }
                           // Os campos generalColumns e descricao sempre devem estar disponíveis (podem receber múltiplas colunas)
-                          if (column.field === "generalColumns" || column.field === "descricao") {
+                          if (column.name === "generalColumns" || column.name === "descricao") {
                             return true;
                           }
                           // Filtrar campos que já estão mapeados
-                          return !mappingColumns.some(mapping => mapping.cpxField === column.field);
+                          return !mappingColumns.some(mapping => mapping.cpxField === column.name);
                         }).map((column) => (
-                          <option key={column.field} value={column.field} className="font-mono">
-                            {column.label} ({column.type})
+                          <option key={column.name} value={column.name} className="font-mono">
+                            {column.description} ({column.type})
                           </option>
                         ))}
                       </select>
