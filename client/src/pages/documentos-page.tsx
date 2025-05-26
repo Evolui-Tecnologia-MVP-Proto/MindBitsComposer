@@ -1435,10 +1435,16 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           console.log("🔍 Response status:", response.status, response.ok);
                           
                           if (response.ok) {
-                            const attachments = await response.json();
-                            console.log("📥 Anexos recebidos do Monday:", attachments);
+                            let attachments;
+                            try {
+                              attachments = await response.json();
+                              console.log("📥 Anexos recebidos do Monday:", attachments);
+                            } catch (parseError) {
+                              console.error("❌ Erro ao fazer parse do JSON:", parseError);
+                              throw new Error("Erro ao processar resposta do servidor");
+                            }
                             
-                            if (attachments.length > 0) {
+                            if (attachments && attachments.length > 0) {
                               // Salvar anexos do Monday no banco
                               for (const attachment of attachments) {
                                 await fetch('/api/documentos/artifacts', {
