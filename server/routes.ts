@@ -271,12 +271,19 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
   
   console.log(`🎉 EXECUÇÃO CONCLUÍDA: ${documentsCreated} documentos criados, ${documentsSkipped} filtrados, ${documentsPreExisting} já existentes`);
   
+  // Atualizar a data de última sincronização
+  await storage.updateMondayMappingLastSync(mappingId);
+  
+  // Retornar resultados
   return {
+    success: true,
+    mapping: existingMapping,
     itemsProcessed: items.length,
     documentsCreated,
     documentsSkipped,
     documentsPreExisting,
-    columnsMapping: mappingColumns.length
+    columnsMapping: mappingColumns.length,
+    timestamp: new Date().toISOString()
   };
 }
 
@@ -1137,12 +1144,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       // Usar a função unificada com isHeadless = false para execução manual
-      await executeMondayMapping(id, req.user?.id, false);
+      const result = await executeMondayMapping(id, req.user?.id, false);
       
-      res.json({
-        success: true,
-        message: "Execução manual iniciada com sucesso"
-      });
+      res.json(result);
     } catch (error) {
       console.error("Erro ao executar mapeamento manual:", error);
       res.status(500).send(`Erro ao executar mapeamento: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
