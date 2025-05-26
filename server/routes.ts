@@ -1459,20 +1459,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
             documentData.statusOrigem = "Monday.com";
           }
 
-          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - SQL DIRETO
-          if (documentData.idOrigem) {
+          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - USAR CAMPO MAPEADO
+          let isDuplicate = false;
+          let duplicateCheckField = null;
+          let duplicateCheckValue = null;
+          
+          // Determinar qual campo ID usar para verificação baseado no mapeamento
+          if (documentData.idOrigemTxt) {
+            duplicateCheckField = 'id_origem_txt';
+            duplicateCheckValue = documentData.idOrigemTxt;
+          } else if (documentData.idOrigem) {
+            duplicateCheckField = 'id_origem';
+            duplicateCheckValue = documentData.idOrigem;
+          }
+          
+          if (duplicateCheckField && duplicateCheckValue) {
             try {
-              const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem = ${documentData.idOrigem} LIMIT 1`);
+              console.log(`👤 VERIFICANDO DUPLICATA para ${duplicateCheckField}: ${duplicateCheckValue}`);
+              const duplicateCheck = await db.execute(sql.raw(`SELECT id FROM documentos WHERE ${duplicateCheckField} = $1 LIMIT 1`, [duplicateCheckValue]));
               
               if (duplicateCheck.rows.length > 0) {
-                console.log(`❌ DUPLICATA: Item ${item.id} já existe como documento ${duplicateCheck.rows[0].id}`);
+                console.log(`👤 ❌ DUPLICATA DETECTADA: Item ${item.id} (${duplicateCheckField}: ${duplicateCheckValue}) já existe como documento ${duplicateCheck.rows[0].id}`);
+                isDuplicate = true;
                 documentsPreExisting++;
-                continue; // Pular item duplicado
+              } else {
+                console.log(`👤 ✅ NOVO DOCUMENTO: Item ${item.id} (${duplicateCheckField}: ${duplicateCheckValue}) será criado`);
               }
             } catch (error) {
-              console.log(`⚠️ Erro na verificação de duplicata para item ${item.id}:`, error);
+              console.log(`👤 ⚠️ Erro na verificação de duplicata para item ${item.id}:`, error);
               // Continuar mesmo com erro na verificação
             }
+          } else {
+            console.log(`👤 ⚠️ ATENÇÃO: Item ${item.id} não tem campo ID mapeado para verificação de duplicatas!`);
+          }
+
+          if (isDuplicate) {
+            continue; // Pular item duplicado
           }
 
           // DEBUG: Verificar dados finais antes de criar documento
@@ -1688,8 +1710,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           }
 
-          // Garantir que idOrigem seja definido (crítico para detecção de duplicatas)
-          documentData.idOrigemTxt = item.id; // Usar campo texto para evitar problemas de conversão
+          // Campo ID será definido apenas se estiver mapeado na configuração
           
           // Aplicar valores padrão se configurados
           if (existingMapping.defaultValues) {
@@ -1705,28 +1726,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
             }
           }
           
-          console.log(`🤖 DEBUG - Item ${item.id} - idOrigemTxt definido como: ${documentData.idOrigemTxt}`);
-
-          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - USANDO CAMPO TEXTO
+          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - USAR CAMPO MAPEADO
           let isDuplicate = false;
+          let duplicateCheckField = null;
+          let duplicateCheckValue = null;
+          
+          // Determinar qual campo ID usar para verificação baseado no mapeamento
           if (documentData.idOrigemTxt) {
+            duplicateCheckField = 'id_origem_txt';
+            duplicateCheckValue = documentData.idOrigemTxt;
+          } else if (documentData.idOrigem) {
+            duplicateCheckField = 'id_origem';
+            duplicateCheckValue = documentData.idOrigem;
+          }
+          
+          if (duplicateCheckField && duplicateCheckValue) {
             try {
-              console.log(`🤖 VERIFICANDO DUPLICATA para idOrigemTxt: ${documentData.idOrigemTxt}`);
-              const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem_txt = ${documentData.idOrigemTxt} LIMIT 1`);
+              console.log(`🤖 VERIFICANDO DUPLICATA para ${duplicateCheckField}: ${duplicateCheckValue}`);
+              const duplicateCheck = await db.execute(sql.raw(`SELECT id FROM documentos WHERE ${duplicateCheckField} = $1 LIMIT 1`, [duplicateCheckValue]));
               
               if (duplicateCheck.rows.length > 0) {
-                console.log(`🤖 ❌ DUPLICATA DETECTADA: Item ${item.id} (idOrigemTxt: ${documentData.idOrigemTxt}) já existe como documento ${duplicateCheck.rows[0].id}`);
+                console.log(`🤖 ❌ DUPLICATA DETECTADA: Item ${item.id} (${duplicateCheckField}: ${duplicateCheckValue}) já existe como documento ${duplicateCheck.rows[0].id}`);
                 isDuplicate = true;
                 documentsPreExisting++;
               } else {
-                console.log(`🤖 ✅ NOVO DOCUMENTO: Item ${item.id} (idOrigemTxt: ${documentData.idOrigemTxt}) será criado`);
+                console.log(`🤖 ✅ NOVO DOCUMENTO: Item ${item.id} (${duplicateCheckField}: ${duplicateCheckValue}) será criado`);
               }
             } catch (error) {
               console.log(`🤖 ⚠️ Erro na verificação de duplicata para item ${item.id}:`, error);
               // Continuar mesmo com erro na verificação
             }
           } else {
-            console.log(`🤖 ⚠️ ATENÇÃO: Item ${item.id} não tem idOrigemTxt definido!`);
+            console.log(`🤖 ⚠️ ATENÇÃO: Item ${item.id} não tem campo ID mapeado para verificação de duplicatas!`);
           }
 
           if (!isDuplicate) {

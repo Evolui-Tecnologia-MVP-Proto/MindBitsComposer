@@ -2129,7 +2129,7 @@ export default function AdminPage() {
                                   return !mappingColumns.some(mapping => mapping.cpxField === column.name);
                                 }).map((column) => (
                                   <option key={column.name} value={column.name} className="font-mono">
-                                    {column.description} ({column.type})
+                                    {column.name} ({column.type})
                                   </option>
                                 ))}
                               </select>
@@ -2925,7 +2925,7 @@ return item.column_values.some(col =>
                           return !mappingColumns.some(mapping => mapping.cpxField === column.name);
                         }).map((column) => (
                           <option key={column.name} value={column.name} className="font-mono">
-                            {column.description} ({column.type})
+                            {column.name} ({column.type})
                           </option>
                         ))}
                       </select>
