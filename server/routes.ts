@@ -1199,93 +1199,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`📊 PROGRESSO: ${index + 1}/${items.length} itens processados | Criados: ${documentsCreated} | Filtrados: ${documentsSkipped}`);
         }
         try {
-          // APLICAR FILTRO PRIMEIRO - antes de processar os dados
-          console.log(`🔍 VERIFICANDO FILTRO para item ${item.id}:`);
-          console.log(`- mappingFilter existe?`, !!existingMapping.mappingFilter);
-          console.log(`- mappingFilter não está vazio?`, existingMapping.mappingFilter && existingMapping.mappingFilter.trim());
-          
           // Aplicar filtro JavaScript se configurado
           if (existingMapping.mappingFilter && existingMapping.mappingFilter.trim()) {
             try {
-              console.log(`✅ APLICANDO FILTRO para item ${item.id}`);
-              console.log(`📋 FILTRO JAVASCRIPT:`, existingMapping.mappingFilter);
-              
-              // DEBUG: Mostrar estrutura completa do primeiro item
-              if (item.id === items[0].id) {
-                console.log(`🔍 ESTRUTURA COMPLETA DO PRIMEIRO ITEM:`, JSON.stringify(item, null, 2));
-                console.log(`📊 COLUNAS DISPONÍVEIS:`);
-                item.column_values.forEach((col: any) => {
-                  console.log(`  - ID: "${col.id}" | Coluna: "${col.column?.title}" | Texto: "${col.text}" | Valor: ${JSON.stringify(col.value)}`);
-                });
-                
-                // DEBUG: Verificar especificamente a coluna status6
-                const status6Column = item.column_values.find((col: any) => col.id === 'status6');
-                console.log(`🎯 COLUNA STATUS6 ESPECÍFICA:`, JSON.stringify(status6Column, null, 2));
-                
-                // DEBUG: Testar o filtro manualmente
-                console.log(`🧪 TESTE MANUAL DO FILTRO:`);
-                const hasStatus6 = item.column_values.some((col: any) => col.id === 'status6');
-                console.log(`   - Tem coluna status6?`, hasStatus6);
-                if (hasStatus6) {
-                  const status6Value = item.column_values.find((col: any) => col.id === 'status6');
-                  console.log(`   - Valor da coluna status6:`, status6Value?.text);
-                  console.log(`   - É 'Em Análise Preliminar'?`, status6Value?.text === 'Em Análise Preliminar');
-                  console.log(`   - É 'Em Detalhamento Técnico'?`, status6Value?.text === 'Em Detalhamento Técnico');
-                }
-              }
-              
-              // Criar função de filtro e executar
               const filterFunction = new Function('item', existingMapping.mappingFilter);
               const shouldInclude = filterFunction(item);
               
-              console.log(`🎯 RESULTADO DO FILTRO para item ${item.id}:`, shouldInclude);
-              
               if (!shouldInclude) {
-                console.log(`❌ Item ${item.id} foi FILTRADO (excluído) - não atende às condições`);
                 documentsSkipped++;
                 continue; // Pular este item
               }
               
-              console.log(`✅ Item ${item.id} PASSOU no filtro - será processado`);
-              
             } catch (filterError) {
               console.error(`💥 ERRO ao aplicar filtro no item ${item.id}:`, filterError);
-              console.log(`⚠️ Item ${item.id} será processado devido ao erro no filtro`);
               // Em caso de erro no filtro, processar o item (comportamento seguro)
             }
-          } else {
-            console.log(`⏭️ NENHUM FILTRO configurado - processando item ${item.id}`);
           }
 
-          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - LOGO APÓS O FILTRO
-          console.log(`👤 🔍 VERIFICANDO DUPLICATAS para item ${item.id}`);
-          let itemIsDuplicate = false;
-          const itemKeyFields = mappingColumns.filter(col => col.isKey);
-          console.log(`👤 Campos chave encontrados: ${itemKeyFields.length}`);
-          
-          if (itemKeyFields.length > 0) {
-            // Assumir que o primeiro campo chave é idOrigemTxt mapeado para id_de_elemento
-            const itemId = item.id; // ID do Monday
-            console.log(`👤 Verificando duplicata para Monday ID: ${itemId}`);
+          // Verificação de duplicatas simplificada
+          const itemId = item.id;
+          try {
+            const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem_txt = ${itemId} LIMIT 1`);
             
-            try {
-              const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem_txt = ${itemId} LIMIT 1`);
-              
-              if (duplicateCheck.rows.length > 0) {
-                console.log(`👤 ❌ DUPLICATA DETECTADA: Item ${item.id} já existe como documento ${duplicateCheck.rows[0].id}`);
-                itemIsDuplicate = true;
-                documentsPreExisting++;
-              } else {
-                console.log(`👤 ✅ NOVO DOCUMENTO: Item ${item.id} será criado`);
-              }
-            } catch (error) {
-              console.log(`👤 ⚠️ Erro na verificação: ${error}`);
+            if (duplicateCheck.rows.length > 0) {
+              documentsPreExisting++;
+              continue;
             }
-          }
-          
-          if (itemIsDuplicate) {
-            console.log(`👤 ⏭️ PULANDO item duplicado ${item.id}`);
-            continue;
+          } catch (error) {
+            console.log(`⚠️ Erro na verificação de duplicata:`, error);
           }
 
           // Construir o documento baseado no mapeamento de colunas
