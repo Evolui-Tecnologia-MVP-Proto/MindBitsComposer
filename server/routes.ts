@@ -1054,17 +1054,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const apiKey = mondayConnection.token;
       
-      // Buscar item específico no board usando a query simples
+      // Query exata conforme solicitado
       const query = `
-        query {
-          boards(ids: [${boardId}]) {
-            items(ids: [${itemId}]) {
+        query GetItemFiles($boardId: Int!) {
+          boards(ids: [$boardId]) {
+            items {
               id
               name
               column_values {
                 id
                 type
                 value
+                text
               }
             }
           }
@@ -1079,7 +1080,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           "Content-Type": "application/json",
           "Authorization": apiKey
         },
-        body: JSON.stringify({ query })
+        body: JSON.stringify({ 
+          query,
+          variables: { boardId: parseInt(boardId) }
+        })
       });
       
       console.log("📥 Status da resposta Monday:", mondayResponse.status, mondayResponse.statusText);
@@ -1122,19 +1126,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      const boards = data.data?.boards || [];
-      if (boards.length === 0 || !boards[0].items || boards[0].items.length === 0) {
-        console.log("❌ Nenhum item encontrado no board");
-        return res.json([]);
-      }
+      // Armazenar o JSON completo retornado pela API
+      console.log("📄 JSON COMPLETO RETORNADO PELA API MONDAY.COM:");
+      console.log(JSON.stringify(data, null, 2));
       
-      const item = boards[0].items[0];
-      console.log("✅ Item encontrado:", {
-        id: item.id,
-        name: item.name,
-        totalColumns: item.column_values?.length || 0
+      return res.json({
+        success: true,
+        data: data,
+        message: "JSON capturado com sucesso - aguardando próximas instruções"
       });
-      const attachments: any[] = [];
       
       // Processar cada coluna especificada no Assets Map
       for (const targetColumnId of columnIds) {
