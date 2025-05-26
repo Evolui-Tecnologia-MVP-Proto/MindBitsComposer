@@ -118,9 +118,9 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     
     // Verificar se já existe um documento com este id_origem
     const idOrigem = BigInt(item.id);
-    const existingDoc = await storage.findDocumentByField('id_origem', idOrigem);
+    const existingDocs = await db.select().from(documentos).where(eq(documentos.id_origem, idOrigem)).limit(1);
     
-    if (existingDoc) {
+    if (existingDocs.length > 0) {
       console.log(`⚠️ Documento já existe para item ${item.id}, pulando...`);
       documentsPreExisting++;
       continue;
