@@ -1075,14 +1075,14 @@ export default function AdminPage() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            eventType: 'MONDAY_SYNC_MANUAL',
-            message: `Execução manual iniciada para mapeamento "${mapping.name}"`,
+            eventType: isHeadless ? 'MONDAY_SYNC_SCHEDULED' : 'MONDAY_SYNC_MANUAL',
+            message: `Execução ${isHeadless ? 'automática' : 'manual'} iniciada para mapeamento "${mapping.name}"`,
             parameters: {
               mappingId: mapping.id,
               mappingName: mapping.name,
               boardId: mapping.boardId,
-              executionType: 'manual',
-              initiatedBy: 'user_interface'
+              executionType: isHeadless ? 'automatic' : 'manual',
+              initiatedBy: isHeadless ? 'scheduler' : 'user_interface'
             }
           })
         });
@@ -1183,14 +1183,14 @@ export default function AdminPage() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            eventType: 'MONDAY_SYNC_MANUAL',
-            message: `Execução manual concluída para mapeamento "${mapping.name}" - ${result.documentsCreated} documentos criados`,
+            eventType: isHeadless ? 'MONDAY_SYNC_SCHEDULED' : 'MONDAY_SYNC_MANUAL',
+            message: `Execução ${isHeadless ? 'automática' : 'manual'} concluída para mapeamento "${mapping.name}" - ${result.documentsCreated} documentos criados`,
             parameters: {
               mappingId: mapping.id,
               mappingName: mapping.name,
               boardId: mapping.boardId,
-              executionType: 'manual',
-              completedBy: 'user_interface',
+              executionType: isHeadless ? 'automatic' : 'manual',
+              completedBy: isHeadless ? 'scheduler' : 'user_interface',
               itemsProcessed: result.itemsProcessed,
               documentsCreated: result.documentsCreated,
               documentsPreExisting: result.documentsPreExisting || 0,
@@ -1218,16 +1218,16 @@ export default function AdminPage() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            eventType: 'MONDAY_SYNC_MANUAL',
-            message: `Erro na execução manual do mapeamento "${mapping.name}": ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
+            eventType: isHeadless ? 'MONDAY_SYNC_SCHEDULED' : 'MONDAY_SYNC_MANUAL',
+            message: `Erro na execução ${isHeadless ? 'automática' : 'manual'} do mapeamento "${mapping.name}": ${error instanceof Error ? error.message : 'Erro desconhecido'}`,
             parameters: {
               mappingId: mapping.id,
               mappingName: mapping.name,
               boardId: mapping.boardId,
-              executionType: 'manual',
+              executionType: isHeadless ? 'automatic' : 'manual',
               errorType: 'execution_failure',
               errorMessage: error instanceof Error ? error.message : 'Erro desconhecido',
-              failedBy: 'user_interface'
+              failedBy: isHeadless ? 'scheduler' : 'user_interface'
             }
           })
         });
