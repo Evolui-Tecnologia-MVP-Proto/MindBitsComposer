@@ -1689,7 +1689,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
 
           // Garantir que idOrigem seja definido (crítico para detecção de duplicatas)
-          documentData.idOrigem = parseInt(item.id);
+          documentData.idOrigem = BigInt(item.id);
           
           // Aplicar valores padrão se configurados
           if (existingMapping.defaultValues) {
