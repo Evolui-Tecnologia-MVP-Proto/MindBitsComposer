@@ -1661,178 +1661,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-            items_page(limit: 500) {
-              items {
-                id
-                name
-                column_values(ids: [${mondayColumns.map(id => `"${id}"`).join(", ")}]) {
-                  id
-                  text
-                  value
-                  column {
-                    title
-                  }
-                }
-              }
-            }
-          }
-        }
-      `;
 
-      const mondayResponse = await fetch("https://api.monday.com/v2", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": apiKey,
-          "API-Version": "2023-10"
-        },
-        body: JSON.stringify({ query })
+  // Upload endpoint
+  app.post("/api/upload", upload.single('file'), async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: "Nenhum arquivo enviado" });
+      }
+
+      const { documentoId, relationshipId } = req.body;
+      if (!documentoId) {
+        return res.status(400).json({ error: "documentoId é obrigatório" });
+      }
+
+      const savedFile = await storage.createDocumentArtifact({
+        documentoId,
+        name: req.file.originalname,
+        type: req.file.mimetype,
+        fileData: req.file.buffer.toString('base64'),
+        fileName: req.file.originalname,
+        mimeType: req.file.mimetype,
+        fileSize: req.file.size.toString()
       });
 
-      if (!mondayResponse.ok) {
-        const errorText = await mondayResponse.text();
-        throw new Error(`Erro na API do Monday (${mondayResponse.status}): ${errorText}`);
-      }
+      res.json({ success: true, file: savedFile });
+    } catch (error) {
+      console.error("Erro no upload:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
 
-      const responseText = await mondayResponse.text();
-      let mondayData;
-      
-      try {
-        mondayData = JSON.parse(responseText);
-      } catch (parseError) {
-        throw new Error(`API do Monday retornou conteúdo inválido`);
-      }
-      
-      if (mondayData.errors) {
-        throw new Error(`Erro na consulta GraphQL: ${JSON.stringify(mondayData.errors)}`);
-      }
+  // Templates endpoints
+  app.get("/api/templates", async (req: Request, res: Response) => {
+    try {
+      const templates = await storage.getAllTemplates();
+      res.json(templates);
+    } catch (error) {
+      console.error("Erro ao buscar templates:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
 
-      const items = mondayData.data?.boards?.[0]?.items_page?.items || [];
-      let documentsCreated = 0;
-      let documentsSkipped = 0;
-      let documentsPreExisting = 0;
-
-      const keyFields = mappingColumns.filter(col => col.isKey).map(col => col.cpxField);
-      console.log(`🤖 EXECUÇÃO AUTOMÁTICA - ${items.length} itens para processar`);
-      
-      // Processar cada item usando a mesma lógica do endpoint manual
-      for (const [itemIndex, item] of items.entries()) {
-        try {
-          // Aplicar filtro se configurado
-          if (existingMapping.mappingFilter && existingMapping.mappingFilter.trim()) {
-            try {
-              const filterFunction = new Function('item', existingMapping.mappingFilter);
-              const shouldInclude = filterFunction(item);
-              
-              if (!shouldInclude) {
-                documentsSkipped++;
-                continue;
-              }
-            } catch (filterError) {
-              console.error(`🤖 Erro ao aplicar filtro no item ${item.id}:`, filterError);
-            }
-          }
-
-          // Construir o documento baseado no mapeamento de colunas
-          const documentData: any = {};
-          
-          const fieldMappings: Record<string, any[]> = {};
-          mappingColumns.forEach(mapping => {
-            if (!fieldMappings[mapping.cpxField]) {
-              fieldMappings[mapping.cpxField] = [];
-            }
-            fieldMappings[mapping.cpxField].push(mapping);
-          });
-
-          // Processar cada campo com seus mapeamentos
-          for (const [fieldName, mappings] of Object.entries(fieldMappings)) {
-            const values: string[] = [];
-            
-            for (const mapping of mappings) {
-              let value = "";
-              
-              if (mapping.mondayColumnId === "name") {
-                value = item.name || "";
-              } else {
-                const columnValue = item.column_values.find((cv: any) => cv.id === mapping.mondayColumnId);
-                value = columnValue?.text || "";
-              }
-              
-              // Aplicar função de transformação se existir
-              if (mapping.transformFunction && mapping.transformFunction.trim()) {
-                try {
-                  if (mapping.transformFunction === "uppercase") {
-                    value = value.toUpperCase();
-                  } else if (mapping.transformFunction === "lowercase") {
-                    value = value.toLowerCase();
-                  } else if (mapping.transformFunction === "trim") {
-                    value = value.trim();
-                  } else {
-                    const func = new Function('value', mapping.transformFunction);
-                    const result = func(value);
-                    value = result !== undefined ? String(result) : value;
-                  }
-                } catch (transformError) {
-                  console.warn(`🤖 Erro na transformação:`, transformError);
-                }
-              }
-              
-              if (value && value.trim()) {
-                values.push(value);
-              }
-            }
-            
-            // Mesclar valores para campos que permitem múltiplas colunas
-            if (fieldName === 'descricao') {
-              documentData[fieldName] = values.join('\n\n');
-            } else if (fieldName === 'generalColumns') {
-              documentData[fieldName] = values.length > 0 ? JSON.stringify(values.reduce((acc, val, idx) => {
-                acc[`[${idx}]`] = val;
-                return acc;
-              }, {})) : null;
-            } else {
-              documentData[fieldName] = values.join(', ');
-            }
-          }
-
-          // Garantir que idOrigem seja definido (crítico para detecção de duplicatas)
-          documentData.idOrigem = BigInt(item.id);
-          
-          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS ANTES DE CRIAR
-          let isDuplicate = false;
-          try {
-            console.log(`🤖 VERIFICANDO DUPLICATA para idOrigem: ${documentData.idOrigem} (tipo: ${typeof documentData.idOrigem})`);
-            const duplicateCheck = await db.execute(sql`SELECT id FROM documentos WHERE id_origem = ${documentData.idOrigem} LIMIT 1`);
-            
-            if (duplicateCheck.rows.length > 0) {
-              console.log(`🤖 ❌ DUPLICATA DETECTADA: Item ${item.id} (idOrigem: ${documentData.idOrigem}) já existe como documento ${duplicateCheck.rows[0].id}`);
-              isDuplicate = true;
-              documentsPreExisting++;
-              continue; // Pular para o próximo item
-            } else {
-              console.log(`🤖 ✅ NOVO DOCUMENTO: Item ${item.id} (idOrigem: ${documentData.idOrigem}) será criado`);
-            }
-          } catch (error) {
-            console.log(`🤖 ⚠️ Erro na verificação de duplicata para item ${item.id}:`, error);
-          }
-          
-          // Aplicar valores padrão se configurados
-          if (existingMapping.defaultValues) {
-            try {
-              const defaults = JSON.parse(existingMapping.defaultValues);
-              for (const [key, value] of Object.entries(defaults)) {
-                if (!documentData[key] || documentData[key] === '') {
-                  documentData[key] = value;
-                }
-              }
-            } catch (error) {
-              console.warn('🤖 Erro ao aplicar valores padrão:', error);
-            }
-          }
-          
-          console.log(`🤖 DEBUG - Item ${item.id} - idOrigem definido como: ${documentData.idOrigem}`);
-
-          // VERIFICAÇÃO CRÍTICA DE DUPLICATAS - MESMA LÓGICA DA EXECUÇÃO MANUAL
+  // Create new HTTP server
+  const httpServer = createServer(app);
+  return httpServer;
+}
           let isDuplicate = false;
           if (documentData.idOrigem) {
             try {
