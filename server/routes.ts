@@ -1054,7 +1054,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const apiKey = mondayConnection.token;
       
-      // Buscar item específico no board usando a query correta
+      // Buscar item específico no board usando a query simples
       const query = `
         query {
           boards(ids: [${boardId}]) {
@@ -1063,10 +1063,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               name
               column_values {
                 id
-                title
-                text
-                value
                 type
+                value
               }
             }
           }
