@@ -329,10 +329,18 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
         if (mapping.cpxField === 'generalColumns') {
           const columnTitle = mapping.mondayColumnTitle || `coluna_${mapping.mondayColumnId}`;
           generalColumnsFromMapping[columnTitle] = value;
-          console.log(`✅ COLUNA MAPEADA PARA GENERAL_COLUMNS:`, {
-            columnTitle,
-            value,
-            mappingId: mapping.mappingId
+          
+          // Log direto no sistema para debug
+          await SystemLogger.log({
+            eventType: 'MONDAY_SYNC_MANUAL',
+            message: `COLUNA MAPEADA PARA GENERAL_COLUMNS: ${columnTitle} = "${value}"`,
+            parameters: { 
+              mappingId: mapping.mappingId,
+              columnTitle,
+              value,
+              columnId: mapping.mondayColumnId
+            },
+            userId: userId
           });
         } else {
           // Para outros campos, comportamento normal
