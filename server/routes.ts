@@ -193,16 +193,26 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       console.log(`=======================================`);
     }
 
-    // Capturar o conteúdo da coluna "arquivos3" para monday_item_values
+    // FORÇAR captura de dados da coluna "arquivos3" 
     const arquivos3Column = item.column_values.find((cv: any) => cv.id === "arquivos3");
+    const todasColunas = item.column_values.map((cv: any) => cv.id).join(', ');
     
-    if (arquivos3Column?.value) {
-      // Gravar o valor diretamente como string JSON, sem parsing
-      documentData.mondayItemValues = arquivos3Column.value;
-      console.log(`✅ Item ${item.id} - monday_item_values definido: ${arquivos3Column.value}`);
+    console.log(`🔍 ITEM ${item.id}: Colunas disponíveis: ${todasColunas}`);
+    console.log(`🎯 ITEM ${item.id}: Coluna arquivos3 encontrada: ${arquivos3Column ? 'SIM' : 'NÃO'}`);
+    
+    if (arquivos3Column) {
+      console.log(`📄 ITEM ${item.id}: Valor arquivos3: ${arquivos3Column.value || 'VAZIO'}`);
+      
+      if (arquivos3Column.value) {
+        documentData.mondayItemValues = arquivos3Column.value;
+        console.log(`✅ ITEM ${item.id}: monday_item_values GRAVADO com sucesso!`);
+      } else {
+        documentData.mondayItemValues = `{"arquivos3_sem_dados": true, "item_id": "${item.id}"}`;
+        console.log(`⚠️ ITEM ${item.id}: Coluna arquivos3 existe mas está vazia`);
+      }
     } else {
-      documentData.mondayItemValues = {};
-      if (index < 3) console.log(`❌ Item ${item.id} - Coluna arquivos3 sem valor`);
+      documentData.mondayItemValues = `{"arquivos3_nao_encontrada": true, "item_id": "${item.id}"}`;
+      console.log(`❌ ITEM ${item.id}: Coluna arquivos3 NÃO ENCONTRADA!`);
     }
 
     // Valores padrão
