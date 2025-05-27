@@ -36,6 +36,9 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
   let cursor: string | null = null;
 
   do {
+    // Log do boardId para debug
+    console.log(`🔍 Board ID utilizado na query: ${boardId}`);
+    
     const query = `
       query GetBoardItems($boardId: ID!, $cursor: String) {
         boards(ids: [$boardId]) {
