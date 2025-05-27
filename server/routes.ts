@@ -155,20 +155,32 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       status: "Integrado"
     };
 
-    // Capturar o conteúdo da coluna "arquivos3" para monday_item_values
-    const arquivos3Column = item.column_values.find((cv: any) => cv.id === "arquivos3");
-    if (arquivos3Column?.value) {
-      try {
-        // Parse do JSON da coluna arquivos3 e armazenar no campo monday_item_values
-        const arquivos3Values = JSON.parse(arquivos3Column.value);
-        documentData.mondayItemValues = arquivos3Values;
-      } catch (parseError) {
-        console.warn(`Erro ao parsear JSON da coluna arquivos3 para item ${item.id}:`, parseError);
-        documentData.mondayItemValues = {};
+    // Capturar valores das colunas de assets para monday_item_values
+    const mondayItemValues: any[] = [];
+    
+    if (existingMapping.assetsMappings) {
+      const assetsMappings = typeof existingMapping.assetsMappings === 'string'
+        ? JSON.parse(existingMapping.assetsMappings)
+        : existingMapping.assetsMappings;
+      
+      // Filtrar apenas colunas de assets (exceto documents_item)
+      const assetsColumnIds = assetsMappings
+        .filter((asset: any) => asset.columnId && asset.columnId !== "documents_item")
+        .map((asset: any) => asset.columnId);
+      
+      // Para cada coluna de assets, buscar o valor no item
+      for (const columnId of assetsColumnIds) {
+        const columnValue = item.column_values.find((cv: any) => cv.id === columnId);
+        if (columnValue?.value) {
+          mondayItemValues.push({
+            columnid: columnId,
+            value: columnValue.value // Manter como string serializada, não fazer parse
+          });
+        }
       }
-    } else {
-      documentData.mondayItemValues = {};
     }
+    
+    documentData.mondayItemValues = mondayItemValues;
 
     // Valores padrão
     if (existingMapping.defaultValues) {
