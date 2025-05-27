@@ -1574,7 +1574,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  /*
   // Execute Monday mapping synchronization
   app.post("/api/monday/mappings/:id/execute", async (req, res) => {
     if (!req.isAuthenticated()) {
@@ -1598,7 +1597,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  /* CÓDIGO DUPLICADO COMENTADO - AGORA USA A FUNÇÃO COMPARTILHADA
+  /* FUNCAO APARENTEMENTE DUPLICADA MAS EM ANALISE (TALVEZ USADA PELA CHAMADA MANUAL)
   // Execute Monday mapping synchronization
   app.post("/api/monday/mappings/:id/execute", async (req, res) => {
     if (!req.isAuthenticated()) {
