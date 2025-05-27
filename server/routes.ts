@@ -1621,6 +1621,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       do {
         pageCount++;
         console.log(`📄 Buscando página ${pageCount}${cursor ? ` (cursor: ${cursor.substring(0, 20)}...)` : ' (primeira página)'}`);
+        console.log(`=== BOARD ID NO MAPPING: ${existingMapping.boardId} ===`);
         
         const query = `
           query {
