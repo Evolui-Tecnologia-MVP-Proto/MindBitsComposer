@@ -1296,21 +1296,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const apiKey = mondayConnection.token;
 
-      // Query GraphQL corrigida para API Monday.com
+      // Query GraphQL usando a mesma estrutura que já funciona
       const query = `
-        query {
-          boards(ids: [${boardId}]) {
-            items {
-              id
-              name
-              column_values {
-                id
-                type
-                value
-                text
-              }
-            }
-          }
+        query { 
+          boards(ids: ["${boardId}"]) { 
+            items { 
+              id 
+              name 
+              column_values { 
+                id 
+                type 
+                value 
+                text 
+              } 
+            } 
+          } 
         }
       `;
 
