@@ -1100,6 +1100,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         data = JSON.parse(responseText);
         console.log("🔍 Resposta do Monday.com parseada:", JSON.stringify(data, null, 2));
+        
+        // Salvar JSON completo em arquivo local para análise
+        const fs = require('fs');
+        const path = require('path');
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `monday-api-response-${itemId}-${timestamp}.json`;
+        const filepath = path.join(process.cwd(), 'uploads', filename);
+        
+        try {
+          fs.writeFileSync(filepath, JSON.stringify(data, null, 2));
+          console.log(`💾 JSON salvo em: ${filepath}`);
+        } catch (saveError) {
+          console.error("❌ Erro ao salvar JSON:", saveError);
+        }
       } catch (parseError) {
         console.error("❌ Erro ao fazer parse da resposta Monday:", parseError);
         console.error("📄 Conteúdo que causou o erro:", responseText);
