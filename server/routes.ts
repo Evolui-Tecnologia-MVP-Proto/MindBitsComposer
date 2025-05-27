@@ -120,13 +120,15 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
 
     // Log de debug das colunas do primeiro item (antes do filtro)
     if (index === 0) {
-      console.log(`🔍 DEBUG - Primeiro item ${item.id}`);
-      console.log(`📋 Todas as colunas disponíveis:`, item.column_values.map((cv: any) => ({
-        id: cv.id,
-        type: cv.type,
-        hasText: !!cv.text,
-        hasValue: !!cv.value
-      })));
+      console.log(`=============== DEBUG COLUNAS ITEM ${item.id} ===============`);
+      const colunasIds = item.column_values.map((cv: any) => cv.id);
+      console.log(`COLUNAS DISPONIVEIS: ${colunasIds.join(', ')}`);
+      console.log(`COLUNA arquivos3 EXISTE: ${colunasIds.includes('arquivos3') ? 'SIM' : 'NAO'}`);
+      const arquivo3Col = item.column_values.find((cv: any) => cv.id === 'arquivos3');
+      if (arquivo3Col) {
+        console.log(`ARQUIVOS3 VALUE: ${arquivo3Col.value || 'VAZIO'}`);
+      }
+      console.log(`===============================================`);
     }
 
     // Filtro (JavaScript string)
