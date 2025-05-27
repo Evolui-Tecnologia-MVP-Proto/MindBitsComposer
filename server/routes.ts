@@ -158,28 +158,42 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     // Capturar valores das colunas de assets para monday_item_values
     const mondayItemValues: any[] = [];
     
+    console.log(`🔍 Debug monday_item_values para item ${item.id}:`);
+    console.log(`📋 assetsMappings existe:`, !!existingMapping.assetsMappings);
+    
     if (existingMapping.assetsMappings) {
       const assetsMappings = typeof existingMapping.assetsMappings === 'string'
         ? JSON.parse(existingMapping.assetsMappings)
         : existingMapping.assetsMappings;
+      
+      console.log(`📋 assetsMappings processado:`, assetsMappings);
       
       // Filtrar apenas colunas de assets (exceto documents_item)
       const assetsColumnIds = assetsMappings
         .filter((asset: any) => asset.columnId && asset.columnId !== "documents_item")
         .map((asset: any) => asset.columnId);
       
+      console.log(`📋 assetsColumnIds filtrados:`, assetsColumnIds);
+      
       // Para cada coluna de assets, buscar o valor no item
       for (const columnId of assetsColumnIds) {
         const columnValue = item.column_values.find((cv: any) => cv.id === columnId);
+        console.log(`📋 Procurando coluna ${columnId}:`, columnValue ? 'ENCONTRADA' : 'NÃO ENCONTRADA');
+        if (columnValue) {
+          console.log(`📋 Valor da coluna ${columnId}:`, columnValue.value ? 'TEM VALOR' : 'SEM VALOR');
+        }
+        
         if (columnValue?.value) {
           mondayItemValues.push({
             columnid: columnId,
             value: columnValue.value // Manter como string serializada, não fazer parse
           });
+          console.log(`✅ Adicionado ${columnId} ao monday_item_values`);
         }
       }
     }
     
+    console.log(`📋 monday_item_values final:`, mondayItemValues);
     documentData.mondayItemValues = mondayItemValues;
 
     // Valores padrão
