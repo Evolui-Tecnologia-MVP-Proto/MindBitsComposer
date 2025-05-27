@@ -1296,21 +1296,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const apiKey = mondayConnection.token;
 
-      // Query GraphQL usando a mesma estrutura que já funciona
+      // Query GraphQL usando exatamente a mesma estrutura que já funciona no sistema
       const query = `
-        query { 
-          boards(ids: [${boardId}]) { 
-            items { 
-              id 
-              name 
-              column_values { 
-                id 
-                type 
-                value 
-                text 
-              } 
-            } 
-          } 
+        query($boardId: [Int]) {
+          boards(ids: $boardId) {
+            items {
+              id
+              name
+              column_values {
+                id
+                type
+                value
+                text
+              }
+            }
+          }
         }
       `;
 
@@ -1325,7 +1325,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           "Content-Type": "application/json",
           "Authorization": apiKey
         },
-        body: JSON.stringify({ query })
+        body: JSON.stringify({ 
+          query,
+          variables: {
+            boardId: [parseInt(boardId)]
+          }
+        })
       });
 
       console.log("📥 Status da resposta Monday:", mondayResponse.status);
