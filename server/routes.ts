@@ -217,10 +217,35 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       // Para cada coluna de assets, buscar o valor no item
       for (const columnId of assetsColumnIds) {
         const columnValue = item.column_values.find((cv: any) => cv.id === columnId);
+        
+        // Log detalhado para diagnosticar extração de valores
         if (index < 3) {
-          console.log(`📋 Procurando coluna ${columnId}:`, columnValue ? 'ENCONTRADA' : 'NÃO ENCONTRADA');
+          console.log(`🔍 EXTRAÇÃO DE VALOR - Item ${item.id}, Coluna ${columnId}:`);
+          console.log(`  ├─ Coluna encontrada:`, columnValue ? 'SIM' : 'NÃO');
+          
           if (columnValue) {
-            console.log(`📋 Valor da coluna ${columnId}:`, columnValue.value ? 'TEM VALOR' : 'SEM VALOR');
+            console.log(`  ├─ Tipo da coluna:`, columnValue.type || 'N/A');
+            console.log(`  ├─ Texto da coluna:`, columnValue.text || 'VAZIO');
+            console.log(`  ├─ Valor JSON (primeiros 200 chars):`, 
+              columnValue.value ? 
+                (columnValue.value.length > 200 ? 
+                  columnValue.value.substring(0, 200) + '...' : 
+                  columnValue.value) : 
+                'NULL'
+            );
+            
+            // Tentar fazer parse do JSON para ver a estrutura
+            if (columnValue.value) {
+              try {
+                const parsedValue = JSON.parse(columnValue.value);
+                console.log(`  ├─ JSON parseado:`, typeof parsedValue, Object.keys(parsedValue || {}));
+                if (parsedValue && typeof parsedValue === 'object') {
+                  console.log(`  └─ Estrutura JSON:`, JSON.stringify(parsedValue, null, 2).substring(0, 300));
+                }
+              } catch (e) {
+                console.log(`  └─ ERRO ao parsear JSON:`, e.message);
+              }
+            }
           }
         }
         
@@ -229,8 +254,29 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
             columnid: columnId,
             value: columnValue.value // Manter como string serializada, não fazer parse
           });
+          
+          // Log quando valor é adicionado
+          await SystemLogger.log({
+            eventType: 'MONDAY_SYNC_MANUAL',
+            message: `VALOR EXTRAÍDO E ADICIONADO - Coluna ${columnId}, Item ${item.id}`,
+            parameters: { 
+              mappingId,
+              itemId: item.id,
+              columnId: columnId,
+              columnType: columnValue.type,
+              valueLength: columnValue.value ? columnValue.value.length : 0,
+              hasValue: !!columnValue.value
+            },
+            userId: userId
+          });
+          
           if (index < 3) {
-            console.log(`✅ Adicionado ${columnId} ao monday_item_values`);
+            console.log(`✅ VALOR ADICIONADO ao monday_item_values - ${columnId}`);
+          }
+        } else {
+          // Log quando valor não é encontrado
+          if (index < 3) {
+            console.log(`❌ VALOR NÃO ADICIONADO - ${columnId} (sem valor válido)`);
           }
         }
       }
