@@ -1083,27 +1083,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("📥 Status da resposta Monday:", mondayResponse.status, mondayResponse.statusText);
       
-      if (!mondayResponse.ok) {
-        const errorText = await mondayResponse.text();
-        console.error("❌ Erro na API Monday:", errorText);
-        return res.status(500).json({
-          success: false,
-          message: `Erro na API do Monday: ${mondayResponse.status}`,
-          details: errorText
-        });
-      }
-      
       const responseText = await mondayResponse.text();
-      console.log("📦 Resposta raw do Monday.com recebida!");
       
-      // SEMPRE salvar JSON completo em arquivo local para análise - ANTES de qualquer processamento
+      // SEMPRE salvar JSON completo - mesmo em caso de erro!
       const fs = require('fs');
       const path = require('path');
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const filename = `monday-api-response-${itemId}-${timestamp}.json`;
       const filepath = path.join(process.cwd(), 'uploads', filename);
       
-      console.log(`🔧 Preparando para salvar em: ${filepath}`);
+      console.log(`🔧 Preparando para salvar resposta (status: ${mondayResponse.status}) em: ${filepath}`);
       
       try {
         // Garantir que o diretório uploads existe
@@ -1123,6 +1112,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error("❌ ERRO CRÍTICO ao salvar JSON:", saveError);
         console.error("📁 Tentando salvar em:", filepath);
         console.error("🔍 Stack trace:", saveError.stack);
+      }
+
+      if (!mondayResponse.ok) {
+        console.error("❌ Erro na API Monday:", responseText);
+        return res.status(500).json({
+          success: false,
+          message: `Erro na API do Monday: ${mondayResponse.status}`,
+          details: responseText
+        });
       }
       
       let data;
