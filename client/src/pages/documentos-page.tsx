@@ -1129,10 +1129,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                             documento.mondayItemValues.length > 0;
                         
                         if (!hasMonValues) {
-                          // Badge cinza com "-" para monday_item_values vazio
+                          // Badge cinza com "none" para monday_item_values vazio
                           return (
                             <Badge variant="outline" className="bg-gray-100 text-gray-500 border-gray-300">
-                              -
+                              none
                             </Badge>
                           );
                         } else {
