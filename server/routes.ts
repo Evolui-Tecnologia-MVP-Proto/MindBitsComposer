@@ -1315,7 +1315,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       `;
 
       console.log("📤 Query GraphQL COMPLETA para Monday.com:", query);
-      console.log("📋 Board ID:", boardId);
+      console.log("📋 Board ID recebido:", boardId);
+      console.log("📋 Tipo do Board ID:", typeof boardId);
+      console.log("📋 Query após substituição:", query.replace(/\s+/g, ' ').trim());
 
       const mondayResponse = await fetch("https://api.monday.com/v2", {
         method: "POST",
