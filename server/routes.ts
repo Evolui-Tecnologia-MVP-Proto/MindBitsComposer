@@ -156,34 +156,31 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     };
 
     // Capturar o conteúdo da coluna "arquivos3" para monday_item_values
-    console.log(`🔍 Item ${item.id} - Buscando coluna arquivos3...`);
-    console.log(`📋 Colunas disponíveis:`, item.column_values.map((cv: any) => cv.id));
+    // Log apenas do primeiro item para não poluir os logs
+    if (index === 0) {
+      console.log(`🔍 DEBUG - Primeiro item ${item.id}`);
+      console.log(`📋 Todas as colunas disponíveis:`, item.column_values.map((cv: any) => ({
+        id: cv.id,
+        type: cv.type,
+        hasText: !!cv.text,
+        hasValue: !!cv.value
+      })));
+    }
     
     const arquivos3Column = item.column_values.find((cv: any) => cv.id === "arquivos3");
-    console.log(`🎯 Coluna arquivos3 encontrada:`, arquivos3Column ? 'SIM' : 'NÃO');
-    
-    if (arquivos3Column) {
-      console.log(`📄 Conteúdo da coluna arquivos3:`, {
-        id: arquivos3Column.id,
-        text: arquivos3Column.text,
-        value: arquivos3Column.value,
-        type: arquivos3Column.type
-      });
-    }
     
     if (arquivos3Column?.value) {
       try {
         // Parse do JSON da coluna arquivos3 e armazenar no campo monday_item_values
         const arquivos3Values = JSON.parse(arquivos3Column.value);
         documentData.mondayItemValues = arquivos3Values;
-        console.log(`✅ monday_item_values definido:`, arquivos3Values);
+        if (index < 3) console.log(`✅ Item ${item.id} - monday_item_values definido:`, arquivos3Values);
       } catch (parseError) {
         console.warn(`Erro ao parsear JSON da coluna arquivos3 para item ${item.id}:`, parseError);
         documentData.mondayItemValues = {};
       }
     } else {
       documentData.mondayItemValues = {};
-      console.log(`❌ Coluna arquivos3 sem valor, definindo objeto vazio`);
     }
 
     // Valores padrão
