@@ -1614,6 +1614,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("🎯 Total de colunas na query:", allColumns);
       console.log(`=== TODAS AS COLUNAS INCLUIDAS: ${allColumns.map(id => `"${id}"`).join(", ")} ===`);
       
+      // Log forçado no sistema para diagnosticar
+      await SystemLogger.log({
+        eventType: 'MONDAY_SYNC_MANUAL',
+        message: `Colunas incluídas na query: ${allColumns.map(id => `"${id}"`).join(", ")}`,
+        parameters: { 
+          mondayColumns: mondayColumns,
+          assetsColumns: assetsColumns,
+          totalColumns: allColumns
+        },
+        userId: userId
+      });
+      
       let allItems: any[] = [];
       let cursor: string | null = null;
       let pageCount = 0;
