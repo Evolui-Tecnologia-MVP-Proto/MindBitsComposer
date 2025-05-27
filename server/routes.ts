@@ -118,45 +118,21 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
   for (let index = 0; index < items.length; index++) {
     const item = items[index];
 
-    // Log de debug das colunas do primeiro item (antes do filtro)
-    if (index === 0) {
-      console.log(`\n🔍 =============== DEBUG PRIMEIRO ITEM ===============`);
-      console.log(`📋 Item ID: ${item.id}`);
-      console.log(`📝 Item Name: ${item.name}`);
-      const colunasIds = item.column_values.map((cv: any) => cv.id);
-      console.log(`📊 Total de colunas: ${colunasIds.length}`);
-      console.log(`🗂️ Colunas disponíveis: ${colunasIds.join(', ')}`);
-      console.log(`🎯 Coluna 'arquivos3' existe: ${colunasIds.includes('arquivos3') ? '✅ SIM' : '❌ NÃO'}`);
-      
-      const arquivo3Col = item.column_values.find((cv: any) => cv.id === 'arquivos3');
-      if (arquivo3Col) {
-        console.log(`📄 Valor da coluna 'arquivos3': ${arquivo3Col.value || 'VAZIO'}`);
-        console.log(`📋 Tipo da coluna 'arquivos3': ${arquivo3Col.type || 'N/A'}`);
+    // Filtro (JavaScript string)
+    if (existingMapping.mappingFilter?.trim()) {
+      try {
+        const filterFunction = new Function('item', existingMapping.mappingFilter);
+        const passesFilter = filterFunction(item);
+        if (!passesFilter) {
+          documentsSkipped++;
+          continue;
+        }
+      } catch (filterError) {
+        console.error(`❌ Erro no filtro para item ${item.id}:`, filterError);
+        documentsSkipped++;
+        continue;
       }
-      console.log(`🔍 ================================================\n`);
     }
-
-    // MODO DEBUG: Processar apenas os primeiros 5 itens, ignorando o filtro
-    if (index >= 5) {
-      console.log(`🛑 DEBUG: Parando após 5 itens para análise`);
-      break;
-    }
-
-    // Filtro desabilitado temporariamente para debug
-    // if (existingMapping.mappingFilter?.trim()) {
-    //   try {
-    //     const filterFunction = new Function('item', existingMapping.mappingFilter);
-    //     const passesFilter = filterFunction(item);
-    //     if (!passesFilter) {
-    //       documentsSkipped++;
-    //       continue;
-    //     }
-    //   } catch (filterError) {
-    //     console.error(`❌ Erro no filtro para item ${item.id}:`, filterError);
-    //     documentsSkipped++;
-    //     continue;
-    //   }
-    // }
 
     // Verificação de duplicatas
     try {
@@ -179,40 +155,19 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       status: "Integrado"
     };
 
-    // DEBUG: Mostrar todas as colunas do primeiro item após filtro
-    if (index === 0) {
-      console.log(`=== DEBUG PRIMEIRO ITEM APÓS FILTRO ===`);
-      console.log(`Item ID: ${item.id}`);
-      console.log(`Item Name: ${item.name}`);
-      console.log(`Total de colunas: ${item.column_values.length}`);
-      const arquivos3Found = item.column_values.find((cv: any) => cv.id === "arquivos3");
-      console.log(`Coluna arquivos3 encontrada: ${arquivos3Found ? 'SIM' : 'NÃO'}`);
-      if (arquivos3Found) {
-        console.log(`Valor arquivos3: ${arquivos3Found.value || 'VAZIO'}`);
-      }
-      console.log(`=======================================`);
-    }
-
-    // FORÇAR captura de dados da coluna "arquivos3" 
+    // Capturar o conteúdo da coluna "arquivos3" para monday_item_values
     const arquivos3Column = item.column_values.find((cv: any) => cv.id === "arquivos3");
-    const todasColunas = item.column_values.map((cv: any) => cv.id).join(', ');
-    
-    console.log(`🔍 ITEM ${item.id}: Colunas disponíveis: ${todasColunas}`);
-    console.log(`🎯 ITEM ${item.id}: Coluna arquivos3 encontrada: ${arquivos3Column ? 'SIM' : 'NÃO'}`);
-    
-    if (arquivos3Column) {
-      console.log(`📄 ITEM ${item.id}: Valor arquivos3: ${arquivos3Column.value || 'VAZIO'}`);
-      
-      if (arquivos3Column.value) {
-        documentData.mondayItemValues = arquivos3Column.value;
-        console.log(`✅ ITEM ${item.id}: monday_item_values GRAVADO com sucesso!`);
-      } else {
-        documentData.mondayItemValues = `{"arquivos3_sem_dados": true, "item_id": "${item.id}"}`;
-        console.log(`⚠️ ITEM ${item.id}: Coluna arquivos3 existe mas está vazia`);
+    if (arquivos3Column?.value) {
+      try {
+        // Parse do JSON da coluna arquivos3 e armazenar no campo monday_item_values
+        const arquivos3Values = JSON.parse(arquivos3Column.value);
+        documentData.mondayItemValues = arquivos3Values;
+      } catch (parseError) {
+        console.warn(`Erro ao parsear JSON da coluna arquivos3 para item ${item.id}:`, parseError);
+        documentData.mondayItemValues = {};
       }
     } else {
-      documentData.mondayItemValues = `{"arquivos3_nao_encontrada": true, "item_id": "${item.id}"}`;
-      console.log(`❌ ITEM ${item.id}: Coluna arquivos3 NÃO ENCONTRADA!`);
+      documentData.mondayItemValues = {};
     }
 
     // Valores padrão
