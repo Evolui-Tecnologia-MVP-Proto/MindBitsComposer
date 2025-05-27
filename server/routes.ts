@@ -50,7 +50,7 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       .map((asset: any) => asset.columnId);
   }
 
-  const allColumns = [...new Set([...mondayColumns, ...assetsColumns])];
+  const allColumns = Array.from(new Set([...mondayColumns, ...assetsColumns]));
   
   // Log forçado das colunas incluídas
   await SystemLogger.log({
