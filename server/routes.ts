@@ -1087,24 +1087,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("🔥 TESTE: responseText obtido, iniciando salvamento...");
       
       // SEMPRE salvar JSON completo - mesmo em caso de erro!
-      const fs = require('fs');
-      const path = require('path');
+      const fs = await import('fs');
+      const path = await import('path');
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const filename = `monday-api-response-${itemId}-${timestamp}.json`;
-      const filepath = path.join(process.cwd(), 'uploads', filename);
+      const filepath = path.default.join(process.cwd(), 'uploads', filename);
       
       console.log(`🔧 Preparando para salvar resposta (status: ${mondayResponse.status}) em: ${filepath}`);
       
       try {
         // Garantir que o diretório uploads existe
-        const uploadsDir = path.join(process.cwd(), 'uploads');
-        if (!fs.existsSync(uploadsDir)) {
-          fs.mkdirSync(uploadsDir, { recursive: true });
+        const uploadsDir = path.default.join(process.cwd(), 'uploads');
+        if (!fs.default.existsSync(uploadsDir)) {
+          fs.default.mkdirSync(uploadsDir, { recursive: true });
           console.log(`📁 Diretório uploads criado: ${uploadsDir}`);
         }
         
-        fs.writeFileSync(filepath, responseText); // Salva o texto bruto da resposta
-        const fileSize = fs.statSync(filepath).size;
+        fs.default.writeFileSync(filepath, responseText); // Salva o texto bruto da resposta
+        const fileSize = fs.default.statSync(filepath).size;
         console.log(`✅ ARQUIVO JSON SALVO COM SUCESSO!`);
         console.log(`📄 Arquivo: ${filename}`);
         console.log(`📊 Tamanho: ${fileSize} bytes`);
