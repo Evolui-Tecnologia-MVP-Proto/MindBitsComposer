@@ -37,7 +37,7 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
 
   do {
     // Log do boardId para debug
-    console.log(`🔍 Board ID utilizado na query: ${boardId}`);
+    console.log(`=== BOARD ID DEBUG: ${boardId} ===`);
     
     const query = `
       query GetBoardItems($boardId: ID!, $cursor: String) {
