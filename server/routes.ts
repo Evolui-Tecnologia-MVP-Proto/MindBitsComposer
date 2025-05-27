@@ -1228,91 +1228,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         attachments: attachments,
         itemName: item.name,
         message: `${attachments.length} anexo(s) encontrado(s) nas colunas do Assets Map`
-      }
+      });
     } catch (error) {
       console.error("Erro ao buscar anexos do Monday:", error);
       res.status(500).json({
         success: false,
         message: "Erro ao buscar anexos do Monday"
-      });
-    }
-  });
-                  
-                  try {
-                    // Baixar o arquivo
-                    const fileResponse = await fetch(file.url);
-                    if (fileResponse.ok) {
-                      const arrayBuffer = await fileResponse.arrayBuffer();
-                      const base64 = Buffer.from(arrayBuffer).toString('base64');
-                      
-                      // Determinar MIME type baseado na extensão
-                      const extension = file.name?.split('.').pop()?.toLowerCase();
-                      let mimeType = 'application/octet-stream';
-                      if (extension) {
-                        const mimeTypes: any = {
-                          'pdf': 'application/pdf',
-                          'jpg': 'image/jpeg',
-                          'jpeg': 'image/jpeg',
-                          'png': 'image/png',
-                          'gif': 'image/gif',
-                          'doc': 'application/msword',
-                          'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                          'xls': 'application/vnd.ms-excel',
-                          'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                          'txt': 'text/plain'
-                        };
-                        mimeType = mimeTypes[extension] || 'application/octet-stream';
-                      }
-                      
-                      attachments.push({
-                        id: file.assetId || `monday-${Date.now()}`,
-                        name: file.name,
-                        fileName: file.name,
-                        fileData: base64,
-                        mimeType: mimeType,
-                        fileSize: file.size ? `${file.size} bytes` : null,
-                        columnId: targetColumnId,
-                        columnTitle: column.title
-                      });
-                      
-                      console.log("✅ Arquivo baixado com sucesso:", file.name);
-                    } else {
-                      console.error("❌ Erro ao baixar arquivo:", file.name, "Status:", fileResponse.status);
-                    }
-                  } catch (downloadError) {
-                    console.error(`❌ Erro ao baixar arquivo ${file.name}:`, downloadError);
-                  }
-                }
-              } else {
-                console.log("ℹ️ Coluna não contém arquivos ou array vazio");
-              }
-            } catch (parseError) {
-              console.error(`❌ Erro ao fazer parse do valor da coluna ${targetColumnId}:`, parseError);
-              console.error("📄 Valor que causou erro:", column.value);
-            }
-          } else {
-            console.log("ℹ️ Coluna não é do tipo 'file' ou não tem valor:", {
-              type: column.type,
-              hasValue: !!column.value
-            });
-          }
-        } else {
-          console.log("❌ Coluna não encontrada:", targetColumnId);
-        }
-      }
-      
-      console.log("📤 Enviando resposta com anexos:", {
-        totalAttachments: attachments.length,
-        attachmentNames: attachments.map(a => a.name || 'sem nome'),
-        responseType: 'JSON'
-      });
-      
-      res.json(attachments);
-    } catch (error) {
-      console.error("Erro ao buscar anexos de colunas do Monday:", error);
-      res.status(500).json({
-        success: false,
-        message: "Erro ao buscar anexos das colunas do Assets Map"
       });
     }
   });
