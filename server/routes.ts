@@ -1096,32 +1096,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const responseText = await mondayResponse.text();
       console.log("📦 Resposta raw do Monday.com:", responseText);
       
+      // SEMPRE salvar JSON completo em arquivo local para análise - ANTES de qualquer processamento
+      const fs = require('fs');
+      const path = require('path');
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const filename = `monday-api-response-${itemId}-${timestamp}.json`;
+      const filepath = path.join(process.cwd(), 'uploads', filename);
+      
+      try {
+        // Garantir que o diretório uploads existe
+        const uploadsDir = path.join(process.cwd(), 'uploads');
+        if (!fs.existsSync(uploadsDir)) {
+          fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+        
+        fs.writeFileSync(filepath, responseText); // Salva o texto bruto da resposta
+        console.log(`💾 JSON SEMPRE salvo em: ${filepath}`);
+        console.log(`📊 Tamanho: ${fs.statSync(filepath).size} bytes`);
+      } catch (saveError) {
+        console.error("❌ Erro ao salvar JSON:", saveError);
+        console.error("📁 Diretório de destino:", path.dirname(filepath));
+      }
+      
       let data;
       try {
         data = JSON.parse(responseText);
         console.log("🔍 Resposta do Monday.com parseada:", JSON.stringify(data, null, 2));
-        
-        // Salvar JSON completo em arquivo local para análise
-        const fs = require('fs');
-        const path = require('path');
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const filename = `monday-api-response-${itemId}-${timestamp}.json`;
-        const filepath = path.join(process.cwd(), 'uploads', filename);
-        
-        try {
-          // Garantir que o diretório uploads existe
-          const uploadsDir = path.join(process.cwd(), 'uploads');
-          if (!fs.existsSync(uploadsDir)) {
-            fs.mkdirSync(uploadsDir, { recursive: true });
-          }
-          
-          fs.writeFileSync(filepath, JSON.stringify(data, null, 2));
-          console.log(`💾 JSON salvo com sucesso em: ${filepath}`);
-          console.log(`📊 Tamanho do arquivo: ${fs.statSync(filepath).size} bytes`);
-        } catch (saveError) {
-          console.error("❌ Erro ao salvar JSON:", saveError);
-          console.error("📁 Diretório de destino:", path.dirname(filepath));
-        }
       } catch (parseError) {
         console.error("❌ Erro ao fazer parse da resposta Monday:", parseError);
         console.error("📄 Conteúdo que causou o erro:", responseText);
