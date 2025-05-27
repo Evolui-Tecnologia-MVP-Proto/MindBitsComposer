@@ -300,6 +300,8 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     }
 
     // Mapear colunas configuradas
+    const mappedColumnIds = new Set(mappingColumns.map(col => col.mondayColumnId));
+    
     for (const mapping of mappingColumns) {
       const columnValue = item.column_values.find((cv: any) => cv.id === mapping.mondayColumnId);
       if (columnValue?.text) {
@@ -315,6 +317,31 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
         documentData[mapping.cpxField] = value;
       }
     }
+
+    // Capturar dados extras das colunas não mapeadas para general_columns
+    const unmappedColumns: Record<string, any> = {};
+    
+    // Adicionar dados básicos do item
+    unmappedColumns.monday_item_id = item.id;
+    unmappedColumns.monday_item_name = item.name;
+    
+    // Capturar todas as colunas não mapeadas
+    if (item.column_values && Array.isArray(item.column_values)) {
+      item.column_values.forEach((columnValue: any) => {
+        // Se a coluna não está mapeada, incluir nos dados extras
+        if (!mappedColumnIds.has(columnValue.id)) {
+          const columnTitle = columnValue.title || `coluna_${columnValue.id}`;
+          unmappedColumns[columnTitle] = columnValue.text || "";
+        }
+      });
+    }
+    
+    // Combinar generalColumns existentes com colunas não mapeadas
+    const existingGeneralColumns = documentData.generalColumns || {};
+    documentData.generalColumns = {
+      ...existingGeneralColumns,
+      ...unmappedColumns
+    };
 
     try {
       const createdDocument = await storage.createDocumento(documentData);
