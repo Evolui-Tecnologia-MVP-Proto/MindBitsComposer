@@ -298,6 +298,21 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
         // Salvar general_columns se existir nos padrões
         if (defaults.generalColumns) {
           preserveGeneralColumns = defaults.generalColumns;
+          
+          // Log para debug - ver o que está vindo dos valores padrão
+          if (index < 3) {
+            await SystemLogger.log({
+              eventType: 'MONDAY_SYNC_MANUAL',
+              message: `DEBUG PRESERVE_GENERAL_COLUMNS: ${JSON.stringify(preserveGeneralColumns)}`,
+              parameters: { 
+                mappingId,
+                itemId: item.id,
+                preserveGeneralColumns,
+                keysCount: Object.keys(preserveGeneralColumns).length
+              },
+              userId: userId
+            });
+          }
         }
         
         Object.assign(documentData, defaults);
