@@ -136,21 +136,27 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       console.log(`🔍 ================================================\n`);
     }
 
-    // Filtro (JavaScript string)
-    if (existingMapping.mappingFilter?.trim()) {
-      try {
-        const filterFunction = new Function('item', existingMapping.mappingFilter);
-        const passesFilter = filterFunction(item);
-        if (!passesFilter) {
-          documentsSkipped++;
-          continue;
-        }
-      } catch (filterError) {
-        console.error(`❌ Erro no filtro para item ${item.id}:`, filterError);
-        documentsSkipped++;
-        continue;
-      }
+    // MODO DEBUG: Processar apenas os primeiros 5 itens, ignorando o filtro
+    if (index >= 5) {
+      console.log(`🛑 DEBUG: Parando após 5 itens para análise`);
+      break;
     }
+
+    // Filtro desabilitado temporariamente para debug
+    // if (existingMapping.mappingFilter?.trim()) {
+    //   try {
+    //     const filterFunction = new Function('item', existingMapping.mappingFilter);
+    //     const passesFilter = filterFunction(item);
+    //     if (!passesFilter) {
+    //       documentsSkipped++;
+    //       continue;
+    //     }
+    //   } catch (filterError) {
+    //     console.error(`❌ Erro no filtro para item ${item.id}:`, filterError);
+    //     documentsSkipped++;
+    //     continue;
+    //   }
+    // }
 
     // Verificação de duplicatas
     try {
