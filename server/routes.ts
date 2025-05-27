@@ -1096,6 +1096,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const responseText = await mondayResponse.text();
       console.log("📦 Resposta raw do Monday.com:", responseText);
       
+      // Salvar JSON BRUTO exatamente como retornado pela API Monday.com
+      try {
+        const fs = require('fs');
+        const timestamp = new Date().toISOString();
+        const filename = `monday-api-RAW-response-${itemId}-${Date.now()}.json`;
+        
+        // Salvar apenas o texto bruto da API, sem processamento
+        fs.writeFileSync(filename, responseText);
+        console.log(`📁 JSON BRUTO SALVO EM: ${filename}`);
+        console.log(`🔍 Tamanho do arquivo: ${responseText.length} caracteres`);
+      } catch (fileError) {
+        console.error("❌ Erro ao salvar arquivo bruto:", fileError);
+      }
+      
       let data;
       try {
         data = JSON.parse(responseText);
