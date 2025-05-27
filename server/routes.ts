@@ -120,15 +120,20 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
 
     // Log de debug das colunas do primeiro item (antes do filtro)
     if (index === 0) {
-      console.log(`=============== DEBUG COLUNAS ITEM ${item.id} ===============`);
+      console.log(`\n🔍 =============== DEBUG PRIMEIRO ITEM ===============`);
+      console.log(`📋 Item ID: ${item.id}`);
+      console.log(`📝 Item Name: ${item.name}`);
       const colunasIds = item.column_values.map((cv: any) => cv.id);
-      console.log(`COLUNAS DISPONIVEIS: ${colunasIds.join(', ')}`);
-      console.log(`COLUNA arquivos3 EXISTE: ${colunasIds.includes('arquivos3') ? 'SIM' : 'NAO'}`);
+      console.log(`📊 Total de colunas: ${colunasIds.length}`);
+      console.log(`🗂️ Colunas disponíveis: ${colunasIds.join(', ')}`);
+      console.log(`🎯 Coluna 'arquivos3' existe: ${colunasIds.includes('arquivos3') ? '✅ SIM' : '❌ NÃO'}`);
+      
       const arquivo3Col = item.column_values.find((cv: any) => cv.id === 'arquivos3');
       if (arquivo3Col) {
-        console.log(`ARQUIVOS3 VALUE: ${arquivo3Col.value || 'VAZIO'}`);
+        console.log(`📄 Valor da coluna 'arquivos3': ${arquivo3Col.value || 'VAZIO'}`);
+        console.log(`📋 Tipo da coluna 'arquivos3': ${arquivo3Col.type || 'N/A'}`);
       }
-      console.log(`===============================================`);
+      console.log(`🔍 ================================================\n`);
     }
 
     // Filtro (JavaScript string)
