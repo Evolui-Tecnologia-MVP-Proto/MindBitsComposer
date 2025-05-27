@@ -1122,9 +1122,28 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className="bg-gray-100 text-gray-500">
-                        {artifactCounts[documento.id] || 0} anexos
-                      </Badge>
+                      {(() => {
+                        // Verificar se monday_item_values tem conteúdo
+                        const hasMonValues = documento.mondayItemValues && 
+                                            Array.isArray(documento.mondayItemValues) && 
+                                            documento.mondayItemValues.length > 0;
+                        
+                        if (!hasMonValues) {
+                          // Badge cinza com "-" para monday_item_values vazio
+                          return (
+                            <Badge variant="outline" className="bg-gray-100 text-gray-500 border-gray-300">
+                              -
+                            </Badge>
+                          );
+                        } else {
+                          // Badge amarelo com "files" quando tem conteúdo
+                          return (
+                            <Badge variant="outline" className="bg-yellow-100 text-yellow-700 border-yellow-300">
+                              files
+                            </Badge>
+                          );
+                        }
+                      })()}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end space-x-2">
