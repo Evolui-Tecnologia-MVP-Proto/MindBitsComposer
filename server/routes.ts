@@ -28,8 +28,45 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
   const mappingColumns = await storage.getMappingColumns(mappingId);
   console.log(`📊 ${mappingColumns.length} colunas mapeadas encontradas`);
 
+  // Log forçado para diagnosticar - FUNÇÃO REAL EXECUTADA
+  await SystemLogger.log({
+    eventType: 'MONDAY_SYNC_MANUAL',
+    message: `FUNÇÃO REAL EXECUTADA - Mapeamento ${mappingId} iniciado na função executeMondayMapping`,
+    parameters: { mappingId, functionName: 'executeMondayMapping' },
+    userId: userId
+  });
+
   const boardId = existingMapping.boardId;
   console.log(`🎯 Buscando dados do quadro ${boardId}...`);
+
+  // Obter colunas de assets para incluir na query
+  const mondayColumns = mappingColumns.map(col => col.mondayColumnId);
+  let assetsColumns: string[] = [];
+  
+  if (existingMapping.assetsMappings) {
+    const assetsMappings = typeof existingMapping.assetsMappings === 'string'
+      ? JSON.parse(existingMapping.assetsMappings)
+      : existingMapping.assetsMappings;
+    
+    assetsColumns = assetsMappings
+      .filter((asset: any) => asset.columnId && asset.columnId !== "documents_item")
+      .map((asset: any) => asset.columnId);
+  }
+
+  const allColumns = [...new Set([...mondayColumns, ...assetsColumns])];
+  
+  // Log forçado das colunas incluídas
+  await SystemLogger.log({
+    eventType: 'MONDAY_SYNC_MANUAL',
+    message: `COLUNAS INCLUÍDAS NA QUERY: ${allColumns.map(id => `"${id}"`).join(", ")}`,
+    parameters: { 
+      mappingId,
+      mondayColumns: mondayColumns,
+      assetsColumns: assetsColumns,
+      totalColumns: allColumns
+    },
+    userId: userId
+  });
 
   // Buscar todos os itens com paginação por cursor
   let items: any[] = [];
