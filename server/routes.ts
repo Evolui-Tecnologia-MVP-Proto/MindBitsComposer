@@ -1612,6 +1612,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("📊 Colunas mapeadas:", mondayColumns);
       console.log("📎 Colunas de anexos:", assetsColumns);
       console.log("🎯 Total de colunas na query:", allColumns);
+      console.log(`=== TODAS AS COLUNAS INCLUIDAS: ${allColumns.map(id => `"${id}"`).join(", ")} ===`);
       
       let allItems: any[] = [];
       let cursor: string | null = null;
