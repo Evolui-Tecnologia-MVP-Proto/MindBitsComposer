@@ -320,34 +320,9 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       const createdDocument = await storage.createDocumento(documentData);
       documentsCreated++;
 
-      // Anexos (colunas de arquivos)
-      if (existingMapping.assetsMappings) {
-        const assetsMappings = typeof existingMapping.assetsMappings === 'string'
-          ? JSON.parse(existingMapping.assetsMappings)
-          : existingMapping.assetsMappings;
-
-        for (const assetMapping of assetsMappings) {
-          const columnValue = item.column_values.find((cv: any) => cv.id === assetMapping.columnId);
-          if (columnValue?.value) {
-            try {
-              const files = JSON.parse(columnValue.value);
-              if (Array.isArray(files?.files)) {
-                for (const file of files.files) {
-                  await storage.createDocumentArtifact({
-                    documentoId: createdDocument.id,
-                    filename: file.name,
-                    fileUrl: file.url,
-                    fileSize: file.size || 0,
-                    uploadedAt: new Date()
-                  });
-                }
-              }
-            } catch (fileError) {
-              console.warn(`Erro ao processar anexos do item ${item.id}:`, fileError);
-            }
-          }
-        }
-      }
+      // Os valores de assets já foram capturados na seção anterior e 
+      // armazenados em documentData.mondayItemValues
+      // Não é necessário processar anexos separadamente
     } catch (docError) {
       console.error(`❌ Erro ao criar documento para item ${item.id}:`, docError);
       documentsSkipped++;
