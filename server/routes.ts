@@ -179,14 +179,9 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     }
     
     if (arquivos3Column?.value) {
-      try {
-        const arquivos3Values = JSON.parse(arquivos3Column.value);
-        documentData.mondayItemValues = arquivos3Values;
-        if (index < 3) console.log(`✅ Item ${item.id} - monday_item_values definido:`, arquivos3Values);
-      } catch (parseError) {
-        console.warn(`Erro ao parsear JSON da coluna arquivos3 para item ${item.id}:`, parseError);
-        documentData.mondayItemValues = {};
-      }
+      // Gravar o valor diretamente como string JSON, sem parsing
+      documentData.mondayItemValues = arquivos3Column.value;
+      if (index < 3) console.log(`✅ Item ${item.id} - monday_item_values definido:`, arquivos3Column.value);
     } else {
       documentData.mondayItemValues = {};
       if (index < 3) console.log(`❌ Item ${item.id} - Coluna arquivos3 sem valor ou não encontrada`);
