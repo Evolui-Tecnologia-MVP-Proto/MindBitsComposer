@@ -309,6 +309,9 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     // Mapear colunas configuradas
     const mappedColumnIds = new Set(mappingColumns.map(col => col.mondayColumnId));
     
+    // Objeto para acumular colunas mapeadas para generalColumns
+    const generalColumnsFromMapping: Record<string, string> = {};
+    
     for (const mapping of mappingColumns) {
       const columnValue = item.column_values.find((cv: any) => cv.id === mapping.mondayColumnId);
       if (columnValue?.text) {
@@ -321,7 +324,15 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
             console.warn(`Erro na transformação da coluna ${mapping.cpxField}:`, transformError);
           }
         }
-        documentData[mapping.cpxField] = value;
+        
+        // Se for generalColumns, acumular em objeto
+        if (mapping.cpxField === 'generalColumns') {
+          const columnTitle = mapping.mondayColumnTitle || `coluna_${mapping.mondayColumnId}`;
+          generalColumnsFromMapping[columnTitle] = value;
+        } else {
+          // Para outros campos, comportamento normal
+          documentData[mapping.cpxField] = value;
+        }
       }
     }
 
@@ -343,9 +354,10 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       });
     }
     
-    // Construir general_columns final combinando valores padrão + colunas não mapeadas
+    // Construir general_columns final combinando valores padrão + colunas mapeadas + colunas não mapeadas
     const finalGeneralColumns = {
       ...(preserveGeneralColumns || {}),
+      ...generalColumnsFromMapping,
       ...unmappedColumns
     };
     
