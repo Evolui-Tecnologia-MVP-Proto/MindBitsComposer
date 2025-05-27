@@ -1,0 +1,1720 @@
+{
+  "data": {
+    "boards": [
+      {
+        "items_page": {
+          "items": [
+            {
+              "id": "8195139024",
+              "name": "[ALCOESTE]  AVALIAÇÃO DO EPI",
+              "column_values": [
+                {
+                  "id": "subelementos",
+                  "type": "subtasks",
+                  "value": null
+                },
+                {
+                  "id": "status6",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "id_de_elemento",
+                  "type": "item_id",
+                  "value": "{\"item_id\":\"8195139024\"}"
+                },
+                {
+                  "id": "texto1",
+                  "type": "long_text",
+                  "value": "{\"text\":\"PESSOAL, BOA TARDE. SOLICITO AVALIAÇÃO DA POSSIBILIDADE DA AVALIAÇÃO DO EPI SER POR EQUIPAMENTO E NÃO POR ENTREGA CONFORME FOI PRPOPOSTO.\"}"
+                },
+                {
+                  "id": "long_text81",
+                  "type": "long_text",
+                  "value": "{\"text\":\"O cliente solicita que as avaliações de EPI seja somente sobre os equipamentos e não tenha a obrigatoriedade de colocar os funcionários (como é hoje). Quando o EPI estiver avaliado e for atribuído para algum funcionário enviar informações ao PPP (relatórios>>PPP)\\nEssa situação se faz necessário para que possa ser emitido o PPP \\nCaminho: GRH - Segurança e saúde no trabalho>>movimentações>>equipamento de proteção>>avaliação de EPI\\nVersão 6.0.110.5\"}"
+                },
+                {
+                  "id": "texto_mkk9z23a",
+                  "type": "text",
+                  "value": "\"Alcoeste\""
+                },
+                {
+                  "id": "status0",
+                  "type": "status",
+                  "value": "{\"index\":2}"
+                },
+                {
+                  "id": "status_1__1",
+                  "type": "status",
+                  "value": "{\"index\":7}"
+                },
+                {
+                  "id": "status4",
+                  "type": "status",
+                  "value": "{\"index\":2}"
+                },
+                {
+                  "id": "status_1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "color",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_status_dev",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_17",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "arquivos__1",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "texto_longo",
+                  "type": "long_text",
+                  "value": "{\"text\":\"\",\"changed_at\":\"2023-07-20T11:58:08.718Z\"}"
+                },
+                {
+                  "id": "color4",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "arquivos5__1",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "pessoas9",
+                  "type": "people",
+                  "value": "{\"personsAndTeams\":[{\"id\":59127491,\"kind\":\"person\"}]}"
+                },
+                {
+                  "id": "pessoas",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "long_text",
+                  "type": "long_text",
+                  "value": null
+                },
+                {
+                  "id": "multiple_person",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_resp_an_dev",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_resp_hmlg_",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "button0",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "conectar_quadros2",
+                  "type": "board_relation",
+                  "value": null
+                },
+                {
+                  "id": "espelho44",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "bot_o2",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "arquivos3",
+                  "type": "file",
+                  "value": "{\"files\":[{\"name\":\"Avaliação de EPI Alcoeste.jpg\",\"assetId\":1884242814,\"isImage\":\"true\",\"fileType\":\"ASSET\",\"createdAt\":1736366544575,\"createdBy\":\"59127491\"}]}"
+                },
+                {
+                  "id": "file",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "texto4",
+                  "type": "text",
+                  "value": null
+                },
+                {
+                  "id": "bot_o",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "link8",
+                  "type": "link",
+                  "value": null
+                },
+                {
+                  "id": "button",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_anexos_dev",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "file49",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "button4",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "link2",
+                  "type": "link",
+                  "value": null
+                },
+                {
+                  "id": "file47",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "bot_o0",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "status__1",
+                  "type": "status",
+                  "value": "{\"index\":7,\"invalid\":false,\"changed_at\":\"2025-01-10T14:50:25.285Z\"}"
+                },
+                {
+                  "id": "marcar",
+                  "type": "checkbox",
+                  "value": "{\"checked\":false}"
+                },
+                {
+                  "id": "e_mail_assinatura__1",
+                  "type": "email",
+                  "value": "{\"text\":\"tiago.magalhaes@alcoeste.com\",\"email\":\"tiago.magalhaes@alcoeste.com\",\"changed_at\":\"2025-01-10T14:50:30.709Z\"}"
+                },
+                {
+                  "id": "subelementos_email",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "log_de_cria__o",
+                  "type": "creation_log",
+                  "value": "{\"created_at\":\"2025-01-08T20:02:36Z\",\"creator_id\":\"39448026\"}"
+                },
+                {
+                  "id": "_ltima_atualiza__o",
+                  "type": "last_updated",
+                  "value": "{\"updated_at\":\"2025-04-14T17:45:05Z\",\"updater_id\":\"40185565\"}"
+                },
+                {
+                  "id": "data4",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data32",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data9",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "date1",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "date7",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "date",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data34",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data6",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "arquivos62",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "pessoas0",
+                  "type": "people",
+                  "value": "{\"personsAndTeams\":[{\"id\":40637092,\"kind\":\"person\"}]}"
+                },
+                {
+                  "id": "conectar_quadros4__1",
+                  "type": "board_relation",
+                  "value": null
+                },
+                {
+                  "id": "espelho1__1",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "espelho6__1",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "espelho3__1",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "f_rmula__1",
+                  "type": "formula",
+                  "value": null
+                },
+                {
+                  "id": "f_rmula_1__1",
+                  "type": "formula",
+                  "value": null
+                },
+                {
+                  "id": "status_11__1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_12__1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_110__1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "numeric_mkps169q",
+                  "type": "numbers",
+                  "value": "\"1030\""
+                },
+                {
+                  "id": "button_mkpsv7hz",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "pulse_id_mkpsbr5f",
+                  "type": "item_id",
+                  "value": "{\"item_id\":\"8195139024\"}"
+                }
+              ]
+            },
+            {
+              "id": "4085065462",
+              "name": "[ALEGO - Portal] Implementar consulta de dados da Margem consignável",
+              "column_values": [
+                {
+                  "id": "subelementos",
+                  "type": "subtasks",
+                  "value": null
+                },
+                {
+                  "id": "status6",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "id_de_elemento",
+                  "type": "item_id",
+                  "value": "{\"item_id\":\"4085065462\"}"
+                },
+                {
+                  "id": "texto1",
+                  "type": "long_text",
+                  "value": "{\"text\":null}"
+                },
+                {
+                  "id": "long_text81",
+                  "type": "long_text",
+                  "value": "{\"text\":\"Implementar no portal do funcionário uma nova consulta da margem consignável do servidor, de acordo com a informação que é disponibilizada no sistema Aeros, no relatório Margem Consignável. (Relatórios |\\nConsignações | Margem Consignável)\"}"
+                },
+                {
+                  "id": "texto_mkk9z23a",
+                  "type": "text",
+                  "value": "\"Assembleia Legislativo do Estado de Goiás\""
+                },
+                {
+                  "id": "status0",
+                  "type": "status",
+                  "value": "{\"index\":0,\"post_id\":null,\"changed_at\":\"2024-12-16T18:25:36.910Z\"}"
+                },
+                {
+                  "id": "status_1__1",
+                  "type": "status",
+                  "value": "{\"index\":7,\"post_id\":null,\"changed_at\":\"2024-09-20T18:46:56.936Z\"}"
+                },
+                {
+                  "id": "status4",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "color",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_status_dev",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_17",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "arquivos__1",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "texto_longo",
+                  "type": "long_text",
+                  "value": null
+                },
+                {
+                  "id": "color4",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "arquivos5__1",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "pessoas9",
+                  "type": "people",
+                  "value": "{\"changed_at\":\"2024-11-22T18:15:23.382Z\",\"personsAndTeams\":[{\"id\":59127491,\"kind\":\"person\"}]}"
+                },
+                {
+                  "id": "pessoas",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "long_text",
+                  "type": "long_text",
+                  "value": null
+                },
+                {
+                  "id": "multiple_person",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_resp_an_dev",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_resp_hmlg_",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "button0",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "conectar_quadros2",
+                  "type": "board_relation",
+                  "value": null
+                },
+                {
+                  "id": "espelho44",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "bot_o2",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "arquivos3",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "file",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "texto4",
+                  "type": "text",
+                  "value": null
+                },
+                {
+                  "id": "bot_o",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "link8",
+                  "type": "link",
+                  "value": null
+                },
+                {
+                  "id": "button",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_anexos_dev",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "file49",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "button4",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "link2",
+                  "type": "link",
+                  "value": null
+                },
+                {
+                  "id": "file47",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "bot_o0",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "status__1",
+                  "type": "status",
+                  "value": "{\"index\":7,\"invalid\":false,\"changed_at\":\"2024-10-17T12:39:28.638Z\"}"
+                },
+                {
+                  "id": "marcar",
+                  "type": "checkbox",
+                  "value": "{\"checked\":false}"
+                },
+                {
+                  "id": "e_mail_assinatura__1",
+                  "type": "email",
+                  "value": "{\"text\":\"egnaldo.lopes@al.go.leg.br\",\"email\":\"egnaldo.lopes@al.go.leg.br\",\"changed_at\":\"2024-10-17T12:39:34.395Z\"}"
+                },
+                {
+                  "id": "subelementos_email",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "log_de_cria__o",
+                  "type": "creation_log",
+                  "value": "{\"created_at\":\"2023-03-03T22:33:21Z\",\"creator_id\":\"39560638\"}"
+                },
+                {
+                  "id": "_ltima_atualiza__o",
+                  "type": "last_updated",
+                  "value": "{\"updated_at\":\"2025-04-14T18:08:17Z\",\"updater_id\":\"40185565\"}"
+                },
+                {
+                  "id": "data4",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data32",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data9",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "date1",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "date7",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "date",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data34",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data6",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "arquivos62",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "pessoas0",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "conectar_quadros4__1",
+                  "type": "board_relation",
+                  "value": null
+                },
+                {
+                  "id": "espelho1__1",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "espelho6__1",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "espelho3__1",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "f_rmula__1",
+                  "type": "formula",
+                  "value": null
+                },
+                {
+                  "id": "f_rmula_1__1",
+                  "type": "formula",
+                  "value": null
+                },
+                {
+                  "id": "status_11__1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_12__1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_110__1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "numeric_mkps169q",
+                  "type": "numbers",
+                  "value": "\"2170\""
+                },
+                {
+                  "id": "button_mkpsv7hz",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "pulse_id_mkpsbr5f",
+                  "type": "item_id",
+                  "value": "{\"item_id\":\"4085065462\"}"
+                }
+              ]
+            },
+            {
+              "id": "4085066050",
+              "name": "[ALEGO] #3019 - Incluir opção para não controlar vagas",
+              "column_values": [
+                {
+                  "id": "subelementos",
+                  "type": "subtasks",
+                  "value": null
+                },
+                {
+                  "id": "status6",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "id_de_elemento",
+                  "type": "item_id",
+                  "value": "{\"item_id\":\"4085066050\"}"
+                },
+                {
+                  "id": "texto1",
+                  "type": "long_text",
+                  "value": "{\"text\":null}"
+                },
+                {
+                  "id": "long_text81",
+                  "type": "long_text",
+                  "value": "{\"text\":\"Na tela de Quadro de Cargos, incluir opção para não ter o controle de vagas.\\nHoje no campo só tem a opção Alertar ou Bloquear, mas temos clientes que não fazem o controle de vagas. Colocar uma opção para não existir esse controle ou deixar esse campo opcional e quando ficar vazio, não ter o controle\"}"
+                },
+                {
+                  "id": "texto_mkk9z23a",
+                  "type": "text",
+                  "value": "\"Assembleia Legislativo do Estado de Goiás\""
+                },
+                {
+                  "id": "status0",
+                  "type": "status",
+                  "value": "{\"index\":0,\"post_id\":null,\"changed_at\":\"2024-12-16T18:25:36.910Z\"}"
+                },
+                {
+                  "id": "status_1__1",
+                  "type": "status",
+                  "value": "{\"index\":7,\"post_id\":null,\"changed_at\":\"2024-09-20T18:46:56.936Z\"}"
+                },
+                {
+                  "id": "status4",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "color",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_status_dev",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_17",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "arquivos__1",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "texto_longo",
+                  "type": "long_text",
+                  "value": null
+                },
+                {
+                  "id": "color4",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "arquivos5__1",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "pessoas9",
+                  "type": "people",
+                  "value": "{\"changed_at\":\"2024-11-22T18:15:43.401Z\",\"personsAndTeams\":[{\"id\":59127491,\"kind\":\"person\"}]}"
+                },
+                {
+                  "id": "pessoas",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "long_text",
+                  "type": "long_text",
+                  "value": null
+                },
+                {
+                  "id": "multiple_person",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_resp_an_dev",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_resp_hmlg_",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "button0",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "conectar_quadros2",
+                  "type": "board_relation",
+                  "value": null
+                },
+                {
+                  "id": "espelho44",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "bot_o2",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "arquivos3",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "file",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "texto4",
+                  "type": "text",
+                  "value": null
+                },
+                {
+                  "id": "bot_o",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "link8",
+                  "type": "link",
+                  "value": null
+                },
+                {
+                  "id": "button",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_anexos_dev",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "file49",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "button4",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "link2",
+                  "type": "link",
+                  "value": null
+                },
+                {
+                  "id": "file47",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "bot_o0",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "status__1",
+                  "type": "status",
+                  "value": "{\"index\":7,\"invalid\":false,\"changed_at\":\"2024-10-17T12:38:24.634Z\"}"
+                },
+                {
+                  "id": "marcar",
+                  "type": "checkbox",
+                  "value": "{\"checked\":false}"
+                },
+                {
+                  "id": "e_mail_assinatura__1",
+                  "type": "email",
+                  "value": "{\"text\":\"egnaldo.lopes@al.go.leg.br\",\"email\":\"egnaldo.lopes@al.go.leg.br\",\"changed_at\":\"2024-10-17T12:38:29.982Z\"}"
+                },
+                {
+                  "id": "subelementos_email",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "log_de_cria__o",
+                  "type": "creation_log",
+                  "value": "{\"created_at\":\"2023-03-03T22:33:25Z\",\"creator_id\":\"39560638\"}"
+                },
+                {
+                  "id": "_ltima_atualiza__o",
+                  "type": "last_updated",
+                  "value": "{\"updated_at\":\"2025-04-14T18:08:43Z\",\"updater_id\":\"40185565\"}"
+                },
+                {
+                  "id": "data4",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data32",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data9",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "date1",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "date7",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "date",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data34",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data6",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "arquivos62",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "pessoas0",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "conectar_quadros4__1",
+                  "type": "board_relation",
+                  "value": null
+                },
+                {
+                  "id": "espelho1__1",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "espelho6__1",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "espelho3__1",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "f_rmula__1",
+                  "type": "formula",
+                  "value": null
+                },
+                {
+                  "id": "f_rmula_1__1",
+                  "type": "formula",
+                  "value": null
+                },
+                {
+                  "id": "status_11__1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_12__1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_110__1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "numeric_mkps169q",
+                  "type": "numbers",
+                  "value": "\"2180\""
+                },
+                {
+                  "id": "button_mkpsv7hz",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "pulse_id_mkpsbr5f",
+                  "type": "item_id",
+                  "value": "{\"item_id\":\"4085066050\"}"
+                }
+              ]
+            },
+            {
+              "id": "4085065638",
+              "name": "[ALEGO] AJUSTES NO FOLHA PARA ATENDER O GABINETE",
+              "column_values": [
+                {
+                  "id": "subelementos",
+                  "type": "subtasks",
+                  "value": null
+                },
+                {
+                  "id": "status6",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "id_de_elemento",
+                  "type": "item_id",
+                  "value": "{\"item_id\":\"4085065638\"}"
+                },
+                {
+                  "id": "texto1",
+                  "type": "long_text",
+                  "value": "{\"text\":null}"
+                },
+                {
+                  "id": "long_text81",
+                  "type": "long_text",
+                  "value": "{\"text\":\"Criar uma listagem para a auditoria dos servidores solicitados pelo gabinete.\\nTer a opção de aprovar (muda o funcionário para Em Exercício) ou reprovar (muda a situação para Em Correção). Se foram encontrados problemas, abre uma campo para apontar todos os pontos que são necessários correções. Bem como o prazo para devolver corrigido.\\nDeve existir um alerta/notificação que tem pendência para corrigir, bem como os prazos.\\n\\nNessa listagem, o usuário precisará visualizar os dados do funcionário e os documentos anexados no prontuário.\\n\\nNessa listagem levar a opção de relatório: Ato de Nomeação (Cadastros | Funcionários | Funcionários)\"}"
+                },
+                {
+                  "id": "texto_mkk9z23a",
+                  "type": "text",
+                  "value": "\"Assembleia Legislativo do Estado de Goiás\""
+                },
+                {
+                  "id": "status0",
+                  "type": "status",
+                  "value": "{\"index\":0,\"post_id\":null,\"changed_at\":\"2024-12-16T18:25:36.910Z\"}"
+                },
+                {
+                  "id": "status_1__1",
+                  "type": "status",
+                  "value": "{\"index\":7,\"post_id\":null,\"changed_at\":\"2024-09-20T18:46:56.936Z\"}"
+                },
+                {
+                  "id": "status4",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "color",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_status_dev",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_17",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "arquivos__1",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "texto_longo",
+                  "type": "long_text",
+                  "value": null
+                },
+                {
+                  "id": "color4",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "arquivos5__1",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "pessoas9",
+                  "type": "people",
+                  "value": "{\"changed_at\":\"2024-11-22T18:15:33.813Z\",\"personsAndTeams\":[{\"id\":59127491,\"kind\":\"person\"}]}"
+                },
+                {
+                  "id": "pessoas",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "long_text",
+                  "type": "long_text",
+                  "value": null
+                },
+                {
+                  "id": "multiple_person",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_resp_an_dev",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_resp_hmlg_",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "button0",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "conectar_quadros2",
+                  "type": "board_relation",
+                  "value": null
+                },
+                {
+                  "id": "espelho44",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "bot_o2",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "arquivos3",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "file",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "texto4",
+                  "type": "text",
+                  "value": null
+                },
+                {
+                  "id": "bot_o",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "link8",
+                  "type": "link",
+                  "value": null
+                },
+                {
+                  "id": "button",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_anexos_dev",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "file49",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "button4",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "link2",
+                  "type": "link",
+                  "value": null
+                },
+                {
+                  "id": "file47",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "bot_o0",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "status__1",
+                  "type": "status",
+                  "value": "{\"index\":7,\"invalid\":false,\"changed_at\":\"2024-10-17T12:38:57.940Z\"}"
+                },
+                {
+                  "id": "marcar",
+                  "type": "checkbox",
+                  "value": "{\"checked\":false}"
+                },
+                {
+                  "id": "e_mail_assinatura__1",
+                  "type": "email",
+                  "value": "{\"text\":\"egnaldo.lopes@al.go.leg.br\",\"email\":\"egnaldo.lopes@al.go.leg.br\",\"changed_at\":\"2024-10-17T12:39:03.585Z\"}"
+                },
+                {
+                  "id": "subelementos_email",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "log_de_cria__o",
+                  "type": "creation_log",
+                  "value": "{\"created_at\":\"2023-03-03T22:33:22Z\",\"creator_id\":\"39560638\"}"
+                },
+                {
+                  "id": "_ltima_atualiza__o",
+                  "type": "last_updated",
+                  "value": "{\"updated_at\":\"2025-04-14T18:08:43Z\",\"updater_id\":\"40185565\"}"
+                },
+                {
+                  "id": "data4",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data32",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data9",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "date1",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "date7",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "date",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data34",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data6",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "arquivos62",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "pessoas0",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "conectar_quadros4__1",
+                  "type": "board_relation",
+                  "value": null
+                },
+                {
+                  "id": "espelho1__1",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "espelho6__1",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "espelho3__1",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "f_rmula__1",
+                  "type": "formula",
+                  "value": null
+                },
+                {
+                  "id": "f_rmula_1__1",
+                  "type": "formula",
+                  "value": null
+                },
+                {
+                  "id": "status_11__1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_12__1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_110__1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "numeric_mkps169q",
+                  "type": "numbers",
+                  "value": "\"2190\""
+                },
+                {
+                  "id": "button_mkpsv7hz",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "pulse_id_mkpsbr5f",
+                  "type": "item_id",
+                  "value": "{\"item_id\":\"4085065638\"}"
+                }
+              ]
+            },
+            {
+              "id": "8385478264",
+              "name": "[ALEGO] Exportação bancária - indicação de funcionários",
+              "column_values": [
+                {
+                  "id": "subelementos",
+                  "type": "subtasks",
+                  "value": null
+                },
+                {
+                  "id": "status6",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "id_de_elemento",
+                  "type": "item_id",
+                  "value": "{\"item_id\":\"8385478264\"}"
+                },
+                {
+                  "id": "texto1",
+                  "type": "long_text",
+                  "value": "{\"text\":\"Se possível, ajustar na tela de EXPORTAÇÃO BANCÁRIA as abas de Funcionários, Aposentados e Pensionistas com campo de inscrição de matrículas igual ao que existe na tela de CÁLCULO DE FOLHA (print anexo).\"}"
+                },
+                {
+                  "id": "long_text81",
+                  "type": "long_text",
+                  "value": "{\"text\":\"Na tele de exportação bancária, caminho: integrações>>exportação>>crédito bancário, o cliente solicita a ordenação das abas conforme abaixo;\\nFuncionário\\nAutônomos (incluir)\\nAposentadorias \\nPensionistas \\nFolhas \\nGrupo de controle \\nLogs \\n\\nversão 6.0.110.16\\nhttp://alego.evoluitecnologia.com.br/Alego/\\n\\nEm anexo segue print da tela \"}"
+                },
+                {
+                  "id": "texto_mkk9z23a",
+                  "type": "text",
+                  "value": "\"Assembleia Legislativo do Estado de Goiás\""
+                },
+                {
+                  "id": "status0",
+                  "type": "status",
+                  "value": "{\"index\":0}"
+                },
+                {
+                  "id": "status_1__1",
+                  "type": "status",
+                  "value": "{\"index\":7}"
+                },
+                {
+                  "id": "status4",
+                  "type": "status",
+                  "value": "{\"index\":2}"
+                },
+                {
+                  "id": "status_1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "color",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_status_dev",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_17",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "arquivos__1",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "texto_longo",
+                  "type": "long_text",
+                  "value": "{\"text\":\"\",\"changed_at\":\"2023-07-20T11:58:08.718Z\"}"
+                },
+                {
+                  "id": "color4",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "arquivos5__1",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "pessoas9",
+                  "type": "people",
+                  "value": "{\"personsAndTeams\":[{\"id\":40637273,\"kind\":\"person\"},{\"id\":59127491,\"kind\":\"person\"}]}"
+                },
+                {
+                  "id": "pessoas",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "long_text",
+                  "type": "long_text",
+                  "value": null
+                },
+                {
+                  "id": "multiple_person",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_resp_an_dev",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_resp_hmlg_",
+                  "type": "people",
+                  "value": null
+                },
+                {
+                  "id": "button0",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "conectar_quadros2",
+                  "type": "board_relation",
+                  "value": null
+                },
+                {
+                  "id": "espelho44",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "bot_o2",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "arquivos3",
+                  "type": "file",
+                  "value": "{\"files\":[{\"name\":\"ordenação de abas.pdf\",\"assetId\":1934123041,\"isImage\":\"false\",\"fileType\":\"ASSET\",\"createdAt\":1738586783162,\"createdBy\":\"59127491\"}]}"
+                },
+                {
+                  "id": "file",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "texto4",
+                  "type": "text",
+                  "value": null
+                },
+                {
+                  "id": "bot_o",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "link8",
+                  "type": "link",
+                  "value": null
+                },
+                {
+                  "id": "button",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "dup__of_anexos_dev",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "file49",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "button4",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "link2",
+                  "type": "link",
+                  "value": null
+                },
+                {
+                  "id": "file47",
+                  "type": "file",
+                  "value": null
+                },
+                {
+                  "id": "bot_o0",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "status__1",
+                  "type": "status",
+                  "value": "{\"index\":7,\"invalid\":false,\"changed_at\":\"2025-02-10T12:35:32.552Z\"}"
+                },
+                {
+                  "id": "marcar",
+                  "type": "checkbox",
+                  "value": "{\"checked\":false}"
+                },
+                {
+                  "id": "e_mail_assinatura__1",
+                  "type": "email",
+                  "value": "{\"text\":\"egnaldo.lopes@al.go.leg.br\",\"email\":\"egnaldo.lopes@al.go.leg.br\",\"changed_at\":\"2025-02-10T12:35:37.490Z\"}"
+                },
+                {
+                  "id": "subelementos_email",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "log_de_cria__o",
+                  "type": "creation_log",
+                  "value": "{\"created_at\":\"2025-02-03T12:48:44Z\",\"creator_id\":\"39560638\"}"
+                },
+                {
+                  "id": "_ltima_atualiza__o",
+                  "type": "last_updated",
+                  "value": "{\"updated_at\":\"2025-04-14T18:06:37Z\",\"updater_id\":\"40185565\"}"
+                },
+                {
+                  "id": "data4",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data32",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data9",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "date1",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "date7",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "date",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data34",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "data6",
+                  "type": "date",
+                  "value": null
+                },
+                {
+                  "id": "arquivos62",
+                  "type": "file",
+                  "value": "{\"files\":[{\"name\":\"Grade para cálculo.jpg\",\"assetId\":1934123094,\"isImage\":\"true\",\"fileType\":\"ASSET\",\"extension\":\"jpg\"}]}"
+                },
+                {
+                  "id": "pessoas0",
+                  "type": "people",
+                  "value": "{\"personsAndTeams\":[{\"id\":40637273,\"kind\":\"person\"}]}"
+                },
+                {
+                  "id": "conectar_quadros4__1",
+                  "type": "board_relation",
+                  "value": null
+                },
+                {
+                  "id": "espelho1__1",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "espelho6__1",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "espelho3__1",
+                  "type": "mirror",
+                  "value": null
+                },
+                {
+                  "id": "f_rmula__1",
+                  "type": "formula",
+                  "value": null
+                },
+                {
+                  "id": "f_rmula_1__1",
+                  "type": "formula",
+                  "value": null
+                },
+                {
+                  "id": "status_11__1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_12__1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "status_110__1",
+                  "type": "status",
+                  "value": null
+                },
+                {
+                  "id": "numeric_mkps169q",
+                  "type": "numbers",
+                  "value": "\"2090\""
+                },
+                {
+                  "id": "button_mkpsv7hz",
+                  "type": "button",
+                  "value": null
+                },
+                {
+                  "id": "pulse_id_mkpsbr5f",
+                  "type": "item_id",
+                  "value": "{\"item_id\":\"8385478264\"}"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "extensions": {
+    "request_id": "be69c097-c366-9ff0-b5d8-b8ae25b10801"
+  }
+}

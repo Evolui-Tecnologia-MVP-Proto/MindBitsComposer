@@ -168,40 +168,28 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       status: "Integrado"
     };
 
-    // Capturar qualquer coluna que possa conter arquivos para monday_item_values
-    const arquivoColunas = item.column_values.filter((cv: any) => 
-      cv.id.toLowerCase().includes('arquivo') || 
-      cv.id.toLowerCase().includes('anexo') ||
-      cv.id === 'arquivos3'
-    );
+    // Capturar o conteúdo da coluna "arquivos3" para monday_item_values
+    const arquivos3Column = item.column_values.find((cv: any) => cv.id === "arquivos3");
     
-    if (arquivoColunas.length > 0 && index < 5) {
-      console.log(`📎 Item ${item.id} - Colunas de arquivo encontradas:`, 
-        arquivoColunas.map(col => ({
-          id: col.id, 
-          hasValue: !!col.value,
-          valuePreview: col.value ? col.value.substring(0, 100) : 'vazio'
-        }))
-      );
+    if (index < 3) {
+      console.log(`🔍 Item ${item.id} - Coluna arquivos3:`, arquivos3Column ? 'ENCONTRADA' : 'NÃO ENCONTRADA');
+      if (arquivos3Column) {
+        console.log(`📄 Valor da coluna arquivos3:`, arquivos3Column.value || 'VAZIO');
+      }
     }
     
-    // Tentar primeiro com arquivos3, depois com qualquer coluna que tenha dados
-    let targetColumn = item.column_values.find((cv: any) => cv.id === "arquivos3");
-    if (!targetColumn?.value && arquivoColunas.length > 0) {
-      targetColumn = arquivoColunas.find(col => col.value);
-    }
-    
-    if (targetColumn?.value) {
+    if (arquivos3Column?.value) {
       try {
-        const arquivosValues = JSON.parse(targetColumn.value);
-        documentData.mondayItemValues = arquivosValues;
-        if (index < 3) console.log(`✅ Item ${item.id} - monday_item_values definido da coluna ${targetColumn.id}:`, arquivosValues);
+        const arquivos3Values = JSON.parse(arquivos3Column.value);
+        documentData.mondayItemValues = arquivos3Values;
+        if (index < 3) console.log(`✅ Item ${item.id} - monday_item_values definido:`, arquivos3Values);
       } catch (parseError) {
-        console.warn(`Erro ao parsear JSON da coluna ${targetColumn.id} para item ${item.id}:`, parseError);
+        console.warn(`Erro ao parsear JSON da coluna arquivos3 para item ${item.id}:`, parseError);
         documentData.mondayItemValues = {};
       }
     } else {
       documentData.mondayItemValues = {};
+      if (index < 3) console.log(`❌ Item ${item.id} - Coluna arquivos3 sem valor ou não encontrada`);
     }
 
     // Valores padrão
