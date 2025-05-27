@@ -1102,22 +1102,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("🔍 Resposta do Monday.com parseada:", JSON.stringify(data, null, 2));
         
         // Salvar JSON completo em arquivo
-        const fs = require('fs');
-        const timestamp = new Date().toISOString();
-        const filename = `monday-api-complete-response-${itemId}-${Date.now()}.json`;
-        
-        const completeResponse = {
-          timestamp: timestamp,
-          itemId: itemId,
-          requestedColumns: columnIds,
-          boardId: boardId,
-          query: query,
-          rawResponseText: responseText,
-          parsedResponse: data
-        };
-        
-        fs.writeFileSync(filename, JSON.stringify(completeResponse, null, 2));
-        console.log(`📁 JSON COMPLETO SALVO EM: ${filename}`);
+        try {
+          const fs = require('fs');
+          const timestamp = new Date().toISOString();
+          const filename = `monday-api-complete-response-${itemId}-${Date.now()}.json`;
+          
+          const completeResponse = {
+            timestamp: timestamp,
+            itemId: itemId,
+            requestedColumns: columnIds,
+            boardId: boardId,
+            query: query,
+            rawResponseText: responseText,
+            parsedResponse: data
+          };
+          
+          fs.writeFileSync(filename, JSON.stringify(completeResponse, null, 2));
+          console.log(`📁 JSON COMPLETO SALVO EM: ${filename}`);
+          console.log(`🔍 Arquivo criado com ${JSON.stringify(completeResponse).length} caracteres`);
+        } catch (fileError) {
+          console.error("❌ Erro ao salvar arquivo:", fileError);
+        }
       } catch (parseError) {
         console.error("❌ Erro ao fazer parse da resposta Monday:", parseError);
         console.error("📄 Conteúdo que causou o erro:", responseText);
