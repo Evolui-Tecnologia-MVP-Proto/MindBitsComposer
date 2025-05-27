@@ -1563,6 +1563,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const { id } = req.params;
     console.log("🚀 INICIANDO EXECUÇÃO DO MAPEAMENTO:", id);
     
+    // Log forçado para confirmar que esta função está sendo executada
+    await SystemLogger.log({
+      eventType: 'MONDAY_SYNC_MANUAL',
+      message: `FUNÇÃO EXECUTADA - Mapeamento ${id} iniciado`,
+      parameters: { mappingId: id },
+      userId: req.user?.id
+    });
+    
     try {
       // Verificar se o mapeamento existe
       const existingMapping = await storage.getMondayMapping(id);
@@ -1623,7 +1631,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           assetsColumns: assetsColumns,
           totalColumns: allColumns
         },
-        userId: userId
+        userId: req.user?.id
       });
       
       let allItems: any[] = [];
