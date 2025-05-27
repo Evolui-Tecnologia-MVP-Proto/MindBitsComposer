@@ -1177,41 +1177,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   
                   // Baixar o arquivo do Monday.com
                   try {
-                    console.log(`⬇️ Tentando baixar arquivo de: ${fileUrl}`);
                     const fileResponse = await fetch(fileUrl);
-                    console.log(`📊 Status da resposta: ${fileResponse.status} ${fileResponse.statusText}`);
-                    
                     if (fileResponse.ok) {
                       const arrayBuffer = await fileResponse.arrayBuffer();
                       const buffer = Buffer.from(arrayBuffer);
                       const base64Data = buffer.toString('base64');
                       
-                      console.log(`📁 Arquivo baixado - Tamanho: ${buffer.length} bytes`);
-                      
                       // Determinar MIME type baseado na extensão do nome do arquivo
                       const extension = file.name.split('.').pop() || 'txt';
                       const mimeType = getMimeType(extension);
                       
-                      const attachment = {
+                      attachments.push({
                         id: file.assetId || `${column.id}-${Date.now()}`,
                         name: file.name,
                         fileName: file.name,
                         fileData: base64Data,
                         mimeType: mimeType,
-                        fileSize: `${buffer.length} bytes`,
+                        fileSize: null, // Monday.com não retorna tamanho neste formato
                         source: `Monday.com - Coluna: ${column.id}`,
                         mondayAssetId: file.assetId
-                      };
-                      
-                      attachments.push(attachment);
-                      console.log("✅ Arquivo processado e adicionado:", {
-                        name: file.name,
-                        size: attachment.fileSize,
-                        mimeType: attachment.mimeType
                       });
+                      
+                      console.log("✅ Arquivo baixado e convertido:", file.name);
                     } else {
-                      console.log(`❌ Erro HTTP ao baixar ${file.name}: ${fileResponse.status} ${fileResponse.statusText}`);
-                      console.log(`❌ Headers da resposta:`, Object.fromEntries(fileResponse.headers.entries()));
+                      console.log(`❌ Erro HTTP ao baixar ${file.name}: ${fileResponse.status}`);
                     }
                   } catch (downloadError) {
                     console.error(`❌ Erro ao baixar arquivo ${file.name}:`, downloadError);
