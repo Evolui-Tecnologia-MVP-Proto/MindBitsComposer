@@ -1551,7 +1551,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Obter dados do quadro Monday com paginação otimizada
       const mondayColumns = mappingColumns.map(col => col.mondayColumnId);
       
+      // Incluir colunas de anexos do assets_mappings (exceto documents_item)
+      let assetsColumns: string[] = [];
+      if (existingMapping.assetsMappings) {
+        const assetsMappings = typeof existingMapping.assetsMappings === 'string'
+          ? JSON.parse(existingMapping.assetsMappings)
+          : existingMapping.assetsMappings;
+        
+        assetsColumns = assetsMappings
+          .filter((asset: any) => asset.columnId && asset.columnId !== "documents_item")
+          .map((asset: any) => asset.columnId);
+      }
+      
+      // Combinar colunas mapeadas + colunas de anexos (removendo duplicatas)
+      const allColumns = [...new Set([...mondayColumns, ...assetsColumns])];
+      
       console.log("🔍 INICIANDO BUSCA COM PAGINAÇÃO OTIMIZADA");
+      console.log("📊 Colunas mapeadas:", mondayColumns);
+      console.log("📎 Colunas de anexos:", assetsColumns);
+      console.log("🎯 Total de colunas na query:", allColumns);
       
       let allItems: any[] = [];
       let cursor: string | null = null;
@@ -1570,7 +1588,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 items {
                   id
                   name
-                  column_values(ids: [${mondayColumns.map(id => `"${id}"`).join(", ")}]) {
+                  column_values(ids: [${allColumns.map(id => `"${id}"`).join(", ")}]) {
                     id
                     text
                     value
