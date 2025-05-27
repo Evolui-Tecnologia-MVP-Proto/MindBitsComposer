@@ -194,7 +194,6 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     if (index < 3) {
       console.log(`🔍 Debug monday_item_values para item ${item.id}:`);
       console.log(`📋 assetsMappings existe:`, !!existingMapping.assetsMappings);
-      console.log(`📋 Total de column_values no item:`, item.column_values?.length || 0);
     }
     
     if (existingMapping.assetsMappings) {
@@ -213,7 +212,6 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       
       if (index < 3) {
         console.log(`📋 assetsColumnIds filtrados:`, assetsColumnIds);
-        console.log(`📋 Todas as colunas disponíveis:`, item.column_values.map((cv: any) => cv.id));
       }
       
       // Para cada coluna de assets, buscar o valor no item
@@ -222,34 +220,24 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
         if (index < 3) {
           console.log(`📋 Procurando coluna ${columnId}:`, columnValue ? 'ENCONTRADA' : 'NÃO ENCONTRADA');
           if (columnValue) {
-            console.log(`📋 Detalhes da coluna ${columnId}:`, {
-              id: columnValue.id,
-              text: columnValue.text,
-              value: columnValue.value,
-              type: columnValue.type
-            });
+            console.log(`📋 Valor da coluna ${columnId}:`, columnValue.value ? 'TEM VALOR' : 'SEM VALOR');
           }
         }
         
-        // Relaxar a verificação - aceitar qualquer valor não nulo/undefined
-        if (columnValue && (columnValue.value !== null && columnValue.value !== undefined && columnValue.value !== '')) {
+        if (columnValue?.value) {
           mondayItemValues.push({
             columnid: columnId,
-            value: columnValue.value,
-            text: columnValue.text,
-            type: columnValue.type
+            value: columnValue.value // Manter como string serializada, não fazer parse
           });
           if (index < 3) {
             console.log(`✅ Adicionado ${columnId} ao monday_item_values`);
           }
-        } else if (index < 3) {
-          console.log(`❌ Coluna ${columnId} não adicionada - valor inválido`);
         }
       }
     }
     
     if (index < 3) {
-      console.log(`📋 monday_item_values final (${mondayItemValues.length} itens):`, mondayItemValues);
+      console.log(`📋 monday_item_values final:`, mondayItemValues);
     }
     documentData.mondayItemValues = mondayItemValues;
 
@@ -1586,15 +1574,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  
+  /*
   // Execute Monday mapping synchronization
   app.post("/api/monday/mappings/:id/execute", async (req, res) => {
-    console.log("🔥 ROTA EXECUTE CHAMADA - ID:", req.params.id);
-    console.log("🔥 HEADERS:", req.headers);
-    
     if (!req.isAuthenticated()) {
       console.log("❌ USUÁRIO NÃO AUTORIZADO");
-      return res.status(401).json({ error: "Não autorizado" });
+      return res.status(401).send("Não autorizado");
     }
     
     const { id } = req.params;
@@ -1602,17 +1587,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const result = await executeMondayMapping(id, req.user?.id, false);
-      console.log("✅ RESULTADO DA EXECUÇÃO:", result);
       res.json({
         success: true,
         message: "Sincronização executada com sucesso",
         ...result
       });
     } catch (error) {
-      console.error("❌ ERRO NA EXECUÇÃO:", error);
-      res.status(500).json({ 
-        error: `Erro ao executar sincronização: ${error instanceof Error ? error.message : 'Erro desconhecido'}` 
-      });
+      console.error("Erro ao executar sincronização:", error);
+      res.status(500).send(`Erro ao executar sincronização: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
   });
 
