@@ -1238,6 +1238,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Debug: Endpoint para capturar JSON completo da API Monday.com
+  app.post("/api/debug/monday-json", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { itemId } = req.body;
+    
+    try {
+      const mondayConnection = await storage.getServiceConnection("monday");
+      if (!mondayConnection || !mondayConnection.token) {
+        return res.status(400).json({ message: "Token Monday.com não configurado" });
+      }
+
+      const query = `
+        query {
+          items(ids: ["${itemId}"]) {
+            id
+            name
+            column_values {
+              id
+              type
+              value
+              text
+            }
+          }
+        }
+      `;
+
+      const response = await fetch("https://api.monday.com/v2", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": mondayConnection.token,
+        },
+        body: JSON.stringify({ query }),
+      });
+
+      const responseText = await response.text();
+      const data = JSON.parse(responseText);
+      
+      // Retornar JSON completo para análise
+      res.json({
+        success: true,
+        rawResponse: data,
+        query: query,
+        itemId: itemId
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  });
+
   // Debug: Verificar documentos com idOrigemTxt
   app.get("/api/debug/documentos-monday", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
