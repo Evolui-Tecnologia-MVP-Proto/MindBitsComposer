@@ -1094,7 +1094,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const responseText = await mondayResponse.text();
-      console.log("📦 Resposta raw do Monday.com:", responseText);
+      console.log("📦 Resposta raw do Monday.com recebida!");
       
       // SEMPRE salvar JSON completo em arquivo local para análise - ANTES de qualquer processamento
       const fs = require('fs');
@@ -1103,19 +1103,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const filename = `monday-api-response-${itemId}-${timestamp}.json`;
       const filepath = path.join(process.cwd(), 'uploads', filename);
       
+      console.log(`🔧 Preparando para salvar em: ${filepath}`);
+      
       try {
         // Garantir que o diretório uploads existe
         const uploadsDir = path.join(process.cwd(), 'uploads');
         if (!fs.existsSync(uploadsDir)) {
           fs.mkdirSync(uploadsDir, { recursive: true });
+          console.log(`📁 Diretório uploads criado: ${uploadsDir}`);
         }
         
         fs.writeFileSync(filepath, responseText); // Salva o texto bruto da resposta
-        console.log(`💾 JSON SEMPRE salvo em: ${filepath}`);
-        console.log(`📊 Tamanho: ${fs.statSync(filepath).size} bytes`);
+        const fileSize = fs.statSync(filepath).size;
+        console.log(`✅ ARQUIVO JSON SALVO COM SUCESSO!`);
+        console.log(`📄 Arquivo: ${filename}`);
+        console.log(`📊 Tamanho: ${fileSize} bytes`);
+        console.log(`📁 Local: ${filepath}`);
       } catch (saveError) {
-        console.error("❌ Erro ao salvar JSON:", saveError);
-        console.error("📁 Diretório de destino:", path.dirname(filepath));
+        console.error("❌ ERRO CRÍTICO ao salvar JSON:", saveError);
+        console.error("📁 Tentando salvar em:", filepath);
+        console.error("🔍 Stack trace:", saveError.stack);
       }
       
       let data;
