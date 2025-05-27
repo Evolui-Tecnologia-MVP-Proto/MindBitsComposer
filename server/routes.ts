@@ -155,6 +155,21 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       status: "Integrado"
     };
 
+    // Capturar o conteúdo da coluna "arquivos3" para monday_item_values
+    const arquivos3Column = item.column_values.find((cv: any) => cv.id === "arquivos3");
+    if (arquivos3Column?.value) {
+      try {
+        // Parse do JSON da coluna arquivos3 e armazenar no campo monday_item_values
+        const arquivos3Values = JSON.parse(arquivos3Column.value);
+        documentData.mondayItemValues = arquivos3Values;
+      } catch (parseError) {
+        console.warn(`Erro ao parsear JSON da coluna arquivos3 para item ${item.id}:`, parseError);
+        documentData.mondayItemValues = {};
+      }
+    } else {
+      documentData.mondayItemValues = {};
+    }
+
     // Valores padrão
     if (existingMapping.defaultValues) {
       try {
