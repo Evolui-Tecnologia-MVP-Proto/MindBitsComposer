@@ -152,5 +152,3 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 ## 📞 Suporte
 
 Para suporte ou dúvidas, entre em contato através dos issues do GitHub.
-
-TESTANDO COMMIT
