@@ -1084,6 +1084,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("📥 Status da resposta Monday:", mondayResponse.status, mondayResponse.statusText);
       
       const responseText = await mondayResponse.text();
+      console.log("🔥 TESTE: responseText obtido, iniciando salvamento...");
       
       // SEMPRE salvar JSON completo - mesmo em caso de erro!
       const fs = require('fs');
