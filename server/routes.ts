@@ -194,6 +194,7 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     if (index < 3) {
       console.log(`🔍 Debug monday_item_values para item ${item.id}:`);
       console.log(`📋 assetsMappings existe:`, !!existingMapping.assetsMappings);
+      console.log(`📋 Total de column_values no item:`, item.column_values?.length || 0);
     }
     
     if (existingMapping.assetsMappings) {
@@ -212,6 +213,7 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       
       if (index < 3) {
         console.log(`📋 assetsColumnIds filtrados:`, assetsColumnIds);
+        console.log(`📋 Todas as colunas disponíveis:`, item.column_values.map((cv: any) => cv.id));
       }
       
       // Para cada coluna de assets, buscar o valor no item
@@ -220,24 +222,34 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
         if (index < 3) {
           console.log(`📋 Procurando coluna ${columnId}:`, columnValue ? 'ENCONTRADA' : 'NÃO ENCONTRADA');
           if (columnValue) {
-            console.log(`📋 Valor da coluna ${columnId}:`, columnValue.value ? 'TEM VALOR' : 'SEM VALOR');
+            console.log(`📋 Detalhes da coluna ${columnId}:`, {
+              id: columnValue.id,
+              text: columnValue.text,
+              value: columnValue.value,
+              type: columnValue.type
+            });
           }
         }
         
-        if (columnValue?.value) {
+        // Relaxar a verificação - aceitar qualquer valor não nulo/undefined
+        if (columnValue && (columnValue.value !== null && columnValue.value !== undefined && columnValue.value !== '')) {
           mondayItemValues.push({
             columnid: columnId,
-            value: columnValue.value // Manter como string serializada, não fazer parse
+            value: columnValue.value,
+            text: columnValue.text,
+            type: columnValue.type
           });
           if (index < 3) {
             console.log(`✅ Adicionado ${columnId} ao monday_item_values`);
           }
+        } else if (index < 3) {
+          console.log(`❌ Coluna ${columnId} não adicionada - valor inválido`);
         }
       }
     }
     
     if (index < 3) {
-      console.log(`📋 monday_item_values final:`, mondayItemValues);
+      console.log(`📋 monday_item_values final (${mondayItemValues.length} itens):`, mondayItemValues);
     }
     documentData.mondayItemValues = mondayItemValues;
 
