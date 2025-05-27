@@ -1296,10 +1296,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const apiKey = mondayConnection.token;
 
-      // Query GraphQL exata como solicitada
+      // Query GraphQL corrigida para API Monday.com
       const query = `
-        query GetItemFiles($boardId: Int!) {
-          boards(ids: [$boardId]) {
+        query {
+          boards(ids: [${boardId}]) {
             items {
               id
               name
@@ -1307,6 +1307,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 id
                 type
                 value
+                text
               }
             }
           }
@@ -1322,10 +1323,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           "Content-Type": "application/json",
           "Authorization": apiKey
         },
-        body: JSON.stringify({ 
-          query,
-          variables: { boardId: parseInt(boardId) }
-        })
+        body: JSON.stringify({ query })
       });
 
       console.log("📥 Status da resposta Monday:", mondayResponse.status);
