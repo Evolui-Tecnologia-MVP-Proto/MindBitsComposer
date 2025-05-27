@@ -1339,13 +1339,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const responseText = await mondayResponse.text();
       
       // Salvar JSON BRUTO COMPLETO do board
+      let savedFilename = '';
       try {
         const fs = require('fs');
         const timestamp = Date.now();
-        const filename = `monday-api-FULL-BOARD-${boardId}-${timestamp}.json`;
+        savedFilename = `monday-api-FULL-BOARD-${boardId}-${timestamp}.json`;
         
-        fs.writeFileSync(filename, responseText);
-        console.log(`📁 JSON BRUTO COMPLETO SALVO EM: ${filename}`);
+        fs.writeFileSync(savedFilename, responseText);
+        console.log(`📁 JSON BRUTO COMPLETO SALVO EM: ${savedFilename}`);
         console.log(`🔍 Tamanho do arquivo: ${responseText.length} caracteres`);
       } catch (fileError) {
         console.error("❌ Erro ao salvar arquivo:", fileError);
@@ -1359,7 +1360,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         message: `JSON completo do board ${boardId} capturado com ${items.length} itens`,
         itemCount: items.length,
-        filename: `monday-api-FULL-BOARD-${boardId}-${timestamp}.json`
+        filename: savedFilename
       });
 
     } catch (error) {
