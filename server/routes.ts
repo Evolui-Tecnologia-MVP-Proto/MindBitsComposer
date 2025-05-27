@@ -1084,35 +1084,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("📥 Status da resposta Monday:", mondayResponse.status, mondayResponse.statusText);
       
       const responseText = await mondayResponse.text();
-      console.log("🔥 TESTE: responseText obtido, iniciando salvamento...");
+      console.log("🔥 TESTE: responseText obtido, tamanho:", responseText.length);
       
-      // SEMPRE salvar JSON completo - mesmo em caso de erro!
-      const fs = await import('fs');
-      const path = await import('path');
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const filename = `monday-api-response-${itemId}-${timestamp}.json`;
-      const filepath = path.default.join(process.cwd(), 'uploads', filename);
-      
-      console.log(`🔧 Preparando para salvar resposta (status: ${mondayResponse.status}) em: ${filepath}`);
-      
+      // SEMPRE salvar JSON - método mais simples
       try {
-        // Garantir que o diretório uploads existe
-        const uploadsDir = path.default.join(process.cwd(), 'uploads');
-        if (!fs.default.existsSync(uploadsDir)) {
-          fs.default.mkdirSync(uploadsDir, { recursive: true });
-          console.log(`📁 Diretório uploads criado: ${uploadsDir}`);
-        }
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `monday-api-response-${itemId}-${timestamp}.json`;
+        const filepath = `./uploads/${filename}`;
         
-        fs.default.writeFileSync(filepath, responseText); // Salva o texto bruto da resposta
-        const fileSize = fs.default.statSync(filepath).size;
-        console.log(`✅ ARQUIVO JSON SALVO COM SUCESSO!`);
-        console.log(`📄 Arquivo: ${filename}`);
-        console.log(`📊 Tamanho: ${fileSize} bytes`);
-        console.log(`📁 Local: ${filepath}`);
+        console.log(`🔧 Salvando em: ${filepath}`);
+        
+        // Usar writeFileSync síncrono para garantir que funcione
+        require('fs').writeFileSync(filepath, responseText);
+        
+        console.log(`✅ ARQUIVO SALVO: ${filename}`);
       } catch (saveError) {
-        console.error("❌ ERRO CRÍTICO ao salvar JSON:", saveError);
-        console.error("📁 Tentando salvar em:", filepath);
-        console.error("🔍 Stack trace:", saveError.stack);
+        console.error("❌ Erro ao salvar:", saveError.message);
       }
 
       if (!mondayResponse.ok) {
