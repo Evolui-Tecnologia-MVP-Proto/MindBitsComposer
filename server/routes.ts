@@ -1241,7 +1241,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         attachments: attachments,
         itemName: item.name,
         message: `${attachments.length} anexo(s) encontrado(s) nas colunas do Assets Map`
-      }
+      });
     } catch (error) {
       console.error("Erro ao buscar anexos do Monday:", error);
       res.status(500).json({
@@ -1250,18 +1250,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-                  
-                  try {
-                    // Baixar o arquivo
-                    const fileResponse = await fetch(file.url);
-                    if (fileResponse.ok) {
-                      const arrayBuffer = await fileResponse.arrayBuffer();
-                      const base64 = Buffer.from(arrayBuffer).toString('base64');
-                      
-                      // Determinar MIME type baseado na extensão
-                      const extension = file.name?.split('.').pop()?.toLowerCase();
-                      let mimeType = 'application/octet-stream';
-                      if (extension) {
+
+  // Endpoint para buscar colunas de um mapeamento específico
                         const mimeTypes: any = {
                           'pdf': 'application/pdf',
                           'jpg': 'image/jpeg',
