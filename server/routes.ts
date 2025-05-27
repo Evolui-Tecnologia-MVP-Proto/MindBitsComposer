@@ -1072,8 +1072,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("📤 Query GraphQL para Monday.com:", query);
       
-      console.log("🚀 INICIANDO REQUEST para Monday.com...");
-      
       const mondayResponse = await fetch("https://api.monday.com/v2", {
         method: "POST",
         headers: {
@@ -1084,35 +1082,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       console.log("📥 Status da resposta Monday:", mondayResponse.status, mondayResponse.statusText);
-      console.log("🎯 REQUEST CONCLUÍDO, obtendo texto...");
       
-      const responseText = await mondayResponse.text();
-      console.log("🔥 TESTE: responseText obtido, tamanho:", responseText.length);
-      
-      // SEMPRE salvar JSON - método mais simples
-      try {
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const filename = `monday-api-response-${itemId}-${timestamp}.json`;
-        const filepath = `./uploads/${filename}`;
-        
-        console.log(`🔧 Salvando em: ${filepath}`);
-        
-        // Usar writeFileSync síncrono para garantir que funcione
-        require('fs').writeFileSync(filepath, responseText);
-        
-        console.log(`✅ ARQUIVO SALVO: ${filename}`);
-      } catch (saveError) {
-        console.error("❌ Erro ao salvar:", saveError.message);
-      }
-
       if (!mondayResponse.ok) {
-        console.error("❌ Erro na API Monday:", responseText);
+        const errorText = await mondayResponse.text();
+        console.error("❌ Erro na API Monday:", errorText);
         return res.status(500).json({
           success: false,
           message: `Erro na API do Monday: ${mondayResponse.status}`,
-          details: responseText
+          details: errorText
         });
       }
+      
+      const responseText = await mondayResponse.text();
+      console.log("📦 Resposta raw do Monday.com:", responseText);
       
       let data;
       try {
@@ -1193,20 +1175,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     continue;
                   }
                   
-                  // Adicionar informações do arquivo sem fazer download
-                  attachments.push({
-                    columnId: column.id,
-                    columnTitle: column.title || `Coluna ${column.id}`,
-                    fileName: file.name,
-                    fileUrl: fileUrl,
-                    assetId: file.assetId,
-                    isImage: file.isImage === "true",
-                    fileType: file.fileType,
-                    createdAt: file.createdAt ? new Date(file.createdAt).toLocaleString('pt-BR') : null,
-                    createdBy: file.createdBy
-                  });
-                  
-                  console.log("📋 Arquivo encontrado:", file.name, "na coluna", column.id);
+                  // Baixar o arquivo do Monday.com
+                  try {
+                    const fileResponse = await fetch(fileUrl);
+                    if (fileResponse.ok) {
+                      const arrayBuffer = await fileResponse.arrayBuffer();
+                      const buffer = Buffer.from(arrayBuffer);
+                      const base64Data = buffer.toString('base64');
+                      
+                      // Determinar MIME type baseado na extensão do nome do arquivo
+                      const extension = file.name.split('.').pop() || 'txt';
+                      const mimeType = getMimeType(extension);
+                      
+                      attachments.push({
+                        id: file.assetId || `${column.id}-${Date.now()}`,
+                        name: file.name,
+                        fileName: file.name,
+                        fileData: base64Data,
+                        mimeType: mimeType,
+                        fileSize: null, // Monday.com não retorna tamanho neste formato
+                        source: `Monday.com - Coluna: ${column.id}`,
+                        mondayAssetId: file.assetId
+                      });
+                      
+                      console.log("✅ Arquivo baixado e convertido:", file.name);
+                    } else {
+                      console.log(`❌ Erro HTTP ao baixar ${file.name}: ${fileResponse.status}`);
+                    }
+                  } catch (downloadError) {
+                    console.error(`❌ Erro ao baixar arquivo ${file.name}:`, downloadError);
+                  }
                 }
               } else {
                 console.log(`ℹ️ Coluna ${targetColumnId} não possui array 'files' ou está vazio`);
@@ -1237,40 +1235,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         message: "Erro ao buscar anexos do Monday"
       });
-    }
-  });
-
-  // Endpoint para listar arquivos JSON salvos
-  app.get("/api/monday/saved-json-files", async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
-    
-    try {
-      const fs = require('fs');
-      const path = require('path');
-      const uploadsDir = path.join(process.cwd(), 'uploads');
-      
-      if (!fs.existsSync(uploadsDir)) {
-        return res.json({ files: [] });
-      }
-      
-      const files = fs.readdirSync(uploadsDir)
-        .filter((file: string) => file.startsWith('monday-api-response-'))
-        .map((file: string) => {
-          const filepath = path.join(uploadsDir, file);
-          const stats = fs.statSync(filepath);
-          return {
-            name: file,
-            size: stats.size,
-            created: stats.mtime,
-            path: filepath
-          };
-        })
-        .sort((a: any, b: any) => b.created - a.created);
-      
-      res.json({ files });
-    } catch (error) {
-      console.error("Erro ao listar arquivos JSON:", error);
-      res.status(500).json({ error: "Erro ao listar arquivos" });
     }
   });
 

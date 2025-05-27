@@ -91,7 +91,6 @@ export default function DocumentosPage() {
   const [isPessoasExpanded, setIsPessoasExpanded] = useState(false);
   const [createModalActiveTab, setCreateModalActiveTab] = useState("dados-gerais");
   const [isLoadingMondayAttachments, setIsLoadingMondayAttachments] = useState(false);
-  const [mondayAttachmentsPreview, setMondayAttachmentsPreview] = useState<any[]>([]);
   const [artifactFormData, setArtifactFormData] = useState<InsertDocumentArtifact>({
     documentoId: "",
     name: "",
@@ -1436,27 +1435,45 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           console.log("🔍 Response status:", response.status, response.ok);
                           
                           if (response.ok) {
-                            let attachmentsData;
+                            let attachments;
                             try {
-                              attachmentsData = await response.json();
-                              console.log("📥 Anexos recebidos do Monday:", attachmentsData);
+                              attachments = await response.json();
+                              console.log("📥 Anexos recebidos do Monday:", attachments);
                             } catch (parseError) {
                               console.error("❌ Erro ao fazer parse do JSON:", parseError);
                               throw new Error("Erro ao processar resposta do servidor");
                             }
                             
-                            if (attachmentsData.success && attachmentsData.attachments && attachmentsData.attachments.length > 0) {
-                              // Armazenar dados dos arquivos encontrados para exibir na tabela
-                              setMondayAttachmentsPreview(attachmentsData.attachments);
+                            if (attachments && attachments.length > 0) {
+                              // Salvar anexos do Monday no banco
+                              for (const attachment of attachments) {
+                                await fetch('/api/documentos/artifacts', {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({
+                                    documentoId: selectedDocument.id,
+                                    name: attachment.name || attachment.fileName,
+                                    type: "monday-attachment",
+                                    fileData: attachment.fileData,
+                                    fileName: attachment.fileName,
+                                    mimeType: attachment.mimeType,
+                                    fileSize: attachment.fileSize
+                                  })
+                                });
+                              }
+                              
+                              // Recarregar lista de anexos
+                              queryClient.invalidateQueries({ queryKey: ["/api/documentos", selectedDocument.id, "artifacts"] });
                               
                               toast({
-                                title: "Arquivos encontrados",
-                                description: `${attachmentsData.attachments.length} arquivo(s) encontrado(s) nas colunas do Assets Map. Veja a tabela abaixo.`,
+                                title: "Anexos importados",
+                                description: `${attachments.length} anexo(s) importado(s) das colunas configuradas no Assets Map`,
                               });
                             } else {
-                              setMondayAttachmentsPreview([]);
                               toast({
-                                title: "Nenhum arquivo encontrado",
+                                title: "Nenhum anexo encontrado",
                                 description: "Este item não possui arquivos nas colunas configuradas no Assets Map",
                               });
                             }
@@ -1497,99 +1514,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     </Button>
                   )}
                 </div>
-                
-                {/* Tabela de arquivos encontrados no Monday.com */}
-                {mondayAttachmentsPreview.length > 0 && (
-                  <div className="mb-6 p-4 border rounded-lg bg-blue-50">
-                    <h4 className="text-md font-medium mb-3 text-blue-800">
-                      📋 Arquivos encontrados no Monday.com
-                    </h4>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Coluna</TableHead>
-                          <TableHead>Nome do Arquivo</TableHead>
-                          <TableHead>URL</TableHead>
-                          <TableHead>Tipo</TableHead>
-                          <TableHead>Data de Criação</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {mondayAttachmentsPreview.map((file, index) => (
-                          <TableRow key={index}>
-                            <TableCell>
-                              <div className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
-                                {file.columnTitle}
-                              </div>
-                              <div className="text-xs text-gray-500 mt-1">
-                                ID: {file.columnId}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center">
-                                {file.isImage && (
-                                  <span className="mr-2 text-green-600">🖼️</span>
-                                )}
-                                <span className="font-medium">{file.fileName}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <a 
-                                href={file.fileUrl} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-800 underline text-sm"
-                              >
-                                Ver arquivo 🔗
-                              </a>
-                            </TableCell>
-                            <TableCell>
-                              <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
-                                {file.fileType}
-                              </span>
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-sm text-gray-600">
-                                {file.createdAt || 'N/A'}
-                              </span>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                    <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                      <div className="text-sm text-gray-600 mb-2">
-                        💡 <strong>Próximo passo:</strong> Implemente uma funcionalidade para baixar e salvar esses arquivos como anexos do documento.
-                      </div>
-                      <Button 
-                        onClick={async () => {
-                          try {
-                            const response = await fetch('/api/monday/saved-json-files');
-                            if (response.ok) {
-                              const data = await response.json();
-                              if (data.files && data.files.length > 0) {
-                                const fileInfo = data.files.map((f: any) => 
-                                  `${f.name} (${f.size} bytes, ${new Date(f.created).toLocaleString('pt-BR')})`
-                                ).join('\n');
-                                alert(`Arquivos JSON salvos (${data.files.length}):\n\n${fileInfo}`);
-                              } else {
-                                alert('Nenhum arquivo JSON foi salvo ainda.');
-                              }
-                            }
-                          } catch (error) {
-                            console.error('Erro ao listar arquivos:', error);
-                            alert('Erro ao listar arquivos JSON salvos.');
-                          }
-                        }}
-                        variant="outline"
-                        size="sm"
-                        className="text-xs"
-                      >
-                        📄 Ver Arquivos JSON Salvos
-                      </Button>
-                    </div>
-                  </div>
-                )}
                 
                 {isLoadingArtifacts ? (
                   <div className="text-center py-6">
