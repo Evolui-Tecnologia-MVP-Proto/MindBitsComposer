@@ -168,23 +168,30 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       status: "Integrado"
     };
 
+    // DEBUG: Mostrar todas as colunas do primeiro item após filtro
+    if (index === 0) {
+      console.log(`=== DEBUG PRIMEIRO ITEM APÓS FILTRO ===`);
+      console.log(`Item ID: ${item.id}`);
+      console.log(`Item Name: ${item.name}`);
+      console.log(`Total de colunas: ${item.column_values.length}`);
+      const arquivos3Found = item.column_values.find((cv: any) => cv.id === "arquivos3");
+      console.log(`Coluna arquivos3 encontrada: ${arquivos3Found ? 'SIM' : 'NÃO'}`);
+      if (arquivos3Found) {
+        console.log(`Valor arquivos3: ${arquivos3Found.value || 'VAZIO'}`);
+      }
+      console.log(`=======================================`);
+    }
+
     // Capturar o conteúdo da coluna "arquivos3" para monday_item_values
     const arquivos3Column = item.column_values.find((cv: any) => cv.id === "arquivos3");
-    
-    if (index < 3) {
-      console.log(`🔍 Item ${item.id} - Coluna arquivos3:`, arquivos3Column ? 'ENCONTRADA' : 'NÃO ENCONTRADA');
-      if (arquivos3Column) {
-        console.log(`📄 Valor da coluna arquivos3:`, arquivos3Column.value || 'VAZIO');
-      }
-    }
     
     if (arquivos3Column?.value) {
       // Gravar o valor diretamente como string JSON, sem parsing
       documentData.mondayItemValues = arquivos3Column.value;
-      if (index < 3) console.log(`✅ Item ${item.id} - monday_item_values definido:`, arquivos3Column.value);
+      console.log(`✅ Item ${item.id} - monday_item_values definido: ${arquivos3Column.value}`);
     } else {
       documentData.mondayItemValues = {};
-      if (index < 3) console.log(`❌ Item ${item.id} - Coluna arquivos3 sem valor ou não encontrada`);
+      if (index < 3) console.log(`❌ Item ${item.id} - Coluna arquivos3 sem valor`);
     }
 
     // Valores padrão
