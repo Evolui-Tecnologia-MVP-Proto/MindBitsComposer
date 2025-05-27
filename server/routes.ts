@@ -1109,10 +1109,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const filepath = path.join(process.cwd(), 'uploads', filename);
         
         try {
+          // Garantir que o diretório uploads existe
+          const uploadsDir = path.join(process.cwd(), 'uploads');
+          if (!fs.existsSync(uploadsDir)) {
+            fs.mkdirSync(uploadsDir, { recursive: true });
+          }
+          
           fs.writeFileSync(filepath, JSON.stringify(data, null, 2));
-          console.log(`💾 JSON salvo em: ${filepath}`);
+          console.log(`💾 JSON salvo com sucesso em: ${filepath}`);
+          console.log(`📊 Tamanho do arquivo: ${fs.statSync(filepath).size} bytes`);
         } catch (saveError) {
           console.error("❌ Erro ao salvar JSON:", saveError);
+          console.error("📁 Diretório de destino:", path.dirname(filepath));
         }
       } catch (parseError) {
         console.error("❌ Erro ao fazer parse da resposta Monday:", parseError);
@@ -1233,6 +1241,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         message: "Erro ao buscar anexos do Monday"
       });
+    }
+  });
+
+  // Endpoint para listar arquivos JSON salvos
+  app.get("/api/monday/saved-json-files", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const uploadsDir = path.join(process.cwd(), 'uploads');
+      
+      if (!fs.existsSync(uploadsDir)) {
+        return res.json({ files: [] });
+      }
+      
+      const files = fs.readdirSync(uploadsDir)
+        .filter((file: string) => file.startsWith('monday-api-response-'))
+        .map((file: string) => {
+          const filepath = path.join(uploadsDir, file);
+          const stats = fs.statSync(filepath);
+          return {
+            name: file,
+            size: stats.size,
+            created: stats.mtime,
+            path: filepath
+          };
+        })
+        .sort((a: any, b: any) => b.created - a.created);
+      
+      res.json({ files });
+    } catch (error) {
+      console.error("Erro ao listar arquivos JSON:", error);
+      res.status(500).json({ error: "Erro ao listar arquivos" });
     }
   });
 

@@ -1557,8 +1557,36 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         ))}
                       </TableBody>
                     </Table>
-                    <div className="mt-4 text-sm text-gray-600">
-                      💡 <strong>Próximo passo:</strong> Implemente uma funcionalidade para baixar e salvar esses arquivos como anexos do documento.
+                    <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                      <div className="text-sm text-gray-600 mb-2">
+                        💡 <strong>Próximo passo:</strong> Implemente uma funcionalidade para baixar e salvar esses arquivos como anexos do documento.
+                      </div>
+                      <Button 
+                        onClick={async () => {
+                          try {
+                            const response = await fetch('/api/monday/saved-json-files');
+                            if (response.ok) {
+                              const data = await response.json();
+                              if (data.files && data.files.length > 0) {
+                                const fileInfo = data.files.map((f: any) => 
+                                  `${f.name} (${f.size} bytes, ${new Date(f.created).toLocaleString('pt-BR')})`
+                                ).join('\n');
+                                alert(`Arquivos JSON salvos (${data.files.length}):\n\n${fileInfo}`);
+                              } else {
+                                alert('Nenhum arquivo JSON foi salvo ainda.');
+                              }
+                            }
+                          } catch (error) {
+                            console.error('Erro ao listar arquivos:', error);
+                            alert('Erro ao listar arquivos JSON salvos.');
+                          }
+                        }}
+                        variant="outline"
+                        size="sm"
+                        className="text-xs"
+                      >
+                        📄 Ver Arquivos JSON Salvos
+                      </Button>
                     </div>
                   </div>
                 )}
