@@ -1980,16 +1980,39 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-3xl font-bold tracking-tight">Documentos</h2>
-          <Button 
-            onClick={() => {
-              resetFormData();
-              setIsCreateModalOpen(true);
-            }} 
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Incluir Documento
-          </Button>
+          <div className="flex space-x-2">
+            <Button 
+              variant="outline"
+              onClick={async () => {
+                try {
+                  const response = await fetch("/api/debug/monday-full-board", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ boardId: "4197389343" })
+                  });
+                  const data = await response.json();
+                  alert(`🔥 DEBUG: ${data.message || data.error}`);
+                  console.log("📋 Resposta completa:", data);
+                } catch (error) {
+                  alert("❌ Erro na captura");
+                  console.error(error);
+                }
+              }}
+              className="bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100"
+            >
+              🔧 Debug Monday
+            </Button>
+            <Button 
+              onClick={() => {
+                resetFormData();
+                setIsCreateModalOpen(true);
+              }} 
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Incluir Documento
+            </Button>
+          </div>
         </div>
         
         <Tabs 
