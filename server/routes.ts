@@ -1574,6 +1574,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  /*
   // Execute Monday mapping synchronization
   app.post("/api/monday/mappings/:id/execute", async (req, res) => {
     if (!req.isAuthenticated()) {
