@@ -1276,6 +1276,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Debug: Endpoint para capturar JSON completo da API Monday.com
+  app.post("/api/debug/monday-full-board", async (req: Request, res: Response) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).send("Não autorizado");
+      }
+
+      const { boardId } = req.body;
+      
+      if (!boardId) {
+        return res.status(400).json({ error: "boardId é obrigatório" });
+      }
+
+      // Buscar token do Monday.com
+      const mondayConnection = await storage.getServiceConnection("monday");
+      if (!mondayConnection?.token) {
+        return res.status(400).json({ error: "Token do Monday.com não configurado" });
+      }
+
+      const apiKey = mondayConnection.token;
+
+      // Query GraphQL exata como solicitada
+      const query = `
+        query GetItemFiles($boardId: Int!) {
+          boards(ids: [$boardId]) {
+            items {
+              id
+              name
+              column_values {
+                id
+                type
+                value
+              }
+            }
+          }
+        }
+      `;
+
+      console.log("📤 Query GraphQL COMPLETA para Monday.com:", query);
+      console.log("📋 Board ID:", boardId);
+
+      const mondayResponse = await fetch("https://api.monday.com/v2", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": apiKey
+        },
+        body: JSON.stringify({ 
+          query,
+          variables: { boardId: parseInt(boardId) }
+        })
+      });
+
+      console.log("📥 Status da resposta Monday:", mondayResponse.status);
+
+      if (!mondayResponse.ok) {
+        const errorText = await mondayResponse.text();
+        console.error("❌ Erro na API Monday:", errorText);
+        return res.status(500).json({ error: "Erro na API Monday.com" });
+      }
+
+      const responseText = await mondayResponse.text();
+      
+      // Salvar JSON BRUTO COMPLETO do board
+      try {
+        const fs = require('fs');
+        const timestamp = Date.now();
+        const filename = `monday-api-FULL-BOARD-${boardId}-${timestamp}.json`;
+        
+        fs.writeFileSync(filename, responseText);
+        console.log(`📁 JSON BRUTO COMPLETO SALVO EM: ${filename}`);
+        console.log(`🔍 Tamanho do arquivo: ${responseText.length} caracteres`);
+      } catch (fileError) {
+        console.error("❌ Erro ao salvar arquivo:", fileError);
+      }
+
+      // Parse para contar itens
+      const data = JSON.parse(responseText);
+      const items = data?.data?.boards?.[0]?.items || [];
+      
+      res.json({
+        success: true,
+        message: `JSON completo do board ${boardId} capturado com ${items.length} itens`,
+        itemCount: items.length,
+        filename: `monday-api-FULL-BOARD-${boardId}-${timestamp}.json`
+      });
+
+    } catch (error) {
+      console.error("❌ Erro geral:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   app.post("/api/debug/monday-json", async (req: Request, res: Response) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     

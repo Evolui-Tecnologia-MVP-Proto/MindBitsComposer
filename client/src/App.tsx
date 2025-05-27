@@ -14,6 +14,7 @@ import EditorPage from "@/pages/editor-page";
 import FluxosPage from "@/pages/fluxos-page";
 import DocumentosPage from "@/pages/documentos-page";
 import PluginsPage from "@/pages/plugins-page";
+import DebugMondayPage from "@/pages/debug-monday-page";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "./lib/protected-route";
 
@@ -30,6 +31,7 @@ function Router() {
       <ProtectedRoute path="/documentos" component={DocumentosPage} />
       <ProtectedRoute path="/plugins" component={PluginsPage} />
       <ProtectedRoute path="/configuracoes" component={ConfiguracoesPage} />
+      <ProtectedRoute path="/debug-monday" component={DebugMondayPage} />
       <Route component={NotFound} />
     </Switch>
   );
