@@ -118,6 +118,17 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
   for (let index = 0; index < items.length; index++) {
     const item = items[index];
 
+    // Log de debug das colunas do primeiro item (antes do filtro)
+    if (index === 0) {
+      console.log(`🔍 DEBUG - Primeiro item ${item.id}`);
+      console.log(`📋 Todas as colunas disponíveis:`, item.column_values.map((cv: any) => ({
+        id: cv.id,
+        type: cv.type,
+        hasText: !!cv.text,
+        hasValue: !!cv.value
+      })));
+    }
+
     // Filtro (JavaScript string)
     if (existingMapping.mappingFilter?.trim()) {
       try {
