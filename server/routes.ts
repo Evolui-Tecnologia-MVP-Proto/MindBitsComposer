@@ -1277,12 +1277,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const responseText = await response.text();
       const data = JSON.parse(responseText);
       
+      // Salvar JSON completo em arquivo
+      const fs = require('fs');
+      const timestamp = new Date().toISOString();
+      const filename = `monday-api-response-${itemId}-${Date.now()}.json`;
+      
+      const completeResponse = {
+        timestamp: timestamp,
+        itemId: itemId,
+        query: query,
+        rawResponse: data,
+        responseText: responseText
+      };
+      
+      fs.writeFileSync(filename, JSON.stringify(completeResponse, null, 2));
+      console.log(`📁 JSON completo salvo em: ${filename}`);
+      
       // Retornar JSON completo para análise
       res.json({
         success: true,
         rawResponse: data,
         query: query,
-        itemId: itemId
+        itemId: itemId,
+        savedFile: filename
       });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
