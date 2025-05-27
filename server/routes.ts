@@ -1665,8 +1665,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Execute Monday mapping synchronization
+  app.post("/api/monday/mappings/:id/execute", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      console.log("❌ USUÁRIO NÃO AUTORIZADO");
+      return res.status(401).send("Não autorizado");
+    }
+    
+    const { id } = req.params;
+    console.log("🚀 INICIANDO EXECUÇÃO DO MAPEAMENTO:", id);
+    
+    try {
+      const result = await executeMondayMapping(id, req.user?.id, false);
+      res.json({
+        success: true,
+        message: "Sincronização executada com sucesso",
+        ...result
+      });
+    } catch (error) {
+      console.error("Erro ao executar sincronização:", error);
+      res.status(500).send(`Erro ao executar sincronização: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+    }
+  });
 
-
+  /* FUNCAO APARENTEMENTE DUPLICADA MAS EM ANALISE (TALVEZ USADA PELA CHAMADA MANUAL)
   // Execute Monday mapping synchronization
   app.post("/api/monday/mappings/:id/execute", async (req, res) => {
     if (!req.isAuthenticated()) {
@@ -2479,7 +2500,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("🤖 Erro na execução automática:", error);
       res.status(500).send(`Erro na execução automática: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
-  });
+  });*/
 
   // Fetch columns from Monday.com API and save them
   app.post("/api/monday/mappings/:id/fetch-columns", async (req, res) => {
