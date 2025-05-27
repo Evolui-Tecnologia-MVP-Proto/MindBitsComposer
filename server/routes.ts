@@ -287,12 +287,19 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     }
     documentData.mondayItemValues = mondayItemValues;
 
-    // Valores padrão
+    // Valores padrão PRIMEIRO (mas salvar o general_columns para não sobrescrever)
+    let preserveGeneralColumns = null;
     if (existingMapping.defaultValues) {
       try {
         const defaults = typeof existingMapping.defaultValues === 'string'
           ? JSON.parse(existingMapping.defaultValues)
           : existingMapping.defaultValues;
+        
+        // Salvar general_columns se existir nos padrões
+        if (defaults.generalColumns) {
+          preserveGeneralColumns = defaults.generalColumns;
+        }
+        
         Object.assign(documentData, defaults);
       } catch (e) {
         console.warn("Erro ao parsear valores padrão:", e);
@@ -336,12 +343,22 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       });
     }
     
-    // Combinar generalColumns existentes com colunas não mapeadas
-    const existingGeneralColumns = documentData.generalColumns || {};
-    documentData.generalColumns = {
-      ...existingGeneralColumns,
+    // Construir general_columns final combinando valores padrão + colunas não mapeadas
+    const finalGeneralColumns = {
+      ...(preserveGeneralColumns || {}),
       ...unmappedColumns
     };
+    
+    documentData.generalColumns = finalGeneralColumns;
+    
+    // Log para debug (apenas primeiros 3 itens)
+    if (index < 3) {
+      console.log(`🔍 GENERAL_COLUMNS FINAL para item ${item.id}:`, {
+        preserveGeneralColumns,
+        unmappedColumnsCount: Object.keys(unmappedColumns).length,
+        finalGeneralColumns: JSON.stringify(finalGeneralColumns, null, 2).substring(0, 500)
+      });
+    }
 
     try {
       const createdDocument = await storage.createDocumento(documentData);
