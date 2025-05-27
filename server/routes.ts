@@ -1667,7 +1667,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Execute Monday mapping synchronization
 
 
-  /* FUNCAO APARENTEMENTE DUPLICADA MAS EM ANALISE (TALVEZ USADA PELA CHAMADA MANUAL)
   // Execute Monday mapping synchronization
   app.post("/api/monday/mappings/:id/execute", async (req, res) => {
     if (!req.isAuthenticated()) {
@@ -2480,7 +2479,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("🤖 Erro na execução automática:", error);
       res.status(500).send(`Erro na execução automática: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
     }
-  });*/
+  });
 
   // Fetch columns from Monday.com API and save them
   app.post("/api/monday/mappings/:id/fetch-columns", async (req, res) => {
