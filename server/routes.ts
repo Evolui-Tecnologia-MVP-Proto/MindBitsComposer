@@ -1600,6 +1600,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const { id } = req.params;
     console.log("🚀 INICIANDO EXECUÇÃO DO MAPEAMENTO:", id);
     
+    try {
+      const result = await executeMondayMapping(id, req.user?.id, false);
+      res.json({
+        success: true,
+        message: "Sincronização executada com sucesso",
+        ...result
+      });
+    } catch (error) {
+      console.error("Erro ao executar sincronização:", error);
+      res.status(500).send(`Erro ao executar sincronização: ${error instanceof Error ? error.message : 'Erro desconhecido'}`);
+    }
+  });
+
+  /* CÓDIGO DUPLICADO COMENTADO - AGORA USA A FUNÇÃO COMPARTILHADA
+  // Execute Monday mapping synchronization
+  app.post("/api/monday/mappings/:id/execute", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      console.log("❌ USUÁRIO NÃO AUTORIZADO");
+      return res.status(401).send("Não autorizado");
+    }
+    
+    const { id } = req.params;
+    console.log("🚀 INICIANDO EXECUÇÃO DO MAPEAMENTO:", id);
+    
     // Log forçado para confirmar que esta função está sendo executada
     await SystemLogger.log({
       eventType: 'MONDAY_SYNC_MANUAL',
