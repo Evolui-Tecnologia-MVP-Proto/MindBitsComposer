@@ -1,6 +1,6 @@
-# Sistema de Gestão de Documentos e Workflows
+# MindBitsComposer
 
-Uma plataforma avançada de gestão de documentos e workflows com integração inteligente aos sistemas empresariais.
+Uma plataforma avançada de gestão de documentos e workflows com integração inteligente aos sistemas empresariais através do MindBitsComposer.
 
 ## 🚀 Características Principais
 
