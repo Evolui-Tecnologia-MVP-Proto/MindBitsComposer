@@ -17,8 +17,7 @@ import multer from "multer";
 
 // Função compartilhada para executar mapeamento Monday
 async function executeMondayMapping(mappingId: string, userId?: number, isHeadless: boolean = false) {
-  console.log(`${isHeadless ? '🤖' : '👤'} INICIANDO EXECUÇÃO DO MAPEAMENTO:`, mappingId);
-
+  
   const existingMapping = await storage.getMondayMapping(mappingId);
   if (!existingMapping) throw new Error("Mapeamento não encontrado");
 
@@ -26,7 +25,6 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
   if (!apiKey) throw new Error("Chave da API do Monday não configurada");
 
   const mappingColumns = await storage.getMappingColumns(mappingId);
-  console.log(`📊 ${mappingColumns.length} colunas mapeadas encontradas`);
 
   // Log forçado para diagnosticar - FUNÇÃO REAL EXECUTADA
   await SystemLogger.log({
@@ -37,7 +35,6 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
   });
 
   const boardId = existingMapping.boardId;
-  console.log(`🎯 Buscando dados do quadro ${boardId}...`);
 
   // Obter colunas de assets para incluir na query
   const mondayColumns = mappingColumns.map(col => col.mondayColumnId);
@@ -116,7 +113,6 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
         
         // Se erro 500/502/503 (temporários), tentar novamente
         if (response.status >= 500 && response.status < 600 && attempt < 3) {
-          console.log(`[MONDAY] Erro ${response.status} na tentativa ${attempt}/3, aguardando 2s...`);
           await new Promise(resolve => setTimeout(resolve, 2000));
           continue;
         }
@@ -125,7 +121,6 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       } catch (error) {
         lastError = error;
         if (attempt < 3) {
-          console.log(`[MONDAY] Erro de rede na tentativa ${attempt}/3, aguardando 2s...`);
           await new Promise(resolve => setTimeout(resolve, 2000));
           continue;
         }
@@ -149,8 +144,6 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     cursor = page?.cursor || null;
   } while (cursor);
 
-  console.log(`📋 ${items.length} itens encontrados no quadro`);
-
   let documentsCreated = 0;
   let documentsSkipped = 0;
   let documentsPreExisting = 0;
@@ -168,7 +161,6 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
           continue;
         }
       } catch (filterError) {
-        console.error(`❌ Erro no filtro para item ${item.id}:`, filterError);
         documentsSkipped++;
         continue;
       }
@@ -318,9 +310,7 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     // Log de progresso removido para logs mais limpos
   }
 
-  console.log(`🎉 CONCLUÍDO: ${documentsCreated} criados, ${documentsSkipped} filtrados, ${documentsPreExisting} duplicados`);
-  console.log(`🧪 TOTAL REAL DE ITENS NO ARRAY: ${items.length}`);
-
+  
   return {
     itemsProcessed: items.length,
     documentsCreated,
@@ -334,7 +324,6 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
 export async function registerRoutes(app: Express): Promise<Server> {
   // Endpoint para execução automática de jobs (sem autenticação)
   app.post("/api/monday/mappings/execute-headless", async (req: Request, res: Response) => {
-    console.log("🤖 ENDPOINT HEADLESS ACIONADO");
     
     try {
       const { mappingId } = req.body;
@@ -343,13 +332,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "mappingId é obrigatório" });
       }
 
-      console.log(`🤖 Executando mapeamento headless: ${mappingId}`);
-
       // Executar a sincronização
       const result = await executeMondayMapping(mappingId, undefined, true);
-      
-      console.log(`🤖 Resultado headless:`, result);
-      
+       
       return res.json({
         success: true,
         message: "Sincronização executada com sucesso",
@@ -359,7 +344,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
     } catch (error: any) {
-      console.error("🤖 Erro no endpoint headless:", error);
       
       // Log de erro
       await SystemLogger.logError(error, "monday_headless_execution", undefined, {
