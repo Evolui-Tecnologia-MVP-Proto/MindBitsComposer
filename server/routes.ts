@@ -1072,6 +1072,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("📤 Query GraphQL para Monday.com:", query);
       
+      console.log("🚀 INICIANDO REQUEST para Monday.com...");
+      
       const mondayResponse = await fetch("https://api.monday.com/v2", {
         method: "POST",
         headers: {
@@ -1082,61 +1084,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       console.log("📥 Status da resposta Monday:", mondayResponse.status, mondayResponse.statusText);
+      console.log("🎯 REQUEST CONCLUÍDO, obtendo texto...");
       
+      const responseText = await mondayResponse.text();
+      console.log("🔥 TESTE: responseText obtido, tamanho:", responseText.length);
+      
+      // SEMPRE salvar JSON - método mais simples
+      try {
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `monday-api-response-${itemId}-${timestamp}.json`;
+        const filepath = `./uploads/${filename}`;
+        
+        console.log(`🔧 Salvando em: ${filepath}`);
+        
+        // Usar writeFileSync síncrono para garantir que funcione
+        require('fs').writeFileSync(filepath, responseText);
+        
+        console.log(`✅ ARQUIVO SALVO: ${filename}`);
+      } catch (saveError) {
+        console.error("❌ Erro ao salvar:", saveError.message);
+      }
+
       if (!mondayResponse.ok) {
-        const errorText = await mondayResponse.text();
-        console.error("❌ Erro na API Monday:", errorText);
+        console.error("❌ Erro na API Monday:", responseText);
         return res.status(500).json({
           success: false,
           message: `Erro na API do Monday: ${mondayResponse.status}`,
-          details: errorText
+          details: responseText
         });
-      }
-      
-      const responseText = await mondayResponse.text();
-      console.log("📦 Resposta raw do Monday.com:", responseText);
-      
-      // Salvar JSON BRUTO exatamente como retornado pela API Monday.com
-      try {
-        const fs = require('fs');
-        const timestamp = new Date().toISOString();
-        const filename = `monday-api-RAW-response-${itemId}-${Date.now()}.json`;
-        
-        // Salvar apenas o texto bruto da API, sem processamento
-        fs.writeFileSync(filename, responseText);
-        console.log(`📁 JSON BRUTO SALVO EM: ${filename}`);
-        console.log(`🔍 Tamanho do arquivo: ${responseText.length} caracteres`);
-      } catch (fileError) {
-        console.error("❌ Erro ao salvar arquivo bruto:", fileError);
       }
       
       let data;
       try {
         data = JSON.parse(responseText);
         console.log("🔍 Resposta do Monday.com parseada:", JSON.stringify(data, null, 2));
-        
-        // Salvar JSON completo em arquivo
-        try {
-          const fs = require('fs');
-          const timestamp = new Date().toISOString();
-          const filename = `monday-api-complete-response-${itemId}-${Date.now()}.json`;
-          
-          const completeResponse = {
-            timestamp: timestamp,
-            itemId: itemId,
-            requestedColumns: columnIds,
-            boardId: boardId,
-            query: query,
-            rawResponseText: responseText,
-            parsedResponse: data
-          };
-          
-          fs.writeFileSync(filename, JSON.stringify(completeResponse, null, 2));
-          console.log(`📁 JSON COMPLETO SALVO EM: ${filename}`);
-          console.log(`🔍 Arquivo criado com ${JSON.stringify(completeResponse).length} caracteres`);
-        } catch (fileError) {
-          console.error("❌ Erro ao salvar arquivo:", fileError);
-        }
       } catch (parseError) {
         console.error("❌ Erro ao fazer parse da resposta Monday:", parseError);
         console.error("📄 Conteúdo que causou o erro:", responseText);
@@ -1212,36 +1193,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
                     continue;
                   }
                   
-                  // Baixar o arquivo do Monday.com
-                  try {
-                    const fileResponse = await fetch(fileUrl);
-                    if (fileResponse.ok) {
-                      const arrayBuffer = await fileResponse.arrayBuffer();
-                      const buffer = Buffer.from(arrayBuffer);
-                      const base64Data = buffer.toString('base64');
-                      
-                      // Determinar MIME type baseado na extensão do nome do arquivo
-                      const extension = file.name.split('.').pop() || 'txt';
-                      const mimeType = getMimeType(extension);
-                      
-                      attachments.push({
-                        id: file.assetId || `${column.id}-${Date.now()}`,
-                        name: file.name,
-                        fileName: file.name,
-                        fileData: base64Data,
-                        mimeType: mimeType,
-                        fileSize: null, // Monday.com não retorna tamanho neste formato
-                        source: `Monday.com - Coluna: ${column.id}`,
-                        mondayAssetId: file.assetId
-                      });
-                      
-                      console.log("✅ Arquivo baixado e convertido:", file.name);
-                    } else {
-                      console.log(`❌ Erro HTTP ao baixar ${file.name}: ${fileResponse.status}`);
-                    }
-                  } catch (downloadError) {
-                    console.error(`❌ Erro ao baixar arquivo ${file.name}:`, downloadError);
-                  }
+                  // Adicionar informações do arquivo sem fazer download
+                  attachments.push({
+                    columnId: column.id,
+                    columnTitle: column.title || `Coluna ${column.id}`,
+                    fileName: file.name,
+                    fileUrl: fileUrl,
+                    assetId: file.assetId,
+                    isImage: file.isImage === "true",
+                    fileType: file.fileType,
+                    createdAt: file.createdAt ? new Date(file.createdAt).toLocaleString('pt-BR') : null,
+                    createdBy: file.createdBy
+                  });
+                  
+                  console.log("📋 Arquivo encontrado:", file.name, "na coluna", column.id);
                 }
               } else {
                 console.log(`ℹ️ Coluna ${targetColumnId} não possui array 'files' ou está vazio`);
@@ -1275,169 +1240,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Debug: Endpoint para capturar JSON completo da API Monday.com
-  app.post("/api/debug/monday-full-board", async (req: Request, res: Response) => {
-    try {
-      if (!req.isAuthenticated()) {
-        return res.status(401).send("Não autorizado");
-      }
-
-      const { boardId } = req.body;
-      
-      if (!boardId) {
-        return res.status(400).json({ error: "boardId é obrigatório" });
-      }
-
-      // Buscar token do Monday.com
-      const mondayConnection = await storage.getServiceConnection("monday");
-      if (!mondayConnection?.token) {
-        return res.status(400).json({ error: "Token do Monday.com não configurado" });
-      }
-
-      const apiKey = mondayConnection.token;
-
-      // Query GraphQL usando exatamente a mesma estrutura que já funciona no sistema
-      const query = `
-        query($boardId: [Int]) {
-          boards(ids: $boardId) {
-            items {
-              id
-              name
-              column_values {
-                id
-                type
-                value
-                text
-              }
-            }
-          }
-        }
-      `;
-
-      console.log("📤 Query GraphQL COMPLETA para Monday.com:", query);
-      console.log("📋 Board ID recebido:", boardId);
-      console.log("📋 Tipo do Board ID:", typeof boardId);
-      console.log("📋 Query após substituição:", query.replace(/\s+/g, ' ').trim());
-
-      const mondayResponse = await fetch("https://api.monday.com/v2", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": apiKey
-        },
-        body: JSON.stringify({ 
-          query,
-          variables: {
-            boardId: [parseInt(boardId)]
-          }
-        })
-      });
-
-      console.log("📥 Status da resposta Monday:", mondayResponse.status);
-
-      if (!mondayResponse.ok) {
-        const errorText = await mondayResponse.text();
-        console.error("❌ Erro na API Monday:", errorText);
-        return res.status(500).json({ error: "Erro na API Monday.com" });
-      }
-
-      const responseText = await mondayResponse.text();
-      
-      // Salvar JSON BRUTO COMPLETO do board
-      let savedFilename = '';
-      try {
-        const fs = require('fs');
-        const timestamp = Date.now();
-        savedFilename = `monday-api-FULL-BOARD-${boardId}-${timestamp}.json`;
-        
-        fs.writeFileSync(savedFilename, responseText);
-        console.log(`📁 JSON BRUTO COMPLETO SALVO EM: ${savedFilename}`);
-        console.log(`🔍 Tamanho do arquivo: ${responseText.length} caracteres`);
-      } catch (fileError) {
-        console.error("❌ Erro ao salvar arquivo:", fileError);
-      }
-
-      // Parse para contar itens
-      const data = JSON.parse(responseText);
-      const items = data?.data?.boards?.[0]?.items || [];
-      
-      res.json({
-        success: true,
-        message: `JSON completo do board ${boardId} capturado com ${items.length} itens`,
-        itemCount: items.length,
-        filename: savedFilename
-      });
-
-    } catch (error) {
-      console.error("❌ Erro geral:", error);
-      res.status(500).json({ error: "Erro interno do servidor" });
-    }
-  });
-
-  app.post("/api/debug/monday-json", async (req: Request, res: Response) => {
+  // Endpoint para listar arquivos JSON salvos
+  app.get("/api/monday/saved-json-files", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
-    const { itemId } = req.body;
-    
     try {
-      const mondayConnection = await storage.getServiceConnection("monday");
-      if (!mondayConnection || !mondayConnection.token) {
-        return res.status(400).json({ message: "Token Monday.com não configurado" });
-      }
-
-      const query = `
-        query {
-          items(ids: ["${itemId}"]) {
-            id
-            name
-            column_values {
-              id
-              type
-              value
-              text
-            }
-          }
-        }
-      `;
-
-      const response = await fetch("https://api.monday.com/v2", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": mondayConnection.token,
-        },
-        body: JSON.stringify({ query }),
-      });
-
-      const responseText = await response.text();
-      const data = JSON.parse(responseText);
-      
-      // Salvar JSON completo em arquivo
       const fs = require('fs');
-      const timestamp = new Date().toISOString();
-      const filename = `monday-api-response-${itemId}-${Date.now()}.json`;
+      const path = require('path');
+      const uploadsDir = path.join(process.cwd(), 'uploads');
       
-      const completeResponse = {
-        timestamp: timestamp,
-        itemId: itemId,
-        query: query,
-        rawResponse: data,
-        responseText: responseText
-      };
+      if (!fs.existsSync(uploadsDir)) {
+        return res.json({ files: [] });
+      }
       
-      fs.writeFileSync(filename, JSON.stringify(completeResponse, null, 2));
-      console.log(`📁 JSON completo salvo em: ${filename}`);
+      const files = fs.readdirSync(uploadsDir)
+        .filter((file: string) => file.startsWith('monday-api-response-'))
+        .map((file: string) => {
+          const filepath = path.join(uploadsDir, file);
+          const stats = fs.statSync(filepath);
+          return {
+            name: file,
+            size: stats.size,
+            created: stats.mtime,
+            path: filepath
+          };
+        })
+        .sort((a: any, b: any) => b.created - a.created);
       
-      // Retornar JSON completo para análise
-      res.json({
-        success: true,
-        rawResponse: data,
-        query: query,
-        itemId: itemId,
-        savedFile: filename
-      });
+      res.json({ files });
     } catch (error) {
-      res.status(500).json({ success: false, error: error.message });
+      console.error("Erro ao listar arquivos JSON:", error);
+      res.status(500).json({ error: "Erro ao listar arquivos" });
     }
   });
 
