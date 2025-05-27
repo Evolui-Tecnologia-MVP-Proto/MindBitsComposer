@@ -1072,6 +1072,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("📤 Query GraphQL para Monday.com:", query);
       
+      console.log("🚀 INICIANDO REQUEST para Monday.com...");
+      
       const mondayResponse = await fetch("https://api.monday.com/v2", {
         method: "POST",
         headers: {
@@ -1082,6 +1084,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
       
       console.log("📥 Status da resposta Monday:", mondayResponse.status, mondayResponse.statusText);
+      console.log("🎯 REQUEST CONCLUÍDO, obtendo texto...");
       
       const responseText = await mondayResponse.text();
       console.log("🔥 TESTE: responseText obtido, tamanho:", responseText.length);
