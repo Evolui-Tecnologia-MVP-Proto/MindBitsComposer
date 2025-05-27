@@ -118,8 +118,8 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
   for (let index = 0; index < items.length; index++) {
     const item = items[index];
 
-    // Filtro (JavaScript string) - TEMPORARIAMENTE DESABILITADO PARA DEBUG
-    if (false && existingMapping.mappingFilter?.trim()) {
+    // Filtro (JavaScript string)
+    if (existingMapping.mappingFilter?.trim()) {
       try {
         const filterFunction = new Function('item', existingMapping.mappingFilter);
         const passesFilter = filterFunction(item);
