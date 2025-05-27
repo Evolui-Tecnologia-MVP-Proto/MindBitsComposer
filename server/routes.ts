@@ -1299,7 +1299,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Query GraphQL usando a mesma estrutura que já funciona
       const query = `
         query { 
-          boards(ids: ["${boardId}"]) { 
+          boards(ids: [${boardId}]) { 
             items { 
               id 
               name 
