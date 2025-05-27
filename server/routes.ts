@@ -329,6 +329,11 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
         if (mapping.cpxField === 'generalColumns') {
           const columnTitle = mapping.mondayColumnTitle || `coluna_${mapping.mondayColumnId}`;
           generalColumnsFromMapping[columnTitle] = value;
+          console.log(`✅ COLUNA MAPEADA PARA GENERAL_COLUMNS:`, {
+            columnTitle,
+            value,
+            mappingId: mapping.mappingId
+          });
         } else {
           // Para outros campos, comportamento normal
           documentData[mapping.cpxField] = value;
