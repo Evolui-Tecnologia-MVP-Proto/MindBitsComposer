@@ -2436,14 +2436,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const { documentoId } = req.params;
+      console.log("🚀 INICIANDO integração de anexos para documento:", documentoId);
       
       // Buscar o documento para obter monday_item_values
       const documento = await storage.getDocumento(documentoId);
       if (!documento) {
+        console.log("❌ Documento não encontrado:", documentoId);
         return res.status(404).send("Documento não encontrado");
       }
       
+      console.log("📄 Documento encontrado:", documento.objeto);
+      console.log("🔍 monday_item_values tipo:", typeof documento.mondayItemValues);
+      console.log("🔍 monday_item_values é array:", Array.isArray(documento.mondayItemValues));
+      console.log("🔍 monday_item_values length:", documento.mondayItemValues?.length);
+      console.log("🔍 monday_item_values conteúdo bruto:", documento.mondayItemValues);
+      
       if (!documento.mondayItemValues || documento.mondayItemValues.length === 0) {
+        console.log("❌ Nenhum monday_item_values encontrado");
         return res.status(400).json({ 
           message: "Nenhum anexo do Monday.com encontrado para integrar",
           attachmentsCount: 0
