@@ -1484,16 +1484,16 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   <div className="w-full overflow-x-auto">
                                     <Table className="table-fixed min-w-full text-sm">
                                       <TableHeader>
-                                        <TableRow>
-                                          <TableHead className="w-48 px-2">Arquivo</TableHead>
-                                          <TableHead className="w-32 px-2">Asset ID</TableHead>
-                                          <TableHead className="w-16 px-2">Tipo</TableHead>
+                                        <TableRow className="h-8">
+                                          <TableHead className="w-48 px-2 py-1 text-xs">Arquivo</TableHead>
+                                          <TableHead className="w-32 px-2 py-1 text-xs">Asset ID</TableHead>
+                                          <TableHead className="w-16 px-2 py-1 text-xs">Tipo</TableHead>
                                         </TableRow>
                                       </TableHeader>
                                       <TableBody>
                                         {files.map((file: any, fileIndex: number) => (
-                                          <TableRow key={fileIndex}>
-                                            <TableCell className="font-medium w-48 px-2">
+                                          <TableRow key={fileIndex} className="h-8">
+                                            <TableCell className="font-medium w-48 px-2 py-1">
                                               <div className="flex items-center gap-1 min-w-0">
                                                 {file.isImage === "true" || file.isImage === true ? (
                                                   <Image className="h-3 w-3 text-green-500 flex-shrink-0" />
@@ -1505,10 +1505,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                                 </span>
                                               </div>
                                             </TableCell>
-                                            <TableCell className="font-mono text-xs w-32 px-2 truncate" title={file.assetId ? String(file.assetId) : 'N/A'}>
+                                            <TableCell className="font-mono text-xs w-32 px-2 py-1 truncate" title={file.assetId ? String(file.assetId) : 'N/A'}>
                                               {file.assetId ? String(file.assetId).substring(0, 8) + '...' : 'N/A'}
                                             </TableCell>
-                                            <TableCell className="w-16 px-2">
+                                            <TableCell className="w-16 px-2 py-1">
                                               <div className="flex justify-center">
                                                 {file.isImage === "true" || file.isImage === true ? (
                                                   <span className="text-xs text-green-600">📷</span>
