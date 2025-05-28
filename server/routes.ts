@@ -2643,6 +2643,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      // Marcar documento como sincronizado se pelo menos um anexo foi criado
+      if (createdArtifacts > 0) {
+        await storage.updateDocumento(documentoId, { assetsSynced: true });
+        console.log(`✅ Documento ${documentoId} marcado como assets_synced = true`);
+      }
+
       res.json({
         success: true,
         message: `Integração concluída. ${createdArtifacts} anexos integrados, ${downloadedFiles} arquivos baixados.`,
