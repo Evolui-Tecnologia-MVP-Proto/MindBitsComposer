@@ -1593,6 +1593,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                           <TableHead className="w-40 px-2 py-1 font-medium" style={{ fontSize: '14px' }}>Arquivo</TableHead>
                                           <TableHead className="w-40 px-2 py-1 font-medium" style={{ fontSize: '14px' }}>Asset ID</TableHead>
                                           <TableHead className="w-20 px-2 py-1 font-medium" style={{ fontSize: '14px' }}>Tipo</TableHead>
+                                          <TableHead className="w-20 px-2 py-1 font-medium text-center" style={{ fontSize: '14px' }}>Ações</TableHead>
                                         </TableRow>
                                       </TableHeader>
                                       <TableBody>
@@ -1619,6 +1620,25 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                                   <span className="text-sm text-green-600">📷</span>
                                                 ) : (
                                                   <span className="text-sm text-gray-600">📄</span>
+                                                )}
+                                              </div>
+                                            </TableCell>
+                                            <TableCell className="w-20 px-2 py-1">
+                                              <div className="flex justify-center">
+                                                {file.assetId && (
+                                                  <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-6 w-6 p-0"
+                                                    onClick={() => {
+                                                      // Abrir asset do Monday.com em nova aba
+                                                      const mondayAssetUrl = `https://files.monday.com/assets/${file.assetId}`;
+                                                      window.open(mondayAssetUrl, '_blank');
+                                                    }}
+                                                    title="Visualizar asset no Monday.com"
+                                                  >
+                                                    <Eye className="h-3 w-3 text-blue-500" />
+                                                  </Button>
                                                 )}
                                               </div>
                                             </TableCell>
