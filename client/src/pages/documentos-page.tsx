@@ -1484,10 +1484,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   <div className="w-full overflow-x-auto">
                                     <Table className="table-fixed min-w-full text-sm">
                                       <TableHeader>
-                                        <TableRow className="h-6">
-                                          <TableHead className="w-40 px-2 py-0.5 text-xs font-medium">Arquivo</TableHead>
-                                          <TableHead className="w-40 px-2 py-0.5 text-xs font-medium">Asset ID</TableHead>
-                                          <TableHead className="w-20 px-2 py-0.5 text-xs font-medium">Tipo</TableHead>
+                                        <TableRow className="h-8">
+                                          <TableHead className="w-40 px-2 py-1 font-medium" style={{ fontSize: '14px' }}>Arquivo</TableHead>
+                                          <TableHead className="w-40 px-2 py-1 font-medium" style={{ fontSize: '14px' }}>Asset ID</TableHead>
+                                          <TableHead className="w-20 px-2 py-1 font-medium" style={{ fontSize: '14px' }}>Tipo</TableHead>
                                         </TableRow>
                                       </TableHeader>
                                       <TableBody>
