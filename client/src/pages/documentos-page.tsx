@@ -193,6 +193,16 @@ export default function DocumentosPage() {
 
   const { toast } = useToast();
 
+  // Estados dos filtros
+  const [filtros, setFiltros] = useState({
+    responsavel: "",
+    modulo: "",
+    cliente: "",
+    statusOrigem: "",
+    arquivos: "", // "sem-arquivos", "a-sincronizar", "sincronizados"
+    nome: ""
+  });
+
   // Buscar documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
     queryKey: ["/api/documentos"],
@@ -1394,6 +1404,85 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       return false;
     }
   };
+
+  // Função para filtrar e ordenar documentos
+  const filteredAndSortedDocumentos = useMemo(() => {
+    let filtered = documentos.filter((doc) => {
+      // Filtro por responsável
+      if (filtros.responsavel && !doc.responsavel?.toLowerCase().includes(filtros.responsavel.toLowerCase())) {
+        return false;
+      }
+      
+      // Filtro por módulo
+      if (filtros.modulo && !doc.modulo?.toLowerCase().includes(filtros.modulo.toLowerCase())) {
+        return false;
+      }
+      
+      // Filtro por cliente
+      if (filtros.cliente && !doc.cliente?.toLowerCase().includes(filtros.cliente.toLowerCase())) {
+        return false;
+      }
+      
+      // Filtro por status origem
+      if (filtros.statusOrigem && doc.statusOrigem !== filtros.statusOrigem) {
+        return false;
+      }
+      
+      // Filtro por nome/objeto
+      if (filtros.nome && !doc.objeto?.toLowerCase().includes(filtros.nome.toLowerCase())) {
+        return false;
+      }
+      
+      // Filtro por arquivos
+      if (filtros.arquivos) {
+        const artifactCount = artifactCounts[doc.id] || 0;
+        const hasMondayData = hasMondayItemValues(doc);
+        
+        switch (filtros.arquivos) {
+          case "sem-arquivos":
+            return artifactCount === 0;
+          case "a-sincronizar":
+            return hasMondayData && artifactCount === 0;
+          case "sincronizados":
+            return artifactCount > 0;
+          default:
+            break;
+        }
+      }
+      
+      return true;
+    });
+
+    // Ordenação alfabética por nome (objeto)
+    filtered.sort((a, b) => {
+      const nomeA = a.objeto?.toLowerCase() || "";
+      const nomeB = b.objeto?.toLowerCase() || "";
+      return nomeA.localeCompare(nomeB);
+    });
+
+    return filtered;
+  }, [documentos, filtros, artifactCounts]);
+
+  // Obter listas únicas para os filtros
+  const responsaveisUnicos = useMemo(() => {
+    const responsaveis = documentos.map(doc => doc.responsavel).filter(Boolean);
+    return [...new Set(responsaveis)].sort();
+  }, [documentos]);
+
+  const modulosUnicos = useMemo(() => {
+    const modulos = documentos.map(doc => doc.modulo).filter(Boolean);
+    return [...new Set(modulos)].sort();
+  }, [documentos]);
+
+  const clientesUnicos = useMemo(() => {
+    const clientes = documentos.map(doc => doc.cliente).filter(Boolean);
+    return [...new Set(clientes)].sort();
+  }, [documentos]);
+
+  const statusOrigensUnicos = useMemo(() => {
+    const statusOrigens = documentos.map(doc => doc.statusOrigem).filter(Boolean);
+    return [...new Set(statusOrigens)].sort();
+  }, [documentos]);
 
   const renderViewModal = () => {
     if (!selectedDocument) return null;
@@ -3027,10 +3116,142 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         </TabsList>
 
         <TabsContent value="integrados">
+          {/* Filtros */}
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Filtros</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+              {/* Filtro por Nome */}
+              <div>
+                <Label htmlFor="filtro-nome" className="text-xs">Nome</Label>
+                <Input
+                  id="filtro-nome"
+                  placeholder="Filtrar por nome..."
+                  value={filtros.nome}
+                  onChange={(e) => setFiltros(prev => ({ ...prev, nome: e.target.value }))}
+                  className="h-8 text-sm"
+                />
+              </div>
+
+              {/* Filtro por Responsável */}
+              <div>
+                <Label htmlFor="filtro-responsavel" className="text-xs">Responsável</Label>
+                <Select
+                  value={filtros.responsavel}
+                  onValueChange={(value) => setFiltros(prev => ({ ...prev, responsavel: value }))}
+                >
+                  <SelectTrigger className="h-8 text-sm">
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Todos</SelectItem>
+                    {responsaveisUnicos.map(responsavel => (
+                      <SelectItem key={responsavel} value={responsavel}>{responsavel}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filtro por Módulo */}
+              <div>
+                <Label htmlFor="filtro-modulo" className="text-xs">Módulo</Label>
+                <Select
+                  value={filtros.modulo}
+                  onValueChange={(value) => setFiltros(prev => ({ ...prev, modulo: value }))}
+                >
+                  <SelectTrigger className="h-8 text-sm">
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Todos</SelectItem>
+                    {modulosUnicos.map(modulo => (
+                      <SelectItem key={modulo} value={modulo}>{modulo}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filtro por Cliente */}
+              <div>
+                <Label htmlFor="filtro-cliente" className="text-xs">Cliente</Label>
+                <Select
+                  value={filtros.cliente}
+                  onValueChange={(value) => setFiltros(prev => ({ ...prev, cliente: value }))}
+                >
+                  <SelectTrigger className="h-8 text-sm">
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Todos</SelectItem>
+                    {clientesUnicos.map(cliente => (
+                      <SelectItem key={cliente} value={cliente}>{cliente}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filtro por Status Origem */}
+              <div>
+                <Label htmlFor="filtro-status-origem" className="text-xs">Status Origem</Label>
+                <Select
+                  value={filtros.statusOrigem}
+                  onValueChange={(value) => setFiltros(prev => ({ ...prev, statusOrigem: value }))}
+                >
+                  <SelectTrigger className="h-8 text-sm">
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Todos</SelectItem>
+                    {statusOrigensUnicos.map(status => (
+                      <SelectItem key={status} value={status}>{status}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Filtro por Arquivos */}
+              <div>
+                <Label htmlFor="filtro-arquivos" className="text-xs">Arquivos</Label>
+                <Select
+                  value={filtros.arquivos}
+                  onValueChange={(value) => setFiltros(prev => ({ ...prev, arquivos: value }))}
+                >
+                  <SelectTrigger className="h-8 text-sm">
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Todos</SelectItem>
+                    <SelectItem value="sem-arquivos">Sem arquivos</SelectItem>
+                    <SelectItem value="a-sincronizar">A sincronizar</SelectItem>
+                    <SelectItem value="sincronizados">Sincronizados</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Botão para limpar filtros */}
+            <div className="mt-3 flex justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setFiltros({
+                  responsavel: "",
+                  modulo: "",
+                  cliente: "",
+                  statusOrigem: "",
+                  arquivos: "",
+                  nome: ""
+                })}
+                className="text-xs"
+              >
+                Limpar filtros
+              </Button>
+            </div>
+          </div>
+
           {isLoading ? (
             <div className="text-center py-6">Carregando documentos...</div>
           ) : (
-            renderDocumentosTable(filteredDocumentos)
+            renderDocumentosTable(filteredAndSortedDocumentos)
           )}
         </TabsContent>
 
