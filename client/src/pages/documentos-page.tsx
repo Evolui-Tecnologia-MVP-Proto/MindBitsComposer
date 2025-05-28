@@ -1638,7 +1638,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                             </TableCell>
                                             <TableCell className="w-20 px-2 py-1">
                                               <div className="flex justify-center">
-                                                {file.assetId && (
+                                                {file.assetId && artifacts?.find(artifact => artifact.originAssetId === file.assetId?.toString()) && (
                                                   <Button
                                                     variant="ghost"
                                                     size="sm"
