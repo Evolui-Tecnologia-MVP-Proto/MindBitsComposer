@@ -2476,80 +2476,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }
 
-  // Função auxiliar para baixar arquivo e converter para base64
-  async function downloadFileAsBase64(url: string, apiKey: string): Promise<{ fileData: string; fileSize: number; mimeType: string } | null> {
+  // Função auxiliar para baixar arquivo usando a API GraphQL do Monday.com
+  async function downloadFileAsBase64(assetId: string, apiKey: string): Promise<{ fileData: string; fileSize: number; mimeType: string } | null> {
     try {
-      console.log(`📥 Tentando baixar arquivo de: ${url}`);
+      console.log(`📥 Baixando arquivo via GraphQL para asset ${assetId}...`);
       
-      // Primeiro, tentar sem o header Authorization
-      const response = await fetch(url, {
-        method: 'GET',
+      const query = `
+        query {
+          assets(ids: [${assetId}]) {
+            id
+            name
+            url
+            file_extension
+            file_size
+            public_url
+          }
+        }
+      `;
+
+      const response = await fetch('https://api.monday.com/v2', {
+        method: 'POST',
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
-          'Accept-Language': 'en-US,en;q=0.9',
-          'Accept-Encoding': 'gzip, deflate, br',
-          'Referer': 'https://legix-evolui.monday.com/',
-          'Sec-Fetch-Dest': 'image',
-          'Sec-Fetch-Mode': 'no-cors',
-          'Sec-Fetch-Site': 'same-origin'
+          'Content-Type': 'application/json',
+          'Authorization': apiKey
         },
-        redirect: 'follow'
+        body: JSON.stringify({ query })
       });
 
-      console.log(`📊 Status da resposta: ${response.status} ${response.statusText}`);
+      const result = await response.json();
+      console.log(`📄 Resposta GraphQL para download:`, JSON.stringify(result, null, 2));
       
-      if (!response.ok) {
-        console.error(`❌ Erro ao baixar arquivo: ${response.status} ${response.statusText}`);
-        console.error(`📄 Headers da resposta:`, Object.fromEntries(response.headers.entries()));
+      if (result.data?.assets?.[0]) {
+        const asset = result.data.assets[0];
         
-        // Se falhar, tentar com Authorization Bearer
-        console.log(`🔄 Tentando novamente com Bearer token...`);
-        
-        const responseWithAuth = await fetch(url, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'Accept': '*/*',
-            'Accept-Language': 'en-US,en;q=0.9'
-          },
-          redirect: 'follow'
-        });
-        
-        console.log(`📊 Status com Bearer: ${responseWithAuth.status} ${responseWithAuth.statusText}`);
-        
-        if (!responseWithAuth.ok) {
-          console.error(`❌ Falha também com Bearer token`);
-          return null;
+        // Tentar usar public_url se disponível
+        if (asset.public_url) {
+          console.log(`🌐 Tentando download via public_url: ${asset.public_url}`);
+          
+          const fileResponse = await fetch(asset.public_url, {
+            method: 'GET',
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            }
+          });
+          
+          if (fileResponse.ok) {
+            const arrayBuffer = await fileResponse.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+            const base64Data = buffer.toString('base64');
+            
+            console.log(`✅ Arquivo baixado via public_url: ${buffer.length} bytes`);
+            
+            return {
+              fileData: base64Data,
+              fileSize: buffer.length,
+              mimeType: fileResponse.headers.get('content-type') || getMimeType(asset.file_extension || '')
+            };
+          }
         }
         
-        const arrayBuffer = await responseWithAuth.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        const base64Data = buffer.toString('base64');
-        
-        console.log(`✅ Arquivo baixado com Bearer: ${buffer.length} bytes`);
-        
-        return {
-          fileData: base64Data,
-          fileSize: buffer.length,
-          mimeType: responseWithAuth.headers.get('content-type') || 'application/octet-stream'
-        };
+        console.log(`❌ public_url não disponível ou falhou. Asset info:`, asset);
+        return null;
       }
-
-      const arrayBuffer = await response.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      const base64Data = buffer.toString('base64');
       
-      console.log(`✅ Arquivo baixado com sucesso: ${buffer.length} bytes`);
-      
-      return {
-        fileData: base64Data,
-        fileSize: buffer.length,
-        mimeType: response.headers.get('content-type') || 'application/octet-stream'
-      };
+      console.error(`❌ Asset ${assetId} não encontrado na resposta GraphQL`);
+      return null;
     } catch (error) {
-      console.error("❌ Erro ao baixar e converter arquivo:", error);
+      console.error(`❌ Erro no download via GraphQL para asset ${assetId}:`, error);
       return null;
     }
   }
@@ -2628,32 +2621,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               // Tentar baixar o arquivo se tiver assetId
               if (file.assetId) {
-                console.log(`🌐 Buscando URL do asset ${file.assetId} no Monday.com`);
-                const assetUrl = await getMondayAssetUrl(file.assetId.toString(), mondayApiKey);
+                console.log(`📥 Baixando arquivo via GraphQL para asset ${file.assetId}...`);
+                const downloadResult = await downloadFileAsBase64(file.assetId.toString(), mondayApiKey);
                 
-                if (assetUrl) {
-                  console.log(`📥 Baixando arquivo de: ${assetUrl}`);
-                  const downloadResult = await downloadFileAsBase64(assetUrl, mondayApiKey);
+                if (downloadResult) {
+                  artifactData.fileData = downloadResult.fileData;
+                  artifactData.fileSize = downloadResult.fileSize.toString();
+                  artifactData.mimeType = downloadResult.mimeType;
                   
-                  if (downloadResult) {
-                    artifactData.fileData = downloadResult.fileData;
-                    artifactData.fileSize = downloadResult.fileSize.toString();
-                    artifactData.mimeType = downloadResult.mimeType;
-                    
-                    // Extrair tipo do arquivo do mimeType
-                    if (downloadResult.mimeType.includes('/')) {
-                      artifactData.type = downloadResult.mimeType.split('/')[1];
-                    }
-                    
-                    downloadedFiles++;
-                    console.log(`✅ Arquivo baixado com sucesso: ${downloadResult.fileSize} bytes`);
-                  } else {
-                    errors.push(`Erro ao baixar arquivo: ${file.name}`);
-                    console.log(`❌ Falha ao baixar arquivo: ${file.name}`);
+                  // Extrair tipo do arquivo do mimeType
+                  if (downloadResult.mimeType.includes('/')) {
+                    artifactData.type = downloadResult.mimeType.split('/')[1];
                   }
+                  
+                  downloadedFiles++;
+                  console.log(`✅ Arquivo baixado com sucesso: ${downloadResult.fileSize} bytes`);
                 } else {
-                  errors.push(`Erro ao obter URL do arquivo: ${file.name}`);
-                  console.log(`❌ Falha ao obter URL: ${file.name}`);
+                  errors.push(`Erro ao baixar arquivo: ${file.name}`);
+                  console.log(`❌ Falha ao baixar arquivo: ${file.name}`);
                 }
               }
               
