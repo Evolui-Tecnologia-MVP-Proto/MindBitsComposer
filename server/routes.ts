@@ -2439,6 +2439,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Função auxiliar para buscar URL do asset no Monday.com
   async function getMondayAssetUrl(assetId: string, apiKey: string): Promise<string | null> {
     try {
+      console.log(`🔍 Fazendo consulta GraphQL para asset ${assetId}...`);
+      
       const query = `
         query {
           assets(ids: [${assetId}]) {
@@ -2459,15 +2461,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       const result = await response.json();
+      console.log(`📄 Resposta GraphQL para asset ${assetId}:`, JSON.stringify(result, null, 2));
       
       if (result.data?.assets?.[0]?.url) {
+        console.log(`✅ URL encontrada para asset ${assetId}: ${result.data.assets[0].url}`);
         return result.data.assets[0].url;
       }
       
-      console.error("Erro ao buscar asset no Monday:", result.errors || "Asset não encontrado");
+      console.error(`❌ Erro ao buscar asset ${assetId} no Monday:`, result.errors || "Asset não encontrado");
       return null;
     } catch (error) {
-      console.error("Erro na requisição para Monday.com:", error);
+      console.error(`❌ Erro na requisição GraphQL para asset ${assetId}:`, error);
       return null;
     }
   }
