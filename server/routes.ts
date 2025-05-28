@@ -2476,73 +2476,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   }
 
-  // Função auxiliar para baixar arquivo usando a API GraphQL do Monday.com
-  async function downloadFileAsBase64(assetId: string, apiKey: string): Promise<{ fileData: string; fileSize: number; mimeType: string } | null> {
+  // Função auxiliar para baixar arquivo e converter para base64
+  async function downloadFileAsBase64(url: string, apiKey: string): Promise<{ fileData: string; fileSize: number; mimeType: string } | null> {
     try {
-      console.log(`📥 Baixando arquivo via GraphQL para asset ${assetId}...`);
+      console.log(`📥 Tentando baixar arquivo de: ${url}`);
       
-      const query = `
-        query {
-          assets(ids: [${assetId}]) {
-            id
-            name
-            url
-            file_extension
-            file_size
-            public_url
-          }
-        }
-      `;
-
-      const response = await fetch('https://api.monday.com/v2', {
-        method: 'POST',
+      const response = await fetch(url, {
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': apiKey
+          'Authorization': apiKey,
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': '*/*',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Cache-Control': 'no-cache'
         },
-        body: JSON.stringify({ query })
+        redirect: 'follow'
       });
 
-      const result = await response.json();
-      console.log(`📄 Resposta GraphQL para download:`, JSON.stringify(result, null, 2));
+      console.log(`📊 Status da resposta: ${response.status} ${response.statusText}`);
       
-      if (result.data?.assets?.[0]) {
-        const asset = result.data.assets[0];
-        
-        // Tentar usar public_url se disponível
-        if (asset.public_url) {
-          console.log(`🌐 Tentando download via public_url: ${asset.public_url}`);
-          
-          const fileResponse = await fetch(asset.public_url, {
-            method: 'GET',
-            headers: {
-              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            }
-          });
-          
-          if (fileResponse.ok) {
-            const arrayBuffer = await fileResponse.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
-            const base64Data = buffer.toString('base64');
-            
-            console.log(`✅ Arquivo baixado via public_url: ${buffer.length} bytes`);
-            
-            return {
-              fileData: base64Data,
-              fileSize: buffer.length,
-              mimeType: fileResponse.headers.get('content-type') || getMimeType(asset.file_extension || '')
-            };
-          }
-        }
-        
-        console.log(`❌ public_url não disponível ou falhou. Asset info:`, asset);
+      if (!response.ok) {
+        console.error(`❌ Erro ao baixar arquivo: ${response.status} ${response.statusText}`);
+        console.error(`📄 Headers da resposta:`, Object.fromEntries(response.headers.entries()));
         return null;
       }
+
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const base64Data = buffer.toString('base64');
       
-      console.error(`❌ Asset ${assetId} não encontrado na resposta GraphQL`);
-      return null;
+      console.log(`✅ Arquivo baixado com sucesso: ${buffer.length} bytes`);
+      
+      return {
+        fileData: base64Data,
+        fileSize: buffer.length,
+        mimeType: response.headers.get('content-type') || 'application/octet-stream'
+      };
     } catch (error) {
-      console.error(`❌ Erro no download via GraphQL para asset ${assetId}:`, error);
+      console.error("❌ Erro ao baixar e converter arquivo:", error);
       return null;
     }
   }
@@ -2621,24 +2592,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               // Tentar baixar o arquivo se tiver assetId
               if (file.assetId) {
-                console.log(`📥 Baixando arquivo via GraphQL para asset ${file.assetId}...`);
-                const downloadResult = await downloadFileAsBase64(file.assetId.toString(), mondayApiKey);
+                console.log(`🌐 Buscando URL do asset ${file.assetId} no Monday.com`);
+                const assetUrl = await getMondayAssetUrl(file.assetId.toString(), mondayApiKey);
                 
-                if (downloadResult) {
-                  artifactData.fileData = downloadResult.fileData;
-                  artifactData.fileSize = downloadResult.fileSize.toString();
-                  artifactData.mimeType = downloadResult.mimeType;
+                if (assetUrl) {
+                  console.log(`📥 Baixando arquivo de: ${assetUrl}`);
+                  const downloadResult = await downloadFileAsBase64(assetUrl, mondayApiKey);
                   
-                  // Extrair tipo do arquivo do mimeType
-                  if (downloadResult.mimeType.includes('/')) {
-                    artifactData.type = downloadResult.mimeType.split('/')[1];
+                  if (downloadResult) {
+                    artifactData.fileData = downloadResult.fileData;
+                    artifactData.fileSize = downloadResult.fileSize.toString();
+                    artifactData.mimeType = downloadResult.mimeType;
+                    
+                    // Extrair tipo do arquivo do mimeType
+                    if (downloadResult.mimeType.includes('/')) {
+                      artifactData.type = downloadResult.mimeType.split('/')[1];
+                    }
+                    
+                    downloadedFiles++;
+                    console.log(`✅ Arquivo baixado com sucesso: ${downloadResult.fileSize} bytes`);
+                  } else {
+                    errors.push(`Erro ao baixar arquivo: ${file.name}`);
+                    console.log(`❌ Falha ao baixar arquivo: ${file.name}`);
                   }
-                  
-                  downloadedFiles++;
-                  console.log(`✅ Arquivo baixado com sucesso: ${downloadResult.fileSize} bytes`);
                 } else {
-                  errors.push(`Erro ao baixar arquivo: ${file.name}`);
-                  console.log(`❌ Falha ao baixar arquivo: ${file.name}`);
+                  errors.push(`Erro ao obter URL do arquivo: ${file.name}`);
+                  console.log(`❌ Falha ao obter URL: ${file.name}`);
                 }
               }
               
