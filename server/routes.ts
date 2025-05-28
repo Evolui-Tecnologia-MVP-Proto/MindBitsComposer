@@ -284,7 +284,12 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
     
     if (index < 3) {
       console.log(`📋 monday_item_values final:`, mondayItemValues);
+      console.log(`🔍 RAW API VALUE SAMPLE:`, mondayItemValues.length > 0 ? mondayItemValues[0].value : 'NENHUM VALOR');
     }
+    
+    // Log EXATO do que está sendo passado para o banco
+    console.log(`🎯 DADOS MONDAY_ITEM_VALUES PARA BANCO - Item ${item.id}:`, JSON.stringify(mondayItemValues, null, 2));
+    
     documentData.mondayItemValues = mondayItemValues;
 
     // Valores padrão PRIMEIRO (mas salvar o general_columns para não sobrescrever)
