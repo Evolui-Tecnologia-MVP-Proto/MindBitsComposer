@@ -1447,9 +1447,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                         <TableHead>Nome do Arquivo</TableHead>
                                         <TableHead>ID do Asset</TableHead>
                                         <TableHead>Tipo</TableHead>
-                                        <TableHead>Extensão</TableHead>
-                                        <TableHead>Criado em</TableHead>
-                                        <TableHead>Criado por</TableHead>
                                       </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -1472,15 +1469,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                             <Badge variant={file.isImage === "true" || file.isImage === true ? "default" : "secondary"}>
                                               {file.isImage === "true" || file.isImage === true ? 'Imagem' : 'Arquivo'}
                                             </Badge>
-                                          </TableCell>
-                                          <TableCell className="font-mono text-xs uppercase">
-                                            {file.extension || 'N/A'}
-                                          </TableCell>
-                                          <TableCell className="text-sm text-gray-500">
-                                            {file.createdAt ? new Date(file.createdAt).toLocaleString('pt-BR') : 'N/A'}
-                                          </TableCell>
-                                          <TableCell className="text-sm">
-                                            {file.createdBy || 'N/A'}
                                           </TableCell>
                                         </TableRow>
                                       ))}
