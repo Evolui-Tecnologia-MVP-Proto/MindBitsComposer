@@ -2635,9 +2635,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               try {
                 console.log(`💾 Tentando criar artifact para: ${file.name}`);
-                await storage.createDocumentArtifact(artifactData);
-                createdArtifacts++;
-                console.log(`✅ Artifact criado com sucesso para: ${file.name}`);
+                
+                // Verificar se já existe um artifact com o mesmo origin_asset_id
+                const existingArtifacts = await storage.getDocumentArtifacts(documentoId);
+                const isDuplicate = existingArtifacts.some(existing => 
+                  existing.originAssetId === file.assetId?.toString()
+                );
+                
+                if (isDuplicate) {
+                  console.log(`⚠️ Artifact já existe para: ${file.name} (Asset ID: ${file.assetId})`);
+                } else {
+                  await storage.createDocumentArtifact(artifactData);
+                  createdArtifacts++;
+                  console.log(`✅ Artifact criado com sucesso para: ${file.name}`);
+                }
               } catch (artifactError) {
                 console.error(`❌ Erro ao criar artifact para ${file.name}:`, artifactError);
                 errors.push(`Erro ao criar artifact: ${file.name} - ${artifactError.message}`);
