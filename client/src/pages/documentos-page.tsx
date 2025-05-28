@@ -809,9 +809,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           }
         }
         
-        const result = await response.json();
-        console.log("✅ FRONTEND: Resultado da integração:", result);
-        return result;
+        const responseText = await response.text();
+        console.log("📄 FRONTEND: Texto da resposta:", responseText);
+        
+        try {
+          const result = JSON.parse(responseText);
+          console.log("✅ FRONTEND: Resultado da integração:", result);
+          return result;
+        } catch (parseError) {
+          console.error("❌ FRONTEND: Erro ao fazer parse do JSON:", parseError);
+          console.error("❌ FRONTEND: Resposta recebida:", responseText);
+          throw new Error("Resposta do servidor não é JSON válido");
+        }
       } catch (error) {
         console.error("🔥 FRONTEND: Erro na mutation:", error);
         throw error;
