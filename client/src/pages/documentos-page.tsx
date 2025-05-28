@@ -64,6 +64,8 @@ import {
   ChevronUp,
   ChevronDown,
   Database,
+  Image,
+  FileText,
 } from "lucide-react";
 import { type Documento, type InsertDocumento, type DocumentArtifact, type InsertDocumentArtifact } from "@shared/schema";
 
@@ -1746,7 +1748,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   
                   {(() => {
                     try {
-                      const mondayData = selectedDocument?.mondayItemValues ? JSON.parse(selectedDocument.mondayItemValues) : null;
+                      const mondayData = selectedDocument?.mondayItemValues ? JSON.parse(selectedDocument.mondayItemValues as string) : null;
                       
                       if (!mondayData || !Array.isArray(mondayData) || mondayData.length === 0) {
                         return (
@@ -1757,60 +1759,84 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         );
                       }
 
+                      // Processar todos os arquivos de todas as colunas
+                      const allFiles: any[] = [];
+                      mondayData.forEach((item: any, itemIndex: number) => {
+                        try {
+                          const value = item.value ? JSON.parse(item.value) : {};
+                          if (value.files && Array.isArray(value.files)) {
+                            value.files.forEach((file: any, fileIndex: number) => {
+                              allFiles.push({
+                                ...file,
+                                columnId: item.columnid,
+                                itemIndex,
+                                fileIndex
+                              });
+                            });
+                          }
+                        } catch (err) {
+                          console.error('Erro ao processar item:', item, err);
+                        }
+                      });
+
                       return (
                         <div className="space-y-4">
-                          <Table>
-                            <TableHeader>
-                              <TableRow>
-                                <TableHead>ID da Coluna</TableHead>
-                                <TableHead>Nome do Arquivo</TableHead>
-                                <TableHead>ID do Asset</TableHead>
-                                <TableHead>Tipo</TableHead>
-                                <TableHead>Extensão</TableHead>
-                                <TableHead>Criado em</TableHead>
-                                <TableHead>Criado por</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {mondayData.map((item: any, index: number) => {
-                                const value = item.value ? JSON.parse(item.value) : {};
-                                return (
+                          {allFiles.length > 0 ? (
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Coluna</TableHead>
+                                  <TableHead>Nome do Arquivo</TableHead>
+                                  <TableHead>ID do Asset</TableHead>
+                                  <TableHead>Tipo</TableHead>
+                                  <TableHead>Extensão</TableHead>
+                                  <TableHead>Criado em</TableHead>
+                                  <TableHead>Criado por</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {allFiles.map((file: any, index: number) => (
                                   <TableRow key={index}>
                                     <TableCell className="font-mono text-xs">
-                                      {item.columnid || 'N/A'}
+                                      {file.columnId || 'N/A'}
                                     </TableCell>
                                     <TableCell className="font-medium">
-                                      {value.name || 'N/A'}
+                                      {file.name || 'N/A'}
                                     </TableCell>
                                     <TableCell className="font-mono text-xs">
-                                      {value.assetId || 'N/A'}
+                                      {file.assetId || 'N/A'}
                                     </TableCell>
                                     <TableCell>
                                       <div className="flex items-center gap-2">
-                                        {value.isImage ? (
+                                        {file.isImage === "true" || file.isImage === true ? (
                                           <Image className="h-4 w-4 text-green-500" />
                                         ) : (
                                           <FileText className="h-4 w-4 text-gray-500" />
                                         )}
                                         <span className="text-xs">
-                                          {value.isImage ? 'Imagem' : value.fileType || 'Arquivo'}
+                                          {file.isImage === "true" || file.isImage === true ? 'Imagem' : 'Arquivo'}
                                         </span>
                                       </div>
                                     </TableCell>
                                     <TableCell className="font-mono text-xs uppercase">
-                                      {value.extension || 'N/A'}
+                                      {file.extension || 'N/A'}
                                     </TableCell>
                                     <TableCell className="text-sm text-gray-500">
-                                      {value.createdAt ? new Date(value.createdAt).toLocaleString('pt-BR') : 'N/A'}
+                                      {file.createdAt ? new Date(file.createdAt).toLocaleString('pt-BR') : 'N/A'}
                                     </TableCell>
                                     <TableCell className="text-sm">
-                                      {value.createdBy ? JSON.stringify(value.createdBy) : 'N/A'}
+                                      {file.createdBy || 'N/A'}
                                     </TableCell>
                                   </TableRow>
-                                );
-                              })}
-                            </TableBody>
-                          </Table>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          ) : (
+                            <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed">
+                              <Database className="h-6 w-6 text-gray-400 mx-auto mb-2" />
+                              <p className="text-sm text-gray-500">Nenhum arquivo encontrado nos dados do Monday.com</p>
+                            </div>
+                          )}
                           
                           <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                             <h5 className="text-sm font-medium text-blue-800 mb-2">Dados Brutos (JSON)</h5>
@@ -1821,11 +1847,20 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         </div>
                       );
                     } catch (error) {
+                      console.error('Erro ao processar monday_item_values:', error);
                       return (
                         <div className="text-center py-6 bg-red-50 rounded-lg border border-red-200">
                           <AlertCircle className="h-6 w-6 text-red-500 mx-auto mb-2" />
                           <p className="text-sm text-red-600">Erro ao processar dados do Monday.com</p>
-                          <p className="text-xs text-red-500 mt-1">Verifique o formato dos dados armazenados</p>
+                          <p className="text-xs text-red-500 mt-1">Formato de dados inválido: {error instanceof Error ? error.message : 'Erro desconhecido'}</p>
+                          {selectedDocument?.mondayItemValues && (
+                            <details className="mt-3 text-left">
+                              <summary className="text-xs text-red-500 cursor-pointer">Ver dados brutos</summary>
+                              <pre className="text-xs bg-white p-2 rounded border mt-2 overflow-x-auto text-gray-700">
+                                {selectedDocument.mondayItemValues}
+                              </pre>
+                            </details>
+                          )}
                         </div>
                       );
                     }
