@@ -1759,79 +1759,92 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         );
                       }
 
-                      // Processar todos os arquivos de todas as colunas
-                      const allFiles: any[] = [];
-                      mondayData.forEach((item: any, itemIndex: number) => {
-                        try {
-                          const value = item.value ? JSON.parse(item.value) : {};
-                          if (value.files && Array.isArray(value.files)) {
-                            value.files.forEach((file: any, fileIndex: number) => {
-                              allFiles.push({
-                                ...file,
-                                columnId: item.columnid,
-                                itemIndex,
-                                fileIndex
-                              });
-                            });
-                          }
-                        } catch (err) {
-                          console.error('Erro ao processar item:', item, err);
-                        }
-                      });
-
                       return (
-                        <div className="space-y-4">
-                          {allFiles.length > 0 ? (
-                            <Table>
-                              <TableHeader>
-                                <TableRow>
-                                  <TableHead>Coluna</TableHead>
-                                  <TableHead>Nome do Arquivo</TableHead>
-                                  <TableHead>ID do Asset</TableHead>
-                                  <TableHead>Tipo</TableHead>
-                                  <TableHead>Extensão</TableHead>
-                                  <TableHead>Criado em</TableHead>
-                                  <TableHead>Criado por</TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {allFiles.map((file: any, index: number) => (
-                                  <TableRow key={index}>
-                                    <TableCell className="font-mono text-xs">
-                                      {file.columnId || 'N/A'}
-                                    </TableCell>
-                                    <TableCell className="font-medium">
-                                      {file.name || 'N/A'}
-                                    </TableCell>
-                                    <TableCell className="font-mono text-xs">
-                                      {file.assetId || 'N/A'}
-                                    </TableCell>
-                                    <TableCell>
-                                      <div className="flex items-center gap-2">
-                                        {file.isImage === "true" || file.isImage === true ? (
-                                          <Image className="h-4 w-4 text-green-500" />
-                                        ) : (
-                                          <FileText className="h-4 w-4 text-gray-500" />
-                                        )}
-                                        <span className="text-xs">
-                                          {file.isImage === "true" || file.isImage === true ? 'Imagem' : 'Arquivo'}
-                                        </span>
-                                      </div>
-                                    </TableCell>
-                                    <TableCell className="font-mono text-xs uppercase">
-                                      {file.extension || 'N/A'}
-                                    </TableCell>
-                                    <TableCell className="text-sm text-gray-500">
-                                      {file.createdAt ? new Date(file.createdAt).toLocaleString('pt-BR') : 'N/A'}
-                                    </TableCell>
-                                    <TableCell className="text-sm">
-                                      {file.createdBy || 'N/A'}
-                                    </TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          ) : (
+                        <div className="space-y-6">
+                          {mondayData.map((column: any, columnIndex: number) => {
+                            try {
+                              const value = column.value ? JSON.parse(column.value) : {};
+                              const files = value.files || [];
+                              
+                              if (!Array.isArray(files) || files.length === 0) {
+                                return null; // Pular colunas sem arquivos
+                              }
+
+                              return (
+                                <div key={columnIndex} className="bg-white border rounded-lg p-4">
+                                  <h5 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800">
+                                    <Paperclip className="h-5 w-5 text-blue-500" />
+                                    Anexos da coluna {column.columnid}
+                                  </h5>
+                                  
+                                  <Table>
+                                    <TableHeader>
+                                      <TableRow>
+                                        <TableHead>Nome do Arquivo</TableHead>
+                                        <TableHead>ID do Asset</TableHead>
+                                        <TableHead>Tipo</TableHead>
+                                        <TableHead>Extensão</TableHead>
+                                        <TableHead>Criado em</TableHead>
+                                        <TableHead>Criado por</TableHead>
+                                      </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                      {files.map((file: any, fileIndex: number) => (
+                                        <TableRow key={fileIndex}>
+                                          <TableCell className="font-medium">
+                                            <div className="flex items-center gap-2">
+                                              {file.isImage === "true" || file.isImage === true ? (
+                                                <Image className="h-4 w-4 text-green-500" />
+                                              ) : (
+                                                <FileText className="h-4 w-4 text-gray-500" />
+                                              )}
+                                              {file.name || 'N/A'}
+                                            </div>
+                                          </TableCell>
+                                          <TableCell className="font-mono text-xs">
+                                            {file.assetId || 'N/A'}
+                                          </TableCell>
+                                          <TableCell>
+                                            <Badge variant={file.isImage === "true" || file.isImage === true ? "default" : "secondary"}>
+                                              {file.isImage === "true" || file.isImage === true ? 'Imagem' : 'Arquivo'}
+                                            </Badge>
+                                          </TableCell>
+                                          <TableCell className="font-mono text-xs uppercase">
+                                            {file.extension || 'N/A'}
+                                          </TableCell>
+                                          <TableCell className="text-sm text-gray-500">
+                                            {file.createdAt ? new Date(file.createdAt).toLocaleString('pt-BR') : 'N/A'}
+                                          </TableCell>
+                                          <TableCell className="text-sm">
+                                            {file.createdBy || 'N/A'}
+                                          </TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                </div>
+                              );
+                            } catch (err) {
+                              console.error('Erro ao processar coluna:', column, err);
+                              return (
+                                <div key={columnIndex} className="bg-red-50 border border-red-200 rounded-lg p-4">
+                                  <p className="text-sm text-red-600">
+                                    Erro ao processar coluna {column.columnid}: {err instanceof Error ? err.message : 'Erro desconhecido'}
+                                  </p>
+                                </div>
+                              );
+                            }
+                          })}
+                          
+                          {mondayData.every((column: any) => {
+                            try {
+                              const value = column.value ? JSON.parse(column.value) : {};
+                              const files = value.files || [];
+                              return !Array.isArray(files) || files.length === 0;
+                            } catch {
+                              return true;
+                            }
+                          }) && (
                             <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed">
                               <Database className="h-6 w-6 text-gray-400 mx-auto mb-2" />
                               <p className="text-sm text-gray-500">Nenhum arquivo encontrado nos dados do Monday.com</p>
