@@ -1648,20 +1648,25 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                                           const blob = await response.blob();
                                                           const url = URL.createObjectURL(blob);
                                                           
-                                                          // Abrir em nova aba
-                                                          window.open(url, '_blank');
+                                                          // Criar elemento de download
+                                                          const link = document.createElement('a');
+                                                          link.href = url;
+                                                          link.download = correspondingArtifact.fileName || file.name || 'arquivo';
+                                                          document.body.appendChild(link);
+                                                          link.click();
+                                                          document.body.removeChild(link);
                                                           
-                                                          // Limpar URL após um tempo
-                                                          setTimeout(() => URL.revokeObjectURL(url), 1000);
+                                                          // Limpar URL
+                                                          URL.revokeObjectURL(url);
                                                         } catch (error) {
-                                                          console.error('Erro ao abrir arquivo:', error);
-                                                          alert('Erro ao abrir arquivo');
+                                                          console.error('Erro ao baixar arquivo:', error);
+                                                          alert('Erro ao baixar arquivo');
                                                         }
                                                       } else {
                                                         alert('Arquivo não encontrado nos artifacts integrados');
                                                       }
                                                     }}
-                                                    title="Visualizar arquivo integrado"
+                                                    title="Baixar arquivo integrado"
                                                   >
                                                     <Eye className="h-3 w-3 text-blue-500" />
                                                   </Button>
