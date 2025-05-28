@@ -312,7 +312,19 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
           console.log(`🧹 Filtro de preserveGeneralColumns: ${Object.keys(rawPreserve).length} → ${Object.keys(preserveGeneralColumns).length} colunas`);
         }
         
-        Object.assign(documentData, defaults);
+        // Filtrar defaults antes de aplicar ao documentData
+        const cleanedDefaults = { ...defaults };
+        if (cleanedDefaults.generalColumns) {
+          const filteredGeneralColumns = {};
+          Object.keys(cleanedDefaults.generalColumns).forEach(key => {
+            if (!key.startsWith('coluna_') || key === 'monday_item_id' || key === 'monday_item_name') {
+              filteredGeneralColumns[key] = cleanedDefaults.generalColumns[key];
+            }
+          });
+          cleanedDefaults.generalColumns = filteredGeneralColumns;
+        }
+        
+        Object.assign(documentData, cleanedDefaults);
       } catch (e) {
         console.warn("Erro ao parsear valores padrão:", e);
       }
