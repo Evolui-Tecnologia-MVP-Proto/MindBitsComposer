@@ -2517,6 +2517,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      console.log(`✅ FINALIZADA integração: ${createdArtifacts} anexos criados, ${errors.length} erros`);
+      
       const response = {
         success: true,
         message: `Integração concluída. ${createdArtifacts} anexos integrados.`,
@@ -2524,6 +2526,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         errors: errors.length > 0 ? errors : undefined
       };
       
+      console.log("📤 RESPOSTA sendo enviada:", JSON.stringify(response, null, 2));
       res.status(200).json(response);
     } catch (error: any) {
       console.error("Erro ao integrar anexos:", error);
