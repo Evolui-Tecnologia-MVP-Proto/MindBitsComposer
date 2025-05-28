@@ -2633,8 +2633,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
               }
               
-              await storage.createDocumentArtifact(artifactData);
-              createdArtifacts++;
+              try {
+                console.log(`💾 Tentando criar artifact para: ${file.name}`);
+                await storage.createDocumentArtifact(artifactData);
+                createdArtifacts++;
+                console.log(`✅ Artifact criado com sucesso para: ${file.name}`);
+              } catch (artifactError) {
+                console.error(`❌ Erro ao criar artifact para ${file.name}:`, artifactError);
+                errors.push(`Erro ao criar artifact: ${file.name} - ${artifactError.message}`);
+              }
             }
           }
         } catch (parseError) {
