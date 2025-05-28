@@ -104,6 +104,19 @@ export default function DocumentosPage() {
     mimeType: "",
     type: "",
   });
+
+  // Estado para modal de visualização de arquivo
+  const [filePreviewModal, setFilePreviewModal] = useState<{
+    isOpen: boolean;
+    fileName: string;
+    mimeType: string;
+    fileUrl: string;
+  }>({
+    isOpen: false,
+    fileName: "",
+    mimeType: "",
+    fileUrl: ""
+  });
   // Função para resetar o formulário
   const resetFormData = () => {
     console.log("🧹 LIMPANDO CAMPOS DO FORMULÁRIO");
@@ -1648,25 +1661,22 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                                           const blob = await response.blob();
                                                           const url = URL.createObjectURL(blob);
                                                           
-                                                          // Criar elemento de download
-                                                          const link = document.createElement('a');
-                                                          link.href = url;
-                                                          link.download = correspondingArtifact.fileName || file.name || 'arquivo';
-                                                          document.body.appendChild(link);
-                                                          link.click();
-                                                          document.body.removeChild(link);
-                                                          
-                                                          // Limpar URL
-                                                          URL.revokeObjectURL(url);
+                                                          // Abrir modal de visualização
+                                                          setFilePreviewModal({
+                                                            isOpen: true,
+                                                            fileName: correspondingArtifact.fileName || file.name || 'arquivo',
+                                                            mimeType: correspondingArtifact.mimeType || 'application/octet-stream',
+                                                            fileUrl: url
+                                                          });
                                                         } catch (error) {
-                                                          console.error('Erro ao baixar arquivo:', error);
-                                                          alert('Erro ao baixar arquivo');
+                                                          console.error('Erro ao carregar arquivo:', error);
+                                                          alert('Erro ao carregar arquivo');
                                                         }
                                                       } else {
                                                         alert('Arquivo não encontrado nos artifacts integrados');
                                                       }
                                                     }}
-                                                    title="Baixar arquivo integrado"
+                                                    title="Visualizar arquivo integrado"
                                                   >
                                                     <Eye className="h-3 w-3 text-blue-500" />
                                                   </Button>
@@ -3096,6 +3106,131 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           </div>
         </div>
       )}
+
+      {/* Modal de Visualização de Arquivo */}
+      <Dialog open={filePreviewModal.isOpen} onOpenChange={(open) => {
+        if (!open) {
+          // Limpar URL do blob quando fechar a modal
+          if (filePreviewModal.fileUrl) {
+            URL.revokeObjectURL(filePreviewModal.fileUrl);
+          }
+          setFilePreviewModal({
+            isOpen: false,
+            fileName: "",
+            mimeType: "",
+            fileUrl: ""
+          });
+        }
+      }}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="h-5 w-5" />
+              {filePreviewModal.fileName}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="mt-4">
+            {filePreviewModal.mimeType.startsWith('image/') ? (
+              // Visualização de imagem
+              <div className="flex justify-center">
+                <img 
+                  src={filePreviewModal.fileUrl} 
+                  alt={filePreviewModal.fileName}
+                  className="max-w-full max-h-[70vh] object-contain"
+                />
+              </div>
+            ) : filePreviewModal.mimeType === 'application/pdf' ? (
+              // Visualização de PDF
+              <div className="w-full h-[70vh]">
+                <iframe
+                  src={filePreviewModal.fileUrl}
+                  width="100%"
+                  height="100%"
+                  title={filePreviewModal.fileName}
+                  className="border rounded"
+                />
+              </div>
+            ) : filePreviewModal.mimeType.startsWith('text/') ? (
+              // Visualização de texto
+              <div className="w-full h-[70vh] border rounded p-4 bg-gray-50 overflow-auto">
+                <iframe
+                  src={filePreviewModal.fileUrl}
+                  width="100%"
+                  height="100%"
+                  title={filePreviewModal.fileName}
+                  className="border-0"
+                />
+              </div>
+            ) : (
+              // Arquivo não suportado para visualização
+              <div className="text-center py-8">
+                <FileText className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-600 mb-4">
+                  Tipo de arquivo não suportado para visualização direta
+                </p>
+                <p className="text-sm text-gray-500 mb-4">
+                  Tipo: {filePreviewModal.mimeType}
+                </p>
+                <Button
+                  onClick={() => {
+                    // Fazer download do arquivo
+                    const link = document.createElement('a');
+                    link.href = filePreviewModal.fileUrl;
+                    link.download = filePreviewModal.fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                  }}
+                  className="mt-2"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Baixar Arquivo
+                </Button>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-between items-center mt-4 pt-4 border-t">
+            <div className="text-sm text-gray-500">
+              Tipo: {filePreviewModal.mimeType}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  // Fazer download do arquivo
+                  const link = document.createElement('a');
+                  link.href = filePreviewModal.fileUrl;
+                  link.download = filePreviewModal.fileName;
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Baixar
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  if (filePreviewModal.fileUrl) {
+                    URL.revokeObjectURL(filePreviewModal.fileUrl);
+                  }
+                  setFilePreviewModal({
+                    isOpen: false,
+                    fileName: "",
+                    mimeType: "",
+                    fileUrl: ""
+                  });
+                }}
+              >
+                Fechar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
     </div>
   );
