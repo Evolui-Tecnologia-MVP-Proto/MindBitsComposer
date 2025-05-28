@@ -2519,9 +2519,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Tentar ler o conteúdo do erro para mais detalhes
         try {
           const errorText = await response.text();
-          console.error(`📄 Conteúdo do erro:`, errorText.substring(0, 500));
+          console.error(`📄 Conteúdo completo do erro S3:`, errorText);
         } catch (e) {
-          console.error(`❌ Não foi possível ler o conteúdo do erro`);
+          console.error(`❌ Não foi possível ler o conteúdo do erro:`, e);
         }
         
         return null;
