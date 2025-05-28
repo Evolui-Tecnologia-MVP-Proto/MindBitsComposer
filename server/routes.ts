@@ -2643,6 +2643,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
+      console.log(`🏁 FIM DO PROCESSAMENTO - Total de anexos criados: ${createdArtifacts}, Total de arquivos baixados: ${downloadedFiles}`);
+      
       // Marcar documento como sincronizado se pelo menos um anexo foi criado
       console.log(`🔍 Verificando se deve marcar documento como sincronizado. Anexos criados: ${createdArtifacts}`);
       if (createdArtifacts > 0) {
