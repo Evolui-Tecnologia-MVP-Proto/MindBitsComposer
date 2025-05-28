@@ -2432,9 +2432,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Integrar anexos do Monday.com
   app.post("/api/documentos/:documentoId/integrate-attachments", async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    console.log("🔥 ROTA ACESSADA - integrate-attachments - ANTES AUTH");
+    console.log("🔍 isAuthenticated:", req.isAuthenticated ? req.isAuthenticated() : "função não disponível");
+    console.log("🔍 user:", req.user ? "usuário logado" : "usuário não encontrado");
     
-    console.log("🔥 ROTA ACESSADA - integrate-attachments");
+    if (!req.isAuthenticated()) {
+      console.log("❌ USUÁRIO NÃO AUTORIZADO");
+      return res.status(401).json({ error: "Não autorizado" });
+    }
+    
+    console.log("✅ USUÁRIO AUTORIZADO - CONTINUANDO");
     
     try {
       const { documentoId } = req.params;
