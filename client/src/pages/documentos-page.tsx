@@ -1465,8 +1465,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                                 </span>
                                               </div>
                                             </TableCell>
-                                            <TableCell className="font-mono text-xs w-32 px-2 truncate" title={file.assetId || 'N/A'}>
-                                              {file.assetId ? file.assetId.substring(0, 8) + '...' : 'N/A'}
+                                            <TableCell className="font-mono text-xs w-32 px-2 truncate" title={file.assetId ? String(file.assetId) : 'N/A'}>
+                                              {file.assetId ? String(file.assetId).substring(0, 8) + '...' : 'N/A'}
                                             </TableCell>
                                             <TableCell className="w-16 px-2">
                                               <div className="flex justify-center">
