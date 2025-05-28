@@ -2609,32 +2609,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               // Tentar baixar o arquivo se tiver assetId
               if (file.assetId) {
-                console.log(`🌐 Buscando URL do asset ${file.assetId} no Monday.com`);
-                const assetUrl = await getMondayAssetUrl(file.assetId.toString(), mondayApiKey);
+                console.log(`🌐 Obtendo e baixando asset ${file.assetId} imediatamente`);
                 
-                if (assetUrl) {
-                  console.log(`📥 Baixando arquivo de: ${assetUrl}`);
-                  const downloadResult = await downloadFileAsBase64(assetUrl, mondayApiKey);
-                  
-                  if (downloadResult) {
-                    artifactData.fileData = downloadResult.fileData;
-                    artifactData.fileSize = downloadResult.fileSize.toString();
-                    artifactData.mimeType = downloadResult.mimeType;
-                    
-                    // Extrair tipo do arquivo do mimeType
-                    if (downloadResult.mimeType.includes('/')) {
-                      artifactData.type = downloadResult.mimeType.split('/')[1];
+                try {
+                  // Fazer GraphQL query e download em sequência rápida para evitar expiração
+                  const query = `
+                    query {
+                      assets(ids: [${file.assetId}]) {
+                        id
+                        name
+                        url
+                        public_url
+                      }
                     }
+                  `;
+
+                  const response = await fetch('https://api.monday.com/v2', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': mondayApiKey
+                    },
+                    body: JSON.stringify({ query })
+                  });
+
+                  const result = await response.json();
+                  
+                  if (result.data?.assets?.[0]) {
+                    const asset = result.data.assets[0];
+                    const downloadUrl = asset.public_url || asset.url;
                     
-                    downloadedFiles++;
-                    console.log(`✅ Arquivo baixado com sucesso: ${downloadResult.fileSize} bytes`);
+                    if (downloadUrl) {
+                      console.log(`📥 Baixando imediatamente de: ${downloadUrl}`);
+                      
+                      // Download imediato
+                      const downloadResult = await downloadFileAsBase64(downloadUrl, mondayApiKey);
+                      
+                      if (downloadResult) {
+                        artifactData.fileData = downloadResult.fileData;
+                        artifactData.fileSize = downloadResult.fileSize.toString();
+                        artifactData.mimeType = downloadResult.mimeType;
+                        
+                        // Extrair tipo do arquivo do mimeType
+                        if (downloadResult.mimeType.includes('/')) {
+                          artifactData.type = downloadResult.mimeType.split('/')[1];
+                        }
+                        
+                        downloadedFiles++;
+                        console.log(`✅ Arquivo baixado: ${downloadResult.fileSize} bytes`);
+                      } else {
+                        errors.push(`Erro ao baixar arquivo: ${file.name}`);
+                        console.log(`❌ Falha no download: ${file.name}`);
+                      }
+                    }
                   } else {
-                    errors.push(`Erro ao baixar arquivo: ${file.name}`);
-                    console.log(`❌ Falha ao baixar arquivo: ${file.name}`);
+                    errors.push(`Asset não encontrado: ${file.name}`);
                   }
-                } else {
-                  errors.push(`Erro ao obter URL do arquivo: ${file.name}`);
-                  console.log(`❌ Falha ao obter URL: ${file.name}`);
+                } catch (error) {
+                  errors.push(`Erro ao processar arquivo: ${file.name}`);
+                  console.error(`❌ Erro ao processar ${file.name}:`, error);
                 }
               }
               
