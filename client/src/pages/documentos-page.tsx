@@ -1444,30 +1444,32 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   <Table>
                                     <TableHeader>
                                       <TableRow>
-                                        <TableHead>Nome do Arquivo</TableHead>
-                                        <TableHead>ID do Asset</TableHead>
-                                        <TableHead>Tipo</TableHead>
+                                        <TableHead className="w-1/2">Nome do Arquivo</TableHead>
+                                        <TableHead className="w-1/3">ID do Asset</TableHead>
+                                        <TableHead className="w-1/6">Tipo</TableHead>
                                       </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                       {files.map((file: any, fileIndex: number) => (
                                         <TableRow key={fileIndex}>
-                                          <TableCell className="font-medium">
-                                            <div className="flex items-center gap-2">
+                                          <TableCell className="font-medium w-1/2">
+                                            <div className="flex items-center gap-2 truncate">
                                               {file.isImage === "true" || file.isImage === true ? (
-                                                <Image className="h-4 w-4 text-green-500" />
+                                                <Image className="h-4 w-4 text-green-500 flex-shrink-0" />
                                               ) : (
-                                                <FileText className="h-4 w-4 text-gray-500" />
+                                                <FileText className="h-4 w-4 text-gray-500 flex-shrink-0" />
                                               )}
-                                              {file.name || 'N/A'}
+                                              <span className="truncate" title={file.name || 'N/A'}>
+                                                {file.name || 'N/A'}
+                                              </span>
                                             </div>
                                           </TableCell>
-                                          <TableCell className="font-mono text-xs">
+                                          <TableCell className="font-mono text-xs w-1/3 truncate" title={file.assetId || 'N/A'}>
                                             {file.assetId || 'N/A'}
                                           </TableCell>
-                                          <TableCell>
-                                            <Badge variant={file.isImage === "true" || file.isImage === true ? "default" : "secondary"}>
-                                              {file.isImage === "true" || file.isImage === true ? 'Imagem' : 'Arquivo'}
+                                          <TableCell className="w-1/6">
+                                            <Badge variant={file.isImage === "true" || file.isImage === true ? "default" : "secondary"} className="text-xs">
+                                              {file.isImage === "true" || file.isImage === true ? 'Img' : 'Arq'}
                                             </Badge>
                                           </TableCell>
                                         </TableRow>
