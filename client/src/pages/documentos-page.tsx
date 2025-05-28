@@ -795,7 +795,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       console.log("🚀 FRONTEND: Iniciando integração para documento:", documentoId);
       try {
         // Fazer requisição usando fetch diretamente para debug
-        const response = await fetch(`/api/test-route`, {
+        const response = await fetch(`/api/documentos/${documentoId}/integrate-attachments`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

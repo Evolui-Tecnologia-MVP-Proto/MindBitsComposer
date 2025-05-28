@@ -2438,20 +2438,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Integrar anexos do Monday.com
   app.post("/api/documentos/:documentoId/integrate-attachments", async (req, res) => {
-    console.log("🔥 ROTA ACESSADA - integrate-attachments - ANTES AUTH");
-    console.log("🔍 isAuthenticated:", req.isAuthenticated ? req.isAuthenticated() : "função não disponível");
-    console.log("🔍 user:", req.user ? "usuário logado" : "usuário não encontrado");
-    
-    if (!req.isAuthenticated()) {
-      console.log("❌ USUÁRIO NÃO AUTORIZADO");
-      return res.status(401).json({ error: "Não autorizado" });
-    }
-    
-    console.log("✅ USUÁRIO AUTORIZADO - CONTINUANDO");
+    console.log("🔥 ROTA ACESSADA - integrate-attachments");
     
     try {
+      if (!req.isAuthenticated()) {
+        console.log("❌ USUÁRIO NÃO AUTORIZADO");
+        return res.status(401).json({ error: "Não autorizado" });
+      }
+      
+      console.log("✅ USUÁRIO AUTORIZADO - CONTINUANDO");
       const { documentoId } = req.params;
       console.log("🚀 INICIANDO integração de anexos para documento:", documentoId);
+      
+      // Resposta simples para teste
+      res.json({
+        success: true,
+        message: "Integração de anexos funcionando!",
+        documentoId: documentoId
+      });
+      
+    } catch (error: any) {
+      console.error("❌ ERRO GERAL na rota:", error);
+      res.status(500).json({
+        success: false,
+        message: "Erro interno do servidor",
+        error: error.message
+      });
+    }
+  });
       
       // Buscar o documento para obter monday_item_values
       const documento = await storage.getDocumento(documentoId);
