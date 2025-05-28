@@ -2447,6 +2447,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             id
             name
             url
+            public_url
           }
         }
       `;
@@ -2463,9 +2464,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const result = await response.json();
       console.log(`📄 Resposta GraphQL para asset ${assetId}:`, JSON.stringify(result, null, 2));
       
-      if (result.data?.assets?.[0]?.url) {
-        console.log(`✅ URL encontrada para asset ${assetId}: ${result.data.assets[0].url}`);
-        return result.data.assets[0].url;
+      if (result.data?.assets?.[0]) {
+        const asset = result.data.assets[0];
+        const downloadUrl = asset.public_url || asset.url;
+        console.log(`✅ URL encontrada para asset ${assetId}: ${downloadUrl}`);
+        console.log(`📋 Tipo de URL: ${asset.public_url ? 'public_url' : 'url'}`);
+        return downloadUrl;
       }
       
       console.error(`❌ Erro ao buscar asset ${assetId} no Monday:`, result.errors || "Asset não encontrado");
