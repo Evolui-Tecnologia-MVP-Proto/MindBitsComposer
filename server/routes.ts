@@ -2489,7 +2489,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   async function downloadFileAsBase64(url: string, apiKey: string): Promise<{ fileData: string; fileSize: number; mimeType: string } | null> {
     try {
       console.log(`📥 Tentando baixar arquivo de: ${url}`);
-      console.log(`🔑 Usando Authorization: ${apiKey ? 'Presente' : 'Ausente'}`);
       
       // URLs do S3 (public_url) não precisam de Authorization
       const isS3Url = url.includes('s3.amazonaws.com') || url.includes('files-monday-com');
@@ -2503,27 +2502,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`🔗 Tipo de URL: ${isS3Url ? 'S3 (sem auth)' : 'Protected (com auth)'}`);
       
-      const response = await fetch(url, {
-        method: 'GET',
-        headers,
-        redirect: 'follow'
-      });
+      // Usar fetch simples sem configurações extras que podem causar problemas
+      const response = await fetch(url);
 
       console.log(`📊 Status da resposta: ${response.status} ${response.statusText}`);
       
       if (!response.ok) {
         console.error(`❌ Erro ao baixar arquivo: ${response.status} ${response.statusText}`);
-        console.error(`📄 Headers da resposta:`, Object.fromEntries(response.headers.entries()));
-        
-        // Clonar a resposta e ler o erro
         const errorText = await response.text();
-        console.error(`📄 ERRO S3 COMPLETO:`, errorText);
-        
+        console.error(`📄 ERRO DETALHADO:`, errorText);
         return null;
       }
 
-      const arrayBuffer = await response.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
+      // Converter diretamente para buffer sem arrayBuffer
+      const buffer = Buffer.from(await response.arrayBuffer());
       const base64Data = buffer.toString('base64');
       
       console.log(`✅ Arquivo baixado com sucesso: ${buffer.length} bytes`);
