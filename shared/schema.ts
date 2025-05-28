@@ -226,11 +226,11 @@ export const documentsArtifacts = pgTable("documents_artifacts", {
   id: uuid("id").defaultRandom().primaryKey(),
   documentoId: uuid("documento_id").notNull().references(() => documentos.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
-  fileData: text("file_data").notNull(), // Armazena fisicamente o arquivo como Base64
-  fileName: text("file_name").notNull(), // Nome original do arquivo
+  fileData: text("file_data").default(""), // Armazena fisicamente o arquivo como Base64
+  fileName: text("file_name").default(""), // Nome original do arquivo
   fileSize: text("file_size"), // Tamanho do arquivo em bytes
-  mimeType: text("mime_type").notNull(), // Tipo MIME do arquivo
-  type: text("type").notNull(), // doc, pdf, txt, json, imagem, etc.
+  mimeType: text("mime_type").default("application/octet-stream"), // Tipo MIME do arquivo
+  type: text("type").default("unknown"), // doc, pdf, txt, json, imagem, etc.
   originAssetId: text("origin_asset_id"), // ID do asset de origem (ex: Monday.com)
   isImage: text("is_image"), // Se é imagem ("true"/"false")
   mondayColumn: text("monday_column"), // Coluna Monday.com de origem do anexo
