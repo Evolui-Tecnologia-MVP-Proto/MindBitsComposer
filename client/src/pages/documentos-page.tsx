@@ -3122,6 +3122,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       )}
 
       {/* Modal de Visualização de Arquivo */}
+      {console.log('🖼️ Estado da modal:', filePreviewModal)}
       <Dialog open={filePreviewModal.isOpen} onOpenChange={(open) => {
         if (!open) {
           // Limpar URL do blob quando fechar a modal
