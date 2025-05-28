@@ -1228,28 +1228,55 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {(() => {
-                        // Verificar se monday_item_values tem conteúdo
-                        const hasMonValues = documento.mondayItemValues && 
-                                            Array.isArray(documento.mondayItemValues) && 
-                                            documento.mondayItemValues.length > 0;
+                      <div className="flex items-center gap-2">
+                        {(() => {
+                          // Verificar se monday_item_values tem conteúdo
+                          const hasMonValues = documento.mondayItemValues && 
+                                              Array.isArray(documento.mondayItemValues) && 
+                                              documento.mondayItemValues.length > 0;
+                          
+                          if (!hasMonValues) {
+                            // Badge cinza com "none" para monday_item_values vazio
+                            return (
+                              <Badge variant="outline" className="bg-gray-100 text-gray-500 border-gray-300">
+                                none
+                              </Badge>
+                            );
+                          } else {
+                            // Badge amarelo com "files" quando tem conteúdo
+                            return (
+                              <Badge variant="outline" className="bg-yellow-100 text-yellow-700 border-yellow-300">
+                                files
+                              </Badge>
+                            );
+                          }
+                        })()}
                         
-                        if (!hasMonValues) {
-                          // Badge cinza com "none" para monday_item_values vazio
-                          return (
-                            <Badge variant="outline" className="bg-gray-100 text-gray-500 border-gray-300">
-                              none
-                            </Badge>
-                          );
-                        } else {
-                          // Badge amarelo com "files" quando tem conteúdo
-                          return (
-                            <Badge variant="outline" className="bg-yellow-100 text-yellow-700 border-yellow-300">
-                              files
-                            </Badge>
-                          );
-                        }
-                      })()}
+                        {/* Badge sync verde quando há artifacts sincronizados */}
+                        {(() => {
+                          const documentQuery = useQuery<DocumentArtifact[]>({
+                            queryKey: ["/api/documentos", documento.id, "artifacts"],
+                            queryFn: async () => {
+                              const response = await fetch(`/api/documentos/${documento.id}/artifacts`);
+                              if (!response.ok) return [];
+                              return response.json();
+                            },
+                            staleTime: 30000, // Cache por 30 segundos
+                          });
+                          
+                          const hasArtifacts = documentQuery.data && documentQuery.data.length > 0;
+                          
+                          if (hasArtifacts) {
+                            return (
+                              <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
+                                sync
+                              </Badge>
+                            );
+                          }
+                          
+                          return null;
+                        })()}
+                      </div>
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end space-x-2">
