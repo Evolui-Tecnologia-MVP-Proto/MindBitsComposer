@@ -1252,21 +1252,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           }
                         })()}
                         
-                        {/* Badge sync verde quando há artifacts sincronizados */}
+                        {/* Badge sync verde quando há artifacts */}
                         {(() => {
-                          const documentQuery = useQuery<DocumentArtifact[]>({
-                            queryKey: ["/api/documentos", documento.id, "artifacts"],
-                            queryFn: async () => {
-                              const response = await fetch(`/api/documentos/${documento.id}/artifacts`);
-                              if (!response.ok) return [];
-                              return response.json();
-                            },
-                            staleTime: 30000, // Cache por 30 segundos
-                          });
+                          // Verificar se este documento tem artifacts (usando o cache das requisições já feitas)
+                          const queryClient = useQueryClient();
+                          const cachedArtifacts = queryClient.getQueryData(["/api/documentos", documento.id, "artifacts"]) as DocumentArtifact[] | undefined;
                           
-                          const hasArtifacts = documentQuery.data && documentQuery.data.length > 0;
-                          
-                          if (hasArtifacts) {
+                          if (cachedArtifacts && cachedArtifacts.length > 0) {
                             return (
                               <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
                                 sync
