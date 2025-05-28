@@ -420,6 +420,7 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       }
     });
     
+    console.log(`🎯 GENERAL_COLUMNS SENDO DEFINIDO - Item ${item.id}:`, Object.keys(cleanedGeneralColumns));
     documentData.generalColumns = cleanedGeneralColumns;
     
     // Log para debug (apenas primeiros 3 itens)
