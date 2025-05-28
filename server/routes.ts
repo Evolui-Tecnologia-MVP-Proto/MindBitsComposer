@@ -2507,6 +2507,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       if (!req.isAuthenticated()) {
+        console.log("❌ Usuário não autenticado");
         return res.status(401).json({ error: "Não autorizado" });
       }
       
@@ -2514,13 +2515,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("📄 Processando documento:", documentoId);
       
       // Buscar a chave de API do Monday.com
-      const mondayConnections = await storage.getServiceConnectionsByService("monday");
-      if (!mondayConnections || mondayConnections.length === 0) {
+      console.log("🔍 Buscando conexões do Monday.com...");
+      const mondayConnections = await storage.getServiceConnections();
+      const mondayConnection = mondayConnections.find(conn => conn.serviceName === "monday");
+      console.log("🔌 Conexão Monday encontrada:", mondayConnection ? "SIM" : "NÃO");
+      
+      if (!mondayConnection) {
+        console.log("❌ Nenhuma conexão com Monday.com encontrada");
         return res.status(400).json({ error: "Conexão com Monday.com não configurada" });
       }
       
-      const mondayApiKey = mondayConnections[0].token;
+      const mondayApiKey = mondayConnection.token;
+      console.log("🗝️ API Key encontrada:", mondayApiKey ? "SIM" : "NÃO");
+      
       if (!mondayApiKey) {
+        console.log("❌ Token de API não encontrado");
         return res.status(400).json({ error: "Token de API do Monday.com não encontrado" });
       }
       
