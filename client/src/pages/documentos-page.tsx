@@ -1253,8 +1253,27 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   };
 
+  // Função para verificar se monday_item_values tem conteúdo JSON válido
+  const hasMondayItemValues = (documento: Documento): boolean => {
+    if (!documento.mondayItemValues) return false;
+    
+    try {
+      const parsed = Array.isArray(documento.mondayItemValues) 
+        ? documento.mondayItemValues 
+        : JSON.parse(JSON.stringify(documento.mondayItemValues));
+      
+      return Array.isArray(parsed) && parsed.length > 0 && 
+             parsed.some(item => item.value && item.value.trim() !== '');
+    } catch {
+      return false;
+    }
+  };
+
   const renderViewModal = () => {
     if (!selectedDocument) return null;
+    
+    const showAnexosTab = hasMondayItemValues(selectedDocument);
+    const gridCols = showAnexosTab ? "grid-cols-3" : "grid-cols-2";
     
     return (
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
@@ -1270,12 +1289,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           </DialogHeader>
           
           <Tabs defaultValue="dados-gerais" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className={`grid w-full ${gridCols}`}>
               <TabsTrigger value="dados-gerais">Dados Gerais</TabsTrigger>
               <TabsTrigger value="general-fields">General Fields</TabsTrigger>
-              <TabsTrigger value="anexos">
-                Anexos ({artifacts.length})
-              </TabsTrigger>
+              {showAnexosTab && (
+                <TabsTrigger value="anexos">
+                  Anexos ({artifacts.length})
+                </TabsTrigger>
+              )}
             </TabsList>
             
             <TabsContent value="dados-gerais" className="mt-6">
@@ -1715,7 +1736,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
               </div>
-            </TabsContent>
+              </TabsContent>
+            )}
           </Tabs>
           
           <DialogFooter className="mt-6">
