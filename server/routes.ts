@@ -250,6 +250,13 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
         }
         
         if (columnValue?.value) {
+          // Log CRÍTICO: Capturar exatamente o que vem da API
+          if (index < 3) {
+            console.log(`🚨 VALOR RAW DA API MONDAY - Item ${item.id}, Coluna ${columnId}:`);
+            console.log(`🚨 VALOR COMPLETO:`, columnValue.value);
+            console.log(`🚨 PRIMEIROS 300 CHARS:`, columnValue.value.substring(0, 300));
+          }
+          
           mondayItemValues.push({
             columnid: columnId,
             value: columnValue.value // Manter como string serializada, não fazer parse
