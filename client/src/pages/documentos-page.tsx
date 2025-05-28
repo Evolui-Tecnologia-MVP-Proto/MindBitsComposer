@@ -1748,7 +1748,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   
                   {(() => {
                     try {
-                      const mondayData = selectedDocument?.mondayItemValues ? JSON.parse(selectedDocument.mondayItemValues as string) : null;
+                      let mondayData = null;
+                      if (selectedDocument?.mondayItemValues) {
+                        // Verificar se já é um objeto ou se é uma string JSON
+                        if (typeof selectedDocument.mondayItemValues === 'string') {
+                          mondayData = JSON.parse(selectedDocument.mondayItemValues);
+                        } else {
+                          mondayData = selectedDocument.mondayItemValues;
+                        }
+                      }
                       
                       if (!mondayData || !Array.isArray(mondayData) || mondayData.length === 0) {
                         return (
