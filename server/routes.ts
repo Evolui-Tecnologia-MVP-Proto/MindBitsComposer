@@ -2438,30 +2438,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Integrar anexos do Monday.com
   app.post("/api/documentos/:documentoId/integrate-attachments", async (req, res) => {
-    console.log("🔥 ROTA ACESSADA - integrate-attachments");
+    console.log("🔥 ROTA INTEGRATE-ATTACHMENTS CHAMADA");
     
     try {
       if (!req.isAuthenticated()) {
-        console.log("❌ USUÁRIO NÃO AUTORIZADO");
         return res.status(401).json({ error: "Não autorizado" });
       }
       
-      console.log("✅ USUÁRIO AUTORIZADO - CONTINUANDO");
       const { documentoId } = req.params;
-      console.log("🚀 INICIANDO integração de anexos para documento:", documentoId);
+      console.log("📄 Processando documento:", documentoId);
       
-      // Resposta simples para teste
+      // Buscar o documento
+      const documento = await storage.getDocumento(documentoId);
+      if (!documento) {
+        return res.status(404).json({ error: "Documento não encontrado" });
+      }
+      
+      if (!documento.mondayItemValues || documento.mondayItemValues.length === 0) {
+        return res.status(400).json({ 
+          message: "Nenhum anexo do Monday.com encontrado para integrar",
+          attachmentsCount: 0
+        });
+      }
+      
+      let createdArtifacts = 0;
+      
+      // Processar cada entrada em monday_item_values
+      for (const itemValue of documento.mondayItemValues) {
+        try {
+          const value = itemValue.value ? JSON.parse(itemValue.value) : {};
+          const files = value.files || [];
+          
+          if (Array.isArray(files) && files.length > 0) {
+            for (const file of files) {
+              const artifactData = {
+                documentoId: documentoId,
+                name: file.name || 'Anexo sem nome',
+                fileData: '',
+                fileName: file.name || 'arquivo',
+                fileSize: null,
+                mimeType: file.fileType || 'application/octet-stream',
+                type: file.fileType ? file.fileType.split('/')[1] : 'unknown',
+                originAssetId: file.assetId?.toString(),
+                isImage: file.isImage?.toString() || 'false',
+                mondayColumn: itemValue.columnid
+              };
+              
+              await storage.createDocumentArtifact(artifactData);
+              createdArtifacts++;
+            }
+          }
+        } catch (parseError) {
+          console.error("Erro ao processar item:", parseError);
+        }
+      }
+      
       res.json({
         success: true,
-        message: "Integração de anexos funcionando!",
-        documentoId: documentoId
+        message: `Integração concluída. ${createdArtifacts} anexos integrados.`,
+        attachmentsCreated: createdArtifacts
       });
       
     } catch (error: any) {
-      console.error("❌ ERRO GERAL na rota:", error);
+      console.error("Erro na integração:", error);
       res.status(500).json({
         success: false,
-        message: "Erro interno do servidor",
+        message: "Erro ao integrar anexos",
         error: error.message
       });
     }
