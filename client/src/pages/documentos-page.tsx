@@ -1336,7 +1336,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               <TabsTrigger value="general-fields">General Fields</TabsTrigger>
               {showAnexosTab && (
                 <TabsTrigger value="anexos">
-                  Anexos ({artifacts.length})
+                  Anexos
                 </TabsTrigger>
               )}
             </TabsList>
