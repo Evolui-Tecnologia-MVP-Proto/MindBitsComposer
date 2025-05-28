@@ -2453,59 +2453,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let createdArtifacts = 0;
       const errors = [];
       
-      // Processar cada entrada em monday_item_values usando a mesma lógica do atendimento
+      // Processar cada entrada em monday_item_values usando EXATAMENTE a mesma lógica da tabela frontend
       for (const itemValue of documento.mondayItemValues) {
         try {
           console.log("Processando itemValue:", JSON.stringify(itemValue, null, 2));
           
-          // Usar a mesma lógica que funciona no atendimento
-          if (itemValue.value) {
-            try {
-              const fileData = JSON.parse(itemValue.value);
-              console.log("📁 Estrutura do arquivo na coluna:", Object.keys(fileData));
-              
-              // Monday.com retorna arrays de arquivos para colunas do tipo file
-              if (fileData.files && Array.isArray(fileData.files)) {
-                console.log(`📁 Encontrados ${fileData.files.length} arquivo(s) na coluna ${itemValue.columnid}`);
+          // Usar exatamente a mesma lógica: column.value ? JSON.parse(column.value) : {}
+          const value = itemValue.value ? JSON.parse(itemValue.value) : {};
+          const files = value.files || [];
+          
+          console.log("📁 Estrutura processada:", { files: files.length });
+          
+          // Verificar se é um array de arquivos (mesma lógica do frontend)
+          if (Array.isArray(files) && files.length > 0) {
+            console.log(`📁 Encontrados ${files.length} arquivo(s) na coluna ${itemValue.columnid}`);
+            
+            for (const file of files) {
+              try {
+                console.log("📎 Processando arquivo:", {
+                  name: file.name,
+                  assetId: file.assetId,
+                  isImage: file.isImage,
+                  fileType: file.fileType
+                });
                 
-                for (const file of fileData.files) {
-                  try {
-                    console.log("📎 Processando arquivo:", {
-                      name: file.name,
-                      assetId: file.assetId,
-                      isImage: file.isImage,
-                      fileType: file.fileType
-                    });
-                    
-                    // Criar artifact a partir dos dados do Monday.com
-                    const artifactData = {
-                      documentoId: documentoId,
-                      name: file.name || 'Anexo sem nome',
-                      fileData: '', // Dados do arquivo não estão disponíveis no Monday.com
-                      fileName: file.name || 'arquivo',
-                      fileSize: null,
-                      mimeType: file.fileType || 'application/octet-stream',
-                      type: file.fileType ? file.fileType.split('/')[1] : 'unknown',
-                      originAssetId: file.assetId?.toString(),
-                      isImage: file.isImage?.toString() || 'false',
-                      mondayColumn: itemValue.columnid // Nova coluna adicionada
-                    };
-                    
-                    console.log("Criando artifact:", artifactData);
-                    await storage.createDocumentArtifact(artifactData);
-                    createdArtifacts++;
-                  } catch (fileError: any) {
-                    console.error("Erro ao processar arquivo individual:", fileError);
-                    errors.push(`Erro no arquivo ${file.name || 'sem nome'}: ${fileError.message}`);
-                  }
-                }
-              } else {
-                console.log("Valor não contém array de arquivos:", fileData);
+                // Criar artifact a partir dos dados do Monday.com
+                const artifactData = {
+                  documentoId: documentoId,
+                  name: file.name || 'Anexo sem nome',
+                  fileData: '', // Dados do arquivo não estão disponíveis no Monday.com
+                  fileName: file.name || 'arquivo',
+                  fileSize: null,
+                  mimeType: file.fileType || 'application/octet-stream',
+                  type: file.fileType ? file.fileType.split('/')[1] : 'unknown',
+                  originAssetId: file.assetId?.toString(),
+                  isImage: file.isImage?.toString() || 'false',
+                  mondayColumn: itemValue.columnid // Nova coluna adicionada
+                };
+                
+                console.log("Criando artifact:", artifactData);
+                await storage.createDocumentArtifact(artifactData);
+                createdArtifacts++;
+              } catch (fileError: any) {
+                console.error("Erro ao processar arquivo individual:", fileError);
+                errors.push(`Erro no arquivo ${file.name || 'sem nome'}: ${fileError.message}`);
               }
-            } catch (parseError: any) {
-              console.error("Erro ao fazer parse do JSON:", parseError);
-              errors.push(`Erro na coluna ${itemValue.columnid}: ${parseError.message}`);
             }
+          } else {
+            console.log("Coluna sem arquivos ou não é array:", itemValue.columnid);
           }
         } catch (itemError: any) {
           console.error("Erro ao processar item value:", itemError);
