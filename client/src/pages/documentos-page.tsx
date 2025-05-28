@@ -1736,7 +1736,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     <p className="text-sm text-gray-500">Nenhum anexo encontrado</p>
                   </div>
                 )}
-              </div>
+                </div>
               </TabsContent>
             )}
           </Tabs>
