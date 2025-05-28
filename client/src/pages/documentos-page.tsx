@@ -218,6 +218,46 @@ export default function DocumentosPage() {
     queryKey: ["/api/repo-structure"],
   });
 
+  // Buscar mapeamentos Monday para obter as colunas
+  const { data: mondayMappings = [] } = useQuery({
+    queryKey: ["/api/monday/mappings"],
+  });
+
+  // Buscar todas as colunas Monday de todos os mapeamentos
+  const { data: allMondayColumns = [] } = useQuery({
+    queryKey: ["/api/monday/columns/all"],
+    queryFn: async () => {
+      const columns = [];
+      for (const mapping of mondayMappings) {
+        try {
+          const response = await fetch(`/api/monday/mappings/${mapping.id}/columns`);
+          if (response.ok) {
+            const mappingColumns = await response.json();
+            columns.push(...mappingColumns);
+          }
+        } catch (error) {
+          console.warn(`Erro ao buscar colunas do mapeamento ${mapping.id}:`, error);
+        }
+      }
+      return columns;
+    },
+    enabled: mondayMappings.length > 0,
+  });
+
+  // Criar um mapa de columnId para title para lookup rápido
+  const columnTitleMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    allMondayColumns.forEach((column: any) => {
+      map[column.columnId] = column.title;
+    });
+    return map;
+  }, [allMondayColumns]);
+
+  // Função para obter o título descritivo da coluna
+  const getColumnTitle = (columnId: string): string => {
+    return columnTitleMap[columnId] || columnId;
+  };
+
   // Mutation para sincronizar estrutura do GitHub para o banco local
   const syncFromGitHubMutation = useMutation({
     mutationFn: async () => {
@@ -1438,7 +1478,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                 <div key={columnIndex} className="bg-white border rounded-lg p-4">
                                   <h5 className="text-sm font-medium mb-3 flex items-center gap-2 text-gray-700">
                                     <Paperclip className="h-4 w-4 text-blue-500" />
-                                    Anexos da coluna {column.columnid}
+                                    {getColumnTitle(column.columnid)}
                                   </h5>
                                   
                                   <div className="w-full overflow-x-auto">
