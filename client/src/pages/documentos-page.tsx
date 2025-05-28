@@ -789,6 +789,36 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     },
   });
 
+  // Mutation para integrar anexos do Monday.com
+  const integrateAttachmentsMutation = useMutation({
+    mutationFn: async (documentoId: string) => {
+      const response = await apiRequest("POST", `/api/documentos/${documentoId}/integrate-attachments`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Erro ao integrar anexos");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      // Invalidar cache dos artifacts
+      if (selectedDocument?.id) {
+        queryClient.invalidateQueries({ queryKey: ["/api/documentos", selectedDocument.id, "artifacts"] });
+      }
+      
+      toast({
+        title: "Anexos integrados!",
+        description: data.message || `${data.attachmentsCreated} anexos foram integrados com sucesso.`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao integrar anexos",
+        description: error.message || "Não foi possível integrar os anexos do Monday.com.",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Mutation para excluir artefato
   const deleteArtifactMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -1437,10 +1467,35 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             {showAnexosTab && (
               <TabsContent value="anexos" className="mt-6">
                 <div className="space-y-4">
-                  <h4 className="text-md font-medium mb-4 flex items-center gap-2">
-                    <Database className="h-4 w-4 text-blue-500" />
-                    Anexos (Assets) na Origem
-                  </h4>
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="text-md font-medium flex items-center gap-2">
+                      <Database className="h-4 w-4 text-blue-500" />
+                      Anexos (Assets) na Origem
+                    </h4>
+                    
+                    <Button
+                      onClick={() => {
+                        if (selectedDocument?.id) {
+                          integrateAttachmentsMutation.mutate(selectedDocument.id);
+                        }
+                      }}
+                      disabled={integrateAttachmentsMutation.isPending}
+                      className="bg-green-600 hover:bg-green-700"
+                      size="sm"
+                    >
+                      {integrateAttachmentsMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Integrando...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="mr-2 h-4 w-4" />
+                          Integrar Anexos
+                        </>
+                      )}
+                    </Button>
+                  </div>
                   
                   {(() => {
                     try {
