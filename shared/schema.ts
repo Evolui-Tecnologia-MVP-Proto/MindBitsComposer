@@ -231,6 +231,8 @@ export const documentsArtifacts = pgTable("documents_artifacts", {
   fileSize: text("file_size"), // Tamanho do arquivo em bytes
   mimeType: text("mime_type").notNull(), // Tipo MIME do arquivo
   type: text("type").notNull(), // doc, pdf, txt, json, imagem, etc.
+  originAssetId: text("origin_asset_id"), // ID do asset de origem (ex: Monday.com)
+  isImage: text("is_image"), // Se é imagem ("true"/"false")
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
