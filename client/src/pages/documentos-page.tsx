@@ -1644,13 +1644,20 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                                     size="sm"
                                                     className="h-6 w-6 p-0"
                                                     onClick={async () => {
+                                                      console.log('🔍 Clicou no botão de visualização');
+                                                      console.log('📁 File data:', file);
+                                                      console.log('🗂️ Artifacts disponíveis:', artifacts);
+                                                      
                                                       // Encontrar o artifact correspondente pelo originAssetId
                                                       const correspondingArtifact = artifacts?.find(
                                                         artifact => artifact.originAssetId === file.assetId?.toString()
                                                       );
                                                       
+                                                      console.log('🎯 Artifact encontrado:', correspondingArtifact);
+                                                      
                                                       if (correspondingArtifact) {
                                                         try {
+                                                          console.log('📥 Fazendo download do arquivo...');
                                                           // Fazer download do arquivo via fetch
                                                           const response = await fetch(`/api/artifacts/${correspondingArtifact.id}/file`);
                                                           
@@ -1661,6 +1668,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                                           const blob = await response.blob();
                                                           const url = URL.createObjectURL(blob);
                                                           
+                                                          console.log('🎬 Abrindo modal com:', {
+                                                            fileName: correspondingArtifact.fileName || file.name || 'arquivo',
+                                                            mimeType: correspondingArtifact.mimeType || 'application/octet-stream',
+                                                            fileUrl: url
+                                                          });
+                                                          
                                                           // Abrir modal de visualização
                                                           setFilePreviewModal({
                                                             isOpen: true,
@@ -1669,10 +1682,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                                             fileUrl: url
                                                           });
                                                         } catch (error) {
-                                                          console.error('Erro ao carregar arquivo:', error);
+                                                          console.error('❌ Erro ao carregar arquivo:', error);
                                                           alert('Erro ao carregar arquivo');
                                                         }
                                                       } else {
+                                                        console.log('❌ Artifact não encontrado');
                                                         alert('Arquivo não encontrado nos artifacts integrados');
                                                       }
                                                     }}
