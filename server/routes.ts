@@ -2663,22 +2663,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`🏁 FIM DO PROCESSAMENTO - Total de anexos criados: ${createdArtifacts}, Total de arquivos baixados: ${downloadedFiles}`);
       
-      // Verificar se o documento tem artifacts e marcar como sincronizado
-      try {
-        const existingArtifacts = await storage.getDocumentArtifacts(documentoId);
-        const hasArtifacts = existingArtifacts.length > 0;
-        
-        console.log(`🔍 Documento ${documentoId} tem ${existingArtifacts.length} artifacts totais`);
-        
-        if (hasArtifacts) {
-          console.log(`🔄 Marcando documento ${documentoId} como assets_synced = true`);
-          await storage.updateDocumento(documentoId, { assetsSynced: true });
-          console.log(`✅ Documento ${documentoId} marcado como sincronizado com sucesso`);
-        } else {
-          console.log(`ℹ️ Documento ${documentoId} não tem artifacts, mantendo assets_synced = false`);
+      // Marcar documento como sincronizado se pelo menos um anexo foi criado
+      console.log(`🔍 Verificando se deve marcar documento como sincronizado. Anexos criados: ${createdArtifacts}`);
+      if (createdArtifacts > 0) {
+        try {
+          console.log(`🔄 Tentando atualizar documento ${documentoId} com assets_synced = true`);
+          const updateResult = await storage.updateDocumento(documentoId, { assetsSynced: true });
+          console.log(`✅ Documento ${documentoId} marcado como assets_synced = true. Resultado:`, updateResult);
+        } catch (updateError) {
+          console.error(`❌ Erro ao atualizar assets_synced para documento ${documentoId}:`, updateError);
         }
-      } catch (syncError) {
-        console.error(`❌ Erro ao verificar/atualizar status de sincronização:`, syncError);
+      } else {
+        console.log(`ℹ️ Nenhum anexo foi criado, não marcando documento como sincronizado`);
       }
 
       res.json({
