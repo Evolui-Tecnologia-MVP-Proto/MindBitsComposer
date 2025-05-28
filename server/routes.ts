@@ -2439,7 +2439,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Função auxiliar para buscar URL do asset no Monday.com
   async function getMondayAssetUrl(assetId: string, apiKey: string): Promise<string | null> {
     try {
-      console.log(`🔍 Fazendo consulta GraphQL para asset ${assetId}...`);
+      console.log(`🔍 [DEPRECATED] Fazendo consulta GraphQL para asset ${assetId}...`);
       
       const query = `
         query {
@@ -2609,65 +2609,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
               
               // Tentar baixar o arquivo se tiver assetId
               if (file.assetId) {
-                console.log(`🌐 Obtendo e baixando asset ${file.assetId} imediatamente`);
+                console.log(`🌐 Obtendo asset ${file.assetId} para download`);
                 
-                try {
-                  // Fazer GraphQL query e download em sequência rápida para evitar expiração
-                  const query = `
-                    query {
-                      assets(ids: [${file.assetId}]) {
-                        id
-                        name
-                        url
-                        public_url
-                      }
-                    }
-                  `;
-
-                  const response = await fetch('https://api.monday.com/v2', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                      'Authorization': mondayApiKey
-                    },
-                    body: JSON.stringify({ query })
-                  });
-
-                  const result = await response.json();
+                // Fazer GraphQL query para obter URL
+                const assetUrl = await getMondayAssetUrl(file.assetId.toString(), mondayApiKey);
+                
+                if (assetUrl) {
+                  console.log(`📥 Baixando de: ${assetUrl}`);
+                  const downloadResult = await downloadFileAsBase64(assetUrl, mondayApiKey);
                   
-                  if (result.data?.assets?.[0]) {
-                    const asset = result.data.assets[0];
-                    const downloadUrl = asset.public_url || asset.url;
+                  if (downloadResult) {
+                    artifactData.fileData = downloadResult.fileData;
+                    artifactData.fileSize = downloadResult.fileSize.toString();
+                    artifactData.mimeType = downloadResult.mimeType;
                     
-                    if (downloadUrl) {
-                      console.log(`📥 Baixando imediatamente de: ${downloadUrl}`);
-                      
-                      // Download imediato
-                      const downloadResult = await downloadFileAsBase64(downloadUrl, mondayApiKey);
-                      
-                      if (downloadResult) {
-                        artifactData.fileData = downloadResult.fileData;
-                        artifactData.fileSize = downloadResult.fileSize.toString();
-                        artifactData.mimeType = downloadResult.mimeType;
-                        
-                        // Extrair tipo do arquivo do mimeType
-                        if (downloadResult.mimeType.includes('/')) {
-                          artifactData.type = downloadResult.mimeType.split('/')[1];
-                        }
-                        
-                        downloadedFiles++;
-                        console.log(`✅ Arquivo baixado: ${downloadResult.fileSize} bytes`);
-                      } else {
-                        errors.push(`Erro ao baixar arquivo: ${file.name}`);
-                        console.log(`❌ Falha no download: ${file.name}`);
-                      }
+                    if (downloadResult.mimeType.includes('/')) {
+                      artifactData.type = downloadResult.mimeType.split('/')[1];
                     }
+                    
+                    downloadedFiles++;
+                    console.log(`✅ Arquivo baixado: ${downloadResult.fileSize} bytes`);
                   } else {
-                    errors.push(`Asset não encontrado: ${file.name}`);
+                    errors.push(`Erro ao baixar arquivo: ${file.name}`);
                   }
-                } catch (error) {
-                  errors.push(`Erro ao processar arquivo: ${file.name}`);
-                  console.error(`❌ Erro ao processar ${file.name}:`, error);
+                } else {
+                  errors.push(`Erro ao obter URL: ${file.name}`);
                 }
               }
               
