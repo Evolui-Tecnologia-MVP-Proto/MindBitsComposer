@@ -295,24 +295,21 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
           ? JSON.parse(existingMapping.defaultValues)
           : existingMapping.defaultValues;
         
-        // Salvar general_columns se existir nos padrões
+        // Salvar general_columns se existir nos padrões, mas filtrar apenas dados válidos
         if (defaults.generalColumns) {
-          preserveGeneralColumns = defaults.generalColumns;
+          const rawPreserve = defaults.generalColumns;
           
-          // Log para debug - ver o que está vindo dos valores padrão
-          if (index < 3) {
-            await SystemLogger.log({
-              eventType: 'MONDAY_SYNC_MANUAL',
-              message: `DEBUG PRESERVE_GENERAL_COLUMNS: ${JSON.stringify(preserveGeneralColumns)}`,
-              parameters: { 
-                mappingId,
-                itemId: item.id,
-                preserveGeneralColumns,
-                keysCount: Object.keys(preserveGeneralColumns).length
-              },
-              userId: userId
-            });
-          }
+          // Filtrar apenas valores que não são colunas Monday.com não mapeadas
+          preserveGeneralColumns = {};
+          
+          // Manter apenas valores que não começam com "coluna_" (que são colunas Monday.com não mapeadas)
+          Object.keys(rawPreserve).forEach(key => {
+            if (!key.startsWith('coluna_') && !key.startsWith('monday_item_')) {
+              preserveGeneralColumns[key] = rawPreserve[key];
+            }
+          });
+          
+          console.log(`🧹 Filtro de preserveGeneralColumns: ${Object.keys(rawPreserve).length} → ${Object.keys(preserveGeneralColumns).length} colunas`);
         }
         
         Object.assign(documentData, defaults);
