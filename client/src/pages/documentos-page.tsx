@@ -195,11 +195,11 @@ export default function DocumentosPage() {
 
   // Estados dos filtros
   const [filtros, setFiltros] = useState({
-    responsavel: "",
-    modulo: "",
-    cliente: "",
-    statusOrigem: "",
-    arquivos: "", // "sem-arquivos", "a-sincronizar", "sincronizados"
+    responsavel: "__todos__",
+    modulo: "__todos__",
+    cliente: "__todos__",
+    statusOrigem: "__todos__",
+    arquivos: "__todos__", // "sem-arquivos", "a-sincronizar", "sincronizados"
     nome: ""
   });
 
@@ -1409,22 +1409,22 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   const filteredAndSortedDocumentos = useMemo(() => {
     let filtered = documentos.filter((doc) => {
       // Filtro por responsável
-      if (filtros.responsavel && !doc.responsavel?.toLowerCase().includes(filtros.responsavel.toLowerCase())) {
+      if (filtros.responsavel !== "__todos__" && filtros.responsavel && !doc.responsavel?.toLowerCase().includes(filtros.responsavel.toLowerCase())) {
         return false;
       }
       
       // Filtro por módulo
-      if (filtros.modulo && !doc.modulo?.toLowerCase().includes(filtros.modulo.toLowerCase())) {
+      if (filtros.modulo !== "__todos__" && filtros.modulo && !doc.modulo?.toLowerCase().includes(filtros.modulo.toLowerCase())) {
         return false;
       }
       
       // Filtro por cliente
-      if (filtros.cliente && !doc.cliente?.toLowerCase().includes(filtros.cliente.toLowerCase())) {
+      if (filtros.cliente !== "__todos__" && filtros.cliente && !doc.cliente?.toLowerCase().includes(filtros.cliente.toLowerCase())) {
         return false;
       }
       
       // Filtro por status origem
-      if (filtros.statusOrigem && doc.statusOrigem !== filtros.statusOrigem) {
+      if (filtros.statusOrigem !== "__todos__" && filtros.statusOrigem && doc.statusOrigem !== filtros.statusOrigem) {
         return false;
       }
       
@@ -1434,7 +1434,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       }
       
       // Filtro por arquivos
-      if (filtros.arquivos) {
+      if (filtros.arquivos !== "__todos__" && filtros.arquivos) {
         const artifactCount = artifactCounts[doc.id] || 0;
         const hasMondayData = hasMondayItemValues(doc);
         
@@ -2340,7 +2340,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       <SelectValue placeholder="Todos" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Todos</SelectItem>
+                      <SelectItem value="__todos__">Todos</SelectItem>
                       {responsaveisUnicos.map(responsavel => (
                         <SelectItem key={responsavel} value={responsavel}>{responsavel}</SelectItem>
                       ))}
@@ -2359,7 +2359,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       <SelectValue placeholder="Todos" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Todos</SelectItem>
+                      <SelectItem value="__todos__">Todos</SelectItem>
                       {modulosUnicos.map(modulo => (
                         <SelectItem key={modulo} value={modulo}>{modulo}</SelectItem>
                       ))}
@@ -2378,7 +2378,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       <SelectValue placeholder="Todos" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Todos</SelectItem>
+                      <SelectItem value="__todos__">Todos</SelectItem>
                       {clientesUnicos.map(cliente => (
                         <SelectItem key={cliente} value={cliente}>{cliente}</SelectItem>
                       ))}
@@ -2397,7 +2397,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       <SelectValue placeholder="Todos" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Todos</SelectItem>
+                      <SelectItem value="__todos__">Todos</SelectItem>
                       {statusOrigensUnicos.map(status => (
                         <SelectItem key={status} value={status}>{status}</SelectItem>
                       ))}
@@ -2416,7 +2416,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       <SelectValue placeholder="Todos" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Todos</SelectItem>
+                      <SelectItem value="__todos__">Todos</SelectItem>
                       <SelectItem value="sem-arquivos">Sem arquivos</SelectItem>
                       <SelectItem value="a-sincronizar">A sincronizar</SelectItem>
                       <SelectItem value="sincronizados">Sincronizados</SelectItem>
@@ -3366,11 +3366,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 variant="outline"
                 size="sm"
                 onClick={() => setFiltros({
-                  responsavel: "",
-                  modulo: "",
-                  cliente: "",
-                  statusOrigem: "",
-                  arquivos: "",
+                  responsavel: "__todos__",
+                  modulo: "__todos__",
+                  cliente: "__todos__",
+                  statusOrigem: "__todos__",
+                  arquivos: "__todos__",
                   nome: ""
                 })}
                 className="text-xs"
