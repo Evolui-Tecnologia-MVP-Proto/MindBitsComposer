@@ -2456,16 +2456,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Processar cada entrada em monday_item_values
       for (const itemValue of documento.mondayItemValues) {
         try {
+          console.log("Processando itemValue:", JSON.stringify(itemValue, null, 2));
+          
           // Parse do JSON se necessário
           let attachmentData = itemValue.value;
+          
+          // Se for string, tentar fazer parse
           if (typeof attachmentData === 'string') {
-            attachmentData = JSON.parse(attachmentData);
+            // Remover caracteres de escape extras se houver
+            const cleanedValue = attachmentData.replace(/\\"/g, '"').replace(/^"/, '').replace(/"$/, '');
+            try {
+              attachmentData = JSON.parse(cleanedValue);
+            } catch (parseError) {
+              console.error("Erro no primeiro parse, tentando valor original:", parseError);
+              attachmentData = JSON.parse(attachmentData);
+            }
           }
+          
+          console.log("Dados de anexo processados:", attachmentData);
           
           // Verificar se é um array de anexos
           if (Array.isArray(attachmentData)) {
             for (const attachment of attachmentData) {
               try {
+                console.log("Processando anexo individual:", attachment);
+                
                 // Criar artifact a partir dos dados do Monday.com
                 const artifactData = {
                   documentoId: documentoId,
@@ -2480,6 +2495,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   mondayColumn: itemValue.columnid // Nova coluna adicionada
                 };
                 
+                console.log("Criando artifact:", artifactData);
                 await storage.createDocumentArtifact(artifactData);
                 createdArtifacts++;
               } catch (attachmentError: any) {
@@ -2487,6 +2503,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 errors.push(`Erro no anexo ${attachment.name || 'sem nome'}: ${attachmentError.message}`);
               }
             }
+          } else {
+            console.log("Valor não é um array:", typeof attachmentData, attachmentData);
           }
         } catch (itemError: any) {
           console.error("Erro ao processar item value:", itemError);
