@@ -1392,11 +1392,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               </div>
             </TabsContent>
             
-            <TabsContent value="anexos" className="mt-6">
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-medium">Anexos do Documento</h3>
-                  {/* Botão para carregar anexos do Monday.com para documentos integrados */}
+            {showAnexosTab && (
+              <TabsContent value="anexos" className="mt-6">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-medium">Anexos do Documento</h3>
+                    {/* Botão para carregar anexos do Monday.com para documentos integrados */}
                   {(() => {
                     const hasIdOrigemTxt = selectedDocument?.idOrigemTxt && selectedDocument.idOrigemTxt.trim() !== '';
                     console.log("🔍 Verificando idOrigemTxt:", {
