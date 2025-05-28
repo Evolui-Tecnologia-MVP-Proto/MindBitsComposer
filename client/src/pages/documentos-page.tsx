@@ -794,7 +794,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     mutationFn: async (documentoId: string) => {
       console.log("🚀 FRONTEND: Iniciando integração para documento:", documentoId);
       try {
-        const response = await apiRequest("POST", `/api/documentos/${documentoId}/integrate-attachments`);
+        // Fazer requisição usando fetch diretamente para debug
+        const response = await fetch(`/api/documentos/${documentoId}/integrate-attachments`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
         console.log("📡 FRONTEND: Response status:", response.status);
         
         if (!response.ok) {
