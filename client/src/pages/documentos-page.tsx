@@ -1521,14 +1521,23 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           integrateAttachmentsMutation.mutate(selectedDocument.id);
                         }
                       }}
-                      disabled={integrateAttachmentsMutation.isPending}
-                      className="bg-green-600 hover:bg-green-700"
+                      disabled={integrateAttachmentsMutation.isPending || (artifacts && artifacts.length > 0)}
+                      className={
+                        (artifacts && artifacts.length > 0) 
+                          ? "bg-gray-400 cursor-not-allowed" 
+                          : "bg-green-600 hover:bg-green-700"
+                      }
                       size="sm"
                     >
                       {integrateAttachmentsMutation.isPending ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Integrando...
+                        </>
+                      ) : (artifacts && artifacts.length > 0) ? (
+                        <>
+                          <Check className="mr-2 h-4 w-4" />
+                          Já Integrado
                         </>
                       ) : (
                         <>
