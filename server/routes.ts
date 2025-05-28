@@ -2479,14 +2479,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Função auxiliar para baixar arquivo e converter para base64
   async function downloadFileAsBase64(url: string, apiKey: string): Promise<{ fileData: string; fileSize: number; mimeType: string } | null> {
     try {
+      console.log(`📥 Tentando baixar arquivo de: ${url}`);
+      
       const response = await fetch(url, {
+        method: 'GET',
         headers: {
-          'Authorization': apiKey
-        }
+          'Authorization': apiKey,
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          'Accept': '*/*',
+          'Accept-Language': 'en-US,en;q=0.9',
+          'Cache-Control': 'no-cache'
+        },
+        redirect: 'follow'
       });
 
+      console.log(`📊 Status da resposta: ${response.status} ${response.statusText}`);
+      
       if (!response.ok) {
-        console.error("Erro ao baixar arquivo:", response.status, response.statusText);
+        console.error(`❌ Erro ao baixar arquivo: ${response.status} ${response.statusText}`);
+        console.error(`📄 Headers da resposta:`, Object.fromEntries(response.headers.entries()));
         return null;
       }
 
@@ -2494,13 +2505,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const buffer = Buffer.from(arrayBuffer);
       const base64Data = buffer.toString('base64');
       
+      console.log(`✅ Arquivo baixado com sucesso: ${buffer.length} bytes`);
+      
       return {
         fileData: base64Data,
         fileSize: buffer.length,
         mimeType: response.headers.get('content-type') || 'application/octet-stream'
       };
     } catch (error) {
-      console.error("Erro ao baixar e converter arquivo:", error);
+      console.error("❌ Erro ao baixar e converter arquivo:", error);
       return null;
     }
   }
