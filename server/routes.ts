@@ -2466,10 +2466,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (result.data?.assets?.[0]) {
         const asset = result.data.assets[0];
-        const downloadUrl = asset.public_url || asset.url;
-        console.log(`✅ URL encontrada para asset ${assetId}: ${downloadUrl}`);
-        console.log(`📋 Tipo de URL: ${asset.public_url ? 'public_url' : 'url'}`);
-        return downloadUrl;
+        if (asset.public_url) {
+          console.log(`✅ URL pública encontrada para asset ${assetId}: ${asset.public_url}`);
+          return asset.public_url;
+        } else if (asset.url) {
+          console.log(`⚠️ Apenas URL protegida disponível para asset ${assetId}: ${asset.url}`);
+          return asset.url;
+        }
       }
       
       console.error(`❌ Erro ao buscar asset ${assetId} no Monday:`, result.errors || "Asset não encontrado");
