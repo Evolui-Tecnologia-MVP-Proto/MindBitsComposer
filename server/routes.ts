@@ -2515,6 +2515,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!response.ok) {
         console.error(`❌ Erro ao baixar arquivo: ${response.status} ${response.statusText}`);
         console.error(`📄 Headers da resposta:`, Object.fromEntries(response.headers.entries()));
+        
+        // Tentar ler o conteúdo do erro para mais detalhes
+        try {
+          const errorText = await response.text();
+          console.error(`📄 Conteúdo do erro:`, errorText.substring(0, 500));
+        } catch (e) {
+          console.error(`❌ Não foi possível ler o conteúdo do erro`);
+        }
+        
         return null;
       }
 
