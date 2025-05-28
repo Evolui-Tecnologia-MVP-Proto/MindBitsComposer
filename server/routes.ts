@@ -2467,13 +2467,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (result.data?.assets?.[0]) {
         const asset = result.data.assets[0];
         
-        // Usar apenas URL pública do S3
-        if (asset.public_url) {
-          console.log(`✅ URL pública encontrada para asset ${assetId}: ${asset.public_url}`);
-          return asset.public_url;
-        } else if (asset.url) {
-          console.log(`⚠️ Apenas URL protegida disponível para asset ${assetId}: ${asset.url}`);
+        // TESTE: Usar URL protegida do Monday.com
+        if (asset.url) {
+          console.log(`🔄 Usando URL protegida do Monday para asset ${assetId}: ${asset.url}`);
           return asset.url;
+        } else if (asset.public_url) {
+          console.log(`⚠️ Fallback para URL pública do S3: ${asset.public_url}`);
+          return asset.public_url;
         }
       }
       
@@ -2492,18 +2492,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // URLs do S3 (public_url) não precisam de Authorization
       const isS3Url = url.includes('s3.amazonaws.com') || url.includes('files-monday-com');
-      const headers: Record<string, string> = {
-        'User-Agent': 'curl/8.0.0'
-      };
+      const headers: Record<string, string> = {};
       
       if (!isS3Url) {
         headers['Authorization'] = apiKey;
+        console.log(`🔐 Adicionando header de autorização para URL protegida`);
       }
       
       console.log(`🔗 Tipo de URL: ${isS3Url ? 'S3 (sem auth)' : 'Protected (com auth)'}`);
       
-      // Usar fetch simples sem configurações extras que podem causar problemas
-      const response = await fetch(url);
+      // Usar fetch com headers quando necessário
+      const response = await fetch(url, {
+        headers: Object.keys(headers).length > 0 ? headers : undefined
+      });
 
       console.log(`📊 Status da resposta: ${response.status} ${response.statusText}`);
       
