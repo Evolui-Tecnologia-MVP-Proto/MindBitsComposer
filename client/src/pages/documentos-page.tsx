@@ -1194,7 +1194,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   <TableHead className="bg-gray-50 border-b">Origem</TableHead>
                   <TableHead className="bg-gray-50 border-b">Nome</TableHead>
                   <TableHead className="bg-gray-50 border-b">Status</TableHead>
-                  <TableHead className="bg-gray-50 border-b">Data Origem</TableHead>
                   <TableHead className="bg-gray-50 border-b">Data Integração</TableHead>
                   <TableHead className="bg-gray-50 border-b">Status Origem</TableHead>
                   <TableHead className="bg-gray-50 border-b">Anexos</TableHead>
@@ -1220,7 +1219,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         {documento.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm text-gray-500">{formatDate(documento.createdAt)}</TableCell>
                     <TableCell className="text-sm text-gray-500">{formatDate(documento.updatedAt)}</TableCell>
                     <TableCell>
                       <Badge variant={getStatusOrigemBadgeVariant(documento.statusOrigem) as any} className="flex items-center gap-1 whitespace-nowrap">
