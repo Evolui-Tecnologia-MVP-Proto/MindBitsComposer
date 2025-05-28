@@ -2430,6 +2430,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota de teste simples
+  app.post("/api/test-route", async (req, res) => {
+    console.log("🔥 ROTA DE TESTE ACESSADA");
+    res.json({ success: true, message: "Rota de teste funcionando" });
+  });
+
   // Integrar anexos do Monday.com
   app.post("/api/documentos/:documentoId/integrate-attachments", async (req, res) => {
     console.log("🔥 ROTA ACESSADA - integrate-attachments - ANTES AUTH");
