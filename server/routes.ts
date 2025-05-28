@@ -2434,6 +2434,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/documentos/:documentoId/integrate-attachments", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
+    console.log("🔥 ROTA ACESSADA - integrate-attachments");
+    
     try {
       const { documentoId } = req.params;
       console.log("🚀 INICIANDO integração de anexos para documento:", documentoId);
