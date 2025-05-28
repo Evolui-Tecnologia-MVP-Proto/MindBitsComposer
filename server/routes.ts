@@ -2467,13 +2467,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (result.data?.assets?.[0]) {
         const asset = result.data.assets[0];
         
-        // TESTE: usar URL protegida por enquanto para debugar
-        if (asset.url) {
-          console.log(`🔄 TESTE: Usando URL protegida para asset ${assetId}: ${asset.url}`);
-          return asset.url;
-        } else if (asset.public_url) {
+        // Usar apenas URL pública do S3
+        if (asset.public_url) {
           console.log(`✅ URL pública encontrada para asset ${assetId}: ${asset.public_url}`);
           return asset.public_url;
+        } else if (asset.url) {
+          console.log(`⚠️ Apenas URL protegida disponível para asset ${assetId}: ${asset.url}`);
+          return asset.url;
         }
       }
       
