@@ -390,7 +390,25 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
       ...basicMetadata
     };
     
-    documentData.generalColumns = finalGeneralColumns;
+    // Log para debug - verificar o que está sendo incluído
+    if (index < 3) {
+      console.log(`🔍 COMPONENTES DO GENERAL_COLUMNS:`, {
+        preserveKeys: Object.keys(preserveGeneralColumns || {}),
+        mappingKeys: Object.keys(generalColumnsFromMapping),
+        basicKeys: Object.keys(basicMetadata),
+        totalKeys: Object.keys(finalGeneralColumns).length
+      });
+    }
+    
+    // Filtrar colunas não mapeadas do general_columns final
+    const cleanedGeneralColumns = {};
+    Object.keys(finalGeneralColumns).forEach(key => {
+      if (!key.startsWith('coluna_') || key === 'monday_item_id' || key === 'monday_item_name') {
+        cleanedGeneralColumns[key] = finalGeneralColumns[key];
+      }
+    });
+    
+    documentData.generalColumns = cleanedGeneralColumns;
     
     // Log para debug (apenas primeiros 3 itens)
     if (index < 3) {
