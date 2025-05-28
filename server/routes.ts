@@ -2516,13 +2516,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error(`❌ Erro ao baixar arquivo: ${response.status} ${response.statusText}`);
         console.error(`📄 Headers da resposta:`, Object.fromEntries(response.headers.entries()));
         
-        // Tentar ler o conteúdo do erro para mais detalhes
-        try {
-          const errorText = await response.text();
-          console.error(`📄 Conteúdo completo do erro S3:`, errorText);
-        } catch (e) {
-          console.error(`❌ Não foi possível ler o conteúdo do erro:`, e);
-        }
+        // Clonar a resposta e ler o erro
+        const errorText = await response.text();
+        console.error(`📄 ERRO S3 COMPLETO:`, errorText);
         
         return null;
       }
