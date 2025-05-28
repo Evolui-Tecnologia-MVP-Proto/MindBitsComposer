@@ -1510,13 +1510,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               <p className="text-sm text-gray-500">Nenhum arquivo encontrado nos dados do Monday.com</p>
                             </div>
                           )}
-                          
-                          <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                            <h5 className="text-sm font-medium text-blue-800 mb-2">Dados Brutos (JSON)</h5>
-                            <pre className="text-xs bg-white p-3 rounded border overflow-x-auto text-gray-700">
-                              {JSON.stringify(mondayData, null, 2)}
-                            </pre>
-                          </div>
                         </div>
                       );
                     } catch (error) {
