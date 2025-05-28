@@ -1627,12 +1627,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                             <TableCell className="font-mono text-xs w-40 px-2 py-1" title={file.assetId ? String(file.assetId) : 'N/A'}>
                                               {file.assetId ? String(file.assetId) : 'N/A'}
                                             </TableCell>
-                                            <TableCell className="w-20 px-2 py-1">
-                                              <div className="flex justify-center">
+                                            <TableCell className="w-28 px-2 py-1">
+                                              <div className="flex items-center justify-center space-x-1">
                                                 {file.isImage === "true" || file.isImage === true ? (
-                                                  <span className="text-sm text-green-600">📷</span>
+                                                  <>
+                                                    <span className="text-sm">📷</span>
+                                                    <span className="text-xs text-green-600">Imagem</span>
+                                                  </>
                                                 ) : (
-                                                  <span className="text-sm text-gray-600">📄</span>
+                                                  <>
+                                                    <span className="text-sm">📄</span>
+                                                    <span className="text-xs text-gray-600">Arquivo</span>
+                                                  </>
                                                 )}
                                               </div>
                                             </TableCell>
