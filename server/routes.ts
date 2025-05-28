@@ -2633,26 +2633,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
               }
               
-              try {
-                console.log(`💾 Tentando criar artifact para: ${file.name}`);
-                
-                // Verificar se já existe um artifact com o mesmo origin_asset_id
-                const existingArtifacts = await storage.getDocumentArtifacts(documentoId);
-                const isDuplicate = existingArtifacts.some(existing => 
-                  existing.originAssetId === file.assetId?.toString()
-                );
-                
-                if (isDuplicate) {
-                  console.log(`⚠️ Artifact já existe para: ${file.name} (Asset ID: ${file.assetId})`);
-                } else {
-                  await storage.createDocumentArtifact(artifactData);
-                  createdArtifacts++;
-                  console.log(`✅ Artifact criado com sucesso para: ${file.name}`);
-                }
-              } catch (artifactError) {
-                console.error(`❌ Erro ao criar artifact para ${file.name}:`, artifactError);
-                errors.push(`Erro ao criar artifact: ${file.name} - ${artifactError.message}`);
-              }
+              await storage.createDocumentArtifact(artifactData);
+              createdArtifacts++;
             }
           }
         } catch (parseError) {
@@ -2661,20 +2643,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      console.log(`🏁 FIM DO PROCESSAMENTO - Total de anexos criados: ${createdArtifacts}, Total de arquivos baixados: ${downloadedFiles}`);
-      
       // Marcar documento como sincronizado se pelo menos um anexo foi criado
-      console.log(`🔍 Verificando se deve marcar documento como sincronizado. Anexos criados: ${createdArtifacts}`);
       if (createdArtifacts > 0) {
         try {
-          console.log(`🔄 Tentando atualizar documento ${documentoId} com assets_synced = true`);
-          const updateResult = await storage.updateDocumento(documentoId, { assetsSynced: true });
-          console.log(`✅ Documento ${documentoId} marcado como assets_synced = true. Resultado:`, updateResult);
+          await storage.updateDocumento(documentoId, { assetsSynced: true });
+          console.log(`✅ Documento ${documentoId} marcado como assets_synced = true`);
         } catch (updateError) {
           console.error(`❌ Erro ao atualizar assets_synced para documento ${documentoId}:`, updateError);
         }
-      } else {
-        console.log(`ℹ️ Nenhum anexo foi criado, não marcando documento como sincronizado`);
       }
 
       res.json({
