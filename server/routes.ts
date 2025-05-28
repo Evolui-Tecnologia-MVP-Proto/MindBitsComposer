@@ -3247,6 +3247,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota para servir arquivos dos artifacts
+  app.get("/api/artifacts/:artifactId/file", async (req: Request, res: Response) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: "Não autorizado" });
+      }
+
+      const { artifactId } = req.params;
+      
+      // Buscar o artifact no banco
+      const artifact = await storage.getDocumentArtifact(artifactId);
+      
+      if (!artifact) {
+        return res.status(404).json({ error: "Arquivo não encontrado" });
+      }
+
+      if (!artifact.fileData) {
+        return res.status(404).json({ error: "Dados do arquivo não encontrados" });
+      }
+
+      // Decodificar base64
+      const fileBuffer = Buffer.from(artifact.fileData, 'base64');
+      
+      // Definir headers apropriados
+      res.set({
+        'Content-Type': artifact.mimeType || 'application/octet-stream',
+        'Content-Length': fileBuffer.length.toString(),
+        'Content-Disposition': `inline; filename="${artifact.fileName || 'arquivo'}"`,
+        'Cache-Control': 'public, max-age=3600'
+      });
+
+      res.send(fileBuffer);
+    } catch (error) {
+      console.error("Erro ao servir arquivo do artifact:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   // Endpoint para buscar colunas da tabela documentos dinamicamente
   app.get("/api/documentos-columns", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");

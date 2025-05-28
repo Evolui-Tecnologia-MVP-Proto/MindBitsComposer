@@ -1631,11 +1631,20 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                                     size="sm"
                                                     className="h-6 w-6 p-0"
                                                     onClick={() => {
-                                                      // Abrir asset do Monday.com em nova aba
-                                                      const mondayAssetUrl = `https://files.monday.com/assets/${file.assetId}`;
-                                                      window.open(mondayAssetUrl, '_blank');
+                                                      // Encontrar o artifact correspondente pelo originAssetId
+                                                      const correspondingArtifact = artifacts?.find(
+                                                        artifact => artifact.originAssetId === file.assetId?.toString()
+                                                      );
+                                                      
+                                                      if (correspondingArtifact) {
+                                                        // Abrir arquivo local em nova aba
+                                                        const fileUrl = `/api/artifacts/${correspondingArtifact.id}/file`;
+                                                        window.open(fileUrl, '_blank');
+                                                      } else {
+                                                        alert('Arquivo não encontrado nos artifacts integrados');
+                                                      }
                                                     }}
-                                                    title="Visualizar asset no Monday.com"
+                                                    title="Visualizar arquivo integrado"
                                                   >
                                                     <Eye className="h-3 w-3 text-blue-500" />
                                                   </Button>
