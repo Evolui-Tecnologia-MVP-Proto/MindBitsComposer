@@ -2436,6 +2436,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ success: true, message: "Rota de teste funcionando" });
   });
 
+  // Função auxiliar para buscar URL do asset no Monday.com
+  async function getMondayAssetUrl(assetId: string, apiKey: string): Promise<string | null> {
+    try {
+      const query = `
+        query {
+          assets(ids: [${assetId}]) {
+            id
+            name
+            url
+          }
+        }
+      `;
+
+      const response = await fetch('https://api.monday.com/v2', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': apiKey
+        },
+        body: JSON.stringify({ query })
+      });
+
+      const result = await response.json();
+      
+      if (result.data?.assets?.[0]?.url) {
+        return result.data.assets[0].url;
+      }
+      
+      console.error("Erro ao buscar asset no Monday:", result.errors || "Asset não encontrado");
+      return null;
+    } catch (error) {
+      console.error("Erro na requisição para Monday.com:", error);
+      return null;
+    }
+  }
+
+  // Função auxiliar para baixar arquivo e converter para base64
+  async function downloadFileAsBase64(url: string, apiKey: string): Promise<{ fileData: string; fileSize: number; mimeType: string } | null> {
+    try {
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': apiKey
+        }
+      });
+
+      if (!response.ok) {
+        console.error("Erro ao baixar arquivo:", response.status, response.statusText);
+        return null;
+      }
+
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const base64Data = buffer.toString('base64');
+      
+      return {
+        fileData: base64Data,
+        fileSize: buffer.length,
+        mimeType: response.headers.get('content-type') || 'application/octet-stream'
+      };
+    } catch (error) {
+      console.error("Erro ao baixar e converter arquivo:", error);
+      return null;
+    }
+  }
+
   // Integrar anexos do Monday.com
   app.post("/api/documentos/:documentoId/integrate-attachments", async (req, res) => {
     console.log("🔥 ROTA INTEGRATE-ATTACHMENTS CHAMADA");
@@ -2447,6 +2512,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const { documentoId } = req.params;
       console.log("📄 Processando documento:", documentoId);
+      
+      // Buscar a chave de API do Monday.com
+      const mondayConnections = await storage.getServiceConnectionsByService("monday");
+      if (!mondayConnections || mondayConnections.length === 0) {
+        return res.status(400).json({ error: "Conexão com Monday.com não configurada" });
+      }
+      
+      const mondayApiKey = mondayConnections[0].token;
+      if (!mondayApiKey) {
+        return res.status(400).json({ error: "Token de API do Monday.com não encontrado" });
+      }
       
       // Buscar o documento
       const documento = await storage.getDocumento(documentoId);
@@ -2462,6 +2538,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       let createdArtifacts = 0;
+      let downloadedFiles = 0;
+      const errors = [];
       
       // Processar cada entrada em monday_item_values
       for (const itemValue of documento.mondayItemValues) {
@@ -2471,18 +2549,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           if (Array.isArray(files) && files.length > 0) {
             for (const file of files) {
+              console.log(`📎 Processando arquivo: ${file.name} (Asset ID: ${file.assetId})`);
+              
+              // Dados básicos do artifact
               const artifactData = {
                 documentoId: documentoId,
                 name: file.name || 'Anexo sem nome',
                 fileData: '',
                 fileName: file.name || 'arquivo',
                 fileSize: null,
-                mimeType: file.fileType || 'application/octet-stream',
-                type: file.fileType ? file.fileType.split('/')[1] : 'unknown',
+                mimeType: file.fileType && file.fileType !== 'ASSET' ? file.fileType : null,
+                type: file.fileType && file.fileType !== 'ASSET' ? file.fileType.split('/')[1] : null,
                 originAssetId: file.assetId?.toString(),
                 isImage: file.isImage?.toString() || 'false',
                 mondayColumn: itemValue.columnid
               };
+              
+              // Tentar baixar o arquivo se tiver assetId
+              if (file.assetId) {
+                console.log(`🌐 Buscando URL do asset ${file.assetId} no Monday.com`);
+                const assetUrl = await getMondayAssetUrl(file.assetId.toString(), mondayApiKey);
+                
+                if (assetUrl) {
+                  console.log(`📥 Baixando arquivo de: ${assetUrl}`);
+                  const downloadResult = await downloadFileAsBase64(assetUrl, mondayApiKey);
+                  
+                  if (downloadResult) {
+                    artifactData.fileData = downloadResult.fileData;
+                    artifactData.fileSize = downloadResult.fileSize.toString();
+                    artifactData.mimeType = downloadResult.mimeType;
+                    
+                    // Extrair tipo do arquivo do mimeType
+                    if (downloadResult.mimeType.includes('/')) {
+                      artifactData.type = downloadResult.mimeType.split('/')[1];
+                    }
+                    
+                    downloadedFiles++;
+                    console.log(`✅ Arquivo baixado com sucesso: ${downloadResult.fileSize} bytes`);
+                  } else {
+                    errors.push(`Erro ao baixar arquivo: ${file.name}`);
+                    console.log(`❌ Falha ao baixar arquivo: ${file.name}`);
+                  }
+                } else {
+                  errors.push(`Erro ao obter URL do arquivo: ${file.name}`);
+                  console.log(`❌ Falha ao obter URL: ${file.name}`);
+                }
+              }
               
               await storage.createDocumentArtifact(artifactData);
               createdArtifacts++;
@@ -2490,13 +2602,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         } catch (parseError) {
           console.error("Erro ao processar item:", parseError);
+          errors.push(`Erro ao processar item: ${parseError.message}`);
         }
       }
       
       res.json({
         success: true,
-        message: `Integração concluída. ${createdArtifacts} anexos integrados.`,
-        attachmentsCreated: createdArtifacts
+        message: `Integração concluída. ${createdArtifacts} anexos integrados, ${downloadedFiles} arquivos baixados.`,
+        attachmentsCreated: createdArtifacts,
+        filesDownloaded: downloadedFiles,
+        errors: errors.length > 0 ? errors : undefined
       });
       
     } catch (error: any) {
