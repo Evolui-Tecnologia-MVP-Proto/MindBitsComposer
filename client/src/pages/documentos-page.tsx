@@ -1436,8 +1436,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
                               return (
                                 <div key={columnIndex} className="bg-white border rounded-lg p-4">
-                                  <h5 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-800">
-                                    <Paperclip className="h-5 w-5 text-blue-500" />
+                                  <h5 className="text-sm font-medium mb-3 flex items-center gap-2 text-gray-700">
+                                    <Paperclip className="h-4 w-4 text-blue-500" />
                                     Anexos da coluna {column.columnid}
                                   </h5>
                                   
