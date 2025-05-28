@@ -2516,8 +2516,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Buscar a chave de API do Monday.com
       console.log("🔍 Buscando conexões do Monday.com...");
-      const mondayConnections = await storage.getServiceConnections();
-      const mondayConnection = mondayConnections.find(conn => conn.serviceName === "monday");
+      const mondayConnection = await storage.getServiceConnection("monday");
       console.log("🔌 Conexão Monday encontrada:", mondayConnection ? "SIM" : "NÃO");
       
       if (!mondayConnection) {
