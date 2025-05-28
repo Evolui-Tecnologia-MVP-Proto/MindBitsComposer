@@ -176,9 +176,8 @@ export default function DocumentosPage() {
   });
 
   const queryClient = useQueryClient();
+
   const { toast } = useToast();
-
-
 
   // Buscar documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
@@ -1253,21 +1252,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         })()}
                         
                         {/* Badge sync verde quando há artifacts */}
-                        {(() => {
-                          // Verificar se este documento tem artifacts (usando o cache das requisições já feitas)
-                          const queryClient = useQueryClient();
-                          const cachedArtifacts = queryClient.getQueryData(["/api/documentos", documento.id, "artifacts"]) as DocumentArtifact[] | undefined;
-                          
-                          if (cachedArtifacts && cachedArtifacts.length > 0) {
-                            return (
-                              <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
-                                sync
-                              </Badge>
-                            );
-                          }
-                          
-                          return null;
-                        })()}
+                        {artifactCounts[documento.id] > 0 && (
+                          <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
+                            sync
+                          </Badge>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
