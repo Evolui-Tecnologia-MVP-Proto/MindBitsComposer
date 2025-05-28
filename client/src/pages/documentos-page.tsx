@@ -1630,16 +1630,33 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                                     variant="ghost"
                                                     size="sm"
                                                     className="h-6 w-6 p-0"
-                                                    onClick={() => {
+                                                    onClick={async () => {
                                                       // Encontrar o artifact correspondente pelo originAssetId
                                                       const correspondingArtifact = artifacts?.find(
                                                         artifact => artifact.originAssetId === file.assetId?.toString()
                                                       );
                                                       
                                                       if (correspondingArtifact) {
-                                                        // Abrir arquivo local em nova aba
-                                                        const fileUrl = `/api/artifacts/${correspondingArtifact.id}/file`;
-                                                        window.open(fileUrl, '_blank');
+                                                        try {
+                                                          // Fazer download do arquivo via fetch
+                                                          const response = await fetch(`/api/artifacts/${correspondingArtifact.id}/file`);
+                                                          
+                                                          if (!response.ok) {
+                                                            throw new Error('Erro ao carregar arquivo');
+                                                          }
+                                                          
+                                                          const blob = await response.blob();
+                                                          const url = URL.createObjectURL(blob);
+                                                          
+                                                          // Abrir em nova aba
+                                                          window.open(url, '_blank');
+                                                          
+                                                          // Limpar URL após um tempo
+                                                          setTimeout(() => URL.revokeObjectURL(url), 1000);
+                                                        } catch (error) {
+                                                          console.error('Erro ao abrir arquivo:', error);
+                                                          alert('Erro ao abrir arquivo');
+                                                        }
                                                       } else {
                                                         alert('Arquivo não encontrado nos artifacts integrados');
                                                       }
