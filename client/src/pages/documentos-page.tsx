@@ -1440,10 +1440,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         
         switch (filtros.arquivos) {
           case "sem-arquivos":
-            return artifactCount === 0;
+            // Badge "none" - documentos sem dados do Monday e sem arquivos
+            return !hasMondayData && artifactCount === 0;
           case "a-sincronizar":
+            // Badge "files" apenas - documentos com dados do Monday mas sem arquivos sincronizados
             return hasMondayData && artifactCount === 0;
           case "sincronizados":
+            // Badge "files" + "sync" - documentos com arquivos sincronizados
             return artifactCount > 0;
           default:
             break;
