@@ -1441,37 +1441,41 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                     Anexos da coluna {column.columnid}
                                   </h5>
                                   
-                                  <div className="w-full overflow-hidden">
-                                    <Table className="table-fixed w-full">
+                                  <div className="w-full overflow-x-auto">
+                                    <Table className="table-fixed min-w-full text-sm">
                                       <TableHeader>
                                         <TableRow>
-                                          <TableHead style={{width: '50%'}}>Nome do Arquivo</TableHead>
-                                          <TableHead style={{width: '35%'}}>ID do Asset</TableHead>
-                                          <TableHead style={{width: '15%'}}>Tipo</TableHead>
+                                          <TableHead className="w-48 px-2">Arquivo</TableHead>
+                                          <TableHead className="w-32 px-2">Asset ID</TableHead>
+                                          <TableHead className="w-16 px-2">Tipo</TableHead>
                                         </TableRow>
                                       </TableHeader>
                                       <TableBody>
                                         {files.map((file: any, fileIndex: number) => (
                                           <TableRow key={fileIndex}>
-                                            <TableCell className="font-medium" style={{width: '50%'}}>
-                                              <div className="flex items-center gap-2 min-w-0">
+                                            <TableCell className="font-medium w-48 px-2">
+                                              <div className="flex items-center gap-1 min-w-0">
                                                 {file.isImage === "true" || file.isImage === true ? (
-                                                  <Image className="h-4 w-4 text-green-500 flex-shrink-0" />
+                                                  <Image className="h-3 w-3 text-green-500 flex-shrink-0" />
                                                 ) : (
-                                                  <FileText className="h-4 w-4 text-gray-500 flex-shrink-0" />
+                                                  <FileText className="h-3 w-3 text-gray-500 flex-shrink-0" />
                                                 )}
-                                                <span className="truncate" title={file.name || 'N/A'}>
+                                                <span className="truncate text-xs" title={file.name || 'N/A'}>
                                                   {file.name || 'N/A'}
                                                 </span>
                                               </div>
                                             </TableCell>
-                                            <TableCell className="font-mono text-xs truncate" style={{width: '35%'}} title={file.assetId || 'N/A'}>
-                                              {file.assetId || 'N/A'}
+                                            <TableCell className="font-mono text-xs w-32 px-2 truncate" title={file.assetId || 'N/A'}>
+                                              {file.assetId ? file.assetId.substring(0, 8) + '...' : 'N/A'}
                                             </TableCell>
-                                            <TableCell style={{width: '15%'}}>
-                                              <Badge variant={file.isImage === "true" || file.isImage === true ? "default" : "secondary"} className="text-xs">
-                                                {file.isImage === "true" || file.isImage === true ? 'Img' : 'Arq'}
-                                              </Badge>
+                                            <TableCell className="w-16 px-2">
+                                              <div className="flex justify-center">
+                                                {file.isImage === "true" || file.isImage === true ? (
+                                                  <span className="text-xs text-green-600">📷</span>
+                                                ) : (
+                                                  <span className="text-xs text-gray-600">📄</span>
+                                                )}
+                                              </div>
                                             </TableCell>
                                           </TableRow>
                                         ))}
