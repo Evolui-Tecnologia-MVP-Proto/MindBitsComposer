@@ -1251,7 +1251,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           }
                         })()}
                         
-                        {/* Badge removido - aguardando instruções */}
+                        {/* Badge sync verde quando assets_synced = true */}
+                        {documento.assetsSynced && (
+                          <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
+                            sync
+                          </Badge>
+                        )}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
