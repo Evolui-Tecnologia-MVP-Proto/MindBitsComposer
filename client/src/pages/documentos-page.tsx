@@ -1644,20 +1644,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                                     size="sm"
                                                     className="h-6 w-6 p-0"
                                                     onClick={async () => {
-                                                      console.log('🔍 Clicou no botão de visualização');
-                                                      console.log('📁 File data:', file);
-                                                      console.log('🗂️ Artifacts disponíveis:', artifacts);
-                                                      
                                                       // Encontrar o artifact correspondente pelo originAssetId
                                                       const correspondingArtifact = artifacts?.find(
                                                         artifact => artifact.originAssetId === file.assetId?.toString()
                                                       );
                                                       
-                                                      console.log('🎯 Artifact encontrado:', correspondingArtifact);
-                                                      
                                                       if (correspondingArtifact) {
                                                         try {
-                                                          console.log('📥 Fazendo download do arquivo...');
                                                           // Fazer download do arquivo via fetch
                                                           const response = await fetch(`/api/artifacts/${correspondingArtifact.id}/file`);
                                                           
@@ -1668,25 +1661,16 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                                           const blob = await response.blob();
                                                           const url = URL.createObjectURL(blob);
                                                           
-                                                          console.log('🎬 Abrindo modal com:', {
-                                                            fileName: correspondingArtifact.fileName || file.name || 'arquivo',
-                                                            mimeType: correspondingArtifact.mimeType || 'application/octet-stream',
-                                                            fileUrl: url
-                                                          });
+                                                          // Abrir em nova aba
+                                                          window.open(url, '_blank');
                                                           
-                                                          // Abrir modal de visualização
-                                                          setFilePreviewModal({
-                                                            isOpen: true,
-                                                            fileName: correspondingArtifact.fileName || file.name || 'arquivo',
-                                                            mimeType: correspondingArtifact.mimeType || 'application/octet-stream',
-                                                            fileUrl: url
-                                                          });
+                                                          // Limpar URL após um tempo
+                                                          setTimeout(() => URL.revokeObjectURL(url), 10000);
                                                         } catch (error) {
-                                                          console.error('❌ Erro ao carregar arquivo:', error);
+                                                          console.error('Erro ao carregar arquivo:', error);
                                                           alert('Erro ao carregar arquivo');
                                                         }
                                                       } else {
-                                                        console.log('❌ Artifact não encontrado');
                                                         alert('Arquivo não encontrado nos artifacts integrados');
                                                       }
                                                     }}
@@ -3121,22 +3105,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         </div>
       )}
 
-    </div>
-  );
-}
-
-{/* Modal de Visualização de Arquivo - Movida para fora do componente principal */}
-function FilePreviewModal({ 
-  filePreviewModal, 
-  setFilePreviewModal 
-}: { 
-  filePreviewModal: any, 
-  setFilePreviewModal: any 
-}) {
-  console.log('🖼️ Estado da modal:', filePreviewModal);
-  
-  return (
-    <Dialog open={filePreviewModal.isOpen} onOpenChange={(open) => {
+      {/* Modal de Visualização de Arquivo */}
+      {console.log('🖼️ Estado da modal:', filePreviewModal)}
+      <Dialog open={filePreviewModal.isOpen} onOpenChange={(open) => {
         if (!open) {
           // Limpar URL do blob quando fechar a modal
           if (filePreviewModal.fileUrl) {
@@ -3261,5 +3232,97 @@ function FilePreviewModal({
       </Dialog>
 
     </div>
+  );
+}
+
+// Componente auxiliar para visualização de arquivos
+function FilePreviewModal({ 
+  filePreviewModal, 
+  setFilePreviewModal 
+}: { 
+  filePreviewModal: any, 
+  setFilePreviewModal: any 
+}) {
+  return (
+    <Dialog open={filePreviewModal.isOpen} onOpenChange={(open) => {
+      if (!open) {
+        // Limpar URL do blob quando fechar a modal
+        if (filePreviewModal.fileUrl) {
+          URL.revokeObjectURL(filePreviewModal.fileUrl);
+        }
+        setFilePreviewModal({
+          isOpen: false,
+          fileName: '',
+          mimeType: '',
+          fileUrl: ''
+        });
+      }
+    }}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
+        <DialogHeader>
+          <DialogTitle>Visualizar Arquivo: {filePreviewModal.fileName}</DialogTitle>
+        </DialogHeader>
+        <div className="mt-4">
+          {filePreviewModal.mimeType?.startsWith('image/') ? (
+            <img 
+              src={filePreviewModal.fileUrl} 
+              alt={filePreviewModal.fileName}
+              className="max-w-full h-auto mx-auto"
+            />
+          ) : filePreviewModal.mimeType === 'application/pdf' ? (
+            <iframe 
+              src={filePreviewModal.fileUrl}
+              className="w-full h-[70vh]"
+              title={filePreviewModal.fileName}
+            />
+          ) : filePreviewModal.mimeType?.startsWith('text/') ? (
+            <iframe 
+              src={filePreviewModal.fileUrl}
+              className="w-full h-[70vh] border"
+              title={filePreviewModal.fileName}
+            />
+          ) : (
+            <div className="text-center p-8">
+              <p className="mb-4">Não é possível visualizar este tipo de arquivo.</p>
+              <a 
+                href={filePreviewModal.fileUrl} 
+                download={filePreviewModal.fileName}
+                className="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Baixar arquivo
+              </a>
+            </div>
+          )}
+        </div>
+        <div className="flex justify-between mt-4">
+          <a 
+            href={filePreviewModal.fileUrl} 
+            download={filePreviewModal.fileName}
+            className="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Baixar
+          </a>
+          <Button
+            variant="outline"
+            onClick={() => {
+              // Limpar URL do blob quando fechar a modal
+              if (filePreviewModal.fileUrl) {
+                URL.revokeObjectURL(filePreviewModal.fileUrl);
+              }
+              setFilePreviewModal({
+                isOpen: false,
+                fileName: '',
+                mimeType: '',
+                fileUrl: ''
+              });
+            }}
+          >
+            Fechar
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
