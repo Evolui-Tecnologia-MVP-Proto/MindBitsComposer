@@ -250,9 +250,41 @@ async function executeMondayMapping(mappingId: string, userId?: number, isHeadle
         }
         
         if (columnValue?.value) {
+          // Parse do JSON para enriquecer com URLs se disponíveis
+          let enrichedValue = columnValue.value;
+          try {
+            const parsedValue = JSON.parse(columnValue.value);
+            if (parsedValue && parsedValue.files && Array.isArray(parsedValue.files)) {
+              // Para cada arquivo, buscar URL se disponível nos dados do item
+              const enrichedFiles = parsedValue.files.map((file: any) => {
+                // Buscar asset correspondente no item para obter a URL
+                if (item.assets && Array.isArray(item.assets)) {
+                  const matchingAsset = item.assets.find((asset: any) => 
+                    asset.id === file.id || asset.assetId === file.assetId
+                  );
+                  if (matchingAsset && matchingAsset.url) {
+                    return {
+                      ...file,
+                      url: matchingAsset.url
+                    };
+                  }
+                }
+                return file;
+              });
+              
+              enrichedValue = JSON.stringify({
+                ...parsedValue,
+                files: enrichedFiles
+              });
+            }
+          } catch (e) {
+            // Se falhar o parse, manter valor original
+            enrichedValue = columnValue.value;
+          }
+          
           mondayItemValues.push({
             columnid: columnId,
-            value: columnValue.value // Manter como string serializada, não fazer parse
+            value: enrichedValue
           });
           
           // Log quando valor é adicionado
