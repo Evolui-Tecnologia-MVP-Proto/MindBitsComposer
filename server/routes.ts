@@ -2481,14 +2481,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log(`📥 Tentando baixar arquivo de: ${url}`);
       
+      // Primeiro, tentar sem o header Authorization
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'Authorization': apiKey,
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-          'Accept': '*/*',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
           'Accept-Language': 'en-US,en;q=0.9',
-          'Cache-Control': 'no-cache'
+          'Accept-Encoding': 'gzip, deflate, br',
+          'Referer': 'https://legix-evolui.monday.com/',
+          'Sec-Fetch-Dest': 'image',
+          'Sec-Fetch-Mode': 'no-cors',
+          'Sec-Fetch-Site': 'same-origin'
         },
         redirect: 'follow'
       });
@@ -2498,7 +2502,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!response.ok) {
         console.error(`❌ Erro ao baixar arquivo: ${response.status} ${response.statusText}`);
         console.error(`📄 Headers da resposta:`, Object.fromEntries(response.headers.entries()));
-        return null;
+        
+        // Se falhar, tentar com Authorization Bearer
+        console.log(`🔄 Tentando novamente com Bearer token...`);
+        
+        const responseWithAuth = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Accept': '*/*',
+            'Accept-Language': 'en-US,en;q=0.9'
+          },
+          redirect: 'follow'
+        });
+        
+        console.log(`📊 Status com Bearer: ${responseWithAuth.status} ${responseWithAuth.statusText}`);
+        
+        if (!responseWithAuth.ok) {
+          console.error(`❌ Falha também com Bearer token`);
+          return null;
+        }
+        
+        const arrayBuffer = await responseWithAuth.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        const base64Data = buffer.toString('base64');
+        
+        console.log(`✅ Arquivo baixado com Bearer: ${buffer.length} bytes`);
+        
+        return {
+          fileData: base64Data,
+          fileSize: buffer.length,
+          mimeType: responseWithAuth.headers.get('content-type') || 'application/octet-stream'
+        };
       }
 
       const arrayBuffer = await response.arrayBuffer();
