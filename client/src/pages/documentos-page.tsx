@@ -1857,7 +1857,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             <details className="mt-3 text-left">
                               <summary className="text-xs text-red-500 cursor-pointer">Ver dados brutos</summary>
                               <pre className="text-xs bg-white p-2 rounded border mt-2 overflow-x-auto text-gray-700">
-                                {selectedDocument.mondayItemValues}
+                                {typeof selectedDocument.mondayItemValues === 'string' 
+                                  ? selectedDocument.mondayItemValues 
+                                  : JSON.stringify(selectedDocument.mondayItemValues, null, 2)}
                               </pre>
                             </details>
                           )}
