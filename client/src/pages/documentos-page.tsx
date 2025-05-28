@@ -792,12 +792,30 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   // Mutation para integrar anexos do Monday.com
   const integrateAttachmentsMutation = useMutation({
     mutationFn: async (documentoId: string) => {
-      const response = await apiRequest("POST", `/api/documentos/${documentoId}/integrate-attachments`);
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Erro ao integrar anexos");
+      console.log("🚀 FRONTEND: Iniciando integração para documento:", documentoId);
+      try {
+        const response = await apiRequest("POST", `/api/documentos/${documentoId}/integrate-attachments`);
+        console.log("📡 FRONTEND: Response status:", response.status);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("❌ FRONTEND: Erro na resposta:", errorText);
+          
+          try {
+            const errorData = JSON.parse(errorText);
+            throw new Error(errorData.message || "Erro ao integrar anexos");
+          } catch {
+            throw new Error(errorText || "Erro ao integrar anexos");
+          }
+        }
+        
+        const result = await response.json();
+        console.log("✅ FRONTEND: Resultado da integração:", result);
+        return result;
+      } catch (error) {
+        console.error("🔥 FRONTEND: Erro na mutation:", error);
+        throw error;
       }
-      return response.json();
     },
     onSuccess: (data) => {
       // Invalidar cache dos artifacts
