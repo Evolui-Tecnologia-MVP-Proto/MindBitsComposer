@@ -2494,10 +2494,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // URLs do S3 (public_url) não precisam de Authorization
       const isS3Url = url.includes('s3.amazonaws.com') || url.includes('files-monday-com');
       const headers: Record<string, string> = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Accept': '*/*',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Cache-Control': 'no-cache'
+        'User-Agent': 'curl/8.0.0'
       };
       
       if (!isS3Url) {
