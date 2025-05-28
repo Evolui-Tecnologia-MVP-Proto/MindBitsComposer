@@ -233,6 +233,7 @@ export const documentsArtifacts = pgTable("documents_artifacts", {
   type: text("type").notNull(), // doc, pdf, txt, json, imagem, etc.
   originAssetId: text("origin_asset_id"), // ID do asset de origem (ex: Monday.com)
   isImage: text("is_image"), // Se é imagem ("true"/"false")
+  mondayColumn: text("monday_column"), // Coluna Monday.com de origem do anexo
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

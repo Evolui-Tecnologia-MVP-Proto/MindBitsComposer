@@ -2430,6 +2430,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Integrar anexos do Monday.com
+  app.post("/api/documentos/:documentoId/integrate-attachments", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { documentoId } = req.params;
+      
+      // Buscar o documento para obter monday_item_values
+      const documento = await storage.getDocumento(documentoId);
+      if (!documento) {
+        return res.status(404).send("Documento não encontrado");
+      }
+      
+      if (!documento.mondayItemValues || documento.mondayItemValues.length === 0) {
+        return res.status(400).json({ 
+          message: "Nenhum anexo do Monday.com encontrado para integrar",
+          attachmentsCount: 0
+        });
+      }
+      
+      let createdArtifacts = 0;
+      const errors = [];
+      
+      // Processar cada entrada em monday_item_values
+      for (const itemValue of documento.mondayItemValues) {
+        try {
+          // Parse do JSON se necessário
+          let attachmentData = itemValue.value;
+          if (typeof attachmentData === 'string') {
+            attachmentData = JSON.parse(attachmentData);
+          }
+          
+          // Verificar se é um array de anexos
+          if (Array.isArray(attachmentData)) {
+            for (const attachment of attachmentData) {
+              try {
+                // Criar artifact a partir dos dados do Monday.com
+                const artifactData = {
+                  documentoId: documentoId,
+                  name: attachment.name || 'Anexo sem nome',
+                  fileData: '', // Dados do arquivo não estão disponíveis no Monday.com
+                  fileName: attachment.name || 'arquivo',
+                  fileSize: null,
+                  mimeType: attachment.fileType || 'application/octet-stream',
+                  type: attachment.extension || 'unknown',
+                  originAssetId: attachment.assetId?.toString(),
+                  isImage: attachment.isImage?.toString() || 'false',
+                  mondayColumn: itemValue.columnid // Nova coluna adicionada
+                };
+                
+                await storage.createDocumentArtifact(artifactData);
+                createdArtifacts++;
+              } catch (attachmentError: any) {
+                console.error("Erro ao processar anexo individual:", attachmentError);
+                errors.push(`Erro no anexo ${attachment.name || 'sem nome'}: ${attachmentError.message}`);
+              }
+            }
+          }
+        } catch (itemError: any) {
+          console.error("Erro ao processar item value:", itemError);
+          errors.push(`Erro na coluna ${itemValue.columnid}: ${itemError.message}`);
+        }
+      }
+      
+      const response = {
+        success: true,
+        message: `Integração concluída. ${createdArtifacts} anexos integrados.`,
+        attachmentsCreated: createdArtifacts,
+        errors: errors.length > 0 ? errors : undefined
+      };
+      
+      res.status(200).json(response);
+    } catch (error: any) {
+      console.error("Erro ao integrar anexos:", error);
+      res.status(500).json({
+        success: false,
+        message: "Erro ao integrar anexos do Monday.com",
+        error: error.message
+      });
+    }
+  });
+
   // Repo Structure routes
   app.get("/api/repo-structure", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
