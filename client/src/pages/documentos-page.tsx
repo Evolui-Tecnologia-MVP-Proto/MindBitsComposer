@@ -1736,6 +1736,101 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     <p className="text-sm text-gray-500">Nenhum anexo encontrado</p>
                   </div>
                 )}
+
+                {/* Seção de dados do Monday.com */}
+                <div className="mt-8 border-t pt-6">
+                  <h4 className="text-md font-medium mb-4 flex items-center gap-2">
+                    <Database className="h-4 w-4 text-blue-500" />
+                    Dados do Monday.com
+                  </h4>
+                  
+                  {(() => {
+                    try {
+                      const mondayData = selectedDocument?.mondayItemValues ? JSON.parse(selectedDocument.mondayItemValues) : null;
+                      
+                      if (!mondayData || !Array.isArray(mondayData) || mondayData.length === 0) {
+                        return (
+                          <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed">
+                            <Database className="h-6 w-6 text-gray-400 mx-auto mb-2" />
+                            <p className="text-sm text-gray-500">Nenhum dado do Monday.com encontrado</p>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div className="space-y-4">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>ID da Coluna</TableHead>
+                                <TableHead>Nome do Arquivo</TableHead>
+                                <TableHead>ID do Asset</TableHead>
+                                <TableHead>Tipo</TableHead>
+                                <TableHead>Extensão</TableHead>
+                                <TableHead>Criado em</TableHead>
+                                <TableHead>Criado por</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {mondayData.map((item: any, index: number) => {
+                                const value = item.value ? JSON.parse(item.value) : {};
+                                return (
+                                  <TableRow key={index}>
+                                    <TableCell className="font-mono text-xs">
+                                      {item.columnid || 'N/A'}
+                                    </TableCell>
+                                    <TableCell className="font-medium">
+                                      {value.name || 'N/A'}
+                                    </TableCell>
+                                    <TableCell className="font-mono text-xs">
+                                      {value.assetId || 'N/A'}
+                                    </TableCell>
+                                    <TableCell>
+                                      <div className="flex items-center gap-2">
+                                        {value.isImage ? (
+                                          <Image className="h-4 w-4 text-green-500" />
+                                        ) : (
+                                          <FileText className="h-4 w-4 text-gray-500" />
+                                        )}
+                                        <span className="text-xs">
+                                          {value.isImage ? 'Imagem' : value.fileType || 'Arquivo'}
+                                        </span>
+                                      </div>
+                                    </TableCell>
+                                    <TableCell className="font-mono text-xs uppercase">
+                                      {value.extension || 'N/A'}
+                                    </TableCell>
+                                    <TableCell className="text-sm text-gray-500">
+                                      {value.createdAt ? new Date(value.createdAt).toLocaleString('pt-BR') : 'N/A'}
+                                    </TableCell>
+                                    <TableCell className="text-sm">
+                                      {value.createdBy ? JSON.stringify(value.createdBy) : 'N/A'}
+                                    </TableCell>
+                                  </TableRow>
+                                );
+                              })}
+                            </TableBody>
+                          </Table>
+                          
+                          <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                            <h5 className="text-sm font-medium text-blue-800 mb-2">Dados Brutos (JSON)</h5>
+                            <pre className="text-xs bg-white p-3 rounded border overflow-x-auto text-gray-700">
+                              {JSON.stringify(mondayData, null, 2)}
+                            </pre>
+                          </div>
+                        </div>
+                      );
+                    } catch (error) {
+                      return (
+                        <div className="text-center py-6 bg-red-50 rounded-lg border border-red-200">
+                          <AlertCircle className="h-6 w-6 text-red-500 mx-auto mb-2" />
+                          <p className="text-sm text-red-600">Erro ao processar dados do Monday.com</p>
+                          <p className="text-xs text-red-500 mt-1">Verifique o formato dos dados armazenados</p>
+                        </div>
+                      );
+                    }
+                  })()}
+                </div>
                 </div>
               </TabsContent>
             )}
