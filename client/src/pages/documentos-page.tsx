@@ -1398,7 +1398,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               <TabsContent value="anexos" className="mt-6">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-medium">Anexos do Documento</h3>
+                    <h3 className="text-lg font-medium">Anexos (Assets) na Origem</h3>
+                  </div>
                     {/* Botão para carregar anexos do Monday.com para documentos integrados */}
                   {(() => {
                     const hasIdOrigemTxt = selectedDocument?.idOrigemTxt && selectedDocument.idOrigemTxt.trim() !== '';
@@ -1740,10 +1741,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 )}
 
                 {/* Seção de dados do Monday.com */}
-                <div className="mt-8 border-t pt-6">
                   <h4 className="text-md font-medium mb-4 flex items-center gap-2">
                     <Database className="h-4 w-4 text-blue-500" />
-                    Dados do Monday.com
+                    Anexos (Assets) na Origem
                   </h4>
                   
                   {(() => {
@@ -1888,8 +1888,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       );
                     }
                   })()}
-                </div>
-                </div>
               </TabsContent>
             )}
           </Tabs>
