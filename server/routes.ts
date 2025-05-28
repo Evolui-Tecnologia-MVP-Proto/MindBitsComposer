@@ -2644,13 +2644,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Marcar documento como sincronizado se pelo menos um anexo foi criado
+      console.log(`🔍 Verificando se deve marcar documento como sincronizado. Anexos criados: ${createdArtifacts}`);
       if (createdArtifacts > 0) {
         try {
-          await storage.updateDocumento(documentoId, { assetsSynced: true });
-          console.log(`✅ Documento ${documentoId} marcado como assets_synced = true`);
+          console.log(`🔄 Tentando atualizar documento ${documentoId} com assets_synced = true`);
+          const updateResult = await storage.updateDocumento(documentoId, { assetsSynced: true });
+          console.log(`✅ Documento ${documentoId} marcado como assets_synced = true. Resultado:`, updateResult);
         } catch (updateError) {
           console.error(`❌ Erro ao atualizar assets_synced para documento ${documentoId}:`, updateError);
         }
+      } else {
+        console.log(`ℹ️ Nenhum anexo foi criado, não marcando documento como sincronizado`);
       }
 
       res.json({
