@@ -64,6 +64,7 @@ import {
   Check,
   BookOpen,
   TestTube,
+  Beaker,
 } from "lucide-react";
 import {
   type Documento,
@@ -88,6 +89,7 @@ export default function DocumentosPage() {
   const [isDocumentationModalOpen, setIsDocumentationModalOpen] =
     useState(false);
   const [isTestModalOpen, setIsTestModalOpen] = useState(false);
+  const [isTest2ModalOpen, setIsTest2ModalOpen] = useState(false);
   const [editingDocument, setEditingDocument] = useState<Documento | null>(
     null,
   );
@@ -1509,6 +1511,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               title="Teste"
                             >
                               <TestTube className="h-4 w-4 text-purple-500" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => setIsTest2ModalOpen(true)}
+                              title="Teste 2"
+                            >
+                              <Beaker className="h-4 w-4 text-green-500" />
                             </Button>
                           </>
                         )}
@@ -3293,8 +3304,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {renderAddArtifactModal()}
       {renderEditArtifactModal()}
       {renderDocumentationModal()}
-
       {renderTestModal()}
+      {renderTest2Modal()}
     </div>
   );
 
@@ -4076,6 +4087,35 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           <DialogFooter>
             <Button
               onClick={() => setIsTestModalOpen(false)}
+              className="w-full"
+            >
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Modal de teste 2
+  function renderTest2Modal() {
+    return (
+      <Dialog open={isTest2ModalOpen} onOpenChange={setIsTest2ModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Beaker className="h-5 w-5 text-green-600" />
+              Modal de Teste 2
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-6 text-center">
+            <p className="text-lg">testando</p>
+          </div>
+
+          <DialogFooter>
+            <Button
+              onClick={() => setIsTest2ModalOpen(false)}
               className="w-full"
             >
               Fechar
