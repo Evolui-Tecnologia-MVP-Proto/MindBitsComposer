@@ -148,6 +148,33 @@ const DocumentNode = memo(({ data }: NodeProps) => (
   </div>
 ));
 
+const MondayNode = memo(({ data }: NodeProps) => (
+  <div className="px-4 py-2 rounded-lg bg-yellow-100 border-2 border-yellow-500 text-yellow-800 shadow-md min-w-[140px] text-center">
+    <div className="font-medium">{data.label}</div>
+    <div className="text-xs mt-1 opacity-75">Plataforma</div>
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-yellow-500" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-yellow-500" />
+  </div>
+));
+
+const GitHubNode = memo(({ data }: NodeProps) => (
+  <div className="px-4 py-2 rounded-lg bg-gray-100 border-2 border-gray-600 text-gray-800 shadow-md min-w-[140px] text-center">
+    <div className="font-medium">{data.label}</div>
+    <div className="text-xs mt-1 opacity-75">Repositório</div>
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-gray-600" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-gray-600" />
+  </div>
+));
+
+const MindBitsNode = memo(({ data }: NodeProps) => (
+  <div className="px-4 py-2 rounded-lg bg-cyan-100 border-2 border-cyan-500 text-cyan-800 shadow-md min-w-[140px] text-center">
+    <div className="font-medium">{data.label}</div>
+    <div className="text-xs mt-1 opacity-75">IA Platform</div>
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-cyan-500" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-cyan-500" />
+  </div>
+));
+
 const initialNodes: Node[] = [];
 
 const nodeTypes: NodeTypes = {
@@ -159,6 +186,9 @@ const nodeTypes: NodeTypes = {
   reviseNode: ReviseNode,
   rawDocumentNode: RawDocumentNode,
   documentNode: DocumentNode,
+  mondayNode: MondayNode,
+  githubNode: GitHubNode,
+  mindbitsNode: MindBitsNode,
 };
 
 const FlowCanvas = () => {
@@ -274,6 +304,9 @@ const FlowCanvas = () => {
       'reviseNode': 'Revisar',
       'rawDocumentNode': 'RAW-Document',
       'documentNode': 'Document',
+      'mondayNode': 'Monday.com',
+      'githubNode': 'GitHub',
+      'mindbitsNode': 'MindBits CTx',
       'endNode': 'Fim'
     };
 
@@ -310,6 +343,9 @@ const FlowCanvas = () => {
                   <SelectItem value="reviseNode">Revisar</SelectItem>
                   <SelectItem value="rawDocumentNode">RAW-Document</SelectItem>
                   <SelectItem value="documentNode">Document</SelectItem>
+                  <SelectItem value="mondayNode">Monday.com</SelectItem>
+                  <SelectItem value="githubNode">GitHub</SelectItem>
+                  <SelectItem value="mindbitsNode">MindBits CTx</SelectItem>
                   <SelectItem value="endNode">Fim</SelectItem>
                 </SelectContent>
               </Select>
