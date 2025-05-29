@@ -3293,6 +3293,31 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {renderAddArtifactModal()}
       {renderEditArtifactModal()}
       {renderDocumentationModal()}
+
+      {/* Modal de teste */}
+      <Dialog open={isTestModalOpen} onOpenChange={setIsTestModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <TestTube className="h-5 w-5 text-purple-600" />
+              Modal de Teste
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-6 text-center">
+            <p className="text-lg">testando</p>
+          </div>
+
+          <DialogFooter>
+            <Button
+              onClick={() => setIsTestModalOpen(false)}
+              className="w-full"
+            >
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 
