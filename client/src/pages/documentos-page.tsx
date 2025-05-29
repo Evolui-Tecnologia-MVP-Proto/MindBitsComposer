@@ -1214,7 +1214,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             <Table>
             <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
                 <TableRow>
-                  <TableHead className="bg-gray-50 border-b w-[105px]">Origem</TableHead>
+                  <TableHead className="bg-gray-50 border-b w-[110px]">Origem</TableHead>
                   <TableHead className="bg-gray-50 border-b">Nome</TableHead>
                   <TableHead className="bg-gray-50 border-b">Status</TableHead>
                   <TableHead className="bg-gray-50 border-b">Data Integração</TableHead>
