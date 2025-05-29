@@ -2193,8 +2193,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   }
 
   return (
-    <div>
-      <div>
+    <div className="h-screen flex flex-col overflow-hidden">
+      <div className="flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-3xl font-bold tracking-tight">Documentos</h2>
           <Button 
@@ -2213,16 +2213,16 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           defaultValue="incluidos" 
           value={activeTab}
           onValueChange={setActiveTab}
-          className="w-full"
+          className="w-full h-full flex flex-col"
         >
-          <TabsList className="mb-6">
+          <TabsList className="mb-6 flex-shrink-0">
             <TabsTrigger value="incluidos">Incluídos</TabsTrigger>
             <TabsTrigger value="integrados">Integrados</TabsTrigger>
             <TabsTrigger value="em-processo">Em Processo</TabsTrigger>
             <TabsTrigger value="repositorio">Repositório</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="incluidos" className="slide-in">
+          <TabsContent value="incluidos" className="slide-in flex-1 overflow-auto">
             {isLoading ? (
               <div className="text-center py-6">Carregando documentos...</div>
             ) : (
@@ -2458,7 +2458,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             </div>
           </TabsContent>
           
-          <TabsContent value="em-processo" className="slide-in">
+          <TabsContent value="em-processo" className="slide-in flex-1 overflow-auto">
             {isLoading ? (
               <div className="text-center py-6">Carregando documentos...</div>
             ) : (
@@ -2466,7 +2466,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             )}
           </TabsContent>
           
-          <TabsContent value="distribuidos" className="slide-in">
+          <TabsContent value="distribuidos" className="slide-in flex-1 overflow-auto">
             {isLoading ? (
               <div className="text-center py-6">Carregando documentos...</div>
             ) : (
@@ -2474,7 +2474,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             )}
           </TabsContent>
           
-          <TabsContent value="repositorio" className="slide-in">
+          <TabsContent value="repositorio" className="slide-in flex-1 overflow-auto">
             <div className="space-y-6">
               <div className="bg-white rounded-lg border p-6">
                 <div className="flex items-center justify-between mb-6 flex-shrink-0">
