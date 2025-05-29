@@ -1209,8 +1209,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   const renderDocumentosTable = (documentos: Documento[]) => {
     if (activeTab === "integrados") {
       return (
-        <div className="border rounded-lg overflow-hidden">
-          <Table>
+        <div className="border rounded-lg">
+          <div className="max-h-[calc(100vh-300px)] overflow-y-auto">
+            <Table>
             <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
                 <TableRow>
                   <TableHead className="bg-gray-50 border-b">Origem</TableHead>
@@ -1303,6 +1304,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 )}
               </TableBody>
             </Table>
+          </div>
         </div>
       );
     }
