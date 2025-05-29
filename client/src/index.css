@@ -2,13 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Desativar scroll da janela do navegador */
-html, body {
-  overflow: hidden;
-  height: 100%;
-  width: 100%;
-}
-
 :root {
   --background: 0 0% 100%;
   --foreground: 20 14.3% 4.1%;

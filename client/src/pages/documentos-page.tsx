@@ -1209,8 +1209,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   const renderDocumentosTable = (documentos: Documento[]) => {
     if (activeTab === "integrados") {
       return (
-        <div className="border rounded-lg overflow-hidden h-full">
-          <div className="h-full overflow-y-auto">
+        <div className="border rounded-lg overflow-hidden">
+          <div className="max-h-[600px] overflow-y-auto">
             <Table>
               <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
                 <TableRow>
@@ -1310,86 +1310,82 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     }
 
     return (
-      <div className="border rounded-lg overflow-hidden h-full">
-        <div className="h-full overflow-y-auto">
-          <Table>
-            <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
-              <TableRow>
-                <TableHead className="bg-gray-50 border-b">Tipo</TableHead>
-                <TableHead className="bg-gray-50 border-b">Nome</TableHead>
-                <TableHead className="bg-gray-50 border-b">Data</TableHead>
-                <TableHead className="bg-gray-50 border-b">Status</TableHead>
-                <TableHead className="bg-gray-50 border-b text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {documentos.map((documento) => (
-                <TableRow key={documento.id}>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <File className="h-5 w-5 text-blue-500" />
-                      <span className="ml-2 text-xs text-gray-500">DOC</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="font-medium">{documento.objeto}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center text-gray-500 text-sm">
-                      <Clock className="mr-1.5 h-3.5 w-3.5" />
-                      {formatDate(documento.createdAt)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusBadgeVariant(documento.status) as any} className="flex items-center gap-1 whitespace-nowrap">
-                      {getStatusIcon(documento.status)}
-                      {documento.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end space-x-2">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Tipo</TableHead>
+            <TableHead>Nome</TableHead>
+            <TableHead>Data</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Ações</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {documentos.map((documento) => (
+            <TableRow key={documento.id}>
+              <TableCell>
+                <div className="flex items-center">
+                  <File className="h-5 w-5 text-blue-500" />
+                  <span className="ml-2 text-xs text-gray-500">DOC</span>
+                </div>
+              </TableCell>
+              <TableCell className="font-medium">{documento.objeto}</TableCell>
+              <TableCell>
+                <div className="flex items-center text-gray-500 text-sm">
+                  <Clock className="mr-1.5 h-3.5 w-3.5" />
+                  {formatDate(documento.createdAt)}
+                </div>
+              </TableCell>
+              <TableCell>
+                <Badge variant={getStatusBadgeVariant(documento.status) as any} className="flex items-center gap-1 whitespace-nowrap">
+                  {getStatusIcon(documento.status)}
+                  {documento.status}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-right">
+                <div className="flex justify-end space-x-2">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8"
+                  onClick={() => openViewModal(documento)}
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
+                {activeTab !== "integrados" && (
+                  <>
                     <Button 
                       variant="ghost" 
                       size="icon" 
                       className="h-8 w-8"
-                      onClick={() => openViewModal(documento)}
+                      onClick={() => openEditModal(documento)}
                     >
-                      <Eye className="h-4 w-4" />
+                      <Pencil className="h-4 w-4 text-blue-500" />
                     </Button>
-                    {activeTab !== "integrados" && (
-                      <>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8"
-                          onClick={() => openEditModal(documento)}
-                        >
-                          <Pencil className="h-4 w-4 text-blue-500" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8"
-                          onClick={() => handleDeleteDocument(documento)}
-                          disabled={deleteDocumentoMutation.isPending}
-                        >
-                          <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-            {documentos.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={activeTab === "integrados" ? 8 : 5} className="text-center py-6 text-gray-500">
-                  Nenhum documento encontrado nesta categoria.
-                </TableCell>
-              </TableRow>
-            )}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8"
+                      onClick={() => handleDeleteDocument(documento)}
+                      disabled={deleteDocumentoMutation.isPending}
+                    >
+                      <Trash2 className="h-4 w-4 text-red-500" />
+                    </Button>
+                  </>
+                )}
+              </div>
+            </TableCell>
+          </TableRow>
+        ))}
+        {documentos.length === 0 && (
+          <TableRow>
+            <TableCell colSpan={activeTab === "integrados" ? 8 : 5} className="text-center py-6 text-gray-500">
+              Nenhum documento encontrado nesta categoria.
+            </TableCell>
+          </TableRow>
+        )}
+        </TableBody>
+      </Table>
     );
   };
 
@@ -2197,8 +2193,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   }
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden p-6">
-      <div className="flex-shrink-0">
+    <div>
+      <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-3xl font-bold tracking-tight">Documentos</h2>
           <Button 
@@ -2212,22 +2208,21 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             Incluir Documento
           </Button>
         </div>
-      </div>
         
-      <Tabs 
-        defaultValue="incluidos" 
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="w-full flex-1 flex flex-col min-h-0"
-      >
-          <TabsList className="mb-6 flex-shrink-0">
+        <Tabs 
+          defaultValue="incluidos" 
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
+          <TabsList className="mb-6">
             <TabsTrigger value="incluidos">Incluídos</TabsTrigger>
             <TabsTrigger value="integrados">Integrados</TabsTrigger>
             <TabsTrigger value="em-processo">Em Processo</TabsTrigger>
             <TabsTrigger value="repositorio">Repositório</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="incluidos" className="slide-in flex-1 overflow-auto">
+          <TabsContent value="incluidos" className="slide-in">
             {isLoading ? (
               <div className="text-center py-6">Carregando documentos...</div>
             ) : (
@@ -2320,9 +2315,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             )}
           </TabsContent>
           
-          <TabsContent value="integrados" className="slide-in flex flex-col h-full">
+          <TabsContent value="integrados" className="slide-in">
             {/* Filtros */}
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg border flex-shrink-0">
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
               <h3 className="text-sm font-medium text-gray-700 mb-3">Filtros</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                 {/* Filtro por Nome */}
@@ -2453,17 +2448,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               </div>
             </div>
 
-            {/* Área da tabela que ocupa o restante da altura */}
-            <div className="flex-1 min-h-0">
-              {isLoading ? (
-                <div className="text-center py-6">Carregando documentos...</div>
-              ) : (
-                renderDocumentosTable(filteredAndSortedDocumentos)
-              )}
-            </div>
+            {isLoading ? (
+              <div className="text-center py-6">Carregando documentos...</div>
+            ) : (
+              renderDocumentosTable(filteredAndSortedDocumentos)
+            )}
           </TabsContent>
           
-          <TabsContent value="em-processo" className="slide-in flex-1 overflow-auto">
+          <TabsContent value="em-processo" className="slide-in">
             {isLoading ? (
               <div className="text-center py-6">Carregando documentos...</div>
             ) : (
@@ -2471,7 +2463,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             )}
           </TabsContent>
           
-          <TabsContent value="distribuidos" className="slide-in flex-1 overflow-auto">
+          <TabsContent value="distribuidos" className="slide-in">
             {isLoading ? (
               <div className="text-center py-6">Carregando documentos...</div>
             ) : (
@@ -2479,7 +2471,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             )}
           </TabsContent>
           
-          <TabsContent value="repositorio" className="slide-in flex-1 overflow-auto">
+          <TabsContent value="repositorio" className="slide-in">
             <div className="space-y-6">
               <div className="bg-white rounded-lg border p-6">
                 <div className="flex items-center justify-between mb-6 flex-shrink-0">
@@ -2660,6 +2652,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             </div>
           </TabsContent>
         </Tabs>
+      </div>
       
       {renderViewModal()}
       {renderCreateModal()}
@@ -3233,9 +3226,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   }
 
   return (
-    <div className="h-full flex flex-col p-6">
+    <div className="p-6">
       {/* Cabeçalho da página */}
-      <div className="flex justify-between items-center mb-6 flex-shrink-0">
+      <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Documentos</h1>
         <Button 
           onClick={() => {
@@ -3251,16 +3244,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       </div>
 
       {/* Abas de navegação */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col flex-1 min-h-0">
-        <TabsList className="flex-shrink-0">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList>
           <TabsTrigger value="integrados">Integrados</TabsTrigger>
           <TabsTrigger value="todos">Todos</TabsTrigger>
-          <TabsTrigger value="repositorio">Repositório</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="integrados" className="flex flex-col flex-1 min-h-0">
+        <TabsContent value="integrados">
           {/* Filtros */}
-          <div className="mb-6 p-4 bg-gray-50 rounded-lg border flex-shrink-0">
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
             <h3 className="text-sm font-medium text-gray-700 mb-3">Filtros</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
               {/* Filtro por Nome */}
@@ -3394,19 +3386,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           {isLoading ? (
             <div className="text-center py-6">Carregando documentos...</div>
           ) : (
-            <div className="flex-1 min-h-0 overflow-y-auto">
-              {renderDocumentosTable(filteredAndSortedDocumentos)}
-            </div>
+            renderDocumentosTable(filteredAndSortedDocumentos)
           )}
         </TabsContent>
 
-        <TabsContent value="todos" className="flex flex-col flex-1 min-h-0">
+        <TabsContent value="todos">
           {isLoading ? (
             <div className="text-center py-6">Carregando documentos...</div>
           ) : (
-            <div className="flex-1 min-h-0 overflow-y-auto">
-              {renderDocumentosTable(documentos)}
-            </div>
+            renderDocumentosTable(documentos)
           )}
         </TabsContent>
       </Tabs>
