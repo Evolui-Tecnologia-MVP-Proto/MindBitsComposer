@@ -3639,6 +3639,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Modal de documentação */}
+      {renderDocumentationModal()}
     </div>
   );
 
