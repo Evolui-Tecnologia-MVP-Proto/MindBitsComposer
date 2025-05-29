@@ -1776,7 +1776,7 @@ export default function AdminPage() {
                     <Loader2 className="h-8 w-8 animate-spin text-border" />
                   </div>
                 ) : systemLogs.length > 0 ? (
-                  <div className="max-h-[calc(100vh-460px)] overflow-y-auto border rounded-md">
+                  <div className="max-h-[calc(100vh-450px)] overflow-y-auto border rounded-md">
                     <Table>
                       <TableHeader className="sticky top-0 bg-background z-10">
                         <TableRow>
