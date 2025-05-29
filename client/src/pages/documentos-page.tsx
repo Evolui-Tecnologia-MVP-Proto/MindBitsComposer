@@ -3226,8 +3226,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="flex-1 p-6">
+    <div className="h-full flex flex-col">
+      <div className="flex-1">
         {/* Cabeçalho da página */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Documentos</h1>
