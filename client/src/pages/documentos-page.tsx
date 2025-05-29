@@ -1292,9 +1292,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             className="h-8 w-8"
                             onClick={() => {
                               console.log("Botão documentação clicado", documento);
+                              console.log("Estado atual da modal:", isDocumentationModalOpen);
                               setSelectedDocument(documento);
                               setIsDocumentationModalOpen(true);
-                              console.log("Modal aberta:", true);
+                              console.log("Tentando abrir modal...");
                             }}
                             title="Iniciar Documentação"
                           >
@@ -3614,7 +3615,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
       {/* Modal para iniciar documentação */}
       <Dialog open={isDocumentationModalOpen} onOpenChange={setIsDocumentationModalOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md z-[9999]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5" />
