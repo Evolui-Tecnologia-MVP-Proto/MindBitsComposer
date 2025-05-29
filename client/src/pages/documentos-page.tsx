@@ -988,12 +988,22 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       }
     },
     onSuccess: (data) => {
-      // Invalidar cache dos artifacts
+      // Invalidar cache dos artifacts para o documento específico
       if (selectedDocument?.id) {
         queryClient.invalidateQueries({
           queryKey: ["/api/documentos", selectedDocument.id, "artifacts"],
         });
       }
+
+      // Invalidar cache de contagem de artifacts para atualizar badges
+      queryClient.invalidateQueries({
+        queryKey: ["/api/documentos/artifacts-count"],
+      });
+
+      // Invalidar cache da lista de documentos para atualizar badges na tabela
+      queryClient.invalidateQueries({
+        queryKey: ["/api/documentos"],
+      });
 
       toast({
         title: "Anexos integrados!",
