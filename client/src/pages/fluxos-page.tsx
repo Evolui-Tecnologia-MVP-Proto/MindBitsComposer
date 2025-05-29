@@ -35,40 +35,40 @@ import { toast } from '@/hooks/use-toast';
 
 // Definição dos componentes de nós personalizados
 const StartNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-full bg-blue-100 border-2 text-blue-700 shadow-md min-w-[100px] text-center transition-all duration-200 ${
-    selected ? 'border-blue-700 shadow-lg ring-2 ring-blue-300 scale-105' : 'border-blue-500'
+  <div className={`px-4 py-2 rounded-full bg-white border-2 text-black shadow-md min-w-[100px] text-center transition-all duration-200 ${
+    selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
   }`}>
     <div className="font-medium">{data.label}</div>
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-blue-500" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
 ));
 
 const EndNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-full bg-slate-100 border-2 text-slate-700 shadow-md min-w-[100px] text-center transition-all duration-200 ${
-    selected ? 'border-slate-700 shadow-lg ring-2 ring-slate-300 scale-105' : 'border-slate-500'
+  <div className={`px-4 py-2 rounded-full bg-white border-2 text-black shadow-md min-w-[100px] text-center transition-all duration-200 ${
+    selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
   }`}>
     <div className="font-medium">{data.label}</div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-slate-500" />
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
   </div>
 ));
 
 const ElaboreNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-lg bg-green-100 border-2 text-green-700 shadow-md min-w-[120px] text-center transition-all duration-200 ${
-    selected ? 'border-green-700 shadow-lg ring-2 ring-green-300 scale-105' : 'border-green-500'
+  <div className={`px-4 py-2 rounded-lg bg-white border-2 text-black shadow-md min-w-[120px] text-center transition-all duration-200 ${
+    selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
   }`}>
     <div className="font-medium">{data.label}</div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-green-500" />
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-green-500" />
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
 ));
 
 const ApproveNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-lg bg-indigo-100 border-2 text-indigo-700 shadow-md min-w-[120px] text-center transition-all duration-200 ${
-    selected ? 'border-indigo-700 shadow-lg ring-2 ring-indigo-300 scale-105' : 'border-indigo-500'
+  <div className={`px-4 py-2 rounded-lg bg-white border-2 text-black shadow-md min-w-[120px] text-center transition-all duration-200 ${
+    selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
   }`}>
     <div className="font-medium">{data.label}</div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-indigo-500" />
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-indigo-500" />
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
 ));
 
@@ -79,52 +79,52 @@ const DecisionNode = memo(({ data, selected }: NodeProps) => (
       style={{
         width: '100%',
         height: '100%',
-        backgroundColor: '#FEF3C7',
-        border: selected ? '3px solid #92400E' : '2px solid #D97706',
+        backgroundColor: 'white',
+        border: selected ? '3px solid black' : '2px solid black',
         transformStyle: 'preserve-3d',
         transform: 'rotateX(60deg) rotateZ(45deg)',
         boxShadow: selected ? '0 8px 12px -2px rgba(0, 0, 0, 0.2)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-        filter: selected ? 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.4))' : 'none'
+        filter: selected ? 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.4))' : 'none'
       }}
     >
       <div 
         className="absolute inset-0 flex flex-col justify-between"
-        style={{ opacity: 0.3, padding: '5px' }}
+        style={{ opacity: 0.2, padding: '5px' }}
       >
         {Array.from({ length: 7 }).map((_, i) => (
-          <div key={i} className="w-full h-px bg-amber-500" />
+          <div key={i} className="w-full h-px bg-black" />
         ))}
       </div>
     </div>
     
     <div className="absolute inset-0 flex items-center justify-center z-10">
-      <div className="font-medium text-amber-800 text-sm">{data.label}</div>
+      <div className="font-medium text-black text-sm">{data.label}</div>
     </div>
     
     <Handle 
       type="target" 
       position={Position.Top} 
-      className="w-2 h-2 bg-amber-500" 
+      className="w-2 h-2 bg-black" 
       style={{ top: '10px', left: '50%', transform: 'translateX(-50%)' }}
     />
     <Handle 
       type="source" 
       position={Position.Right} 
-      className="w-2 h-2 bg-amber-500" 
+      className="w-2 h-2 bg-black" 
       id="a"
       style={{ top: '50%', right: '-25px', transform: 'translateY(-50%)' }}
     />
     <Handle 
       type="source" 
       position={Position.Bottom} 
-      className="w-2 h-2 bg-amber-500" 
+      className="w-2 h-2 bg-black" 
       id="b"
       style={{ bottom: '10px', left: '50%', transform: 'translateX(-50%)' }}
     />
     <Handle 
       type="source" 
       position={Position.Left} 
-      className="w-2 h-2 bg-amber-500" 
+      className="w-2 h-2 bg-black" 
       id="c"
       style={{ top: '50%', left: '-25px', transform: 'translateY(-50%)' }}
     />
@@ -132,34 +132,34 @@ const DecisionNode = memo(({ data, selected }: NodeProps) => (
 ));
 
 const ReviseNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-lg bg-rose-100 border-2 text-rose-700 shadow-md min-w-[120px] text-center transition-all duration-200 ${
-    selected ? 'border-rose-700 shadow-lg ring-2 ring-rose-300 scale-105' : 'border-rose-500'
+  <div className={`px-4 py-2 rounded-lg bg-white border-2 text-black shadow-md min-w-[120px] text-center transition-all duration-200 ${
+    selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
   }`}>
     <div className="font-medium">{data.label}</div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-rose-500" />
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-rose-500" />
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
 ));
 
 const RawDocumentNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-lg bg-orange-100 border-2 text-orange-700 shadow-md min-w-[140px] text-center transition-all duration-200 ${
-    selected ? 'border-orange-700 shadow-lg ring-2 ring-orange-300 scale-105' : 'border-orange-500'
+  <div className={`px-4 py-2 rounded-lg bg-white border-2 text-black shadow-md min-w-[140px] text-center transition-all duration-200 ${
+    selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
   }`}>
     <div className="font-medium">{data.label}</div>
     <div className="text-xs mt-1 opacity-75">Documento Bruto</div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-orange-500" />
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-orange-500" />
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
 ));
 
 const DocumentNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-lg bg-purple-100 border-2 text-purple-700 shadow-md min-w-[140px] text-center transition-all duration-200 ${
-    selected ? 'border-purple-700 shadow-lg ring-2 ring-purple-300 scale-105' : 'border-purple-500'
+  <div className={`px-4 py-2 rounded-lg bg-white border-2 text-black shadow-md min-w-[140px] text-center transition-all duration-200 ${
+    selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
   }`}>
     <div className="font-medium">{data.label}</div>
     <div className="text-xs mt-1 opacity-75">Documento Final</div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-purple-500" />
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-purple-500" />
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
 ));
 
@@ -171,20 +171,20 @@ const MondayNode = memo(({ data, selected }: NodeProps) => (
         selected ? 'scale-105' : ''
       }`}
       style={{
-        backgroundColor: '#FEF3C7',
-        border: selected ? '3px solid #92400E' : '2px solid #D97706',
+        backgroundColor: 'white',
+        border: selected ? '3px solid black' : '2px solid black',
         clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
         boxShadow: selected ? '0 8px 12px -2px rgba(0, 0, 0, 0.2)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-        filter: selected ? 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.4))' : 'none'
+        filter: selected ? 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.4))' : 'none'
       }}
     >
       <div className="text-center">
-        <div className="font-medium text-amber-800 text-sm">{data.label}</div>
-        <div className="text-xs opacity-75 text-amber-700">Plataforma</div>
+        <div className="font-medium text-black text-sm">{data.label}</div>
+        <div className="text-xs opacity-75 text-black">Plataforma</div>
       </div>
     </div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-amber-500" />
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-amber-500" />
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
 ));
 
@@ -196,20 +196,20 @@ const GitHubNode = memo(({ data, selected }: NodeProps) => (
         selected ? 'scale-105' : ''
       }`}
       style={{
-        backgroundColor: '#F3F4F6',
-        border: selected ? '3px solid #1F2937' : '2px solid #374151',
+        backgroundColor: 'white',
+        border: selected ? '3px solid black' : '2px solid black',
         clipPath: 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)',
         boxShadow: selected ? '0 8px 12px -2px rgba(0, 0, 0, 0.2)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-        filter: selected ? 'drop-shadow(0 0 8px rgba(107, 114, 128, 0.4))' : 'none'
+        filter: selected ? 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.4))' : 'none'
       }}
     >
       <div className="text-center">
-        <div className="font-medium text-gray-800 text-sm">{data.label}</div>
-        <div className="text-xs opacity-75 text-gray-600">Repositório</div>
+        <div className="font-medium text-black text-sm">{data.label}</div>
+        <div className="text-xs opacity-75 text-black">Repositório</div>
       </div>
     </div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-gray-600" />
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-gray-600" />
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
 ));
 
@@ -217,17 +217,17 @@ const MindBitsNode = memo(({ data, selected }: NodeProps) => (
   <div className="relative" style={{ width: '140px', height: '100px' }}>
     {/* Elipse para MindBits */}
     <div
-      className={`absolute inset-0 flex items-center justify-center rounded-full bg-cyan-100 border-2 shadow-md transition-all duration-200 ${
-        selected ? 'border-cyan-700 shadow-lg ring-2 ring-cyan-300 scale-105' : 'border-cyan-500'
+      className={`absolute inset-0 flex items-center justify-center rounded-full bg-white border-2 shadow-md transition-all duration-200 ${
+        selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
       }`}
     >
       <div className="text-center">
-        <div className="font-medium text-cyan-800 text-sm">{data.label}</div>
-        <div className="text-xs opacity-75 text-cyan-700">IA Platform</div>
+        <div className="font-medium text-black text-sm">{data.label}</div>
+        <div className="text-xs opacity-75 text-black">IA Platform</div>
       </div>
     </div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-cyan-500" />
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-cyan-500" />
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
 ));
 
