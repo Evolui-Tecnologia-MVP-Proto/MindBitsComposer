@@ -1291,8 +1291,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             size="icon" 
                             className="h-8 w-8"
                             onClick={() => {
+                              console.log("Botão documentação clicado", documento);
                               setSelectedDocument(documento);
                               setIsDocumentationModalOpen(true);
+                              console.log("Modal aberta:", true);
                             }}
                             title="Iniciar Documentação"
                           >
