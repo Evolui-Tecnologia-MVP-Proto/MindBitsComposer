@@ -2193,7 +2193,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   }
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
+    <div className="h-screen flex flex-col overflow-hidden p-6">
       <div className="flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-3xl font-bold tracking-tight">Documentos</h2>
@@ -2208,13 +2208,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             Incluir Documento
           </Button>
         </div>
+      </div>
         
-        <Tabs 
-          defaultValue="incluidos" 
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="w-full h-full flex flex-col"
-        >
+      <Tabs 
+        defaultValue="incluidos" 
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="w-full flex-1 flex flex-col min-h-0"
+      >
           <TabsList className="mb-6 flex-shrink-0">
             <TabsTrigger value="incluidos">Incluídos</TabsTrigger>
             <TabsTrigger value="integrados">Integrados</TabsTrigger>
@@ -2655,7 +2656,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             </div>
           </TabsContent>
         </Tabs>
-      </div>
       
       {renderViewModal()}
       {renderCreateModal()}
