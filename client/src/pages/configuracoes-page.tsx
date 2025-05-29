@@ -68,6 +68,8 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 // Schema para o formulário de conexão
 const connectionFormSchema = z.object({
@@ -84,6 +86,12 @@ const predefinedServices = [
   { name: "github", label: "GitHub", icon: <GitBranchPlus size={18} /> },
   { name: "openai", label: "OpenAI", icon: <BrainCircuit size={18} /> }
 ];
+
+function isValidDate(dateString?: string) {
+  if (!dateString) return false;
+  const date = new Date(dateString);
+  return !isNaN(date.getTime());
+}
 
 export default function ConfiguracoesPage() {
   const { toast } = useToast();
@@ -468,7 +476,9 @@ export default function ConfiguracoesPage() {
                   <h3 className="text-lg font-medium mb-2">Ambiente</h3>
                   <p className="text-sm text-gray-500">
                     <strong>Ambiente:</strong> Produção<br />
-                    <strong>Data da build:</strong> {new Date().toLocaleDateString('pt-BR')}
+                    <strong>Data da build:</strong> {isValidDate(documento.dataCriacao)
+                      ? format(new Date(documento.dataCriacao), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })
+                      : "Data desconhecida"}
                   </p>
                 </div>
                 
