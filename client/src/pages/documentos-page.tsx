@@ -3882,14 +3882,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             {/* Aviso de anexos - não sincronizados ou já sincronizados */}
             {selectedDocument && (() => {
               const hasMondayData = hasMondayItemValues(selectedDocument);
-              const artifactCount = artifactCounts[selectedDocument.id] || 0;
               
-              // Usar estado otimístico se disponível
+              // Usar estado otimístico se disponível, senão usar o campo assetsSynced do documento
               const isOptimisticallySynced = optimisticSyncState === selectedDocument.id;
-              const effectiveArtifactCount = isOptimisticallySynced ? 1 : artifactCount;
+              const isSynced = isOptimisticallySynced || selectedDocument.assetsSynced;
               
-              const hasUnsyncedAttachments = hasMondayData && effectiveArtifactCount === 0;
-              const hasSyncedAttachments = hasMondayData && effectiveArtifactCount > 0;
+              const hasUnsyncedAttachments = hasMondayData && !isSynced;
+              const hasSyncedAttachments = hasMondayData && isSynced;
               
               if (hasUnsyncedAttachments) {
                 return (
