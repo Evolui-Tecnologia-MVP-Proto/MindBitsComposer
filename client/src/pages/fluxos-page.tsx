@@ -131,16 +131,20 @@ const DecisionNode = memo(({ data, selected }: NodeProps) => (
   </div>
 ));
 
-const ReviseNode = memo(({ data }: NodeProps) => (
-  <div className="px-4 py-2 rounded-lg bg-rose-100 border-2 border-rose-500 text-rose-700 shadow-md min-w-[120px] text-center">
+const ReviseNode = memo(({ data, selected }: NodeProps) => (
+  <div className={`px-4 py-2 rounded-lg bg-rose-100 border-2 text-rose-700 shadow-md min-w-[120px] text-center transition-all duration-200 ${
+    selected ? 'border-rose-700 shadow-lg ring-2 ring-rose-300 scale-105' : 'border-rose-500'
+  }`}>
     <div className="font-medium">{data.label}</div>
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-rose-500" />
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-rose-500" />
   </div>
 ));
 
-const RawDocumentNode = memo(({ data }: NodeProps) => (
-  <div className="px-4 py-2 rounded-lg bg-orange-100 border-2 border-orange-500 text-orange-700 shadow-md min-w-[140px] text-center">
+const RawDocumentNode = memo(({ data, selected }: NodeProps) => (
+  <div className={`px-4 py-2 rounded-lg bg-orange-100 border-2 text-orange-700 shadow-md min-w-[140px] text-center transition-all duration-200 ${
+    selected ? 'border-orange-700 shadow-lg ring-2 ring-orange-300 scale-105' : 'border-orange-500'
+  }`}>
     <div className="font-medium">{data.label}</div>
     <div className="text-xs mt-1 opacity-75">Documento Bruto</div>
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-orange-500" />
@@ -148,8 +152,10 @@ const RawDocumentNode = memo(({ data }: NodeProps) => (
   </div>
 ));
 
-const DocumentNode = memo(({ data }: NodeProps) => (
-  <div className="px-4 py-2 rounded-lg bg-purple-100 border-2 border-purple-500 text-purple-700 shadow-md min-w-[140px] text-center">
+const DocumentNode = memo(({ data, selected }: NodeProps) => (
+  <div className={`px-4 py-2 rounded-lg bg-purple-100 border-2 text-purple-700 shadow-md min-w-[140px] text-center transition-all duration-200 ${
+    selected ? 'border-purple-700 shadow-lg ring-2 ring-purple-300 scale-105' : 'border-purple-500'
+  }`}>
     <div className="font-medium">{data.label}</div>
     <div className="text-xs mt-1 opacity-75">Documento Final</div>
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-purple-500" />
@@ -157,16 +163,19 @@ const DocumentNode = memo(({ data }: NodeProps) => (
   </div>
 ));
 
-const MondayNode = memo(({ data }: NodeProps) => (
+const MondayNode = memo(({ data, selected }: NodeProps) => (
   <div className="relative" style={{ width: '140px', height: '80px' }}>
     {/* Hexágono para Monday.com */}
     <div
-      className="absolute inset-0 flex items-center justify-center"
+      className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
+        selected ? 'scale-105' : ''
+      }`}
       style={{
         backgroundColor: '#FEF3C7',
-        border: '2px solid #D97706',
+        border: selected ? '3px solid #92400E' : '2px solid #D97706',
         clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+        boxShadow: selected ? '0 8px 12px -2px rgba(0, 0, 0, 0.2)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        filter: selected ? 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.4))' : 'none'
       }}
     >
       <div className="text-center">
@@ -179,16 +188,19 @@ const MondayNode = memo(({ data }: NodeProps) => (
   </div>
 ));
 
-const GitHubNode = memo(({ data }: NodeProps) => (
+const GitHubNode = memo(({ data, selected }: NodeProps) => (
   <div className="relative" style={{ width: '140px', height: '140px' }}>
     {/* Octógono para GitHub */}
     <div
-      className="absolute inset-0 flex items-center justify-center"
+      className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
+        selected ? 'scale-105' : ''
+      }`}
       style={{
         backgroundColor: '#F3F4F6',
-        border: '2px solid #374151',
+        border: selected ? '3px solid #1F2937' : '2px solid #374151',
         clipPath: 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+        boxShadow: selected ? '0 8px 12px -2px rgba(0, 0, 0, 0.2)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        filter: selected ? 'drop-shadow(0 0 8px rgba(107, 114, 128, 0.4))' : 'none'
       }}
     >
       <div className="text-center">
@@ -201,11 +213,13 @@ const GitHubNode = memo(({ data }: NodeProps) => (
   </div>
 ));
 
-const MindBitsNode = memo(({ data }: NodeProps) => (
+const MindBitsNode = memo(({ data, selected }: NodeProps) => (
   <div className="relative" style={{ width: '140px', height: '100px' }}>
     {/* Elipse para MindBits */}
     <div
-      className="absolute inset-0 flex items-center justify-center rounded-full bg-cyan-100 border-2 border-cyan-500 shadow-md"
+      className={`absolute inset-0 flex items-center justify-center rounded-full bg-cyan-100 border-2 shadow-md transition-all duration-200 ${
+        selected ? 'border-cyan-700 shadow-lg ring-2 ring-cyan-300 scale-105' : 'border-cyan-500'
+      }`}
     >
       <div className="text-center">
         <div className="font-medium text-cyan-800 text-sm">{data.label}</div>
