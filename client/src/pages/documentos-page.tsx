@@ -1504,6 +1504,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   isDocumentationModalOpen,
                                 );
                                 setSelectedDocument(documento);
+                                
+                                // Forçar atualização dos dados necessários para a modal
+                                queryClient.invalidateQueries({
+                                  queryKey: ["/api/documentos", documento.id, "artifacts"],
+                                });
+                                queryClient.invalidateQueries({
+                                  queryKey: ["/api/documentos/artifacts-count"],
+                                });
+                                
                                 setIsDocumentationModalOpen(true);
                                 console.log("Tentando abrir modal...");
                               }}
