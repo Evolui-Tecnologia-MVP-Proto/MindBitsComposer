@@ -149,27 +149,60 @@ const DocumentNode = memo(({ data }: NodeProps) => (
 ));
 
 const MondayNode = memo(({ data }: NodeProps) => (
-  <div className="px-4 py-2 rounded-lg bg-yellow-100 border-2 border-yellow-500 text-yellow-800 shadow-md min-w-[140px] text-center">
-    <div className="font-medium">{data.label}</div>
-    <div className="text-xs mt-1 opacity-75">Plataforma</div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-yellow-500" />
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-yellow-500" />
+  <div className="relative" style={{ width: '140px', height: '80px' }}>
+    {/* Hexágono para Monday.com */}
+    <div
+      className="absolute inset-0 flex items-center justify-center"
+      style={{
+        backgroundColor: '#FEF3C7',
+        border: '2px solid #D97706',
+        clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+      }}
+    >
+      <div className="text-center">
+        <div className="font-medium text-amber-800 text-sm">{data.label}</div>
+        <div className="text-xs opacity-75 text-amber-700">Plataforma</div>
+      </div>
+    </div>
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-amber-500" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-amber-500" />
   </div>
 ));
 
 const GitHubNode = memo(({ data }: NodeProps) => (
-  <div className="px-4 py-2 rounded-lg bg-gray-100 border-2 border-gray-600 text-gray-800 shadow-md min-w-[140px] text-center">
-    <div className="font-medium">{data.label}</div>
-    <div className="text-xs mt-1 opacity-75">Repositório</div>
+  <div className="relative" style={{ width: '140px', height: '140px' }}>
+    {/* Octógono para GitHub */}
+    <div
+      className="absolute inset-0 flex items-center justify-center"
+      style={{
+        backgroundColor: '#F3F4F6',
+        border: '2px solid #374151',
+        clipPath: 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)',
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+      }}
+    >
+      <div className="text-center">
+        <div className="font-medium text-gray-800 text-sm">{data.label}</div>
+        <div className="text-xs opacity-75 text-gray-600">Repositório</div>
+      </div>
+    </div>
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-gray-600" />
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-gray-600" />
   </div>
 ));
 
 const MindBitsNode = memo(({ data }: NodeProps) => (
-  <div className="px-4 py-2 rounded-lg bg-cyan-100 border-2 border-cyan-500 text-cyan-800 shadow-md min-w-[140px] text-center">
-    <div className="font-medium">{data.label}</div>
-    <div className="text-xs mt-1 opacity-75">IA Platform</div>
+  <div className="relative" style={{ width: '140px', height: '100px' }}>
+    {/* Elipse para MindBits */}
+    <div
+      className="absolute inset-0 flex items-center justify-center rounded-full bg-cyan-100 border-2 border-cyan-500 shadow-md"
+    >
+      <div className="text-center">
+        <div className="font-medium text-cyan-800 text-sm">{data.label}</div>
+        <div className="text-xs opacity-75 text-cyan-700">IA Platform</div>
+      </div>
+    </div>
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-cyan-500" />
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-cyan-500" />
   </div>
