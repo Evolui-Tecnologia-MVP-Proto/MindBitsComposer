@@ -19,9 +19,9 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="h-screen flex flex-col overflow-hidden">
       {/* Header */}
-      <header className="bg-white shadow-sm z-10 w-full">
+      <header className="bg-white shadow-sm z-10 w-full flex-shrink-0">
         <div className="w-full px-0 mx-0">
           <div className="flex justify-between h-16 w-full">
             <div className="flex items-center pl-5" style={{ marginLeft: 0 }}>
@@ -40,13 +40,13 @@ export default function Layout({ children }: LayoutProps) {
         </div>
       </header>
 
-      <div className="flex flex-1">
+      <div className="flex flex-1 min-h-0">
         <Sidebar 
           isMobileOpen={isMobileMenuOpen} 
           setIsMobileOpen={setIsMobileMenuOpen} 
         />
         
-        <main className="flex-1 relative z-0 focus:outline-none bg-gray-50 p-5">
+        <main className="flex-1 relative z-0 focus:outline-none bg-gray-50 overflow-hidden">
           {children}
         </main>
       </div>
