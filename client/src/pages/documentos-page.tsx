@@ -3229,9 +3229,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   }
 
   return (
-    <div className="p-6">
+    <div className="h-full flex flex-col p-6">
       {/* Cabeçalho da página */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6 flex-shrink-0">
         <h1 className="text-2xl font-bold">Documentos</h1>
         <Button 
           onClick={() => {
@@ -3247,15 +3247,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       </div>
 
       {/* Abas de navegação */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col flex-1 min-h-0">
+        <TabsList className="flex-shrink-0">
           <TabsTrigger value="integrados">Integrados</TabsTrigger>
           <TabsTrigger value="todos">Todos</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="integrados">
+        <TabsContent value="integrados" className="flex flex-col flex-1 min-h-0">
           {/* Filtros */}
-          <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
+          <div className="mb-6 p-4 bg-gray-50 rounded-lg border flex-shrink-0">
             <h3 className="text-sm font-medium text-gray-700 mb-3">Filtros</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
               {/* Filtro por Nome */}
@@ -3389,15 +3389,19 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           {isLoading ? (
             <div className="text-center py-6">Carregando documentos...</div>
           ) : (
-            renderDocumentosTable(filteredAndSortedDocumentos)
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              {renderDocumentosTable(filteredAndSortedDocumentos)}
+            </div>
           )}
         </TabsContent>
 
-        <TabsContent value="todos">
+        <TabsContent value="todos" className="flex flex-col flex-1 min-h-0">
           {isLoading ? (
             <div className="text-center py-6">Carregando documentos...</div>
           ) : (
-            renderDocumentosTable(documentos)
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              {renderDocumentosTable(documentos)}
+            </div>
           )}
         </TabsContent>
       </Tabs>
