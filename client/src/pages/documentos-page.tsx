@@ -989,11 +989,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       }
     },
     onSuccess: (data) => {
-      // Limpar estado otimístico
-      setOptimisticSyncState(null);
-      
-      // Invalidar cache dos artifacts para o documento específico
+      // Atualizar o documento selecionado localmente para refletir que está sincronizado
       if (selectedDocument?.id) {
+        setSelectedDocument({
+          ...selectedDocument,
+          assetsSynced: true
+        });
+        
+        // Invalidar cache dos artifacts para o documento específico
         queryClient.invalidateQueries({
           queryKey: ["/api/documentos", selectedDocument.id, "artifacts"],
         });
@@ -1008,6 +1011,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       queryClient.invalidateQueries({
         queryKey: ["/api/documentos"],
       });
+
+      // Limpar estado otimístico após todas as atualizações
+      setOptimisticSyncState(null);
 
       toast({
         title: "Anexos integrados!",
