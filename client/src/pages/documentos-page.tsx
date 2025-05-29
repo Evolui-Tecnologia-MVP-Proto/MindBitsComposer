@@ -2318,7 +2318,24 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           <TabsContent value="integrados" className="slide-in">
             {/* Filtros */}
             <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
-              <h3 className="text-sm font-medium text-gray-700 mb-3">Filtros</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-medium text-gray-700">Filtros</h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setFiltros({
+                    responsavel: "",
+                    modulo: "",
+                    cliente: "",
+                    statusOrigem: "",
+                    arquivos: "",
+                    nome: ""
+                  })}
+                  className="text-xs"
+                >
+                  Limpar filtros
+                </Button>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                 {/* Filtro por Nome */}
                 <div>
@@ -2428,24 +2445,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 </div>
               </div>
 
-              {/* Botão para limpar filtros */}
-              <div className="mt-3 flex justify-end">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setFiltros({
-                    responsavel: "",
-                    modulo: "",
-                    cliente: "",
-                    statusOrigem: "",
-                    arquivos: "",
-                    nome: ""
-                  })}
-                  className="text-xs"
-                >
-                  Limpar filtros
-                </Button>
-              </div>
+
             </div>
 
             {isLoading ? (
