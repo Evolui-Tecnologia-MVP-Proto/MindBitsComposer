@@ -63,6 +63,7 @@ import {
   FileText,
   Check,
   BookOpen,
+  TestTube,
 } from "lucide-react";
 import {
   type Documento,
@@ -86,6 +87,7 @@ export default function DocumentosPage() {
     useState(false);
   const [isDocumentationModalOpen, setIsDocumentationModalOpen] =
     useState(false);
+  const [isTestModalOpen, setIsTestModalOpen] = useState(false);
   const [editingDocument, setEditingDocument] = useState<Documento | null>(
     null,
   );
@@ -1477,27 +1479,38 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     <TableCell className="text-right">
                       <div className="flex justify-end space-x-2">
                         {activeTab === "integrados" && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => {
-                              console.log(
-                                "Botão documentação clicado",
-                                documento,
-                              );
-                              console.log(
-                                "Estado atual da modal:",
-                                isDocumentationModalOpen,
-                              );
-                              setSelectedDocument(documento);
-                              setIsDocumentationModalOpen(true);
-                              console.log("Tentando abrir modal...");
-                            }}
-                            title="Iniciar Documentação"
-                          >
-                            <BookOpen className="h-4 w-4" />
-                          </Button>
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => {
+                                console.log(
+                                  "Botão documentação clicado",
+                                  documento,
+                                );
+                                console.log(
+                                  "Estado atual da modal:",
+                                  isDocumentationModalOpen,
+                                );
+                                setSelectedDocument(documento);
+                                setIsDocumentationModalOpen(true);
+                                console.log("Tentando abrir modal...");
+                              }}
+                              title="Iniciar Documentação"
+                            >
+                              <BookOpen className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                              onClick={() => setIsTestModalOpen(true)}
+                              title="Teste"
+                            >
+                              <TestTube className="h-4 w-4 text-purple-500" />
+                            </Button>
+                          </>
                         )}
                         <Button
                           variant="ghost"
@@ -3279,76 +3292,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {renderEditModal()}
       {renderAddArtifactModal()}
       {renderEditArtifactModal()}
-
-      {/* Modal de documentação */}
-      <Dialog open={isDocumentationModalOpen} onOpenChange={setIsDocumentationModalOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-blue-600" />
-              Iniciar Documentação
-            </DialogTitle>
-            <DialogDescription>
-              Configure os parâmetros para iniciar o processo de documentação do documento selecionado.
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="space-y-6 py-4">
-            {/* Documento selecionado */}
-            {selectedDocument && (
-              <div className="bg-gray-50 p-4 rounded-lg border">
-                <div className="flex items-start gap-3">
-                  <File className="h-5 w-5 text-blue-500 mt-0.5" />
-                  <div className="flex-1">
-                    <p className="font-medium text-sm text-gray-900">{selectedDocument.objeto}</p>
-                    <div className="mt-2 grid grid-cols-2 gap-3 text-xs text-gray-600">
-                      <div>
-                        <span className="font-medium">Cliente:</span> {selectedDocument.cliente}
-                      </div>
-                      <div>
-                        <span className="font-medium">Responsável:</span> {selectedDocument.responsavel}
-                      </div>
-                      <div>
-                        <span className="font-medium">Sistema:</span> {selectedDocument.sistema}
-                      </div>
-                      <div>
-                        <span className="font-medium">Módulo:</span> {selectedDocument.modulo}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {/* Área para futuras configurações */}
-            <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
-              <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p className="text-sm font-medium">Configurações de Documentação</p>
-              <p className="text-xs mt-1">Parâmetros e opções serão implementados aqui</p>
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsDocumentationModalOpen(false)}
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={() => {
-                console.log("Iniciar documentação para:", selectedDocument);
-                // Aqui será implementada a funcionalidade de documentação
-                setIsDocumentationModalOpen(false);
-              }}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              <BookOpen className="mr-2 h-4 w-4" />
-              Confirmar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {renderDocumentationModal()}
     </div>
   );
 
@@ -3857,6 +3801,93 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   Adicionar Anexo
                 </>
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  function renderDocumentationModal() {
+    return (
+      <Dialog
+        open={isDocumentationModalOpen}
+        onOpenChange={setIsDocumentationModalOpen}
+      >
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-blue-600" />
+              Iniciar Documentação
+            </DialogTitle>
+            <DialogDescription>
+              Configure os parâmetros para iniciar o processo de documentação do
+              documento selecionado.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* Documento selecionado */}
+            {selectedDocument && (
+              <div className="bg-gray-50 p-4 rounded-lg border">
+                <div className="flex items-start gap-3">
+                  <File className="h-5 w-5 text-blue-500 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="font-medium text-sm text-gray-900">
+                      {selectedDocument.objeto}
+                    </p>
+                    <div className="mt-2 grid grid-cols-2 gap-3 text-xs text-gray-600">
+                      <div>
+                        <span className="font-medium">Cliente:</span>{" "}
+                        {selectedDocument.cliente}
+                      </div>
+                      <div>
+                        <span className="font-medium">Responsável:</span>{" "}
+                        {selectedDocument.responsavel}
+                      </div>
+                      <div>
+                        <span className="font-medium">Sistema:</span>{" "}
+                        {selectedDocument.sistema}
+                      </div>
+                      <div>
+                        <span className="font-medium">Módulo:</span>{" "}
+                        {selectedDocument.modulo}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Área para futuras configurações */}
+            <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
+              <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <p className="text-sm font-medium">
+                Configurações de Documentação
+              </p>
+              <p className="text-xs mt-1">
+                Parâmetros e opções serão implementados aqui
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDocumentationModalOpen(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                console.log("Iniciar documentação para:", selectedDocument);
+                // Aqui será implementada a funcionalidade de documentação
+                setIsDocumentationModalOpen(false);
+              }}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <BookOpen className="mr-2 h-4 w-4" />
+              Confirmar
             </Button>
           </DialogFooter>
         </DialogContent>
