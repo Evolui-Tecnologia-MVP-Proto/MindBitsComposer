@@ -3614,50 +3614,52 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       </Dialog>
 
       {/* Modal para iniciar documentação */}
-      <Dialog open={isDocumentationModalOpen} onOpenChange={setIsDocumentationModalOpen}>
-        <DialogContent className="max-w-md z-[9999]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5" />
-              Iniciar Documentação
-            </DialogTitle>
-            <DialogDescription>
-              Configure os parâmetros para iniciar o processo de documentação do documento selecionado.
-            </DialogDescription>
-          </DialogHeader>
+      {isDocumentationModalOpen && (
+        <Dialog open={isDocumentationModalOpen} onOpenChange={setIsDocumentationModalOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5" />
+                Iniciar Documentação
+              </DialogTitle>
+              <DialogDescription>
+                Configure os parâmetros para iniciar o processo de documentação do documento selecionado.
+              </DialogDescription>
+            </DialogHeader>
 
-          <div className="space-y-4 py-4">
-            {selectedDocument && (
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="font-medium text-sm">{selectedDocument.objeto}</p>
-                <p className="text-xs text-gray-500">Documento selecionado</p>
+            <div className="space-y-4 py-4">
+              {selectedDocument && (
+                <div className="bg-gray-50 p-3 rounded-lg">
+                  <p className="font-medium text-sm">{selectedDocument.objeto}</p>
+                  <p className="text-xs text-gray-500">Documento selecionado</p>
+                </div>
+              )}
+              
+              <div className="text-center py-8 text-gray-500">
+                <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                <p>Parâmetros de documentação serão implementados aqui</p>
               </div>
-            )}
-            
-            <div className="text-center py-8 text-gray-500">
-              <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>Parâmetros de documentação serão implementados aqui</p>
             </div>
-          </div>
 
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setIsDocumentationModalOpen(false)}
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={() => {
-                // Lógica para iniciar documentação será implementada
-                setIsDocumentationModalOpen(false);
-              }}
-            >
-              Confirmar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setIsDocumentationModalOpen(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={() => {
+                  // Lógica para iniciar documentação será implementada
+                  setIsDocumentationModalOpen(false);
+                }}
+              >
+                Confirmar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
 
       </div>
     </div>
