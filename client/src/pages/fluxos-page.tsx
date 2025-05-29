@@ -34,48 +34,57 @@ import {
 import { toast } from '@/hooks/use-toast';
 
 // Definição dos componentes de nós personalizados
-const StartNode = memo(({ data }: NodeProps) => (
-  <div className="px-4 py-2 rounded-full bg-blue-100 border-2 border-blue-500 text-blue-700 shadow-md min-w-[100px] text-center">
+const StartNode = memo(({ data, selected }: NodeProps) => (
+  <div className={`px-4 py-2 rounded-full bg-blue-100 border-2 text-blue-700 shadow-md min-w-[100px] text-center transition-all duration-200 ${
+    selected ? 'border-blue-700 shadow-lg ring-2 ring-blue-300 scale-105' : 'border-blue-500'
+  }`}>
     <div className="font-medium">{data.label}</div>
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-blue-500" />
   </div>
 ));
 
-const EndNode = memo(({ data }: NodeProps) => (
-  <div className="px-4 py-2 rounded-full bg-slate-100 border-2 border-slate-500 text-slate-700 shadow-md min-w-[100px] text-center">
+const EndNode = memo(({ data, selected }: NodeProps) => (
+  <div className={`px-4 py-2 rounded-full bg-slate-100 border-2 text-slate-700 shadow-md min-w-[100px] text-center transition-all duration-200 ${
+    selected ? 'border-slate-700 shadow-lg ring-2 ring-slate-300 scale-105' : 'border-slate-500'
+  }`}>
     <div className="font-medium">{data.label}</div>
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-slate-500" />
   </div>
 ));
 
-const ElaboreNode = memo(({ data }: NodeProps) => (
-  <div className="px-4 py-2 rounded-lg bg-green-100 border-2 border-green-500 text-green-700 shadow-md min-w-[120px] text-center">
+const ElaboreNode = memo(({ data, selected }: NodeProps) => (
+  <div className={`px-4 py-2 rounded-lg bg-green-100 border-2 text-green-700 shadow-md min-w-[120px] text-center transition-all duration-200 ${
+    selected ? 'border-green-700 shadow-lg ring-2 ring-green-300 scale-105' : 'border-green-500'
+  }`}>
     <div className="font-medium">{data.label}</div>
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-green-500" />
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-green-500" />
   </div>
 ));
 
-const ApproveNode = memo(({ data }: NodeProps) => (
-  <div className="px-4 py-2 rounded-lg bg-indigo-100 border-2 border-indigo-500 text-indigo-700 shadow-md min-w-[120px] text-center">
+const ApproveNode = memo(({ data, selected }: NodeProps) => (
+  <div className={`px-4 py-2 rounded-lg bg-indigo-100 border-2 text-indigo-700 shadow-md min-w-[120px] text-center transition-all duration-200 ${
+    selected ? 'border-indigo-700 shadow-lg ring-2 ring-indigo-300 scale-105' : 'border-indigo-500'
+  }`}>
     <div className="font-medium">{data.label}</div>
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-indigo-500" />
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-indigo-500" />
   </div>
 ));
 
-const DecisionNode = memo(({ data }: NodeProps) => (
+const DecisionNode = memo(({ data, selected }: NodeProps) => (
   <div className="relative" style={{ width: '100px', height: '100px' }}>
     <div
-      className="absolute"
+      className={`absolute transition-all duration-200 ${selected ? 'scale-105' : ''}`}
       style={{
         width: '100%',
         height: '100%',
         backgroundColor: '#FEF3C7',
-        border: '2px solid #D97706',
+        border: selected ? '3px solid #92400E' : '2px solid #D97706',
         transformStyle: 'preserve-3d',
         transform: 'rotateX(60deg) rotateZ(45deg)',
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+        boxShadow: selected ? '0 8px 12px -2px rgba(0, 0, 0, 0.2)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        filter: selected ? 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.4))' : 'none'
       }}
     >
       <div 
@@ -231,6 +240,7 @@ const FlowCanvas = () => {
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
   const [flowName, setFlowName] = useState('Novo Fluxo');
   const [selectedNodeType, setSelectedNodeType] = useState<string>('');
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   const onConnect = useCallback((params: any) => {
     setEdges((eds) =>
@@ -247,6 +257,15 @@ const FlowCanvas = () => {
       )
     );
   }, [setEdges]);
+
+  const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
+    event.stopPropagation();
+    setSelectedNodeId(node.id);
+  }, []);
+
+  const onPaneClick = useCallback(() => {
+    setSelectedNodeId(null);
+  }, []);
 
   const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -413,6 +432,8 @@ const FlowCanvas = () => {
             onInit={setReactFlowInstance}
             onDrop={onDrop}
             onDragOver={onDragOver}
+            onNodeClick={onNodeClick}
+            onPaneClick={onPaneClick}
             nodeTypes={nodeTypes}
             defaultEdgeOptions={{
               type: 'smoothstep',
