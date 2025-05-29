@@ -1223,7 +1223,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   <TableHead className="bg-gray-50 border-b text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
+              <TableBody className="table-compact">
                 {documentos.map((documento) => (
                   <TableRow key={documento.id}>
                     <TableCell>
