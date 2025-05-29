@@ -130,6 +130,24 @@ const ReviseNode = memo(({ data }: NodeProps) => (
   </div>
 ));
 
+const RawDocumentNode = memo(({ data }: NodeProps) => (
+  <div className="px-4 py-2 rounded-lg bg-orange-100 border-2 border-orange-500 text-orange-700 shadow-md min-w-[140px] text-center">
+    <div className="font-medium">{data.label}</div>
+    <div className="text-xs mt-1 opacity-75">Documento Bruto</div>
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-orange-500" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-orange-500" />
+  </div>
+));
+
+const DocumentNode = memo(({ data }: NodeProps) => (
+  <div className="px-4 py-2 rounded-lg bg-purple-100 border-2 border-purple-500 text-purple-700 shadow-md min-w-[140px] text-center">
+    <div className="font-medium">{data.label}</div>
+    <div className="text-xs mt-1 opacity-75">Documento Final</div>
+    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-purple-500" />
+    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-purple-500" />
+  </div>
+));
+
 const initialNodes: Node[] = [];
 
 const nodeTypes: NodeTypes = {
@@ -139,6 +157,8 @@ const nodeTypes: NodeTypes = {
   approveNode: ApproveNode,
   decisionNode: DecisionNode,
   reviseNode: ReviseNode,
+  rawDocumentNode: RawDocumentNode,
+  documentNode: DocumentNode,
 };
 
 const FlowCanvas = () => {
@@ -286,6 +306,8 @@ const FlowCanvas = () => {
                   <SelectItem value="approveNode">Aprovar</SelectItem>
                   <SelectItem value="decisionNode">Decisão</SelectItem>
                   <SelectItem value="reviseNode">Revisar</SelectItem>
+                  <SelectItem value="rawDocumentNode">RAW-Document</SelectItem>
+                  <SelectItem value="documentNode">Document</SelectItem>
                   <SelectItem value="endNode">Fim</SelectItem>
                 </SelectContent>
               </Select>
