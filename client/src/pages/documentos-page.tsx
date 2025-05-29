@@ -3853,11 +3853,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               </div>
             )}
 
-            {/* Aviso de anexos não sincronizados */}
+            {/* Aviso de anexos - não sincronizados ou já sincronizados */}
             {selectedDocument && (() => {
               const hasMondayData = hasMondayItemValues(selectedDocument);
               const artifactCount = artifactCounts[selectedDocument.id] || 0;
               const hasUnsyncedAttachments = hasMondayData && artifactCount === 0;
+              const hasSyncedAttachments = hasMondayData && artifactCount > 0;
               
               if (hasUnsyncedAttachments) {
                 return (
@@ -3902,6 +3903,24 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 );
               }
+              
+              if (hasSyncedAttachments) {
+                return (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0">
+                        <Check className="h-5 w-5 text-green-500" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-sm font-medium text-green-800">
+                          Anexos do item já sincronizados
+                        </h4>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+              
               return null;
             })()}
 
