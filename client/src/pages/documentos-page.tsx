@@ -86,6 +86,7 @@ export default function DocumentosPage() {
     useState(false);
   const [isDocumentationModalOpen, setIsDocumentationModalOpen] =
     useState(false);
+  const [optimisticSyncState, setOptimisticSyncState] = useState<string | null>(null);
 
 
   const [editingDocument, setEditingDocument] = useState<Documento | null>(
@@ -988,6 +989,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       }
     },
     onSuccess: (data) => {
+      // Limpar estado otimístico
+      setOptimisticSyncState(null);
+      
       // Invalidar cache dos artifacts para o documento específico
       if (selectedDocument?.id) {
         queryClient.invalidateQueries({
@@ -1013,6 +1017,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       });
     },
     onError: (error: any) => {
+      // Limpar estado otimístico em caso de erro
+      setOptimisticSyncState(null);
+      
       toast({
         title: "Erro ao integrar anexos",
         description:
@@ -3876,8 +3883,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             {selectedDocument && (() => {
               const hasMondayData = hasMondayItemValues(selectedDocument);
               const artifactCount = artifactCounts[selectedDocument.id] || 0;
-              const hasUnsyncedAttachments = hasMondayData && artifactCount === 0;
-              const hasSyncedAttachments = hasMondayData && artifactCount > 0;
+              
+              // Usar estado otimístico se disponível
+              const isOptimisticallySynced = optimisticSyncState === selectedDocument.id;
+              const effectiveArtifactCount = isOptimisticallySynced ? 1 : artifactCount;
+              
+              const hasUnsyncedAttachments = hasMondayData && effectiveArtifactCount === 0;
+              const hasSyncedAttachments = hasMondayData && effectiveArtifactCount > 0;
               
               if (hasUnsyncedAttachments) {
                 return (
@@ -3898,6 +3910,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         <Button
                           onClick={() => {
                             if (selectedDocument?.id) {
+                              // Atualização otimística - definir como sincronizado imediatamente
+                              setOptimisticSyncState(selectedDocument.id);
                               integrateAttachmentsMutation.mutate(selectedDocument.id);
                             }
                           }}
