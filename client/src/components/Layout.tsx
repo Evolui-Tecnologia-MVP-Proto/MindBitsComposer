@@ -46,7 +46,7 @@ export default function Layout({ children }: LayoutProps) {
           setIsMobileOpen={setIsMobileMenuOpen} 
         />
         
-        <main className="flex-1 relative z-0 focus:outline-none bg-gray-50 p-5 overflow-auto min-h-0">
+        <main className="flex-1 relative z-0 focus:outline-none bg-gray-50 p-5 min-h-0 overflow-hidden">
           <div className="h-full overflow-auto">
             {children}
           </div>
