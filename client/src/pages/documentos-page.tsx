@@ -3226,10 +3226,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   }
 
   return (
-    <div className="p-6">
-      {/* Cabeçalho da página */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Documentos</h1>
+    <div className="min-h-screen flex flex-col">
+      <div className="flex-1 p-6">
+        {/* Cabeçalho da página */}
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Documentos</h1>
         <Button 
           onClick={() => {
             console.log("🔥 BOTÃO INCLUIR CLICADO!");
@@ -3241,10 +3242,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           <Plus className="mr-2 h-4 w-4" />
           🆕 INCLUIR
         </Button>
-      </div>
+        </div>
 
-      {/* Abas de navegação */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        {/* Abas de navegação */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="integrados">Integrados</TabsTrigger>
           <TabsTrigger value="todos">Todos</TabsTrigger>
@@ -3593,6 +3594,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         </DialogContent>
       </Dialog>
 
+      </div>
     </div>
   );
 }
