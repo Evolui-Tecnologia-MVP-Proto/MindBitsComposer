@@ -3853,6 +3853,58 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               </div>
             )}
 
+            {/* Aviso de anexos não sincronizados */}
+            {selectedDocument && (() => {
+              const hasMondayData = hasMondayItemValues(selectedDocument);
+              const artifactCount = artifactCounts[selectedDocument.id] || 0;
+              const hasUnsyncedAttachments = hasMondayData && artifactCount === 0;
+              
+              if (hasUnsyncedAttachments) {
+                return (
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-sm font-medium text-amber-800 mb-2">
+                          Anexos não sincronizados
+                        </h4>
+                        <p className="text-sm text-amber-700 mb-4">
+                          O item tem anexos que não foram sincronizados. Estes anexos podem ser úteis para o processo de análise e geração da documentação.
+                        </p>
+                        <Button
+                          onClick={() => {
+                            if (selectedDocument?.id) {
+                              integrateAttachmentsMutation.mutate(selectedDocument.id);
+                            }
+                          }}
+                          disabled={integrateAttachmentsMutation.isPending}
+                          size="sm"
+                          className="bg-amber-600 hover:bg-amber-700 text-white"
+                        >
+                          {integrateAttachmentsMutation.isPending ? (
+                            <>
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              Sincronizando...
+                            </>
+                          ) : (
+                            <>
+                              <Download className="mr-2 h-4 w-4" />
+                              Sincronizar
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+              return null;
+            })()}
+
             {/* Área para futuras configurações */}
             <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
               <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300" />
