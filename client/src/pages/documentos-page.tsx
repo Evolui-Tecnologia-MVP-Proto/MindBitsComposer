@@ -3244,254 +3244,340 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   }
 
+  // Modal para iniciar documentação
+  const renderDocumentationModal = () => {
+    if (!selectedDocument) return null;
+    
+    return (
+      <Dialog open={isDocumentationModalOpen} onOpenChange={setIsDocumentationModalOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-blue-600" />
+              Iniciar Documentação
+            </DialogTitle>
+            <DialogDescription>
+              Configure os parâmetros para iniciar o processo de documentação do documento selecionado.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {/* Documento selecionado */}
+            <div className="bg-gray-50 p-4 rounded-lg border">
+              <div className="flex items-start gap-3">
+                <File className="h-5 w-5 text-blue-500 mt-0.5" />
+                <div className="flex-1">
+                  <p className="font-medium text-sm text-gray-900">{selectedDocument.objeto}</p>
+                  <div className="mt-2 grid grid-cols-2 gap-3 text-xs text-gray-600">
+                    <div>
+                      <span className="font-medium">Cliente:</span> {selectedDocument.cliente}
+                    </div>
+                    <div>
+                      <span className="font-medium">Responsável:</span> {selectedDocument.responsavel}
+                    </div>
+                    <div>
+                      <span className="font-medium">Sistema:</span> {selectedDocument.sistema}
+                    </div>
+                    <div>
+                      <span className="font-medium">Módulo:</span> {selectedDocument.modulo}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Área para futuras configurações */}
+            <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
+              <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <p className="text-sm font-medium">Configurações de Documentação</p>
+              <p className="text-xs mt-1">Parâmetros e opções serão implementados aqui</p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDocumentationModalOpen(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={() => {
+                console.log("Iniciar documentação para:", selectedDocument);
+                // Aqui será implementada a funcionalidade de documentação
+                setIsDocumentationModalOpen(false);
+              }}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <BookOpen className="mr-2 h-4 w-4" />
+              Confirmar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex-1">
-        {/* Cabeçalho da página */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Documentos</h1>
-        <Button 
-          onClick={() => {
-            console.log("🔥 BOTÃO INCLUIR CLICADO!");
-            resetFormData();
-            setIsCreateModalOpen(true);
-          }}
-          className="bg-green-600 hover:bg-green-700 text-white font-bold"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          🆕 INCLUIR
-        </Button>
+    <div className="flex flex-col h-screen overflow-hidden">
+      {/* Header fixo */}
+      <div className="flex-shrink-0 p-6 border-b bg-white">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Documentos</h1>
+            <p className="text-gray-600 mt-1">Gerencie documentos e suas integrações com sistemas externos</p>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Novo Documento
+            </Button>
+          </div>
         </div>
 
-        {/* Abas de navegação */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="integrados">Integrados</TabsTrigger>
-          <TabsTrigger value="todos">Todos</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="integrados">
-          {/* Filtros */}
-          <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Filtros</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-              {/* Filtro por Nome */}
-              <div>
-                <Label htmlFor="filtro-nome" className="text-xs">Nome</Label>
-                <Input
-                  id="filtro-nome"
-                  placeholder="Filtrar por nome..."
-                  value={filtros.nome}
-                  onChange={(e) => setFiltros(prev => ({ ...prev, nome: e.target.value }))}
-                  className="h-8 text-sm"
-                />
-              </div>
-
-              {/* Filtro por Responsável */}
-              <div>
-                <Label htmlFor="filtro-responsavel" className="text-xs">Responsável</Label>
-                <Select
-                  value={filtros.responsavel}
-                  onValueChange={(value) => setFiltros(prev => ({ ...prev, responsavel: value }))}
-                >
-                  <SelectTrigger className="h-8 text-sm">
-                    <SelectValue placeholder="Todos" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
-                    {responsaveisUnicos.map(responsavel => (
-                      <SelectItem key={responsavel} value={responsavel}>{responsavel}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Filtro por Módulo */}
-              <div>
-                <Label htmlFor="filtro-modulo" className="text-xs">Módulo</Label>
-                <Select
-                  value={filtros.modulo}
-                  onValueChange={(value) => setFiltros(prev => ({ ...prev, modulo: value }))}
-                >
-                  <SelectTrigger className="h-8 text-sm">
-                    <SelectValue placeholder="Todos" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
-                    {modulosUnicos.map(modulo => (
-                      <SelectItem key={modulo} value={modulo}>{modulo}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Filtro por Cliente */}
-              <div>
-                <Label htmlFor="filtro-cliente" className="text-xs">Cliente</Label>
-                <Select
-                  value={filtros.cliente}
-                  onValueChange={(value) => setFiltros(prev => ({ ...prev, cliente: value }))}
-                >
-                  <SelectTrigger className="h-8 text-sm">
-                    <SelectValue placeholder="Todos" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
-                    {clientesUnicos.map(cliente => (
-                      <SelectItem key={cliente} value={cliente}>{cliente}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Filtro por Status Origem */}
-              <div>
-                <Label htmlFor="filtro-status-origem" className="text-xs">Status Origem</Label>
-                <Select
-                  value={filtros.statusOrigem}
-                  onValueChange={(value) => setFiltros(prev => ({ ...prev, statusOrigem: value }))}
-                >
-                  <SelectTrigger className="h-8 text-sm">
-                    <SelectValue placeholder="Todos" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
-                    {statusOrigensUnicos.map(status => (
-                      <SelectItem key={status} value={status}>{status}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Filtro por Arquivos */}
-              <div>
-                <Label htmlFor="filtro-arquivos" className="text-xs">Arquivos</Label>
-                <Select
-                  value={filtros.arquivos}
-                  onValueChange={(value) => setFiltros(prev => ({ ...prev, arquivos: value }))}
-                >
-                  <SelectTrigger className="h-8 text-sm">
-                    <SelectValue placeholder="Todos" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="">Todos</SelectItem>
-                    <SelectItem value="sem-arquivos">Sem arquivos</SelectItem>
-                    <SelectItem value="a-sincronizar">A sincronizar</SelectItem>
-                    <SelectItem value="sincronizados">Sincronizados</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Botão para limpar filtros */}
-            <div className="mt-3 flex justify-end">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setFiltros({
-                  responsavel: "__todos__",
-                  modulo: "__todos__",
-                  cliente: "__todos__",
-                  statusOrigem: "__todos__",
-                  arquivos: "__todos__",
-                  nome: ""
-                })}
-                className="text-xs"
-              >
-                Limpar filtros
-              </Button>
-            </div>
+        {/* Filtros */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
+          <div>
+            <Label htmlFor="filter-responsavel" className="text-xs font-medium text-gray-700 mb-1 block">
+              Responsável
+            </Label>
+            <Select
+              value={filtros.responsavel}
+              onValueChange={(value) => setFiltros(prev => ({ ...prev, responsavel: value }))}
+            >
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue placeholder="Todos" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__todos__">Todos</SelectItem>
+                {responsaveisUnicos.map(responsavel => (
+                  <SelectItem key={responsavel} value={responsavel}>
+                    {responsavel}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          {isLoading ? (
-            <div className="text-center py-6">Carregando documentos...</div>
-          ) : (
-            renderDocumentosTable(filteredAndSortedDocumentos)
-          )}
-        </TabsContent>
+          <div>
+            <Label htmlFor="filter-modulo" className="text-xs font-medium text-gray-700 mb-1 block">
+              Módulo
+            </Label>
+            <Select
+              value={filtros.modulo}
+              onValueChange={(value) => setFiltros(prev => ({ ...prev, modulo: value }))}
+            >
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue placeholder="Todos" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__todos__">Todos</SelectItem>
+                {modulosUnicos.map(modulo => (
+                  <SelectItem key={modulo} value={modulo}>
+                    {modulo}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        <TabsContent value="todos">
-          {isLoading ? (
-            <div className="text-center py-6">Carregando documentos...</div>
-          ) : (
-            renderDocumentosTable(documentos)
-          )}
-        </TabsContent>
-      </Tabs>
+          <div>
+            <Label htmlFor="filter-cliente" className="text-xs font-medium text-gray-700 mb-1 block">
+              Cliente
+            </Label>
+            <Select
+              value={filtros.cliente}
+              onValueChange={(value) => setFiltros(prev => ({ ...prev, cliente: value }))}
+            >
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue placeholder="Todos" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__todos__">Todos</SelectItem>
+                {clientesUnicos.map(cliente => (
+                  <SelectItem key={cliente} value={cliente}>
+                    {cliente}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-      {/* Modal de visualização */}
-      {renderViewModal()}
+          <div>
+            <Label htmlFor="filter-status-origem" className="text-xs font-medium text-gray-700 mb-1 block">
+              Status Origem
+            </Label>
+            <Select
+              value={filtros.statusOrigem}
+              onValueChange={(value) => setFiltros(prev => ({ ...prev, statusOrigem: value }))}
+            >
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue placeholder="Todos" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__todos__">Todos</SelectItem>
+                {statusOrigensUnicos.map(status => (
+                  <SelectItem key={status} value={status}>
+                    {status}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-      {/* Modal de criação */}
+          <div>
+            <Label htmlFor="filter-arquivos" className="text-xs font-medium text-gray-700 mb-1 block">
+              Status Arquivos
+            </Label>
+            <Select
+              value={filtros.arquivos}
+              onValueChange={(value) => setFiltros(prev => ({ ...prev, arquivos: value }))}
+            >
+              <SelectTrigger className="h-8 text-xs">
+                <SelectValue placeholder="Todos" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__todos__">Todos</SelectItem>
+                <SelectItem value="sem-arquivos">Sem arquivos</SelectItem>
+                <SelectItem value="a-sincronizar">A sincronizar</SelectItem>
+                <SelectItem value="sincronizados">Sincronizados</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="filter-nome" className="text-xs font-medium text-gray-700 mb-1 block">
+              Buscar Nome
+            </Label>
+            <Input
+              id="filter-nome"
+              placeholder="Filtrar por nome..."
+              value={filtros.nome}
+              onChange={(e) => setFiltros(prev => ({ ...prev, nome: e.target.value }))}
+              className="h-8 text-xs"
+            />
+          </div>
+        </div>
+
+        {/* Botão para limpar filtros */}
+        <div className="flex justify-end">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setFiltros({
+              responsavel: "__todos__",
+              modulo: "__todos__",
+              cliente: "__todos__",
+              statusOrigem: "__todos__",
+              arquivos: "__todos__",
+              nome: ""
+            })}
+            className="text-xs"
+          >
+            <X className="h-3 w-3 mr-1" />
+            Limpar Filtros
+          </Button>
+        </div>
+
+        {/* Tabs de navegação */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="incluidos" className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Incluídos ({getDocumentosPorCategoria("incluidos").length})
+            </TabsTrigger>
+            <TabsTrigger value="atualizados" className="flex items-center gap-2">
+              <RefreshCw className="h-4 w-4" />
+              Atualizados ({getDocumentosPorCategoria("atualizados").length})
+            </TabsTrigger>
+            <TabsTrigger value="integrados" className="flex items-center gap-2">
+              <Database className="h-4 w-4" />
+              Integrados ({getDocumentosPorCategoria("integrados").length})
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </div>
+
+      {/* Conteúdo principal com scroll */}
+      <div className="flex-1 min-h-0 overflow-auto">
+        <div className="p-6">
+          <div className="bg-white rounded-lg border shadow-sm" style={{ height: 'calc(100vh - 450px)', minHeight: '400px' }}>
+            <div className="overflow-auto h-full">
+              {renderTableContent()}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modais */}
       {renderCreateModal()}
-
-      {/* Modal de edição */}
+      {renderViewModal()}
       {renderEditModal()}
-
-      {/* Modal de adição de artefato */}
       {renderAddArtifactModal()}
-
-      {/* Modal de edição de artefato */}
       {renderEditArtifactModal()}
+      {renderDocumentationModal()}
 
-      {/* Modal de confirmação de exclusão simples */}
-      {isDeleteConfirmOpen && documentToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
-            <div className="flex items-center gap-2 text-red-600 mb-4">
-              <Trash2 className="h-5 w-5" />
-              <h3 className="font-semibold text-lg">Confirmar Exclusão</h3>
-            </div>
-            
-            <p className="text-gray-700 mb-6">
-              Tem certeza que deseja excluir o documento{" "}
-              <span className="font-semibold text-gray-900">
-                "{documentToDelete.objeto}"
-              </span>
-              ?
-              <br />
-              <br />
-              <span className="text-red-600 font-medium">
-                Esta ação não pode ser desfeita.
-              </span>
-            </p>
-            
-            <div className="flex gap-3 justify-end">
-              <Button
-                variant="outline"
-                onClick={cancelDelete}
-                disabled={deleteDocumentoMutation.isPending}
-              >
-                Cancelar
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={confirmDelete}
-                disabled={deleteDocumentoMutation.isPending}
-                className="bg-red-600 hover:bg-red-700"
-              >
-                {deleteDocumentoMutation.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Excluindo...
-                  </>
-                ) : (
-                  <>
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Excluir
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Diálogos de confirmação */}
+      <AlertDialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o documento "{documentToDelete?.objeto}"? 
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (documentToDelete) {
+                  deleteDocumentoMutation.mutate(documentToDelete.id);
+                  setDocumentToDelete(null);
+                }
+                setIsDeleteConfirmOpen(false);
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-      {/* Modal de Visualização de Arquivo */}
-      {console.log('🖼️ Estado da modal:', filePreviewModal)}
+      <AlertDialog open={isDeleteArtifactConfirmOpen} onOpenChange={setIsDeleteArtifactConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir este anexo? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (artifactToDelete) {
+                  deleteArtifactMutation.mutate(artifactToDelete);
+                  setArtifactToDelete(null);
+                }
+                setIsDeleteArtifactConfirmOpen(false);
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Modal de preview de arquivos */}
       <Dialog open={filePreviewModal.isOpen} onOpenChange={(open) => {
         if (!open) {
-          // Limpar URL do blob quando fechar a modal
           if (filePreviewModal.fileUrl) {
             URL.revokeObjectURL(filePreviewModal.fileUrl);
           }
@@ -3503,257 +3589,57 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           });
         }
       }}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh]">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Eye className="h-5 w-5" />
+              <FileText className="h-5 w-5" />
               {filePreviewModal.fileName}
             </DialogTitle>
           </DialogHeader>
-
-          <div className="mt-4">
-            {filePreviewModal.mimeType.startsWith('image/') ? (
-              // Visualização de imagem
-              <div className="flex justify-center">
-                <img 
-                  src={filePreviewModal.fileUrl} 
-                  alt={filePreviewModal.fileName}
-                  className="max-w-full max-h-[70vh] object-contain"
-                />
-              </div>
+          <div className="w-full h-[70vh] bg-gray-50 rounded-lg overflow-hidden">
+            {filePreviewModal.mimeType?.startsWith('image/') ? (
+              <img 
+                src={filePreviewModal.fileUrl} 
+                alt={filePreviewModal.fileName}
+                className="w-full h-full object-contain"
+              />
             ) : filePreviewModal.mimeType === 'application/pdf' ? (
-              // Visualização de PDF
-              <div className="w-full h-[70vh]">
-                <iframe
-                  src={filePreviewModal.fileUrl}
-                  width="100%"
-                  height="100%"
-                  title={filePreviewModal.fileName}
-                  className="border rounded"
-                />
-              </div>
-            ) : filePreviewModal.mimeType.startsWith('text/') ? (
-              // Visualização de texto
-              <div className="w-full h-[70vh] border rounded p-4 bg-gray-50 overflow-auto">
-                <iframe
-                  src={filePreviewModal.fileUrl}
-                  width="100%"
-                  height="100%"
-                  title={filePreviewModal.fileName}
-                  className="border-0"
-                />
-              </div>
+              <iframe 
+                src={filePreviewModal.fileUrl} 
+                className="w-full h-full border-0"
+                title={filePreviewModal.fileName}
+              />
             ) : (
-              // Arquivo não suportado para visualização
-              <div className="text-center py-8">
-                <FileText className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                <p className="text-gray-600 mb-4">
-                  Tipo de arquivo não suportado para visualização direta
-                </p>
-                <p className="text-sm text-gray-500 mb-4">
-                  Tipo: {filePreviewModal.mimeType}
-                </p>
-                <Button
-                  onClick={() => {
-                    // Fazer download do arquivo
-                    const link = document.createElement('a');
-                    link.href = filePreviewModal.fileUrl;
-                    link.download = filePreviewModal.fileName;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                  }}
-                  className="mt-2"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Baixar Arquivo
-                </Button>
+              <div className="flex items-center justify-center h-full text-gray-500">
+                <div className="text-center">
+                  <FileText className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+                  <p>Preview não disponível para este tipo de arquivo</p>
+                  <p className="text-sm mt-2">Tipo: {filePreviewModal.mimeType}</p>
+                </div>
               </div>
             )}
           </div>
-
-          <div className="flex justify-between items-center mt-4 pt-4 border-t">
-            <div className="text-sm text-gray-500">
-              Tipo: {filePreviewModal.mimeType}
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  // Fazer download do arquivo
-                  const link = document.createElement('a');
-                  link.href = filePreviewModal.fileUrl;
-                  link.download = filePreviewModal.fileName;
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                }}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Baixar
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  if (filePreviewModal.fileUrl) {
-                    URL.revokeObjectURL(filePreviewModal.fileUrl);
-                  }
-                  setFilePreviewModal({
-                    isOpen: false,
-                    fileName: "",
-                    mimeType: "",
-                    fileUrl: ""
-                  });
-                }}
-              >
-                Fechar
-              </Button>
-            </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (filePreviewModal.fileUrl) {
+                  URL.revokeObjectURL(filePreviewModal.fileUrl);
+                }
+                setFilePreviewModal({
+                  isOpen: false,
+                  fileName: "",
+                  mimeType: "",
+                  fileUrl: ""
+                });
+              }}
+            >
+              Fechar
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Modal para iniciar documentação */}
-      {isDocumentationModalOpen && (
-        <Dialog open={isDocumentationModalOpen} onOpenChange={setIsDocumentationModalOpen}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <BookOpen className="h-5 w-5" />
-                Iniciar Documentação
-              </DialogTitle>
-              <DialogDescription>
-                Configure os parâmetros para iniciar o processo de documentação do documento selecionado.
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4 py-4">
-              {selectedDocument && (
-                <div className="bg-gray-50 p-3 rounded-lg">
-                  <p className="font-medium text-sm">{selectedDocument.objeto}</p>
-                  <p className="text-xs text-gray-500">Documento selecionado</p>
-                </div>
-              )}
-              
-              <div className="text-center py-8 text-gray-500">
-                <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                <p>Parâmetros de documentação serão implementados aqui</p>
-              </div>
-            </div>
-
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setIsDocumentationModalOpen(false)}
-              >
-                Cancelar
-              </Button>
-              <Button
-                onClick={() => {
-                  // Lógica para iniciar documentação será implementada
-                  setIsDocumentationModalOpen(false);
-                }}
-              >
-                Confirmar
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
-
-      </div>
     </div>
   );
-}
 
-// Componente auxiliar para visualização de arquivos
-function FilePreviewModal({ 
-  filePreviewModal, 
-  setFilePreviewModal 
-}: { 
-  filePreviewModal: any, 
-  setFilePreviewModal: any 
-}) {
-  return (
-    <Dialog open={filePreviewModal.isOpen} onOpenChange={(open) => {
-      if (!open) {
-        // Limpar URL do blob quando fechar a modal
-        if (filePreviewModal.fileUrl) {
-          URL.revokeObjectURL(filePreviewModal.fileUrl);
-        }
-        setFilePreviewModal({
-          isOpen: false,
-          fileName: '',
-          mimeType: '',
-          fileUrl: ''
-        });
-      }
-    }}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-auto">
-        <DialogHeader>
-          <DialogTitle>Visualizar Arquivo: {filePreviewModal.fileName}</DialogTitle>
-        </DialogHeader>
-        <div className="mt-4">
-          {filePreviewModal.mimeType?.startsWith('image/') ? (
-            <img 
-              src={filePreviewModal.fileUrl} 
-              alt={filePreviewModal.fileName}
-              className="max-w-full h-auto mx-auto"
-            />
-          ) : filePreviewModal.mimeType === 'application/pdf' ? (
-            <iframe 
-              src={filePreviewModal.fileUrl}
-              className="w-full h-[70vh]"
-              title={filePreviewModal.fileName}
-            />
-          ) : filePreviewModal.mimeType?.startsWith('text/') ? (
-            <iframe 
-              src={filePreviewModal.fileUrl}
-              className="w-full h-[70vh] border"
-              title={filePreviewModal.fileName}
-            />
-          ) : (
-            <div className="text-center p-8">
-              <p className="mb-4">Não é possível visualizar este tipo de arquivo.</p>
-              <a 
-                href={filePreviewModal.fileUrl} 
-                download={filePreviewModal.fileName}
-                className="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Baixar arquivo
-              </a>
-            </div>
-          )}
-        </div>
-        <div className="flex justify-between mt-4">
-          <a 
-            href={filePreviewModal.fileUrl} 
-            download={filePreviewModal.fileName}
-            className="inline-flex items-center px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Baixar
-          </a>
-          <Button
-            variant="outline"
-            onClick={() => {
-              // Limpar URL do blob quando fechar a modal
-              if (filePreviewModal.fileUrl) {
-                URL.revokeObjectURL(filePreviewModal.fileUrl);
-              }
-              setFilePreviewModal({
-                isOpen: false,
-                fileName: '',
-                mimeType: '',
-                fileUrl: ''
-              });
-            }}
-          >
-            Fechar
-          </Button>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
 }
