@@ -3255,6 +3255,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         <TabsList className="flex-shrink-0">
           <TabsTrigger value="integrados">Integrados</TabsTrigger>
           <TabsTrigger value="todos">Todos</TabsTrigger>
+          <TabsTrigger value="repositorio">Repositório</TabsTrigger>
         </TabsList>
 
         <TabsContent value="integrados" className="flex flex-col flex-1 min-h-0">
