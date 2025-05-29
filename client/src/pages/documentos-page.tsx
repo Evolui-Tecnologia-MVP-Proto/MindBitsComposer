@@ -1209,8 +1209,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   const renderDocumentosTable = (documentos: Documento[]) => {
     if (activeTab === "integrados") {
       return (
-        <div className="border rounded-lg overflow-hidden">
-          <div className="max-h-[600px] overflow-y-auto">
+        <div className="border rounded-lg overflow-hidden h-full">
+          <div className="h-full overflow-y-auto">
             <Table>
               <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
                 <TableRow>
@@ -2315,9 +2315,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             )}
           </TabsContent>
           
-          <TabsContent value="integrados" className="slide-in">
+          <TabsContent value="integrados" className="slide-in flex flex-col h-full">
             {/* Filtros */}
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg border flex-shrink-0">
               <h3 className="text-sm font-medium text-gray-700 mb-3">Filtros</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                 {/* Filtro por Nome */}
@@ -2448,11 +2448,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               </div>
             </div>
 
-            {isLoading ? (
-              <div className="text-center py-6">Carregando documentos...</div>
-            ) : (
-              renderDocumentosTable(filteredAndSortedDocumentos)
-            )}
+            {/* Área da tabela que ocupa o restante da altura */}
+            <div className="flex-1 min-h-0">
+              {isLoading ? (
+                <div className="text-center py-6">Carregando documentos...</div>
+              ) : (
+                renderDocumentosTable(filteredAndSortedDocumentos)
+              )}
+            </div>
           </TabsContent>
           
           <TabsContent value="em-processo" className="slide-in">
