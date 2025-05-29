@@ -272,6 +272,8 @@ const FlowCanvas = () => {
       'approveNode': 'Aprovar',
       'decisionNode': 'Decisão',
       'reviseNode': 'Revisar',
+      'rawDocumentNode': 'RAW-Document',
+      'documentNode': 'Document',
       'endNode': 'Fim'
     };
 
