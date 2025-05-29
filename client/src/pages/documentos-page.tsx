@@ -1210,7 +1210,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     if (activeTab === "integrados") {
       return (
         <div className="border rounded-lg">
-          <div className="max-h-[calc(100vh-450px)] overflow-y-auto">
+          <div className="max-h-[calc(100vh-500px)] overflow-y-auto">
             <Table>
             <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
                 <TableRow>
