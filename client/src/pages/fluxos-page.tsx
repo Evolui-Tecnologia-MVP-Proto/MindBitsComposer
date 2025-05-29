@@ -281,6 +281,20 @@ const FlowCanvas = () => {
     setSelectedNodeId(null);
   }, []);
 
+  const onKeyDown = useCallback((event: KeyboardEvent) => {
+    if (event.key === 'Delete' && selectedNodeId) {
+      setNodes((nds) => nds.filter((node) => node.id !== selectedNodeId));
+      setSelectedNodeId(null);
+    }
+  }, [selectedNodeId, setNodes]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [onKeyDown]);
+
   const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
