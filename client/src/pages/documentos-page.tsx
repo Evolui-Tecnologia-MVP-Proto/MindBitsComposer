@@ -1310,82 +1310,86 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     }
 
     return (
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Tipo</TableHead>
-            <TableHead>Nome</TableHead>
-            <TableHead>Data</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="text-right">Ações</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {documentos.map((documento) => (
-            <TableRow key={documento.id}>
-              <TableCell>
-                <div className="flex items-center">
-                  <File className="h-5 w-5 text-blue-500" />
-                  <span className="ml-2 text-xs text-gray-500">DOC</span>
-                </div>
-              </TableCell>
-              <TableCell className="font-medium">{documento.objeto}</TableCell>
-              <TableCell>
-                <div className="flex items-center text-gray-500 text-sm">
-                  <Clock className="mr-1.5 h-3.5 w-3.5" />
-                  {formatDate(documento.createdAt)}
-                </div>
-              </TableCell>
-              <TableCell>
-                <Badge variant={getStatusBadgeVariant(documento.status) as any} className="flex items-center gap-1 whitespace-nowrap">
-                  {getStatusIcon(documento.status)}
-                  {documento.status}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end space-x-2">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8"
-                  onClick={() => openViewModal(documento)}
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
-                {activeTab !== "integrados" && (
-                  <>
+      <div className="border rounded-lg overflow-hidden h-full">
+        <div className="h-full overflow-y-auto">
+          <Table>
+            <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
+              <TableRow>
+                <TableHead className="bg-gray-50 border-b">Tipo</TableHead>
+                <TableHead className="bg-gray-50 border-b">Nome</TableHead>
+                <TableHead className="bg-gray-50 border-b">Data</TableHead>
+                <TableHead className="bg-gray-50 border-b">Status</TableHead>
+                <TableHead className="bg-gray-50 border-b text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {documentos.map((documento) => (
+                <TableRow key={documento.id}>
+                  <TableCell>
+                    <div className="flex items-center">
+                      <File className="h-5 w-5 text-blue-500" />
+                      <span className="ml-2 text-xs text-gray-500">DOC</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="font-medium">{documento.objeto}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center text-gray-500 text-sm">
+                      <Clock className="mr-1.5 h-3.5 w-3.5" />
+                      {formatDate(documento.createdAt)}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={getStatusBadgeVariant(documento.status) as any} className="flex items-center gap-1 whitespace-nowrap">
+                      {getStatusIcon(documento.status)}
+                      {documento.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end space-x-2">
                     <Button 
                       variant="ghost" 
                       size="icon" 
                       className="h-8 w-8"
-                      onClick={() => openEditModal(documento)}
+                      onClick={() => openViewModal(documento)}
                     >
-                      <Pencil className="h-4 w-4 text-blue-500" />
+                      <Eye className="h-4 w-4" />
                     </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8"
-                      onClick={() => handleDeleteDocument(documento)}
-                      disabled={deleteDocumentoMutation.isPending}
-                    >
-                      <Trash2 className="h-4 w-4 text-red-500" />
-                    </Button>
-                  </>
-                )}
-              </div>
-            </TableCell>
-          </TableRow>
-        ))}
-        {documentos.length === 0 && (
-          <TableRow>
-            <TableCell colSpan={activeTab === "integrados" ? 8 : 5} className="text-center py-6 text-gray-500">
-              Nenhum documento encontrado nesta categoria.
-            </TableCell>
-          </TableRow>
-        )}
-        </TableBody>
-      </Table>
+                    {activeTab !== "integrados" && (
+                      <>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8"
+                          onClick={() => openEditModal(documento)}
+                        >
+                          <Pencil className="h-4 w-4 text-blue-500" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8"
+                          onClick={() => handleDeleteDocument(documento)}
+                          disabled={deleteDocumentoMutation.isPending}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+            {documentos.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={activeTab === "integrados" ? 8 : 5} className="text-center py-6 text-gray-500">
+                  Nenhum documento encontrado nesta categoria.
+                </TableCell>
+              </TableRow>
+            )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
     );
   };
 
