@@ -1242,7 +1242,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         {documento.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm text-gray-500">{formatDate(documento.updatedAt)}</TableCell>
+                    <TableCell className="text-xs text-gray-500">{formatDate(documento.updatedAt)}</TableCell>
                     <TableCell>
                       <Badge variant={getStatusOrigemBadgeVariant(documento.statusOrigem) as any} className="flex items-center gap-1 whitespace-nowrap">
                         {documento.statusOrigem}
