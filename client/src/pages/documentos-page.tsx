@@ -88,7 +88,7 @@ export default function DocumentosPage() {
     useState(false);
   const [isDocumentationModalOpen, setIsDocumentationModalOpen] =
     useState(false);
-  const [isTestModalOpen, setIsTestModalOpen] = useState(false);
+
   const [isTest2ModalOpen, setIsTest2ModalOpen] = useState(false);
   const [editingDocument, setEditingDocument] = useState<Documento | null>(
     null,
@@ -1503,15 +1503,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             >
                               <BookOpen className="h-4 w-4" />
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => setIsTestModalOpen(true)}
-                              title="Teste"
-                            >
-                              <TestTube className="h-4 w-4 text-purple-500" />
-                            </Button>
+
                             <Button
                               variant="ghost"
                               size="icon"
@@ -3304,7 +3296,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {renderAddArtifactModal()}
       {renderEditArtifactModal()}
       {renderDocumentationModal()}
-      {renderTestModal()}
       {renderTest2Modal()}
     </div>
   );
