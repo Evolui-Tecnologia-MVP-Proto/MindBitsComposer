@@ -4079,7 +4079,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               Modal de Teste
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="py-6 text-center">
             <p className="text-lg">testando</p>
           </div>
@@ -4108,7 +4108,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               Modal de Teste 2
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="py-6 text-center">
             <p className="text-lg">testando</p>
           </div>
