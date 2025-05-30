@@ -63,7 +63,7 @@ const StartNode = memo(({ data, selected }: NodeProps) => (
         {!data.integrType && !data.service && !data.actionType && !data.docType && <div>✓ Início</div>}
       </div>
     )}
-    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-white border-2 border-blue-500 translate-y-2" />
+    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ bottom: '-8px' }} />
   </div>
 ));
 
@@ -77,7 +77,7 @@ const EndNode = memo(({ data, selected }: NodeProps) => (
     {data.configured && data.showLabel === false && (
       <div className="text-xs font-medium">✓ Configurado</div>
     )}
-    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500 -translate-y-2" />
+    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ top: '-8px' }} />
   </div>
 ));
 
@@ -162,8 +162,8 @@ const ActionNode = memo(({ data, selected }: NodeProps) => (
         {!data.actionType && <div>✓ Ação</div>}
       </div>
     )}
-    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500 -translate-y-2" />
-    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-white border-2 border-blue-500 translate-y-2" />
+    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ top: '-8px' }} />
+    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ bottom: '-8px' }} />
   </div>
 ));
 
@@ -209,8 +209,8 @@ const DocumentNode = memo(({ data, selected }: NodeProps) => (
         )}
       </div>
     </div>
-    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500 -translate-y-2" />
-    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-white border-2 border-blue-500 translate-y-2" />
+    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ top: '-8px' }} />
+    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ bottom: '-8px' }} />
   </div>
 ));
 
@@ -256,8 +256,8 @@ const IntegrationNode = memo(({ data, selected }: NodeProps) => (
         )}
       </div>
     </div>
-    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500 -translate-y-2" />
-    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-white border-2 border-blue-500 translate-y-2" />
+    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ top: '-8px' }} />
+    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ bottom: '-8px' }} />
   </div>
 ));
 
