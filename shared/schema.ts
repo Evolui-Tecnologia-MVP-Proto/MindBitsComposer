@@ -294,6 +294,7 @@ export const documentsFlows = pgTable("documents_flows", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
   description: text("description").default(""),
+  code: text("code").notNull().unique(),
   flowData: json("flow_data").$type<{
     nodes: Array<{
       id: string;

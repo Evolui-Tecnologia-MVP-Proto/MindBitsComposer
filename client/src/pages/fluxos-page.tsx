@@ -271,6 +271,7 @@ const FlowCanvas = () => {
   const [isNewFlowModalOpen, setIsNewFlowModalOpen] = useState(false);
   const [newFlowName, setNewFlowName] = useState('');
   const [newFlowDescription, setNewFlowDescription] = useState('');
+  const [newFlowCode, setNewFlowCode] = useState('');
   
   const queryClient = useQueryClient();
   
@@ -374,6 +375,7 @@ const FlowCanvas = () => {
 
     saveFlowMutation.mutate({
       name: flowName,
+      code: newFlowCode || `FLX-${Math.floor(Math.random() * 100).toString().padStart(2, '0')}`,
       description: `Fluxo criado em ${new Date().toLocaleString('pt-BR')}`,
       flowData: processedFlowData
     });
@@ -412,6 +414,34 @@ const FlowCanvas = () => {
     }
   }, [setNodes, setEdges, reactFlowInstance]);
 
+  // Função para aplicar máscara no código XXX-99
+  const applyCodeMask = useCallback((value: string) => {
+    // Remove tudo que não é letra ou número
+    const cleaned = value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    
+    if (cleaned.length <= 3) {
+      // Apenas letras para os primeiros 3 caracteres
+      return cleaned.replace(/[^A-Z]/g, '');
+    } else {
+      // Primeiros 3 caracteres como letras + hífen + até 2 números
+      const letters = cleaned.slice(0, 3).replace(/[^A-Z]/g, '');
+      const numbers = cleaned.slice(3, 5).replace(/[^0-9]/g, '');
+      return letters + (numbers ? '-' + numbers : '');
+    }
+  }, []);
+
+  // Função para validar código XXX-99
+  const validateCode = useCallback((code: string) => {
+    const codeRegex = /^[A-Z]{3}-[0-9]{2}$/;
+    return codeRegex.test(code);
+  }, []);
+
+  // Função para tratar mudança no campo code
+  const handleCodeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const maskedValue = applyCodeMask(e.target.value);
+    setNewFlowCode(maskedValue);
+  }, [applyCodeMask]);
+
   // Função para criar novo fluxo com nome personalizado
   const createNewFlow = useCallback(() => {
     if (!newFlowName.trim()) {
@@ -423,23 +453,55 @@ const FlowCanvas = () => {
       return;
     }
 
-    setNodes([]);
-    setEdges([]);
-    setFlowName(newFlowName);
-    setCurrentFlowId(null);
-    setIsNewFlowModalOpen(false);
-    setNewFlowName('');
-    setNewFlowDescription('');
-    
-    if (reactFlowInstance) {
-      reactFlowInstance.fitView();
+    if (!newFlowCode.trim()) {
+      toast({
+        title: "Erro",
+        description: "Código do fluxo é obrigatório",
+        variant: "destructive"
+      });
+      return;
     }
 
-    toast({
-      title: "Sucesso",
-      description: `Novo fluxo "${newFlowName}" criado!`
+    if (!validateCode(newFlowCode)) {
+      toast({
+        title: "Erro",
+        description: "Código deve ter o formato XXX-99 (3 letras maiúsculas + hífen + 2 números)",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Criar um novo fluxo e salvá-lo no banco de dados
+    const newFlowData = {
+      name: newFlowName,
+      code: newFlowCode,
+      description: newFlowDescription || `Fluxo criado em ${new Date().toLocaleString('pt-BR')}`,
+      flowData: { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
+      userId: 1 // Placeholder - deveria vir do contexto de autenticação
+    };
+
+    saveFlowMutation.mutate(newFlowData, {
+      onSuccess: (data) => {
+        setNodes([]);
+        setEdges([]);
+        setFlowName(newFlowName);
+        setCurrentFlowId(data.id);
+        setIsNewFlowModalOpen(false);
+        setNewFlowName('');
+        setNewFlowDescription('');
+        setNewFlowCode('');
+        
+        if (reactFlowInstance) {
+          reactFlowInstance.fitView();
+        }
+
+        toast({
+          title: "Sucesso",
+          description: `Novo fluxo "${newFlowName}" criado e salvo!`
+        });
+      }
     });
-  }, [newFlowName, setNodes, setEdges, reactFlowInstance]);
+  }, [newFlowName, newFlowCode, validateCode, setNodes, setEdges, reactFlowInstance]);
 
   const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -605,6 +667,20 @@ const FlowCanvas = () => {
                     placeholder="Digite o nome do fluxo"
                     className="w-full"
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="code">Código do Fluxo</Label>
+                  <Input
+                    id="code"
+                    value={newFlowCode}
+                    onChange={handleCodeChange}
+                    placeholder="XXX-99"
+                    className="w-full"
+                    maxLength={6}
+                  />
+                  <p className="text-sm text-gray-500">
+                    Formato: 3 letras maiúsculas + hífen + 2 números (ex: ABC-12)
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="description">Descrição (opcional)</Label>
