@@ -183,7 +183,6 @@ const MondayNode = memo(({ data, selected }: NodeProps) => (
       }`}
       style={{
         backgroundColor: 'white',
-        border: selected ? '3px solid black' : '2px solid black',
         clipPath: 'polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%)',
         boxShadow: selected ? '0 8px 12px -2px rgba(0, 0, 0, 0.2)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
         filter: selected ? 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.4))' : 'none'
@@ -194,6 +193,15 @@ const MondayNode = memo(({ data, selected }: NodeProps) => (
         <div className="text-xs opacity-75 text-black">Plataforma</div>
       </div>
     </div>
+    {/* Contorno do paralelogramo */}
+    <div
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        clipPath: 'polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%)',
+        border: selected ? '3px solid black' : '2px solid black',
+        borderRadius: '0'
+      }}
+    />
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
@@ -208,7 +216,6 @@ const GitHubNode = memo(({ data, selected }: NodeProps) => (
       }`}
       style={{
         backgroundColor: 'white',
-        border: selected ? '3px solid black' : '2px solid black',
         clipPath: 'polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%)',
         boxShadow: selected ? '0 8px 12px -2px rgba(0, 0, 0, 0.2)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
         filter: selected ? 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.4))' : 'none'
@@ -219,6 +226,15 @@ const GitHubNode = memo(({ data, selected }: NodeProps) => (
         <div className="text-xs opacity-75 text-black">Repositório</div>
       </div>
     </div>
+    {/* Contorno do paralelogramo */}
+    <div
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        clipPath: 'polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%)',
+        border: selected ? '3px solid black' : '2px solid black',
+        borderRadius: '0'
+      }}
+    />
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
@@ -233,7 +249,6 @@ const MindBitsNode = memo(({ data, selected }: NodeProps) => (
       }`}
       style={{
         backgroundColor: 'white',
-        border: selected ? '3px solid black' : '2px solid black',
         clipPath: 'polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%)',
         boxShadow: selected ? '0 8px 12px -2px rgba(0, 0, 0, 0.2)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
         filter: selected ? 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.4))' : 'none'
@@ -244,6 +259,15 @@ const MindBitsNode = memo(({ data, selected }: NodeProps) => (
         <div className="text-xs opacity-75 text-black">IA</div>
       </div>
     </div>
+    {/* Contorno do paralelogramo */}
+    <div
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        clipPath: 'polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%)',
+        border: selected ? '3px solid black' : '2px solid black',
+        borderRadius: '0'
+      }}
+    />
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
