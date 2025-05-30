@@ -152,16 +152,7 @@ const ReviseNode = memo(({ data, selected }: NodeProps) => (
   </div>
 ));
 
-const RawDocumentNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-lg bg-white border-2 text-black shadow-md min-w-[140px] text-center transition-all duration-200 ${
-    selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
-  }`}>
-    <div className="font-medium">{data.label}</div>
-    <div className="text-xs mt-1 opacity-75">Documento Bruto</div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
-  </div>
-));
+
 
 const DocumentNode = memo(({ data, selected }: NodeProps) => (
   <div className={`px-4 py-2 rounded-lg bg-white border-2 text-black shadow-md min-w-[140px] text-center transition-all duration-200 ${
@@ -221,7 +212,6 @@ const nodeTypes: NodeTypes = {
   approveNode: ApproveNode,
   decisionNode: DecisionNode,
   reviseNode: ReviseNode,
-  rawDocumentNode: RawDocumentNode,
   documentNode: DocumentNode,
   integrationNode: IntegrationNode,
 };
@@ -1068,7 +1058,6 @@ const FlowCanvas = () => {
                     <SelectItem value="approveNode">Aprovar</SelectItem>
                     <SelectItem value="decisionNode">Decisão</SelectItem>
                     <SelectItem value="reviseNode">Revisar</SelectItem>
-                    <SelectItem value="rawDocumentNode">RAW-Document</SelectItem>
                     <SelectItem value="documentNode">Document</SelectItem>
                     <SelectItem value="integrationNode">Integration</SelectItem>
                     <SelectItem value="endNode">Fim</SelectItem>
