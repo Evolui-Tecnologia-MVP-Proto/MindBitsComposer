@@ -138,19 +138,33 @@ const ActionNode = memo(({ data, selected }: NodeProps) => (
 
 const DocumentNode = memo(({ data, selected }: NodeProps) => (
   <div className="relative" style={{ width: '140px', height: '80px' }}>
-    {/* Fundo do documento com clip-path */}
+    {/* SVG para contorno do documento com base ondulada */}
+    <svg 
+      className="absolute inset-0 pointer-events-none"
+      width="140" 
+      height="80" 
+      viewBox="0 0 140 80"
+    >
+      <polygon
+        points="0,0 140,0 140,64 112,80 28,64 0,64"
+        fill="white"
+        stroke="black"
+        strokeWidth={selected ? "3" : "2"}
+        style={{
+          filter: selected ? 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))' : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+        }}
+      />
+    </svg>
+    {/* Conteúdo do nó */}
     <div
-      className={`absolute inset-0 bg-white border-2 border-black shadow-md transition-all duration-200 ${
-        selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
+      className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
+        selected ? 'scale-105' : ''
       }`}
       style={{
-        clipPath: 'polygon(0% 0%, 100% 0%, 100% 80%, 80% 100%, 20% 80%, 0% 80%)',
-        filter: selected ? 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))' : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+        pointerEvents: 'none'
       }}
-    />
-    {/* Conteúdo do nó */}
-    <div className="absolute inset-0 flex items-center justify-center pt-2">
-      <div className="text-center">
+    >
+      <div className="text-center pt-2">
         <div className="font-medium text-black text-sm">{data.label}</div>
       </div>
     </div>
