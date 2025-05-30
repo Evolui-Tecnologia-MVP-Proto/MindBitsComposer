@@ -350,23 +350,43 @@ const FlowCanvas = () => {
   const [showInspector, setShowInspector] = useState<boolean>(false);
   
   // Aplicar estilo de seleção às edges
-  const styledEdges = edges.map((edge: Edge) => ({
-    ...edge,
-    type: 'smoothstep', // Volta para smoothstep conforme preferência
-    style: {
-      stroke: edge.id === selectedEdgeId ? '#f97316' : '#6b7280', // Laranja se selecionado, cinza se não
-      strokeWidth: edge.id === selectedEdgeId ? 4 : 3, // Mais grosso se selecionado
-      strokeDasharray: 'none'
-    },
-    markerEnd: {
-      type: MarkerType.ArrowClosed,
-      color: edge.id === selectedEdgeId ? '#f97316' : '#6b7280', // Laranja se selecionado, cinza se não
-    },
-    animated: false,
-    updatable: true, // Permite atualizar a conexão
-    focusable: true, // Permite focar na conexão
-    interactionWidth: 20 // Aumenta a área clicável da conexão
-  }));
+  const styledEdges = edges.map((edge: Edge) => {
+    // Detectar se a conexão parte de um SwitchNode e de qual conector
+    const sourceNode = nodes.find(node => node.id === edge.source);
+    let edgeColor = '#6b7280'; // Cor padrão (cinza)
+    
+    if (sourceNode?.type === 'switchNode') {
+      // Verificar qual handle está sendo usado baseado no sourceHandle
+      if (edge.sourceHandle === 'a') {
+        edgeColor = '#dc2626'; // Vermelho para conector direito (id="a")
+      } else if (edge.sourceHandle === 'c') {
+        edgeColor = '#16a34a'; // Verde para conector esquerdo (id="c")
+      }
+    }
+    
+    // Se a edge está selecionada, usar laranja
+    if (edge.id === selectedEdgeId) {
+      edgeColor = '#f97316';
+    }
+    
+    return {
+      ...edge,
+      type: 'smoothstep',
+      style: {
+        stroke: edgeColor,
+        strokeWidth: edge.id === selectedEdgeId ? 4 : 3,
+        strokeDasharray: 'none'
+      },
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+        color: edgeColor,
+      },
+      animated: false,
+      updatable: true,
+      focusable: true,
+      interactionWidth: 20
+    };
+  });
   const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isNewFlowModalOpen, setIsNewFlowModalOpen] = useState(false);
