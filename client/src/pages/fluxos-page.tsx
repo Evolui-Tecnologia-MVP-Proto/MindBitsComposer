@@ -126,21 +126,14 @@ const SwitchNode = memo(({ data, selected }: NodeProps) => (
     <Handle 
       type="source" 
       position={Position.Right} 
-      className="w-4 h-4 bg-white border-2 border-blue-500" 
+      className="w-4 h-4 bg-white border-4 border-red-500" 
       id="a"
       style={{ top: '50%', right: '-33px', transform: 'translateY(-50%)' }}
     />
     <Handle 
       type="source" 
-      position={Position.Bottom} 
-      className="w-4 h-4 bg-white border-2 border-blue-500" 
-      id="b"
-      style={{ bottom: '2px', left: '50%', transform: 'translateX(-50%)' }}
-    />
-    <Handle 
-      type="source" 
       position={Position.Left} 
-      className="w-4 h-4 bg-white border-2 border-blue-500" 
+      className="w-4 h-4 bg-white border-4 border-green-500" 
       id="c"
       style={{ top: '50%', left: '-33px', transform: 'translateY(-50%)' }}
     />
