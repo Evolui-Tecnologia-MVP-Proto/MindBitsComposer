@@ -552,10 +552,18 @@ const FlowCanvas = () => {
       return;
     }
 
-    if (confirm("Tem certeza que deseja excluir este fluxo? Esta ação não pode ser desfeita.")) {
-      deleteFlowMutation.mutate(currentFlowId);
-    }
-  }, [currentFlowId, deleteFlowMutation]);
+    const currentFlow = savedFlows?.find((flow: any) => flow.id === currentFlowId);
+    
+    toast({
+      title: "Confirmar Exclusão",
+      description: `Tem certeza que deseja excluir o fluxo "${currentFlow?.code} - ${currentFlow?.name}"? Esta ação não pode ser desfeita.`,
+      variant: "destructive",
+      action: {
+        altText: "Confirmar exclusão",
+        onClick: () => deleteFlowMutation.mutate(currentFlowId)
+      }
+    });
+  }, [currentFlowId, deleteFlowMutation, savedFlows]);
 
   // Função para tratar mudança no campo code
   const handleCodeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {

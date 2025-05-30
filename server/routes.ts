@@ -3386,7 +3386,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .values({
           name,
           code,
-          description: description || "",
+          description: description || null,
           flowData: processedFlowData,
           userId: req.user.id
         })
