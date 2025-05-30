@@ -21,7 +21,7 @@ import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PlusCircle, Save, RotateCcw, BookOpen, Edit } from 'lucide-react';
+import { PlusCircle, Save, RotateCcw, BookOpen, Edit, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -272,6 +272,10 @@ const FlowCanvas = () => {
   const [newFlowName, setNewFlowName] = useState('');
   const [newFlowDescription, setNewFlowDescription] = useState('');
   const [newFlowCode, setNewFlowCode] = useState('');
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editFlowName, setEditFlowName] = useState('');
+  const [editFlowDescription, setEditFlowDescription] = useState('');
+  const [editFlowCode, setEditFlowCode] = useState('');
   
   const queryClient = useQueryClient();
   
@@ -310,6 +314,72 @@ const FlowCanvas = () => {
       toast({
         title: "Erro",
         description: "Erro ao salvar fluxo",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Mutation para editar metadados do fluxo
+  const editFlowMutation = useMutation({
+    mutationFn: async (flowData: any) => {
+      const response = await fetch(`/api/documents-flows/${currentFlowId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(flowData),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erro ao editar fluxo');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/documents-flows'] });
+      setIsEditModalOpen(false);
+      toast({
+        title: "Sucesso",
+        description: "Metadados do fluxo atualizados com sucesso!"
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Erro ao editar fluxo",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Mutation para excluir fluxo
+  const deleteFlowMutation = useMutation({
+    mutationFn: async (flowId: string) => {
+      const response = await fetch(`/api/documents-flows/${flowId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erro ao excluir fluxo');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/documents-flows'] });
+      setCurrentFlowId(null);
+      setNodes([]);
+      setEdges([]);
+      toast({
+        title: "Sucesso",
+        description: "Fluxo excluído com sucesso!"
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Erro ao excluir fluxo",
         variant: "destructive"
       });
     }
@@ -435,6 +505,75 @@ const FlowCanvas = () => {
     const codeRegex = /^[A-Z]{3}-[0-9]{2}$/;
     return codeRegex.test(code);
   }, []);
+
+  // Função para abrir modal de edição
+  const openEditModal = useCallback(() => {
+    if (!currentFlowId || !savedFlows) return;
+    
+    const currentFlow = savedFlows.find((flow: any) => flow.id === currentFlowId);
+    if (currentFlow) {
+      setEditFlowName(currentFlow.name);
+      setEditFlowCode(currentFlow.code);
+      setEditFlowDescription(currentFlow.description || '');
+      setIsEditModalOpen(true);
+    }
+  }, [currentFlowId, savedFlows]);
+
+  // Função para editar metadados do fluxo
+  const handleEditFlow = useCallback(() => {
+    if (!editFlowName.trim()) {
+      toast({
+        title: "Erro",
+        description: "Nome do fluxo é obrigatório",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!editFlowCode.trim()) {
+      toast({
+        title: "Erro",
+        description: "Código do fluxo é obrigatório",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!validateCode(editFlowCode)) {
+      toast({
+        title: "Erro",
+        description: "Código deve ter o formato XXX-99 (3 letras maiúsculas + hífen + 2 números)",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Preservar os dados do fluxo atual
+    const currentFlow = savedFlows?.find((flow: any) => flow.id === currentFlowId);
+    
+    editFlowMutation.mutate({
+      name: editFlowName,
+      code: editFlowCode,
+      description: editFlowDescription,
+      flowData: currentFlow?.flowData || { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } }
+    });
+  }, [editFlowName, editFlowCode, editFlowDescription, validateCode, editFlowMutation, savedFlows, currentFlowId]);
+
+  // Função para excluir fluxo
+  const handleDeleteFlow = useCallback(() => {
+    if (!currentFlowId) {
+      toast({
+        title: "Erro",
+        description: "Nenhum fluxo selecionado para excluir",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (confirm("Tem certeza que deseja excluir este fluxo? Esta ação não pode ser desfeita.")) {
+      deleteFlowMutation.mutate(currentFlowId);
+    }
+  }, [currentFlowId, deleteFlowMutation]);
 
   // Função para tratar mudança no campo code
   const handleCodeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -764,6 +903,24 @@ const FlowCanvas = () => {
           <Button onClick={handleReset} variant="outline" size="sm">
             <RotateCcw className="mr-1 h-4 w-4" />
             Reiniciar
+          </Button>
+          <Button 
+            onClick={openEditModal} 
+            variant="outline" 
+            size="sm"
+            disabled={!currentFlowId}
+          >
+            <Edit className="mr-1 h-4 w-4" />
+            Editar Metadados
+          </Button>
+          <Button 
+            onClick={handleDeleteFlow} 
+            variant="destructive" 
+            size="sm"
+            disabled={!currentFlowId}
+          >
+            <Trash2 className="mr-1 h-4 w-4" />
+            Excluir
           </Button>
           <Button onClick={handleSave} size="sm">
             <Save className="mr-1 h-4 w-4" />
