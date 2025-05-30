@@ -298,6 +298,20 @@ const FlowCanvas = () => {
     setHistoryIndex(prevIndex => Math.min(prevIndex + 1, 49));
   }, [historyIndex]);
 
+  // Inicializa o histórico quando o editor é carregado
+  useEffect(() => {
+    if (history.length === 0) {
+      setHistory([{ nodes: [...nodes], edges: [...edges] }]);
+      setHistoryIndex(0);
+    }
+  }, []);
+
+  // Reset do histórico quando um novo fluxo é carregado
+  const resetHistory = useCallback((newNodes: any[], newEdges: any[]) => {
+    setHistory([{ nodes: [...newNodes], edges: [...newEdges] }]);
+    setHistoryIndex(0);
+  }, []);
+
   // Função para desfazer
   const handleUndo = useCallback(() => {
     if (historyIndex > 0) {
@@ -561,6 +575,9 @@ const FlowCanvas = () => {
     setFlowName(flow.name);
     setCurrentFlowId(flow.id);
     
+    // Reset do histórico com o novo estado
+    resetHistory(flowNodes || [], flowEdges || []);
+    
     if (viewport) {
       reactFlowInstance.setViewport(viewport);
     }
@@ -569,7 +586,7 @@ const FlowCanvas = () => {
       title: "Sucesso",
       description: `Fluxo "${flow.name}" carregado com sucesso!`
     });
-  }, [reactFlowInstance, setNodes, setEdges]);
+  }, [reactFlowInstance, setNodes, setEdges, resetHistory]);
 
   // Função para criar novo fluxo
   const newFlow = useCallback(() => {
@@ -578,10 +595,13 @@ const FlowCanvas = () => {
     setFlowName('Novo Fluxo');
     setCurrentFlowId(null);
     
+    // Reset do histórico para novo fluxo
+    resetHistory([], []);
+    
     if (reactFlowInstance) {
       reactFlowInstance.fitView();
     }
-  }, [setNodes, setEdges, reactFlowInstance]);
+  }, [setNodes, setEdges, reactFlowInstance, resetHistory]);
 
   // Função para aplicar máscara no código XXX-99
   const applyCodeMask = useCallback((value: string) => {
@@ -838,6 +858,9 @@ const FlowCanvas = () => {
           variant="secondary"
           size="sm"
           onClick={() => {
+            // Salva estado atual no histórico antes de limpar
+            addToHistory(nodes, edges);
+            
             // Apenas limpa o canvas, mantém a seleção do fluxo atual
             setNodes([]);
             setEdges([]);
