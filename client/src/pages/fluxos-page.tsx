@@ -71,7 +71,7 @@ const StartNode = memo(({ data, selected }: NodeProps) => {
     selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
     {data.showLabel !== false && (
-      <div className="font-medium">{data.label}</div>
+      <div className="font-medium font-mono">{data.label}</div>
     )}
     {data.configured && data.showLabel === false && (
       <div className="text-xs font-medium">
@@ -121,7 +121,7 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
     selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
     {data.showLabel !== false && (
-      <div className="font-medium">{data.label}</div>
+      <div className="font-medium font-mono">{data.label}</div>
     )}
     {data.configured && data.showLabel === false && (
       <div className="text-xs font-medium">
@@ -175,7 +175,7 @@ const SwitchNode = memo(({ data, selected }: NodeProps) => (
     
     <div className="absolute inset-0 flex items-center justify-center z-10">
       {data.showLabel !== false && (
-        <div className="font-medium text-black text-sm">{data.label}</div>
+        <div className="font-medium font-mono text-black text-sm">{data.label}</div>
       )}
       {data.configured && data.showLabel === false && (
         <div className="text-xs text-green-600 font-medium">✓ Config</div>
@@ -212,7 +212,7 @@ const ActionNode = memo(({ data, selected }: NodeProps) => (
     selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
     {data.showLabel !== false && (
-      <div className="font-medium">{data.label}</div>
+      <div className="font-medium font-mono">{data.label}</div>
     )}
     {data.configured && data.showLabel === false && (
       <div className="text-xs font-medium">
@@ -257,7 +257,7 @@ const DocumentNode = memo(({ data, selected }: NodeProps) => (
     >
       <div className="text-center pt-2">
         {data.showLabel !== false && (
-          <div className={`font-medium text-sm ${data.configured ? 'text-green-800' : 'text-black'}`}>{data.label}</div>
+          <div className={`font-medium font-mono text-sm ${data.configured ? 'text-green-800' : 'text-black'}`}>{data.label}</div>
         )}
         {data.configured && data.showLabel === false && (
           <div className="text-xs text-green-800 font-medium">
@@ -303,7 +303,7 @@ const IntegrationNode = memo(({ data, selected }: NodeProps) => (
     >
       <div className="text-center">
         {data.showLabel !== false && (
-          <div className={`font-medium text-sm ${data.configured ? 'text-green-800' : 'text-black'}`}>{data.label}</div>
+          <div className={`font-medium font-mono text-sm ${data.configured ? 'text-green-800' : 'text-black'}`}>{data.label}</div>
         )}
         {data.configured && data.showLabel === false && (
           <div className="text-xs text-green-800 font-medium">
