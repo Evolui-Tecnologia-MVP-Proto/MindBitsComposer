@@ -46,7 +46,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 // Definição dos componentes de nós personalizados
 const StartNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-full bg-white border-2 text-black shadow-md min-w-[100px] text-center transition-all duration-200 ${
+  <div className={`px-4 py-2 rounded-full bg-green-500 border-2 text-white shadow-md min-w-[100px] text-center transition-all duration-200 ${
     selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
   }`}>
     <div className="font-medium">{data.label}</div>
@@ -55,7 +55,7 @@ const StartNode = memo(({ data, selected }: NodeProps) => (
 ));
 
 const EndNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-full bg-white border-2 text-black shadow-md min-w-[100px] text-center transition-all duration-200 ${
+  <div className={`px-4 py-2 rounded-full bg-red-500 border-2 text-white shadow-md min-w-[100px] text-center transition-all duration-200 ${
     selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
   }`}>
     <div className="font-medium">{data.label}</div>
@@ -1033,12 +1033,12 @@ const FlowCanvas = () => {
                     <SelectValue placeholder="Selecione um nó" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="startNode">Início</SelectItem>
+                    <SelectItem value="startNode">Start</SelectItem>
                     <SelectItem value="switchNode">Switch</SelectItem>
                     <SelectItem value="actionNode">Action</SelectItem>
                     <SelectItem value="documentNode">Document</SelectItem>
                     <SelectItem value="integrationNode">Integration</SelectItem>
-                    <SelectItem value="endNode">Fim</SelectItem>
+                    <SelectItem value="endNode">Finish</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
