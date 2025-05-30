@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { PluginStatus, PluginType, documentos } from "@shared/schema";
+import { PluginStatus, PluginType, documentos, documentsFlows } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc, and, gte, lte, isNull } from "drizzle-orm";
@@ -3316,6 +3316,152 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Erro ao buscar colunas:', error);
       res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Documents Flows Routes
+  
+  // Get all flows for a user
+  app.get("/api/documents-flows", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const flows = await db.select()
+        .from(documentsFlows)
+        .where(eq(documentsFlows.userId, req.user.id))
+        .orderBy(desc(documentsFlows.updatedAt));
+      
+      res.json(flows);
+    } catch (error) {
+      console.error("Erro ao buscar fluxos:", error);
+      res.status(500).json({ error: "Erro ao buscar fluxos" });
+    }
+  });
+
+  // Get a specific flow
+  app.get("/api/documents-flows/:id", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const flow = await db.select()
+        .from(documentsFlows)
+        .where(and(
+          eq(documentsFlows.id, req.params.id),
+          eq(documentsFlows.userId, req.user.id)
+        ))
+        .limit(1);
+      
+      if (flow.length === 0) {
+        return res.status(404).json({ error: "Fluxo não encontrado" });
+      }
+      
+      res.json(flow[0]);
+    } catch (error) {
+      console.error("Erro ao buscar fluxo:", error);
+      res.status(500).json({ error: "Erro ao buscar fluxo" });
+    }
+  });
+
+  // Create a new flow
+  app.post("/api/documents-flows", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { name, description, flowData } = req.body;
+      
+      // Generate UUIDs for nodes and edges if they don't have them
+      const processedFlowData = {
+        ...flowData,
+        nodes: flowData.nodes?.map((node: any) => ({
+          ...node,
+          id: node.id || crypto.randomUUID()
+        })) || [],
+        edges: flowData.edges?.map((edge: any) => ({
+          ...edge,
+          id: edge.id || crypto.randomUUID()
+        })) || []
+      };
+      
+      const newFlow = await db.insert(storage.documentsFlows)
+        .values({
+          name,
+          description: description || "",
+          flowData: processedFlowData,
+          userId: req.user.id
+        })
+        .returning();
+      
+      res.status(201).json(newFlow[0]);
+    } catch (error) {
+      console.error("Erro ao criar fluxo:", error);
+      res.status(500).json({ error: "Erro ao criar fluxo" });
+    }
+  });
+
+  // Update a flow
+  app.put("/api/documents-flows/:id", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { name, description, flowData } = req.body;
+      
+      // Generate UUIDs for nodes and edges if they don't have them
+      const processedFlowData = {
+        ...flowData,
+        nodes: flowData.nodes?.map((node: any) => ({
+          ...node,
+          id: node.id || crypto.randomUUID()
+        })) || [],
+        edges: flowData.edges?.map((edge: any) => ({
+          ...edge,
+          id: edge.id || crypto.randomUUID()
+        })) || []
+      };
+      
+      const updatedFlow = await db.update(storage.documentsFlows)
+        .set({
+          name,
+          description: description || "",
+          flowData: processedFlowData,
+          updatedAt: new Date()
+        })
+        .where(and(
+          eq(storage.documentsFlows.id, req.params.id),
+          eq(storage.documentsFlows.userId, req.user.id)
+        ))
+        .returning();
+      
+      if (updatedFlow.length === 0) {
+        return res.status(404).json({ error: "Fluxo não encontrado" });
+      }
+      
+      res.json(updatedFlow[0]);
+    } catch (error) {
+      console.error("Erro ao atualizar fluxo:", error);
+      res.status(500).json({ error: "Erro ao atualizar fluxo" });
+    }
+  });
+
+  // Delete a flow
+  app.delete("/api/documents-flows/:id", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const deletedFlow = await db.delete(storage.documentsFlows)
+        .where(and(
+          eq(storage.documentsFlows.id, req.params.id),
+          eq(storage.documentsFlows.userId, req.user.id)
+        ))
+        .returning();
+      
+      if (deletedFlow.length === 0) {
+        return res.status(404).json({ error: "Fluxo não encontrado" });
+      }
+      
+      res.json({ message: "Fluxo deletado com sucesso" });
+    } catch (error) {
+      console.error("Erro ao deletar fluxo:", error);
+      res.status(500).json({ error: "Erro ao deletar fluxo" });
     }
   });
 
