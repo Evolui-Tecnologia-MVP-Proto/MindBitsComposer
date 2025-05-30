@@ -137,11 +137,37 @@ const ActionNode = memo(({ data, selected }: NodeProps) => (
 
 
 const DocumentNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-lg bg-white border-2 text-black shadow-md min-w-[140px] text-center transition-all duration-200 ${
-    selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
-  }`}>
-    <div className="font-medium">{data.label}</div>
-    <div className="text-xs mt-1 opacity-75">Documento Final</div>
+  <div className="relative" style={{ width: '140px', height: '80px' }}>
+    {/* SVG para contorno do documento */}
+    <svg 
+      className="absolute inset-0 pointer-events-none"
+      width="140" 
+      height="80" 
+      viewBox="0 0 140 80"
+    >
+      <path
+        d="M 10 10 L 130 10 L 130 50 C 120 60, 100 55, 90 65 C 80 55, 60 60, 50 50 C 40 60, 20 55, 10 65 Z"
+        fill="white"
+        stroke="black"
+        strokeWidth={selected ? "3" : "2"}
+        style={{
+          filter: selected ? 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))' : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+        }}
+      />
+    </svg>
+    {/* Conteúdo do nó */}
+    <div
+      className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
+        selected ? 'scale-105' : ''
+      }`}
+      style={{
+        pointerEvents: 'none'
+      }}
+    >
+      <div className="text-center">
+        <div className="font-medium text-black text-sm">{data.label}</div>
+      </div>
+    </div>
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
