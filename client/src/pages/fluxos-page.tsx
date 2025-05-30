@@ -45,9 +45,19 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 
 // Definição dos componentes de nós personalizados
-const StartNode = memo(({ data, selected }: NodeProps) => (
+const StartNode = memo(({ data, selected }: NodeProps) => {
+  const getBackgroundColor = () => {
+    if (data.FromType === 'Init') {
+      return 'bg-[#22c55e] text-white'; // Verde para início direto
+    } else if (data.FromType) {
+      return 'bg-[#3b82f6] text-white'; // Azul para outros tipos
+    }
+    return data.configured ? 'bg-green-200 text-green-800' : 'bg-green-500 text-white'; // Cor padrão
+  };
+
+  return (
   <div className={`px-4 py-2 rounded-full shadow-md min-w-[100px] text-center transition-all duration-200 ${
-    data.configured ? 'bg-green-200 text-green-800' : 'bg-green-500 text-white'
+    getBackgroundColor()
   } ${
     selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
@@ -73,10 +83,23 @@ const StartNode = memo(({ data, selected }: NodeProps) => (
     )}
     <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ bottom: '-8px' }} />
   </div>
-));
+  );
+});
 
-const EndNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-full bg-red-500 text-white shadow-md min-w-[100px] text-center transition-all duration-200 ${
+const EndNode = memo(({ data, selected }: NodeProps) => {
+  const getBackgroundColor = () => {
+    if (data.FromType === 'Init') {
+      return 'bg-[#ef4444] text-white'; // Vermelho para encerramento direto
+    } else if (data.FromType) {
+      return 'bg-[#3b82f6] text-white'; // Azul para outros tipos
+    }
+    return 'bg-red-500 text-white'; // Cor padrão
+  };
+
+  return (
+  <div className={`px-4 py-2 rounded-full shadow-md min-w-[100px] text-center transition-all duration-200 ${
+    getBackgroundColor()
+  } ${
     selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
     {data.showLabel !== false && (
@@ -87,7 +110,8 @@ const EndNode = memo(({ data, selected }: NodeProps) => (
     )}
     <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ top: '-8px' }} />
   </div>
-));
+  );
+});
 
 
 
