@@ -205,7 +205,6 @@ const IntegrationNode = memo(({ data, selected }: NodeProps) => (
     >
       <div className="text-center">
         <div className="font-medium text-black text-sm">{data.label}</div>
-        <div className="text-xs opacity-75 text-black">Integration</div>
       </div>
     </div>
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
