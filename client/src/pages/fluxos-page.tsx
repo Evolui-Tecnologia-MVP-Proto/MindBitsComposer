@@ -978,7 +978,7 @@ const FlowCanvas = () => {
           <div className="border-b pb-2">
             <h3 className="text-lg font-semibold">Inspector de Propriedades</h3>
             <p className="text-sm text-gray-600">
-              {selectedNode.type} - {selectedNode.id}
+              {nodeMetadata?.label || selectedNode.type} - {selectedNode.id}
             </p>
           </div>
           
@@ -986,7 +986,7 @@ const FlowCanvas = () => {
             <div>
               <Label className="text-sm font-medium">Rótulo do Nó</Label>
               <Input 
-                value={selectedNode.data.label || ''}
+                value={selectedNode.data.label || nodeMetadata?.label || ''}
                 onChange={(e) => {
                   setNodes(nds => nds.map(node => 
                     node.id === selectedNode.id 
@@ -995,15 +995,21 @@ const FlowCanvas = () => {
                   ));
                 }}
                 className="mt-1"
+                placeholder={nodeMetadata?.label || 'Digite o rótulo'}
               />
             </div>
 
             {nodeMetadata?.metadata && Object.entries(nodeMetadata.metadata).map(([key, value]) => {
               if (Array.isArray(value)) {
-                // Renderizar como Select para arrays
+                // Renderizar como Select para arrays simples
                 return (
                   <div key={key}>
-                    <Label className="text-sm font-medium capitalize">{key}</Label>
+                    <Label className="text-sm font-medium capitalize">
+                      {key === 'integrType' ? 'Tipo de Integração' : 
+                       key === 'service' ? 'Serviço' :
+                       key === 'actionType' ? 'Tipo de Ação' :
+                       key === 'docType' ? 'Tipo de Documento' : key}
+                    </Label>
                     <Select 
                       value={selectedNode.data[key] || ''} 
                       onValueChange={(newValue) => {
@@ -1015,23 +1021,40 @@ const FlowCanvas = () => {
                       }}
                     >
                       <SelectTrigger className="mt-1">
-                        <SelectValue placeholder={`Selecione ${key}`} />
+                        <SelectValue placeholder={`Selecione ${key === 'integrType' ? 'tipo de integração' : 
+                                                                key === 'service' ? 'serviço' :
+                                                                key === 'actionType' ? 'tipo de ação' :
+                                                                key === 'docType' ? 'tipo de documento' : key}`} />
                       </SelectTrigger>
                       <SelectContent>
-                        {value.map((option: any, index: number) => (
-                          <SelectItem key={index} value={typeof option === 'string' ? option : option.type || option.name || String(index)}>
-                            {typeof option === 'string' ? option : option.name || option.type || String(option)}
-                          </SelectItem>
-                        ))}
+                        {value.map((option: any, index: number) => {
+                          if (typeof option === 'string') {
+                            return (
+                              <SelectItem key={index} value={option}>
+                                {option}
+                              </SelectItem>
+                            );
+                          } else if (option.type && option.name) {
+                            // Para docType que tem estrutura {type, name, template}
+                            return (
+                              <SelectItem key={index} value={option.type}>
+                                {option.name} ({option.type})
+                              </SelectItem>
+                            );
+                          }
+                          return null;
+                        })}
                       </SelectContent>
                     </Select>
                   </div>
                 );
-              } else if (typeof value === 'object') {
+              } else if (typeof value === 'object' && value !== null) {
                 // Renderizar como Select para objetos (chave-valor)
                 return (
                   <div key={key}>
-                    <Label className="text-sm font-medium capitalize">{key}</Label>
+                    <Label className="text-sm font-medium capitalize">
+                      {key === 'actionType' ? 'Tipo de Ação' : key}
+                    </Label>
                     <Select 
                       value={selectedNode.data[key] || ''} 
                       onValueChange={(newValue) => {
@@ -1043,7 +1066,7 @@ const FlowCanvas = () => {
                       }}
                     >
                       <SelectTrigger className="mt-1">
-                        <SelectValue placeholder={`Selecione ${key}`} />
+                        <SelectValue placeholder={`Selecione ${key === 'actionType' ? 'tipo de ação' : key}`} />
                       </SelectTrigger>
                       <SelectContent>
                         {Object.entries(value as Record<string, any>).map(([optKey, optValue]) => (
@@ -1058,6 +1081,28 @@ const FlowCanvas = () => {
               }
               return null;
             })}
+
+            {/* Informações adicionais quando uma propriedade é selecionada */}
+            {selectedNode.data.docType && (
+              <div className="p-3 bg-blue-50 rounded-md">
+                <p className="text-xs text-blue-600 font-medium">Tipo de Documento Selecionado</p>
+                <p className="text-sm text-blue-800">{selectedNode.data.docType}</p>
+              </div>
+            )}
+
+            {selectedNode.data.service && (
+              <div className="p-3 bg-green-50 rounded-md">
+                <p className="text-xs text-green-600 font-medium">Serviço Selecionado</p>
+                <p className="text-sm text-green-800">{selectedNode.data.service}</p>
+              </div>
+            )}
+
+            {selectedNode.data.actionType && (
+              <div className="p-3 bg-purple-50 rounded-md">
+                <p className="text-xs text-purple-600 font-medium">Tipo de Ação Selecionado</p>
+                <p className="text-sm text-purple-800">{selectedNode.data.actionType}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
