@@ -176,16 +176,31 @@ const DocumentNode = memo(({ data, selected }: NodeProps) => (
 
 const MondayNode = memo(({ data, selected }: NodeProps) => (
   <div className="relative" style={{ width: '140px', height: '80px' }}>
-    {/* Paralelogramo para Monday.com */}
+    {/* SVG para contorno do paralelogramo */}
+    <svg 
+      className="absolute inset-0 pointer-events-none"
+      width="140" 
+      height="80" 
+      viewBox="0 0 140 80"
+    >
+      <polygon
+        points="28,0 140,0 112,80 0,80"
+        fill="white"
+        stroke="black"
+        strokeWidth={selected ? "3" : "2"}
+        style={{
+          filter: selected ? 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))' : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+        }}
+      />
+    </svg>
+    {/* Conteúdo do nó */}
     <div
       className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
         selected ? 'scale-105' : ''
       }`}
       style={{
-        backgroundColor: 'white',
         clipPath: 'polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%)',
-        boxShadow: selected ? '0 8px 12px -2px rgba(0, 0, 0, 0.2)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-        filter: selected ? 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.4))' : 'none'
+        pointerEvents: 'none'
       }}
     >
       <div className="text-center">
@@ -193,15 +208,6 @@ const MondayNode = memo(({ data, selected }: NodeProps) => (
         <div className="text-xs opacity-75 text-black">Plataforma</div>
       </div>
     </div>
-    {/* Contorno do paralelogramo */}
-    <div
-      className="absolute inset-0 pointer-events-none"
-      style={{
-        clipPath: 'polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%)',
-        border: selected ? '3px solid black' : '2px solid black',
-        borderRadius: '0'
-      }}
-    />
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
@@ -209,16 +215,31 @@ const MondayNode = memo(({ data, selected }: NodeProps) => (
 
 const GitHubNode = memo(({ data, selected }: NodeProps) => (
   <div className="relative" style={{ width: '140px', height: '80px' }}>
-    {/* Paralelogramo para GitHub */}
+    {/* SVG para contorno do paralelogramo */}
+    <svg 
+      className="absolute inset-0 pointer-events-none"
+      width="140" 
+      height="80" 
+      viewBox="0 0 140 80"
+    >
+      <polygon
+        points="28,0 140,0 112,80 0,80"
+        fill="white"
+        stroke="black"
+        strokeWidth={selected ? "3" : "2"}
+        style={{
+          filter: selected ? 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))' : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+        }}
+      />
+    </svg>
+    {/* Conteúdo do nó */}
     <div
       className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
         selected ? 'scale-105' : ''
       }`}
       style={{
-        backgroundColor: 'white',
         clipPath: 'polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%)',
-        boxShadow: selected ? '0 8px 12px -2px rgba(0, 0, 0, 0.2)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-        filter: selected ? 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.4))' : 'none'
+        pointerEvents: 'none'
       }}
     >
       <div className="text-center">
@@ -226,15 +247,6 @@ const GitHubNode = memo(({ data, selected }: NodeProps) => (
         <div className="text-xs opacity-75 text-black">Repositório</div>
       </div>
     </div>
-    {/* Contorno do paralelogramo */}
-    <div
-      className="absolute inset-0 pointer-events-none"
-      style={{
-        clipPath: 'polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%)',
-        border: selected ? '3px solid black' : '2px solid black',
-        borderRadius: '0'
-      }}
-    />
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
@@ -242,16 +254,31 @@ const GitHubNode = memo(({ data, selected }: NodeProps) => (
 
 const MindBitsNode = memo(({ data, selected }: NodeProps) => (
   <div className="relative" style={{ width: '140px', height: '80px' }}>
-    {/* Paralelogramo para MindBits CTx */}
+    {/* SVG para contorno do paralelogramo */}
+    <svg 
+      className="absolute inset-0 pointer-events-none"
+      width="140" 
+      height="80" 
+      viewBox="0 0 140 80"
+    >
+      <polygon
+        points="28,0 140,0 112,80 0,80"
+        fill="white"
+        stroke="black"
+        strokeWidth={selected ? "3" : "2"}
+        style={{
+          filter: selected ? 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))' : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+        }}
+      />
+    </svg>
+    {/* Conteúdo do nó */}
     <div
       className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
         selected ? 'scale-105' : ''
       }`}
       style={{
-        backgroundColor: 'white',
         clipPath: 'polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%)',
-        boxShadow: selected ? '0 8px 12px -2px rgba(0, 0, 0, 0.2)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-        filter: selected ? 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.4))' : 'none'
+        pointerEvents: 'none'
       }}
     >
       <div className="text-center">
@@ -259,15 +286,6 @@ const MindBitsNode = memo(({ data, selected }: NodeProps) => (
         <div className="text-xs opacity-75 text-black">IA</div>
       </div>
     </div>
-    {/* Contorno do paralelogramo */}
-    <div
-      className="absolute inset-0 pointer-events-none"
-      style={{
-        clipPath: 'polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%)',
-        border: selected ? '3px solid black' : '2px solid black',
-        borderRadius: '0'
-      }}
-    />
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
