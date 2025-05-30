@@ -929,9 +929,30 @@ const FlowCanvas = () => {
   return (
     <div className="flex flex-col h-full">
       <div className="mb-4 bg-white p-4 rounded-lg shadow-sm space-y-3">
-        {/* Primeira linha - Botões principais */}
+        {/* Primeira linha - Seleção de fluxo e botões principais */}
         <div className="flex justify-between items-center">
-          <div className="flex space-x-2">
+          <div className="flex items-center space-x-4">
+            <div className="w-64">
+              <Select value={currentFlowId || ""} onValueChange={(value) => {
+                if (value && savedFlows) {
+                  const selectedFlow = savedFlows.find(flow => flow.id === value);
+                  if (selectedFlow) {
+                    loadFlow(selectedFlow);
+                  }
+                }
+              }}>
+                <SelectTrigger id="flow-select">
+                  <SelectValue placeholder="Carregar fluxo existente" />
+                </SelectTrigger>
+                <SelectContent>
+                  {savedFlows?.map((flow) => (
+                    <SelectItem key={flow.id} value={flow.id}>
+                      {flow.code} - {flow.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <Dialog open={isNewFlowModalOpen} onOpenChange={setIsNewFlowModalOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm">
@@ -1066,32 +1087,9 @@ const FlowCanvas = () => {
           </div>
         </div>
         
-        {/* Segunda linha - Controles de fluxo, seleção de nós e histórico */}
+        {/* Segunda linha - Seleção de nós e controles de histórico */}
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-64">
-                <Select value={currentFlowId || ""} onValueChange={(value) => {
-                  if (value && savedFlows) {
-                    const selectedFlow = savedFlows.find(flow => flow.id === value);
-                    if (selectedFlow) {
-                      loadFlow(selectedFlow);
-                    }
-                  }
-                }}>
-                  <SelectTrigger id="flow-select">
-                    <SelectValue placeholder="Carregar fluxo existente" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {savedFlows?.map((flow) => (
-                      <SelectItem key={flow.id} value={flow.id}>
-                        {flow.code} - {flow.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
             <div className="flex items-center space-x-2">
               <div className="w-64">
                 <Select onValueChange={setSelectedNodeType}>
