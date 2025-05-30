@@ -279,7 +279,7 @@ const FlowCanvas = () => {
   // Aplicar estilo de seleção às edges
   const styledEdges = edges.map((edge: Edge) => ({
     ...edge,
-    type: 'default', // Usar tipo default que suporta melhor o reposicionamento
+    type: 'smoothstep', // Volta para smoothstep conforme preferência
     style: {
       stroke: edge.id === selectedEdgeId ? '#f97316' : '#6b7280', // Laranja se selecionado, cinza se não
       strokeWidth: edge.id === selectedEdgeId ? 4 : 3, // Mais grosso se selecionado
@@ -1472,7 +1472,7 @@ const FlowCanvas = () => {
             onPaneClick={onPaneClick}
             nodeTypes={nodeTypes}
             defaultEdgeOptions={{
-              type: 'default',
+              type: 'smoothstep',
               markerEnd: {
                 type: MarkerType.ArrowClosed,
               },
