@@ -1196,7 +1196,7 @@ const FlowCanvas = () => {
                           ));
                         }}
                       >
-                        <SelectTrigger className="mt-1">
+                        <SelectTrigger className="mt-1 text-left">
                           <SelectValue placeholder="Selecione o fluxo de destino" />
                         </SelectTrigger>
                         <SelectContent>
