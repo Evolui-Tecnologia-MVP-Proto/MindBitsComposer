@@ -256,8 +256,8 @@ const IntegrationNode = memo(({ data, selected }: NodeProps) => (
         )}
       </div>
     </div>
-    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-black" />
-    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-black" />
+    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500" />
+    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-white border-2 border-blue-500" />
   </div>
 ));
 
