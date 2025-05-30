@@ -174,7 +174,7 @@ const DocumentNode = memo(({ data, selected }: NodeProps) => (
   </div>
 ));
 
-const MondayNode = memo(({ data, selected }: NodeProps) => (
+const IntegrationNode = memo(({ data, selected }: NodeProps) => (
   <div className="relative" style={{ width: '140px', height: '80px' }}>
     {/* SVG para contorno do paralelogramo */}
     <svg 
@@ -205,85 +205,7 @@ const MondayNode = memo(({ data, selected }: NodeProps) => (
     >
       <div className="text-center">
         <div className="font-medium text-black text-sm">{data.label}</div>
-        <div className="text-xs opacity-75 text-black">Plataforma</div>
-      </div>
-    </div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
-  </div>
-));
-
-const GitHubNode = memo(({ data, selected }: NodeProps) => (
-  <div className="relative" style={{ width: '140px', height: '80px' }}>
-    {/* SVG para contorno do paralelogramo */}
-    <svg 
-      className="absolute inset-0 pointer-events-none"
-      width="140" 
-      height="80" 
-      viewBox="0 0 140 80"
-    >
-      <polygon
-        points="28,0 140,0 112,80 0,80"
-        fill="white"
-        stroke="black"
-        strokeWidth={selected ? "3" : "2"}
-        style={{
-          filter: selected ? 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))' : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
-        }}
-      />
-    </svg>
-    {/* Conteúdo do nó */}
-    <div
-      className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
-        selected ? 'scale-105' : ''
-      }`}
-      style={{
-        clipPath: 'polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%)',
-        pointerEvents: 'none'
-      }}
-    >
-      <div className="text-center">
-        <div className="font-medium text-black text-sm">{data.label}</div>
-        <div className="text-xs opacity-75 text-black">Repositório</div>
-      </div>
-    </div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
-  </div>
-));
-
-const MindBitsNode = memo(({ data, selected }: NodeProps) => (
-  <div className="relative" style={{ width: '140px', height: '80px' }}>
-    {/* SVG para contorno do paralelogramo */}
-    <svg 
-      className="absolute inset-0 pointer-events-none"
-      width="140" 
-      height="80" 
-      viewBox="0 0 140 80"
-    >
-      <polygon
-        points="28,0 140,0 112,80 0,80"
-        fill="white"
-        stroke="black"
-        strokeWidth={selected ? "3" : "2"}
-        style={{
-          filter: selected ? 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))' : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
-        }}
-      />
-    </svg>
-    {/* Conteúdo do nó */}
-    <div
-      className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
-        selected ? 'scale-105' : ''
-      }`}
-      style={{
-        clipPath: 'polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%)',
-        pointerEvents: 'none'
-      }}
-    >
-      <div className="text-center">
-        <div className="font-medium text-black text-sm">{data.label}</div>
-        <div className="text-xs opacity-75 text-black">IA</div>
+        <div className="text-xs opacity-75 text-black">Integration</div>
       </div>
     </div>
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
@@ -302,9 +224,7 @@ const nodeTypes: NodeTypes = {
   reviseNode: ReviseNode,
   rawDocumentNode: RawDocumentNode,
   documentNode: DocumentNode,
-  mondayNode: MondayNode,
-  githubNode: GitHubNode,
-  mindbitsNode: MindBitsNode,
+  integrationNode: IntegrationNode,
 };
 
 const FlowCanvas = () => {
@@ -949,9 +869,7 @@ const FlowCanvas = () => {
       'reviseNode': 'Revisar',
       'rawDocumentNode': 'RAW-Document',
       'documentNode': 'Document',
-      'mondayNode': 'Monday.com',
-      'githubNode': 'GitHub',
-      'mindbitsNode': 'MindBits CTx',
+      'integrationNode': 'Integration',
       'endNode': 'Fim'
     };
 
@@ -1153,9 +1071,7 @@ const FlowCanvas = () => {
                     <SelectItem value="reviseNode">Revisar</SelectItem>
                     <SelectItem value="rawDocumentNode">RAW-Document</SelectItem>
                     <SelectItem value="documentNode">Document</SelectItem>
-                    <SelectItem value="mondayNode">Monday.com</SelectItem>
-                    <SelectItem value="githubNode">GitHub</SelectItem>
-                    <SelectItem value="mindbitsNode">MindBits CTx</SelectItem>
+                    <SelectItem value="integrationNode">Integration</SelectItem>
                     <SelectItem value="endNode">Fim</SelectItem>
                   </SelectContent>
                 </Select>
