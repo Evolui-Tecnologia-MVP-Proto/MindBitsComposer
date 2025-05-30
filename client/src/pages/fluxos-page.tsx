@@ -209,8 +209,8 @@ const DocumentNode = memo(({ data, selected }: NodeProps) => (
         )}
       </div>
     </div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
+    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-black" />
+    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-black" />
   </div>
 ));
 
@@ -256,8 +256,8 @@ const IntegrationNode = memo(({ data, selected }: NodeProps) => (
         )}
       </div>
     </div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
+    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-black" />
+    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-black" />
   </div>
 ));
 
