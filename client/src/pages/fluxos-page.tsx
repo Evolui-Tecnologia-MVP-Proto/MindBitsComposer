@@ -1156,7 +1156,7 @@ const FlowCanvas = () => {
         <div className="space-y-4">
           <div className="border-b pb-2">
             <h3 className="text-lg font-semibold">Inspector de Propriedades</h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 font-mono">
               {nodeMetadata?.label || selectedNode.type} - {selectedNode.id}
             </p>
           </div>
