@@ -540,26 +540,56 @@ const FlowCanvas = () => {
   );
 
   const handleSave = () => {
-    if (nodes.length <= 1) {
+    if (nodes.length === 0) {
       toast({
-        title: 'Fluxo incompleto',
-        description: 'Adicione pelo menos um nó de término para salvar o fluxo',
+        title: 'Fluxo vazio',
+        description: 'Adicione pelo menos um nó para salvar o fluxo',
         variant: 'destructive',
       });
       return;
     }
 
-    const flow = {
-      name: flowName,
-      nodes,
-      edges,
+    if (!currentFlowId) {
+      toast({
+        title: 'Nenhum fluxo selecionado',
+        description: 'Crie um novo fluxo ou selecione um existente para salvar',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!reactFlowInstance) {
+      toast({
+        title: 'Erro',
+        description: 'Editor não inicializado corretamente',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const flowData = reactFlowInstance.toObject();
+    
+    // Garantir que nodes e edges tenham UUIDs
+    const processedFlowData = {
+      ...flowData,
+      nodes: flowData.nodes.map((node: any) => ({
+        ...node,
+        id: node.id || crypto.randomUUID()
+      })),
+      edges: flowData.edges.map((edge: any) => ({
+        ...edge,
+        id: edge.id || crypto.randomUUID()
+      }))
     };
 
-    console.log('Salvando fluxo:', flow);
+    // Buscar dados do fluxo atual para preservar nome e código
+    const currentFlow = savedFlows?.find(flow => flow.id === currentFlowId);
     
-    toast({
-      title: 'Fluxo salvo',
-      description: `O fluxo "${flowName}" foi salvo com sucesso!`,
+    saveFlowMutation.mutate({
+      name: currentFlow?.name || flowName,
+      code: currentFlow?.code || `FLX-${Math.floor(Math.random() * 100).toString().padStart(2, '0')}`,
+      description: currentFlow?.description || `Fluxo atualizado em ${new Date().toLocaleString('pt-BR')}`,
+      flowData: processedFlowData
     });
   };
 
