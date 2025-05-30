@@ -530,34 +530,16 @@ const FlowCanvas = () => {
       return;
     }
 
-    if (!editFlowCode.trim()) {
-      toast({
-        title: "Erro",
-        description: "Código do fluxo é obrigatório",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!validateCode(editFlowCode)) {
-      toast({
-        title: "Erro",
-        description: "Código deve ter o formato XXX-99 (3 letras maiúsculas + hífen + 2 números)",
-        variant: "destructive"
-      });
-      return;
-    }
-
     // Preservar os dados do fluxo atual
     const currentFlow = savedFlows?.find((flow: any) => flow.id === currentFlowId);
     
     editFlowMutation.mutate({
       name: editFlowName,
-      code: editFlowCode,
+      code: editFlowCode, // Mantém o código original
       description: editFlowDescription,
       flowData: currentFlow?.flowData || { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } }
     });
-  }, [editFlowName, editFlowCode, editFlowDescription, validateCode, editFlowMutation, savedFlows, currentFlowId]);
+  }, [editFlowName, editFlowCode, editFlowDescription, editFlowMutation, savedFlows, currentFlowId]);
 
   // Função para excluir fluxo
   const handleDeleteFlow = useCallback(() => {
@@ -905,23 +887,11 @@ const FlowCanvas = () => {
           <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Editar Metadados do Fluxo</DialogTitle>
+                <DialogTitle>
+                  Editar Metadados do Fluxo - [{editFlowCode}]
+                </DialogTitle>
               </DialogHeader>
               <div className="grid gap-6 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="edit-code">Código do Fluxo</Label>
-                  <Input
-                    id="edit-code"
-                    value={editFlowCode}
-                    onChange={(e) => setEditFlowCode(applyCodeMask(e.target.value))}
-                    placeholder="XXX-99"
-                    className="w-full"
-                    maxLength={6}
-                  />
-                  <p className="text-sm text-gray-500">
-                    Formato: 3 letras maiúsculas + hífen + 2 números (ex: ABC-12)
-                  </p>
-                </div>
                 <div className="space-y-2">
                   <Label htmlFor="edit-name">Nome do Fluxo</Label>
                   <Input
