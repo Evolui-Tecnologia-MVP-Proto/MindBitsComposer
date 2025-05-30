@@ -52,7 +52,7 @@ const StartNode = memo(({ data, selected }: NodeProps) => {
     } else if (data.FromType) {
       return 'bg-[#3b82f6] text-white'; // Azul para outros tipos
     }
-    return data.configured ? 'bg-green-200 text-green-800' : 'bg-green-500 text-white'; // Cor padrão
+    return 'bg-white text-black'; // Estado padrão: fundo branco com texto preto
   };
 
   return (
@@ -93,7 +93,7 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
     } else if (data.FromType) {
       return 'bg-[#3b82f6] text-white'; // Azul para outros tipos
     }
-    return 'bg-red-500 text-white'; // Cor padrão
+    return 'bg-white text-black'; // Estado padrão: fundo branco com texto preto
   };
 
   return (
