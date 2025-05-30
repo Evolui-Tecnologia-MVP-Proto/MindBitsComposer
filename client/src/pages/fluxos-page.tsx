@@ -1135,7 +1135,7 @@ const FlowCanvas = () => {
                           <SelectValue placeholder="Selecione o fluxo de destino" />
                         </SelectTrigger>
                         <SelectContent>
-                          {flowsData && flowsData.map((flow: any) => (
+                          {savedFlows && savedFlows.map((flow: any) => (
                             <SelectItem key={flow.id} value={flow.id}>
                               {flow.name}
                             </SelectItem>
