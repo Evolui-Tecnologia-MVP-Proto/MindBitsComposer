@@ -1108,65 +1108,43 @@ const FlowCanvas = () => {
             </div>
 
             {nodeMetadata?.metadata && Object.entries(nodeMetadata.metadata).map(([key, value]) => {
+              console.log('Processando campo:', key, 'valor:', value, 'tipo:', typeof value);
+              
               // Verificar se é um campo de referência com marcadores {{ }}
               if (typeof value === 'string' && value.includes('{{') && value.includes('}}')) {
-                // Extrair informações do marcador (ex: "{{documents_flows.name}},{{documents_flows.id}}")
-                const matches = value.match(/\{\{([^}]+)\}\}/g);
-                if (matches && matches.length >= 2) {
-                  const displayField = matches[0].replace(/[{}]/g, ''); // documents_flows.name
-                  const valueField = matches[1].replace(/[{}]/g, ''); // documents_flows.id
-                  const tableName = displayField.split('.')[0]; // documents_flows
-                  
-                  if (tableName === 'documents_flows') {
-                    return (
-                      <div key={key}>
-                        <Label className="text-sm font-medium capitalize">
-                          {key === 'To_Flow_id' ? 'Fluxo de Destino' : key}
-                        </Label>
-                        <Select 
-                          value={selectedNode.data[key] || ''} 
-                          onValueChange={(newValue) => {
-                            setNodes(nds => nds.map(node => 
-                              node.id === selectedNode.id 
-                                ? { ...node, data: { ...node.data, [key]: newValue } }
-                                : node
-                            ));
-                          }}
-                        >
-                          <SelectTrigger className="mt-1">
-                            <SelectValue placeholder="Selecione o fluxo de destino" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {documentsFlowsData && documentsFlowsData.map((flow: any) => (
-                              <SelectItem key={flow.id} value={flow.id}>
-                                {flow.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    );
-                  }
-                }
+                console.log('Campo com marcadores detectado:', key, value);
                 
-                // Retornar campo de texto simples se não conseguir processar a referência
-                return (
-                  <div key={key}>
-                    <Label className="text-sm font-medium capitalize">{key}</Label>
-                    <Input 
-                      value={selectedNode.data[key] || ''}
-                      onChange={(e) => {
-                        setNodes(nds => nds.map(node => 
-                          node.id === selectedNode.id 
-                            ? { ...node, data: { ...node.data, [key]: e.target.value } }
-                            : node
-                        ));
-                      }}
-                      className="mt-1"
-                      placeholder={`Digite ${key}`}
-                    />
-                  </div>
-                );
+                // Para campos que referenciam documents_flows
+                if (value.includes('documents_flows')) {
+                  return (
+                    <div key={key}>
+                      <Label className="text-sm font-medium capitalize">
+                        {key === 'To_Flow_id' ? 'Fluxo de Destino' : key}
+                      </Label>
+                      <Select 
+                        value={selectedNode.data[key] || ''} 
+                        onValueChange={(newValue) => {
+                          setNodes(nds => nds.map(node => 
+                            node.id === selectedNode.id 
+                              ? { ...node, data: { ...node.data, [key]: newValue } }
+                              : node
+                          ));
+                        }}
+                      >
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder="Selecione o fluxo de destino" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {documentsFlowsQuery.data && documentsFlowsQuery.data.map((flow: any) => (
+                            <SelectItem key={flow.id} value={flow.id}>
+                              {flow.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  );
+                }
               }
               
               if (Array.isArray(value)) {
