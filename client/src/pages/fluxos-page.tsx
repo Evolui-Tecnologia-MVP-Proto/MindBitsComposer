@@ -21,7 +21,7 @@ import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PlusCircle, Save, RotateCcw, BookOpen, Edit, Trash2 } from 'lucide-react';
+import { PlusCircle, Save, RotateCcw, BookOpen, Edit, Trash2, Undo2, Redo2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -277,7 +277,56 @@ const FlowCanvas = () => {
   const [editFlowDescription, setEditFlowDescription] = useState('');
   const [editFlowCode, setEditFlowCode] = useState('');
   
+  // Estados para desfazer/refazer
+  const [history, setHistory] = useState<Array<{ nodes: any[], edges: any[] }>>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  
   const queryClient = useQueryClient();
+  
+  // Função para adicionar estado ao histórico
+  const addToHistory = useCallback((currentNodes: any[], currentEdges: any[]) => {
+    setHistory(prevHistory => {
+      const newHistory = prevHistory.slice(0, historyIndex + 1);
+      newHistory.push({ nodes: [...currentNodes], edges: [...currentEdges] });
+      // Limita o histórico a 50 estados para não consumir muita memória
+      if (newHistory.length > 50) {
+        newHistory.shift();
+        return newHistory;
+      }
+      return newHistory;
+    });
+    setHistoryIndex(prevIndex => Math.min(prevIndex + 1, 49));
+  }, [historyIndex]);
+
+  // Função para desfazer
+  const handleUndo = useCallback(() => {
+    if (historyIndex > 0) {
+      const prevState = history[historyIndex - 1];
+      setNodes(prevState.nodes);
+      setEdges(prevState.edges);
+      setHistoryIndex(historyIndex - 1);
+      
+      toast({
+        title: 'Ação desfeita',
+        description: 'Estado anterior restaurado',
+      });
+    }
+  }, [history, historyIndex, setNodes, setEdges]);
+
+  // Função para refazer
+  const handleRedo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      const nextState = history[historyIndex + 1];
+      setNodes(nextState.nodes);
+      setEdges(nextState.edges);
+      setHistoryIndex(historyIndex + 1);
+      
+      toast({
+        title: 'Ação refeita',
+        description: 'Estado posterior restaurado',
+      });
+    }
+  }, [history, historyIndex, setNodes, setEdges]);
   
   // Query para buscar fluxos salvos
   const { data: savedFlows } = useQuery({
@@ -791,7 +840,12 @@ const FlowCanvas = () => {
       data: { label: labelMap[selectedNodeType] || 'Novo Nó' },
     };
 
-    setNodes((nds) => nds.concat(newNode));
+    setNodes((nds) => {
+      const newNodes = nds.concat(newNode);
+      // Adiciona ao histórico após adicionar o nó
+      addToHistory(nodes, edges);
+      return newNodes;
+    });
     
     toast({
       title: 'Nó adicionado',
@@ -964,6 +1018,26 @@ const FlowCanvas = () => {
             </DialogContent>
           </Dialog>
           
+          <Button 
+            onClick={handleUndo} 
+            variant="outline" 
+            size="sm"
+            disabled={historyIndex <= 0}
+            title="Desfazer última ação"
+          >
+            <Undo2 className="mr-1 h-4 w-4" />
+            Desfazer
+          </Button>
+          <Button 
+            onClick={handleRedo} 
+            variant="outline" 
+            size="sm"
+            disabled={historyIndex >= history.length - 1}
+            title="Refazer última ação"
+          >
+            <Redo2 className="mr-1 h-4 w-4" />
+            Refazer
+          </Button>
           <Button onClick={handleReset} variant="outline" size="sm">
             <RotateCcw className="mr-1 h-4 w-4" />
             Reiniciar
