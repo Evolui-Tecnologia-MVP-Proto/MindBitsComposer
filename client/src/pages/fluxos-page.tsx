@@ -126,9 +126,9 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
       <div className="font-medium font-mono">{data.label}</div>
     )}
     {data.configured && data.showLabel === false && (
-      <div className="text-xs font-medium">
+      <div className="text-xs font-medium font-mono">
         {data.FromType && (
-          <div className={`px-2 py-1 rounded ${
+          <div className={`px-2 py-1 rounded font-mono ${
             data.FromType === 'Init' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
           }`}>
             {data.FromType === 'Init' ? 'Encerramento Direto' : 
@@ -136,11 +136,11 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
           </div>
         )}
         {data.To_Flow_id && (
-          <div className="mt-1 px-2 py-1 rounded bg-gray-100 text-gray-800">
+          <div className="mt-1 px-2 py-1 rounded bg-gray-100 text-gray-800 font-mono">
             Fluxo: {data.To_Flow_id}
           </div>
         )}
-        {!data.FromType && !data.To_Flow_id && <div>✓ Configurado</div>}
+        {!data.FromType && !data.To_Flow_id && <div className="font-mono">✓ Configurado</div>}
       </div>
     )}
     <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ top: '-8px' }} />
@@ -181,7 +181,7 @@ const SwitchNode = memo(({ data, selected }: NodeProps) => (
         <div className="font-medium font-mono text-black text-sm">{data.label}</div>
       )}
       {data.configured && data.showLabel === false && (
-        <div className="text-xs text-green-600 font-medium">✓ Config</div>
+        <div className="text-xs text-green-600 font-medium font-mono">✓ Config</div>
       )}
     </div>
     
@@ -219,9 +219,9 @@ const ActionNode = memo(({ data, selected }: NodeProps) => (
       <div className="font-medium font-mono">{data.label}</div>
     )}
     {data.configured && data.showLabel === false && (
-      <div className="text-xs font-medium">
-        {data.actionType && <div>{data.actionType}</div>}
-        {!data.actionType && <div>✓ Ação</div>}
+      <div className="text-xs font-medium font-mono">
+        {data.actionType && <div className="font-mono">{data.actionType}</div>}
+        {!data.actionType && <div className="font-mono">✓ Ação</div>}
       </div>
     )}
     <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ top: '-8px' }} />
@@ -266,9 +266,9 @@ const DocumentNode = memo(({ data, selected }: NodeProps) => (
           <div className={`font-medium font-mono text-sm ${data.configured ? 'text-green-800' : 'text-black'}`}>{data.label}</div>
         )}
         {data.configured && data.showLabel === false && (
-          <div className="text-xs text-green-800 font-medium">
-            {data.docType && <div>{data.docType}</div>}
-            {!data.docType && <div>✓ Documento</div>}
+          <div className="text-xs text-green-800 font-medium font-mono">
+            {data.docType && <div className="font-mono">{data.docType}</div>}
+            {!data.docType && <div className="font-mono">✓ Documento</div>}
           </div>
         )}
       </div>
@@ -314,10 +314,10 @@ const IntegrationNode = memo(({ data, selected }: NodeProps) => (
           <div className={`font-medium font-mono text-sm ${data.configured ? 'text-green-800' : 'text-black'}`}>{data.label}</div>
         )}
         {data.configured && data.showLabel === false && (
-          <div className="text-xs text-green-800 font-medium">
-            {data.integrType && <div>{data.integrType}</div>}
-            {data.service && <div>{data.service}</div>}
-            {!data.integrType && !data.service && <div>✓ Integração</div>}
+          <div className="text-xs text-green-800 font-medium font-mono">
+            {data.integrType && <div className="font-mono">{data.integrType}</div>}
+            {data.service && <div className="font-mono">{data.service}</div>}
+            {!data.integrType && !data.service && <div className="font-mono">✓ Integração</div>}
           </div>
         )}
       </div>
