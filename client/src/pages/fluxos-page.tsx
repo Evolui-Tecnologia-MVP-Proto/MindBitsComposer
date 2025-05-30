@@ -34,6 +34,15 @@ import {
 import { toast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 
 // Definição dos componentes de nós personalizados
 const StartNode = memo(({ data, selected }: NodeProps) => (
@@ -259,6 +268,9 @@ const FlowCanvas = () => {
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isNewFlowModalOpen, setIsNewFlowModalOpen] = useState(false);
+  const [newFlowName, setNewFlowName] = useState('');
+  const [newFlowDescription, setNewFlowDescription] = useState('');
   
   const queryClient = useQueryClient();
   
@@ -399,6 +411,35 @@ const FlowCanvas = () => {
       reactFlowInstance.fitView();
     }
   }, [setNodes, setEdges, reactFlowInstance]);
+
+  // Função para criar novo fluxo com nome personalizado
+  const createNewFlow = useCallback(() => {
+    if (!newFlowName.trim()) {
+      toast({
+        title: "Erro",
+        description: "Nome do fluxo é obrigatório",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setNodes([]);
+    setEdges([]);
+    setFlowName(newFlowName);
+    setCurrentFlowId(null);
+    setIsNewFlowModalOpen(false);
+    setNewFlowName('');
+    setNewFlowDescription('');
+    
+    if (reactFlowInstance) {
+      reactFlowInstance.fitView();
+    }
+
+    toast({
+      title: "Sucesso",
+      description: `Novo fluxo "${newFlowName}" criado!`
+    });
+  }, [newFlowName, setNodes, setEdges, reactFlowInstance]);
 
   const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -543,6 +584,58 @@ const FlowCanvas = () => {
         </div>
         
         <div className="flex space-x-2">
+          <Dialog open={isNewFlowModalOpen} onOpenChange={setIsNewFlowModalOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                <PlusCircle className="mr-1 h-4 w-4" />
+                + Novo Fluxo
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Criar Novo Fluxo</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">
+                    Nome
+                  </Label>
+                  <Input
+                    id="name"
+                    value={newFlowName}
+                    onChange={(e) => setNewFlowName(e.target.value)}
+                    className="col-span-3"
+                    placeholder="Nome do fluxo"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="description" className="text-right">
+                    Descrição
+                  </Label>
+                  <Textarea
+                    id="description"
+                    value={newFlowDescription}
+                    onChange={(e) => setNewFlowDescription(e.target.value)}
+                    className="col-span-3"
+                    placeholder="Descrição do fluxo (opcional)"
+                    rows={3}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  onClick={() => setIsNewFlowModalOpen(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button type="button" onClick={createNewFlow}>
+                  Criar Fluxo
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
           <Button onClick={handleReset} variant="outline" size="sm">
             <RotateCcw className="mr-1 h-4 w-4" />
             Reiniciar
