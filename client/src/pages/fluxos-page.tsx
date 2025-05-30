@@ -1390,7 +1390,7 @@ const FlowCanvas = () => {
                   }
                 }
               }}>
-                <SelectTrigger id="flow-select">
+                <SelectTrigger id="flow-select" className="text-left font-mono">
                   <SelectValue placeholder="Carregar fluxo existente" />
                 </SelectTrigger>
                 <SelectContent>
