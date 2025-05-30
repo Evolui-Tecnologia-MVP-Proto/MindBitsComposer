@@ -151,13 +151,14 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
 
 
 const SwitchNode = memo(({ data, selected }: NodeProps) => {
-  // Calcular tamanho dinâmico baseado no texto
+  // Calcular tamanho dinâmico baseado no texto, mantendo proporção do paralelogramo
   const hasText = data.switchField && data.switchField.length > 0;
   const textLength = hasText ? data.switchField.length : 0;
   
-  // Tamanho mínimo de 100px, aumenta conforme o texto
-  const dynamicWidth = Math.max(100, Math.min(200, 100 + (textLength * 8)));
-  const dynamicHeight = hasText && textLength > 12 ? 120 : 100; // Aumenta altura para textos longos
+  // Tamanho base aumenta conforme o texto, mantendo formato quadrado para o paralelogramo
+  const baseSize = Math.max(100, Math.min(200, 100 + (textLength * 6)));
+  const dynamicWidth = baseSize;
+  const dynamicHeight = baseSize; // Altura igual à largura para manter proporção do paralelogramo
   
   return (
     <div className="relative" style={{ width: `${dynamicWidth}px`, height: `${dynamicHeight}px` }}>
