@@ -289,6 +289,16 @@ export const insertRepoStructureSchema = createInsertSchema(repoStructure).omit(
 export type InsertRepoStructure = z.infer<typeof insertRepoStructureSchema>;
 export type RepoStructure = typeof repoStructure.$inferSelect;
 
+// Flow Types table
+export const flowTypes = pgTable("flow_types", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").default(""),
+  nodeMetadata: json("node_metadata").$type<Record<string, any>>().default({}),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Documents Flows table
 export const documentsFlows = pgTable("documents_flows", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -319,6 +329,16 @@ export const documentsFlows = pgTable("documents_flows", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+// Flow Types schema
+export const insertFlowTypeSchema = createInsertSchema(flowTypes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertFlowType = z.infer<typeof insertFlowTypeSchema>;
+export type FlowType = typeof flowTypes.$inferSelect;
 
 // Documents Flows schema
 export const insertDocumentsFlowSchema = createInsertSchema(documentsFlows).omit({
