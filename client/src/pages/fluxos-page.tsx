@@ -1203,6 +1203,29 @@ const FlowCanvas = () => {
             {nodeMetadata?.metadata && Object.entries(nodeMetadata.metadata).map(([key, value]) => {
               console.log('Processando campo:', key, 'valor:', value, 'tipo:', typeof value);
               
+              // Verificar se é uma string vazia - criar campo de input
+              if (typeof value === 'string' && value === '') {
+                return (
+                  <div key={key}>
+                    <Label className="text-sm font-medium capitalize font-mono">
+                      {key === 'switchField' ? 'Campo de Decisão' : key}
+                    </Label>
+                    <Input 
+                      value={selectedNode.data[key] || ''} 
+                      onChange={(e) => {
+                        setNodes(nds => nds.map(node => 
+                          node.id === selectedNode.id 
+                            ? { ...node, data: { ...node.data, [key]: e.target.value } }
+                            : node
+                        ));
+                      }}
+                      className="mt-1 font-mono"
+                      placeholder={`Digite o valor para ${key === 'switchField' ? 'campo de decisão' : key}`}
+                    />
+                  </div>
+                );
+              }
+              
               // Verificar se é um campo de referência com marcadores {{ }}
               if (typeof value === 'string' && value.includes('{{') && value.includes('}}')) {
                 console.log('Campo com marcadores detectado:', key, value);
