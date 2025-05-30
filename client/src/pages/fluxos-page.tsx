@@ -56,11 +56,19 @@ const StartNode = memo(({ data, selected }: NodeProps) => (
     )}
     {data.configured && data.showLabel === false && (
       <div className="text-xs font-medium">
+        {data.FromType && (
+          <div className={`px-2 py-1 rounded ${
+            data.FromType === 'Init' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+          }`}>
+            {data.FromType === 'Init' ? 'Início Direto' : 
+             data.FromType === 'flow_init' ? 'Transferência de Fluxo' : data.FromType}
+          </div>
+        )}
         {data.integrType && <div>{data.integrType}</div>}
         {data.service && <div>{data.service}</div>}
         {data.actionType && <div>{data.actionType}</div>}
         {data.docType && <div>{data.docType}</div>}
-        {!data.integrType && !data.service && !data.actionType && !data.docType && <div>✓ Início</div>}
+        {!data.FromType && !data.integrType && !data.service && !data.actionType && !data.docType && <div>✓ Início</div>}
       </div>
     )}
     <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ bottom: '-8px' }} />
@@ -1138,6 +1146,48 @@ const FlowCanvas = () => {
                           {savedFlows && savedFlows.map((flow: any) => (
                             <SelectItem key={flow.id} value={flow.id}>
                               {flow.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  );
+                }
+              }
+              
+              // Verificar se é um objeto com opções (como FromType)
+              if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                const options = Object.entries(value);
+                if (options.length > 0) {
+                  return (
+                    <div key={key}>
+                      <Label className="text-sm font-medium capitalize">
+                        {key === 'FromType' ? 'Tipo de Início' : key}
+                      </Label>
+                      <Select 
+                        value={selectedNode.data[key] || ''} 
+                        onValueChange={(newValue) => {
+                          setNodes(nds => nds.map(node => 
+                            node.id === selectedNode.id 
+                              ? { ...node, data: { ...node.data, [key]: newValue, configured: true, showLabel: false } }
+                              : node
+                          ));
+                        }}
+                      >
+                        <SelectTrigger className="mt-1">
+                          <SelectValue placeholder={`Selecione ${key === 'FromType' ? 'tipo de início' : key}`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {options.map(([optionKey, optionValue]) => (
+                            <SelectItem 
+                              key={optionKey} 
+                              value={optionKey}
+                              className={key === 'FromType' && optionKey === 'Init' ? 
+                                'bg-green-50 text-green-800 hover:bg-green-100' : 
+                                key === 'FromType' ? 'bg-blue-50 text-blue-800 hover:bg-blue-100' : ''
+                              }
+                            >
+                              {String(optionValue)}
                             </SelectItem>
                           ))}
                         </SelectContent>
