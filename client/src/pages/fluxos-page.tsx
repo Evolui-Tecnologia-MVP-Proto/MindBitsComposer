@@ -298,7 +298,7 @@ const IntegrationNode = memo(({ data, selected }: NodeProps) => (
       />
     </svg>
     {/* Ícone no canto superior esquerdo */}
-    <Link className="absolute top-1 right-4 h-6 w-6 text-orange-600 z-10" />
+    <Link className="absolute top-1 right-3 h-6 w-6 text-orange-600 z-10" />
     {/* Conteúdo do nó */}
     <div
       className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
