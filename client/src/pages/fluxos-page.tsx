@@ -176,7 +176,7 @@ const DocumentNode = memo(({ data, selected }: NodeProps) => (
 
 const MondayNode = memo(({ data, selected }: NodeProps) => (
   <div className="relative" style={{ width: '140px', height: '80px' }}>
-    {/* Hexágono para Monday.com */}
+    {/* Paralelogramo para Monday.com */}
     <div
       className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
         selected ? 'scale-105' : ''
@@ -184,7 +184,7 @@ const MondayNode = memo(({ data, selected }: NodeProps) => (
       style={{
         backgroundColor: 'white',
         border: selected ? '3px solid black' : '2px solid black',
-        clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
+        clipPath: 'polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%)',
         boxShadow: selected ? '0 8px 12px -2px rgba(0, 0, 0, 0.2)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
         filter: selected ? 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.4))' : 'none'
       }}
@@ -200,8 +200,8 @@ const MondayNode = memo(({ data, selected }: NodeProps) => (
 ));
 
 const GitHubNode = memo(({ data, selected }: NodeProps) => (
-  <div className="relative" style={{ width: '140px', height: '140px' }}>
-    {/* Octógono para GitHub */}
+  <div className="relative" style={{ width: '140px', height: '80px' }}>
+    {/* Paralelogramo para GitHub */}
     <div
       className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
         selected ? 'scale-105' : ''
@@ -209,7 +209,7 @@ const GitHubNode = memo(({ data, selected }: NodeProps) => (
       style={{
         backgroundColor: 'white',
         border: selected ? '3px solid black' : '2px solid black',
-        clipPath: 'polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)',
+        clipPath: 'polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%)',
         boxShadow: selected ? '0 8px 12px -2px rgba(0, 0, 0, 0.2)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
         filter: selected ? 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.4))' : 'none'
       }}
@@ -225,16 +225,23 @@ const GitHubNode = memo(({ data, selected }: NodeProps) => (
 ));
 
 const MindBitsNode = memo(({ data, selected }: NodeProps) => (
-  <div className="relative" style={{ width: '140px', height: '100px' }}>
-    {/* Elipse para MindBits */}
+  <div className="relative" style={{ width: '140px', height: '80px' }}>
+    {/* Paralelogramo para MindBits CTx */}
     <div
-      className={`absolute inset-0 flex items-center justify-center rounded-full bg-white border-2 shadow-md transition-all duration-200 ${
-        selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
+      className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
+        selected ? 'scale-105' : ''
       }`}
+      style={{
+        backgroundColor: 'white',
+        border: selected ? '3px solid black' : '2px solid black',
+        clipPath: 'polygon(20% 0%, 100% 0%, 80% 100%, 0% 100%)',
+        boxShadow: selected ? '0 8px 12px -2px rgba(0, 0, 0, 0.2)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        filter: selected ? 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.4))' : 'none'
+      }}
     >
       <div className="text-center">
         <div className="font-medium text-black text-sm">{data.label}</div>
-        <div className="text-xs opacity-75 text-black">IA Platform</div>
+        <div className="text-xs opacity-75 text-black">IA</div>
       </div>
     </div>
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
