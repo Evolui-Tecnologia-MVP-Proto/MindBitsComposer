@@ -1062,8 +1062,24 @@ const FlowCanvas = () => {
 
   // Função para renderizar o inspector de propriedades
   const renderInspector = () => {
+    if (!showInspector) return null;
+    
     const selectedNode = getSelectedNode();
-    if (!selectedNode || !showInspector) return null;
+    
+    if (!selectedNode) {
+      return (
+        <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto">
+          <div className="space-y-4">
+            <div className="border-b pb-2">
+              <h3 className="text-lg font-semibold">Inspector de Propriedades</h3>
+              <p className="text-sm text-gray-600">
+                Selecione um nó para configurar suas propriedades
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
 
     const nodeMetadata = getNodeMetadata(selectedNode.type);
     
