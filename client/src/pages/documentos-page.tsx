@@ -87,6 +87,7 @@ export default function DocumentosPage() {
   const [isDocumentationModalOpen, setIsDocumentationModalOpen] =
     useState(false);
   const [optimisticSyncState, setOptimisticSyncState] = useState<string | null>(null);
+  const [selectedFlowId, setSelectedFlowId] = useState<string>("");
 
 
   const [editingDocument, setEditingDocument] = useState<Documento | null>(
@@ -227,6 +228,11 @@ export default function DocumentosPage() {
   // Buscar documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
     queryKey: ["/api/documentos"],
+  });
+
+  // Buscar fluxos disponíveis
+  const { data: documentsFlows = [] } = useQuery({
+    queryKey: ["/api/documents-flows"],
   });
 
   // Buscar contagem de anexos para todos os documentos
@@ -3962,15 +3968,41 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               return null;
             })()}
 
-            {/* Área para futuras configurações */}
-            <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
-              <BookOpen className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p className="text-sm font-medium">
-                Configurações de Documentação
-              </p>
-              <p className="text-xs mt-1">
-                Parâmetros e opções serão implementados aqui
-              </p>
+            {/* Seleção de Fluxo */}
+            <div className="space-y-3">
+              <Label htmlFor="flow-select" className="text-sm font-medium">
+                Selecionar Fluxo de Documentação
+              </Label>
+              <Select value={selectedFlowId} onValueChange={setSelectedFlowId}>
+                <SelectTrigger id="flow-select">
+                  <SelectValue placeholder="Escolha um fluxo para a documentação" />
+                </SelectTrigger>
+                <SelectContent>
+                  {documentsFlows.map((flow: any) => (
+                    <SelectItem key={flow.id} value={flow.id}>
+                      <div className="flex flex-col">
+                        <span className="font-medium">{flow.name}</span>
+                        <span className="text-xs text-gray-500">
+                          {flow.code} - {flow.description}
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedFlowId && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-blue-600" />
+                    <span className="text-sm font-medium text-blue-800">
+                      Fluxo selecionado
+                    </span>
+                  </div>
+                  <p className="text-xs text-blue-700 mt-1">
+                    {documentsFlows.find((flow: any) => flow.id === selectedFlowId)?.description}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -3984,10 +4016,21 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             <Button
               onClick={() => {
                 console.log("Iniciar documentação para:", selectedDocument);
+                console.log("Fluxo selecionado:", selectedFlowId);
+                if (!selectedFlowId) {
+                  toast({
+                    title: "Fluxo obrigatório",
+                    description: "Por favor, selecione um fluxo de documentação.",
+                    variant: "destructive",
+                  });
+                  return;
+                }
                 // Aqui será implementada a funcionalidade de documentação
                 setIsDocumentationModalOpen(false);
+                setSelectedFlowId(""); // Limpar seleção
               }}
               className="bg-blue-600 hover:bg-blue-700"
+              disabled={!selectedFlowId}
             >
               <BookOpen className="mr-2 h-4 w-4" />
               Confirmar
