@@ -121,7 +121,7 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
   } ${
     selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
-    <Square className="absolute -top-4 -left-4 h-6 w-6 text-red-600" />
+    <Square className="absolute -top-4 -left-5 h-6 w-6 text-red-600" />
     {data.showLabel !== false && (
       <div className="font-medium font-mono">{data.label}</div>
     )}
