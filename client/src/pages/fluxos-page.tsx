@@ -279,6 +279,7 @@ const FlowCanvas = () => {
   // Aplicar estilo de seleção às edges
   const styledEdges = edges.map((edge: Edge) => ({
     ...edge,
+    type: 'smoothstep', // Usar tipo smoothstep para permitir reposicionamento
     style: {
       stroke: edge.id === selectedEdgeId ? '#f97316' : '#6b7280', // Laranja se selecionado, cinza se não
       strokeWidth: edge.id === selectedEdgeId ? 4 : 3, // Mais grosso se selecionado
@@ -288,7 +289,9 @@ const FlowCanvas = () => {
       type: MarkerType.ArrowClosed,
       color: edge.id === selectedEdgeId ? '#f97316' : '#6b7280', // Laranja se selecionado, cinza se não
     },
-    animated: false
+    animated: false,
+    updatable: true, // Permite atualizar a conexão
+    focusable: true  // Permite focar na conexão
   }));
   const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -561,6 +564,12 @@ const FlowCanvas = () => {
     setSelectedEdgeId(edge.id);
     setSelectedNodeId(null); // Desseleciona nó quando edge é selecionado
   }, []);
+
+  const onEdgeUpdate = useCallback((oldEdge: Edge, newConnection: any) => {
+    // Salvar estado atual no histórico antes de atualizar edge
+    addToHistory(nodes, edges);
+    setEdges((eds) => eds.map((edge) => (edge.id === oldEdge.id ? { ...edge, ...newConnection } : edge)));
+  }, [setEdges, nodes, edges, addToHistory]);
 
   const onPaneClick = useCallback(() => {
     setSelectedNodeId(null);
@@ -1453,6 +1462,7 @@ const FlowCanvas = () => {
             onNodesChange={handleNodesChange}
             onEdgesChange={handleEdgesChange}
             onConnect={onConnect}
+            onEdgeUpdate={onEdgeUpdate}
             onInit={setReactFlowInstance}
             onDrop={onDrop}
             onDragOver={onDragOver}
