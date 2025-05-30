@@ -1340,21 +1340,21 @@ const FlowCanvas = () => {
             {selectedNode.data.docType && (
               <div className="p-3 bg-blue-50 rounded-md">
                 <p className="text-xs text-blue-600 font-medium">Tipo de Documento Selecionado</p>
-                <p className="text-sm text-blue-800">{selectedNode.data.docType}</p>
+                <p className="text-sm text-blue-800 font-mono">{selectedNode.data.docType}</p>
               </div>
             )}
 
             {selectedNode.data.service && (
               <div className="p-3 bg-green-50 rounded-md">
                 <p className="text-xs text-green-600 font-medium">Serviço Selecionado</p>
-                <p className="text-sm text-green-800">{selectedNode.data.service}</p>
+                <p className="text-sm text-green-800 font-mono">{selectedNode.data.service}</p>
               </div>
             )}
 
             {selectedNode.data.actionType && (
               <div className="p-3 bg-purple-50 rounded-md">
                 <p className="text-xs text-purple-600 font-medium">Tipo de Ação Selecionado</p>
-                <p className="text-sm text-purple-800">{selectedNode.data.actionType}</p>
+                <p className="text-sm text-purple-800 font-mono">{selectedNode.data.actionType}</p>
               </div>
             )}
 
