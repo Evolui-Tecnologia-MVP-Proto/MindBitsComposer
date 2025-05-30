@@ -46,7 +46,9 @@ import { Textarea } from '@/components/ui/textarea';
 
 // Definição dos componentes de nós personalizados
 const StartNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-full bg-green-500 text-white shadow-md min-w-[100px] text-center transition-all duration-200 ${
+  <div className={`px-4 py-2 rounded-full shadow-md min-w-[100px] text-center transition-all duration-200 ${
+    data.configured ? 'bg-green-200 text-green-800' : 'bg-green-500 text-white'
+  } ${
     selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
     {data.showLabel !== false && (
@@ -140,10 +142,17 @@ const SwitchNode = memo(({ data, selected }: NodeProps) => (
 ));
 
 const ActionNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-lg bg-white text-black shadow-md min-w-[120px] text-center transition-all duration-200 ${
+  <div className={`px-4 py-2 rounded-lg shadow-md min-w-[120px] text-center transition-all duration-200 ${
+    data.configured ? 'bg-green-200 text-green-800' : 'bg-white text-black'
+  } ${
     selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
-    <div className="font-medium">{data.label}</div>
+    {data.showLabel !== false && (
+      <div className="font-medium">{data.label}</div>
+    )}
+    {data.configured && data.showLabel === false && (
+      <div className="text-xs font-medium">✓ Configurado</div>
+    )}
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
@@ -199,7 +208,7 @@ const IntegrationNode = memo(({ data, selected }: NodeProps) => (
     >
       <polygon
         points="28,0 140,0 112,80 0,80"
-        fill="white"
+        fill={data.configured ? "#dcfce7" : "white"}
         stroke={selected ? "orange" : "black"}
         strokeWidth={selected ? "4" : "2"}
         style={{
@@ -218,7 +227,12 @@ const IntegrationNode = memo(({ data, selected }: NodeProps) => (
       }}
     >
       <div className="text-center">
-        <div className="font-medium text-black text-sm">{data.label}</div>
+        {data.showLabel !== false && (
+          <div className={`font-medium text-sm ${data.configured ? 'text-green-800' : 'text-black'}`}>{data.label}</div>
+        )}
+        {data.configured && data.showLabel === false && (
+          <div className="text-xs text-green-800 font-medium">✓ Configurado</div>
+        )}
       </div>
     </div>
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
@@ -1014,11 +1028,6 @@ const FlowCanvas = () => {
               ...node.data, 
               configured: true,
               showLabel: false
-            },
-            style: {
-              ...node.style,
-              backgroundColor: '#f0f9f0', // Verde claro
-              border: '2px solid #4ade80'
             }
           }
         : node
