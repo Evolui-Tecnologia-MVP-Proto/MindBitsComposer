@@ -730,13 +730,29 @@ const FlowCanvas = () => {
   };
 
   const handleReset = () => {
-    setNodes(initialNodes);
-    setEdges([]);
-    setFlowName('Novo Fluxo');
-    
     toast({
-      title: 'Fluxo reiniciado',
-      description: 'Todas as alterações foram descartadas',
+      title: "ATENÇÃO",
+      description: "Esta ação apagará todos os elementos do diagrama e reiniciará em um canvas vazio. Caso salve estas alterações, estas não poderão ser desfeitas. Confirma?",
+      variant: "destructive",
+      action: (
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => {
+            setNodes(initialNodes);
+            setEdges([]);
+            setFlowName('Novo Fluxo');
+            setCurrentFlowId(null);
+            
+            toast({
+              title: 'Fluxo reiniciado',
+              description: 'Todas as alterações foram descartadas',
+            });
+          }}
+        >
+          Confirmar
+        </Button>
+      )
     });
   };
 
