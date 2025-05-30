@@ -468,9 +468,15 @@ const FlowCanvas = () => {
         {
           ...params,
           type: 'smoothstep',
-          animated: true,
+          animated: false,
+          style: {
+            stroke: '#6b7280',
+            strokeWidth: 3,
+            strokeDasharray: 'none'
+          },
           markerEnd: {
             type: MarkerType.ArrowClosed,
+            color: '#6b7280',
           },
         },
         eds
@@ -534,13 +540,28 @@ const FlowCanvas = () => {
     
     const { nodes: flowNodes, edges: flowEdges, viewport } = flow.flowData;
     
+    // Aplicar estilo sólido cinza às edges carregadas
+    const styledEdges = (flowEdges || []).map((edge: any) => ({
+      ...edge,
+      style: {
+        stroke: '#6b7280',
+        strokeWidth: 3,
+        strokeDasharray: 'none'
+      },
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+        color: '#6b7280',
+      },
+      animated: false
+    }));
+    
     setNodes(flowNodes || []);
-    setEdges(flowEdges || []);
+    setEdges(styledEdges);
     setFlowName(flow.name);
     setCurrentFlowId(flow.id);
     
     // Reset do histórico com o novo estado
-    resetHistory(flowNodes || [], flowEdges || []);
+    resetHistory(flowNodes || [], styledEdges);
     
     if (viewport) {
       reactFlowInstance.setViewport(viewport);
