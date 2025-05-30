@@ -3369,6 +3369,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { name, code, description, flowData } = req.body;
       
+      console.log('Dados recebidos para criar fluxo:', {
+        name,
+        code,
+        description,
+        descriptionType: typeof description,
+        descriptionLength: description?.length
+      });
+      
       // Generate UUIDs for nodes and edges if they don't have them
       const processedFlowData = {
         ...flowData,
