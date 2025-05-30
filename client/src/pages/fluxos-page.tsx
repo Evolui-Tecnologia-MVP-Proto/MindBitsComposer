@@ -659,16 +659,6 @@ const FlowCanvas = () => {
               </DialogHeader>
               <div className="grid gap-6 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Nome do Fluxo</Label>
-                  <Input
-                    id="name"
-                    value={newFlowName}
-                    onChange={(e) => setNewFlowName(e.target.value)}
-                    placeholder="Digite o nome do fluxo"
-                    className="w-full"
-                  />
-                </div>
-                <div className="space-y-2">
                   <Label htmlFor="code">Código do Fluxo</Label>
                   <Input
                     id="code"
@@ -681,6 +671,16 @@ const FlowCanvas = () => {
                   <p className="text-sm text-gray-500">
                     Formato: 3 letras maiúsculas + hífen + 2 números (ex: ABC-12)
                   </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nome do Fluxo</Label>
+                  <Input
+                    id="name"
+                    value={newFlowName}
+                    onChange={(e) => setNewFlowName(e.target.value)}
+                    placeholder="Digite o nome do fluxo"
+                    className="w-full"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="description">Descrição (opcional)</Label>
