@@ -560,7 +560,7 @@ const FlowCanvas = () => {
       variant: "destructive",
       action: (
         <Button
-          variant="outline"
+          variant="secondary"
           size="sm"
           onClick={() => deleteFlowMutation.mutate(currentFlowId)}
         >
