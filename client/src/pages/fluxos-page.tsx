@@ -129,7 +129,7 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
       <div className="text-xs font-medium font-mono">
         {data.FromType && (
           <div className={`px-2 py-1 rounded font-mono ${
-            data.FromType === 'Init' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
+            data.FromType === 'Init' ? 'bg-[#ef4444] text-white' : 'bg-[#3b82f6] text-white'
           }`}>
             {data.FromType === 'Init' ? 'Encerramento Direto' : 
              data.FromType === 'flow_init' ? 'Transferência para Fluxo' : data.FromType}
