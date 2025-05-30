@@ -114,13 +114,14 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
   };
 
   return (
-  <div className={`px-4 py-2 rounded-full shadow-md min-w-[100px] text-center transition-all duration-200 ${
+  <div className={`relative px-4 py-2 rounded-full shadow-md min-w-[100px] text-center transition-all duration-200 ${
     getBackgroundColor()
   } ${
     getTextColor()
   } ${
     selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
+    <Square className="absolute top-1 left-1 h-3 w-3 text-red-600" />
     {data.showLabel !== false && (
       <div className="font-medium font-mono">{data.label}</div>
     )}
@@ -151,6 +152,7 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
 
 const SwitchNode = memo(({ data, selected }: NodeProps) => (
   <div className="relative" style={{ width: '100px', height: '100px' }}>
+    <GitBranch className="absolute top-1 left-1 h-3 w-3 text-blue-600 z-20" />
     <div
       className={`absolute transition-all duration-200 ${selected ? 'scale-105' : ''}`}
       style={{
