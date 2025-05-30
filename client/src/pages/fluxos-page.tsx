@@ -46,8 +46,8 @@ import { Textarea } from '@/components/ui/textarea';
 
 // Definição dos componentes de nós personalizados
 const StartNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-full bg-green-500 border-2 text-white shadow-md min-w-[100px] text-center transition-all duration-200 ${
-    selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
+  <div className={`px-4 py-2 rounded-full bg-green-500 text-white shadow-md min-w-[100px] text-center transition-all duration-200 ${
+    selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
     <div className="font-medium">{data.label}</div>
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
@@ -55,8 +55,8 @@ const StartNode = memo(({ data, selected }: NodeProps) => (
 ));
 
 const EndNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-full bg-red-500 border-2 text-white shadow-md min-w-[100px] text-center transition-all duration-200 ${
-    selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
+  <div className={`px-4 py-2 rounded-full bg-red-500 text-white shadow-md min-w-[100px] text-center transition-all duration-200 ${
+    selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
     <div className="font-medium">{data.label}</div>
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
@@ -73,11 +73,11 @@ const SwitchNode = memo(({ data, selected }: NodeProps) => (
         width: '100%',
         height: '100%',
         backgroundColor: 'white',
-        border: selected ? '3px solid black' : '2px solid black',
+        border: selected ? '4px solid orange' : '2px solid black',
         transformStyle: 'preserve-3d',
         transform: 'rotateX(60deg) rotateZ(45deg)',
-        boxShadow: selected ? '0 8px 12px -2px rgba(0, 0, 0, 0.2)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-        filter: selected ? 'drop-shadow(0 0 8px rgba(0, 0, 0, 0.4))' : 'none'
+        boxShadow: selected ? '0 8px 12px -2px rgba(255, 165, 0, 0.3)' : '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        filter: selected ? 'drop-shadow(0 0 8px rgba(255, 165, 0, 0.4))' : 'none'
       }}
     >
       <div 
@@ -125,8 +125,8 @@ const SwitchNode = memo(({ data, selected }: NodeProps) => (
 ));
 
 const ActionNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-lg bg-white border-2 text-black shadow-md min-w-[120px] text-center transition-all duration-200 ${
-    selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
+  <div className={`px-4 py-2 rounded-lg bg-white text-black shadow-md min-w-[120px] text-center transition-all duration-200 ${
+    selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
     <div className="font-medium">{data.label}</div>
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
@@ -185,10 +185,10 @@ const IntegrationNode = memo(({ data, selected }: NodeProps) => (
       <polygon
         points="28,0 140,0 112,80 0,80"
         fill="white"
-        stroke="black"
-        strokeWidth={selected ? "3" : "2"}
+        stroke={selected ? "orange" : "black"}
+        strokeWidth={selected ? "4" : "2"}
         style={{
-          filter: selected ? 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))' : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+          filter: selected ? 'drop-shadow(0 4px 8px rgba(255, 165, 0, 0.4))' : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
         }}
       />
     </svg>
