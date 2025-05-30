@@ -217,6 +217,24 @@ const SwitchNode = memo(({ data, selected }: NodeProps) => {
       id="c"
       style={{ top: '50%', left: '-33px', transform: 'translateY(-50%)' }}
     />
+    
+    {/* Mostrar valores dos switches abaixo dos nós de saída */}
+    {data.configured && data.redSwitch && (
+      <div 
+        className="absolute text-xs font-mono text-red-700 bg-red-100 px-1 rounded"
+        style={{ top: '75%', right: '-45px', transform: 'translateX(50%)', whiteSpace: 'nowrap' }}
+      >
+        {Array.isArray(data.redSwitch) ? data.redSwitch.join(',') : data.redSwitch}
+      </div>
+    )}
+    {data.configured && data.greenSwitch && (
+      <div 
+        className="absolute text-xs font-mono text-green-700 bg-green-100 px-1 rounded"
+        style={{ top: '75%', left: '-45px', transform: 'translateX(-50%)', whiteSpace: 'nowrap' }}
+      >
+        {Array.isArray(data.greenSwitch) ? data.greenSwitch.join(',') : data.greenSwitch}
+      </div>
+    )}
   </div>
   );
 });
