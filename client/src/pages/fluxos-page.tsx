@@ -78,7 +78,7 @@ const StartNode = memo(({ data, selected }: NodeProps) => {
       <div className="text-xs font-medium font-mono">
         {data.FromType && (
           <div className={`px-2 py-1 rounded font-mono ${
-            data.FromType === 'Init' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+            data.FromType === 'Init' ? 'bg-[#22c55e] text-white' : 'bg-[#3b82f6] text-white'
           }`}>
             {data.FromType === 'Init' ? 'Início Direto' : 
              data.FromType === 'flow_init' ? 'Transferência de Fluxo' : data.FromType}
