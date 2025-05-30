@@ -63,7 +63,7 @@ const StartNode = memo(({ data, selected }: NodeProps) => (
         {!data.integrType && !data.service && !data.actionType && !data.docType && <div>✓ Início</div>}
       </div>
     )}
-    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-black" />
+    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-white border-2 border-blue-500" />
   </div>
 ));
 
@@ -77,7 +77,7 @@ const EndNode = memo(({ data, selected }: NodeProps) => (
     {data.configured && data.showLabel === false && (
       <div className="text-xs font-medium">✓ Configurado</div>
     )}
-    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-black" />
+    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500" />
   </div>
 ));
 
@@ -120,27 +120,27 @@ const SwitchNode = memo(({ data, selected }: NodeProps) => (
     <Handle 
       type="target" 
       position={Position.Top} 
-      className="w-4 h-4 bg-black" 
+      className="w-4 h-4 bg-white border-2 border-blue-500" 
       style={{ top: '10px', left: '50%', transform: 'translateX(-50%)' }}
     />
     <Handle 
       type="source" 
       position={Position.Right} 
-      className="w-4 h-4 bg-black" 
+      className="w-4 h-4 bg-white border-2 border-blue-500" 
       id="a"
       style={{ top: '50%', right: '-25px', transform: 'translateY(-50%)' }}
     />
     <Handle 
       type="source" 
       position={Position.Bottom} 
-      className="w-4 h-4 bg-black" 
+      className="w-4 h-4 bg-white border-2 border-blue-500" 
       id="b"
       style={{ bottom: '10px', left: '50%', transform: 'translateX(-50%)' }}
     />
     <Handle 
       type="source" 
       position={Position.Left} 
-      className="w-4 h-4 bg-black" 
+      className="w-4 h-4 bg-white border-2 border-blue-500" 
       id="c"
       style={{ top: '50%', left: '-25px', transform: 'translateY(-50%)' }}
     />
@@ -162,8 +162,8 @@ const ActionNode = memo(({ data, selected }: NodeProps) => (
         {!data.actionType && <div>✓ Ação</div>}
       </div>
     )}
-    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-black" />
-    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-black" />
+    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500" />
+    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-white border-2 border-blue-500" />
   </div>
 ));
 
@@ -209,8 +209,8 @@ const DocumentNode = memo(({ data, selected }: NodeProps) => (
         )}
       </div>
     </div>
-    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-black" />
-    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-black" />
+    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500" />
+    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-white border-2 border-blue-500" />
   </div>
 ));
 
