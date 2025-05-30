@@ -613,6 +613,14 @@ const FlowCanvas = () => {
       flowData: { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
       userId: 1 // Placeholder - deveria vir do contexto de autenticação
     };
+    
+    console.log('Dados que serão enviados para criar fluxo:', {
+      name: newFlowName,
+      code: newFlowCode,
+      description: newFlowDescription,
+      descriptionType: typeof newFlowDescription,
+      descriptionLength: newFlowDescription?.length
+    });
 
     saveFlowMutation.mutate(newFlowData, {
       onSuccess: (data) => {
