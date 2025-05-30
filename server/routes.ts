@@ -3367,7 +3367,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      const { name, description, flowData } = req.body;
+      const { name, code, description, flowData } = req.body;
       
       // Generate UUIDs for nodes and edges if they don't have them
       const processedFlowData = {
@@ -3385,6 +3385,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newFlow = await db.insert(documentsFlows)
         .values({
           name,
+          code,
           description: description || "",
           flowData: processedFlowData,
           userId: req.user.id
@@ -3403,7 +3404,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      const { name, description, flowData } = req.body;
+      const { name, code, description, flowData } = req.body;
       
       // Generate UUIDs for nodes and edges if they don't have them
       const processedFlowData = {
@@ -3421,6 +3422,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const updatedFlow = await db.update(documentsFlows)
         .set({
           name,
+          code,
           description: description || "",
           flowData: processedFlowData,
           updatedAt: new Date()
