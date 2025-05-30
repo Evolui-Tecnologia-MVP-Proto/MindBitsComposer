@@ -226,6 +226,11 @@ const FlowCanvas = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
+  const [flowName, setFlowName] = useState('Novo Fluxo');
+  const [selectedNodeType, setSelectedNodeType] = useState<string>('');
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
   
   // Aplicar estilo de seleção às edges
   const styledEdges = edges.map((edge: Edge) => ({
@@ -241,11 +246,6 @@ const FlowCanvas = () => {
     },
     animated: false
   }));
-  const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
-  const [flowName, setFlowName] = useState('Novo Fluxo');
-  const [selectedNodeType, setSelectedNodeType] = useState<string>('');
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
   const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isNewFlowModalOpen, setIsNewFlowModalOpen] = useState(false);
