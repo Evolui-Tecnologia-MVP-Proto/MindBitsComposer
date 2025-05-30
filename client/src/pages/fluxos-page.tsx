@@ -928,67 +928,17 @@ const FlowCanvas = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex justify-between items-center mb-4 bg-white p-4 rounded-lg shadow-sm">
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2">
-            <div className="w-64">
-              <Select value={currentFlowId || ""} onValueChange={(value) => {
-                if (value && savedFlows) {
-                  const selectedFlow = savedFlows.find(flow => flow.id === value);
-                  if (selectedFlow) {
-                    loadFlow(selectedFlow);
-                  }
-                }
-              }}>
-                <SelectTrigger id="flow-select">
-                  <SelectValue placeholder="Carregar fluxo existente" />
-                </SelectTrigger>
-                <SelectContent>
-                  {savedFlows?.map((flow) => (
-                    <SelectItem key={flow.id} value={flow.id}>
-                      {flow.code} - {flow.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-64">
-              <Select onValueChange={setSelectedNodeType}>
-                <SelectTrigger id="node-type">
-                  <SelectValue placeholder="Selecione um nó" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="startNode">Início</SelectItem>
-                  <SelectItem value="elaboreNode">Elaborar</SelectItem>
-                  <SelectItem value="approveNode">Aprovar</SelectItem>
-                  <SelectItem value="decisionNode">Decisão</SelectItem>
-                  <SelectItem value="reviseNode">Revisar</SelectItem>
-                  <SelectItem value="rawDocumentNode">RAW-Document</SelectItem>
-                  <SelectItem value="documentNode">Document</SelectItem>
-                  <SelectItem value="mondayNode">Monday.com</SelectItem>
-                  <SelectItem value="githubNode">GitHub</SelectItem>
-                  <SelectItem value="mindbitsNode">MindBits CTx</SelectItem>
-                  <SelectItem value="endNode">Fim</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button onClick={handleAddNode} size="sm" disabled={!selectedNodeType}>
-              <PlusCircle className="mr-1 h-4 w-4" />
-              Adicionar Nó
-            </Button>
-          </div>
-        </div>
-        
-        <div className="flex space-x-2">
-          <Dialog open={isNewFlowModalOpen} onOpenChange={setIsNewFlowModalOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <PlusCircle className="mr-1 h-4 w-4" />
-                + Novo Fluxo
-              </Button>
-            </DialogTrigger>
+      <div className="mb-4 bg-white p-4 rounded-lg shadow-sm space-y-3">
+        {/* Primeira linha - Botões principais */}
+        <div className="flex justify-between items-center">
+          <div className="flex space-x-2">
+            <Dialog open={isNewFlowModalOpen} onOpenChange={setIsNewFlowModalOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <PlusCircle className="mr-1 h-4 w-4" />
+                  + Novo Fluxo
+                </Button>
+              </DialogTrigger>
             <DialogContent className="sm:max-w-[550px]">
               <DialogHeader>
                 <DialogTitle>Criar Novo Fluxo</DialogTitle>
@@ -1091,52 +1041,111 @@ const FlowCanvas = () => {
             </DialogContent>
           </Dialog>
           
-          <Button 
-            onClick={handleUndo} 
-            variant="outline" 
-            size="sm"
-            disabled={historyIndex <= 0}
-            title="Desfazer última ação"
-          >
-            <Undo2 className="mr-1 h-4 w-4" />
-            Desfazer
-          </Button>
-          <Button 
-            onClick={handleRedo} 
-            variant="outline" 
-            size="sm"
-            disabled={historyIndex >= history.length - 1}
-            title="Refazer última ação"
-          >
-            <Redo2 className="mr-1 h-4 w-4" />
-            Refazer
-          </Button>
-          <Button onClick={handleReset} variant="outline" size="sm">
-            <RotateCcw className="mr-1 h-4 w-4" />
-            Reiniciar
-          </Button>
-          <Button 
-            onClick={openEditModal} 
-            variant="outline" 
-            size="sm"
-            disabled={!currentFlowId}
-          >
-            <Edit className="mr-1 h-4 w-4" />
-            Editar Metadados
-          </Button>
-          <Button 
-            onClick={handleDeleteFlow} 
-            variant="destructive" 
-            size="sm"
-            disabled={!currentFlowId}
-          >
-            <Trash2 className="mr-1 h-4 w-4" />
-            Excluir
-          </Button>
-          <Button onClick={handleSave} size="sm">
-            <Save className="mr-1 h-4 w-4" />
-            Salvar
-          </Button>
+            <Button 
+              onClick={openEditModal} 
+              variant="outline" 
+              size="sm"
+              disabled={!currentFlowId}
+            >
+              <Edit className="mr-1 h-4 w-4" />
+              Editar Metadados
+            </Button>
+            <Button 
+              onClick={handleDeleteFlow} 
+              variant="destructive" 
+              size="sm"
+              disabled={!currentFlowId}
+            >
+              <Trash2 className="mr-1 h-4 w-4" />
+              Excluir
+            </Button>
+            <Button onClick={handleSave} size="sm">
+              <Save className="mr-1 h-4 w-4" />
+              Salvar
+            </Button>
+          </div>
+        </div>
+        
+        {/* Segunda linha - Controles de fluxo, seleção de nós e histórico */}
+        <div className="flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <div className="w-64">
+                <Select value={currentFlowId || ""} onValueChange={(value) => {
+                  if (value && savedFlows) {
+                    const selectedFlow = savedFlows.find(flow => flow.id === value);
+                    if (selectedFlow) {
+                      loadFlow(selectedFlow);
+                    }
+                  }
+                }}>
+                  <SelectTrigger id="flow-select">
+                    <SelectValue placeholder="Carregar fluxo existente" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {savedFlows?.map((flow) => (
+                      <SelectItem key={flow.id} value={flow.id}>
+                        {flow.code} - {flow.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <div className="w-64">
+                <Select onValueChange={setSelectedNodeType}>
+                  <SelectTrigger id="node-type">
+                    <SelectValue placeholder="Selecione um nó" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="startNode">Início</SelectItem>
+                    <SelectItem value="elaboreNode">Elaborar</SelectItem>
+                    <SelectItem value="approveNode">Aprovar</SelectItem>
+                    <SelectItem value="decisionNode">Decisão</SelectItem>
+                    <SelectItem value="reviseNode">Revisar</SelectItem>
+                    <SelectItem value="rawDocumentNode">RAW-Document</SelectItem>
+                    <SelectItem value="documentNode">Document</SelectItem>
+                    <SelectItem value="mondayNode">Monday.com</SelectItem>
+                    <SelectItem value="githubNode">GitHub</SelectItem>
+                    <SelectItem value="mindbitsNode">MindBits CTx</SelectItem>
+                    <SelectItem value="endNode">Fim</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button onClick={handleAddNode} size="sm" disabled={!selectedNodeType}>
+                <PlusCircle className="mr-1 h-4 w-4" />
+                Adicionar Nó
+              </Button>
+            </div>
+          </div>
+          
+          <div className="flex space-x-2">
+            <Button 
+              onClick={handleUndo} 
+              variant="outline" 
+              size="sm"
+              disabled={historyIndex <= 0}
+              title="Desfazer última ação"
+            >
+              <Undo2 className="mr-1 h-4 w-4" />
+              Desfazer
+            </Button>
+            <Button 
+              onClick={handleRedo} 
+              variant="outline" 
+              size="sm"
+              disabled={historyIndex >= history.length - 1}
+              title="Refazer última ação"
+            >
+              <Redo2 className="mr-1 h-4 w-4" />
+              Refazer
+            </Button>
+            <Button onClick={handleReset} variant="outline" size="sm">
+              <RotateCcw className="mr-1 h-4 w-4" />
+              Reiniciar
+            </Button>
+          </div>
         </div>
       </div>
       
