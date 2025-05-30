@@ -48,16 +48,25 @@ import { Textarea } from '@/components/ui/textarea';
 const StartNode = memo(({ data, selected }: NodeProps) => {
   const getBackgroundColor = () => {
     if (data.FromType === 'Init') {
-      return 'bg-[#22c55e] text-white'; // Verde para início direto
+      return 'bg-[#22c55e]'; // Verde para início direto
     } else if (data.FromType) {
-      return 'bg-[#3b82f6] text-white'; // Azul para outros tipos
+      return 'bg-[#3b82f6]'; // Azul para outros tipos
     }
-    return 'bg-white text-black'; // Estado padrão: fundo branco com texto preto
+    return 'bg-white'; // Estado padrão: fundo branco
+  };
+
+  const getTextColor = () => {
+    if (data.FromType === 'Init' || data.FromType) {
+      return 'text-white'; // Texto branco para fundos coloridos
+    }
+    return 'text-black'; // Texto preto para fundo branco
   };
 
   return (
   <div className={`px-4 py-2 rounded-full shadow-md min-w-[100px] text-center transition-all duration-200 ${
     getBackgroundColor()
+  } ${
+    getTextColor()
   } ${
     selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
@@ -89,16 +98,25 @@ const StartNode = memo(({ data, selected }: NodeProps) => {
 const EndNode = memo(({ data, selected }: NodeProps) => {
   const getBackgroundColor = () => {
     if (data.FromType === 'Init') {
-      return 'bg-[#ef4444] text-white'; // Vermelho para encerramento direto
+      return 'bg-[#ef4444]'; // Vermelho para encerramento direto
     } else if (data.FromType) {
-      return 'bg-[#3b82f6] text-white'; // Azul para outros tipos
+      return 'bg-[#3b82f6]'; // Azul para outros tipos
     }
-    return 'bg-white text-black'; // Estado padrão: fundo branco com texto preto
+    return 'bg-white'; // Estado padrão: fundo branco
+  };
+
+  const getTextColor = () => {
+    if (data.FromType === 'Init' || data.FromType) {
+      return 'text-white'; // Texto branco para fundos coloridos
+    }
+    return 'text-black'; // Texto preto para fundo branco
   };
 
   return (
   <div className={`px-4 py-2 rounded-full shadow-md min-w-[100px] text-center transition-all duration-200 ${
     getBackgroundColor()
+  } ${
+    getTextColor()
   } ${
     selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
