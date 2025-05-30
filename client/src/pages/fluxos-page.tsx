@@ -136,7 +136,9 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
           </div>
         )}
         {data.To_Flow_id && (
-          <div className="mt-1 px-2 py-1 rounded bg-gray-100 text-gray-800 font-mono">
+          <div className={`mt-1 px-2 py-1 rounded font-mono ${
+            data.FromType === 'Init' ? 'bg-[#ef4444] text-white' : 'bg-[#3b82f6] text-white'
+          }`}>
             Fluxo: {data.To_Flow_id}
           </div>
         )}
