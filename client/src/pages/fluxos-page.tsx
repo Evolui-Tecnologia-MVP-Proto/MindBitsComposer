@@ -558,10 +558,15 @@ const FlowCanvas = () => {
       title: "Confirmar Exclusão",
       description: `Tem certeza que deseja excluir o fluxo "${currentFlow?.code} - ${currentFlow?.name}"? Esta ação não pode ser desfeita.`,
       variant: "destructive",
-      action: {
-        altText: "Confirmar exclusão",
-        onClick: () => deleteFlowMutation.mutate(currentFlowId)
-      }
+      action: (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => deleteFlowMutation.mutate(currentFlowId)}
+        >
+          Confirmar
+        </Button>
+      )
     });
   }, [currentFlowId, deleteFlowMutation, savedFlows]);
 
