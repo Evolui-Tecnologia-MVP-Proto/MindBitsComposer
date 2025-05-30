@@ -518,11 +518,20 @@ const FlowCanvas = () => {
   }, []);
 
   const onKeyDown = useCallback((event: KeyboardEvent) => {
-    if (event.key === 'Delete' && selectedNodeId) {
-      setNodes((nds) => nds.filter((node) => node.id !== selectedNodeId));
-      setSelectedNodeId(null);
+    if (event.key === 'Delete') {
+      if (selectedNodeId) {
+        // Salvar estado atual no histórico antes de remover nó
+        addToHistory(nodes, edges);
+        setNodes((nds) => nds.filter((node) => node.id !== selectedNodeId));
+        setSelectedNodeId(null);
+      } else if (selectedEdgeId) {
+        // Salvar estado atual no histórico antes de remover edge
+        addToHistory(nodes, edges);
+        setEdges((eds) => eds.filter((edge) => edge.id !== selectedEdgeId));
+        setSelectedEdgeId(null);
+      }
     }
-  }, [selectedNodeId, setNodes]);
+  }, [selectedNodeId, selectedEdgeId, setNodes, setEdges, nodes, edges, addToHistory]);
 
   useEffect(() => {
     document.addEventListener('keydown', onKeyDown);
