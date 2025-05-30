@@ -327,6 +327,53 @@ const FlowCanvas = () => {
       });
     }
   }, [history, historyIndex, setNodes, setEdges]);
+
+  // Handlers personalizados para capturar mudanças
+  const handleNodesChange = useCallback((changes: any[]) => {
+    // Verifica se é uma mudança significativa (não apenas posição)
+    const hasSignificantChange = changes.some(change => 
+      change.type === 'remove' || change.type === 'add' || change.type === 'reset'
+    );
+    
+    if (hasSignificantChange) {
+      addToHistory(nodes, edges);
+    }
+    
+    onNodesChange(changes);
+  }, [nodes, edges, onNodesChange, addToHistory]);
+
+  const handleEdgesChange = useCallback((changes: any[]) => {
+    // Verifica se é uma mudança significativa
+    const hasSignificantChange = changes.some(change => 
+      change.type === 'remove' || change.type === 'add' || change.type === 'reset'
+    );
+    
+    if (hasSignificantChange) {
+      addToHistory(nodes, edges);
+    }
+    
+    onEdgesChange(changes);
+  }, [nodes, edges, onEdgesChange, addToHistory]);
+
+  // Event listener para atalhos de teclado
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey || event.metaKey) {
+        if (event.key === 'z' && !event.shiftKey) {
+          event.preventDefault();
+          handleUndo();
+        } else if (event.key === 'y' || (event.key === 'z' && event.shiftKey)) {
+          event.preventDefault();
+          handleRedo();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleUndo, handleRedo]);
   
   // Query para buscar fluxos salvos
   const { data: savedFlows } = useQuery({
@@ -435,6 +482,9 @@ const FlowCanvas = () => {
   });
 
   const onConnect = useCallback((params: any) => {
+    // Salvar estado atual no histórico antes de adicionar nova conexão
+    addToHistory(nodes, edges);
+    
     setEdges((eds) =>
       addEdge(
         {
@@ -448,7 +498,7 @@ const FlowCanvas = () => {
         eds
       )
     );
-  }, [setEdges]);
+  }, [setEdges, nodes, edges, addToHistory]);
 
   const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
     event.stopPropagation();
@@ -1072,8 +1122,8 @@ const FlowCanvas = () => {
           <ReactFlow
             nodes={nodes}
             edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
+            onNodesChange={handleNodesChange}
+            onEdgesChange={handleEdgesChange}
             onConnect={onConnect}
             onInit={setReactFlowInstance}
             onDrop={onDrop}
