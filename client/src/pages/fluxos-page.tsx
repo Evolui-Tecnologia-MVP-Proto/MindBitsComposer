@@ -376,6 +376,12 @@ const FlowCanvas = () => {
     enabled: true
   });
 
+  // Query para buscar tipos de fluxo
+  const { data: flowTypes } = useQuery({
+    queryKey: ['/api/flow-types'],
+    enabled: true
+  });
+
   // Mutation para salvar fluxo
   const saveFlowMutation = useMutation({
     mutationFn: async (flowData: any) => {
@@ -643,6 +649,25 @@ const FlowCanvas = () => {
     const codeRegex = /^[A-Z]{3}-[0-9]{2}$/;
     return codeRegex.test(code);
   }, []);
+
+  // Função para obter o nó selecionado
+  const getSelectedNode = useCallback(() => {
+    if (!selectedNodeId) return null;
+    return nodes.find(node => node.id === selectedNodeId);
+  }, [selectedNodeId, nodes]);
+
+  // Função para obter metadados do tipo de nó atual
+  const getNodeMetadata = useCallback((nodeType: string) => {
+    if (!flowTypes || !currentFlowId || !savedFlows) return null;
+    
+    const currentFlow = savedFlows.find((flow: any) => flow.id === currentFlowId);
+    if (!currentFlow?.flow_type_id) return null;
+    
+    const flowType = flowTypes.find((type: any) => type.id === currentFlow.flow_type_id);
+    if (!flowType?.node_metadata?.nodeTypes) return null;
+    
+    return flowType.node_metadata.nodeTypes[nodeType];
+  }, [flowTypes, currentFlowId, savedFlows]);
 
   // Função para abrir modal de edição
   const openEditModal = useCallback(() => {
@@ -938,6 +963,105 @@ const FlowCanvas = () => {
       title: 'Nó adicionado',
       description: `${labelMap[selectedNodeType]} foi adicionado ao fluxo`,
     });
+  };
+
+  // Função para renderizar o inspector de propriedades
+  const renderInspector = () => {
+    const selectedNode = getSelectedNode();
+    if (!selectedNode || !showInspector) return null;
+
+    const nodeMetadata = getNodeMetadata(selectedNode.type);
+    
+    return (
+      <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto">
+        <div className="space-y-4">
+          <div className="border-b pb-2">
+            <h3 className="text-lg font-semibold">Inspector de Propriedades</h3>
+            <p className="text-sm text-gray-600">
+              {selectedNode.type} - {selectedNode.id}
+            </p>
+          </div>
+          
+          <div className="space-y-3">
+            <div>
+              <Label className="text-sm font-medium">Rótulo do Nó</Label>
+              <Input 
+                value={selectedNode.data.label || ''}
+                onChange={(e) => {
+                  setNodes(nds => nds.map(node => 
+                    node.id === selectedNode.id 
+                      ? { ...node, data: { ...node.data, label: e.target.value } }
+                      : node
+                  ));
+                }}
+                className="mt-1"
+              />
+            </div>
+
+            {nodeMetadata?.metadata && Object.entries(nodeMetadata.metadata).map(([key, value]) => {
+              if (Array.isArray(value)) {
+                // Renderizar como Select para arrays
+                return (
+                  <div key={key}>
+                    <Label className="text-sm font-medium capitalize">{key}</Label>
+                    <Select 
+                      value={selectedNode.data[key] || ''} 
+                      onValueChange={(newValue) => {
+                        setNodes(nds => nds.map(node => 
+                          node.id === selectedNode.id 
+                            ? { ...node, data: { ...node.data, [key]: newValue } }
+                            : node
+                        ));
+                      }}
+                    >
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder={`Selecione ${key}`} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {value.map((option: any, index: number) => (
+                          <SelectItem key={index} value={typeof option === 'string' ? option : option.type || option.name || String(index)}>
+                            {typeof option === 'string' ? option : option.name || option.type || String(option)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                );
+              } else if (typeof value === 'object') {
+                // Renderizar como Select para objetos (chave-valor)
+                return (
+                  <div key={key}>
+                    <Label className="text-sm font-medium capitalize">{key}</Label>
+                    <Select 
+                      value={selectedNode.data[key] || ''} 
+                      onValueChange={(newValue) => {
+                        setNodes(nds => nds.map(node => 
+                          node.id === selectedNode.id 
+                            ? { ...node, data: { ...node.data, [key]: newValue } }
+                            : node
+                        ));
+                      }}
+                    >
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder={`Selecione ${key}`} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(value as Record<string, any>).map(([optKey, optValue]) => (
+                          <SelectItem key={optKey} value={optKey}>
+                            {String(optValue)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                );
+              }
+              return null;
+            })}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (

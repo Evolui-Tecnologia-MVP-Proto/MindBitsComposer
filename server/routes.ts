@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { PluginStatus, PluginType, documentos, documentsFlows } from "@shared/schema";
+import { PluginStatus, PluginType, documentos, documentsFlows, flowTypes } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc, and, gte, lte, isNull } from "drizzle-orm";
@@ -3316,6 +3316,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Erro ao buscar colunas:', error);
       res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  // Flow Types Routes
+  
+  // Get all flow types
+  app.get("/api/flow-types", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const types = await db.select()
+        .from(flowTypes)
+        .orderBy(flowTypes.name);
+      
+      res.json(types);
+    } catch (error) {
+      console.error("Erro ao buscar tipos de fluxo:", error);
+      res.status(500).json({ error: "Erro ao buscar tipos de fluxo" });
     }
   });
 
