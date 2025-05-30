@@ -180,7 +180,7 @@ const DocumentNode = memo(({ data, selected }: NodeProps) => (
     >
       <polygon
         points="0,0 140,0 140,64 112,80 28,64 0,64"
-        fill="white"
+        fill={data.configured ? "#dcfce7" : "white"}
         stroke={selected ? "orange" : "black"}
         strokeWidth={selected ? "4" : "2"}
         style={{
@@ -198,7 +198,15 @@ const DocumentNode = memo(({ data, selected }: NodeProps) => (
       }}
     >
       <div className="text-center pt-2">
-        <div className="font-medium text-black text-sm">{data.label}</div>
+        {data.showLabel !== false && (
+          <div className={`font-medium text-sm ${data.configured ? 'text-green-800' : 'text-black'}`}>{data.label}</div>
+        )}
+        {data.configured && data.showLabel === false && (
+          <div className="text-xs text-green-800 font-medium">
+            {data.docType && <div>{data.docType}</div>}
+            {!data.docType && <div>✓ Documento</div>}
+          </div>
+        )}
       </div>
     </div>
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
