@@ -831,15 +831,12 @@ const FlowCanvas = () => {
     }
 
     const labelMap: Record<string, string> = {
-      'startNode': 'Início',
-      'elaboreNode': 'Elaborar',
-      'approveNode': 'Aprovar',
-      'decisionNode': 'Decisão',
-      'reviseNode': 'Revisar',
-      'rawDocumentNode': 'RAW-Document',
+      'startNode': 'Start',
+      'switchNode': 'Switch',
+      'actionNode': 'Action',
       'documentNode': 'Document',
       'integrationNode': 'Integration',
-      'endNode': 'Fim'
+      'endNode': 'Finish'
     };
 
     const newNode = {
