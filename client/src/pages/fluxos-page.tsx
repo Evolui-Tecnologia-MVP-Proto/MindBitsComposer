@@ -658,15 +658,33 @@ const FlowCanvas = () => {
 
   // Função para obter metadados do tipo de nó atual
   const getNodeMetadata = useCallback((nodeType: string) => {
-    if (!flowTypes || !currentFlowId || !savedFlows) return null;
+    console.log('getNodeMetadata chamada:', { nodeType, flowTypes, currentFlowId, savedFlows });
+    
+    if (!flowTypes || !currentFlowId || !savedFlows) {
+      console.log('Dados faltando:', { flowTypes: !!flowTypes, currentFlowId: !!currentFlowId, savedFlows: !!savedFlows });
+      return null;
+    }
     
     const currentFlow = savedFlows.find((flow: any) => flow.id === currentFlowId);
-    if (!currentFlow?.flow_type_id) return null;
+    console.log('currentFlow encontrado:', currentFlow);
+    
+    if (!currentFlow?.flow_type_id) {
+      console.log('flow_type_id não encontrado:', currentFlow?.flow_type_id);
+      return null;
+    }
     
     const flowType = flowTypes.find((type: any) => type.id === currentFlow.flow_type_id);
-    if (!flowType?.node_metadata?.nodeTypes) return null;
+    console.log('flowType encontrado:', flowType);
     
-    return flowType.node_metadata.nodeTypes[nodeType];
+    if (!flowType?.node_metadata?.nodeTypes) {
+      console.log('node_metadata ou nodeTypes não encontrado:', flowType?.node_metadata);
+      return null;
+    }
+    
+    const nodeMetadata = flowType.node_metadata.nodeTypes[nodeType];
+    console.log('nodeMetadata para', nodeType, ':', nodeMetadata);
+    
+    return nodeMetadata;
   }, [flowTypes, currentFlowId, savedFlows]);
 
   // Função para abrir modal de edição
