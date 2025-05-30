@@ -619,6 +619,29 @@ const FlowCanvas = () => {
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             <div className="w-64">
+              <Select value={currentFlowId || ""} onValueChange={(value) => {
+                if (value && savedFlows) {
+                  const selectedFlow = savedFlows.find(flow => flow.id === value);
+                  if (selectedFlow) {
+                    loadFlow(selectedFlow);
+                  }
+                }
+              }}>
+                <SelectTrigger id="flow-select">
+                  <SelectValue placeholder="Carregar fluxo existente" />
+                </SelectTrigger>
+                <SelectContent>
+                  {savedFlows?.map((flow) => (
+                    <SelectItem key={flow.id} value={flow.id}>
+                      {flow.code} - {flow.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-64">
               <Select onValueChange={setSelectedNodeType}>
                 <SelectTrigger id="node-type">
                   <SelectValue placeholder="Selecione um nó" />
