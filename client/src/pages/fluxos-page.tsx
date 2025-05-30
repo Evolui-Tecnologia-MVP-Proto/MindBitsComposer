@@ -70,7 +70,7 @@ const StartNode = memo(({ data, selected }: NodeProps) => {
   } ${
     selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
-    <Play className="absolute top-1 left-1 h-3 w-3 text-green-600" />
+    <Play className="absolute top-1 left-1 h-6 w-6 text-green-600" />
     {data.showLabel !== false && (
       <div className="font-medium font-mono">{data.label}</div>
     )}
@@ -121,7 +121,7 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
   } ${
     selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
-    <Square className="absolute top-1 left-1 h-3 w-3 text-red-600" />
+    <Square className="absolute top-1 left-1 h-6 w-6 text-red-600" />
     {data.showLabel !== false && (
       <div className="font-medium font-mono">{data.label}</div>
     )}
@@ -152,7 +152,7 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
 
 const SwitchNode = memo(({ data, selected }: NodeProps) => (
   <div className="relative" style={{ width: '100px', height: '100px' }}>
-    <GitBranch className="absolute top-1 left-1 h-3 w-3 text-blue-600 z-20" />
+    <GitBranch className="absolute top-1 left-1 h-6 w-6 text-blue-600 z-20" />
     <div
       className={`absolute transition-all duration-200 ${selected ? 'scale-105' : ''}`}
       style={{
@@ -214,7 +214,7 @@ const ActionNode = memo(({ data, selected }: NodeProps) => (
   } ${
     selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
-    <Zap className="absolute top-1 left-1 h-3 w-3 text-yellow-600" />
+    <Zap className="absolute top-1 left-1 h-6 w-6 text-yellow-600" />
     {data.showLabel !== false && (
       <div className="font-medium font-mono">{data.label}</div>
     )}
@@ -251,7 +251,7 @@ const DocumentNode = memo(({ data, selected }: NodeProps) => (
       />
     </svg>
     {/* Ícone no canto superior esquerdo */}
-    <FileText className="absolute top-1 left-1 h-3 w-3 text-purple-600 z-10" />
+    <FileText className="absolute top-1 left-1 h-6 w-6 text-purple-600 z-10" />
     {/* Conteúdo do nó */}
     <div
       className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
@@ -298,7 +298,7 @@ const IntegrationNode = memo(({ data, selected }: NodeProps) => (
       />
     </svg>
     {/* Ícone no canto superior esquerdo */}
-    <Link className="absolute top-1 left-1 h-3 w-3 text-orange-600 z-10" />
+    <Link className="absolute top-1 left-1 h-6 w-6 text-orange-600 z-10" />
     {/* Conteúdo do nó */}
     <div
       className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
