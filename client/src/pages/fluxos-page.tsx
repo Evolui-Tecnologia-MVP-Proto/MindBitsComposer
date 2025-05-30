@@ -158,7 +158,7 @@ const SwitchNode = memo(({ data, selected }: NodeProps) => (
       style={{
         width: '100%',
         height: '100%',
-        backgroundColor: 'white',
+        backgroundColor: data.configured ? '#dcfce7' : 'white', // Verde claro quando configurado
         border: selected ? '4px solid orange' : '2px solid black',
         transformStyle: 'preserve-3d',
         transform: 'rotateX(60deg) rotateZ(45deg)',
@@ -181,7 +181,12 @@ const SwitchNode = memo(({ data, selected }: NodeProps) => (
         <div className="font-medium font-mono text-black text-sm">{data.label}</div>
       )}
       {data.configured && data.showLabel === false && (
-        <div className="text-xs text-green-600 font-medium font-mono">✓ Config</div>
+        <div className="text-xs text-green-800 font-medium font-mono text-center">
+          {data.switchField && (
+            <div className="mb-1 text-xs">{data.switchField}</div>
+          )}
+          <div>✓ Config</div>
+        </div>
       )}
     </div>
     
