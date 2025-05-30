@@ -180,12 +180,9 @@ const SwitchNode = memo(({ data, selected }: NodeProps) => (
       {data.showLabel !== false && (
         <div className="font-medium font-mono text-black text-sm">{data.label}</div>
       )}
-      {data.configured && data.showLabel === false && (
+      {data.configured && data.showLabel === false && data.switchField && (
         <div className="text-xs text-green-800 font-medium font-mono text-center">
-          {data.switchField && (
-            <div className="mb-1 text-xs">{data.switchField}</div>
-          )}
-          <div>✓ Config</div>
+          <div>{data.switchField}</div>
         </div>
       )}
     </div>
