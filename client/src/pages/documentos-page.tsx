@@ -3980,12 +3980,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 <SelectContent>
                   {documentsFlows.map((flow: any) => (
                     <SelectItem key={flow.id} value={flow.id}>
-                      <div className="flex flex-col">
-                        <span className="font-medium">{flow.name}</span>
-                        <span className="text-xs text-gray-500">
-                          {flow.code} - {flow.description}
-                        </span>
-                      </div>
+                      {flow.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
