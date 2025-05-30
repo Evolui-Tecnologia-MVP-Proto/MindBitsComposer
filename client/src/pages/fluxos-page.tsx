@@ -222,7 +222,7 @@ const SwitchNode = memo(({ data, selected }: NodeProps) => {
     {data.configured && data.redSwitch && (
       <div 
         className="absolute text-xs font-mono text-red-700 bg-red-100 px-1 rounded"
-        style={{ top: 'calc(75% - 5px)', right: '-45px', transform: 'translateX(50%)', whiteSpace: 'nowrap' }}
+        style={{ top: 'calc(75% - 11px)', right: '-45px', transform: 'translateX(50%)', whiteSpace: 'nowrap' }}
       >
         {Array.isArray(data.redSwitch) ? data.redSwitch.join(',') : data.redSwitch}
       </div>
@@ -230,7 +230,7 @@ const SwitchNode = memo(({ data, selected }: NodeProps) => {
     {data.configured && data.greenSwitch && (
       <div 
         className="absolute text-xs font-mono text-green-700 bg-green-100 px-1 rounded"
-        style={{ top: 'calc(75% - 5px)', left: '-45px', transform: 'translateX(-50%)', whiteSpace: 'nowrap' }}
+        style={{ top: 'calc(75% - 11px)', left: '-45px', transform: 'translateX(-50%)', whiteSpace: 'nowrap' }}
       >
         {Array.isArray(data.greenSwitch) ? data.greenSwitch.join(',') : data.greenSwitch}
       </div>
