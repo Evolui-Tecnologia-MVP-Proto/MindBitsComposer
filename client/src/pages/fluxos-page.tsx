@@ -1167,7 +1167,7 @@ const FlowCanvas = () => {
               <Input 
                 value={selectedNode.data.label || nodeMetadata?.label || ''}
                 readOnly
-                className="mt-1 bg-gray-50"
+                className="mt-1 bg-gray-50 font-mono"
                 placeholder={nodeMetadata?.label || 'Rótulo do nó'}
               />
             </div>
