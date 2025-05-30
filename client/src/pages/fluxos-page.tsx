@@ -591,34 +591,30 @@ const FlowCanvas = () => {
                 + Novo Fluxo
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[550px]">
               <DialogHeader>
                 <DialogTitle>Criar Novo Fluxo</DialogTitle>
               </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Nome
-                  </Label>
+              <div className="grid gap-6 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nome do Fluxo</Label>
                   <Input
                     id="name"
                     value={newFlowName}
                     onChange={(e) => setNewFlowName(e.target.value)}
-                    className="col-span-3"
-                    placeholder="Nome do fluxo"
+                    placeholder="Digite o nome do fluxo"
+                    className="w-full"
                   />
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="description" className="text-right">
-                    Descrição
-                  </Label>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Descrição (opcional)</Label>
                   <Textarea
                     id="description"
                     value={newFlowDescription}
                     onChange={(e) => setNewFlowDescription(e.target.value)}
-                    className="col-span-3"
-                    placeholder="Descrição do fluxo (opcional)"
-                    rows={3}
+                    placeholder="Descreva o propósito deste fluxo"
+                    rows={4}
+                    className="w-full resize-none"
                   />
                 </div>
               </div>
