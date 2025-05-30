@@ -226,10 +226,26 @@ const FlowCanvas = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  
+  // Aplicar estilo de seleção às edges
+  const styledEdges = edges.map((edge: Edge) => ({
+    ...edge,
+    style: {
+      stroke: edge.id === selectedEdgeId ? '#f97316' : '#6b7280', // Laranja se selecionado, cinza se não
+      strokeWidth: edge.id === selectedEdgeId ? 4 : 3, // Mais grosso se selecionado
+      strokeDasharray: 'none'
+    },
+    markerEnd: {
+      type: MarkerType.ArrowClosed,
+      color: edge.id === selectedEdgeId ? '#f97316' : '#6b7280', // Laranja se selecionado, cinza se não
+    },
+    animated: false
+  }));
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
   const [flowName, setFlowName] = useState('Novo Fluxo');
   const [selectedNodeType, setSelectedNodeType] = useState<string>('');
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
   const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isNewFlowModalOpen, setIsNewFlowModalOpen] = useState(false);
@@ -487,10 +503,18 @@ const FlowCanvas = () => {
   const onNodeClick = useCallback((event: React.MouseEvent, node: Node) => {
     event.stopPropagation();
     setSelectedNodeId(node.id);
+    setSelectedEdgeId(null); // Desseleciona edge quando nó é selecionado
+  }, []);
+
+  const onEdgeClick = useCallback((event: React.MouseEvent, edge: Edge) => {
+    event.stopPropagation();
+    setSelectedEdgeId(edge.id);
+    setSelectedNodeId(null); // Desseleciona nó quando edge é selecionado
   }, []);
 
   const onPaneClick = useCallback(() => {
     setSelectedNodeId(null);
+    setSelectedEdgeId(null);
   }, []);
 
   const onKeyDown = useCallback((event: KeyboardEvent) => {
@@ -1126,7 +1150,7 @@ const FlowCanvas = () => {
         <div className="flex-1 h-full" ref={reactFlowWrapper}>
           <ReactFlow
             nodes={nodes}
-            edges={edges}
+            edges={styledEdges}
             onNodesChange={handleNodesChange}
             onEdgesChange={handleEdgesChange}
             onConnect={onConnect}
@@ -1134,6 +1158,7 @@ const FlowCanvas = () => {
             onDrop={onDrop}
             onDragOver={onDragOver}
             onNodeClick={onNodeClick}
+            onEdgeClick={onEdgeClick}
             onPaneClick={onPaneClick}
             nodeTypes={nodeTypes}
             defaultEdgeOptions={{
