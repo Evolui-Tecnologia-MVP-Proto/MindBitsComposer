@@ -21,7 +21,7 @@ import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PlusCircle, Save, RotateCcw, BookOpen, Edit, Trash2, Undo2, Redo2 } from 'lucide-react';
+import { PlusCircle, Save, RotateCcw, BookOpen, Edit, Trash2, Undo2, Redo2, Settings } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -231,6 +231,7 @@ const FlowCanvas = () => {
   const [selectedNodeType, setSelectedNodeType] = useState<string>('');
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
+  const [showInspector, setShowInspector] = useState<boolean>(false);
   
   // Aplicar estilo de seleção às edges
   const styledEdges = edges.map((edge: Edge) => ({
@@ -966,6 +967,16 @@ const FlowCanvas = () => {
                 </SelectContent>
               </Select>
             </div>
+            
+            <Button
+              variant={showInspector ? "default" : "outline"}
+              size="sm"
+              onClick={() => setShowInspector(!showInspector)}
+            >
+              <Settings className="h-4 w-4 mr-2" />
+              Exibir Inspector
+            </Button>
+            
             <Dialog open={isNewFlowModalOpen} onOpenChange={setIsNewFlowModalOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm">
