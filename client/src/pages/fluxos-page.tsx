@@ -148,10 +148,10 @@ const DocumentNode = memo(({ data, selected }: NodeProps) => (
       <polygon
         points="0,0 140,0 140,64 112,80 28,64 0,64"
         fill="white"
-        stroke="black"
-        strokeWidth={selected ? "3" : "2"}
+        stroke={selected ? "orange" : "black"}
+        strokeWidth={selected ? "4" : "2"}
         style={{
-          filter: selected ? 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))' : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+          filter: selected ? 'drop-shadow(0 4px 8px rgba(255, 165, 0, 0.4))' : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
         }}
       />
     </svg>
