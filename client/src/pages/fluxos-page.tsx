@@ -21,7 +21,7 @@ import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PlusCircle, Save, RotateCcw, BookOpen, Edit, Trash2, Undo2, Redo2, Settings } from 'lucide-react';
+import { PlusCircle, Save, RotateCcw, BookOpen, Edit, Trash2, Undo2, Redo2, Settings, Play, GitBranch, Zap, FileText, Link, Square } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -1556,12 +1556,42 @@ const FlowCanvas = () => {
                     <SelectValue placeholder="Selecione um nó" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="startNode">Start</SelectItem>
-                    <SelectItem value="switchNode">Switch</SelectItem>
-                    <SelectItem value="actionNode">Action</SelectItem>
-                    <SelectItem value="documentNode">Document</SelectItem>
-                    <SelectItem value="integrationNode">Integration</SelectItem>
-                    <SelectItem value="endNode">Finish</SelectItem>
+                    <SelectItem value="startNode">
+                      <div className="flex items-center space-x-2">
+                        <Play className="h-4 w-4 text-green-600" />
+                        <span>Start</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="switchNode">
+                      <div className="flex items-center space-x-2">
+                        <GitBranch className="h-4 w-4 text-blue-600" />
+                        <span>Switch</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="actionNode">
+                      <div className="flex items-center space-x-2">
+                        <Zap className="h-4 w-4 text-yellow-600" />
+                        <span>Action</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="documentNode">
+                      <div className="flex items-center space-x-2">
+                        <FileText className="h-4 w-4 text-purple-600" />
+                        <span>Document</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="integrationNode">
+                      <div className="flex items-center space-x-2">
+                        <Link className="h-4 w-4 text-orange-600" />
+                        <span>Integration</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="endNode">
+                      <div className="flex items-center space-x-2">
+                        <Square className="h-4 w-4 text-red-600" />
+                        <span>Finish</span>
+                      </div>
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
