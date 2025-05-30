@@ -614,13 +614,7 @@ const FlowCanvas = () => {
       userId: 1 // Placeholder - deveria vir do contexto de autenticação
     };
     
-    console.log('Dados que serão enviados para criar fluxo:', {
-      name: newFlowName,
-      code: newFlowCode,
-      description: newFlowDescription,
-      descriptionType: typeof newFlowDescription,
-      descriptionLength: newFlowDescription?.length
-    });
+
 
     saveFlowMutation.mutate(newFlowData, {
       onSuccess: (data) => {
@@ -643,7 +637,7 @@ const FlowCanvas = () => {
         });
       }
     });
-  }, [newFlowName, newFlowCode, validateCode, setNodes, setEdges, reactFlowInstance]);
+  }, [newFlowName, newFlowCode, newFlowDescription, validateCode, setNodes, setEdges, reactFlowInstance]);
 
   const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -882,10 +876,7 @@ const FlowCanvas = () => {
                   <Textarea
                     id="description"
                     value={newFlowDescription}
-                    onChange={(e) => {
-                      console.log('Descrição alterada:', e.target.value);
-                      setNewFlowDescription(e.target.value);
-                    }}
+                    onChange={(e) => setNewFlowDescription(e.target.value)}
                     placeholder="Descreva o propósito deste fluxo"
                     rows={4}
                     className="w-full resize-none"
