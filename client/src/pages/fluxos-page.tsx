@@ -596,7 +596,7 @@ const FlowCanvas = () => {
     const newFlowData = {
       name: newFlowName,
       code: newFlowCode,
-      description: newFlowDescription || `Fluxo criado em ${new Date().toLocaleString('pt-BR')}`,
+      description: newFlowDescription,
       flowData: { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
       userId: 1 // Placeholder - deveria vir do contexto de autenticação
     };
