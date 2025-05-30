@@ -150,8 +150,17 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
 
 
 
-const SwitchNode = memo(({ data, selected }: NodeProps) => (
-  <div className="relative" style={{ width: '100px', height: '100px' }}>
+const SwitchNode = memo(({ data, selected }: NodeProps) => {
+  // Calcular tamanho dinâmico baseado no texto
+  const hasText = data.switchField && data.switchField.length > 0;
+  const textLength = hasText ? data.switchField.length : 0;
+  
+  // Tamanho mínimo de 100px, aumenta conforme o texto
+  const dynamicWidth = Math.max(100, Math.min(200, 100 + (textLength * 8)));
+  const dynamicHeight = hasText && textLength > 12 ? 120 : 100; // Aumenta altura para textos longos
+  
+  return (
+  <div className="relative" style={{ width: `${dynamicWidth}px`, height: `${dynamicHeight}px` }}>
     <GitBranch className="absolute top-1 left-1 h-6 w-6 text-blue-600 z-20" />
     <div
       className={`absolute transition-all duration-200 ${selected ? 'scale-105' : ''}`}
@@ -208,7 +217,8 @@ const SwitchNode = memo(({ data, selected }: NodeProps) => (
       style={{ top: '50%', left: '-33px', transform: 'translateY(-50%)' }}
     />
   </div>
-));
+  );
+});
 
 const ActionNode = memo(({ data, selected }: NodeProps) => (
   <div className={`relative px-4 py-2 rounded-lg shadow-md min-w-[120px] text-center transition-all duration-200 ${
