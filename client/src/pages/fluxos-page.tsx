@@ -279,7 +279,7 @@ const FlowCanvas = () => {
   // Aplicar estilo de seleção às edges
   const styledEdges = edges.map((edge: Edge) => ({
     ...edge,
-    type: 'smoothstep', // Usar tipo smoothstep para permitir reposicionamento
+    type: 'default', // Usar tipo default que suporta melhor o reposicionamento
     style: {
       stroke: edge.id === selectedEdgeId ? '#f97316' : '#6b7280', // Laranja se selecionado, cinza se não
       strokeWidth: edge.id === selectedEdgeId ? 4 : 3, // Mais grosso se selecionado
@@ -291,7 +291,8 @@ const FlowCanvas = () => {
     },
     animated: false,
     updatable: true, // Permite atualizar a conexão
-    focusable: true  // Permite focar na conexão
+    focusable: true, // Permite focar na conexão
+    interactionWidth: 20 // Aumenta a área clicável da conexão
   }));
   const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -1471,11 +1472,14 @@ const FlowCanvas = () => {
             onPaneClick={onPaneClick}
             nodeTypes={nodeTypes}
             defaultEdgeOptions={{
-              type: 'smoothstep',
+              type: 'default',
               markerEnd: {
                 type: MarkerType.ArrowClosed,
               },
+              updatable: true,
             }}
+            edgesUpdatable={true}
+            edgesFocusable={true}
             fitView
             connectionLineType={ConnectionLineType.SmoothStep}
           >
