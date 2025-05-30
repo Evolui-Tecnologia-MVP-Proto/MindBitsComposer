@@ -160,7 +160,7 @@ const SwitchNode = memo(({ data, selected }: NodeProps) => {
   const dynamicHeight = hasText && textLength > 12 ? 120 : 100; // Aumenta altura para textos longos
   
   return (
-  <div className="relative" style={{ width: `${dynamicWidth}px`, height: `${dynamicHeight}px` }}>
+    <div className="relative" style={{ width: `${dynamicWidth}px`, height: `${dynamicHeight}px` }}>
     <GitBranch className="absolute top-1 left-1 h-6 w-6 text-blue-600 z-20" />
     <div
       className={`absolute transition-all duration-200 ${selected ? 'scale-105' : ''}`}
