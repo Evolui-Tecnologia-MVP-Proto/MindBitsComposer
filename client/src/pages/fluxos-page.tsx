@@ -739,14 +739,18 @@ const FlowCanvas = () => {
           variant="secondary"
           size="sm"
           onClick={() => {
-            setNodes(initialNodes);
+            // Apenas limpa o canvas, mantém a seleção do fluxo atual
+            setNodes([]);
             setEdges([]);
-            setFlowName('Novo Fluxo');
-            setCurrentFlowId(null);
+            
+            // Centraliza a visualização
+            if (reactFlowInstance) {
+              reactFlowInstance.fitView();
+            }
             
             toast({
-              title: 'Fluxo reiniciado',
-              description: 'Todas as alterações foram descartadas',
+              title: 'Canvas limpo',
+              description: 'Todos os elementos foram removidos. Use o botão SALVAR para persistir as alterações.',
             });
           }}
         >
