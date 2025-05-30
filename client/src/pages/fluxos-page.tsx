@@ -900,6 +900,65 @@ const FlowCanvas = () => {
               </DialogFooter>
             </DialogContent>
           </Dialog>
+          
+          {/* Modal para editar metadados do fluxo */}
+          <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Editar Metadados do Fluxo</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-6 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit-code">Código do Fluxo</Label>
+                  <Input
+                    id="edit-code"
+                    value={editFlowCode}
+                    onChange={(e) => setEditFlowCode(applyCodeMask(e.target.value))}
+                    placeholder="XXX-99"
+                    className="w-full"
+                    maxLength={6}
+                  />
+                  <p className="text-sm text-gray-500">
+                    Formato: 3 letras maiúsculas + hífen + 2 números (ex: ABC-12)
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-name">Nome do Fluxo</Label>
+                  <Input
+                    id="edit-name"
+                    value={editFlowName}
+                    onChange={(e) => setEditFlowName(e.target.value)}
+                    placeholder="Digite o nome do fluxo"
+                    className="w-full"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit-description">Descrição (opcional)</Label>
+                  <Textarea
+                    id="edit-description"
+                    value={editFlowDescription}
+                    onChange={(e) => setEditFlowDescription(e.target.value)}
+                    placeholder="Descreva o propósito deste fluxo"
+                    rows={4}
+                    className="w-full resize-none"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  onClick={() => setIsEditModalOpen(false)}
+                >
+                  Cancelar
+                </Button>
+                <Button type="button" onClick={handleEditFlow}>
+                  Salvar Alterações
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          
           <Button onClick={handleReset} variant="outline" size="sm">
             <RotateCcw className="mr-1 h-4 w-4" />
             Reiniciar
