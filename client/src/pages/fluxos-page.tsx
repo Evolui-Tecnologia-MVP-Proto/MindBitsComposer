@@ -55,7 +55,13 @@ const StartNode = memo(({ data, selected }: NodeProps) => (
       <div className="font-medium">{data.label}</div>
     )}
     {data.configured && data.showLabel === false && (
-      <div className="text-xs font-medium">✓ Configurado</div>
+      <div className="text-xs font-medium">
+        {data.integrType && <div>{data.integrType}</div>}
+        {data.service && <div>{data.service}</div>}
+        {data.actionType && <div>{data.actionType}</div>}
+        {data.docType && <div>{data.docType}</div>}
+        {!data.integrType && !data.service && !data.actionType && !data.docType && <div>✓ Início</div>}
+      </div>
     )}
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
@@ -151,7 +157,10 @@ const ActionNode = memo(({ data, selected }: NodeProps) => (
       <div className="font-medium">{data.label}</div>
     )}
     {data.configured && data.showLabel === false && (
-      <div className="text-xs font-medium">✓ Configurado</div>
+      <div className="text-xs font-medium">
+        {data.actionType && <div>{data.actionType}</div>}
+        {!data.actionType && <div>✓ Ação</div>}
+      </div>
     )}
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
@@ -231,7 +240,11 @@ const IntegrationNode = memo(({ data, selected }: NodeProps) => (
           <div className={`font-medium text-sm ${data.configured ? 'text-green-800' : 'text-black'}`}>{data.label}</div>
         )}
         {data.configured && data.showLabel === false && (
-          <div className="text-xs text-green-800 font-medium">✓ Configurado</div>
+          <div className="text-xs text-green-800 font-medium">
+            {data.integrType && <div>{data.integrType}</div>}
+            {data.service && <div>{data.service}</div>}
+            {!data.integrType && !data.service && <div>✓ Integração</div>}
+          </div>
         )}
       </div>
     </div>
