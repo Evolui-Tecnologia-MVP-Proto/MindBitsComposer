@@ -1199,7 +1199,17 @@ const FlowCanvas = () => {
                         onValueChange={(newValue) => {
                           setNodes(nds => nds.map(node => 
                             node.id === selectedNode.id 
-                              ? { ...node, data: { ...node.data, [key]: newValue } }
+                              ? { 
+                                  ...node, 
+                                  data: { 
+                                    ...node.data, 
+                                    [key]: newValue,
+                                    // Se for EndNode e FromType = 'Init' (Encerramento Direto), limpar To_Flow_id
+                                    ...(selectedNode.type === 'endNode' && key === 'FromType' && newValue === 'Init' 
+                                      ? { To_Flow_id: '' } 
+                                      : {})
+                                  }
+                                }
                               : node
                           ));
                         }}
@@ -1234,7 +1244,19 @@ const FlowCanvas = () => {
                         onValueChange={(newValue) => {
                           setNodes(nds => nds.map(node => 
                             node.id === selectedNode.id 
-                              ? { ...node, data: { ...node.data, [key]: newValue, configured: true, showLabel: false } }
+                              ? { 
+                                  ...node, 
+                                  data: { 
+                                    ...node.data, 
+                                    [key]: newValue, 
+                                    configured: true, 
+                                    showLabel: false,
+                                    // Se for EndNode e FromType = 'Init' (Encerramento Direto), limpar To_Flow_id
+                                    ...(selectedNode.type === 'endNode' && key === 'FromType' && newValue === 'Init' 
+                                      ? { To_Flow_id: '' } 
+                                      : {})
+                                  }
+                                }
                               : node
                           ));
                         }}
