@@ -49,7 +49,12 @@ const StartNode = memo(({ data, selected }: NodeProps) => (
   <div className={`px-4 py-2 rounded-full bg-green-500 text-white shadow-md min-w-[100px] text-center transition-all duration-200 ${
     selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
-    <div className="font-medium">{data.label}</div>
+    {data.showLabel !== false && (
+      <div className="font-medium">{data.label}</div>
+    )}
+    {data.configured && data.showLabel === false && (
+      <div className="text-xs font-medium">✓ Configurado</div>
+    )}
     <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
   </div>
 ));
@@ -58,7 +63,12 @@ const EndNode = memo(({ data, selected }: NodeProps) => (
   <div className={`px-4 py-2 rounded-full bg-red-500 text-white shadow-md min-w-[100px] text-center transition-all duration-200 ${
     selected ? 'border-orange-500 shadow-lg ring-2 ring-orange-300 scale-105 border-4' : 'border-black border-2'
   }`}>
-    <div className="font-medium">{data.label}</div>
+    {data.showLabel !== false && (
+      <div className="font-medium">{data.label}</div>
+    )}
+    {data.configured && data.showLabel === false && (
+      <div className="text-xs font-medium">✓ Configurado</div>
+    )}
     <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
   </div>
 ));
@@ -91,7 +101,12 @@ const SwitchNode = memo(({ data, selected }: NodeProps) => (
     </div>
     
     <div className="absolute inset-0 flex items-center justify-center z-10">
-      <div className="font-medium text-black text-sm">{data.label}</div>
+      {data.showLabel !== false && (
+        <div className="font-medium text-black text-sm">{data.label}</div>
+      )}
+      {data.configured && data.showLabel === false && (
+        <div className="text-xs text-green-600 font-medium">✓ Config</div>
+      )}
     </div>
     
     <Handle 
@@ -986,6 +1001,35 @@ const FlowCanvas = () => {
     });
   };
 
+  // Função para aplicar as alterações do inspector
+  const applyInspectorChanges = useCallback(() => {
+    const selectedNode = getSelectedNode();
+    if (!selectedNode) return;
+
+    setNodes(nds => nds.map(node => 
+      node.id === selectedNode.id 
+        ? { 
+            ...node, 
+            data: { 
+              ...node.data, 
+              configured: true,
+              showLabel: false
+            },
+            style: {
+              ...node.style,
+              backgroundColor: '#f0f9f0', // Verde claro
+              border: '2px solid #4ade80'
+            }
+          }
+        : node
+    ));
+
+    toast({
+      title: 'Propriedades aplicadas',
+      description: 'As configurações do nó foram aplicadas com sucesso',
+    });
+  }, [getSelectedNode, setNodes]);
+
   // Função para renderizar o inspector de propriedades
   const renderInspector = () => {
     const selectedNode = getSelectedNode();
@@ -1008,15 +1052,9 @@ const FlowCanvas = () => {
               <Label className="text-sm font-medium">Rótulo do Nó</Label>
               <Input 
                 value={selectedNode.data.label || nodeMetadata?.label || ''}
-                onChange={(e) => {
-                  setNodes(nds => nds.map(node => 
-                    node.id === selectedNode.id 
-                      ? { ...node, data: { ...node.data, label: e.target.value } }
-                      : node
-                  ));
-                }}
-                className="mt-1"
-                placeholder={nodeMetadata?.label || 'Digite o rótulo'}
+                readOnly
+                className="mt-1 bg-gray-50"
+                placeholder={nodeMetadata?.label || 'Rótulo do nó'}
               />
             </div>
 
@@ -1124,6 +1162,18 @@ const FlowCanvas = () => {
                 <p className="text-sm text-purple-800">{selectedNode.data.actionType}</p>
               </div>
             )}
+
+            {/* Botão para aplicar alterações */}
+            <div className="pt-4 border-t">
+              <Button 
+                onClick={applyInspectorChanges}
+                className="w-full"
+                size="sm"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Aplicar Alterações
+              </Button>
+            </div>
           </div>
         </div>
       </div>
