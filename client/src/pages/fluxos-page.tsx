@@ -124,7 +124,22 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
       <div className="font-medium">{data.label}</div>
     )}
     {data.configured && data.showLabel === false && (
-      <div className="text-xs font-medium">✓ Configurado</div>
+      <div className="text-xs font-medium">
+        {data.FromType && (
+          <div className={`px-2 py-1 rounded ${
+            data.FromType === 'Init' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
+          }`}>
+            {data.FromType === 'Init' ? 'Encerramento Direto' : 
+             data.FromType === 'flow_init' ? 'Transferência para Fluxo' : data.FromType}
+          </div>
+        )}
+        {data.To_Flow_id && (
+          <div className="mt-1 px-2 py-1 rounded bg-gray-100 text-gray-800">
+            Fluxo: {data.To_Flow_id}
+          </div>
+        )}
+        {!data.FromType && !data.To_Flow_id && <div>✓ Configurado</div>}
+      </div>
     )}
     <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ top: '-8px' }} />
   </div>
