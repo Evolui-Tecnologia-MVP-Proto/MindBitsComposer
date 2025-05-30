@@ -1,0 +1,1 @@
+// Backup do arquivo original - será usado para restaurar se necessário
