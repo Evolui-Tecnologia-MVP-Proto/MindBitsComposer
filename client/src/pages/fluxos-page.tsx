@@ -1231,7 +1231,7 @@ const FlowCanvas = () => {
                           ));
                         }}
                       >
-                        <SelectTrigger className="mt-1 font-mono">
+                        <SelectTrigger className="mt-1 text-left font-mono">
                           <SelectValue placeholder={`Selecione ${key === 'FromType' ? 'tipo de início' : key}`} />
                         </SelectTrigger>
                         <SelectContent>
@@ -1274,7 +1274,7 @@ const FlowCanvas = () => {
                         ));
                       }}
                     >
-                      <SelectTrigger className="mt-1 font-mono">
+                      <SelectTrigger className="mt-1 text-left font-mono">
                         <SelectValue placeholder={`Selecione ${key === 'integrType' ? 'tipo de integração' : 
                                                                 key === 'service' ? 'serviço' :
                                                                 key === 'actionType' ? 'tipo de ação' :
@@ -1319,7 +1319,7 @@ const FlowCanvas = () => {
                         ));
                       }}
                     >
-                      <SelectTrigger className="mt-1 font-mono">
+                      <SelectTrigger className="mt-1 text-left font-mono">
                         <SelectValue placeholder={`Selecione ${key === 'actionType' ? 'tipo de ação' : key}`} />
                       </SelectTrigger>
                       <SelectContent>
