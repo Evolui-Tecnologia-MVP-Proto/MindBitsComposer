@@ -3382,7 +3382,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })) || []
       };
       
-      const newFlow = await db.insert(storage.documentsFlows)
+      const newFlow = await db.insert(documentsFlows)
         .values({
           name,
           description: description || "",
@@ -3418,7 +3418,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })) || []
       };
       
-      const updatedFlow = await db.update(storage.documentsFlows)
+      const updatedFlow = await db.update(documentsFlows)
         .set({
           name,
           description: description || "",
@@ -3426,8 +3426,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           updatedAt: new Date()
         })
         .where(and(
-          eq(storage.documentsFlows.id, req.params.id),
-          eq(storage.documentsFlows.userId, req.user.id)
+          eq(documentsFlows.id, req.params.id),
+          eq(documentsFlows.userId, req.user.id)
         ))
         .returning();
       
@@ -3447,10 +3447,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      const deletedFlow = await db.delete(storage.documentsFlows)
+      const deletedFlow = await db.delete(documentsFlows)
         .where(and(
-          eq(storage.documentsFlows.id, req.params.id),
-          eq(storage.documentsFlows.userId, req.user.id)
+          eq(documentsFlows.id, req.params.id),
+          eq(documentsFlows.userId, req.user.id)
         ))
         .returning();
       

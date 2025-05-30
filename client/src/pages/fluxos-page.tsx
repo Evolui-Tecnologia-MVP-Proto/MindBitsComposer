@@ -32,6 +32,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
 
 // Definição dos componentes de nós personalizados
 const StartNode = memo(({ data, selected }: NodeProps) => (
@@ -255,6 +257,50 @@ const FlowCanvas = () => {
   const [flowName, setFlowName] = useState('Novo Fluxo');
   const [selectedNodeType, setSelectedNodeType] = useState<string>('');
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  
+  const queryClient = useQueryClient();
+  
+  // Query para buscar fluxos salvos
+  const { data: savedFlows } = useQuery({
+    queryKey: ['/api/documents-flows'],
+    enabled: true
+  });
+
+  // Mutation para salvar fluxo
+  const saveFlowMutation = useMutation({
+    mutationFn: async (flowData: any) => {
+      const response = await fetch(currentFlowId ? `/api/documents-flows/${currentFlowId}` : '/api/documents-flows', {
+        method: currentFlowId ? 'PUT' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(flowData),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erro ao salvar fluxo');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setCurrentFlowId(data.id);
+      queryClient.invalidateQueries({ queryKey: ['/api/documents-flows'] });
+      toast({
+        title: "Sucesso",
+        description: "Fluxo salvo com sucesso!"
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Erro ao salvar fluxo",
+        variant: "destructive"
+      });
+    }
+  });
 
   const onConnect = useCallback((params: any) => {
     setEdges((eds) =>
@@ -294,6 +340,65 @@ const FlowCanvas = () => {
       document.removeEventListener('keydown', onKeyDown);
     };
   }, [onKeyDown]);
+
+  // Função para salvar fluxo
+  const saveFlow = useCallback(() => {
+    if (!reactFlowInstance) return;
+    
+    const flowData = reactFlowInstance.toObject();
+    
+    // Garantir que nodes e edges tenham UUIDs
+    const processedFlowData = {
+      ...flowData,
+      nodes: flowData.nodes.map((node: any) => ({
+        ...node,
+        id: node.id || crypto.randomUUID()
+      })),
+      edges: flowData.edges.map((edge: any) => ({
+        ...edge,
+        id: edge.id || crypto.randomUUID()
+      }))
+    };
+
+    saveFlowMutation.mutate({
+      name: flowName,
+      description: `Fluxo criado em ${new Date().toLocaleString('pt-BR')}`,
+      flowData: processedFlowData
+    });
+  }, [reactFlowInstance, flowName, saveFlowMutation]);
+
+  // Função para carregar fluxo
+  const loadFlow = useCallback((flow: any) => {
+    if (!reactFlowInstance || !flow.flowData) return;
+    
+    const { nodes: flowNodes, edges: flowEdges, viewport } = flow.flowData;
+    
+    setNodes(flowNodes || []);
+    setEdges(flowEdges || []);
+    setFlowName(flow.name);
+    setCurrentFlowId(flow.id);
+    
+    if (viewport) {
+      reactFlowInstance.setViewport(viewport);
+    }
+
+    toast({
+      title: "Sucesso",
+      description: `Fluxo "${flow.name}" carregado com sucesso!`
+    });
+  }, [reactFlowInstance, setNodes, setEdges]);
+
+  // Função para criar novo fluxo
+  const newFlow = useCallback(() => {
+    setNodes([]);
+    setEdges([]);
+    setFlowName('Novo Fluxo');
+    setCurrentFlowId(null);
+    
+    if (reactFlowInstance) {
+      reactFlowInstance.fitView();
+    }
+  }, [setNodes, setEdges, reactFlowInstance]);
 
   const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
