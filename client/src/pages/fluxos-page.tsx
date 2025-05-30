@@ -882,7 +882,10 @@ const FlowCanvas = () => {
                   <Textarea
                     id="description"
                     value={newFlowDescription}
-                    onChange={(e) => setNewFlowDescription(e.target.value)}
+                    onChange={(e) => {
+                      console.log('Descrição alterada:', e.target.value);
+                      setNewFlowDescription(e.target.value);
+                    }}
                     placeholder="Descreva o propósito deste fluxo"
                     rows={4}
                     className="w-full resize-none"
