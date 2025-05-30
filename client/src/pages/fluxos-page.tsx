@@ -75,20 +75,20 @@ const StartNode = memo(({ data, selected }: NodeProps) => {
       <div className="font-medium font-mono">{data.label}</div>
     )}
     {data.configured && data.showLabel === false && (
-      <div className="text-xs font-medium">
+      <div className="text-xs font-medium font-mono">
         {data.FromType && (
-          <div className={`px-2 py-1 rounded ${
+          <div className={`px-2 py-1 rounded font-mono ${
             data.FromType === 'Init' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
           }`}>
             {data.FromType === 'Init' ? 'Início Direto' : 
              data.FromType === 'flow_init' ? 'Transferência de Fluxo' : data.FromType}
           </div>
         )}
-        {data.integrType && <div>{data.integrType}</div>}
-        {data.service && <div>{data.service}</div>}
-        {data.actionType && <div>{data.actionType}</div>}
-        {data.docType && <div>{data.docType}</div>}
-        {!data.FromType && !data.integrType && !data.service && !data.actionType && !data.docType && <div>✓ Início</div>}
+        {data.integrType && <div className="font-mono">{data.integrType}</div>}
+        {data.service && <div className="font-mono">{data.service}</div>}
+        {data.actionType && <div className="font-mono">{data.actionType}</div>}
+        {data.docType && <div className="font-mono">{data.docType}</div>}
+        {!data.FromType && !data.integrType && !data.service && !data.actionType && !data.docType && <div className="font-mono">✓ Início</div>}
       </div>
     )}
     <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ bottom: '-8px' }} />
