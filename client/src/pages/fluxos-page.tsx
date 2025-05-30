@@ -63,27 +63,9 @@ const EndNode = memo(({ data, selected }: NodeProps) => (
   </div>
 ));
 
-const ElaboreNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-lg bg-white border-2 text-black shadow-md min-w-[120px] text-center transition-all duration-200 ${
-    selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
-  }`}>
-    <div className="font-medium">{data.label}</div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
-  </div>
-));
 
-const ApproveNode = memo(({ data, selected }: NodeProps) => (
-  <div className={`px-4 py-2 rounded-lg bg-white border-2 text-black shadow-md min-w-[120px] text-center transition-all duration-200 ${
-    selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
-  }`}>
-    <div className="font-medium">{data.label}</div>
-    <Handle type="target" position={Position.Top} className="w-2 h-2 bg-black" />
-    <Handle type="source" position={Position.Bottom} className="w-2 h-2 bg-black" />
-  </div>
-));
 
-const DecisionNode = memo(({ data, selected }: NodeProps) => (
+const SwitchNode = memo(({ data, selected }: NodeProps) => (
   <div className="relative" style={{ width: '100px', height: '100px' }}>
     <div
       className={`absolute transition-all duration-200 ${selected ? 'scale-105' : ''}`}
@@ -142,7 +124,7 @@ const DecisionNode = memo(({ data, selected }: NodeProps) => (
   </div>
 ));
 
-const ReviseNode = memo(({ data, selected }: NodeProps) => (
+const ActionNode = memo(({ data, selected }: NodeProps) => (
   <div className={`px-4 py-2 rounded-lg bg-white border-2 text-black shadow-md min-w-[120px] text-center transition-all duration-200 ${
     selected ? 'border-black shadow-lg ring-2 ring-gray-400 scale-105' : 'border-black'
   }`}>
@@ -208,10 +190,8 @@ const initialNodes: Node[] = [];
 const nodeTypes: NodeTypes = {
   startNode: StartNode,
   endNode: EndNode,
-  elaboreNode: ElaboreNode,
-  approveNode: ApproveNode,
-  decisionNode: DecisionNode,
-  reviseNode: ReviseNode,
+  switchNode: SwitchNode,
+  actionNode: ActionNode,
   documentNode: DocumentNode,
   integrationNode: IntegrationNode,
 };
@@ -1054,10 +1034,8 @@ const FlowCanvas = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="startNode">Início</SelectItem>
-                    <SelectItem value="elaboreNode">Elaborar</SelectItem>
-                    <SelectItem value="approveNode">Aprovar</SelectItem>
-                    <SelectItem value="decisionNode">Decisão</SelectItem>
-                    <SelectItem value="reviseNode">Revisar</SelectItem>
+                    <SelectItem value="switchNode">Switch</SelectItem>
+                    <SelectItem value="actionNode">Action</SelectItem>
                     <SelectItem value="documentNode">Document</SelectItem>
                     <SelectItem value="integrationNode">Integration</SelectItem>
                     <SelectItem value="endNode">Fim</SelectItem>
