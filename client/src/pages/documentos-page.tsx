@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -82,6 +82,23 @@ import {
   type DocumentArtifact,
   type InsertDocumentArtifact,
 } from "@shared/schema";
+
+// Custom node components for React Flow
+const ActionNodeComponent = (props: any) => (
+  <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-blue-500">
+    <div className="text-xs font-bold text-blue-700">
+      {props.data.actionType || 'Action'}
+    </div>
+  </div>
+);
+
+const DocumentNodeComponent = (props: any) => (
+  <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-green-500">
+    <div className="text-xs font-bold text-green-700">
+      Document
+    </div>
+  </div>
+);
 
 export default function DocumentosPage() {
   const [activeTab, setActiveTab] = useState("incluidos");
@@ -4353,6 +4370,40 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   }
 
+  // Memoize node types to avoid React Flow warning
+  const nodeTypes = useMemo(() => ({
+    startNode: StartNode,
+    endNode: EndNode,
+    actionNode: ActionNodeComponent,
+    documentNode: DocumentNodeComponent,
+  }), []);
+
+  const convertFlowDataToReactFlow = useCallback((flowData: any) => {
+    // Try to access flow_tasks first, then fall back to direct flowData
+    const tasksData = flowData?.flowTasks || flowData;
+    
+    if (!tasksData?.nodes) {
+      console.log("🔴 Nenhum node encontrado nos dados:", tasksData);
+      return { nodes: [], edges: [] };
+    }
+
+    const nodes = tasksData.nodes.map((node: any) => ({
+      ...node,
+      data: {
+        ...node.data,
+        isReadonly: true,
+      },
+    }));
+
+    console.log("🔴 Nodes convertidos:", nodes);
+    console.log("🔴 Edges encontradas:", tasksData.edges || []);
+
+    return {
+      nodes,
+      edges: tasksData.edges || [],
+    };
+  }, []);
+
   function renderFlowDiagramModal() {
     console.log("🔴 RENDERIZANDO MODAL:", flowDiagramModal);
     if (!flowDiagramModal.isOpen || !flowDiagramModal.flowData) {
@@ -4360,44 +4411,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       return null;
     }
     console.log("🔴 Modal ABERTA, renderizando...");
-
-    const nodeTypes = {
-      startNode: StartNode,
-      endNode: EndNode,
-      actionNode: (props: any) => (
-        <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-blue-500">
-          <div className="text-xs font-bold text-blue-700">
-            {props.data.actionType || 'Action'}
-          </div>
-        </div>
-      ),
-      documentNode: (props: any) => (
-        <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-green-500">
-          <div className="text-xs font-bold text-green-700">
-            Document
-          </div>
-        </div>
-      ),
-    };
-
-    const convertFlowDataToReactFlow = (flowData: any) => {
-      if (!flowData?.nodes) {
-        return { nodes: [], edges: [] };
-      }
-
-      const nodes = flowData.nodes.map((node: any) => ({
-        ...node,
-        data: {
-          ...node.data,
-          isReadonly: true,
-        },
-      }));
-
-      return {
-        nodes,
-        edges: flowData.edges || [],
-      };
-    };
 
     const { nodes, edges } = convertFlowDataToReactFlow(flowDiagramModal.flowData);
 
