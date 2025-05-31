@@ -268,12 +268,6 @@ const DocumentNodeComponent = (props: any) => (
 
 const IntegrationNodeComponent = (props: any) => (
   <div className="relative" style={{ width: '140px', height: '80px' }}>
-    <Handle
-      type="target"
-      position={Position.Top}
-      className="w-4 h-4 bg-white border-2 border-blue-500"
-      style={{ top: '-8px' }}
-    />
     <svg 
       className="absolute inset-0 pointer-events-none"
       width="140" 
@@ -298,10 +292,16 @@ const IntegrationNodeComponent = (props: any) => (
       </div>
     </div>
     <Handle
+      type="target"
+      position={Position.Top}
+      className="w-4 h-4 bg-white border-2 border-blue-500"
+      style={{ top: '-8px', zIndex: 10 }}
+    />
+    <Handle
       type="source"
       position={Position.Bottom}
       className="w-4 h-4 bg-white border-2 border-blue-500"
-      style={{ bottom: '-8px' }}
+      style={{ bottom: '-8px', zIndex: 10 }}
     />
   </div>
 );
