@@ -1112,7 +1112,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     [documentos],
   );
   const documentosProcessando = useMemo(
-    () => documentos.filter((doc) => doc.status === "Processando"),
+    () => documentos.filter((doc) => doc.status === "Em Processo"),
     [documentos],
   );
   const documentosConcluidos = useMemo(
@@ -3089,7 +3089,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             {isLoading ? (
               <div className="text-center py-6">Carregando documentos...</div>
             ) : (
-              renderDocumentosTable(filteredAndSortedDocumentos)
+              renderDocumentosTable(documentosIntegrados)
             )}
           </TabsContent>
 
