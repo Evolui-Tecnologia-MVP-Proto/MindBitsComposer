@@ -304,17 +304,42 @@ const DocumentNode = memo(({ data, selected, ...nodeProps }: NodeProps) => {
 
   const templateInfo = data.docType ? getTemplateInfo(data.docType) : null;
 
+  // Calcular altura dinâmica baseada no conteúdo
+  const calculateHeight = () => {
+    if (!data.configured || data.showLabel !== false) {
+      return 80; // Altura padrão
+    }
+    
+    if (templateInfo) {
+      const codeLength = templateInfo.code.length;
+      const nameLength = templateInfo.name.length;
+      const maxLineLength = Math.max(codeLength, nameLength);
+      
+      // Altura base + espaço adicional para texto longo
+      const baseHeight = 80;
+      const additionalHeight = Math.max(0, (maxLineLength - 15) * 2); // 2px por caractere extra
+      const nameLines = Math.ceil(nameLength / 18); // Quebra de linha a cada ~18 caracteres
+      const multiLineHeight = nameLines > 1 ? (nameLines - 1) * 12 : 0;
+      
+      return Math.min(baseHeight + additionalHeight + multiLineHeight, 120); // Máximo de 120px
+    }
+    
+    return 80;
+  };
+
+  const dynamicHeight = calculateHeight();
+
   return (
-    <div className="relative" style={{ width: '140px', height: '80px' }}>
+    <div className="relative" style={{ width: '140px', height: `${dynamicHeight}px` }}>
       {/* SVG para contorno do documento com base ondulada */}
       <svg 
         className="absolute inset-0 pointer-events-none"
         width="140" 
-        height="80" 
-        viewBox="0 0 140 80"
+        height={dynamicHeight} 
+        viewBox={`0 0 140 ${dynamicHeight}`}
       >
         <polygon
-          points="0,0 140,0 140,64 112,80 28,64 0,64"
+          points={`0,0 140,0 140,${dynamicHeight - 16} 112,${dynamicHeight} 28,${dynamicHeight - 16} 0,${dynamicHeight - 16}`}
           fill={data.configured ? "#dcfce7" : "white"}
           stroke={selected ? "orange" : "black"}
           strokeWidth={selected ? "4" : "2"}
@@ -339,14 +364,16 @@ const DocumentNode = memo(({ data, selected, ...nodeProps }: NodeProps) => {
             <div className={`font-medium font-mono text-sm ${data.configured ? 'text-green-800' : 'text-black'}`}>{data.label}</div>
           )}
           {data.configured && data.showLabel === false && (
-            <div className="text-xs text-green-800 font-medium font-mono">
+            <div className="text-xs text-green-800 font-medium font-mono px-2">
               {templateInfo ? (
                 <>
-                  <div className="font-mono font-bold">{templateInfo.code}</div>
-                  <div className="font-mono text-[10px] leading-tight mt-0.5">{templateInfo.name}</div>
+                  <div className="font-mono font-bold text-center">{templateInfo.code}</div>
+                  <div className="font-mono text-[9px] leading-tight mt-1 text-center break-words whitespace-normal px-1">
+                    {templateInfo.name}
+                  </div>
                 </>
               ) : (
-                <div className="font-mono">✓ Documento</div>
+                <div className="font-mono text-center">✓ Documento</div>
               )}
             </div>
           )}
