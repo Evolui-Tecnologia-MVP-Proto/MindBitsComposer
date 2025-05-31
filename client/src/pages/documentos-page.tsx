@@ -1346,23 +1346,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   // Função para obter o fluxo ativo de um documento
   const getActiveFlow = (documentId: string) => {
-    console.log("🔍 getActiveFlow - Buscando fluxo para documento:", documentId);
-    console.log("📊 flowExecutions disponíveis:", flowExecutions);
-    console.log("📊 Tipo de flowExecutions:", typeof flowExecutions, Array.isArray(flowExecutions));
-    
     if (!flowExecutions || !Array.isArray(flowExecutions)) {
-      console.log("❌ flowExecutions não é um array válido");
       return null;
     }
 
     const activeFlow = flowExecutions.find((execution: any) => {
-      console.log("🔍 Verificando execução:", execution);
-      console.log("🔍 documentId:", execution.documentId, "vs", documentId);
-      console.log("🔍 status:", execution.status);
       return execution.documentId === documentId && execution.status === "initiated";
     });
     
-    console.log("✅ Fluxo ativo encontrado:", activeFlow);
     return activeFlow;
   };
 
