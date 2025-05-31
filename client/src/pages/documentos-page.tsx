@@ -4370,14 +4370,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   }
 
-  // Memoize node types to avoid React Flow warning
-  const nodeTypes = useMemo(() => ({
-    startNode: StartNode,
-    endNode: EndNode,
-    actionNode: ActionNodeComponent,
-    documentNode: DocumentNodeComponent,
-  }), []);
-
+  // Convert flow data function
   const convertFlowDataToReactFlow = useCallback((flowData: any) => {
     // Try to access flow_tasks first, then fall back to direct flowData
     const tasksData = flowData?.flowTasks || flowData;
@@ -4403,6 +4396,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       edges: tasksData.edges || [],
     };
   }, []);
+
+  // Memoize node types to avoid React Flow warning
+  const nodeTypes = useMemo(() => ({
+    startNode: StartNode,
+    endNode: EndNode,
+    actionNode: ActionNodeComponent,
+    documentNode: DocumentNodeComponent,
+  }), []);
 
   function renderFlowDiagramModal() {
     console.log("🔴 RENDERIZANDO MODAL:", flowDiagramModal);
