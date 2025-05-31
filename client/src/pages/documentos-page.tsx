@@ -4422,14 +4422,49 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 Visualização do diagrama de fluxo de trabalho aplicado ao documento
               </DialogDescription>
             </DialogHeader>
-            <div className="p-6 text-center">
-              <p>Modal do diagrama de fluxo funcionando!</p>
-              <p className="text-sm text-gray-500 mt-2">
-                Documento: {currentDocTitle}
-              </p>
-              <p className="text-xs text-gray-400 mt-2">
-                Dados do fluxo carregados: {currentFlowData ? 'Sim' : 'Não'}
-              </p>
+            <div className="h-[500px] w-full border rounded-lg">
+              {currentFlowData ? (
+                <ReactFlowProvider>
+                  <ReactFlow
+                    nodes={currentFlowData.nodes || []}
+                    edges={currentFlowData.edges || []}
+                    nodeTypes={{
+                      startNode: StartNode,
+                      endNode: EndNode,
+                      actionNode: ({ data }: any) => (
+                        <div className="px-4 py-2 bg-blue-100 border border-blue-300 rounded-lg">
+                          <div className="text-sm font-medium text-blue-800">
+                            {data.actionType || 'Action'}
+                          </div>
+                        </div>
+                      ),
+                      documentNode: ({ data }: any) => (
+                        <div className="px-4 py-2 bg-green-100 border border-green-300 rounded-lg">
+                          <div className="text-sm font-medium text-green-800">
+                            {data.docType || 'Document'}
+                          </div>
+                        </div>
+                      ),
+                    }}
+                    fitView
+                    attributionPosition="bottom-left"
+                    nodesDraggable={false}
+                    nodesConnectable={false}
+                    elementsSelectable={false}
+                    panOnDrag={true}
+                    zoomOnScroll={true}
+                    zoomOnPinch={true}
+                    zoomOnDoubleClick={false}
+                  >
+                    <Controls showInteractive={false} />
+                    <Background />
+                  </ReactFlow>
+                </ReactFlowProvider>
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-gray-500">Nenhum dado de fluxo disponível</p>
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button onClick={() => setIsFlowModalOpen(false)}>
