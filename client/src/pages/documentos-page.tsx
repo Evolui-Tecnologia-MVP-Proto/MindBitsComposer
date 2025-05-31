@@ -1608,7 +1608,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Tipo</TableHead>
+            <TableHead>Origem</TableHead>
             <TableHead>Nome</TableHead>
             <TableHead>Data</TableHead>
             <TableHead>Status</TableHead>
@@ -1620,8 +1620,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             <TableRow key={documento.id}>
               <TableCell>
                 <div className="flex items-center">
-                  <File className="h-5 w-5 text-blue-500" />
-                  <span className="ml-2 text-xs text-gray-500">DOC</span>
+                  {documento.origem === "Monday" ? (
+                    <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                      Monday
+                    </div>
+                  ) : (
+                    <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-medium">
+                      {documento.origem}
+                    </div>
+                  )}
                 </div>
               </TableCell>
               <TableCell className="font-medium">{documento.objeto}</TableCell>
@@ -2920,8 +2927,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           <TabsContent value="integrados" className="slide-in">
             {/* Filtros */}
             <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-medium text-gray-700">Filtros</h3>
+              <div className="flex items-center justify-end mb-3">
                 <Button
                   variant="outline"
                   size="sm"
