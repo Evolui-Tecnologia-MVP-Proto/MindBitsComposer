@@ -4725,6 +4725,31 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
     const { nodes, edges } = convertFlowDataToReactFlow(flowDiagramModal.flowData);
 
+    // Processar edges para colorir conexões entre nós executados
+    const processedEdges = edges.map((edge: any) => {
+      const sourceNode = nodes.find((n: any) => n.id === edge.source);
+      const targetNode = nodes.find((n: any) => n.id === edge.target);
+      
+      const sourceExecuted = sourceNode?.data?.isExecuted === 'TRUE';
+      const targetExecuted = targetNode?.data?.isExecuted === 'TRUE';
+      
+      // Se ambos os nós estão executados, usar cor azul escuro
+      const edgeColor = (sourceExecuted && targetExecuted) ? '#21639a' : '#6b7280';
+      
+      return {
+        ...edge,
+        style: {
+          stroke: edgeColor,
+          strokeWidth: 3,
+          strokeDasharray: 'none'
+        },
+        markerEnd: {
+          type: 'arrowclosed',
+          color: edgeColor,
+        },
+      };
+    });
+
     return (
       <Dialog 
         open={flowDiagramModal.isOpen} 
@@ -4753,7 +4778,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             <ReactFlowProvider>
               <ReactFlow
                 nodes={nodes}
-                edges={edges}
+                edges={processedEdges}
                 nodeTypes={nodeTypes}
                 fitView
                 fitViewOptions={{
