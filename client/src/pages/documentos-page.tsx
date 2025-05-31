@@ -1764,8 +1764,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     <Eye className="h-4 w-4" />
                   </Button>
                   {(() => {
-                    const shouldShow = activeTab === "em-processo" && getActiveFlow(documento.id);
-                    console.log(`🔍 Botão GitBranch para ${documento.objeto}: activeTab=${activeTab}, shouldShow=${shouldShow}`);
+                    const activeFlow = getActiveFlow(documento.id);
+                    const shouldShow = activeTab === "em-processo" && !!activeFlow;
+                    console.log(`🔍 Botão GitBranch para ${documento.objeto}: activeTab=${activeTab}, activeFlow=${!!activeFlow}, shouldShow=${shouldShow}`);
                     return shouldShow;
                   })() && (
                     <Button
