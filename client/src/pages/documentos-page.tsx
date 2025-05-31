@@ -315,9 +315,17 @@ const IntegrationNodeComponent = (props: any) => (
 );
 
 const SwitchNodeComponent = (props: any) => {
-  const baseSize = 100;
+  // Calcular tamanho dinâmico baseado no texto, mantendo proporção do paralelogramo
+  const hasText = props.data.switchField && props.data.switchField.length > 0;
+  const textLength = hasText ? props.data.switchField.length : 0;
+  
+  // Tamanho base aumenta conforme o texto, mantendo formato quadrado para o paralelogramo
+  const baseSize = Math.max(100, Math.min(200, 100 + (textLength * 6)));
+  const dynamicWidth = baseSize;
+  const dynamicHeight = baseSize; // Altura igual à largura para manter proporção do paralelogramo
+  
   return (
-    <div className="relative" style={{ width: `${baseSize}px`, height: `${baseSize}px` }}>
+    <div className="relative" style={{ width: `${dynamicWidth}px`, height: `${dynamicHeight}px` }}>
       <Handle 
         type="target" 
         position={Position.Top} 
