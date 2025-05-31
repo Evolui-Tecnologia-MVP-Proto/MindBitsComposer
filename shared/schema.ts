@@ -327,6 +327,8 @@ export const documentsFlows = pgTable("documents_flows", {
     };
   }>().notNull(),
   userId: integer("user_id").notNull().references(() => users.id),
+  createdBy: integer("created_by").notNull().references(() => users.id),
+  updatedBy: integer("updated_by").notNull().references(() => users.id),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -344,6 +346,8 @@ export type FlowType = typeof flowTypes.$inferSelect;
 // Documents Flows schema
 export const insertDocumentsFlowSchema = createInsertSchema(documentsFlows).omit({
   id: true,
+  createdBy: true,
+  updatedBy: true,
   createdAt: true,
   updatedAt: true,
 });

@@ -3406,7 +3406,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           code,
           description: description || null,
           flowData: processedFlowData,
-          userId: req.user.id
+          userId: req.user.id,
+          createdBy: req.user.id,
+          updatedBy: req.user.id
         })
         .returning();
       
@@ -3443,6 +3445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           code,
           description: description || "",
           flowData: processedFlowData,
+          updatedBy: req.user.id,
           updatedAt: new Date()
         })
         .where(and(
