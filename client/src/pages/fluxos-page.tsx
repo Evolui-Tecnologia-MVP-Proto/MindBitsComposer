@@ -1561,12 +1561,12 @@ const FlowCanvas = () => {
                     <SelectTrigger className="text-left">
                       <SelectValue placeholder="Selecione o tipo de fluxo" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="w-[500px]">
                       {flowTypes?.map((flowType: any) => (
-                        <SelectItem key={flowType.id} value={flowType.id} className="h-auto py-3">
-                          <div className="flex flex-col w-full">
-                            <span className="font-medium text-left">{flowType.name}</span>
-                            <span className="text-sm text-gray-500 text-left whitespace-normal break-words max-w-[400px]">{flowType.description}</span>
+                        <SelectItem key={flowType.id} value={flowType.id} className="h-auto py-3 min-h-[60px]">
+                          <div className="flex flex-col w-full space-y-1">
+                            <span className="font-medium text-left whitespace-normal">{flowType.name}</span>
+                            <span className="text-sm text-gray-500 text-left whitespace-normal break-words leading-tight">{flowType.description}</span>
                           </div>
                         </SelectItem>
                       ))}
