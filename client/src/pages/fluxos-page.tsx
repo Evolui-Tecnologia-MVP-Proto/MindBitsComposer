@@ -1563,10 +1563,10 @@ const FlowCanvas = () => {
                     </SelectTrigger>
                     <SelectContent>
                       {flowTypes?.map((flowType: any) => (
-                        <SelectItem key={flowType.id} value={flowType.id}>
-                          <div className="flex flex-col">
-                            <span className="font-medium">{flowType.name}</span>
-                            <span className="text-sm text-gray-500">{flowType.description}</span>
+                        <SelectItem key={flowType.id} value={flowType.id} className="h-auto py-3">
+                          <div className="flex flex-col w-full">
+                            <span className="font-medium text-left">{flowType.name}</span>
+                            <span className="text-sm text-gray-500 text-left whitespace-normal break-words max-w-[400px]">{flowType.description}</span>
                           </div>
                         </SelectItem>
                       ))}
