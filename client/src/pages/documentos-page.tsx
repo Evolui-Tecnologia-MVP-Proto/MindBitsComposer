@@ -323,6 +323,10 @@ const SwitchNodeComponent = (props: any) => {
   const dynamicWidth = baseSize;
   const dynamicHeight = baseSize; // Altura igual à largura para manter proporção do paralelogramo
   
+  const isExecuted = props.data.isExecuted === 'TRUE';
+  const backgroundColor = isExecuted ? '#22c55e' : 'white';
+  const textClass = isExecuted ? 'text-white' : 'text-black';
+  
   return (
     <div className="relative" style={{ width: `${dynamicWidth}px`, height: `${dynamicHeight}px` }}>
       <GitBranch className="absolute top-1 left-1 h-6 w-6 text-blue-600 z-20" />
@@ -337,7 +341,7 @@ const SwitchNodeComponent = (props: any) => {
         style={{
           width: '100%',
           height: '100%',
-          backgroundColor: 'white',
+          backgroundColor: backgroundColor,
           border: '2px solid black',
           transformStyle: 'preserve-3d',
           transform: 'rotateX(60deg) rotateZ(45deg)',
@@ -357,10 +361,10 @@ const SwitchNodeComponent = (props: any) => {
       <div className="absolute inset-0 flex items-center justify-center z-10">
         <div className="text-center">
           {props.data.showLabel !== false && (
-            <div className="font-medium font-mono text-black text-sm">{props.data.label}</div>
+            <div className={`font-medium font-mono ${textClass} text-sm`}>{props.data.label}</div>
           )}
           {props.data.configured && props.data.showLabel === false && (
-            <div className="text-xs font-medium font-mono text-black">
+            <div className={`text-xs font-medium font-mono ${textClass}`}>
               {props.data.switchField && <div className="font-mono">{props.data.switchField}</div>}
               {!props.data.switchField && <div className="font-mono">✓ Switch</div>}
             </div>
