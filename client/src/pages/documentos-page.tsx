@@ -855,6 +855,38 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     },
   });
 
+  // Mutation para iniciar documentação
+  const startDocumentationMutation = useMutation({
+    mutationFn: async ({ documentId, flowId }: { documentId: string; flowId: string }) => {
+      const response = await fetch("/api/documentos/start-documentation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          documentId,
+          flowId
+        }),
+      });
+      if (!response.ok) throw new Error("Erro ao iniciar documentação");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+      setIsDocumentationModalOpen(false);
+      setSelectedFlowId("");
+      toast({
+        title: "Documentação iniciada!",
+        description: "O processo de documentação foi iniciado com sucesso.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao iniciar documentação",
+        description: error.message || "Erro ao iniciar o processo de documentação",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Mutation para criar artefato
   const createArtifactMutation = useMutation({
     mutationFn: async (data: InsertDocumentArtifact) => {
@@ -4020,15 +4052,27 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   });
                   return;
                 }
-                // Aqui será implementada a funcionalidade de documentação
-                setIsDocumentationModalOpen(false);
-                setSelectedFlowId(""); // Limpar seleção
+                if (selectedDocument) {
+                  startDocumentationMutation.mutate({
+                    documentId: selectedDocument.id,
+                    flowId: selectedFlowId
+                  });
+                }
               }}
               className="bg-blue-600 hover:bg-blue-700"
-              disabled={!selectedFlowId}
+              disabled={!selectedFlowId || startDocumentationMutation.isPending}
             >
-              <BookOpen className="mr-2 h-4 w-4" />
-              Confirmar
+              {startDocumentationMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processando...
+                </>
+              ) : (
+                <>
+                  <BookOpen className="mr-2 h-4 w-4" />
+                  Confirmar
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
