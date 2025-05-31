@@ -100,6 +100,69 @@ const DocumentNodeComponent = (props: any) => (
   </div>
 );
 
+const IntegrationNodeComponent = (props: any) => (
+  <div className="relative" style={{ width: '140px', height: '80px' }}>
+    <svg 
+      className="absolute inset-0 pointer-events-none"
+      width="140" 
+      height="80" 
+      viewBox="0 0 140 80"
+    >
+      <polygon
+        points="28,0 140,0 112,80 0,80"
+        fill={props.data.configured ? "#dcfce7" : "white"}
+        stroke="black"
+        strokeWidth="2"
+        style={{
+          filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+        }}
+      />
+    </svg>
+    <div className="absolute inset-0 flex items-center justify-center">
+      <div className="text-center">
+        <div className="font-medium font-mono text-sm text-black">
+          {props.data.label || 'Integration'}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const SwitchNodeComponent = (props: any) => {
+  const baseSize = 100;
+  return (
+    <div className="relative" style={{ width: `${baseSize}px`, height: `${baseSize}px` }}>
+      <div
+        className="absolute"
+        style={{
+          width: '100%',
+          height: '100%',
+          backgroundColor: props.data.configured ? '#dcfce7' : 'white',
+          border: '2px solid black',
+          transformStyle: 'preserve-3d',
+          transform: 'rotateX(60deg) rotateZ(45deg)',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        }}
+      >
+        <div 
+          className="absolute inset-0 flex flex-col justify-between"
+          style={{ opacity: 0.2, padding: '4px' }}
+        >
+          {Array.from({ length: 7 }).map((_, i) => (
+            <div key={i} className="w-full h-px bg-black" />
+          ))}
+        </div>
+      </div>
+      
+      <div className="absolute inset-0 flex items-center justify-center z-10">
+        <div className="font-medium font-mono text-black text-sm">
+          {props.data.label || 'Switch'}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function DocumentosPage() {
   const [activeTab, setActiveTab] = useState("incluidos");
   const [selectedDocument, setSelectedDocument] = useState<Documento | null>(
@@ -4384,6 +4447,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       endNode: EndNode,
       actionNode: ActionNodeComponent,
       documentNode: DocumentNodeComponent,
+      integrationNode: IntegrationNodeComponent,
+      switchNode: SwitchNodeComponent,
     };
 
     // Convert flow data function moved inside render function
