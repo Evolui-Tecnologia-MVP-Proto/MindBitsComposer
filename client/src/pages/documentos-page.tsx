@@ -197,15 +197,15 @@ const ActionNodeComponent = (props: any) => (
   <div className={`relative px-4 py-2 rounded-lg shadow-md min-w-[120px] text-center transition-all duration-200 ${
     props.data.configured ? 'bg-green-200 text-green-800' : 'bg-white text-black'
   } border-black border-2`}>
-    <div className="font-medium font-mono">
-      {props.data.showLabel !== false && props.data.label}
-      {props.data.configured && props.data.showLabel === false && (
-        <div className="text-xs font-medium font-mono">
-          {props.data.actionType && <div className="font-mono">{props.data.actionType}</div>}
-          {!props.data.actionType && <div className="font-mono">✓ Ação</div>}
-        </div>
-      )}
-    </div>
+    {props.data.showLabel !== false && (
+      <div className="font-medium font-mono">{props.data.label}</div>
+    )}
+    {props.data.configured && props.data.showLabel === false && (
+      <div className="text-xs font-medium font-mono">
+        {props.data.actionType && <div className="font-mono">{props.data.actionType}</div>}
+        {!props.data.actionType && <div className="font-mono">✓ Ação</div>}
+      </div>
+    )}
     <Handle 
       type="target" 
       position={Position.Top} 
@@ -286,9 +286,16 @@ const IntegrationNodeComponent = (props: any) => (
     </svg>
     <div className="absolute inset-0 flex items-center justify-center">
       <div className="text-center">
-        <div className="font-medium font-mono text-sm text-black">
-          {props.data.label || 'Integration'}
-        </div>
+        {props.data.showLabel !== false && (
+          <div className="font-medium font-mono text-sm text-black">{props.data.label}</div>
+        )}
+        {props.data.configured && props.data.showLabel === false && (
+          <div className="text-xs font-medium font-mono text-black">
+            {props.data.integrType && <div className="font-mono">{props.data.integrType}</div>}
+            {props.data.service && <div className="font-mono">{props.data.service}</div>}
+            {!props.data.integrType && !props.data.service && <div className="font-mono">✓ Integração</div>}
+          </div>
+        )}
       </div>
     </div>
     <Handle
@@ -339,8 +346,16 @@ const SwitchNodeComponent = (props: any) => {
       </div>
       
       <div className="absolute inset-0 flex items-center justify-center z-10">
-        <div className="font-medium font-mono text-black text-sm">
-          {props.data.label || 'Switch'}
+        <div className="text-center">
+          {props.data.showLabel !== false && (
+            <div className="font-medium font-mono text-black text-sm">{props.data.label}</div>
+          )}
+          {props.data.configured && props.data.showLabel === false && (
+            <div className="text-xs font-medium font-mono text-black">
+              {props.data.switchType && <div className="font-mono">{props.data.switchType}</div>}
+              {!props.data.switchType && <div className="font-mono">✓ Switch</div>}
+            </div>
+          )}
         </div>
       </div>
       
