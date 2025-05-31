@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -261,16 +261,6 @@ export default function DocumentosPage() {
   // Buscar execuções de fluxo ativas
   const { data: flowExecutions = [] } = useQuery({
     queryKey: ["/api/document-flow-executions"],
-    queryFn: async () => {
-      console.log("🔍 Buscando execuções de fluxo...");
-      const response = await fetch("/api/document-flow-executions");
-      if (!response.ok) {
-        throw new Error("Erro ao buscar execuções de fluxo");
-      }
-      const data = await response.json();
-      console.log("✅ Execuções de fluxo encontradas:", data);
-      return data;
-    }
   });
 
   // Buscar contagem de anexos para todos os documentos
@@ -1348,130 +1338,22 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   };
 
   // Função para obter o fluxo ativo de um documento
-  const getActiveFlow = useCallback((documentId: string) => {
-    console.log("🔍 getActiveFlow chamado para documento:", documentId);
-    console.log("📊 flowExecutions:", flowExecutions);
-    
-    if (!flowExecutions || !Array.isArray(flowExecutions)) {
-      console.log("❌ flowExecutions inválido:", flowExecutions);
-      return null;
-    }
-
-    const activeFlow = flowExecutions.find((execution: any) => {
-      const isMatch = execution.documentId === documentId && execution.status === "initiated";
-      console.log("🔍 Verificando execução:", { 
-        executionId: execution.id,
-        executionDocumentId: execution.documentId,
-        executionStatus: execution.status,
-        isMatch
-      });
-      return isMatch;
-    });
-    
-    console.log("✅ Fluxo ativo encontrado:", activeFlow);
-    return activeFlow;
-  }, [flowExecutions]);
+  const getActiveFlow = (documentId: string) => {
+    return flowExecutions.find((execution: any) => 
+      execution.documentId === documentId && execution.status === "initiated"
+    );
+  };
 
   // Função para abrir modal do diagrama de fluxo
-  const openFlowDiagramModal = useCallback((documento: Documento) => {
-    console.log("🚀 openFlowDiagramModal chamado para documento:", documento.id);
-    const activeFlow = getActiveFlow(documento.id);
-    console.log("🔍 activeFlow encontrado:", activeFlow);
-    
-    if (activeFlow && activeFlow.flowTasks) {
-      console.log("✅ Abrindo modal com flowTasks:", activeFlow.flowTasks);
+  const openFlowDiagramModal = (execution: any) => {
+    if (execution && execution.flowTasks) {
       setFlowDiagramModal({
         isOpen: true,
-        flowData: activeFlow.flowTasks,
-        documentTitle: documento.objeto || "Documento"
-      });
-    } else {
-      console.log("❌ Não foi possível abrir modal - activeFlow ou flowTasks ausente");
-      toast({
-        title: "Fluxo não encontrado",
-        description: "Não foi possível encontrar um fluxo ativo para este documento.",
-        variant: "destructive",
+        flowData: execution.flowTasks,
+        documentTitle: execution.document?.objeto || "Documento"
       });
     }
-  }, [getActiveFlow]);
-
-  // Modal para visualizar diagrama do fluxo
-  function renderFlowDiagramModal() {
-    if (!flowDiagramModal.isOpen || !flowDiagramModal.flowData) return null;
-
-    const nodeTypes = {
-      startNode: StartNode,
-      endNode: EndNode,
-      actionNode: ActionNode,
-      documentNode: DocumentNode,
-    };
-
-    const convertFlowDataToReactFlow = (flowData: any) => {
-      if (!flowData?.nodes || !flowData?.edges) {
-        return { nodes: [], edges: [] };
-      }
-
-      const nodes = flowData.nodes.map((node: any) => ({
-        ...node,
-        data: {
-          ...node.data,
-          isReadonly: true,
-        },
-      }));
-
-      return {
-        nodes,
-        edges: flowData.edges || [],
-      };
-    };
-
-    const { nodes, edges } = convertFlowDataToReactFlow(flowDiagramModal.flowData);
-
-    return (
-      <Dialog open={flowDiagramModal.isOpen} onOpenChange={(open) => {
-        if (!open) {
-          setFlowDiagramModal({
-            isOpen: false,
-            flowData: null,
-            documentTitle: "",
-          });
-        }
-      }}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <GitBranch className="h-5 w-5" />
-              Diagrama do Fluxo - {flowDiagramModal.documentTitle}
-            </DialogTitle>
-            <DialogDescription>
-              Visualização do diagrama de fluxo de trabalho aplicado ao documento
-            </DialogDescription>
-          </DialogHeader>
-          <div className="h-[500px] w-full border rounded-lg">
-            <ReactFlowProvider>
-              <ReactFlow
-                nodes={nodes}
-                edges={edges}
-                nodeTypes={nodeTypes}
-                fitView
-                attributionPosition="bottom-left"
-                nodesDraggable={false}
-                nodesConnectable={false}
-                elementsSelectable={false}
-                panOnDrag={true}
-                zoomOnScroll={true}
-                zoomOnPinch={true}
-                zoomOnDoubleClick={false}
-              >
-                <Controls showInteractive={false} />
-                <Background />
-              </ReactFlow>
-            </ReactFlowProvider>
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
+  };
 
   const handleDeleteDocument = (documento: Documento) => {
     toast({
@@ -1847,7 +1729,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
-                  {activeTab === "em-processo" && getActiveFlow(documento.id) && (
+                  {activeTab === "em-processo" && (
                     <Button
                       variant="ghost"
                       size="icon"
@@ -3563,7 +3445,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {renderAddArtifactModal()}
       {renderEditArtifactModal()}
       {renderDocumentationModal()}
-      {renderFlowDiagramModal()}
+
     </div>
   );
 
@@ -4447,11 +4329,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   }
 
+  // Modal do diagrama de fluxo
+  function renderFlowDiagramModal() {
+    if (!flowDiagramModal.isOpen || !flowDiagramModal.flowData) return null;
 
+    const nodeTypes = {
+      start: StartNode,
+      end: EndNode,
+    };
 
     const convertFlowDataToReactFlow = (flowData: any) => {
       if (!flowData?.nodes || !flowData?.edges) {
-        console.log("❌ flowData inválido:", flowData);
         return { nodes: [], edges: [] };
       }
 
@@ -4469,13 +4357,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       };
     };
 
-    if (!flowDiagramModal.isOpen || !flowDiagramModal.flowData) {
-      console.log("❌ Modal não deve ser renderizada:", { isOpen: flowDiagramModal.isOpen, hasFlowData: !!flowDiagramModal.flowData });
-      return null;
-    }
-
     const { nodes, edges } = convertFlowDataToReactFlow(flowDiagramModal.flowData);
-    console.log("✅ Convertendo dados do fluxo:", { nodes, edges });
 
     return (
       <Dialog open={flowDiagramModal.isOpen} onOpenChange={(open) => {
@@ -4521,27 +4403,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         </DialogContent>
       </Dialog>
     );
-  }, [flowDiagramModal]);
+  }
 
   return (
     <div className="container mx-auto py-6">
-      {/* Botão de teste temporário */}
-      <div className="mb-4 p-4 bg-yellow-100 rounded">
-        <Button
-          onClick={() => {
-            console.log("🧪 TESTE: Botão clicado!");
-            const testDoc = documentos.find(d => d.id === "9ef9937a-5e02-45af-9d71-e5fb26b71a5e");
-            if (testDoc) {
-              console.log("🧪 TESTE: Documento encontrado:", testDoc.objeto);
-              openFlowDiagramModal(testDoc);
-            }
-          }}
-          className="bg-yellow-500 hover:bg-yellow-600"
-        >
-          TESTE: Abrir Modal do Fluxo
-        </Button>
-      </div>
+      {/* Conteúdo principal */}
+      {/* ... resto do conteúdo ... */}
       
+      {/* Modals */}
       {renderEditModal()}
       {renderAddArtifactModal()}
       {renderDocumentationModal()}
