@@ -281,52 +281,72 @@ const ActionNode = memo(({ data, selected }: NodeProps) => {
 
 
 
-const DocumentNode = memo(({ data, selected }: NodeProps) => (
-  <div className="relative" style={{ width: '140px', height: '80px' }}>
-    {/* SVG para contorno do documento com base ondulada */}
-    <svg 
-      className="absolute inset-0 pointer-events-none"
-      width="140" 
-      height="80" 
-      viewBox="0 0 140 80"
-    >
-      <polygon
-        points="0,0 140,0 140,64 112,80 28,64 0,64"
-        fill={data.configured ? "#dcfce7" : "white"}
-        stroke={selected ? "orange" : "black"}
-        strokeWidth={selected ? "4" : "2"}
+const DocumentNode = memo(({ data, selected }: NodeProps) => {
+  // Função para obter informações do tipo de documento
+  const getDocTypeInfo = (docTypeId: string) => {
+    const docTypeMap: { [key: string]: { code: string; name: string } } = {
+      'ERF': { code: 'ERF-01', name: 'Especificação Técnica da Solução' },
+      'ETS': { code: 'ETS-01', name: 'Elicitação de Requisito Funcional' },
+      'ORC': { code: 'ORC-01', name: 'Orçamento para Execução' }
+    };
+    return docTypeMap[docTypeId] || { code: docTypeId, name: docTypeId };
+  };
+
+  const docInfo = data.docType ? getDocTypeInfo(data.docType) : null;
+
+  return (
+    <div className="relative" style={{ width: '140px', height: '80px' }}>
+      {/* SVG para contorno do documento com base ondulada */}
+      <svg 
+        className="absolute inset-0 pointer-events-none"
+        width="140" 
+        height="80" 
+        viewBox="0 0 140 80"
+      >
+        <polygon
+          points="0,0 140,0 140,64 112,80 28,64 0,64"
+          fill={data.configured ? "#dcfce7" : "white"}
+          stroke={selected ? "orange" : "black"}
+          strokeWidth={selected ? "4" : "2"}
+          style={{
+            filter: selected ? 'drop-shadow(0 4px 8px rgba(255, 165, 0, 0.4))' : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+          }}
+        />
+      </svg>
+      {/* Ícone no canto superior esquerdo */}
+      <FileText className="absolute top-1 left-1 h-6 w-6 text-purple-600 z-10" />
+      {/* Conteúdo do nó */}
+      <div
+        className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
+          selected ? 'scale-105' : ''
+        }`}
         style={{
-          filter: selected ? 'drop-shadow(0 4px 8px rgba(255, 165, 0, 0.4))' : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+          pointerEvents: 'none'
         }}
-      />
-    </svg>
-    {/* Ícone no canto superior esquerdo */}
-    <FileText className="absolute top-1 left-1 h-6 w-6 text-purple-600 z-10" />
-    {/* Conteúdo do nó */}
-    <div
-      className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
-        selected ? 'scale-105' : ''
-      }`}
-      style={{
-        pointerEvents: 'none'
-      }}
-    >
-      <div className="text-center pt-2">
-        {data.showLabel !== false && (
-          <div className={`font-medium font-mono text-sm ${data.configured ? 'text-green-800' : 'text-black'}`}>{data.label}</div>
-        )}
-        {data.configured && data.showLabel === false && (
-          <div className="text-xs text-green-800 font-medium font-mono">
-            {data.docType && <div className="font-mono">{data.docType}</div>}
-            {!data.docType && <div className="font-mono">✓ Documento</div>}
-          </div>
-        )}
+      >
+        <div className="text-center pt-2">
+          {data.showLabel !== false && (
+            <div className={`font-medium font-mono text-sm ${data.configured ? 'text-green-800' : 'text-black'}`}>{data.label}</div>
+          )}
+          {data.configured && data.showLabel === false && (
+            <div className="text-xs text-green-800 font-medium font-mono">
+              {docInfo ? (
+                <>
+                  <div className="font-mono font-bold">{docInfo.code}</div>
+                  <div className="font-mono text-[10px] leading-tight mt-0.5">{docInfo.name}</div>
+                </>
+              ) : (
+                <div className="font-mono">✓ Documento</div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
+      <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ top: '-8px' }} />
+      <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ bottom: '-8px' }} />
     </div>
-    <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ top: '-8px' }} />
-    <Handle type="source" position={Position.Bottom} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ bottom: '-8px' }} />
-  </div>
-));
+  );
+});
 
 const IntegrationNode = memo(({ data, selected }: NodeProps) => (
   <div className="relative" style={{ width: '140px', height: '80px' }}>
