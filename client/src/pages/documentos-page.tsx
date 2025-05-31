@@ -4415,72 +4415,69 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {renderEditArtifactModal()}
       {renderFlowDiagramModal()}
       
-      {/* Modal simples do diagrama de fluxo */}
-      {console.log("🔴 RENDERIZANDO - isFlowModalOpen:", isFlowModalOpen)}
-      {isFlowModalOpen && (
-        <Dialog open={isFlowModalOpen} onOpenChange={setIsFlowModalOpen}>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <GitBranch className="h-5 w-5" />
-                Diagrama do Fluxo - {currentDocTitle}
-              </DialogTitle>
-              <DialogDescription>
-                Visualização do diagrama de fluxo de trabalho aplicado ao documento
-              </DialogDescription>
-            </DialogHeader>
-            <div className="h-[500px] w-full border rounded-lg">
-              {currentFlowData ? (
-                <ReactFlowProvider>
-                  <ReactFlow
-                    nodes={currentFlowData.nodes || []}
-                    edges={currentFlowData.edges || []}
-                    nodeTypes={{
-                      startNode: StartNode,
-                      endNode: EndNode,
-                      actionNode: ({ data }: any) => (
-                        <div className="px-4 py-2 bg-blue-100 border border-blue-300 rounded-lg">
-                          <div className="text-sm font-medium text-blue-800">
-                            {data.actionType || 'Action'}
-                          </div>
+      {/* Modal do diagrama de fluxo */}
+      <Dialog open={isFlowModalOpen} onOpenChange={setIsFlowModalOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <GitBranch className="h-5 w-5" />
+              Diagrama do Fluxo - {currentDocTitle}
+            </DialogTitle>
+            <DialogDescription>
+              Visualização do diagrama de fluxo de trabalho aplicado ao documento
+            </DialogDescription>
+          </DialogHeader>
+          <div className="h-[500px] w-full border rounded-lg">
+            {currentFlowData ? (
+              <ReactFlowProvider>
+                <ReactFlow
+                  nodes={currentFlowData.nodes || []}
+                  edges={currentFlowData.edges || []}
+                  nodeTypes={{
+                    startNode: StartNode,
+                    endNode: EndNode,
+                    actionNode: ({ data }: any) => (
+                      <div className="px-4 py-2 bg-blue-100 border border-blue-300 rounded-lg">
+                        <div className="text-sm font-medium text-blue-800">
+                          {data.actionType || 'Action'}
                         </div>
-                      ),
-                      documentNode: ({ data }: any) => (
-                        <div className="px-4 py-2 bg-green-100 border border-green-300 rounded-lg">
-                          <div className="text-sm font-medium text-green-800">
-                            {data.docType || 'Document'}
-                          </div>
+                      </div>
+                    ),
+                    documentNode: ({ data }: any) => (
+                      <div className="px-4 py-2 bg-green-100 border border-green-300 rounded-lg">
+                        <div className="text-sm font-medium text-green-800">
+                          {data.docType || 'Document'}
                         </div>
-                      ),
-                    }}
-                    fitView
-                    attributionPosition="bottom-left"
-                    nodesDraggable={false}
-                    nodesConnectable={false}
-                    elementsSelectable={false}
-                    panOnDrag={true}
-                    zoomOnScroll={true}
-                    zoomOnPinch={true}
-                    zoomOnDoubleClick={false}
-                  >
-                    <Controls showInteractive={false} />
-                    <Background />
-                  </ReactFlow>
-                </ReactFlowProvider>
-              ) : (
-                <div className="flex items-center justify-center h-full">
-                  <p className="text-gray-500">Nenhum dado de fluxo disponível</p>
-                </div>
-              )}
-            </div>
-            <DialogFooter>
-              <Button onClick={() => setIsFlowModalOpen(false)}>
-                Fechar
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
+                      </div>
+                    ),
+                  }}
+                  fitView
+                  attributionPosition="bottom-left"
+                  nodesDraggable={false}
+                  nodesConnectable={false}
+                  elementsSelectable={false}
+                  panOnDrag={true}
+                  zoomOnScroll={true}
+                  zoomOnPinch={true}
+                  zoomOnDoubleClick={false}
+                >
+                  <Controls showInteractive={false} />
+                  <Background />
+                </ReactFlow>
+              </ReactFlowProvider>
+            ) : (
+              <div className="flex items-center justify-center h-full">
+                <p className="text-gray-500">Nenhum dado de fluxo disponível</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setIsFlowModalOpen(false)}>
+              Fechar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
