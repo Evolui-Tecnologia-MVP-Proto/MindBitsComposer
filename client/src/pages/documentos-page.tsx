@@ -1744,14 +1744,16 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         const activeFlow = getActiveFlow(documento.id);
                         console.log("🔴 Active flow encontrado:", activeFlow);
                         if (activeFlow) {
-                          console.log("🔴 Abrindo modal com estados simples...");
-                          console.log("🔴 Definindo isFlowModalOpen para true");
-                          setIsFlowModalOpen(true);
+                          console.log("🔴 Abrindo modal com força...");
                           setCurrentFlowData(activeFlow.flowTasks);
                           setCurrentDocTitle(documento.objeto || "Documento");
-                          setTimeout(() => {
-                            console.log("🔴 Estado atual isFlowModalOpen:", isFlowModalOpen);
-                          }, 100);
+                          
+                          // Força a abertura da modal usando uma função callback
+                          setIsFlowModalOpen(prevState => {
+                            console.log("🔴 Estado anterior isFlowModalOpen:", prevState);
+                            console.log("🔴 Mudando para true");
+                            return true;
+                          });
                         } else {
                           console.log("🔴 Nenhum fluxo ativo encontrado para:", documento.id);
                         }
