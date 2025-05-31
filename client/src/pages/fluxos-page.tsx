@@ -371,7 +371,7 @@ const nodeTypes: NodeTypes = {
   integrationNode: IntegrationNode,
 };
 
-const FlowCanvas = () => {
+const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: string, name: string} | null) => void }) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -780,6 +780,9 @@ const FlowCanvas = () => {
     setFlowName(flow.name);
     setCurrentFlowId(flow.id);
     
+    // Notificar o componente pai sobre o fluxo carregado
+    onFlowInfoChange({ code: flow.code, name: flow.name });
+    
     // Reset do histórico com o novo estado
     resetHistory(flowNodes || [], styledEdges);
     
@@ -791,7 +794,7 @@ const FlowCanvas = () => {
       title: "Sucesso",
       description: `Fluxo "${flow.name}" carregado com sucesso!`
     });
-  }, [reactFlowInstance, setNodes, setEdges, resetHistory]);
+  }, [reactFlowInstance, setNodes, setEdges, resetHistory, onFlowInfoChange]);
 
   // Função para criar novo fluxo
   const newFlow = useCallback(() => {
@@ -800,13 +803,16 @@ const FlowCanvas = () => {
     setFlowName('Novo Fluxo');
     setCurrentFlowId(null);
     
+    // Limpar informações do título
+    onFlowInfoChange(null);
+    
     // Reset do histórico para novo fluxo
     resetHistory([], []);
     
     if (reactFlowInstance) {
       reactFlowInstance.fitView();
     }
-  }, [setNodes, setEdges, reactFlowInstance, resetHistory]);
+  }, [setNodes, setEdges, reactFlowInstance, resetHistory, onFlowInfoChange]);
 
   // Função para aplicar máscara no código XXX-99
   const applyCodeMask = useCallback((value: string) => {
@@ -997,6 +1003,10 @@ const FlowCanvas = () => {
         setFlowName(newFlowName);
         setCurrentFlowId(data.id);
         setIsNewFlowModalOpen(false);
+        
+        // Atualizar informações do título
+        onFlowInfoChange({ code: newFlowCode, name: newFlowName });
+        
         setNewFlowName('');
         setNewFlowDescription('');
         setNewFlowCode('');
@@ -1012,7 +1022,7 @@ const FlowCanvas = () => {
         });
       }
     });
-  }, [newFlowName, newFlowCode, newFlowDescription, validateCode, setNodes, setEdges, reactFlowInstance]);
+  }, [newFlowName, newFlowCode, newFlowDescription, newFlowTypeId, validateCode, setNodes, setEdges, reactFlowInstance, onFlowInfoChange, saveFlowMutation]);
 
   const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -1941,11 +1951,20 @@ const BibliotecaFluxos = () => {
 };
 
 export default function FluxosPage() {
+  const [currentFlowInfo, setCurrentFlowInfo] = useState<{code: string, name: string} | null>(null);
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Área do título e descrição */}
       <div className="flex-shrink-0 p-6 pb-4">
-        <h1 className="text-3xl font-bold tracking-tight">Fluxos de Documentos</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Fluxos de Documentos
+          {currentFlowInfo && (
+            <span className="text-xl font-normal text-blue-600 ml-2">
+              - [{currentFlowInfo.code}] - {currentFlowInfo.name} (Editando)
+            </span>
+          )}
+        </h1>
         <p className="text-muted-foreground">
           Defina e gerencie fluxos de trabalho para seus documentos
         </p>
@@ -1967,7 +1986,7 @@ export default function FluxosPage() {
           
           <TabsContent value="editor" className="flex-1 mt-4 min-h-0">
             <ReactFlowProvider>
-              <FlowCanvas />
+              <FlowCanvas onFlowInfoChange={setCurrentFlowInfo} />
             </ReactFlowProvider>
           </TabsContent>
           
