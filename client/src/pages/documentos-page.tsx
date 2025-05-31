@@ -76,6 +76,8 @@ import {
   Check,
   BookOpen,
   Zap,
+  GitBranch,
+  FileText,
 } from "lucide-react";
 import {
   type Documento,
