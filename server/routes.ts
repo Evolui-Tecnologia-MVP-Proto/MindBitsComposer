@@ -2368,20 +2368,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
+      console.log("=== INÍCIO ROTA START DOCUMENTATION ===");
+      console.log("Body recebido:", req.body);
+      console.log("Usuário:", req.user?.name);
+      
       const { documentId, flowId } = req.body;
 
       if (!documentId || !flowId) {
+        console.log("Erro: parâmetros obrigatórios ausentes");
         return res.status(400).json({ 
           error: "documentId e flowId são obrigatórios" 
         });
       }
 
+      console.log("Verificando documento:", documentId);
       // Verificar se o documento existe
       const documento = await storage.getDocumento(documentId);
       if (!documento) {
+        console.log("Erro: documento não encontrado");
         return res.status(404).json({ error: "Documento não encontrado" });
       }
+      console.log("Documento encontrado:", documento.objeto);
 
+      console.log("Verificando fluxo:", flowId);
       // Verificar se o fluxo existe
       const flow = await db.select()
         .from(documentsFlows)
@@ -2389,13 +2398,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .limit(1);
       
       if (flow.length === 0) {
+        console.log("Erro: fluxo não encontrado");
         return res.status(404).json({ error: "Fluxo não encontrado" });
       }
+      console.log("Fluxo encontrado:", flow[0].name);
 
+      console.log("Atualizando status do documento para 'Em Processo'");
       // Atualizar status do documento para "Em Processo"
       const updatedDocument = await storage.updateDocumento(documentId, { 
         status: "Em Processo"
       });
+      console.log("Documento atualizado com sucesso");
 
       // Log da ação
       console.log(`Documentação iniciada para documento ${documentId} com fluxo ${flowId} pelo usuário ${req.user?.name}`);
@@ -2409,7 +2422,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
     } catch (error: any) {
-      console.error("Erro ao iniciar documentação:", error);
+      console.error("ERRO DETALHADO ao iniciar documentação:");
+      console.error("Mensagem:", error.message);
+      console.error("Stack:", error.stack);
+      console.error("Nome:", error.name);
+      console.error("=== FIM ERRO ===");
       res.status(500).json({ 
         error: "Erro interno do servidor ao iniciar documentação" 
       });
