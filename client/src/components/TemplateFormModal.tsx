@@ -9,6 +9,7 @@ import { Template, TemplateType } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
 type TemplateFormValues = {
+  name: string;
   code: string;
   description: string;
   type: string;
@@ -16,6 +17,7 @@ type TemplateFormValues = {
 };
 
 const emptyTemplate: TemplateFormValues = {
+  name: "",
   code: "",
   description: "",
   type: "struct",
@@ -42,6 +44,7 @@ export default function TemplateFormModal({
   const [formData, setFormData] = useState<TemplateFormValues>(
     template
       ? {
+          name: template.name || "",
           code: template.code,
           description: template.description,
           type: template.type,
