@@ -14,8 +14,8 @@ import ReactFlow, {
   Handle,
   Position 
 } from 'reactflow';
-import StartNode from '@/components/flow/StartNode';
-import EndNode from '@/components/flow/EndNode';
+// Importing icons for custom nodes
+import { Play, Square } from 'lucide-react';
 import 'reactflow/dist/style.css';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -86,6 +86,113 @@ import {
 } from "@shared/schema";
 
 // Custom node components for React Flow
+const StartNodeComponent = (props: any) => {
+  const getBackgroundColor = () => {
+    if (props.data.FromType === 'Init') {
+      return 'bg-[#22c55e]'; // Verde para início direto
+    } else if (props.data.FromType) {
+      return 'bg-[#3b82f6]'; // Azul para outros tipos
+    }
+    return 'bg-white'; // Estado padrão: fundo branco
+  };
+
+  const getTextColor = () => {
+    if (props.data.FromType === 'Init' || props.data.FromType) {
+      return 'text-white'; // Texto branco para fundos coloridos
+    }
+    return 'text-black'; // Texto preto para fundo branco
+  };
+
+  return (
+    <div className={`relative px-4 py-2 rounded-full shadow-md min-w-[100px] text-center transition-all duration-200 ${
+      getBackgroundColor()
+    } ${
+      getTextColor()
+    } border-black border-2`}>
+      <Play className="absolute -top-4 -left-3 h-6 w-6 text-green-600" />
+      {props.data.showLabel !== false && (
+        <div className="font-medium font-mono">{props.data.label}</div>
+      )}
+      {props.data.configured && props.data.showLabel === false && (
+        <div className="text-xs font-medium font-mono">
+          {props.data.FromType && (
+            <div className={`px-2 py-1 rounded font-mono ${
+              props.data.FromType === 'Init' ? 'bg-[#22c55e] text-white' : 'bg-[#3b82f6] text-white'
+            }`}>
+              {props.data.FromType === 'Init' ? 'Início Direto' : 
+               props.data.FromType === 'flow_init' ? 'Transferência de Fluxo' : props.data.FromType}
+            </div>
+          )}
+          {!props.data.FromType && <div className="font-mono">✓ Início</div>}
+        </div>
+      )}
+      <Handle 
+        type="source" 
+        position={Position.Bottom} 
+        className="w-4 h-4 bg-white border-2 border-blue-500" 
+        style={{ bottom: '-8px' }} 
+      />
+    </div>
+  );
+};
+
+const EndNodeComponent = (props: any) => {
+  const getBackgroundColor = () => {
+    if (props.data.FromType === 'Init') {
+      return 'bg-[#ef4444]'; // Vermelho para encerramento direto
+    } else if (props.data.FromType) {
+      return 'bg-[#3b82f6]'; // Azul para outros tipos
+    }
+    return 'bg-white'; // Estado padrão: fundo branco
+  };
+
+  const getTextColor = () => {
+    if (props.data.FromType === 'Init' || props.data.FromType) {
+      return 'text-white'; // Texto branco para fundos coloridos
+    }
+    return 'text-black'; // Texto preto para fundo branco
+  };
+
+  return (
+    <div className={`relative px-4 py-2 rounded-full shadow-md min-w-[100px] text-center transition-all duration-200 ${
+      getBackgroundColor()
+    } ${
+      getTextColor()
+    } border-black border-2`}>
+      <Square className="absolute -top-4 -left-5 h-6 w-6 text-red-600" />
+      {props.data.showLabel !== false && (
+        <div className="font-medium font-mono">{props.data.label}</div>
+      )}
+      {props.data.configured && props.data.showLabel === false && (
+        <div className="text-xs font-medium font-mono">
+          {props.data.FromType && (
+            <div className={`px-2 py-1 rounded font-mono ${
+              props.data.FromType === 'Init' ? 'bg-[#ef4444] text-white' : 'bg-[#3b82f6] text-white'
+            }`}>
+              {props.data.FromType === 'Init' ? 'Encerramento Direto' : 
+               props.data.FromType === 'flow_init' ? 'Transferência para Fluxo' : props.data.FromType}
+            </div>
+          )}
+          {props.data.To_Flow_id && (
+            <div className={`mt-1 px-2 py-1 rounded font-mono ${
+              props.data.FromType === 'Init' ? 'bg-[#ef4444] text-white' : 'bg-[#3b82f6] text-white'
+            }`}>
+              Fluxo: {props.data.To_Flow_id}
+            </div>
+          )}
+          {!props.data.FromType && !props.data.To_Flow_id && <div className="font-mono">✓ Configurado</div>}
+        </div>
+      )}
+      <Handle 
+        type="target" 
+        position={Position.Top} 
+        className="w-4 h-4 bg-white border-2 border-blue-500" 
+        style={{ top: '-8px' }} 
+      />
+    </div>
+  );
+};
+
 const ActionNodeComponent = (props: any) => (
   <div className={`relative px-4 py-2 rounded-lg shadow-md min-w-[120px] text-center transition-all duration-200 ${
     props.data.configured ? 'bg-green-200 text-green-800' : 'bg-white text-black'
@@ -4535,8 +4642,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
     // Node types definition moved inside render function
     const nodeTypes = {
-      startNode: StartNode,
-      endNode: EndNode,
+      startNode: StartNodeComponent,
+      endNode: EndNodeComponent,
       actionNode: ActionNodeComponent,
       documentNode: DocumentNodeComponent,
       integrationNode: IntegrationNodeComponent,
