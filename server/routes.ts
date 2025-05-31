@@ -2363,6 +2363,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota para iniciar documentação
+  app.post("/api/documentos/start-documentation", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { documentId, flowId } = req.body;
+
+      if (!documentId || !flowId) {
+        return res.status(400).json({ 
+          error: "documentId e flowId são obrigatórios" 
+        });
+      }
+
+      // Verificar se o documento existe
+      const documento = await storage.getDocumento(documentId);
+      if (!documento) {
+        return res.status(404).json({ error: "Documento não encontrado" });
+      }
+
+      // Verificar se o fluxo existe
+      const flow = await storage.getDocumentsFlow(flowId);
+      if (!flow) {
+        return res.status(404).json({ error: "Fluxo não encontrado" });
+      }
+
+      // Atualizar status do documento para "Em Processo"
+      const updatedDocument = await storage.updateDocumento(documentId, { 
+        status: "Em Processo"
+      });
+
+      // Log da ação
+      console.log(`Documentação iniciada para documento ${documentId} com fluxo ${flowId} pelo usuário ${req.user?.name}`);
+      
+      res.json({ 
+        success: true, 
+        message: "Documentação iniciada com sucesso",
+        documentId,
+        flowId,
+        updatedDocument
+      });
+
+    } catch (error: any) {
+      console.error("Erro ao iniciar documentação:", error);
+      res.status(500).json({ 
+        error: "Erro interno do servidor ao iniciar documentação" 
+      });
+    }
+  });
+
   // Document Artifacts routes
   app.get("/api/documentos/:documentoId/artifacts", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
