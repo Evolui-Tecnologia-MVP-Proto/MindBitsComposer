@@ -140,19 +140,11 @@ const StartNodeComponent = (props: any) => {
 
 const EndNodeComponent = (props: any) => {
   const getBackgroundColor = () => {
-    if (props.data.FromType === 'Init') {
-      return 'bg-[#ef4444]'; // Vermelho para encerramento direto
-    } else if (props.data.FromType) {
-      return 'bg-[#3b82f6]'; // Azul para outros tipos
-    }
-    return 'bg-white'; // Estado padrão: fundo branco
+    return 'bg-white';
   };
 
   const getTextColor = () => {
-    if (props.data.FromType === 'Init' || props.data.FromType) {
-      return 'text-white'; // Texto branco para fundos coloridos
-    }
-    return 'text-black'; // Texto preto para fundo branco
+    return 'text-black';
   };
 
   return (
@@ -168,21 +160,17 @@ const EndNodeComponent = (props: any) => {
       {props.data.configured && props.data.showLabel === false && (
         <div className="text-xs font-medium font-mono">
           {props.data.FromType && (
-            <div className={`px-2 py-1 rounded font-mono ${
-              props.data.FromType === 'Init' ? 'bg-[#ef4444] text-white' : 'bg-[#3b82f6] text-white'
-            }`}>
+            <div className="px-2 py-1 rounded font-mono bg-white text-black border border-gray-300">
               {props.data.FromType === 'Init' ? 'Encerramento Direto' : 
                props.data.FromType === 'flow_init' ? 'Transferência para Fluxo' : props.data.FromType}
             </div>
           )}
           {props.data.To_Flow_id && (
-            <div className={`mt-1 px-2 py-1 rounded font-mono ${
-              props.data.FromType === 'Init' ? 'bg-[#ef4444] text-white' : 'bg-[#3b82f6] text-white'
-            }`}>
+            <div className="mt-1 px-2 py-1 rounded font-mono bg-white text-black border border-gray-300">
               Fluxo: {props.data.To_Flow_id}
             </div>
           )}
-          {!props.data.FromType && !props.data.To_Flow_id && <div className="font-mono">✓ Configurado</div>}
+          {!props.data.FromType && !props.data.To_Flow_id && <div className="font-mono text-black">✓ Configurado</div>}
         </div>
       )}
       <Handle 
