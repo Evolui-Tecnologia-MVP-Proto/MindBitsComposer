@@ -3607,7 +3607,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: documentFlowExecutions.status,
         createdAt: documentFlowExecutions.createdAt,
         flowName: documentsFlows.name,
-        flowCode: documentsFlows.code
+        flowCode: documentsFlows.code,
+        flowTasks: documentFlowExecutions.flowTasks
       })
         .from(documentFlowExecutions)
         .innerJoin(documentsFlows, eq(documentFlowExecutions.flowId, documentsFlows.id))
