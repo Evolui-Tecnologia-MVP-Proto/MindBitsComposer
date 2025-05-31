@@ -90,7 +90,7 @@ import {
 // Custom node components for React Flow
 const StartNodeComponent = (props: any) => {
   const getBackgroundColor = () => {
-    return props.data.isExecuted === 'TRUE' ? 'bg-green-500' : 'bg-white';
+    return props.data.isExecuted === 'TRUE' ? 'bg-[#21639a]' : 'bg-white';
   };
 
   const getTextColor = () => {
@@ -130,7 +130,7 @@ const StartNodeComponent = (props: any) => {
 
 const EndNodeComponent = (props: any) => {
   const getBackgroundColor = () => {
-    return props.data.isExecuted === 'TRUE' ? 'bg-green-500' : 'bg-white';
+    return props.data.isExecuted === 'TRUE' ? 'bg-[#21639a]' : 'bg-white';
   };
 
   const getTextColor = () => {
@@ -175,7 +175,7 @@ const EndNodeComponent = (props: any) => {
 
 const ActionNodeComponent = (props: any) => {
   const isExecuted = props.data.isExecuted === 'TRUE';
-  const backgroundClass = isExecuted ? 'bg-green-500' : 'bg-white';
+  const backgroundClass = isExecuted ? 'bg-[#21639a]' : 'bg-white';
   const textClass = isExecuted ? 'text-white' : 'text-black';
   
   return (
@@ -208,7 +208,7 @@ const ActionNodeComponent = (props: any) => {
 
 const DocumentNodeComponent = (props: any) => {
   const isExecuted = props.data.isExecuted === 'TRUE';
-  const fillColor = isExecuted ? '#22c55e' : 'white';
+  const fillColor = isExecuted ? '#21639a' : 'white';
   const textClass = isExecuted ? 'text-white' : 'text-black';
   
   return (
