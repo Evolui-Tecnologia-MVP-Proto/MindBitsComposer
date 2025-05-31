@@ -1814,6 +1814,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
             edgesUpdatable={true}
             edgesFocusable={true}
             fitView
+            minZoom={0.1}
+            maxZoom={2}
             connectionLineType={ConnectionLineType.SmoothStep}
           >
             <Controls />
