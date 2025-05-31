@@ -4370,33 +4370,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   }
 
-  // Convert flow data function
-  const convertFlowDataToReactFlow = useCallback((flowData: any) => {
-    // Try to access flow_tasks first, then fall back to direct flowData
-    const tasksData = flowData?.flowTasks || flowData;
-    
-    if (!tasksData?.nodes) {
-      console.log("🔴 Nenhum node encontrado nos dados:", tasksData);
-      return { nodes: [], edges: [] };
-    }
-
-    const nodes = tasksData.nodes.map((node: any) => ({
-      ...node,
-      data: {
-        ...node.data,
-        isReadonly: true,
-      },
-    }));
-
-    console.log("🔴 Nodes convertidos:", nodes);
-    console.log("🔴 Edges encontradas:", tasksData.edges || []);
-
-    return {
-      nodes,
-      edges: tasksData.edges || [],
-    };
-  }, []);
-
   // Memoize node types to avoid React Flow warning
   const nodeTypes = useMemo(() => ({
     startNode: StartNode,
@@ -4412,6 +4385,33 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       return null;
     }
     console.log("🔴 Modal ABERTA, renderizando...");
+
+    // Convert flow data function moved inside render function
+    const convertFlowDataToReactFlow = (flowData: any) => {
+      // Try to access flow_tasks first, then fall back to direct flowData
+      const tasksData = flowData?.flowTasks || flowData;
+      
+      if (!tasksData?.nodes) {
+        console.log("🔴 Nenhum node encontrado nos dados:", tasksData);
+        return { nodes: [], edges: [] };
+      }
+
+      const nodes = tasksData.nodes.map((node: any) => ({
+        ...node,
+        data: {
+          ...node.data,
+          isReadonly: true,
+        },
+      }));
+
+      console.log("🔴 Nodes convertidos:", nodes);
+      console.log("🔴 Edges encontradas:", tasksData.edges || []);
+
+      return {
+        nodes,
+        edges: tasksData.edges || [],
+      };
+    };
 
     const { nodes, edges } = convertFlowDataToReactFlow(flowDiagramModal.flowData);
 
