@@ -3595,6 +3595,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get active flow executions for documents
+  app.get("/api/document-flow-executions", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const executions = await db.select({
+        documentId: documentFlowExecutions.documentId,
+        flowId: documentFlowExecutions.flowId,
+        status: documentFlowExecutions.status,
+        createdAt: documentFlowExecutions.createdAt,
+        flowName: documentsFlows.name,
+        flowCode: documentsFlows.code
+      })
+        .from(documentFlowExecutions)
+        .innerJoin(documentsFlows, eq(documentFlowExecutions.flowId, documentsFlows.id))
+        .where(eq(documentFlowExecutions.status, "initiated"));
+      
+      res.json(executions);
+    } catch (error) {
+      console.error("Erro ao buscar execuções de fluxo:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 
