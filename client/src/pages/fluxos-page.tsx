@@ -1517,7 +1517,9 @@ const FlowCanvas = () => {
               <Settings className="h-4 w-4 mr-2" />
               Exibir Inspector
             </Button>
-            
+          </div>
+          
+          <div className="flex space-x-2">
             <Dialog open={isNewFlowModalOpen} onOpenChange={setIsNewFlowModalOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm">
