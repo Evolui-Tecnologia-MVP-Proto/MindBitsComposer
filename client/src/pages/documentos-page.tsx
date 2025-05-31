@@ -14,10 +14,6 @@ import ReactFlow, {
 } from 'reactflow';
 import StartNode from '@/components/flow/StartNode';
 import EndNode from '@/components/flow/EndNode';
-import ActionNode from '@/components/flow/ActionNode';
-import DocumentNode from '@/components/flow/DocumentNode';
-import SwitchNode from '@/components/flow/SwitchNode';
-import IntegrationNode from '@/components/flow/IntegrationNode';
 import 'reactflow/dist/style.css';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -3474,51 +3470,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {renderAddArtifactModal()}
       {renderEditArtifactModal()}
       {renderDocumentationModal()}
-      <Dialog 
-        open={flowDiagramModal.isOpen} 
-        onOpenChange={(open) => {
-          console.log("🔴 onOpenChange chamado:", open);
-          if (!open) {
-            setFlowDiagramModal({
-              isOpen: false,
-              flowData: null,
-              documentTitle: "",
-            });
-          }
-        }}
-      >
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <GitBranch className="h-5 w-5" />
-              Diagrama do Fluxo - {flowDiagramModal.documentTitle}
-            </DialogTitle>
-            <DialogDescription>
-              Modal de teste para visualização do diagrama de fluxo
-            </DialogDescription>
-          </DialogHeader>
-          <div className="p-6 text-center">
-            <p>Modal do diagrama de fluxo funcionando!</p>
-            <p className="text-sm text-gray-500 mt-2">
-              Documento: {flowDiagramModal.documentTitle}
-            </p>
-          </div>
-          <DialogFooter>
-            <Button 
-              onClick={() => {
-                console.log("🔴 Botão fechar clicado");
-                setFlowDiagramModal({
-                  isOpen: false,
-                  flowData: null,
-                  documentTitle: "",
-                });
-              }}
-            >
-              Fechar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 
@@ -4421,26 +4372,44 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           }
         }}
       >
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <GitBranch className="h-5 w-5" />
               Diagrama do Fluxo - {flowDiagramModal.documentTitle}
             </DialogTitle>
             <DialogDescription>
-              Modal de teste para visualização do diagrama de fluxo
+              Visualização do diagrama de fluxo de trabalho aplicado ao documento
             </DialogDescription>
           </DialogHeader>
-          <div className="p-6 text-center">
-            <p>Modal do diagrama de fluxo funcionando!</p>
-            <p className="text-sm text-gray-500 mt-2">
-              Documento: {flowDiagramModal.documentTitle}
-            </p>
+          <div className="h-[600px] w-full border rounded-lg">
+            <ReactFlowProvider>
+              <ReactFlow
+                nodes={flowDiagramModal.flowData?.nodes || []}
+                edges={flowDiagramModal.flowData?.edges || []}
+                nodeTypes={{
+                  startNode: StartNode,
+                  endNode: EndNode,
+                }}
+                fitView
+                attributionPosition="bottom-left"
+                nodesDraggable={false}
+                nodesConnectable={false}
+                elementsSelectable={false}
+                panOnDrag={true}
+                zoomOnScroll={true}
+                zoomOnPinch={true}
+                panOnScroll={false}
+                preventScrolling={false}
+              >
+                <Controls showInteractive={false} />
+                <Background />
+              </ReactFlow>
+            </ReactFlowProvider>
           </div>
           <DialogFooter>
             <Button 
               onClick={() => {
-                console.log("🔴 Botão fechar clicado");
                 setFlowDiagramModal({
                   isOpen: false,
                   flowData: null,
