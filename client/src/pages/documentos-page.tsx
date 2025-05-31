@@ -90,19 +90,11 @@ import {
 // Custom node components for React Flow
 const StartNodeComponent = (props: any) => {
   const getBackgroundColor = () => {
-    if (props.data.FromType === 'Init') {
-      return 'bg-[#22c55e]'; // Verde para início direto
-    } else if (props.data.FromType) {
-      return 'bg-[#3b82f6]'; // Azul para outros tipos
-    }
-    return 'bg-white'; // Estado padrão: fundo branco
+    return 'bg-white';
   };
 
   const getTextColor = () => {
-    if (props.data.FromType === 'Init' || props.data.FromType) {
-      return 'text-white'; // Texto branco para fundos coloridos
-    }
-    return 'text-black'; // Texto preto para fundo branco
+    return 'text-black';
   };
 
   return (
@@ -118,14 +110,12 @@ const StartNodeComponent = (props: any) => {
       {props.data.configured && props.data.showLabel === false && (
         <div className="text-xs font-medium font-mono">
           {props.data.FromType && (
-            <div className={`px-2 py-1 rounded font-mono ${
-              props.data.FromType === 'Init' ? 'bg-[#22c55e] text-white' : 'bg-[#3b82f6] text-white'
-            }`}>
+            <div className="px-2 py-1 rounded font-mono bg-white text-black border border-gray-300">
               {props.data.FromType === 'Init' ? 'Início Direto' : 
                props.data.FromType === 'flow_init' ? 'Transferência de Fluxo' : props.data.FromType}
             </div>
           )}
-          {!props.data.FromType && <div className="font-mono">✓ Início</div>}
+          {!props.data.FromType && <div className="font-mono text-black">✓ Início</div>}
         </div>
       )}
       <Handle 
