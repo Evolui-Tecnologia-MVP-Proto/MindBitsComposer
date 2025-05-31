@@ -1390,7 +1390,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                       {key === 'integrType' ? 'Tipo de Integração' : 
                        key === 'service' ? 'Serviço' :
                        key === 'actionType' ? 'Tipo de Ação' :
-                       key === 'docType' ? 'Tipo de Documento' : key}
+                       key === 'docType' ? 'Tipo de Documento' :
+                       key === 'isExecuted' ? 'Status de Execução' : key}
                     </Label>
                     <Select 
                       value={selectedNode.data[key] || ''} 
@@ -1406,7 +1407,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                         <SelectValue placeholder={`Selecione ${key === 'integrType' ? 'tipo de integração' : 
                                                                 key === 'service' ? 'serviço' :
                                                                 key === 'actionType' ? 'tipo de ação' :
-                                                                key === 'docType' ? 'tipo de documento' : key}`} />
+                                                                key === 'docType' ? 'tipo de documento' :
+                                                                key === 'isExecuted' ? 'status de execução' : key}`} />
                       </SelectTrigger>
                       <SelectContent>
                         {value.map((option: any, index: number) => {
