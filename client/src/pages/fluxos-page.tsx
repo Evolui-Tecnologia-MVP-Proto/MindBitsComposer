@@ -266,6 +266,12 @@ const ActionNode = memo(({ data, selected }: NodeProps) => {
         <div className="text-xs font-medium font-mono">
           {data.actionType && <div className="font-mono">{getActionTypeText(data.actionType)}</div>}
           {!data.actionType && <div className="font-mono">✓ Ação</div>}
+          {data.description && (
+            <div className="mt-2 p-2 bg-gray-100 rounded text-xs text-gray-700 border max-w-[200px]">
+              <div className="font-semibold text-gray-800 mb-1">Descrição:</div>
+              <div className="whitespace-pre-wrap break-words">{data.description}</div>
+            </div>
+          )}
         </div>
       )}
       <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ top: '-8px' }} />
