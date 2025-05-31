@@ -1517,6 +1517,16 @@ const FlowCanvas = () => {
               <Settings className="h-4 w-4 mr-2" />
               Exibir Inspector
             </Button>
+            
+            <Button 
+              onClick={openEditModal} 
+              variant="outline" 
+              size="sm"
+              disabled={!currentFlowId}
+            >
+              <Edit className="mr-1 h-4 w-4" />
+              Editar Metadados
+            </Button>
           </div>
           
           <div className="flex space-x-2">
@@ -1629,15 +1639,6 @@ const FlowCanvas = () => {
             </DialogContent>
           </Dialog>
           
-            <Button 
-              onClick={openEditModal} 
-              variant="outline" 
-              size="sm"
-              disabled={!currentFlowId}
-            >
-              <Edit className="mr-1 h-4 w-4" />
-              Editar Metadados
-            </Button>
             <Button 
               onClick={handleDeleteFlow} 
               variant="destructive" 
