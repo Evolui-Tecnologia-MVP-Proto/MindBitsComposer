@@ -333,6 +333,29 @@ export const documentsFlows = pgTable("documents_flows", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Document Flow Executions table
+export const documentFlowExecutions = pgTable("document_flow_executions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  documentId: uuid("document_id").notNull().references(() => documentos.id, { onDelete: "cascade" }),
+  flowId: uuid("flow_id").notNull().references(() => documentsFlows.id, { onDelete: "cascade" }),
+  status: text("status", { enum: ["initiated", "in_progress", "completed", "failed"] }).notNull().default("initiated"),
+  executionData: json("execution_data").$type<Record<string, any>>().default({}),
+  startedBy: integer("started_by").notNull().references(() => users.id),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Document Flow Executions schema
+export const insertDocumentFlowExecutionSchema = createInsertSchema(documentFlowExecutions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertDocumentFlowExecution = z.infer<typeof insertDocumentFlowExecutionSchema>;
+export type DocumentFlowExecution = typeof documentFlowExecutions.$inferSelect;
+
 // Flow Types schema
 export const insertFlowTypeSchema = createInsertSchema(flowTypes).omit({
   id: true,

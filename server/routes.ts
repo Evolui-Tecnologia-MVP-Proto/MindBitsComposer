@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { PluginStatus, PluginType, documentos, documentsFlows, flowTypes, users } from "@shared/schema";
+import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc, and, gte, lte, isNull } from "drizzle-orm";
@@ -2403,6 +2403,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.log("Fluxo encontrado:", flow[0].name);
 
+      console.log("Criando registro de execução de fluxo");
+      // Criar registro de execução de fluxo
+      const flowExecution = await db.insert(documentFlowExecutions)
+        .values({
+          documentId,
+          flowId,
+          status: "initiated",
+          startedBy: req.user.id,
+          executionData: {
+            flowName: flow[0].name,
+            documentTitle: documento.objeto,
+            initiatedAt: new Date().toISOString()
+          }
+        })
+        .returning();
+
       console.log("Atualizando status do documento para 'Em Processo'");
       // Atualizar status do documento para "Em Processo"
       const updatedDocument = await storage.updateDocumento(documentId, { 
@@ -2418,6 +2434,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: "Documentação iniciada com sucesso",
         documentId,
         flowId,
+        executionId: flowExecution[0].id,
         updatedDocument
       });
 
