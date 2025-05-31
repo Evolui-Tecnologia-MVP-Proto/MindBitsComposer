@@ -15,7 +15,7 @@ import ReactFlow, {
   Position 
 } from 'reactflow';
 // Importing icons for custom nodes
-import { Play, Square } from 'lucide-react';
+import { Play, Square, Cloud } from 'lucide-react';
 import 'reactflow/dist/style.css';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -73,10 +73,9 @@ import {
   ChevronDown,
   Database,
   Image,
-  FileText,
   Check,
   BookOpen,
-  GitBranch,
+  Zap,
 } from "lucide-react";
 import {
   type Documento,
@@ -197,6 +196,7 @@ const ActionNodeComponent = (props: any) => (
   <div className={`relative px-4 py-2 rounded-lg shadow-md min-w-[120px] text-center transition-all duration-200 ${
     props.data.configured ? 'bg-green-200 text-green-800' : 'bg-white text-black'
   } border-black border-2`}>
+    <Zap className="absolute top-1 left-1 h-5 w-5 text-yellow-600 z-10" />
     {props.data.showLabel !== false && (
       <div className="font-medium font-mono">{props.data.label}</div>
     )}
@@ -239,6 +239,7 @@ const DocumentNodeComponent = (props: any) => (
         }}
       />
     </svg>
+    <FileText className="absolute top-1 left-1 h-6 w-6 text-purple-600 z-10" />
     <div className="absolute inset-0 flex items-center justify-center" style={{ pointerEvents: 'none' }}>
       <div className="text-center pt-2">
         {props.data.showLabel !== false && (
@@ -326,6 +327,7 @@ const SwitchNodeComponent = (props: any) => {
   
   return (
     <div className="relative" style={{ width: `${dynamicWidth}px`, height: `${dynamicHeight}px` }}>
+      <GitBranch className="absolute top-1 left-1 h-6 w-6 text-blue-600 z-20" />
       <Handle 
         type="target" 
         position={Position.Top} 
