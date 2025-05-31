@@ -2,10 +2,11 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { PluginStatus, PluginType, documentos, documentsFlows, flowTypes } from "@shared/schema";
+import { PluginStatus, PluginType, documentos, documentsFlows, flowTypes, users } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc, and, gte, lte, isNull } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { systemLogs } from "@shared/schema";
 import { ZodError } from "zod";
 import fetch from "node-fetch";
@@ -3344,8 +3345,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      const flows = await db.select()
+      const usersCreated = alias(users, 'usersCreated');
+      const usersUpdated = alias(users, 'usersUpdated');
+      
+      const flows = await db.select({
+        id: documentsFlows.id,
+        name: documentsFlows.name,
+        description: documentsFlows.description,
+        code: documentsFlows.code,
+        flowTypeId: documentsFlows.flowTypeId,
+        flowData: documentsFlows.flowData,
+        userId: documentsFlows.userId,
+        createdBy: documentsFlows.createdBy,
+        updatedBy: documentsFlows.updatedBy,
+        createdAt: documentsFlows.createdAt,
+        updatedAt: documentsFlows.updatedAt,
+        createdByName: usersCreated.name,
+        updatedByName: usersUpdated.name
+      })
         .from(documentsFlows)
+        .leftJoin(usersCreated, eq(documentsFlows.createdBy, usersCreated.id))
+        .leftJoin(usersUpdated, eq(documentsFlows.updatedBy, usersUpdated.id))
         .where(eq(documentsFlows.userId, req.user.id))
         .orderBy(desc(documentsFlows.updatedAt));
       
