@@ -1000,6 +1000,7 @@ const FlowCanvas = () => {
         setNewFlowName('');
         setNewFlowDescription('');
         setNewFlowCode('');
+        setNewFlowTypeId('');
         
         if (reactFlowInstance) {
           reactFlowInstance.fitView();
@@ -1588,6 +1589,24 @@ const FlowCanvas = () => {
                     rows={4}
                     className="w-full resize-none"
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="flowType">Tipo de Fluxo</Label>
+                  <Select value={newFlowTypeId} onValueChange={setNewFlowTypeId}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o tipo de fluxo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {flowTypes?.map((flowType: any) => (
+                        <SelectItem key={flowType.id} value={flowType.id}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{flowType.name}</span>
+                            <span className="text-sm text-gray-500">{flowType.description}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <DialogFooter>
