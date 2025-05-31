@@ -1515,7 +1515,7 @@ const FlowCanvas = () => {
               onClick={() => setShowInspector(!showInspector)}
             >
               <Settings className="h-4 w-4 mr-2" />
-              Exibir Inspector
+              Propriedades
             </Button>
             
             <Button 
