@@ -804,6 +804,24 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     
     const { nodes: flowNodes, edges: flowEdges, viewport } = flow.flowData;
     
+    // Atualizar nós EndNode que têm To_Flow_id mas não têm To_Flow_code/To_Flow_name
+    const updatedNodes = (flowNodes || []).map((node: any) => {
+      if (node.type === 'endNode' && node.data.To_Flow_id && (!node.data.To_Flow_code || !node.data.To_Flow_name)) {
+        const targetFlow = savedFlows?.find((f: any) => f.id === node.data.To_Flow_id);
+        if (targetFlow) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              To_Flow_code: targetFlow.code,
+              To_Flow_name: targetFlow.name
+            }
+          };
+        }
+      }
+      return node;
+    });
+    
     // Aplicar estilo sólido cinza às edges carregadas
     const styledEdges = (flowEdges || []).map((edge: any) => ({
       ...edge,
@@ -819,7 +837,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       animated: false
     }));
     
-    setNodes(flowNodes || []);
+    setNodes(updatedNodes);
     setEdges(styledEdges);
     setFlowName(flow.name);
     setCurrentFlowId(flow.id);
@@ -838,7 +856,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       title: "Sucesso",
       description: `Fluxo "${flow.name}" carregado com sucesso!`
     });
-  }, [reactFlowInstance, setNodes, setEdges, resetHistory, onFlowInfoChange]);
+  }, [reactFlowInstance, setNodes, setEdges, resetHistory, onFlowInfoChange, savedFlows]);
 
   // Função para criar novo fluxo
   const newFlow = useCallback(() => {

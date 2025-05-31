@@ -161,7 +161,14 @@ const EndNodeComponent = (props: any) => {
           )}
           {props.data.To_Flow_id && (
             <div className="mt-1 px-2 py-1 rounded font-mono bg-white text-black">
-              Fluxo: {props.data.To_Flow_id}
+              {props.data.To_Flow_code && props.data.To_Flow_name ? (
+                <>
+                  <div className="font-bold">{props.data.To_Flow_code}</div>
+                  <div className="text-[10px] leading-tight">{props.data.To_Flow_name}</div>
+                </>
+              ) : (
+                <div className="text-xs">Fluxo: {props.data.To_Flow_id}</div>
+              )}
             </div>
           )}
           {!props.data.FromType && !props.data.To_Flow_id && <div className="font-mono text-black">✓ Configurado</div>}
@@ -225,6 +232,18 @@ const DocumentNodeComponent = (props: any) => {
   
   const textClass = isExecuted ? 'text-white' : 'text-black';
   
+  // Função para obter informações do tipo de documento
+  const getDocTypeInfo = (docTypeId: string) => {
+    const docTypeMap: { [key: string]: { code: string; name: string } } = {
+      'ERF': { code: 'ERF-01', name: 'Especificação Técnica da Solução' },
+      'ETS': { code: 'ETS-01', name: 'Elicitação de Requisito Funcional' },
+      'ORC': { code: 'ORC-01', name: 'Orçamento para Execução' }
+    };
+    return docTypeMap[docTypeId] || { code: docTypeId, name: docTypeId };
+  };
+
+  const docInfo = props.data.docType ? getDocTypeInfo(props.data.docType) : null;
+  
   return (
     <div className="relative" style={{ width: '140px', height: '80px' }}>
       <svg 
@@ -251,8 +270,14 @@ const DocumentNodeComponent = (props: any) => {
         )}
         {props.data.configured && props.data.showLabel === false && (
           <div className={`text-xs font-medium font-mono ${textClass}`}>
-            {props.data.docType && <div className="font-mono">{props.data.docType}</div>}
-            {!props.data.docType && <div className="font-mono">✓ Documento</div>}
+            {docInfo ? (
+              <>
+                <div className="font-mono font-bold">{docInfo.code}</div>
+                <div className="font-mono text-[10px] leading-tight mt-0.5">{docInfo.name}</div>
+              </>
+            ) : (
+              <div className="font-mono">✓ Documento</div>
+            )}
           </div>
         )}
       </div>
