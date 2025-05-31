@@ -180,9 +180,9 @@ export default function TemplateFormModal({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="code" className="text-right">
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="code">
                 Código
               </Label>
               <Input
@@ -190,20 +190,18 @@ export default function TemplateFormModal({
                 name="code"
                 value={formData.code}
                 onChange={handleChange}
-                className="col-span-3"
+                className="w-full"
                 placeholder="XXX-99"
                 required
                 maxLength={6}
               />
-              <div className="col-start-2 col-span-3">
-                <p className="text-sm text-gray-500">
-                  Formato: 3 letras maiúsculas + hífen + 2 números (ex: ABC-12)
-                </p>
-              </div>
+              <p className="text-sm text-gray-500">
+                Formato: 3 letras maiúsculas + hífen + 2 números (ex: ABC-12)
+              </p>
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right">
+            <div className="space-y-2">
+              <Label htmlFor="description">
                 Descrição
               </Label>
               <Textarea
@@ -211,13 +209,13 @@ export default function TemplateFormModal({
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                className="col-span-3"
+                className="w-full"
                 required
               />
             </div>
             
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="type" className="text-right">
+            <div className="space-y-2">
+              <Label htmlFor="type">
                 Tipo
               </Label>
               <Select
@@ -225,7 +223,7 @@ export default function TemplateFormModal({
                 onValueChange={handleTypeChange}
                 disabled={mode === "edit"}
               >
-                <SelectTrigger className="col-span-3">
+                <SelectTrigger className="w-full">
                   <SelectValue placeholder="Selecione o tipo" />
                 </SelectTrigger>
                 <SelectContent>
@@ -235,25 +233,23 @@ export default function TemplateFormModal({
               </Select>
             </div>
             
-            <div className="grid grid-cols-4 items-start gap-4">
-              <Label htmlFor="structure" className="text-right pt-2">
+            <div className="space-y-2">
+              <Label htmlFor="structure">
                 Estrutura (JSON)
               </Label>
-              <div className="col-span-3">
-                <Textarea
-                  id="structure"
-                  name="structure"
-                  value={typeof formData.structure === 'string' 
-                    ? formData.structure 
-                    : JSON.stringify(formData.structure, null, 2)}
-                  onChange={handleStructureChange}
-                  className="font-mono text-sm h-32"
-                  required
-                />
-                {structureError && (
-                  <p className="text-sm text-red-500 mt-1">{structureError}</p>
-                )}
-              </div>
+              <Textarea
+                id="structure"
+                name="structure"
+                value={typeof formData.structure === 'string' 
+                  ? formData.structure 
+                  : JSON.stringify(formData.structure, null, 2)}
+                onChange={handleStructureChange}
+                className="font-mono text-sm h-32 w-full"
+                required
+              />
+              {structureError && (
+                <p className="text-sm text-red-500">{structureError}</p>
+              )}
             </div>
           </div>
           <DialogFooter>
