@@ -4355,11 +4355,51 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   function renderFlowDiagramModal() {
     console.log("🔴 RENDERIZANDO MODAL:", flowDiagramModal);
-    if (!flowDiagramModal.isOpen) {
-      console.log("🔴 Modal fechada, não renderizando");
+    if (!flowDiagramModal.isOpen || !flowDiagramModal.flowData) {
+      console.log("🔴 Modal fechada ou sem dados, não renderizando");
       return null;
     }
     console.log("🔴 Modal ABERTA, renderizando...");
+
+    const nodeTypes = {
+      startNode: StartNode,
+      endNode: EndNode,
+      actionNode: (props: any) => (
+        <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-blue-500">
+          <div className="text-xs font-bold text-blue-700">
+            {props.data.actionType || 'Action'}
+          </div>
+        </div>
+      ),
+      documentNode: (props: any) => (
+        <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-green-500">
+          <div className="text-xs font-bold text-green-700">
+            Document
+          </div>
+        </div>
+      ),
+    };
+
+    const convertFlowDataToReactFlow = (flowData: any) => {
+      if (!flowData?.nodes) {
+        return { nodes: [], edges: [] };
+      }
+
+      const nodes = flowData.nodes.map((node: any) => ({
+        ...node,
+        data: {
+          ...node.data,
+          isReadonly: true,
+        },
+      }));
+
+      return {
+        nodes,
+        edges: flowData.edges || [],
+      };
+    };
+
+    const { nodes, edges } = convertFlowDataToReactFlow(flowDiagramModal.flowData);
 
     return (
       <Dialog 
@@ -4375,21 +4415,36 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           }
         }}
       >
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <GitBranch className="h-5 w-5" />
               Diagrama do Fluxo - {flowDiagramModal.documentTitle}
             </DialogTitle>
             <DialogDescription>
-              Modal de teste para visualização do diagrama de fluxo
+              Visualização do diagrama de fluxo de trabalho aplicado ao documento
             </DialogDescription>
           </DialogHeader>
-          <div className="p-6 text-center">
-            <p>Modal do diagrama de fluxo funcionando!</p>
-            <p className="text-sm text-gray-500 mt-2">
-              Documento: {flowDiagramModal.documentTitle}
-            </p>
+          <div className="h-[500px] w-full border rounded-lg">
+            <ReactFlowProvider>
+              <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                nodeTypes={nodeTypes}
+                fitView
+                attributionPosition="bottom-left"
+                nodesDraggable={false}
+                nodesConnectable={false}
+                elementsSelectable={false}
+                panOnDrag={true}
+                zoomOnScroll={true}
+                zoomOnPinch={true}
+                zoomOnDoubleClick={false}
+              >
+                <Controls showInteractive={false} />
+                <Background />
+              </ReactFlow>
+            </ReactFlowProvider>
           </div>
           <DialogFooter>
             <Button 
