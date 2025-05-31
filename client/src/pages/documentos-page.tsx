@@ -235,6 +235,11 @@ export default function DocumentosPage() {
     queryKey: ["/api/documents-flows"],
   });
 
+  // Buscar execuções de fluxo ativas
+  const { data: flowExecutions = [] } = useQuery({
+    queryKey: ["/api/document-flow-executions"],
+  });
+
   // Buscar contagem de anexos para todos os documentos
   const { data: artifactCounts = {} } = useQuery<Record<string, number>>({
     queryKey: ["/api/documentos/artifacts-count"],
@@ -1308,6 +1313,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     setIsViewModalOpen(true);
   };
 
+  // Função para obter o fluxo ativo de um documento
+  const getActiveFlow = (documentId: string) => {
+    return flowExecutions.find((execution: any) => 
+      execution.documentId === documentId && execution.status === "initiated"
+    );
+  };
+
   const handleDeleteDocument = (documento: Documento) => {
     toast({
       title: "⚠️ Confirmar Exclusão",
@@ -1647,9 +1659,23 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 </div>
               </TableCell>
               <TableCell>
-                <div className="text-xs text-gray-600">
-                  -
-                </div>
+                {(() => {
+                  const activeFlow = getActiveFlow(documento.id);
+                  if (activeFlow) {
+                    return (
+                      <div className="text-xs">
+                        <span className="font-mono text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                          [{activeFlow.flowCode}] - {activeFlow.flowName}
+                        </span>
+                      </div>
+                    );
+                  }
+                  return (
+                    <div className="text-xs text-gray-400">
+                      -
+                    </div>
+                  );
+                })()}
               </TableCell>
               <TableCell>
                 <Badge
