@@ -90,11 +90,11 @@ import {
 // Custom node components for React Flow
 const StartNodeComponent = (props: any) => {
   const getBackgroundColor = () => {
-    return 'bg-white';
+    return props.data.isExecuted === 'TRUE' ? 'bg-green-500' : 'bg-white';
   };
 
   const getTextColor = () => {
-    return 'text-black';
+    return props.data.isExecuted === 'TRUE' ? 'text-white' : 'text-black';
   };
 
   return (
@@ -130,11 +130,11 @@ const StartNodeComponent = (props: any) => {
 
 const EndNodeComponent = (props: any) => {
   const getBackgroundColor = () => {
-    return 'bg-white';
+    return props.data.isExecuted === 'TRUE' ? 'bg-green-500' : 'bg-white';
   };
 
   const getTextColor = () => {
-    return 'text-black';
+    return props.data.isExecuted === 'TRUE' ? 'text-white' : 'text-black';
   };
 
   return (
@@ -173,59 +173,70 @@ const EndNodeComponent = (props: any) => {
   );
 };
 
-const ActionNodeComponent = (props: any) => (
-  <div className="relative px-4 py-2 rounded-lg shadow-md min-w-[120px] text-center transition-all duration-200 bg-white text-black border-black border-2">
-    <Zap className="absolute top-1 left-1 h-5 w-5 text-yellow-600 z-10" />
-    {props.data.showLabel !== false && (
-      <div className="font-medium font-mono">{props.data.label}</div>
-    )}
-    {props.data.configured && props.data.showLabel === false && (
-      <div className="text-xs font-medium font-mono text-black">
-        {props.data.actionType && <div className="font-mono">{props.data.actionType}</div>}
-        {!props.data.actionType && <div className="font-mono">✓ Ação</div>}
-      </div>
-    )}
-    <Handle 
-      type="target" 
-      position={Position.Top} 
-      className="w-4 h-4 bg-white border-2 border-blue-500" 
-      style={{ top: '-8px' }} 
-    />
-    <Handle 
-      type="source" 
-      position={Position.Bottom} 
-      className="w-4 h-4 bg-white border-2 border-blue-500" 
-      style={{ bottom: '-8px' }} 
-    />
-  </div>
-);
-
-const DocumentNodeComponent = (props: any) => (
-  <div className="relative" style={{ width: '140px', height: '80px' }}>
-    <svg 
-      className="absolute inset-0 pointer-events-none"
-      width="140" 
-      height="80" 
-      viewBox="0 0 140 80"
-    >
-      <polygon
-        points="0,0 140,0 140,64 112,80 28,64 0,64"
-        fill="white"
-        stroke="black"
-        strokeWidth="2"
-        style={{
-          filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
-        }}
+const ActionNodeComponent = (props: any) => {
+  const isExecuted = props.data.isExecuted === 'TRUE';
+  const backgroundClass = isExecuted ? 'bg-green-500' : 'bg-white';
+  const textClass = isExecuted ? 'text-white' : 'text-black';
+  
+  return (
+    <div className={`relative px-4 py-2 rounded-lg shadow-md min-w-[120px] text-center transition-all duration-200 ${backgroundClass} ${textClass} border-black border-2`}>
+      <Zap className="absolute top-1 left-1 h-5 w-5 text-yellow-600 z-10" />
+      {props.data.showLabel !== false && (
+        <div className="font-medium font-mono">{props.data.label}</div>
+      )}
+      {props.data.configured && props.data.showLabel === false && (
+        <div className={`text-xs font-medium font-mono ${textClass}`}>
+          {props.data.actionType && <div className="font-mono">{props.data.actionType}</div>}
+          {!props.data.actionType && <div className="font-mono">✓ Ação</div>}
+        </div>
+      )}
+      <Handle 
+        type="target" 
+        position={Position.Top} 
+        className="w-4 h-4 bg-white border-2 border-blue-500" 
+        style={{ top: '-8px' }} 
       />
-    </svg>
+      <Handle 
+        type="source" 
+        position={Position.Bottom} 
+        className="w-4 h-4 bg-white border-2 border-blue-500" 
+        style={{ bottom: '-8px' }} 
+      />
+    </div>
+  );
+};
+
+const DocumentNodeComponent = (props: any) => {
+  const isExecuted = props.data.isExecuted === 'TRUE';
+  const fillColor = isExecuted ? '#22c55e' : 'white';
+  const textClass = isExecuted ? 'text-white' : 'text-black';
+  
+  return (
+    <div className="relative" style={{ width: '140px', height: '80px' }}>
+      <svg 
+        className="absolute inset-0 pointer-events-none"
+        width="140" 
+        height="80" 
+        viewBox="0 0 140 80"
+      >
+        <polygon
+          points="0,0 140,0 140,64 112,80 28,64 0,64"
+          fill={fillColor}
+          stroke="black"
+          strokeWidth="2"
+          style={{
+            filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+          }}
+        />
+      </svg>
     <FileText className="absolute top-1 left-1 h-6 w-6 text-purple-600 z-10" />
     <div className="absolute inset-0 flex items-center justify-center" style={{ pointerEvents: 'none' }}>
       <div className="text-center pt-2">
         {props.data.showLabel !== false && (
-          <div className="font-medium font-mono text-sm text-black">{props.data.label}</div>
+          <div className={`font-medium font-mono text-sm ${textClass}`}>{props.data.label}</div>
         )}
         {props.data.configured && props.data.showLabel === false && (
-          <div className="text-xs text-black font-medium font-mono">
+          <div className={`text-xs font-medium font-mono ${textClass}`}>
             {props.data.docType && <div className="font-mono">{props.data.docType}</div>}
             {!props.data.docType && <div className="font-mono">✓ Documento</div>}
           </div>
@@ -245,34 +256,40 @@ const DocumentNodeComponent = (props: any) => (
       style={{ bottom: '-8px' }} 
     />
   </div>
-);
+  );
+};
 
-const IntegrationNodeComponent = (props: any) => (
-  <div className="relative" style={{ width: '140px', height: '80px' }}>
-    <svg 
-      className="absolute inset-0 pointer-events-none"
-      width="140" 
-      height="80" 
-      viewBox="0 0 140 80"
-    >
-      <polygon
-        points="28,0 140,0 112,80 0,80"
-        fill="white"
-        stroke="black"
-        strokeWidth="2"
-        style={{
-          filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
-        }}
-      />
-    </svg>
+const IntegrationNodeComponent = (props: any) => {
+  const isExecuted = props.data.isExecuted === 'TRUE';
+  const fillColor = isExecuted ? '#22c55e' : 'white';
+  const textClass = isExecuted ? 'text-white' : 'text-black';
+  
+  return (
+    <div className="relative" style={{ width: '140px', height: '80px' }}>
+      <svg 
+        className="absolute inset-0 pointer-events-none"
+        width="140" 
+        height="80" 
+        viewBox="0 0 140 80"
+      >
+        <polygon
+          points="28,0 140,0 112,80 0,80"
+          fill={fillColor}
+          stroke="black"
+          strokeWidth="2"
+          style={{
+            filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+          }}
+        />
+      </svg>
     <Link className="absolute top-1 right-3 h-6 w-6 text-orange-600 z-10" />
     <div className="absolute inset-0 flex items-center justify-center">
       <div className="text-center">
         {props.data.showLabel !== false && (
-          <div className="font-medium font-mono text-sm text-black">{props.data.label}</div>
+          <div className={`font-medium font-mono text-sm ${textClass}`}>{props.data.label}</div>
         )}
         {props.data.configured && props.data.showLabel === false && (
-          <div className="text-xs font-medium font-mono text-black">
+          <div className={`text-xs font-medium font-mono ${textClass}`}>
             {props.data.integrType && <div className="font-mono">{props.data.integrType}</div>}
             {props.data.service && <div className="font-mono">{props.data.service}</div>}
             {!props.data.integrType && !props.data.service && <div className="font-mono">✓ Integração</div>}
@@ -293,7 +310,8 @@ const IntegrationNodeComponent = (props: any) => (
       style={{ bottom: '-8px', zIndex: 10 }}
     />
   </div>
-);
+  );
+};
 
 const SwitchNodeComponent = (props: any) => {
   // Calcular tamanho dinâmico baseado no texto, mantendo proporção do paralelogramo
