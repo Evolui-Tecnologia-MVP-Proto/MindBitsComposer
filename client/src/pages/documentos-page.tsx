@@ -1768,7 +1768,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
-                      onClick={() => openFlowDiagramModal(documento)}
+                      onClick={() => {
+                        console.log("🖱️ Clique no botão GitBranch detectado!");
+                        openFlowDiagramModal(documento);
+                      }}
                       title="Mostrar diagrama do fluxo"
                     >
                       <GitBranch className="h-4 w-4 text-purple-500" />
