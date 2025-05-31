@@ -4,6 +4,17 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import ReactFlow, { 
+  Node, 
+  Edge, 
+  ReactFlowProvider, 
+  useReactFlow, 
+  Controls, 
+  Background 
+} from 'reactflow';
+import StartNode from '@/components/flow/StartNode';
+import EndNode from '@/components/flow/EndNode';
+import 'reactflow/dist/style.css';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -63,6 +74,7 @@ import {
   FileText,
   Check,
   BookOpen,
+  GitBranch,
 } from "lucide-react";
 import {
   type Documento,
@@ -138,6 +150,17 @@ export default function DocumentosPage() {
     fileName: "",
     mimeType: "",
     fileUrl: "",
+  });
+
+  // Estado para modal do diagrama de fluxo
+  const [flowDiagramModal, setFlowDiagramModal] = useState<{
+    isOpen: boolean;
+    flowData: any;
+    documentTitle: string;
+  }>({
+    isOpen: false,
+    flowData: null,
+    documentTitle: "",
   });
   // Função para resetar o formulário
   const resetFormData = () => {
@@ -1695,6 +1718,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
+                  {activeTab === "em-processo" && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => openFlowDiagramModal(documento)}
+                      title="Mostrar diagrama do fluxo"
+                    >
+                      <GitBranch className="h-4 w-4 text-purple-500" />
+                    </Button>
+                  )}
                   {activeTab !== "integrados" && activeTab !== "em-processo" && (
                     <>
                       <Button
