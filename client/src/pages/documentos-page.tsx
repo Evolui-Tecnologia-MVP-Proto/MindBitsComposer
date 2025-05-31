@@ -196,15 +196,13 @@ const EndNodeComponent = (props: any) => {
 };
 
 const ActionNodeComponent = (props: any) => (
-  <div className={`relative px-4 py-2 rounded-lg shadow-md min-w-[120px] text-center transition-all duration-200 ${
-    props.data.configured ? 'bg-green-200 text-green-800' : 'bg-white text-black'
-  } border-black border-2`}>
+  <div className="relative px-4 py-2 rounded-lg shadow-md min-w-[120px] text-center transition-all duration-200 bg-white text-black border-black border-2">
     <Zap className="absolute top-1 left-1 h-5 w-5 text-yellow-600 z-10" />
     {props.data.showLabel !== false && (
       <div className="font-medium font-mono">{props.data.label}</div>
     )}
     {props.data.configured && props.data.showLabel === false && (
-      <div className="text-xs font-medium font-mono">
+      <div className="text-xs font-medium font-mono text-black">
         {props.data.actionType && <div className="font-mono">{props.data.actionType}</div>}
         {!props.data.actionType && <div className="font-mono">✓ Ação</div>}
       </div>
@@ -234,7 +232,7 @@ const DocumentNodeComponent = (props: any) => (
     >
       <polygon
         points="0,0 140,0 140,64 112,80 28,64 0,64"
-        fill={props.data.configured ? "#dcfce7" : "white"}
+        fill="white"
         stroke="black"
         strokeWidth="2"
         style={{
@@ -246,10 +244,10 @@ const DocumentNodeComponent = (props: any) => (
     <div className="absolute inset-0 flex items-center justify-center" style={{ pointerEvents: 'none' }}>
       <div className="text-center pt-2">
         {props.data.showLabel !== false && (
-          <div className={`font-medium font-mono text-sm ${props.data.configured ? 'text-green-800' : 'text-black'}`}>{props.data.label}</div>
+          <div className="font-medium font-mono text-sm text-black">{props.data.label}</div>
         )}
         {props.data.configured && props.data.showLabel === false && (
-          <div className="text-xs text-green-800 font-medium font-mono">
+          <div className="text-xs text-black font-medium font-mono">
             {props.data.docType && <div className="font-mono">{props.data.docType}</div>}
             {!props.data.docType && <div className="font-mono">✓ Documento</div>}
           </div>
@@ -281,7 +279,7 @@ const IntegrationNodeComponent = (props: any) => (
     >
       <polygon
         points="28,0 140,0 112,80 0,80"
-        fill={props.data.configured ? "#dcfce7" : "white"}
+        fill="white"
         stroke="black"
         strokeWidth="2"
         style={{
@@ -343,7 +341,7 @@ const SwitchNodeComponent = (props: any) => {
         style={{
           width: '100%',
           height: '100%',
-          backgroundColor: props.data.configured ? '#dcfce7' : 'white',
+          backgroundColor: 'white',
           border: '2px solid black',
           transformStyle: 'preserve-3d',
           transform: 'rotateX(60deg) rotateZ(45deg)',
