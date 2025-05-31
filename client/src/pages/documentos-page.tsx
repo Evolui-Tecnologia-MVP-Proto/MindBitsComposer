@@ -1344,6 +1344,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   };
 
+  // Função para abrir modal do diagrama de fluxo
+  const openFlowDiagramModal = (execution: any) => {
+    if (execution && execution.flowTasks) {
+      setFlowDiagramModal({
+        isOpen: true,
+        flowData: execution.flowTasks,
+        documentTitle: execution.document?.objeto || "Documento"
+      });
+    }
+  };
+
   const handleDeleteDocument = (documento: Documento) => {
     toast({
       title: "⚠️ Confirmar Exclusão",
@@ -4318,5 +4329,93 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   }
 
+  // Modal do diagrama de fluxo
+  function renderFlowDiagramModal() {
+    if (!flowDiagramModal.isOpen || !flowDiagramModal.flowData) return null;
 
+    const nodeTypes = {
+      start: StartNode,
+      end: EndNode,
+    };
+
+    const convertFlowDataToReactFlow = (flowData: any) => {
+      if (!flowData?.nodes || !flowData?.edges) {
+        return { nodes: [], edges: [] };
+      }
+
+      const nodes = flowData.nodes.map((node: any) => ({
+        ...node,
+        data: {
+          ...node.data,
+          isReadonly: true,
+        },
+      }));
+
+      return {
+        nodes,
+        edges: flowData.edges || [],
+      };
+    };
+
+    const { nodes, edges } = convertFlowDataToReactFlow(flowDiagramModal.flowData);
+
+    return (
+      <Dialog open={flowDiagramModal.isOpen} onOpenChange={(open) => {
+        if (!open) {
+          setFlowDiagramModal({
+            isOpen: false,
+            flowData: null,
+            documentTitle: "",
+          });
+        }
+      }}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <GitBranch className="h-5 w-5" />
+              Diagrama do Fluxo - {flowDiagramModal.documentTitle}
+            </DialogTitle>
+            <DialogDescription>
+              Visualização do diagrama de fluxo de trabalho aplicado ao documento
+            </DialogDescription>
+          </DialogHeader>
+          <div className="h-[500px] w-full border rounded-lg">
+            <ReactFlowProvider>
+              <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                nodeTypes={nodeTypes}
+                fitView
+                attributionPosition="bottom-left"
+                nodesDraggable={false}
+                nodesConnectable={false}
+                elementsSelectable={false}
+                panOnDrag={true}
+                zoomOnScroll={true}
+                zoomOnPinch={true}
+                zoomOnDoubleClick={false}
+              >
+                <Controls showInteractive={false} />
+                <Background />
+              </ReactFlow>
+            </ReactFlowProvider>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <div className="container mx-auto py-6">
+      {/* Conteúdo principal */}
+      {/* ... resto do conteúdo ... */}
+      
+      {/* Modals */}
+      {renderEditModal()}
+      {renderAddArtifactModal()}
+      {renderDocumentationModal()}
+      {renderEditArtifactModal()}
+      {renderFlowDiagramModal()}
+    </div>
+  );
 }
