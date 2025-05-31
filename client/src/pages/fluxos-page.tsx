@@ -1593,7 +1593,7 @@ const FlowCanvas = () => {
                 <div className="space-y-2">
                   <Label htmlFor="flowType">Tipo de Fluxo</Label>
                   <Select value={newFlowTypeId} onValueChange={setNewFlowTypeId}>
-                    <SelectTrigger>
+                    <SelectTrigger className="text-left">
                       <SelectValue placeholder="Selecione o tipo de fluxo" />
                     </SelectTrigger>
                     <SelectContent>
