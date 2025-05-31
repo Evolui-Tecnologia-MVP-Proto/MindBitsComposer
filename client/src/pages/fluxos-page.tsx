@@ -1977,7 +1977,7 @@ const BibliotecaFluxos = () => {
                   
                   {flow.createdAt && (
                     <div className="text-xs text-muted-foreground pt-1 border-t">
-                      Criado em: {new Date(flow.createdAt).toLocaleDateString('pt-BR')}
+                      Criado em {new Date(flow.createdAt).toLocaleDateString('pt-BR')} por {flow.createdBy || 'Usuário desconhecido'}
                     </div>
                   )}
                 </div>
