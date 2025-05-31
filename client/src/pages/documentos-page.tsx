@@ -1610,7 +1610,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           <TableRow>
             <TableHead>Origem</TableHead>
             <TableHead>Nome</TableHead>
-            <TableHead>Data</TableHead>
+            <TableHead>Incluído</TableHead>
+            <TableHead>Iniciado</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Ações</TableHead>
           </TableRow>
@@ -1636,6 +1637,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 <div className="flex items-center text-gray-500 text-sm">
                   <Clock className="mr-1.5 h-3.5 w-3.5" />
                   {formatDate(documento.createdAt)}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center text-gray-500 text-sm">
+                  <Clock className="mr-1.5 h-3.5 w-3.5" />
+                  {formatDate(documento.updatedAt)}
                 </div>
               </TableCell>
               <TableCell>
@@ -1685,7 +1692,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           {documentos.length === 0 && (
             <TableRow>
               <TableCell
-                colSpan={activeTab === "integrados" ? 8 : 5}
+                colSpan={activeTab === "integrados" ? 8 : 6}
                 className="text-center py-6 text-gray-500"
               >
                 Nenhum documento encontrado nesta categoria.
