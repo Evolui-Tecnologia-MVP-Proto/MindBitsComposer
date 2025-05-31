@@ -1650,7 +1650,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
-                  {activeTab !== "integrados" && (
+                  {activeTab !== "integrados" && activeTab !== "em-processo" && (
                     <>
                       <Button
                         variant="ghost"
