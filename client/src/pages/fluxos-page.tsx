@@ -1317,7 +1317,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                         </SelectTrigger>
                         <SelectContent>
                           {savedFlows && savedFlows.map((flow: any) => (
-                            <SelectItem key={flow.id} value={flow.id}>
+                            <SelectItem key={flow.id} value={flow.id} className="font-mono">
                               {flow.name}
                             </SelectItem>
                           ))}
