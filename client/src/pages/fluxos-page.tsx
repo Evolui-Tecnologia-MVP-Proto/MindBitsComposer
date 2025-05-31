@@ -139,7 +139,8 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
           <div className={`mt-1 px-2 py-1 rounded font-mono ${
             data.FromType === 'Init' ? 'bg-[#ef4444] text-white' : 'bg-[#3b82f6] text-white'
           }`}>
-            Fluxo: {data.To_Flow_id}
+            <div className="font-bold">{data.To_Flow_code || 'Código'}</div>
+            <div className="text-[10px] leading-tight">{data.To_Flow_name || data.To_Flow_id}</div>
           </div>
         )}
         {!data.FromType && !data.To_Flow_id && <div className="font-mono">✓ Configurado</div>}
@@ -1332,6 +1333,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                       <Select 
                         value={selectedNode.data[key] || ''} 
                         onValueChange={(newValue) => {
+                          const selectedFlow = savedFlows?.find((flow: any) => flow.id === newValue);
                           setNodes(nds => nds.map(node => 
                             node.id === selectedNode.id 
                               ? { 
@@ -1339,9 +1341,13 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                                   data: { 
                                     ...node.data, 
                                     [key]: newValue,
+                                    To_Flow_code: selectedFlow?.code || '',
+                                    To_Flow_name: selectedFlow?.name || '',
+                                    configured: true,
+                                    showLabel: false,
                                     // Se for EndNode e FromType = 'Init' (Encerramento Direto), limpar To_Flow_id
                                     ...(selectedNode.type === 'endNode' && key === 'FromType' && newValue === 'Init' 
-                                      ? { To_Flow_id: '' } 
+                                      ? { To_Flow_id: '', To_Flow_code: '', To_Flow_name: '' } 
                                       : {})
                                   }
                                 }
@@ -1355,7 +1361,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                         <SelectContent>
                           {savedFlows && savedFlows.map((flow: any) => (
                             <SelectItem key={flow.id} value={flow.id} className="font-mono">
-                              {flow.name}
+                              [{flow.code}] - {flow.name}
                             </SelectItem>
                           ))}
                         </SelectContent>
