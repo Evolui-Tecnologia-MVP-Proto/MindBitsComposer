@@ -185,6 +185,21 @@ export default function TemplateFormModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-4 py-4">
             <div className="space-y-2">
+              <Label htmlFor="name">
+                Nome
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full"
+                placeholder="Nome do template"
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
               <Label htmlFor="code">
                 Código
               </Label>

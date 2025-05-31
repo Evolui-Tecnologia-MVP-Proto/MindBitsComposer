@@ -258,7 +258,10 @@ export default function TemplatesPage() {
               ) : (
                 <FileJson className="h-5 w-5 mr-2 text-purple-500" />
               )}
-              <h3 className="font-medium">{template.code}</h3>
+              <div>
+                <h3 className="font-medium">{template.name || template.code}</h3>
+                <p className="text-xs text-gray-500">{template.code}</p>
+              </div>
             </div>
             <div className="text-xs bg-gray-100 px-2 py-1 rounded-full">
               {template.type === "struct" ? "Estrutural" : "Saída"}
