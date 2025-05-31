@@ -343,7 +343,12 @@ const SwitchNodeComponent = (props: any) => {
   const dynamicHeight = baseSize; // Altura igual à largura para manter proporção do paralelogramo
   
   const isExecuted = props.data.isExecuted === 'TRUE';
-  const backgroundColor = isExecuted ? '#21639a' : 'white';
+  const isPendingConnected = props.data.isPendingConnected;
+  
+  let backgroundColor = 'white';
+  if (isExecuted) backgroundColor = '#21639a';
+  else if (isPendingConnected) backgroundColor = '#fef3cd'; // amarelo claro
+  
   const textClass = isExecuted ? 'text-white' : 'text-black';
   
   return (
