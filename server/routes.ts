@@ -2383,8 +2383,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Verificar se o fluxo existe
-      const flow = await storage.getDocumentsFlow(flowId);
-      if (!flow) {
+      const flow = await db.select()
+        .from(documentsFlows)
+        .where(eq(documentsFlows.id, flowId))
+        .limit(1);
+      
+      if (flow.length === 0) {
         return res.status(404).json({ error: "Fluxo não encontrado" });
       }
 
