@@ -1368,14 +1368,19 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   // Função para abrir modal do diagrama de fluxo
   const openFlowDiagramModal = (documento: Documento) => {
+    console.log("🚀 openFlowDiagramModal chamado para documento:", documento.id);
     const activeFlow = getActiveFlow(documento.id);
+    console.log("🔍 activeFlow encontrado:", activeFlow);
+    
     if (activeFlow && activeFlow.flowTasks) {
+      console.log("✅ Abrindo modal com flowTasks:", activeFlow.flowTasks);
       setFlowDiagramModal({
         isOpen: true,
         flowData: activeFlow.flowTasks,
         documentTitle: documento.objeto || "Documento"
       });
     } else {
+      console.log("❌ Não foi possível abrir modal - activeFlow ou flowTasks ausente");
       toast({
         title: "Fluxo não encontrado",
         description: "Não foi possível encontrar um fluxo ativo para este documento.",
