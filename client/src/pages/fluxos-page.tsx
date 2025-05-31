@@ -139,8 +139,14 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
           <div className={`mt-1 px-2 py-1 rounded font-mono ${
             data.FromType === 'Init' ? 'bg-[#ef4444] text-white' : 'bg-[#3b82f6] text-white'
           }`}>
-            <div className="font-bold">{data.To_Flow_code || 'Código'}</div>
-            <div className="text-[10px] leading-tight">{data.To_Flow_name || data.To_Flow_id}</div>
+            {data.To_Flow_code && data.To_Flow_name ? (
+              <>
+                <div className="font-bold">{data.To_Flow_code}</div>
+                <div className="text-[10px] leading-tight">{data.To_Flow_name}</div>
+              </>
+            ) : (
+              <div className="text-xs">Fluxo: {data.To_Flow_id}</div>
+            )}
           </div>
         )}
         {!data.FromType && !data.To_Flow_id && <div className="font-mono">✓ Configurado</div>}
