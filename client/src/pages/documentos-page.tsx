@@ -261,6 +261,13 @@ export default function DocumentosPage() {
   // Buscar execuções de fluxo ativas
   const { data: flowExecutions = [] } = useQuery({
     queryKey: ["/api/document-flow-executions"],
+    queryFn: async () => {
+      const response = await fetch("/api/document-flow-executions");
+      if (!response.ok) {
+        throw new Error("Erro ao buscar execuções de fluxo");
+      }
+      return response.json();
+    }
   });
 
   // Buscar contagem de anexos para todos os documentos
@@ -1345,12 +1352,19 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   };
 
   // Função para abrir modal do diagrama de fluxo
-  const openFlowDiagramModal = (execution: any) => {
-    if (execution && execution.flowTasks) {
+  const openFlowDiagramModal = (documento: Documento) => {
+    const activeFlow = getActiveFlow(documento.id);
+    if (activeFlow && activeFlow.flowTasks) {
       setFlowDiagramModal({
         isOpen: true,
-        flowData: execution.flowTasks,
-        documentTitle: execution.document?.objeto || "Documento"
+        flowData: activeFlow.flowTasks,
+        documentTitle: documento.objeto || "Documento"
+      });
+    } else {
+      toast({
+        title: "Fluxo não encontrado",
+        description: "Não foi possível encontrar um fluxo ativo para este documento.",
+        variant: "destructive",
       });
     }
   };
@@ -1729,7 +1743,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
-                  {activeTab === "em-processo" && (
+                  {activeTab === "em-processo" && getActiveFlow(documento.id) && (
                     <Button
                       variant="ghost"
                       size="icon"
@@ -4331,8 +4345,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   // Modal do diagrama de fluxo
   function renderFlowDiagramModal() {
-    if (!flowDiagramModal.isOpen || !flowDiagramModal.flowData) return null;
-
     const nodeTypes = {
       start: StartNode,
       end: EndNode,
@@ -4356,6 +4368,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         edges: flowData.edges || [],
       };
     };
+
+    if (!flowDiagramModal.isOpen || !flowDiagramModal.flowData) {
+      return null;
+    }
 
     const { nodes, edges } = convertFlowDataToReactFlow(flowDiagramModal.flowData);
 
@@ -4407,10 +4423,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   return (
     <div className="container mx-auto py-6">
-      {/* Conteúdo principal */}
-      {/* ... resto do conteúdo ... */}
-      
-      {/* Modals */}
       {renderEditModal()}
       {renderAddArtifactModal()}
       {renderDocumentationModal()}
