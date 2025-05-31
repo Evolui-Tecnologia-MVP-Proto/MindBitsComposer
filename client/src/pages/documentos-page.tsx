@@ -1754,22 +1754,20 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
-                  {(() => {
-                    const activeFlow = getActiveFlow(documento.id);
-                    const shouldShow = activeTab === "em-processo" && !!activeFlow;
-                    console.log(`🔍 Botão GitBranch para ${documento.objeto}: activeTab=${activeTab}, activeFlow=${!!activeFlow}, shouldShow=${shouldShow}`);
-                    return shouldShow;
-                  })() && (
+                  {activeTab === "em-processo" && getActiveFlow(documento.id) && (
                     <Button
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log("🖱️ Clique no botão GitBranch detectado!");
-                        console.log("📄 Documento:", documento.objeto);
-                        openFlowDiagramModal(documento);
+                      onClick={() => {
+                        const activeFlow = getActiveFlow(documento.id);
+                        if (activeFlow && activeFlow.flowTasks) {
+                          setFlowDiagramModal({
+                            isOpen: true,
+                            flowData: activeFlow.flowTasks,
+                            documentTitle: documento.objeto || "Documento"
+                          });
+                        }
                       }}
                       title="Mostrar diagrama do fluxo"
                     >
