@@ -4454,6 +4454,23 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   return (
     <div className="container mx-auto py-6">
+      {/* Botão de teste temporário */}
+      <div className="mb-4 p-4 bg-yellow-100 rounded">
+        <Button
+          onClick={() => {
+            console.log("🧪 TESTE: Botão clicado!");
+            const testDoc = documentos.find(d => d.id === "9ef9937a-5e02-45af-9d71-e5fb26b71a5e");
+            if (testDoc) {
+              console.log("🧪 TESTE: Documento encontrado:", testDoc.objeto);
+              openFlowDiagramModal(testDoc);
+            }
+          }}
+          className="bg-yellow-500 hover:bg-yellow-600"
+        >
+          TESTE: Abrir Modal do Fluxo
+        </Button>
+      </div>
+      
       {renderEditModal()}
       {renderAddArtifactModal()}
       {renderDocumentationModal()}
