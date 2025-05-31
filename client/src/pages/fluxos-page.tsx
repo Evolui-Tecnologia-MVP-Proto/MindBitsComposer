@@ -1513,6 +1513,7 @@ const FlowCanvas = () => {
               variant={showInspector ? "default" : "outline"}
               size="sm"
               onClick={() => setShowInspector(!showInspector)}
+              disabled={!currentFlowId}
             >
               <Settings className="h-4 w-4 mr-2" />
               Propriedades
@@ -1660,7 +1661,7 @@ const FlowCanvas = () => {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <div className="w-64">
-                <Select onValueChange={setSelectedNodeType}>
+                <Select onValueChange={setSelectedNodeType} disabled={!currentFlowId}>
                   <SelectTrigger id="node-type">
                     <SelectValue placeholder="Selecione um nó" />
                   </SelectTrigger>
@@ -1704,7 +1705,7 @@ const FlowCanvas = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Button onClick={handleAddNode} size="sm" disabled={!selectedNodeType}>
+              <Button onClick={handleAddNode} size="sm" disabled={!selectedNodeType || !currentFlowId}>
                 <PlusCircle className="mr-1 h-4 w-4" />
                 Adicionar Nó
               </Button>
@@ -1732,7 +1733,7 @@ const FlowCanvas = () => {
               <Redo2 className="mr-1 h-4 w-4" />
               Refazer
             </Button>
-            <Button onClick={handleReset} variant="outline" size="sm">
+            <Button onClick={handleReset} variant="outline" size="sm" disabled={!currentFlowId}>
               <RotateCcw className="mr-1 h-4 w-4" />
               Reiniciar
             </Button>
