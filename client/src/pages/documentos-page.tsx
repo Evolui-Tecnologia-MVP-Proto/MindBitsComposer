@@ -1351,11 +1351,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   // Função para abrir modal do diagrama de fluxo
   const openFlowDiagramModal = (execution: any) => {
-    if (execution && execution.flowTasks) {
+    console.log("🔴 Dados recebidos na função:", execution);
+    if (execution) {
       setFlowDiagramModal({
         isOpen: true,
-        flowData: execution.flowTasks,
-        documentTitle: execution.document?.objeto || "Documento"
+        flowData: execution.flowTasks || execution,
+        documentTitle: execution.document?.objeto || execution.flowName || "Documento"
+      });
+      console.log("🔴 Estado atualizado:", {
+        isOpen: true,
+        flowData: execution.flowTasks || execution,
+        documentTitle: execution.document?.objeto || execution.flowName || "Documento"
       });
     }
   };
@@ -1744,15 +1750,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         const activeFlow = getActiveFlow(documento.id);
                         console.log("🔴 Active flow encontrado:", activeFlow);
                         if (activeFlow) {
-                          console.log("🔴 Abrindo modal com força...");
-                          setCurrentFlowData(activeFlow.flowTasks);
-                          setCurrentDocTitle(documento.objeto || "Documento");
-                          
-                          // Força a abertura da modal usando uma função callback
-                          setIsFlowModalOpen(prevState => {
-                            console.log("🔴 Estado anterior isFlowModalOpen:", prevState);
-                            console.log("🔴 Mudando para true");
-                            return true;
+                          console.log("🔴 Abrindo modal com fluxo ativo");
+                          openFlowDiagramModal({
+                            flowTasks: activeFlow,
+                            document: { objeto: documento.objeto }
                           });
                         } else {
                           console.log("🔴 Nenhum fluxo ativo encontrado para:", documento.id);
@@ -3468,7 +3469,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {renderAddArtifactModal()}
       {renderEditArtifactModal()}
       {renderDocumentationModal()}
-
+      {renderFlowDiagramModal()}
     </div>
   );
 
@@ -4352,7 +4353,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   }
 
-  // Modal do diagrama de fluxo
   function renderFlowDiagramModal() {
     console.log("🔴 RENDERIZANDO MODAL:", flowDiagramModal);
     if (!flowDiagramModal.isOpen) {
@@ -4362,15 +4362,19 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     console.log("🔴 Modal ABERTA, renderizando...");
 
     return (
-      <Dialog open={flowDiagramModal.isOpen} onOpenChange={(open) => {
-        if (!open) {
-          setFlowDiagramModal({
-            isOpen: false,
-            flowData: null,
-            documentTitle: "",
-          });
-        }
-      }}>
+      <Dialog 
+        open={flowDiagramModal.isOpen} 
+        onOpenChange={(open) => {
+          console.log("🔴 onOpenChange chamado:", open);
+          if (!open) {
+            setFlowDiagramModal({
+              isOpen: false,
+              flowData: null,
+              documentTitle: "",
+            });
+          }
+        }}
+      >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
@@ -4389,11 +4393,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           </div>
           <DialogFooter>
             <Button 
-              onClick={() => setFlowDiagramModal({
-                isOpen: false,
-                flowData: null,
-                documentTitle: "",
-              })}
+              onClick={() => {
+                console.log("🔴 Botão fechar clicado");
+                setFlowDiagramModal({
+                  isOpen: false,
+                  flowData: null,
+                  documentTitle: "",
+                });
+              }}
             >
               Fechar
             </Button>
