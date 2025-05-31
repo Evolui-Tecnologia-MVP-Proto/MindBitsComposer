@@ -110,12 +110,12 @@ const StartNodeComponent = (props: any) => {
       {props.data.configured && props.data.showLabel === false && (
         <div className="text-xs font-medium font-mono">
           {props.data.FromType && (
-            <div className="px-2 py-1 rounded font-mono bg-white text-black">
+            <div className={`px-2 py-1 rounded font-mono ${textClass}`}>
               {props.data.FromType === 'Init' ? 'Início Direto' : 
                props.data.FromType === 'flow_init' ? 'Transferência de Fluxo' : props.data.FromType}
             </div>
           )}
-          {!props.data.FromType && <div className="font-mono text-black">✓ Início</div>}
+          {!props.data.FromType && <div className={`font-mono ${textClass}`}>✓ Início</div>}
         </div>
       )}
       <Handle 
