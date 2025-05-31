@@ -2435,7 +2435,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         documentId,
         flowId,
         executionId: flowExecution[0].id,
-        updatedDocument
+        documentStatus: updatedDocument.status
       });
 
     } catch (error: any) {
