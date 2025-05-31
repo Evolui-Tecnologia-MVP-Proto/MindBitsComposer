@@ -270,9 +270,9 @@ const IntegrationNodeComponent = (props: any) => (
   <div className="relative" style={{ width: '140px', height: '80px' }}>
     <Handle
       type="target"
-      position={Position.Left}
-      className="w-4 h-4 bg-white border-2 border-orange-500"
-      style={{ left: '-8px', top: '50%', transform: 'translateY(-50%)' }}
+      position={Position.Top}
+      className="w-4 h-4 bg-white border-2 border-blue-500"
+      style={{ top: '-8px' }}
     />
     <svg 
       className="absolute inset-0 pointer-events-none"
@@ -299,9 +299,9 @@ const IntegrationNodeComponent = (props: any) => (
     </div>
     <Handle
       type="source"
-      position={Position.Right}
-      className="w-4 h-4 bg-white border-2 border-orange-500"
-      style={{ right: '-8px', top: '50%', transform: 'translateY(-50%)' }}
+      position={Position.Bottom}
+      className="w-4 h-4 bg-white border-2 border-blue-500"
+      style={{ bottom: '-8px' }}
     />
   </div>
 );
