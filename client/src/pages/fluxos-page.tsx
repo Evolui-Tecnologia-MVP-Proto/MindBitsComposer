@@ -288,18 +288,21 @@ const ActionNode = memo(({ data, selected }: NodeProps) => {
 
 
 
-const DocumentNode = memo(({ data, selected }: NodeProps) => {
-  // Função para obter informações do tipo de documento
-  const getDocTypeInfo = (docTypeId: string) => {
-    const docTypeMap: { [key: string]: { code: string; name: string } } = {
-      'ERF': { code: 'ERF-01', name: 'Especificação Técnica da Solução' },
-      'ETS': { code: 'ETS-01', name: 'Elicitação de Requisito Funcional' },
-      'ORC': { code: 'ORC-01', name: 'Orçamento para Execução' }
-    };
-    return docTypeMap[docTypeId] || { code: docTypeId, name: docTypeId };
+const DocumentNode = memo(({ data, selected, ...nodeProps }: NodeProps) => {
+  // Hook para buscar templates
+  const { data: templatesList } = useQuery({
+    queryKey: ['/api/templates/struct'],
+    enabled: true
+  });
+
+  // Função para obter informações do template selecionado
+  const getTemplateInfo = (templateId: string) => {
+    if (!templatesList || !templateId) return null;
+    const template = templatesList.find((t: any) => t.id === templateId);
+    return template ? { code: template.code, name: template.name } : null;
   };
 
-  const docInfo = data.docType ? getDocTypeInfo(data.docType) : null;
+  const templateInfo = data.docType ? getTemplateInfo(data.docType) : null;
 
   return (
     <div className="relative" style={{ width: '140px', height: '80px' }}>
@@ -337,10 +340,10 @@ const DocumentNode = memo(({ data, selected }: NodeProps) => {
           )}
           {data.configured && data.showLabel === false && (
             <div className="text-xs text-green-800 font-medium font-mono">
-              {docInfo ? (
+              {templateInfo ? (
                 <>
-                  <div className="font-mono font-bold">{docInfo.code}</div>
-                  <div className="font-mono text-[10px] leading-tight mt-0.5">{docInfo.name}</div>
+                  <div className="font-mono font-bold">{templateInfo.code}</div>
+                  <div className="font-mono text-[10px] leading-tight mt-0.5">{templateInfo.name}</div>
                 </>
               ) : (
                 <div className="font-mono">✓ Documento</div>
@@ -597,6 +600,12 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
   // Query para buscar tipos de fluxo
   const { data: flowTypes } = useQuery({
     queryKey: ['/api/flow-types'],
+    enabled: true
+  });
+
+  // Query para buscar templates
+  const { data: templatesData } = useQuery({
+    queryKey: ['/api/templates/struct'],
     enabled: true
   });
 
@@ -1392,6 +1401,80 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                       </Select>
                     </div>
                   );
+                }
+                
+                // Para campos que referenciam templates
+                if (value.includes('templates')) {
+                  // Parse da definição do template
+                  const templateMatch = value.match(/{{templates\.([^}]+)}}/);
+                  if (templateMatch) {
+                    const templateDef = templateMatch[1];
+                    const parts = templateDef.split(',');
+                    let displayFormat = '{code}-{name}';
+                    let filterCriteria: any = {};
+                    
+                    // Processar cada parte da definição
+                    parts.forEach(part => {
+                      const trimmedPart = part.trim();
+                      if (trimmedPart.includes('-')) {
+                        // Formato de exibição (ex: cod-name)
+                        displayFormat = trimmedPart;
+                      } else if (trimmedPart.includes('=')) {
+                        // Critério de filtro (ex: type=struct)
+                        const [filterKey, filterValue] = trimmedPart.split('=');
+                        filterCriteria[filterKey.trim()] = filterValue.trim();
+                      }
+                    });
+
+                    return (
+                      <div key={key}>
+                        <Label className="text-sm font-medium capitalize">
+                          {key === 'docType' ? 'Tipo de Documento' : key}
+                        </Label>
+                        <Select 
+                          value={selectedNode.data[key] || ''} 
+                          onValueChange={(newValue) => {
+                            const selectedTemplate = templatesData?.find((template: any) => template.id === newValue);
+                            setNodes(nds => nds.map(node => 
+                              node.id === selectedNode.id 
+                                ? { 
+                                    ...node, 
+                                    data: { 
+                                      ...node.data, 
+                                      [key]: newValue,
+                                      ...(selectedTemplate ? {
+                                        template_code: selectedTemplate.code,
+                                        template_name: selectedTemplate.name
+                                      } : {}),
+                                      configured: true,
+                                      showLabel: false
+                                    }
+                                  }
+                                : node
+                            ));
+                          }}
+                        >
+                          <SelectTrigger className="mt-1 text-left font-mono">
+                            <SelectValue placeholder="Selecione o template" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {templatesData && templatesData
+                              .filter((template: any) => {
+                                // Aplicar filtros se definidos
+                                return Object.keys(filterCriteria).every(filterKey => 
+                                  template[filterKey] === filterCriteria[filterKey]
+                                );
+                              })
+                              .map((template: any) => (
+                                <SelectItem key={template.id} value={template.id} className="font-mono">
+                                  [{template.code}] - {template.name}
+                                </SelectItem>
+                              ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    );
+                  }
                 }
               }
               
