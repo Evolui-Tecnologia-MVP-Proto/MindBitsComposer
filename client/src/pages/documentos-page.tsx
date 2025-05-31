@@ -10,7 +10,9 @@ import ReactFlow, {
   ReactFlowProvider, 
   useReactFlow, 
   Controls, 
-  Background 
+  Background,
+  Handle,
+  Position 
 } from 'reactflow';
 import StartNode from '@/components/flow/StartNode';
 import EndNode from '@/components/flow/EndNode';
@@ -85,23 +87,53 @@ import {
 
 // Custom node components for React Flow
 const ActionNodeComponent = (props: any) => (
-  <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-blue-500">
+  <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-blue-500 relative">
+    <Handle
+      type="target"
+      position={Position.Top}
+      className="w-4 h-4 bg-white border-2 border-blue-500"
+      style={{ top: '-8px' }}
+    />
     <div className="text-xs font-bold text-blue-700">
       {props.data.actionType || 'Action'}
     </div>
+    <Handle
+      type="source"
+      position={Position.Bottom}
+      className="w-4 h-4 bg-white border-2 border-blue-500"
+      style={{ bottom: '-8px' }}
+    />
   </div>
 );
 
 const DocumentNodeComponent = (props: any) => (
-  <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-green-500">
+  <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-green-500 relative">
+    <Handle
+      type="target"
+      position={Position.Top}
+      className="w-4 h-4 bg-white border-2 border-green-500"
+      style={{ top: '-8px' }}
+    />
     <div className="text-xs font-bold text-green-700">
       Document
     </div>
+    <Handle
+      type="source"
+      position={Position.Bottom}
+      className="w-4 h-4 bg-white border-2 border-green-500"
+      style={{ bottom: '-8px' }}
+    />
   </div>
 );
 
 const IntegrationNodeComponent = (props: any) => (
   <div className="relative" style={{ width: '140px', height: '80px' }}>
+    <Handle
+      type="target"
+      position={Position.Left}
+      className="w-4 h-4 bg-white border-2 border-orange-500"
+      style={{ left: '-8px', top: '50%', transform: 'translateY(-50%)' }}
+    />
     <svg 
       className="absolute inset-0 pointer-events-none"
       width="140" 
@@ -125,6 +157,12 @@ const IntegrationNodeComponent = (props: any) => (
         </div>
       </div>
     </div>
+    <Handle
+      type="source"
+      position={Position.Right}
+      className="w-4 h-4 bg-white border-2 border-orange-500"
+      style={{ right: '-8px', top: '50%', transform: 'translateY(-50%)' }}
+    />
   </div>
 );
 
@@ -132,6 +170,12 @@ const SwitchNodeComponent = (props: any) => {
   const baseSize = 100;
   return (
     <div className="relative" style={{ width: `${baseSize}px`, height: `${baseSize}px` }}>
+      <Handle 
+        type="target" 
+        position={Position.Top} 
+        className="w-4 h-4 bg-white border-2 border-blue-500" 
+        style={{ top: '2px', left: '50%', transform: 'translateX(-50%)' }}
+      />
       <div
         className="absolute"
         style={{
@@ -159,6 +203,21 @@ const SwitchNodeComponent = (props: any) => {
           {props.data.label || 'Switch'}
         </div>
       </div>
+      
+      <Handle 
+        type="source" 
+        position={Position.Right} 
+        className="w-4 h-4 bg-white border-4 border-red-500" 
+        id="a"
+        style={{ top: '50%', right: '-33px', transform: 'translateY(-50%)' }}
+      />
+      <Handle 
+        type="source" 
+        position={Position.Left} 
+        className="w-4 h-4 bg-white border-4 border-green-500" 
+        id="c"
+        style={{ top: '50%', left: '-33px', transform: 'translateY(-50%)' }}
+      />
     </div>
   );
 };
