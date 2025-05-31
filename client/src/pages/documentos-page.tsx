@@ -876,6 +876,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
       setIsDocumentationModalOpen(false);
       setSelectedFlowId("");
       toast({
