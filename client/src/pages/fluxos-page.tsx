@@ -1923,28 +1923,17 @@ const BibliotecaFluxos = () => {
           return (
             <Card key={flow.id} className="hover:shadow-md transition-shadow">
               <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg font-mono">
-                      [{flow.code}] {flow.name}
-                    </CardTitle>
-                    <CardDescription className="mt-1">
-                      {flow.description || "Sem descrição"}
-                    </CardDescription>
-                  </div>
-                  {flowType && (
-                    <div className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-md font-medium">
-                      {flowType.name}
-                    </div>
-                  )}
+                <div>
+                  <CardTitle className="text-lg font-mono">
+                    [{flow.code}] {flow.name}
+                  </CardTitle>
+                  <CardDescription className="mt-1">
+                    {flow.description || "Sem descrição"}
+                  </CardDescription>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="text-sm text-muted-foreground">
-                    {nodeStats.steps} etapa{nodeStats.steps !== 1 ? 's' : ''} • {nodeStats.decisions} decisõ{nodeStats.decisions !== 1 ? 'es' : 'ão'}
-                  </div>
-                  
                   <div className="flex justify-between items-center gap-2">
                     <Button 
                       size="sm" 
