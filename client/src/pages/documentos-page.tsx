@@ -162,6 +162,11 @@ export default function DocumentosPage() {
     flowData: null,
     documentTitle: "",
   });
+  
+  // Estado simples para forçar re-render
+  const [isFlowModalOpen, setIsFlowModalOpen] = useState(false);
+  const [currentFlowData, setCurrentFlowData] = useState<any>(null);
+  const [currentDocTitle, setCurrentDocTitle] = useState("");
   // Função para resetar o formulário
   const resetFormData = () => {
     console.log("🧹 LIMPANDO CAMPOS DO FORMULÁRIO");
@@ -1739,17 +1744,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         const activeFlow = getActiveFlow(documento.id);
                         console.log("🔴 Active flow encontrado:", activeFlow);
                         if (activeFlow) {
-                          console.log("🔴 Abrindo modal...");
-                          setFlowDiagramModal(prev => {
-                            console.log("🔴 Estado anterior:", prev);
-                            const newState = {
-                              isOpen: true,
-                              flowData: activeFlow.flowTasks,
-                              documentTitle: documento.objeto || "Documento"
-                            };
-                            console.log("🔴 Novo estado:", newState);
-                            return newState;
-                          });
+                          console.log("🔴 Abrindo modal com estados simples...");
+                          setIsFlowModalOpen(true);
+                          setCurrentFlowData(activeFlow.flowTasks);
+                          setCurrentDocTitle(documento.objeto || "Documento");
                         } else {
                           console.log("🔴 Nenhum fluxo ativo encontrado para:", documento.id);
                         }
@@ -4409,8 +4407,38 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {renderAddArtifactModal()}
       {renderDocumentationModal()}
       {renderEditArtifactModal()}
-      {console.log("🔴 RENDERIZANDO COMPONENTE - Estado da modal:", flowDiagramModal)}
       {renderFlowDiagramModal()}
+      
+      {/* Modal simples do diagrama de fluxo */}
+      {isFlowModalOpen && (
+        <Dialog open={isFlowModalOpen} onOpenChange={setIsFlowModalOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <GitBranch className="h-5 w-5" />
+                Diagrama do Fluxo - {currentDocTitle}
+              </DialogTitle>
+              <DialogDescription>
+                Visualização do diagrama de fluxo de trabalho aplicado ao documento
+              </DialogDescription>
+            </DialogHeader>
+            <div className="p-6 text-center">
+              <p>Modal do diagrama de fluxo funcionando!</p>
+              <p className="text-sm text-gray-500 mt-2">
+                Documento: {currentDocTitle}
+              </p>
+              <p className="text-xs text-gray-400 mt-2">
+                Dados do fluxo carregados: {currentFlowData ? 'Sim' : 'Não'}
+              </p>
+            </div>
+            <DialogFooter>
+              <Button onClick={() => setIsFlowModalOpen(false)}>
+                Fechar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
