@@ -59,9 +59,38 @@ export default function TemplateFormModal({
   const [structureError, setStructureError] = useState("");
   const { toast } = useToast();
 
+  // Função para aplicar máscara no código XXX-99
+  const applyCodeMask = (value: string) => {
+    // Remove tudo que não é letra ou número
+    const cleaned = value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    
+    if (cleaned.length <= 3) {
+      // Apenas letras para os primeiros 3 caracteres
+      return cleaned.replace(/[^A-Z]/g, '');
+    } else {
+      // Primeiros 3 caracteres como letras + hífen + até 2 números
+      const letters = cleaned.slice(0, 3).replace(/[^A-Z]/g, '');
+      const numbers = cleaned.slice(3, 5).replace(/[^0-9]/g, '');
+      return letters + (numbers ? '-' + numbers : '');
+    }
+  };
+
+  // Função para validar código XXX-99
+  const validateCode = (code: string) => {
+    const codeRegex = /^[A-Z]{3}-[0-9]{2}$/;
+    return codeRegex.test(code);
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    if (name === 'code') {
+      // Aplicar máscara no campo código
+      const maskedValue = applyCodeMask(value);
+      setFormData((prev) => ({ ...prev, [name]: maskedValue }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleTypeChange = (value: string) => {
@@ -99,6 +128,15 @@ export default function TemplateFormModal({
       toast({
         title: "Erro de validação",
         description: "O formato JSON da estrutura é inválido",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!validateCode(formData.code)) {
+      toast({
+        title: "Erro de validação",
+        description: "O código deve ter o formato XXX-99 (3 letras maiúsculas + hífen + 2 números)",
         variant: "destructive",
       });
       return;
@@ -153,9 +191,15 @@ export default function TemplateFormModal({
                 value={formData.code}
                 onChange={handleChange}
                 className="col-span-3"
+                placeholder="XXX-99"
                 required
-                maxLength={15}
+                maxLength={6}
               />
+              <div className="col-start-2 col-span-3">
+                <p className="text-sm text-gray-500">
+                  Formato: 3 letras maiúsculas + hífen + 2 números (ex: ABC-12)
+                </p>
+              </div>
             </div>
             
             <div className="grid grid-cols-4 items-center gap-4">
