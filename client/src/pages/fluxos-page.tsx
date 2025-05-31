@@ -1558,8 +1558,15 @@ const FlowCanvas = () => {
                 <div className="space-y-2">
                   <Label htmlFor="flowType">Tipo de Fluxo</Label>
                   <Select value={newFlowTypeId} onValueChange={setNewFlowTypeId}>
-                    <SelectTrigger className="text-left">
-                      <SelectValue placeholder="Selecione o tipo de fluxo" />
+                    <SelectTrigger className="text-left h-auto min-h-[40px] py-2">
+                      <SelectValue placeholder="Selecione o tipo de fluxo">
+                        {newFlowTypeId && flowTypes?.find((type: any) => type.id === newFlowTypeId) && (
+                          <div className="flex flex-col text-left">
+                            <span className="font-medium">{flowTypes.find((type: any) => type.id === newFlowTypeId)?.name}</span>
+                            <span className="text-sm text-gray-500 whitespace-normal break-words">{flowTypes.find((type: any) => type.id === newFlowTypeId)?.description}</span>
+                          </div>
+                        )}
+                      </SelectValue>
                     </SelectTrigger>
                     <SelectContent className="w-[500px]">
                       {flowTypes?.map((flowType: any) => (
