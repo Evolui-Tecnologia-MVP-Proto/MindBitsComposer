@@ -364,6 +364,24 @@ const SwitchNodeComponent = (props: any) => {
         id="c"
         style={{ top: '50%', left: '-33px', transform: 'translateY(-50%)' }}
       />
+      
+      {/* Mostrar valores dos switches abaixo dos nós de saída */}
+      {props.data.configured && props.data.redSwitch && (
+        <div 
+          className="absolute text-xs font-mono text-red-700 bg-red-100 px-1 rounded"
+          style={{ top: 'calc(75% - 11px)', right: '-45px', transform: 'translateX(50%)', whiteSpace: 'nowrap' }}
+        >
+          {Array.isArray(props.data.redSwitch) ? props.data.redSwitch.join(',') : props.data.redSwitch}
+        </div>
+      )}
+      {props.data.configured && props.data.greenSwitch && (
+        <div 
+          className="absolute text-xs font-mono text-green-700 bg-green-100 px-1 rounded"
+          style={{ top: 'calc(75% - 11px)', left: '-45px', transform: 'translateX(-50%)', whiteSpace: 'nowrap' }}
+        >
+          {Array.isArray(props.data.greenSwitch) ? props.data.greenSwitch.join(',') : props.data.greenSwitch}
+        </div>
+      )}
     </div>
   );
 };
@@ -4723,7 +4741,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 }}
                 minZoom={0.1}
                 maxZoom={2}
-                defaultZoom={0.8}
                 attributionPosition="bottom-left"
                 nodesDraggable={false}
                 nodesConnectable={false}
