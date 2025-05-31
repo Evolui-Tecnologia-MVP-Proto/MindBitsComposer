@@ -261,7 +261,7 @@ const DocumentNodeComponent = (props: any) => {
 
 const IntegrationNodeComponent = (props: any) => {
   const isExecuted = props.data.isExecuted === 'TRUE';
-  const fillColor = isExecuted ? '#22c55e' : 'white';
+  const fillColor = isExecuted ? '#21639a' : 'white';
   const textClass = isExecuted ? 'text-white' : 'text-black';
   
   return (
@@ -324,7 +324,7 @@ const SwitchNodeComponent = (props: any) => {
   const dynamicHeight = baseSize; // Altura igual à largura para manter proporção do paralelogramo
   
   const isExecuted = props.data.isExecuted === 'TRUE';
-  const backgroundColor = isExecuted ? '#22c55e' : 'white';
+  const backgroundColor = isExecuted ? '#21639a' : 'white';
   const textClass = isExecuted ? 'text-white' : 'text-black';
   
   return (
