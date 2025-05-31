@@ -34,7 +34,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogPortal,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -1352,17 +1351,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   // Função para abrir modal do diagrama de fluxo
   const openFlowDiagramModal = (execution: any) => {
-    console.log("🔴 Dados recebidos na função:", execution);
-    if (execution) {
+    if (execution && execution.flowTasks) {
       setFlowDiagramModal({
         isOpen: true,
-        flowData: execution.flowTasks || execution,
-        documentTitle: execution.document?.objeto || execution.flowName || "Documento"
-      });
-      console.log("🔴 Estado atualizado:", {
-        isOpen: true,
-        flowData: execution.flowTasks || execution,
-        documentTitle: execution.document?.objeto || execution.flowName || "Documento"
+        flowData: execution.flowTasks,
+        documentTitle: execution.document?.objeto || "Documento"
       });
     }
   };
@@ -1751,10 +1744,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         const activeFlow = getActiveFlow(documento.id);
                         console.log("🔴 Active flow encontrado:", activeFlow);
                         if (activeFlow) {
-                          console.log("🔴 Abrindo modal com fluxo ativo");
-                          openFlowDiagramModal({
-                            flowTasks: activeFlow,
-                            document: { objeto: documento.objeto }
+                          console.log("🔴 Abrindo modal com força...");
+                          setCurrentFlowData(activeFlow.flowTasks);
+                          setCurrentDocTitle(documento.objeto || "Documento");
+                          
+                          // Força a abertura da modal usando uma função callback
+                          setIsFlowModalOpen(prevState => {
+                            console.log("🔴 Estado anterior isFlowModalOpen:", prevState);
+                            console.log("🔴 Mudando para true");
+                            return true;
                           });
                         } else {
                           console.log("🔴 Nenhum fluxo ativo encontrado para:", documento.id);
@@ -3470,6 +3468,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {renderAddArtifactModal()}
       {renderEditArtifactModal()}
       {renderDocumentationModal()}
+
     </div>
   );
 
@@ -4353,75 +4352,64 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   }
 
-  return (
-    <div className="container mx-auto py-6">
-      {renderEditModal()}
-      {renderAddArtifactModal()}
-      {renderDocumentationModal()}
-      {renderEditArtifactModal()}
-      <Dialog 
-        open={flowDiagramModal.isOpen} 
-        onOpenChange={(open) => {
-          console.log("🔴 onOpenChange chamado:", open);
-          if (!open) {
-            setFlowDiagramModal({
-              isOpen: false,
-              flowData: null,
-              documentTitle: "",
-            });
-          }
-        }}
-      >
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
+  // Modal do diagrama de fluxo
+  function renderFlowDiagramModal() {
+    console.log("🔴 RENDERIZANDO MODAL:", flowDiagramModal);
+    if (!flowDiagramModal.isOpen) {
+      console.log("🔴 Modal fechada, não renderizando");
+      return null;
+    }
+    console.log("🔴 Modal ABERTA, renderizando...");
+
+    return (
+      <Dialog open={flowDiagramModal.isOpen} onOpenChange={(open) => {
+        if (!open) {
+          setFlowDiagramModal({
+            isOpen: false,
+            flowData: null,
+            documentTitle: "",
+          });
+        }
+      }}>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <GitBranch className="h-5 w-5" />
               Diagrama do Fluxo - {flowDiagramModal.documentTitle}
             </DialogTitle>
             <DialogDescription>
-              Visualização do diagrama de fluxo de trabalho aplicado ao documento
+              Modal de teste para visualização do diagrama de fluxo
             </DialogDescription>
           </DialogHeader>
-          <div className="h-[600px] w-full border rounded-lg">
-            <ReactFlowProvider>
-              <ReactFlow
-                nodes={flowDiagramModal.flowData?.nodes || []}
-                edges={flowDiagramModal.flowData?.edges || []}
-                nodeTypes={{
-                  startNode: StartNode,
-                  endNode: EndNode,
-                }}
-                fitView
-                attributionPosition="bottom-left"
-                nodesDraggable={false}
-                nodesConnectable={false}
-                elementsSelectable={false}
-                panOnDrag={true}
-                zoomOnScroll={true}
-                zoomOnPinch={true}
-                panOnScroll={false}
-                preventScrolling={false}
-              >
-                <Controls showInteractive={false} />
-                <Background />
-              </ReactFlow>
-            </ReactFlowProvider>
+          <div className="p-6 text-center">
+            <p>Modal do diagrama de fluxo funcionando!</p>
+            <p className="text-sm text-gray-500 mt-2">
+              Documento: {flowDiagramModal.documentTitle}
+            </p>
           </div>
           <DialogFooter>
             <Button 
-              onClick={() => {
-                setFlowDiagramModal({
-                  isOpen: false,
-                  flowData: null,
-                  documentTitle: "",
-                });
-              }}
+              onClick={() => setFlowDiagramModal({
+                isOpen: false,
+                flowData: null,
+                documentTitle: "",
+              })}
             >
               Fechar
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    );
+  }
+
+  return (
+    <div className="container mx-auto py-6">
+      {renderEditModal()}
+      {renderAddArtifactModal()}
+      {renderDocumentationModal()}
+      {renderEditArtifactModal()}
+      {renderFlowDiagramModal()}
     </div>
   );
 }
