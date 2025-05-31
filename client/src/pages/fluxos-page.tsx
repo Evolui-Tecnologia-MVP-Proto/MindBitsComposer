@@ -426,6 +426,7 @@ const FlowCanvas = () => {
   const [newFlowName, setNewFlowName] = useState('');
   const [newFlowDescription, setNewFlowDescription] = useState('');
   const [newFlowCode, setNewFlowCode] = useState('');
+  const [newFlowTypeId, setNewFlowTypeId] = useState('');
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editFlowName, setEditFlowName] = useState('');
   const [editFlowDescription, setEditFlowDescription] = useState('');
@@ -968,11 +969,21 @@ const FlowCanvas = () => {
       return;
     }
 
+    if (!newFlowTypeId.trim()) {
+      toast({
+        title: "Erro",
+        description: "Tipo de fluxo é obrigatório",
+        variant: "destructive"
+      });
+      return;
+    }
+
     // Criar um novo fluxo e salvá-lo no banco de dados
     const newFlowData = {
       name: newFlowName,
       code: newFlowCode,
       description: newFlowDescription,
+      flowTypeId: newFlowTypeId,
       flowData: { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
       userId: 1 // Placeholder - deveria vir do contexto de autenticação
     };
