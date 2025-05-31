@@ -241,12 +241,13 @@ const DocumentNodeComponent = (props: any) => (
     </svg>
     <div className="absolute inset-0 flex items-center justify-center" style={{ pointerEvents: 'none' }}>
       <div className="text-center pt-2">
-        <div className={`font-medium font-mono text-sm ${props.data.configured ? 'text-green-800' : 'text-black'}`}>
-          {props.data.label || 'Document'}
-        </div>
-        {props.data.configured && props.data.docType && (
+        {props.data.showLabel !== false && (
+          <div className={`font-medium font-mono text-sm ${props.data.configured ? 'text-green-800' : 'text-black'}`}>{props.data.label}</div>
+        )}
+        {props.data.configured && props.data.showLabel === false && (
           <div className="text-xs text-green-800 font-medium font-mono">
-            {props.data.docType}
+            {props.data.docType && <div className="font-mono">{props.data.docType}</div>}
+            {!props.data.docType && <div className="font-mono">✓ Documento</div>}
           </div>
         )}
       </div>
@@ -352,8 +353,8 @@ const SwitchNodeComponent = (props: any) => {
           )}
           {props.data.configured && props.data.showLabel === false && (
             <div className="text-xs font-medium font-mono text-black">
-              {props.data.switchType && <div className="font-mono">{props.data.switchType}</div>}
-              {!props.data.switchType && <div className="font-mono">✓ Switch</div>}
+              {props.data.switchField && <div className="font-mono">{props.data.switchField}</div>}
+              {!props.data.switchField && <div className="font-mono">✓ Switch</div>}
             </div>
           )}
         </div>
