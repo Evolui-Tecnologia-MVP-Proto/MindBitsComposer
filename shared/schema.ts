@@ -340,6 +340,7 @@ export const documentFlowExecutions = pgTable("document_flow_executions", {
   flowId: uuid("flow_id").notNull().references(() => documentsFlows.id, { onDelete: "cascade" }),
   status: text("status", { enum: ["initiated", "in_progress", "completed", "failed"] }).notNull().default("initiated"),
   executionData: json("execution_data").$type<Record<string, any>>().default({}),
+  flowTasks: json("flow_tasks").$type<Record<string, any>>().default({}),
   startedBy: integer("started_by").notNull().references(() => users.id),
   completedAt: timestamp("completed_at"),
   createdAt: timestamp("created_at").defaultNow(),

@@ -1624,7 +1624,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             <TableHead>Nome</TableHead>
             <TableHead>Incluído</TableHead>
             <TableHead>Iniciado</TableHead>
-            <TableHead>Fluxo</TableHead>
+            <TableHead>Fluxo Atual</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Ações</TableHead>
           </TableRow>
@@ -1663,10 +1663,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   const activeFlow = getActiveFlow(documento.id);
                   if (activeFlow) {
                     return (
-                      <div className="text-xs">
-                        <span className="font-mono text-blue-600 bg-blue-50 px-2 py-1 rounded">
-                          [{activeFlow.flowCode}] - {activeFlow.flowName}
-                        </span>
+                      <div className="flex items-center text-gray-500 text-sm">
+                        [{activeFlow.flowCode}] - {activeFlow.flowName}
                       </div>
                     );
                   }

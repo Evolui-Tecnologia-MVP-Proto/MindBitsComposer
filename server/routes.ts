@@ -2415,7 +2415,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             flowName: flow[0].name,
             documentTitle: documento.objeto,
             initiatedAt: new Date().toISOString()
-          }
+          },
+          flowTasks: flow[0].flowData || {}
         })
         .returning();
 
