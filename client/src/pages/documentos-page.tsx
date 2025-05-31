@@ -4345,7 +4345,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   // Modal do diagrama de fluxo
   function renderFlowDiagramModal() {
-    if (!flowDiagramModal.isOpen) return null;
+    console.log("🔴 RENDERIZANDO MODAL:", flowDiagramModal);
+    if (!flowDiagramModal.isOpen) {
+      console.log("🔴 Modal fechada, não renderizando");
+      return null;
+    }
+    console.log("🔴 Modal ABERTA, renderizando...");
 
     return (
       <Dialog open={flowDiagramModal.isOpen} onOpenChange={(open) => {
