@@ -1745,9 +1745,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         console.log("🔴 Active flow encontrado:", activeFlow);
                         if (activeFlow) {
                           console.log("🔴 Abrindo modal com estados simples...");
+                          console.log("🔴 Definindo isFlowModalOpen para true");
                           setIsFlowModalOpen(true);
                           setCurrentFlowData(activeFlow.flowTasks);
                           setCurrentDocTitle(documento.objeto || "Documento");
+                          setTimeout(() => {
+                            console.log("🔴 Estado atual isFlowModalOpen:", isFlowModalOpen);
+                          }, 100);
                         } else {
                           console.log("🔴 Nenhum fluxo ativo encontrado para:", documento.id);
                         }
@@ -4410,6 +4414,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {renderFlowDiagramModal()}
       
       {/* Modal simples do diagrama de fluxo */}
+      {console.log("🔴 RENDERIZANDO - isFlowModalOpen:", isFlowModalOpen)}
       {isFlowModalOpen && (
         <Dialog open={isFlowModalOpen} onOpenChange={setIsFlowModalOpen}>
           <DialogContent className="max-w-2xl">
