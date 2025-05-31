@@ -4409,6 +4409,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {renderAddArtifactModal()}
       {renderDocumentationModal()}
       {renderEditArtifactModal()}
+      {console.log("🔴 RENDERIZANDO COMPONENTE - Estado da modal:", flowDiagramModal)}
       {renderFlowDiagramModal()}
     </div>
   );
