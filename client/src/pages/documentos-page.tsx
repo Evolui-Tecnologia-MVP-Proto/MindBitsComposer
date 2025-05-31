@@ -90,7 +90,9 @@ import {
 // Custom node components for React Flow
 const StartNodeComponent = (props: any) => {
   const getBackgroundColor = () => {
-    return props.data.isExecuted === 'TRUE' ? 'bg-[#21639a]' : 'bg-white';
+    if (props.data.isExecuted === 'TRUE') return 'bg-[#21639a]';
+    if (props.data.isPendingConnected) return 'bg-yellow-200';
+    return 'bg-white';
   };
 
   const getTextColor = () => {
@@ -130,7 +132,9 @@ const StartNodeComponent = (props: any) => {
 
 const EndNodeComponent = (props: any) => {
   const getBackgroundColor = () => {
-    return props.data.isExecuted === 'TRUE' ? 'bg-[#21639a]' : 'bg-white';
+    if (props.data.isExecuted === 'TRUE') return 'bg-[#21639a]';
+    if (props.data.isPendingConnected) return 'bg-yellow-200';
+    return 'bg-white';
   };
 
   const getTextColor = () => {
@@ -175,7 +179,12 @@ const EndNodeComponent = (props: any) => {
 
 const ActionNodeComponent = (props: any) => {
   const isExecuted = props.data.isExecuted === 'TRUE';
-  const backgroundClass = isExecuted ? 'bg-[#21639a]' : 'bg-white';
+  const isPendingConnected = props.data.isPendingConnected;
+  
+  let backgroundClass = 'bg-white';
+  if (isExecuted) backgroundClass = 'bg-[#21639a]';
+  else if (isPendingConnected) backgroundClass = 'bg-yellow-200';
+  
   const textClass = isExecuted ? 'text-white' : 'text-black';
   
   return (
@@ -208,7 +217,12 @@ const ActionNodeComponent = (props: any) => {
 
 const DocumentNodeComponent = (props: any) => {
   const isExecuted = props.data.isExecuted === 'TRUE';
-  const fillColor = isExecuted ? '#21639a' : 'white';
+  const isPendingConnected = props.data.isPendingConnected;
+  
+  let fillColor = 'white';
+  if (isExecuted) fillColor = '#21639a';
+  else if (isPendingConnected) fillColor = '#fef3cd'; // amarelo claro
+  
   const textClass = isExecuted ? 'text-white' : 'text-black';
   
   return (
@@ -261,7 +275,12 @@ const DocumentNodeComponent = (props: any) => {
 
 const IntegrationNodeComponent = (props: any) => {
   const isExecuted = props.data.isExecuted === 'TRUE';
-  const fillColor = isExecuted ? '#21639a' : 'white';
+  const isPendingConnected = props.data.isPendingConnected;
+  
+  let fillColor = 'white';
+  if (isExecuted) fillColor = '#21639a';
+  else if (isPendingConnected) fillColor = '#fef3cd'; // amarelo claro
+  
   const textClass = isExecuted ? 'text-white' : 'text-black';
   
   return (
@@ -4725,7 +4744,41 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
     const { nodes, edges } = convertFlowDataToReactFlow(flowDiagramModal.flowData);
 
-    // Processar edges para colorir conexões entre nós executados
+    // Identificar nós não executados conectados a nós executados
+    const pendingConnectedNodes = new Set<string>();
+    
+    edges.forEach((edge: any) => {
+      const sourceNode = nodes.find((n: any) => n.id === edge.source);
+      const targetNode = nodes.find((n: any) => n.id === edge.target);
+      
+      const sourceExecuted = sourceNode?.data?.isExecuted === 'TRUE';
+      const targetExecuted = targetNode?.data?.isExecuted === 'TRUE';
+      
+      // Se source executado e target não executado
+      if (sourceExecuted && !targetExecuted) {
+        pendingConnectedNodes.add(edge.target);
+      }
+      // Se target executado e source não executado
+      if (targetExecuted && !sourceExecuted) {
+        pendingConnectedNodes.add(edge.source);
+      }
+    });
+
+    // Processar nós para adicionar destaque amarelo aos pendentes conectados
+    const processedNodes = nodes.map((node: any) => {
+      if (pendingConnectedNodes.has(node.id)) {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            isPendingConnected: true,
+          },
+        };
+      }
+      return node;
+    });
+
+    // Processar edges para colorir conexões
     const processedEdges = edges.map((edge: any) => {
       const sourceNode = nodes.find((n: any) => n.id === edge.source);
       const targetNode = nodes.find((n: any) => n.id === edge.target);
@@ -4733,8 +4786,19 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       const sourceExecuted = sourceNode?.data?.isExecuted === 'TRUE';
       const targetExecuted = targetNode?.data?.isExecuted === 'TRUE';
       
-      // Se ambos os nós estão executados, usar cor azul escuro
-      const edgeColor = (sourceExecuted && targetExecuted) ? '#21639a' : '#6b7280';
+      const sourcePending = pendingConnectedNodes.has(edge.source);
+      const targetPending = pendingConnectedNodes.has(edge.target);
+      
+      let edgeColor = '#6b7280'; // cor padrão
+      
+      // Se ambos os nós estão executados
+      if (sourceExecuted && targetExecuted) {
+        edgeColor = '#21639a';
+      }
+      // Se há conexão entre executado e pendente
+      else if ((sourceExecuted && targetPending) || (targetExecuted && sourcePending)) {
+        edgeColor = '#fbbf24'; // amarelo
+      }
       
       return {
         ...edge,
@@ -4777,7 +4841,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           <div className="h-[500px] w-full border rounded-lg">
             <ReactFlowProvider>
               <ReactFlow
-                nodes={nodes}
+                nodes={processedNodes}
                 edges={processedEdges}
                 nodeTypes={nodeTypes}
                 fitView
