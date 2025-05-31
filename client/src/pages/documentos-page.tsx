@@ -1734,7 +1734,16 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8"
-                      onClick={() => openFlowDiagramModal(documento)}
+                      onClick={() => {
+                        const activeFlow = getActiveFlow(documento.id);
+                        if (activeFlow) {
+                          setFlowDiagramModal({
+                            isOpen: true,
+                            flowData: activeFlow.flowTasks,
+                            documentTitle: documento.objeto || "Documento"
+                          });
+                        }
+                      }}
                       title="Mostrar diagrama do fluxo"
                     >
                       <GitBranch className="h-4 w-4 text-purple-500" />
