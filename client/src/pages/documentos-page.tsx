@@ -87,41 +87,74 @@ import {
 
 // Custom node components for React Flow
 const ActionNodeComponent = (props: any) => (
-  <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-blue-500 relative">
-    <Handle
-      type="target"
-      position={Position.Top}
-      className="w-4 h-4 bg-white border-2 border-blue-500"
-      style={{ top: '-8px' }}
-    />
-    <div className="text-xs font-bold text-blue-700">
-      {props.data.actionType || 'Action'}
+  <div className={`relative px-4 py-2 rounded-lg shadow-md min-w-[120px] text-center transition-all duration-200 ${
+    props.data.configured ? 'bg-green-200 text-green-800' : 'bg-white text-black'
+  } border-black border-2`}>
+    <div className="font-medium font-mono">
+      {props.data.showLabel !== false && props.data.label}
+      {props.data.configured && props.data.showLabel === false && (
+        <div className="text-xs font-medium font-mono">
+          {props.data.actionType && <div className="font-mono">{props.data.actionType}</div>}
+          {!props.data.actionType && <div className="font-mono">✓ Ação</div>}
+        </div>
+      )}
     </div>
-    <Handle
-      type="source"
-      position={Position.Bottom}
-      className="w-4 h-4 bg-white border-2 border-blue-500"
-      style={{ bottom: '-8px' }}
+    <Handle 
+      type="target" 
+      position={Position.Top} 
+      className="w-4 h-4 bg-white border-2 border-blue-500" 
+      style={{ top: '-8px' }} 
+    />
+    <Handle 
+      type="source" 
+      position={Position.Bottom} 
+      className="w-4 h-4 bg-white border-2 border-blue-500" 
+      style={{ bottom: '-8px' }} 
     />
   </div>
 );
 
 const DocumentNodeComponent = (props: any) => (
-  <div className="px-4 py-2 shadow-md rounded-md bg-white border-2 border-green-500 relative">
-    <Handle
-      type="target"
-      position={Position.Top}
-      className="w-4 h-4 bg-white border-2 border-green-500"
-      style={{ top: '-8px' }}
-    />
-    <div className="text-xs font-bold text-green-700">
-      Document
+  <div className="relative" style={{ width: '140px', height: '80px' }}>
+    <svg 
+      className="absolute inset-0 pointer-events-none"
+      width="140" 
+      height="80" 
+      viewBox="0 0 140 80"
+    >
+      <polygon
+        points="0,0 140,0 140,64 112,80 28,64 0,64"
+        fill={props.data.configured ? "#dcfce7" : "white"}
+        stroke="black"
+        strokeWidth="2"
+        style={{
+          filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+        }}
+      />
+    </svg>
+    <div className="absolute inset-0 flex items-center justify-center" style={{ pointerEvents: 'none' }}>
+      <div className="text-center pt-2">
+        <div className={`font-medium font-mono text-sm ${props.data.configured ? 'text-green-800' : 'text-black'}`}>
+          {props.data.label || 'Document'}
+        </div>
+        {props.data.configured && props.data.docType && (
+          <div className="text-xs text-green-800 font-medium font-mono">
+            {props.data.docType}
+          </div>
+        )}
+      </div>
     </div>
-    <Handle
-      type="source"
-      position={Position.Bottom}
-      className="w-4 h-4 bg-white border-2 border-green-500"
-      style={{ bottom: '-8px' }}
+    <Handle 
+      type="target" 
+      position={Position.Top} 
+      className="w-4 h-4 bg-white border-2 border-blue-500" 
+      style={{ top: '-8px' }} 
+    />
+    <Handle 
+      type="source" 
+      position={Position.Bottom} 
+      className="w-4 h-4 bg-white border-2 border-blue-500" 
+      style={{ bottom: '-8px' }} 
     />
   </div>
 );
