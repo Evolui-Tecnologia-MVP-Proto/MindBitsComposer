@@ -78,6 +78,7 @@ import {
   Zap,
   GitBranch,
   FileText,
+  Link,
 } from "lucide-react";
 import {
   type Documento,
@@ -288,7 +289,7 @@ const IntegrationNodeComponent = (props: any) => (
         }}
       />
     </svg>
-    <Cloud className="absolute top-1 left-1 h-6 w-6 text-blue-500 z-10" />
+    <Link className="absolute top-1 right-3 h-6 w-6 text-orange-600 z-10" />
     <div className="absolute inset-0 flex items-center justify-center">
       <div className="text-center">
         {props.data.showLabel !== false && (
