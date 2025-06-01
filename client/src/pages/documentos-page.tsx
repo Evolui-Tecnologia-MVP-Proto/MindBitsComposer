@@ -5485,8 +5485,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
                 {(selectedFlowNode.data.callType?.toLowerCase() === 'automatico' || selectedFlowNode.data.callType?.toLowerCase() === 'automático') && (
                   <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm text-blue-800">
-                      Esta integração é feita automaticamente por um processo agendado, o ID deste processo é <span className="font-mono">{selectedFlowNode.data.jobId || 'N/A'}</span>
+                    <p className="text-xs text-blue-800">
+                      Esta integração é feita automaticamente por um processo agendado, o ID deste processo é:
+                    </p>
+                    <p className="text-xs text-blue-800 font-mono mt-1">
+                      {selectedFlowNode.data.jobId || 'N/A'}
                     </p>
                   </div>
                 )}
