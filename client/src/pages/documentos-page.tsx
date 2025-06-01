@@ -5949,10 +5949,19 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         return false;
       };
       
+      // Debug: log edge information
+      console.log(`Edge ${edge.source} -> ${edge.target}:`, {
+        sourceExecuted,
+        targetExecuted,
+        sourcePending,
+        targetPending
+      });
+
       // Se ambos os nós estão executados
       if (sourceExecuted && targetExecuted) {
         edgeColor = '#21639a';
         shouldAnimate = true; // animar conexões executadas (azuis)
+        console.log(`Animating blue edge: ${edge.source} -> ${edge.target}`);
       }
       // Se há conexão entre executado e pendente conectado
       else if (sourceExecuted && targetPending) {
@@ -5961,16 +5970,19 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           if (isValidSwitchConnection(sourceNode, targetNode, edge)) {
             edgeColor = '#fbbf24'; // amarelo para conexão válida
             shouldAnimate = true; // animar conexões pendentes válidas (amarelas)
+            console.log(`Animating yellow switch edge: ${edge.source} -> ${edge.target}`);
           }
         } else {
           edgeColor = '#fbbf24'; // amarelo para outros tipos de nós
           shouldAnimate = true; // animar conexões pendentes (amarelas)
+          console.log(`Animating yellow edge: ${edge.source} -> ${edge.target}`);
         }
       }
       // Se há conexão entre pendente conectado e executado
       else if (sourcePending && targetExecuted) {
         edgeColor = '#fbbf24'; // amarelo
         shouldAnimate = true; // animar conexões pendentes (amarelas)
+        console.log(`Animating yellow reverse edge: ${edge.source} -> ${edge.target}`);
       }
       
       return {
