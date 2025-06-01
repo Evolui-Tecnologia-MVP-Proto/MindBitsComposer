@@ -6000,6 +6000,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       };
     });
 
+    console.log("🔴 Edges processadas com animação:", processedEdges);
+
     return (
       <Dialog 
         open={flowDiagramModal.isOpen} 
