@@ -5205,12 +5205,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     <div className="flex space-x-2 mb-2">
                       <button
                         onClick={() => {
-                          updateApprovalStatus(selectedFlowNode.id, 'TRUE');
+                          if (selectedFlowNode.data.isPendingConnected) {
+                            updateApprovalStatus(selectedFlowNode.id, 'TRUE');
+                          }
                         }}
+                        disabled={!selectedFlowNode.data.isPendingConnected}
                         className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all flex-1 justify-center ${
                           selectedFlowNode.data.isAproved === 'TRUE'
                             ? 'bg-green-100 border-green-300 text-green-800'
-                            : 'bg-white border-gray-300 text-gray-600 hover:bg-green-50 hover:border-green-300'
+                            : selectedFlowNode.data.isPendingConnected
+                            ? 'bg-white border-gray-300 text-gray-600 hover:bg-green-50 hover:border-green-300 cursor-pointer'
+                            : 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
                         }`}
                       >
                         <CircleCheck className="w-4 h-4" />
@@ -5219,12 +5224,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       
                       <button
                         onClick={() => {
-                          updateApprovalStatus(selectedFlowNode.id, 'FALSE');
+                          if (selectedFlowNode.data.isPendingConnected) {
+                            updateApprovalStatus(selectedFlowNode.id, 'FALSE');
+                          }
                         }}
+                        disabled={!selectedFlowNode.data.isPendingConnected}
                         className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all flex-1 justify-center ${
                           selectedFlowNode.data.isAproved === 'FALSE'
                             ? 'bg-red-100 border-red-300 text-red-800'
-                            : 'bg-white border-gray-300 text-gray-600 hover:bg-red-50 hover:border-red-300'
+                            : selectedFlowNode.data.isPendingConnected
+                            ? 'bg-white border-gray-300 text-gray-600 hover:bg-red-50 hover:border-red-300 cursor-pointer'
+                            : 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
                         }`}
                       >
                         <X className="w-4 h-4" />
