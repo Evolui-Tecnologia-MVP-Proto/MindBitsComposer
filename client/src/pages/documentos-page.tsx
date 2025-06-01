@@ -722,6 +722,7 @@ export default function DocumentosPage() {
   // Estado para controlar o side panel do inspector
   const [showFlowInspector, setShowFlowInspector] = useState(false);
   const [selectedFlowNode, setSelectedFlowNode] = useState<any>(null);
+  const [isFlowInspectorPinned, setIsFlowInspectorPinned] = useState(false);
   // Função para resetar o formulário
   const resetFormData = () => {
     console.log("🧹 LIMPANDO CAMPOS DO FORMULÁRIO");
@@ -5369,7 +5370,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 {/* Formulário dinâmico baseado no attached_Form */}
                 {selectedFlowNode.type === 'actionNode' && (selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form) && (
                   <div>
-                    <p className="text-sm font-medium text-gray-700 mb-3">Execution Form</p>
                     <div className="bg-gray-50 p-4 rounded border space-y-4">
                       {(() => {
                         try {
@@ -5814,10 +5814,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       setShowFlowInspector(true);
     };
 
-    // Handler para clique no painel (fechar inspector)
+    // Handler para clique no painel (fechar inspector apenas se não estiver pinado)
     const onPaneClick = () => {
-      setShowFlowInspector(false);
-      setSelectedFlowNode(null);
+      if (!isFlowInspectorPinned) {
+        setShowFlowInspector(false);
+        setSelectedFlowNode(null);
+      }
     };
 
     // Identificar nós não executados conectados a nós executados
