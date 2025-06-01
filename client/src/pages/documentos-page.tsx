@@ -15,7 +15,7 @@ import ReactFlow, {
   Position 
 } from 'reactflow';
 // Importing icons for custom nodes
-import { Play, Square, Cloud } from 'lucide-react';
+import { Play, Square, Cloud, Pin } from 'lucide-react';
 import 'reactflow/dist/style.css';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -4794,6 +4794,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   // Componente interno que usa useReactFlow para fit view automático
   function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode }: any) {
     const { fitView } = useReactFlow();
+    const [isPinned, setIsPinned] = useState(false);
 
     // Effect para executar fit view quando o painel inspector é aberto/fechado
     useEffect(() => {
@@ -4908,8 +4909,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     };
 
     const onPaneClick = () => {
-      setShowFlowInspector(false);
-      setSelectedFlowNode(null);
+      if (!isPinned) {
+        setShowFlowInspector(false);
+        setSelectedFlowNode(null);
+      }
     };
 
     return (
@@ -4943,9 +4946,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           </ReactFlow>
         </div>
         {showFlowInspector && selectedFlowNode && (
-          <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto">
+          <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto relative">
             <div className="space-y-4">
-              <div className="border-b pb-2">
+              <div className="border-b pb-2 relative">
                 <h3 className="text-lg font-semibold">Execution Form</h3>
                 <p className="text-sm text-gray-600 font-mono">
                   {(() => {
@@ -4960,6 +4963,19 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     return typeMap[selectedFlowNode.type] || selectedFlowNode.type;
                   })()} - {selectedFlowNode.id}
                 </p>
+                <button
+                  onClick={() => setIsPinned(!isPinned)}
+                  className={`absolute top-0 right-0 p-1 rounded transition-colors ${
+                    isPinned 
+                      ? 'text-blue-600 bg-blue-100 hover:bg-blue-200' 
+                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                  }`}
+                  title={isPinned ? "Desafixar painel" : "Fixar painel"}
+                >
+                  <Pin 
+                    className={`w-4 h-4 transition-transform ${isPinned ? 'rotate-45' : 'rotate-0'}`}
+                  />
+                </button>
               </div>
               
               <div className="space-y-3">
@@ -5049,17 +5065,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     </div>
                   </div>
                 )}
-              </div>
-
-              <div className="pt-4 border-t">
-                <Button 
-                  onClick={() => setShowFlowInspector(false)}
-                  variant="outline"
-                  size="sm"
-                  className="w-full"
-                >
-                  Fechar Inspetor
-                </Button>
               </div>
             </div>
           </div>
