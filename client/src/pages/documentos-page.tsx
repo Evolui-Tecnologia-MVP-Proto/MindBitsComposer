@@ -4919,7 +4919,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     // Função helper para extrair dados do formulário
     const getFormFields = () => {
       try {
+        if (!selectedFlowNode) {
+          console.log('🔍 getFormFields: Nenhum nó selecionado');
+          return {};
+        }
+        
         const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+        console.log('🔍 getFormFields: dados brutos', {
+          nodeId: selectedFlowNode.id,
+          attachedFormData,
+          hasForm: !!attachedFormData
+        });
+        
         if (!attachedFormData) return {};
         
         const correctedData = attachedFormData
@@ -4928,8 +4939,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           .replace(/\]\s*\]/g, ']}');
         
         const parsedData = JSON.parse(correctedData);
-        return parsedData.Fields || {};
+        const fields = parsedData.Fields || {};
+        console.log('🔍 getFormFields: campos extraídos', fields);
+        return fields;
       } catch (e) {
+        console.log('🔍 getFormFields: erro', e);
         return {};
       }
     };
