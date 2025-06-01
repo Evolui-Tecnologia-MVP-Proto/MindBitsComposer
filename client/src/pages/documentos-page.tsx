@@ -89,6 +89,8 @@ import {
 
 // Custom node components for React Flow
 const StartNodeComponent = (props: any) => {
+  const isSelected = props.selected;
+  
   const getBackgroundColor = () => {
     if (props.data.isExecuted === 'TRUE') return 'bg-[#21639a]';
     if (props.data.isPendingConnected) return 'bg-yellow-200';
@@ -98,13 +100,21 @@ const StartNodeComponent = (props: any) => {
   const getTextColor = () => {
     return props.data.isExecuted === 'TRUE' ? 'text-white' : 'text-black';
   };
+  
+  // Classes para realce do nó selecionado
+  const selectionStyle = isSelected 
+    ? 'ring-4 ring-orange-400 ring-opacity-75 shadow-lg shadow-orange-200 scale-105' 
+    : '';
+  const borderStyle = isSelected 
+    ? 'border-orange-500 border-4' 
+    : 'border-black border-2';
 
   return (
     <div className={`relative px-4 py-2 rounded-full shadow-md min-w-[100px] text-center transition-all duration-200 ${
       getBackgroundColor()
     } ${
       getTextColor()
-    } border-black border-2`}>
+    } ${borderStyle} ${selectionStyle}`}>
       <Play className="absolute -top-4 -left-3 h-6 w-6 text-green-600" />
       {props.data.showLabel !== false && (
         <div className="font-medium font-mono">{props.data.label}</div>
@@ -131,6 +141,8 @@ const StartNodeComponent = (props: any) => {
 };
 
 const EndNodeComponent = (props: any) => {
+  const isSelected = props.selected;
+  
   const getBackgroundColor = () => {
     if (props.data.isExecuted === 'TRUE') return 'bg-[#21639a]';
     if (props.data.isPendingConnected) return 'bg-yellow-200';
@@ -140,6 +152,14 @@ const EndNodeComponent = (props: any) => {
   const getTextColor = () => {
     return props.data.isExecuted === 'TRUE' ? 'text-white' : 'text-black';
   };
+  
+  // Classes para realce do nó selecionado
+  const selectionStyle = isSelected 
+    ? 'ring-4 ring-orange-400 ring-opacity-75 shadow-lg shadow-orange-200 scale-105' 
+    : '';
+  const borderStyle = isSelected 
+    ? 'border-orange-500 border-4' 
+    : 'border-black border-2';
 
   // Hook para buscar fluxos de documentos
   const { data: documentsFlowsList } = useQuery({
@@ -202,6 +222,7 @@ const EndNodeComponent = (props: any) => {
 const ActionNodeComponent = (props: any) => {
   const isExecuted = props.data.isExecuted === 'TRUE';
   const isPendingConnected = props.data.isPendingConnected;
+  const isSelected = props.selected;
   const { getNodes, setNodes } = useReactFlow();
   
   let backgroundClass = 'bg-white';
@@ -209,6 +230,14 @@ const ActionNodeComponent = (props: any) => {
   else if (isPendingConnected) backgroundClass = 'bg-yellow-200';
   
   const textClass = isExecuted ? 'text-white' : 'text-black';
+  
+  // Classes para realce do nó selecionado
+  const selectionStyle = isSelected 
+    ? 'ring-4 ring-orange-400 ring-opacity-75 shadow-lg shadow-orange-200 scale-105' 
+    : '';
+  const borderStyle = isSelected 
+    ? 'border-orange-500 border-4' 
+    : 'border-black border-2';
 
   // Função para atualizar o status de aprovação diretamente no nó
   const updateApprovalStatus = (newStatus: string) => {
@@ -239,7 +268,7 @@ const ActionNodeComponent = (props: any) => {
   };
   
   return (
-    <div className={`relative px-4 py-2 rounded-lg shadow-md min-w-[120px] text-center transition-all duration-200 ${backgroundClass} ${textClass} border-black border-2`}>
+    <div className={`relative px-4 py-2 rounded-lg shadow-md min-w-[120px] text-center transition-all duration-200 ${backgroundClass} ${textClass} ${borderStyle} ${selectionStyle}`}>
       <Zap className="absolute top-1 left-0 h-6 w-6 text-yellow-600" />
       
       {/* Checkboxes de aprovação - apenas se o nó tem campo isAproved */}
