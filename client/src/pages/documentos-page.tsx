@@ -5276,7 +5276,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               node.data.isPendingConnected && 
               node.data.isExecuted !== 'TRUE') {
             
-            console.log(`🔄 Processando endNode de encerramento direto automaticamente: ${node.id}`);
+            console.log(`🔄 GATILHO AUTOMÁTICO: Processando endNode de encerramento direto: ${node.id}`);
             hasDirectEndNodeChanges = true;
             
             updatedNodes[index] = {
@@ -5289,17 +5289,21 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 completedAt: new Date().toISOString()
               }
             };
+            
+            console.log(`✅ EndNode ${node.id} automaticamente marcado como encerrado`);
           }
         });
 
         // Verificar se todos os nós estão executados para marcar o fluxo como completo
-        if (hasDirectEndNodeChanges) {
+        if (hasDirectEndNodeChanges || updatedNodes.every(node => 
+            node.data.isExecuted === 'TRUE' || node.type === 'startNode'
+          )) {
           const allNodesExecuted = updatedNodes.every(node => 
             node.data.isExecuted === 'TRUE' || node.type === 'startNode'
           );
 
           if (allNodesExecuted) {
-            console.log('🎯 Fluxo completo detectado - marcando documento como completed');
+            console.log('🎯 FLUXO COMPLETO: Todos os nós executados - marcando documento como completed');
             documentCompleted = true;
           }
         }
