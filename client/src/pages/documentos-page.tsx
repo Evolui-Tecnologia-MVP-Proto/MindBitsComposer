@@ -4787,6 +4787,140 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   }
 
+  // Estado para controlar o side panel do inspector
+  const [showFlowInspector, setShowFlowInspector] = useState(false);
+  const [selectedFlowNode, setSelectedFlowNode] = useState<any>(null);
+
+  // Função para renderizar o inspector de propriedades do fluxo
+  const renderFlowInspector = () => {
+    if (!selectedFlowNode) return null;
+    
+    const getNodeTypeLabel = (nodeType: string) => {
+      const typeMap: { [key: string]: string } = {
+        'startNode': 'Início',
+        'endNode': 'Fim',
+        'actionNode': 'Ação',
+        'documentNode': 'Documento',
+        'integrationNode': 'Integração',
+        'switchNode': 'Condição'
+      };
+      return typeMap[nodeType] || nodeType;
+    };
+
+    return (
+      <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto">
+        <div className="space-y-4">
+          <div className="border-b pb-2">
+            <h3 className="text-lg font-semibold">Inspetor de Propriedades</h3>
+            <p className="text-sm text-gray-600 font-mono">
+              {getNodeTypeLabel(selectedFlowNode.type)} - {selectedFlowNode.id}
+            </p>
+          </div>
+          
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm font-medium text-gray-700">Status de Execução</p>
+              <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                selectedFlowNode.data.isExecuted === 'TRUE' 
+                  ? 'bg-blue-100 text-blue-800' 
+                  : selectedFlowNode.data.isPendingConnected
+                  ? 'bg-yellow-100 text-yellow-800'
+                  : 'bg-gray-100 text-gray-800'
+              }`}>
+                {selectedFlowNode.data.isExecuted === 'TRUE' 
+                  ? 'Executado' 
+                  : selectedFlowNode.data.isPendingConnected
+                  ? 'Pendente Conectado'
+                  : 'Não Executado'}
+              </div>
+            </div>
+
+            {selectedFlowNode.data.actionType && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Tipo de Ação</p>
+                <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.actionType}</p>
+              </div>
+            )}
+
+            {selectedFlowNode.data.description && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Descrição</p>
+                <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded border">
+                  {selectedFlowNode.data.description}
+                </p>
+              </div>
+            )}
+
+            {selectedFlowNode.data.docType && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Tipo de Documento</p>
+                <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.docType}</p>
+              </div>
+            )}
+
+            {selectedFlowNode.data.integrType && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Tipo de Integração</p>
+                <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.integrType}</p>
+              </div>
+            )}
+
+            {selectedFlowNode.data.service && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Serviço</p>
+                <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.service}</p>
+              </div>
+            )}
+
+            {selectedFlowNode.data.FromType && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Tipo de Origem</p>
+                <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.FromType}</p>
+              </div>
+            )}
+
+            {selectedFlowNode.data.To_Flow_id && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Fluxo de Destino</p>
+                <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.To_Flow_id}</p>
+              </div>
+            )}
+
+            {selectedFlowNode.data.isAproved && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Status de Aprovação</p>
+                <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                  selectedFlowNode.data.isAproved === 'TRUE' 
+                    ? 'bg-green-100 text-green-800' 
+                    : selectedFlowNode.data.isAproved === 'FALSE'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {selectedFlowNode.data.isAproved === 'TRUE' 
+                    ? 'Aprovado' 
+                    : selectedFlowNode.data.isAproved === 'FALSE'
+                    ? 'Rejeitado'
+                    : 'Indefinido'}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="pt-4 border-t">
+            <Button 
+              onClick={() => setShowFlowInspector(false)}
+              variant="outline"
+              size="sm"
+              className="w-full"
+            >
+              Fechar Inspetor
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   function renderFlowDiagramModal() {
     console.log("🔴 RENDERIZANDO MODAL:", flowDiagramModal);
     if (!flowDiagramModal.isOpen || !flowDiagramModal.flowData) {
@@ -4833,6 +4967,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     };
 
     const { nodes, edges } = convertFlowDataToReactFlow(flowDiagramModal.flowData);
+
+    // Handler para clique em nós
+    const onNodeClick = (event: React.MouseEvent, node: any) => {
+      setSelectedFlowNode(node);
+      setShowFlowInspector(true);
+    };
+
+    // Handler para clique no painel (fechar inspector)
+    const onPaneClick = () => {
+      setShowFlowInspector(false);
+      setSelectedFlowNode(null);
+    };
 
     // Identificar nós não executados conectados a nós executados
     const pendingConnectedNodes = new Set<string>();
@@ -4928,32 +5074,37 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               Visualização do diagrama de fluxo de trabalho aplicado ao documento
             </DialogDescription>
           </DialogHeader>
-          <div className="h-[500px] w-full border rounded-lg">
+          <div className="h-[500px] w-full border rounded-lg flex">
             <ReactFlowProvider>
-              <ReactFlow
-                nodes={processedNodes}
-                edges={processedEdges}
-                nodeTypes={nodeTypes}
-                fitView
-                fitViewOptions={{
-                  padding: 0.2,
-                  minZoom: 0.1,
-                  maxZoom: 2
-                }}
-                minZoom={0.1}
-                maxZoom={2}
-                attributionPosition="bottom-left"
-                nodesDraggable={false}
-                nodesConnectable={false}
-                elementsSelectable={false}
-                panOnDrag={true}
-                zoomOnScroll={true}
-                zoomOnPinch={true}
-                zoomOnDoubleClick={false}
-              >
-                <Controls showInteractive={false} />
-                <Background />
-              </ReactFlow>
+              <div className="flex-1">
+                <ReactFlow
+                  nodes={processedNodes}
+                  edges={processedEdges}
+                  nodeTypes={nodeTypes}
+                  onNodeClick={onNodeClick}
+                  onPaneClick={onPaneClick}
+                  fitView
+                  fitViewOptions={{
+                    padding: 0.2,
+                    minZoom: 0.1,
+                    maxZoom: 2
+                  }}
+                  minZoom={0.1}
+                  maxZoom={2}
+                  attributionPosition="bottom-left"
+                  nodesDraggable={false}
+                  nodesConnectable={false}
+                  elementsSelectable={true}
+                  panOnDrag={true}
+                  zoomOnScroll={true}
+                  zoomOnPinch={true}
+                  zoomOnDoubleClick={false}
+                >
+                  <Controls showInteractive={false} />
+                  <Background />
+                </ReactFlow>
+              </div>
+              {showFlowInspector && renderFlowInspector()}
             </ReactFlowProvider>
           </div>
           <DialogFooter>
