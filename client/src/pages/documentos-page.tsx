@@ -5276,7 +5276,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         };
 
         // 5. Enviar para o servidor (atualizar execução do fluxo, não o template)
-        const requestBody = {
+        const requestBody: any = {
           flowTasks: updatedFlowTasks
         };
 
