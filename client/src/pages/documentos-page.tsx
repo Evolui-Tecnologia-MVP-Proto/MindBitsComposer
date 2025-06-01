@@ -201,12 +201,31 @@ const EndNodeComponent = (props: any) => {
 const ActionNodeComponent = (props: any) => {
   const isExecuted = props.data.isExecuted === 'TRUE';
   const isPendingConnected = props.data.isPendingConnected;
+  const { getNodes, setNodes } = useReactFlow();
   
   let backgroundClass = 'bg-white';
   if (isExecuted) backgroundClass = 'bg-[#21639a]';
   else if (isPendingConnected) backgroundClass = 'bg-yellow-200';
   
   const textClass = isExecuted ? 'text-white' : 'text-black';
+
+  // Função para atualizar o status de aprovação diretamente no nó
+  const updateApprovalStatus = (newStatus: string) => {
+    const currentNodes = getNodes();
+    const updatedNodes = currentNodes.map(node => {
+      if (node.id === props.id) {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            isAproved: newStatus
+          }
+        };
+      }
+      return node;
+    });
+    setNodes(updatedNodes);
+  };
   
   // Função para obter o texto descritivo do actionType
   const getActionTypeText = (actionTypeId: string) => {
@@ -221,6 +240,42 @@ const ActionNodeComponent = (props: any) => {
   return (
     <div className={`relative px-4 py-2 rounded-lg shadow-md min-w-[120px] text-center transition-all duration-200 ${backgroundClass} ${textClass} border-black border-2`}>
       <Zap className="absolute top-1 left-0 h-6 w-6 text-yellow-600" />
+      
+      {/* Checkboxes de aprovação - apenas se o nó tem campo isAproved */}
+      {props.data.isAproved !== undefined && !props.data.isReadonly && (
+        <div className="absolute top-1 right-1 flex space-x-1">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              updateApprovalStatus('TRUE');
+            }}
+            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+              props.data.isAproved === 'TRUE'
+                ? 'bg-green-500 border-green-600 text-white'
+                : 'bg-white border-gray-400 hover:border-green-500'
+            }`}
+            title="Aprovar"
+          >
+            {props.data.isAproved === 'TRUE' && <CircleCheck className="w-3 h-3" />}
+          </button>
+          
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              updateApprovalStatus('FALSE');
+            }}
+            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+              props.data.isAproved === 'FALSE'
+                ? 'bg-red-500 border-red-600 text-white'
+                : 'bg-white border-gray-400 hover:border-red-500'
+            }`}
+            title="Rejeitar"
+          >
+            {props.data.isAproved === 'FALSE' && <X className="w-3 h-3" />}
+          </button>
+        </div>
+      )}
+      
       {props.data.showLabel !== false && (
         <div className="font-medium font-mono">{props.data.label}</div>
       )}
@@ -5110,8 +5165,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => {
-                            // Função para rejeitar o status no diagrama
-                            console.log('Rejeitar nó:', selectedFlowNode.id);
+                            updateNodeApprovalStatus(selectedFlowNode.id, 'FALSE');
                           }}
                           className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all ${
                             selectedFlowNode.data.isAproved === 'FALSE'
