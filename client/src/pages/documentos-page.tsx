@@ -5376,10 +5376,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             : 'bg-gray-100 text-gray-800'
                         }`}>
                           {selectedFlowNode.data.isAproved === 'TRUE' 
-                            ? 'Aprovado' 
+                            ? 'SIM' 
                             : selectedFlowNode.data.isAproved === 'FALSE'
-                            ? 'Rejeitado'
-                            : 'Indefinido'}
+                            ? 'NÃO'
+                            : 'UNDEF'}
                         </div>
                       )}
                     </div>
