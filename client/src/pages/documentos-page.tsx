@@ -4888,12 +4888,98 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     };
 
     // Função para persistir as alterações no banco de dados
-    const saveChangesToDatabase = () => {
-      // Aqui seria implementada a lógica para salvar no banco de dados
+    const saveChangesToDatabase = async () => {
+      if (!selectedFlowNode || selectedFlowNode.type !== 'actionNode') {
+        console.log('Nenhum actionNode selecionado');
+        return;
+      }
+
       console.log('Salvando alterações no banco de dados...');
       
-      // Fechar o alerta
-      setShowApprovalAlert(false);
+      try {
+        // 1. Marcar o actionNode atual como executado
+        const updatedNodes = [...nodes];
+        const actionNodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
+        if (actionNodeIndex !== -1) {
+          updatedNodes[actionNodeIndex] = {
+            ...updatedNodes[actionNodeIndex],
+            data: {
+              ...updatedNodes[actionNodeIndex].data,
+              isExecuted: 'TRUE'
+            }
+          };
+        }
+
+        // 2. Encontrar nós diretamente conectados ao actionNode (originating from actionNode)
+        const connectedTargetNodeIds = edges
+          .filter(edge => edge.source === selectedFlowNode.id)
+          .map(edge => edge.target);
+
+        console.log('Nós conectados encontrados:', connectedTargetNodeIds);
+
+        // 3. Processar cada nó conectado
+        connectedTargetNodeIds.forEach(nodeId => {
+          const nodeIndex = updatedNodes.findIndex(n => n.id === nodeId);
+          if (nodeIndex !== -1) {
+            const node = updatedNodes[nodeIndex];
+            
+            // Marcar como executado
+            updatedNodes[nodeIndex] = {
+              ...node,
+              data: {
+                ...node.data,
+                isExecuted: 'TRUE',
+                // Se for switchNode, definir inputSwitch igual ao isAproved do actionNode
+                ...(node.type === 'switchNode' ? {
+                  inputSwitch: selectedFlowNode.data.isAproved
+                } : {})
+              }
+            };
+          }
+        });
+
+        // 4. Preparar dados para envio ao servidor
+        const updatedFlowTasks = {
+          ...flowData.flowTasks,
+          nodes: updatedNodes
+        };
+
+        // 5. Enviar para o servidor
+        const response = await fetch(`/api/documents-flows/${flowData.flowId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            flowTasks: updatedFlowTasks
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Erro ao salvar alterações');
+        }
+
+        console.log('Alterações salvas com sucesso');
+
+        // 6. Atualizar estado local e recarregar diagrama
+        setFlowDiagramModal(prev => ({
+          ...prev,
+          flowData: {
+            ...prev.flowData,
+            flowTasks: updatedFlowTasks
+          }
+        }));
+
+        // Fechar o alerta
+        setShowApprovalAlert(false);
+        
+        // Recarregar a lista de execuções de fluxo para atualizar dados
+        queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
+        
+      } catch (error) {
+        console.error('Erro ao salvar alterações:', error);
+        // Aqui poderia mostrar um toast de erro
+      }
     };
 
     // Effect para executar fit view quando o painel inspector é aberto/fechado
