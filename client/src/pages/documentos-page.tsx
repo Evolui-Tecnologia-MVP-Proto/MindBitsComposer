@@ -5099,6 +5099,55 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             }
           });
 
+          // Verificar endNodes de "encerramento direto" após integração manual
+          console.log('🔍 VERIFICANDO endNodes para gatilho automático após integração manual...');
+          let hasDirectEndNodeChanges = false;
+          let documentCompleted = false;
+          
+          updatedNodes.forEach((node, index) => {
+            console.log(`🔍 Nó ${node.id} - tipo: ${node.type}, endType: ${node.data?.endType}, isPendingConnected: ${node.data?.isPendingConnected}, isExecuted: ${node.data?.isExecuted}`);
+            
+            if (node.type === 'endNode' && 
+                node.data.endType === 'Encerramento Direto' && 
+                node.data.isPendingConnected && 
+                node.data.isExecuted !== 'TRUE') {
+              
+              console.log(`🔄 GATILHO AUTOMÁTICO: Processando endNode de encerramento direto: ${node.id}`);
+              hasDirectEndNodeChanges = true;
+              
+              updatedNodes[index] = {
+                ...node,
+                data: {
+                  ...node.data,
+                  isExecuted: 'TRUE',
+                  isPendingConnected: false,
+                  status: 'completed',
+                  completedAt: new Date().toISOString()
+                }
+              };
+              
+              console.log(`✅ EndNode ${node.id} automaticamente marcado como encerrado`);
+            }
+          });
+          
+          if (!hasDirectEndNodeChanges) {
+            console.log('⚠️ Nenhum endNode de encerramento direto encontrado para processamento automático');
+          }
+
+          // Verificar se todos os nós estão executados para marcar o fluxo como completo
+          if (hasDirectEndNodeChanges || updatedNodes.every(node => 
+              node.data.isExecuted === 'TRUE' || node.type === 'startNode'
+            )) {
+            const allNodesExecuted = updatedNodes.every(node => 
+              node.data.isExecuted === 'TRUE' || node.type === 'startNode'
+            );
+
+            if (allNodesExecuted) {
+              console.log('🎯 FLUXO COMPLETO: Todos os nós executados - marcando documento como completed');
+              documentCompleted = true;
+            }
+          }
+
           // Salvar alterações no banco de dados - atualizando fluxo completo
           try {
             const finalFlowTasks = {
@@ -5106,14 +5155,23 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               nodes: updatedNodes
             };
 
+            const requestBody: any = {
+              flowTasks: finalFlowTasks
+            };
+
+            // Se o documento foi marcado como completo, adicionar status e timestamp
+            if (documentCompleted) {
+              requestBody.status = 'completed';
+              requestBody.completedAt = new Date().toISOString();
+              console.log('📝 Marcando fluxo como completed no banco de dados');
+            }
+
             const response = await fetch(`/api/document-flow-executions/${flowDiagramModal.flowData.documentId}`, {
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({
-                flowTasks: finalFlowTasks
-              }),
+              body: JSON.stringify(requestBody),
             });
 
             if (!response.ok) {
