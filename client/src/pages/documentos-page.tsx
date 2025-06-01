@@ -141,6 +141,21 @@ const EndNodeComponent = (props: any) => {
     return props.data.isExecuted === 'TRUE' ? 'text-white' : 'text-black';
   };
 
+  // Hook para buscar fluxos de documentos
+  const { data: documentsFlowsList } = useQuery({
+    queryKey: ['/api/documents-flows'],
+    enabled: true
+  });
+
+  // Função para obter informações do fluxo selecionado
+  const getFlowInfo = (flowId: string) => {
+    if (!documentsFlowsList || !flowId) return null;
+    const flow = (documentsFlowsList as any[]).find((f: any) => f.id === flowId);
+    return flow ? { code: flow.code, name: flow.name } : null;
+  };
+
+  const flowInfo = props.data.To_Flow_id ? getFlowInfo(props.data.To_Flow_id) : null;
+
   return (
     <div className={`relative px-4 py-2 rounded-full shadow-md min-w-[100px] text-center transition-all duration-200 ${
       getBackgroundColor()
@@ -161,10 +176,10 @@ const EndNodeComponent = (props: any) => {
           )}
           {props.data.To_Flow_id && (
             <div className="mt-1 px-2 py-1 rounded font-mono bg-white text-black">
-              {props.data.To_Flow_code && props.data.To_Flow_name ? (
+              {flowInfo ? (
                 <>
-                  <div className="font-bold">{props.data.To_Flow_code}</div>
-                  <div className="text-[10px] leading-tight">{props.data.To_Flow_name}</div>
+                  <div className="font-bold">{flowInfo.code}</div>
+                  <div className="text-[10px] leading-tight">{flowInfo.name}</div>
                 </>
               ) : (
                 <div className="text-xs">Fluxo: {props.data.To_Flow_id}</div>
@@ -194,16 +209,31 @@ const ActionNodeComponent = (props: any) => {
   
   const textClass = isExecuted ? 'text-white' : 'text-black';
   
+  // Função para obter o texto descritivo do actionType
+  const getActionTypeText = (actionTypeId: string) => {
+    const actionTypeMap: { [key: string]: string } = {
+      'Aprove_Doc': 'Análise Externa',
+      'Intern_Aprove': 'Análise Interna', 
+      'Complete_Form': 'Preencher Formulário'
+    };
+    return actionTypeMap[actionTypeId] || actionTypeId;
+  };
+  
   return (
     <div className={`relative px-4 py-2 rounded-lg shadow-md min-w-[120px] text-center transition-all duration-200 ${backgroundClass} ${textClass} border-black border-2`}>
-      <Zap className="absolute top-1 left-1 h-5 w-5 text-yellow-600 z-10" />
+      <Zap className="absolute top-1 left-0 h-6 w-6 text-yellow-600" />
       {props.data.showLabel !== false && (
         <div className="font-medium font-mono">{props.data.label}</div>
       )}
       {props.data.configured && props.data.showLabel === false && (
         <div className={`text-xs font-medium font-mono ${textClass}`}>
-          {props.data.actionType && <div className="font-mono">{props.data.actionType}</div>}
+          {props.data.actionType && <div className="font-mono">{getActionTypeText(props.data.actionType)}</div>}
           {!props.data.actionType && <div className="font-mono">✓ Ação</div>}
+          {props.data.description && (
+            <div className="mt-2 p-2 bg-gray-100 rounded text-xs text-gray-700 border max-w-[200px]">
+              <div className="whitespace-pre-wrap break-words">{props.data.description}</div>
+            </div>
+          )}
         </div>
       )}
       <Handle 
@@ -232,28 +262,56 @@ const DocumentNodeComponent = (props: any) => {
   
   const textClass = isExecuted ? 'text-white' : 'text-black';
   
-  // Função para obter informações do tipo de documento
-  const getDocTypeInfo = (docTypeId: string) => {
-    const docTypeMap: { [key: string]: { code: string; name: string } } = {
-      'ERF': { code: 'ERF-01', name: 'Especificação Técnica da Solução' },
-      'ETS': { code: 'ETS-01', name: 'Elicitação de Requisito Funcional' },
-      'ORC': { code: 'ORC-01', name: 'Orçamento para Execução' }
-    };
-    return docTypeMap[docTypeId] || { code: docTypeId, name: docTypeId };
+  // Hook para buscar templates
+  const { data: templatesList } = useQuery({
+    queryKey: ['/api/templates/struct'],
+    enabled: true
+  });
+
+  // Função para obter informações do template selecionado
+  const getTemplateInfo = (templateId: string) => {
+    if (!templatesList || !templateId) return null;
+    const template = (templatesList as any[]).find((t: any) => t.id === templateId);
+    return template ? { code: template.code, name: template.name } : null;
   };
 
-  const docInfo = props.data.docType ? getDocTypeInfo(props.data.docType) : null;
+  const templateInfo = props.data.docType ? getTemplateInfo(props.data.docType) : null;
+
+  // Calcular altura dinâmica baseada no conteúdo
+  const calculateHeight = () => {
+    if (!props.data.configured || props.data.showLabel !== false) {
+      return 80; // Altura padrão
+    }
+    
+    if (templateInfo) {
+      const codeLength = templateInfo.code.length;
+      const nameLength = templateInfo.name.length;
+      const maxLineLength = Math.max(codeLength, nameLength);
+      
+      // Altura base + espaço adicional para texto longo
+      const baseHeight = 80;
+      const additionalHeight = Math.max(0, (maxLineLength - 15) * 2); // 2px por caractere extra
+      const nameLines = Math.ceil(nameLength / 18); // Quebra de linha a cada ~18 caracteres
+      const multiLineHeight = nameLines > 1 ? (nameLines - 1) * 12 : 0;
+      
+      return Math.min(baseHeight + additionalHeight + multiLineHeight, 120); // Máximo de 120px
+    }
+    
+    return 80;
+  };
+
+  const dynamicHeight = calculateHeight();
   
   return (
-    <div className="relative" style={{ width: '140px', height: '80px' }}>
+    <div className="relative" style={{ width: '140px', height: `${dynamicHeight}px` }}>
       <svg 
         className="absolute inset-0 pointer-events-none"
         width="140" 
-        height="80" 
-        viewBox="0 0 140 80"
+        height={dynamicHeight} 
+        viewBox={`0 0 140 ${dynamicHeight}`}
       >
         <polygon
-          points="0,0 140,0 140,64 112,80 28,64 0,64"
+          points={`0,0 140,0 140,${dynamicHeight - 16} 112,${dynamicHeight} 28,${dynamicHeight - 16} 0,${dynamicHeight - 16}`}
           fill={fillColor}
           stroke="black"
           strokeWidth="2"
@@ -269,14 +327,16 @@ const DocumentNodeComponent = (props: any) => {
           <div className={`font-medium font-mono text-sm ${textClass}`}>{props.data.label}</div>
         )}
         {props.data.configured && props.data.showLabel === false && (
-          <div className={`text-xs font-medium font-mono ${textClass}`}>
-            {docInfo ? (
+          <div className={`text-xs font-medium font-mono px-2 ${textClass}`}>
+            {templateInfo ? (
               <>
-                <div className="font-mono font-bold">{docInfo.code}</div>
-                <div className="font-mono text-[10px] leading-tight mt-0.5">{docInfo.name}</div>
+                <div className="font-mono font-bold text-center">{templateInfo.code}</div>
+                <div className="font-mono text-[9px] leading-tight mt-1 text-center break-words whitespace-normal px-1">
+                  {templateInfo.name}
+                </div>
               </>
             ) : (
-              <div className="font-mono">✓ Documento</div>
+              <div className="font-mono text-center">✓ Documento</div>
             )}
           </div>
         )}
