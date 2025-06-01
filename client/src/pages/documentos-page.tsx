@@ -4899,7 +4899,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       console.log('flowData:', flowData);
       
       try {
-        // 1. Marcar o actionNode atual como executado
+        // 1. Marcar o actionNode atual como executado e preservar o isAproved
         const updatedNodes = [...nodes];
         const actionNodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
         if (actionNodeIndex !== -1) {
@@ -4907,9 +4907,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             ...updatedNodes[actionNodeIndex],
             data: {
               ...updatedNodes[actionNodeIndex].data,
-              isExecuted: 'TRUE'
+              isExecuted: 'TRUE',
+              isAproved: selectedFlowNode.data.isAproved // Preservar o valor de aprovação
             }
           };
+          console.log('Nó atual atualizado com isAproved:', selectedFlowNode.data.isAproved);
         }
 
         // 2. Encontrar nós diretamente conectados ao actionNode (originating from actionNode)
