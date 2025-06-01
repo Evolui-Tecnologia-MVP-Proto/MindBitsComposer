@@ -5087,19 +5087,36 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               isPendingConnected: false
             }
           };
-          setNodes(updatedNodes);
+          // Processar nós conectados à integração executada
+          const outgoingConnections = edges.filter(edge => edge.source === selectedFlowNode.id);
+          console.log('🔗 Conexões de saída da integração encontradas:', outgoingConnections);
+
+          // Marcar nós conectados como pendente conectado
+          const pendingConnectedNodeIds = new Set<string>();
           
-          // Atualizar nó selecionado
-          setSelectedFlowNode({
-            ...selectedFlowNode,
-            data: {
-              ...selectedFlowNode.data,
-              isExecuted: 'TRUE',
-              isPendingConnected: false
+          outgoingConnections.forEach(edge => {
+            const targetNodeIndex = updatedNodes.findIndex(n => n.id === edge.target);
+            if (targetNodeIndex !== -1) {
+              const targetNode = updatedNodes[targetNodeIndex];
+              console.log(`🎯 Processando nó conectado: ${targetNode.id} (${targetNode.type})`);
+              
+              if (targetNode.data?.isExecuted !== 'TRUE') {
+                pendingConnectedNodeIds.add(edge.target);
+                
+                // Marcar como pendente conectado
+                updatedNodes[targetNodeIndex] = {
+                  ...targetNode,
+                  data: {
+                    ...targetNode.data,
+                    isPendingConnected: true
+                  }
+                };
+                console.log(`📝 Nó ${targetNode.id} marcado como pendente conectado`);
+              }
             }
           });
 
-          // Verificar endNodes de "encerramento direto" após integração manual
+          // Processar endNodes de "encerramento direto" automaticamente
           console.log('🔍 VERIFICANDO endNodes para gatilho automático após integração manual...');
           console.log(`📊 Total de nós no fluxo: ${updatedNodes.length}`);
           
@@ -5117,6 +5134,133 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 endNodesDirectClose++;
                 
                 if (node.data.isPendingConnected && node.data.isExecuted !== 'TRUE') {
+                  console.log(`🔄 GATILHO AUTOMÁTICO: Processando endNode de encerramento direto: ${node.id}`);
+                  hasDirectEndNodeChanges = true;
+                  
+                  updatedNodes[index] = {
+                    ...node,
+                    data: {
+                      ...node.data,
+                      isExecuted: 'TRUE',
+                      isPendingConnected: false,
+                      status: 'completed',
+                      completedAt: new Date().toISOString()
+                    }
+                  };
+                  
+                  console.log(`✅ EndNode ${node.id} automaticamente marcado como encerrado`);
+                } else {
+                  console.log(`ℹ️ EndNode ${node.id} não está pendente ou já foi executado`);
+                }
+              }
+            } else {
+              console.log(`📋 Nó ${node.id} - tipo: ${node.type}, isExecuted: ${node.data?.isExecuted}`);
+            }
+          });
+          
+          console.log(`📈 Estatísticas: ${endNodesFound} endNodes encontrados, ${endNodesDirectClose} de encerramento direto`);
+          
+          if (!hasDirectEndNodeChanges) {
+            console.log('⚠️ Nenhum endNode de encerramento direto encontrado para processamento automático');
+          }
+
+          // Verificar se todos os nós estão executados para marcar o fluxo como completo
+          if (hasDirectEndNodeChanges || updatedNodes.every(node => 
+              node.data.isExecuted === 'TRUE' || node.type === 'startNode'
+            )) {
+            const allNodesExecuted = updatedNodes.every(node => 
+              node.data.isExecuted === 'TRUE' || node.type === 'startNode'
+            );
+
+            if (allNodesExecuted) {
+              console.log('🎯 FLUXO COMPLETO: Todos os nós executados - marcando documento como completed');
+              documentCompleted = true;
+            }
+          }
+
+          setNodes(updatedNodes);
+          
+          // Atualizar nó selecionado
+          setSelectedFlowNode({
+            ...selectedFlowNode,
+            data: {
+              ...selectedFlowNode.data,
+              isExecuted: 'TRUE',
+              isPendingConnected: false
+            }
+          });
+
+          // Salvar alterações no banco de dados
+          try {
+            const finalFlowTasks = {
+              ...flowDiagramModal.flowData.flowTasks,
+              nodes: updatedNodes
+            };
+
+            const requestBody: any = {
+              flowTasks: finalFlowTasks
+            };
+
+            // Se o documento foi marcado como completo, adicionar status e timestamp
+            if (documentCompleted) {
+              requestBody.status = 'completed';
+              requestBody.completedAt = new Date().toISOString();
+              console.log('📝 Marcando fluxo como completed no banco de dados');
+            }
+
+            const response = await fetch(`/api/document-flow-executions/${flowDiagramModal.flowData.documentId}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(requestBody),
+            });
+
+            if (!response.ok) {
+              throw new Error('Erro ao salvar alterações no banco');
+            }
+
+            console.log('✅ Alterações da integração manual salvas no banco de dados');
+            
+            // Atualizar estado local
+            setFlowDiagramModal(prev => ({
+              ...prev,
+              flowData: {
+                ...prev.flowData!,
+                flowTasks: finalFlowTasks,
+                ...(documentCompleted && { 
+                  status: 'completed',
+                  completedAt: new Date().toISOString()
+                })
+              }
+            }));
+
+          } catch (error) {
+            console.error('Erro ao salvar alterações:', error);
+            setIntegrationResult({
+              status: 'error',
+              message: 'Erro ao salvar alterações no banco de dados'
+            });
+          }
+        } else {
+          setIntegrationResult({
+            status: 'error',
+            message: 'Falha na execução da integração. Tente novamente.'
+          });
+        }
+      } catch (error) {
+        setIntegrationResult({
+          status: 'error',
+          message: 'Erro durante a execução da integração'
+        });
+        console.error('Erro na integração:', error);
+      } finally {
+        setIsExecutingIntegration(false);
+      }
+    };
+
+    // Função para alterar o status de aprovação (altera estado imediatamente e mostra alerta)
+    const updateApprovalStatus = (nodeId: string, newStatus: string) => {
                   console.log(`🔄 GATILHO AUTOMÁTICO: Processando endNode de encerramento direto: ${node.id}`);
                   hasDirectEndNodeChanges = true;
                   
