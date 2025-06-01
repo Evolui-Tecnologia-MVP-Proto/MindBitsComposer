@@ -5270,6 +5270,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       }
     };
 
+    // Log para debug das edges com animação
+    console.log("🟢 FlowWithAutoFitView - Edges com animação:", processedEdges.filter(edge => edge.animated));
+
     return (
       <div className="flex-1 flex h-full w-full">
         <div className="flex-1 h-full w-full">
