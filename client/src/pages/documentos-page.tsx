@@ -5954,7 +5954,42 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             <div className="flex space-x-2">
                               <button
                                 onClick={saveChangesToDatabase}
-                                className="px-3 py-1.5 bg-orange-600 text-white text-xs font-medium rounded hover:bg-orange-700 transition-colors"
+                                disabled={!areAllFieldsFilled((() => {
+                                  try {
+                                    const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+                                    if (!attachedFormData) return {};
+                                    
+                                    const correctedData = attachedFormData
+                                      .replace(/\[\"([^"]+)\"\:\s*\[/g, '"$1":[')
+                                      .replace(/\]\s*,\s*\"([^"]+)\"\:\s*\[/g, '],"$1":[')
+                                      .replace(/\]\s*\]/g, ']}');
+                                    
+                                    const parsedData = JSON.parse(correctedData);
+                                    return parsedData.Fields || {};
+                                  } catch (e) {
+                                    return {};
+                                  }
+                                })())}
+                                className={`px-3 py-1.5 text-white text-xs font-medium rounded transition-colors ${
+                                  areAllFieldsFilled((() => {
+                                    try {
+                                      const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+                                      if (!attachedFormData) return {};
+                                      
+                                      const correctedData = attachedFormData
+                                        .replace(/\[\"([^"]+)\"\:\s*\[/g, '"$1":[')
+                                        .replace(/\]\s*,\s*\"([^"]+)\"\:\s*\[/g, '],"$1":[')
+                                        .replace(/\]\s*\]/g, ']}');
+                                      
+                                      const parsedData = JSON.parse(correctedData);
+                                      return parsedData.Fields || {};
+                                    } catch (e) {
+                                      return {};
+                                    }
+                                  })())
+                                    ? 'bg-orange-600 hover:bg-orange-700'
+                                    : 'bg-gray-400 cursor-not-allowed'
+                                }`}
                               >
                                 Salvar Alterações
                               </button>
