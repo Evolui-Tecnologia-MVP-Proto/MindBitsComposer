@@ -5404,25 +5404,92 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           // Verifica tanto attached_Form (maiúsculo) quanto attached_form (minúsculo)
                           const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
                           const formData = JSON.parse(attachedFormData);
-                          return Object.entries(formData).map(([fieldName, fieldValue]) => (
-                            <div key={fieldName} className="space-y-2">
-                              <label className="text-sm font-medium text-gray-700">{fieldName}</label>
-                              {Array.isArray(fieldValue) ? (
-                                <select className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono">
-                                  <option value="">Selecione uma opção</option>
-                                  {fieldValue.map((option, index) => (
-                                    <option key={index} value={option}>{option}</option>
-                                  ))}
-                                </select>
-                              ) : (
-                                <input
-                                  type="text"
-                                  placeholder={fieldValue || `Digite ${fieldName.toLowerCase()}`}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"
-                                />
-                              )}
-                            </div>
-                          ));
+                          return Object.entries(formData).map(([fieldName, fieldValue]) => {
+                            // Verifica se é um array de configuração com default e type
+                            if (Array.isArray(fieldValue) && fieldValue.length === 2 && 
+                                typeof fieldValue[0] === 'string' && fieldValue[0].startsWith('default:') &&
+                                typeof fieldValue[1] === 'string' && fieldValue[1].startsWith('type:')) {
+                              
+                              const defaultValue = fieldValue[0].replace('default:', '');
+                              const fieldType = fieldValue[1].replace('type:', '');
+                              
+                              return (
+                                <div key={fieldName} className="space-y-2">
+                                  <label className="text-sm font-medium text-gray-700">{fieldName}</label>
+                                  {(() => {
+                                    if (fieldType === 'longText') {
+                                      return (
+                                        <textarea
+                                          rows={4}
+                                          placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
+                                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono resize-vertical"
+                                        />
+                                      );
+                                    } else if (fieldType.startsWith('char(')) {
+                                      const maxLength = parseInt(fieldType.match(/\d+/)?.[0] || '255');
+                                      return (
+                                        <input
+                                          type="text"
+                                          maxLength={maxLength}
+                                          placeholder={defaultValue || `Digite ${fieldName.toLowerCase()} (máx. ${maxLength} caracteres)`}
+                                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"
+                                        />
+                                      );
+                                    } else if (fieldType === 'int') {
+                                      return (
+                                        <input
+                                          type="number"
+                                          step="1"
+                                          placeholder={defaultValue || `Digite um número inteiro`}
+                                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"
+                                        />
+                                      );
+                                    } else if (fieldType.startsWith('number(')) {
+                                      const precision = parseInt(fieldType.match(/\d+/)?.[0] || '2');
+                                      const step = Math.pow(10, -precision);
+                                      return (
+                                        <input
+                                          type="number"
+                                          step={step}
+                                          placeholder={defaultValue || `Digite um número (${precision} decimais)`}
+                                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"
+                                        />
+                                      );
+                                    } else {
+                                      return (
+                                        <input
+                                          type="text"
+                                          placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
+                                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"
+                                        />
+                                      );
+                                    }
+                                  })()}
+                                </div>
+                              );
+                            }
+                            
+                            // Comportamento original para arrays simples ou strings
+                            return (
+                              <div key={fieldName} className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">{fieldName}</label>
+                                {Array.isArray(fieldValue) ? (
+                                  <select className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono">
+                                    <option value="">Selecione uma opção</option>
+                                    {fieldValue.map((option, index) => (
+                                      <option key={index} value={option}>{option}</option>
+                                    ))}
+                                  </select>
+                                ) : (
+                                  <input
+                                    type="text"
+                                    placeholder={fieldValue || `Digite ${fieldName.toLowerCase()}`}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"
+                                  />
+                                )}
+                              </div>
+                            );
+                          });
                         } catch (e) {
                           const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
                           return (
