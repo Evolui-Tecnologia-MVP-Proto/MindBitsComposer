@@ -5819,7 +5819,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
     // Handler para clique no painel (fechar inspector apenas se não estiver pinado)
     const onPaneClick = () => {
-      if (!isPinned) {
+      if (!isFlowInspectorPinned) {
         setShowFlowInspector(false);
         setSelectedFlowNode(null);
       }
@@ -5975,6 +5975,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       
       return {
         ...edge,
+        animated: shouldAnimate,
         style: {
           stroke: edgeColor,
           strokeWidth: 3,
