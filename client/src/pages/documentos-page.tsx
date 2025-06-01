@@ -5436,10 +5436,57 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
 
-                {selectedFlowNode.data.docType && (
+                {/* Layout tabular 3x2 para DocumentNode */}
+                {selectedFlowNode.type === 'documentNode' && (
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Tipo de Documento</p>
-                    <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.docType}</p>
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Status Exec.</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Tipo Documento</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 text-xs">Template Info</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="bg-white">
+                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                              <div className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                                selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'bg-blue-100 text-blue-800' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'Executado' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'Pendente Conectado'
+                                  : 'Não Executado'}
+                              </div>
+                            </td>
+                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                              {selectedFlowNode.data.docType ? (
+                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                  {selectedFlowNode.data.docType}
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-xs">-</span>
+                              )}
+                            </td>
+                            <td className="px-2 py-1.5 text-center">
+                              {selectedFlowNode.data.docType ? (
+                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                  Template
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-xs">-</span>
+                              )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 )}
 
@@ -5515,60 +5562,110 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
 
-                {(selectedFlowNode.data.FromType || selectedFlowNode.type === 'startNode') && (
+                {/* Layout tabular 3x2 para StartNode e EndNode */}
+                {(selectedFlowNode.type === 'startNode' || selectedFlowNode.type === 'endNode') && (
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Status Exec./Tipo Origem</p>
-                    <div className="flex space-x-2">
-                      <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                        selectedFlowNode.data.isExecuted === 'TRUE' 
-                          ? 'bg-blue-100 text-blue-800' 
-                          : selectedFlowNode.data.isPendingConnected
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {selectedFlowNode.data.isExecuted === 'TRUE' 
-                          ? 'Executado' 
-                          : selectedFlowNode.data.isPendingConnected
-                          ? 'Pendente Conectado'
-                          : 'Não Executado'}
-                      </div>
-                      {selectedFlowNode.data.FromType && (
-                        <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          {selectedFlowNode.data.FromType}
-                        </div>
-                      )}
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Status Exec.</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Tipo Origem</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 text-xs">Fluxo Destino</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="bg-white">
+                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                              <div className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                                selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'bg-blue-100 text-blue-800' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'Executado' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'Pendente Conectado'
+                                  : 'Não Executado'}
+                              </div>
+                            </td>
+                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                              {selectedFlowNode.data.FromType ? (
+                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                  {selectedFlowNode.data.FromType}
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-xs">-</span>
+                              )}
+                            </td>
+                            <td className="px-2 py-1.5 text-center">
+                              {selectedFlowNode.data.To_Flow_id ? (
+                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                  Fluxo
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-xs">-</span>
+                              )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 )}
 
-                {/* Status Exec./Campo Switch/Input apenas para SwitchNode */}
+                {/* Layout tabular 3x2 para SwitchNode */}
                 {selectedFlowNode.type === 'switchNode' && (
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Status Exec./Campo Switch/Input</p>
-                    <div className="flex space-x-2">
-                      <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                        selectedFlowNode.data.isExecuted === 'TRUE' 
-                          ? 'bg-blue-100 text-blue-800' 
-                          : selectedFlowNode.data.isPendingConnected
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {selectedFlowNode.data.isExecuted === 'TRUE' 
-                          ? 'Executado' 
-                          : selectedFlowNode.data.isPendingConnected
-                          ? 'Pendente Conectado'
-                          : 'Não Executado'}
-                      </div>
-                      {selectedFlowNode.data.switchField && (
-                        <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                          {selectedFlowNode.data.switchField}
-                        </div>
-                      )}
-                      {selectedFlowNode.data.inputSwitch && (
-                        <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800">
-                          {selectedFlowNode.data.inputSwitch}
-                        </div>
-                      )}
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Status Exec.</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Campo Switch</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 text-xs">Input Switch</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="bg-white">
+                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                              <div className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                                selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'bg-blue-100 text-blue-800' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'Executado' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'Pendente Conectado'
+                                  : 'Não Executado'}
+                              </div>
+                            </td>
+                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                              {selectedFlowNode.data.switchField ? (
+                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                  {selectedFlowNode.data.switchField}
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-xs">-</span>
+                              )}
+                            </td>
+                            <td className="px-2 py-1.5 text-center">
+                              {selectedFlowNode.data.inputSwitch ? (
+                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800">
+                                  {selectedFlowNode.data.inputSwitch}
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-xs">-</span>
+                              )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 )}
