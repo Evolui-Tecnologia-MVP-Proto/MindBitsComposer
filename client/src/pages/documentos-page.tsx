@@ -4916,14 +4916,49 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     // Estado para controlar os valores dos campos do formulário
     const [formValues, setFormValues] = useState<Record<string, string>>({});
     
+    // Função helper para extrair dados do formulário
+    const getFormFields = () => {
+      try {
+        const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+        if (!attachedFormData) return {};
+        
+        const correctedData = attachedFormData
+          .replace(/\[\"([^"]+)\"\:\s*\[/g, '"$1":[')
+          .replace(/\]\s*,\s*\"([^"]+)\"\:\s*\[/g, '],"$1":[')
+          .replace(/\]\s*\]/g, ']}');
+        
+        const parsedData = JSON.parse(correctedData);
+        return parsedData.Fields || {};
+      } catch (e) {
+        return {};
+      }
+    };
+
     // Função para verificar se todos os campos obrigatórios estão preenchidos
-    const areAllFieldsFilled = (fieldsData: any) => {
-      if (!fieldsData || typeof fieldsData !== 'object') return false;
+    const areAllFieldsFilled = () => {
+      const fieldsData = getFormFields();
+      const fieldNames = Object.keys(fieldsData);
       
-      return Object.keys(fieldsData).every(fieldName => {
-        const value = formValues[fieldName];
-        return value && value.trim() !== '';
+      console.log('🔍 Validação de campos:', {
+        fieldsData,
+        fieldNames,
+        formValues,
+        hasFields: fieldNames.length > 0
       });
+      
+      // Se não há campos, permite salvar
+      if (fieldNames.length === 0) return true;
+      
+      // Verifica se todos os campos têm valores preenchidos
+      const allFilled = fieldNames.every(fieldName => {
+        const value = formValues[fieldName];
+        const isFilled = value && value.trim() !== '';
+        console.log(`Campo ${fieldName}: valor="${value}", preenchido=${isFilled}`);
+        return isFilled;
+      });
+      
+      console.log('🔍 Resultado da validação:', allFilled);
+      return allFilled;
     };
 
     // Função para alterar o status de aprovação (altera estado imediatamente e mostra alerta)
@@ -5954,39 +5989,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             <div className="flex space-x-2">
                               <button
                                 onClick={saveChangesToDatabase}
-                                disabled={!areAllFieldsFilled((() => {
-                                  try {
-                                    const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
-                                    if (!attachedFormData) return {};
-                                    
-                                    const correctedData = attachedFormData
-                                      .replace(/\[\"([^"]+)\"\:\s*\[/g, '"$1":[')
-                                      .replace(/\]\s*,\s*\"([^"]+)\"\:\s*\[/g, '],"$1":[')
-                                      .replace(/\]\s*\]/g, ']}');
-                                    
-                                    const parsedData = JSON.parse(correctedData);
-                                    return parsedData.Fields || {};
-                                  } catch (e) {
-                                    return {};
-                                  }
-                                })())}
+                                disabled={!areAllFieldsFilled()}
                                 className={`px-3 py-1.5 text-white text-xs font-medium rounded transition-colors ${
-                                  areAllFieldsFilled((() => {
-                                    try {
-                                      const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
-                                      if (!attachedFormData) return {};
-                                      
-                                      const correctedData = attachedFormData
-                                        .replace(/\[\"([^"]+)\"\:\s*\[/g, '"$1":[')
-                                        .replace(/\]\s*,\s*\"([^"]+)\"\:\s*\[/g, '],"$1":[')
-                                        .replace(/\]\s*\]/g, ']}');
-                                      
-                                      const parsedData = JSON.parse(correctedData);
-                                      return parsedData.Fields || {};
-                                    } catch (e) {
-                                      return {};
-                                    }
-                                  })())
+                                  areAllFieldsFilled()
                                     ? 'bg-orange-600 hover:bg-orange-700'
                                     : 'bg-gray-400 cursor-not-allowed'
                                 }`}
