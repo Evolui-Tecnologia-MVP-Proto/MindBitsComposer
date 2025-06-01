@@ -5270,7 +5270,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         let hasDirectEndNodeChanges = false;
         let documentCompleted = false;
         
+        console.log('🔍 VERIFICANDO endNodes para gatilho automático...');
         updatedNodes.forEach((node, index) => {
+          console.log(`🔍 Nó ${node.id} - tipo: ${node.type}, endType: ${node.data?.endType}, isPendingConnected: ${node.data?.isPendingConnected}, isExecuted: ${node.data?.isExecuted}`);
+          
           if (node.type === 'endNode' && 
               node.data.endType === 'Encerramento Direto' && 
               node.data.isPendingConnected && 
@@ -5293,6 +5296,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             console.log(`✅ EndNode ${node.id} automaticamente marcado como encerrado`);
           }
         });
+        
+        if (!hasDirectEndNodeChanges) {
+          console.log('⚠️ Nenhum endNode de encerramento direto encontrado para processamento automático');
+        }
 
         // Verificar se todos os nós estão executados para marcar o fluxo como completo
         if (hasDirectEndNodeChanges || updatedNodes.every(node => 
