@@ -109,27 +109,54 @@ const StartNodeComponent = (props: any) => {
     ? 'border-orange-500 border-4' 
     : 'border-black border-2';
 
+  const isExecuted = props.data.isExecuted === 'TRUE';
+  const isPendingConnected = props.data.isPendingConnected;
+
   return (
-    <div className={`relative px-4 py-2 rounded-full shadow-md min-w-[100px] text-center transition-all duration-200 ${
-      getBackgroundColor()
-    } ${
-      getTextColor()
-    } ${borderStyle} ${selectionStyle}`}>
+    <div className={`relative shadow-md transition-all duration-200 ${borderStyle} ${selectionStyle}`}
+         style={{ width: 137, height: 57 }}>
       <Play className="absolute -top-4 -left-3 h-6 w-6 text-green-600" />
-      {props.data.showLabel !== false && (
-        <div className="font-medium font-mono">{props.data.label}</div>
-      )}
-      {props.data.configured && props.data.showLabel === false && (
-        <div className="text-xs font-medium font-mono">
-          {props.data.FromType && (
-            <div className={`px-2 py-1 rounded font-mono ${getTextColor()}`}>
-              {props.data.FromType === 'Init' ? 'Início Direto' : 
-               props.data.FromType === 'flow_init' ? 'Transferência de Fluxo' : props.data.FromType}
+      
+      {/* Container principal com layout tabular 3x2 */}
+      <div className={`w-full h-full rounded ${getBackgroundColor()} ${getTextColor()} p-1`}>
+        <div className="grid grid-cols-3 grid-rows-2 gap-0.5 h-full w-full text-center">
+          {/* Linha 1 */}
+          <div className="flex items-center justify-center">
+            <div className={`inline-flex px-1 py-0.5 rounded text-xs font-medium ${
+              isExecuted 
+                ? 'bg-blue-100 text-blue-800' 
+                : isPendingConnected
+                ? 'bg-yellow-100 text-yellow-800'
+                : 'bg-gray-100 text-gray-800'
+            }`}>
+              {isExecuted ? 'Exec.' : isPendingConnected ? 'Pend.' : 'N.Exec.'}
             </div>
-          )}
-          {!props.data.FromType && <div className={`font-mono ${getTextColor()}`}>✓ Início</div>}
+          </div>
+          <div className="flex items-center justify-center">
+            <div className="inline-flex px-1 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+              Início
+            </div>
+          </div>
+          <div className="flex items-center justify-center">
+            {props.data.FromType ? (
+              <div className="inline-flex px-1 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800">
+                {props.data.FromType === 'Init' ? 'Dir.' : 
+                 props.data.FromType === 'flow_init' ? 'Transf.' : props.data.FromType}
+              </div>
+            ) : (
+              <span className="text-gray-400 text-xs">-</span>
+            )}
+          </div>
+          
+          {/* Linha 2 */}
+          <div className="col-span-3 flex items-center justify-center">
+            <span className="text-xs font-mono font-medium">
+              {props.data.label || 'Start'}
+            </span>
+          </div>
         </div>
-      )}
+      </div>
+      
       <Handle 
         type="source" 
         position={Position.Bottom} 
