@@ -4916,6 +4916,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     // Estado para controlar os valores dos campos do formulário
     const [formValues, setFormValues] = useState<Record<string, string>>({});
     
+    // Estado para controlar resultado da execução de integração
+    const [integrationResult, setIntegrationResult] = useState<{
+      status: 'success' | 'error' | null;
+      message: string;
+    }>({ status: null, message: '' });
+    
     // Carregar dados salvos quando um nó é selecionado
     useEffect(() => {
       if (selectedFlowNode && selectedFlowNode.data.formData) {
@@ -4925,6 +4931,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         // Limpar formulário se não há dados salvos
         setFormValues({});
       }
+      
+      // Limpar resultado da integração ao mudar de nó
+      setIntegrationResult({ status: null, message: '' });
     }, [selectedFlowNode?.id, selectedFlowNode?.data.formData]);
     
     // Função helper para extrair dados do formulário
@@ -5046,6 +5055,56 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       // Mostrar alerta para persistir alterações
       console.log('🔴 Definindo showApprovalAlert para true');
       setShowApprovalAlert(true);
+    };
+
+    // Função para executar integração manual
+    const executeManualIntegration = async () => {
+      if (!selectedFlowNode || selectedFlowNode.type !== 'integrationNode') {
+        console.log('Nenhum integrationNode selecionado');
+        return;
+      }
+
+      console.log('Executando integração manual...');
+      
+      // Simular execução - 70% chance de sucesso
+      const isSuccess = Math.random() > 0.3;
+      
+      if (isSuccess) {
+        setIntegrationResult({
+          status: 'success',
+          message: `Integração executada com sucesso! A função ${selectedFlowNode.data.callType || 'callJob'} foi processada e ${selectedFlowNode.data.integrType || 'dados'} foram sincronizados com o serviço ${selectedFlowNode.data.service || 'externo'}.`
+        });
+        
+        // Marcar o nó como executado
+        const updatedNodes = [...nodes];
+        const nodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
+        if (nodeIndex !== -1) {
+          updatedNodes[nodeIndex] = {
+            ...updatedNodes[nodeIndex],
+            data: {
+              ...updatedNodes[nodeIndex].data,
+              isExecuted: 'TRUE',
+              isPendingConnected: false
+            }
+          };
+          setNodes(updatedNodes);
+          
+          // Atualizar nó selecionado
+          setSelectedFlowNode({
+            ...selectedFlowNode,
+            data: {
+              ...selectedFlowNode.data,
+              isExecuted: 'TRUE',
+              isPendingConnected: false
+            }
+          });
+        }
+      } else {
+        setIntegrationResult({
+          status: 'error',
+          message: `Falha na execução da integração. Erro ao executar a função ${selectedFlowNode.data.callType || 'callJob'}. Verifique a conectividade com o serviço ${selectedFlowNode.data.service || 'externo'} e tente novamente.`
+        });
+      }
     };
 
     // Função para persistir as alterações no banco de dados
@@ -5859,6 +5918,44 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     <p className="text-xs text-blue-800 font-mono mt-1">
                       {selectedFlowNode.data.jobId || 'N/A'}
                     </p>
+                  </div>
+                )}
+
+                {selectedFlowNode.data.callType?.toLowerCase() === 'manual' && selectedFlowNode.data.isPendingConnected && (
+                  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="mb-3">
+                      <p className="text-sm text-yellow-800 mb-2">
+                        Ao clicar no botão você executará a função <span className="font-semibold">{selectedFlowNode.data.callType || 'callJob'}</span> que <span className="font-semibold">{selectedFlowNode.data.integrType || 'sincroniza dados'}</span> com o serviço <span className="font-semibold">{selectedFlowNode.data.service || 'externo'}</span>. Pressione para continuar.
+                      </p>
+                    </div>
+
+                    {integrationResult.status && (
+                      <div className={`mb-3 p-3 rounded-md ${
+                        integrationResult.status === 'success' 
+                          ? 'bg-green-50 border border-green-200' 
+                          : 'bg-red-50 border border-red-200'
+                      }`}>
+                        <p className={`text-sm ${
+                          integrationResult.status === 'success' 
+                            ? 'text-green-800' 
+                            : 'text-red-800'
+                        }`}>
+                          {integrationResult.message}
+                        </p>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={executeManualIntegration}
+                      disabled={selectedFlowNode.data.isExecuted === 'TRUE'}
+                      className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                        selectedFlowNode.data.isExecuted === 'TRUE'
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-yellow-600 text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2'
+                      }`}
+                    >
+                      {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Já Executado' : 'Executar'}
+                    </button>
                   </div>
                 )}
 
