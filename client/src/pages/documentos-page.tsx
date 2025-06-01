@@ -5233,7 +5233,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     </div>
                     
                     {/* Caixa de alerta para confirmação */}
-                    {showApprovalAlert && (
+                    {showApprovalAlert && selectedFlowNode.data.isAproved !== 'UNDEF' && (
                       <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
                         <div className="flex items-start space-x-2">
                           <div className="flex-shrink-0">
