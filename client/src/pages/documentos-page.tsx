@@ -5425,18 +5425,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 {(selectedFlowNode.data.integrType || selectedFlowNode.type === 'integrationNode') && (
                   <div>
                     <div className="border border-gray-200 rounded-lg overflow-hidden">
-                      <table className="w-full text-sm">
+                      <table className="w-full text-xs">
                         <thead>
                           <tr className="bg-gray-50">
-                            <th className="px-3 py-2 text-left font-medium text-gray-700 border-r border-gray-200">Status Exec.</th>
-                            <th className="px-3 py-2 text-left font-medium text-gray-700 border-r border-gray-200">Dir.Integr.</th>
-                            <th className="px-3 py-2 text-left font-medium text-gray-700">Tipo Integr.</th>
+                            <th className="px-2 py-1.5 text-left font-medium text-gray-700 border-r border-gray-200 text-xs">Status Exec.</th>
+                            <th className="px-2 py-1.5 text-left font-medium text-gray-700 border-r border-gray-200 text-xs">Dir.Integr.</th>
+                            <th className="px-2 py-1.5 text-left font-medium text-gray-700 text-xs">Tipo Integr.</th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr className="bg-white">
-                            <td className="px-3 py-2 border-r border-gray-200">
-                              <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                            <td className="px-2 py-1.5 border-r border-gray-200">
+                              <div className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${
                                 selectedFlowNode.data.isExecuted === 'TRUE' 
                                   ? 'bg-blue-100 text-blue-800' 
                                   : selectedFlowNode.data.isPendingConnected
@@ -5450,18 +5450,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   : 'Não Executado'}
                               </div>
                             </td>
-                            <td className="px-3 py-2 border-r border-gray-200">
+                            <td className="px-2 py-1.5 border-r border-gray-200">
                               {selectedFlowNode.data.integrType ? (
-                                <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
                                   {selectedFlowNode.data.integrType}
                                 </div>
                               ) : (
                                 <span className="text-gray-400 text-xs">-</span>
                               )}
                             </td>
-                            <td className="px-3 py-2">
+                            <td className="px-2 py-1.5">
                               {selectedFlowNode.data.callType ? (
-                                <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                                   {selectedFlowNode.data.callType}
                                 </div>
                               ) : (
