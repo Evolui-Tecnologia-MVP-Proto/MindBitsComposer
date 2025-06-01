@@ -5426,7 +5426,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             return null;
                           }
                           
-                          // Converte Fields para objeto se for array
+                          // Converte Fields para objeto se for array - só processa se vai mostrar
                           let fieldsData = formData.Fields;
                           if (Array.isArray(formData.Fields)) {
                             fieldsData = {};
@@ -5445,66 +5445,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           return (
                             <div className="bg-gray-50 p-4 rounded border space-y-4">
                               {Object.entries(fieldsData).map(([fieldName, fieldValue]) => {
-                                // Verifica se é um array de configuração com default e type
-                                if (Array.isArray(fieldValue) && fieldValue.length === 2 && 
-                                    typeof fieldValue[0] === 'string' && fieldValue[0].startsWith('default:') &&
-                                    typeof fieldValue[1] === 'string' && fieldValue[1].startsWith('type:')) {
-                                  
-                                  const defaultValue = fieldValue[0].replace('default:', '');
-                                  const fieldType = fieldValue[1].replace('type:', '');
-                                  const isReadonly = !selectedFlowNode.data.isPendingConnected;
-                                  const baseClasses = "w-full px-3 py-2 border rounded-md text-xs font-mono";
-                                  const readonlyClasses = isReadonly 
-                                    ? "bg-gray-50 border-gray-200 text-gray-600 cursor-not-allowed" 
-                                    : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
-                                  
-                                  return (
-                                    <div key={fieldName} className="space-y-2">
-                                      <label className="text-sm font-medium text-gray-700">{fieldName}</label>
-                                      {fieldType === 'longText' ? (
-                                        <textarea
-                                          rows={4}
-                                          placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
-                                          readOnly={isReadonly}
-                                          className={`${baseClasses} ${readonlyClasses} resize-vertical`}
-                                        />
-                                      ) : fieldType.startsWith('char(') ? (
-                                        <input
-                                          type="text"
-                                          maxLength={parseInt(fieldType.match(/\d+/)?.[0] || '255')}
-                                          placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
-                                          readOnly={isReadonly}
-                                          className={`${baseClasses} ${readonlyClasses}`}
-                                        />
-                                      ) : fieldType === 'int' ? (
-                                        <input
-                                          type="number"
-                                          step="1"
-                                          placeholder={defaultValue || `Digite um número inteiro`}
-                                          readOnly={isReadonly}
-                                          className={`${baseClasses} ${readonlyClasses}`}
-                                        />
-                                      ) : fieldType.startsWith('number(') ? (
-                                        <input
-                                          type="number"
-                                          step={Math.pow(10, -parseInt(fieldType.match(/\d+/)?.[0] || '2'))}
-                                          placeholder={defaultValue || `Digite um número`}
-                                          readOnly={isReadonly}
-                                          className={`${baseClasses} ${readonlyClasses}`}
-                                        />
-                                      ) : (
-                                        <input
-                                          type="text"
-                                          placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
-                                          readOnly={isReadonly}
-                                          className={`${baseClasses} ${readonlyClasses}`}
-                                        />
-                                      )}
-                                    </div>
-                                  );
-                                }
+                              // Verifica se é um array de configuração com default e type
+                              if (Array.isArray(fieldValue) && fieldValue.length === 2 && 
+                                  typeof fieldValue[0] === 'string' && fieldValue[0].startsWith('default:') &&
+                                  typeof fieldValue[1] === 'string' && fieldValue[1].startsWith('type:')) {
                                 
-                                // Comportamento original para arrays simples ou strings
+                                const defaultValue = fieldValue[0].replace('default:', '');
+                                const fieldType = fieldValue[1].replace('type:', '');
                                 const isReadonly = !selectedFlowNode.data.isPendingConnected;
                                 const baseClasses = "w-full px-3 py-2 border rounded-md text-xs font-mono";
                                 const readonlyClasses = isReadonly 
@@ -5514,29 +5461,82 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                 return (
                                   <div key={fieldName} className="space-y-2">
                                     <label className="text-sm font-medium text-gray-700">{fieldName}</label>
-                                    {Array.isArray(fieldValue) ? (
-                                      <select 
-                                        disabled={isReadonly}
+                                    {fieldType === 'longText' ? (
+                                      <textarea
+                                        rows={4}
+                                        placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
+                                        readOnly={isReadonly}
+                                        className={`${baseClasses} ${readonlyClasses} resize-vertical`}
+                                      />
+                                    ) : fieldType.startsWith('char(') ? (
+                                      <input
+                                        type="text"
+                                        maxLength={parseInt(fieldType.match(/\d+/)?.[0] || '255')}
+                                        placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
+                                        readOnly={isReadonly}
                                         className={`${baseClasses} ${readonlyClasses}`}
-                                      >
-                                        <option value="">Selecione uma opção</option>
-                                        {fieldValue.map((option, index) => (
-                                          <option key={index} value={option}>{option}</option>
-                                        ))}
-                                      </select>
+                                      />
+                                    ) : fieldType === 'int' ? (
+                                      <input
+                                        type="number"
+                                        step="1"
+                                        placeholder={defaultValue || `Digite um número inteiro`}
+                                        readOnly={isReadonly}
+                                        className={`${baseClasses} ${readonlyClasses}`}
+                                      />
+                                    ) : fieldType.startsWith('number(') ? (
+                                      <input
+                                        type="number"
+                                        step={Math.pow(10, -parseInt(fieldType.match(/\d+/)?.[0] || '2'))}
+                                        placeholder={defaultValue || `Digite um número`}
+                                        readOnly={isReadonly}
+                                        className={`${baseClasses} ${readonlyClasses}`}
+                                      />
                                     ) : (
                                       <input
                                         type="text"
-                                        placeholder={fieldValue || `Digite ${fieldName.toLowerCase()}`}
+                                        placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
                                         readOnly={isReadonly}
                                         className={`${baseClasses} ${readonlyClasses}`}
                                       />
                                     )}
                                   </div>
                                 );
-                              })}
-                            </div>
-                          );
+                              }
+                              
+                              // Comportamento original para arrays simples ou strings
+                              const isReadonly = !selectedFlowNode.data.isPendingConnected;
+                              const baseClasses = "w-full px-3 py-2 border rounded-md text-xs font-mono";
+                              const readonlyClasses = isReadonly 
+                                ? "bg-gray-50 border-gray-200 text-gray-600 cursor-not-allowed" 
+                                : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+                              
+                              return (
+                                <div key={fieldName} className="space-y-2">
+                                  <label className="text-sm font-medium text-gray-700">{fieldName}</label>
+                                  {Array.isArray(fieldValue) ? (
+                                    <select 
+                                      disabled={isReadonly}
+                                      className={`${baseClasses} ${readonlyClasses}`}
+                                    >
+                                      <option value="">Selecione uma opção</option>
+                                      {fieldValue.map((option, index) => (
+                                        <option key={index} value={option}>{option}</option>
+                                      ))}
+                                    </select>
+                                  ) : (
+                                    <input
+                                      type="text"
+                                      placeholder={fieldValue || `Digite ${fieldName.toLowerCase()}`}
+                                      readOnly={isReadonly}
+                                      className={`${baseClasses} ${readonlyClasses}`}
+                                    />
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        );
                         }
                         
                         // Comportamento legado para formulários sem condição
