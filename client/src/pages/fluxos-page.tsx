@@ -98,16 +98,16 @@ const StartNode = memo(({ data, selected }: NodeProps) => {
 
 const EndNode = memo(({ data, selected }: NodeProps) => {
   const getBackgroundColor = () => {
-    if (data.FromType === 'Init') {
+    if (data.To_Type === 'Direct_finish') {
       return 'bg-[#ef4444]'; // Vermelho para encerramento direto
-    } else if (data.FromType) {
+    } else if (data.To_Type) {
       return 'bg-[#3b82f6]'; // Azul para outros tipos
     }
     return 'bg-white'; // Estado padrão: fundo branco
   };
 
   const getTextColor = () => {
-    if (data.FromType === 'Init' || data.FromType) {
+    if (data.To_Type === 'Direct_finish' || data.To_Type) {
       return 'text-white'; // Texto branco para fundos coloridos
     }
     return 'text-black'; // Texto preto para fundo branco
@@ -127,17 +127,17 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
     )}
     {data.configured && data.showLabel === false && (
       <div className="text-xs font-medium font-mono">
-        {data.FromType && (
+        {data.To_Type && (
           <div className={`px-2 py-1 rounded font-mono ${
-            data.FromType === 'Init' ? 'bg-[#ef4444] text-white' : 'bg-[#3b82f6] text-white'
+            data.To_Type === 'Direct_finish' ? 'bg-[#ef4444] text-white' : 'bg-[#3b82f6] text-white'
           }`}>
-            {data.FromType === 'Init' ? 'Encerramento Direto' : 
-             data.FromType === 'flow_init' ? 'Transferência para Fluxo' : data.FromType}
+            {data.To_Type === 'Direct_finish' ? 'Encerramento Direto' : 
+             data.To_Type === 'flow_Finish' ? 'Transferência para Fluxo' : data.To_Type}
           </div>
         )}
         {data.To_Flow_id && (
           <div className={`mt-1 px-2 py-1 rounded font-mono ${
-            data.FromType === 'Init' ? 'bg-[#ef4444] text-white' : 'bg-[#3b82f6] text-white'
+            data.To_Type === 'Direct_finish' ? 'bg-[#ef4444] text-white' : 'bg-[#3b82f6] text-white'
           }`}>
             {data.To_Flow_code && data.To_Flow_name ? (
               <>
@@ -149,7 +149,7 @@ const EndNode = memo(({ data, selected }: NodeProps) => {
             )}
           </div>
         )}
-        {!data.FromType && !data.To_Flow_id && <div className="font-mono">✓ Configurado</div>}
+        {!data.To_Type && !data.To_Flow_id && <div className="font-mono">✓ Configurado</div>}
       </div>
     )}
     <Handle type="target" position={Position.Top} className="w-4 h-4 bg-white border-2 border-blue-500" style={{ top: '-8px' }} />
@@ -1512,7 +1512,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                   return (
                     <div key={key}>
                       <Label className="text-sm font-medium capitalize">
-                        {key === 'FromType' ? 'Tipo de Início' : key}
+                        {key === 'FromType' ? 'Tipo de Início' : 
+                         key === 'To_Type' ? 'Tipo de Encerramento' : key}
                       </Label>
                       <Select 
                         value={selectedNode.data[key] || ''} 
@@ -1537,7 +1538,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                         }}
                       >
                         <SelectTrigger className="mt-1 text-left font-mono">
-                          <SelectValue placeholder={`Selecione ${key === 'FromType' ? 'tipo de início' : key}`} />
+                          <SelectValue placeholder={`Selecione ${key === 'FromType' ? 'tipo de início' : 
+                            key === 'To_Type' ? 'tipo de encerramento' : key}`} />
                         </SelectTrigger>
                         <SelectContent>
                           {options.map(([optionKey, optionValue]) => (
