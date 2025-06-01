@@ -5354,7 +5354,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           ? 'Executado' 
                           : selectedFlowNode.data.isPendingConnected
                           ? 'Pendente Conectado'
-                          : 'Não Executado'}
+                          : 'N.Exec.'}
                       </div>
                     </div>
                     <div>
@@ -5462,7 +5462,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   ? 'Executado' 
                                   : selectedFlowNode.data.isPendingConnected
                                   ? 'Pendente Conectado'
-                                  : 'Não Executado'}
+                                  : 'N.Exec.'}
                               </div>
                             </td>
                             <td className="px-2 py-1.5 border-r border-gray-200 text-center">
@@ -5515,7 +5515,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   ? 'Executado' 
                                   : selectedFlowNode.data.isPendingConnected
                                   ? 'Pendente Conectado'
-                                  : 'Não Executado'}
+                                  : 'N.Exec.'}
                               </div>
                             </td>
                             <td className="px-2 py-1.5 border-r border-gray-200 text-center">
@@ -5562,15 +5562,55 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
 
-                {/* Layout tabular 3x2 para StartNode e EndNode */}
-                {(selectedFlowNode.type === 'startNode' || selectedFlowNode.type === 'endNode') && (
+                {/* Layout tabular para StartNode - 2 colunas */}
+                {selectedFlowNode.type === 'startNode' && (
                   <div>
                     <div className="border border-gray-200 rounded-lg overflow-hidden">
                       <table className="w-full text-xs">
                         <thead>
                           <tr className="bg-gray-50">
                             <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Status Exec.</th>
-                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Tipo Origem</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 text-xs">Tipo</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="bg-white">
+                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                              <div className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                                selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'bg-blue-100 text-blue-800' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'Executado' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'Pendente Conectado'
+                                  : 'N.Exec.'}
+                              </div>
+                            </td>
+                            <td className="px-2 py-1.5 text-center">
+                              <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Início Direto
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* Layout tabular 3x2 para EndNode */}
+                {selectedFlowNode.type === 'endNode' && (
+                  <div>
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Status Exec.</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Tipo</th>
                             <th className="px-2 py-1.5 text-center font-medium text-gray-700 text-xs">Fluxo Destino</th>
                           </tr>
                         </thead>
@@ -5588,13 +5628,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   ? 'Executado' 
                                   : selectedFlowNode.data.isPendingConnected
                                   ? 'Pendente Conectado'
-                                  : 'Não Executado'}
+                                  : 'N.Exec.'}
                               </div>
                             </td>
                             <td className="px-2 py-1.5 border-r border-gray-200 text-center">
                               {selectedFlowNode.data.FromType ? (
                                 <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                  {selectedFlowNode.data.FromType}
+                                  {selectedFlowNode.data.FromType === 'Init' ? 'Encerramento Direto' : 
+                                   selectedFlowNode.data.FromType === 'flow_init' ? 'Transferência para Fluxo' : selectedFlowNode.data.FromType}
                                 </div>
                               ) : (
                                 <span className="text-gray-400 text-xs">-</span>
@@ -5642,7 +5683,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   ? 'Executado' 
                                   : selectedFlowNode.data.isPendingConnected
                                   ? 'Pendente Conectado'
-                                  : 'Não Executado'}
+                                  : 'N.Exec.'}
                               </div>
                             </td>
                             <td className="px-2 py-1.5 border-r border-gray-200 text-center">
@@ -5800,7 +5841,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   ? 'Executado' 
                   : selectedFlowNode.data.isPendingConnected
                   ? 'Pendente Conectado'
-                  : 'Não Executado'}
+                  : 'N.Exec.'}
               </div>
             </div>
 
