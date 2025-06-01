@@ -4791,6 +4791,206 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   }
 
+  // Componente interno que usa useReactFlow para fit view automático
+  const FlowWithAutoFitView = ({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode }: any) => {
+    const { fitView } = useReactFlow();
+
+    // Effect para executar fit view quando o painel inspector é aberto/fechado
+    useEffect(() => {
+      const timeoutId = setTimeout(() => {
+        fitView({
+          padding: 0.2,
+          minZoom: 0.1,
+          maxZoom: 2,
+          duration: 300
+        });
+      }, 100);
+
+      return () => clearTimeout(timeoutId);
+    }, [showFlowInspector, fitView]);
+
+    const processedNodes = flowData.flowTasks.nodes.map((node: any) => ({
+      ...node,
+      data: { ...node.data, isReadonly: true }
+    }));
+
+    const processedEdges = flowData.flowTasks.edges || [];
+
+    const nodeTypes = useMemo(() => ({
+      startNode: StartNode,
+      endNode: EndNode,
+      actionNode: ActionNode,
+      documentNode: DocumentNode,
+      integrationNode: IntegrationNode,
+      switchNode: SwitchNode
+    }), []);
+
+    const onNodeClick = (event: any, node: any) => {
+      setSelectedFlowNode(node);
+      setShowFlowInspector(true);
+    };
+
+    const onPaneClick = () => {
+      setShowFlowInspector(false);
+      setSelectedFlowNode(null);
+    };
+
+    return (
+      <div className="flex-1 flex">
+        <div className="flex-1">
+          <ReactFlow
+            nodes={processedNodes}
+            edges={processedEdges}
+            nodeTypes={nodeTypes}
+            onNodeClick={onNodeClick}
+            onPaneClick={onPaneClick}
+            fitView
+            fitViewOptions={{
+              padding: 0.2,
+              minZoom: 0.1,
+              maxZoom: 2
+            }}
+            minZoom={0.1}
+            maxZoom={2}
+            attributionPosition="bottom-left"
+            nodesDraggable={false}
+            nodesConnectable={false}
+            elementsSelectable={true}
+            panOnDrag={true}
+            zoomOnScroll={true}
+            zoomOnPinch={true}
+            zoomOnDoubleClick={false}
+          >
+            <Controls showInteractive={false} />
+            <Background />
+          </ReactFlow>
+        </div>
+        {showFlowInspector && selectedFlowNode && (
+          <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto">
+            <div className="space-y-4">
+              <div className="border-b pb-2">
+                <h3 className="text-lg font-semibold">Execution Form</h3>
+                <p className="text-sm text-gray-600 font-mono">
+                  {(() => {
+                    const typeMap: { [key: string]: string } = {
+                      'startNode': 'Início',
+                      'endNode': 'Fim',
+                      'actionNode': 'Ação',
+                      'documentNode': 'Documento',
+                      'integrationNode': 'Integração',
+                      'switchNode': 'Condição'
+                    };
+                    return typeMap[selectedFlowNode.type] || selectedFlowNode.type;
+                  })()} - {selectedFlowNode.id}
+                </p>
+              </div>
+              
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm font-medium text-gray-700">Status de Execução</p>
+                  <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                    selectedFlowNode.data.isExecuted === 'TRUE' 
+                      ? 'bg-blue-100 text-blue-800' 
+                      : selectedFlowNode.data.isPendingConnected
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {selectedFlowNode.data.isExecuted === 'TRUE' 
+                      ? 'Executado' 
+                      : selectedFlowNode.data.isPendingConnected
+                      ? 'Pendente Conectado'
+                      : 'Não Executado'}
+                  </div>
+                </div>
+
+                {selectedFlowNode.data.actionType && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Tipo de Ação</p>
+                    <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.actionType}</p>
+                  </div>
+                )}
+
+                {selectedFlowNode.data.description && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Descrição</p>
+                    <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded border">
+                      {selectedFlowNode.data.description}
+                    </p>
+                  </div>
+                )}
+
+                {selectedFlowNode.data.docType && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Tipo de Documento</p>
+                    <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.docType}</p>
+                  </div>
+                )}
+
+                {selectedFlowNode.data.integrType && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Tipo de Integração</p>
+                    <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.integrType}</p>
+                  </div>
+                )}
+
+                {selectedFlowNode.data.service && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Serviço</p>
+                    <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.service}</p>
+                  </div>
+                )}
+
+                {selectedFlowNode.data.FromType && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Tipo de Origem</p>
+                    <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.FromType}</p>
+                  </div>
+                )}
+
+                {selectedFlowNode.data.To_Flow_id && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Fluxo de Destino</p>
+                    <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.To_Flow_id}</p>
+                  </div>
+                )}
+
+                {selectedFlowNode.data.isAproved && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Status de Aprovação</p>
+                    <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                      selectedFlowNode.data.isAproved === 'TRUE' 
+                        ? 'bg-green-100 text-green-800' 
+                        : selectedFlowNode.data.isAproved === 'FALSE'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {selectedFlowNode.data.isAproved === 'TRUE' 
+                        ? 'Aprovado' 
+                        : selectedFlowNode.data.isAproved === 'FALSE'
+                        ? 'Rejeitado'
+                        : 'Indefinido'}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-4 border-t">
+                <Button 
+                  onClick={() => setShowFlowInspector(false)}
+                  variant="outline"
+                  size="sm"
+                  className="w-full"
+                >
+                  Fechar Inspetor
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // Função para renderizar o inspector de propriedades do fluxo
   const renderFlowInspector = () => {
     if (!selectedFlowNode) return null;
@@ -5074,158 +5274,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               Visualização do diagrama de fluxo de trabalho aplicado ao documento
             </DialogDescription>
           </DialogHeader>
-          <div className="h-[500px] w-full border rounded-lg flex">
+          <div className="h-[500px] w-full border rounded-lg">
             <ReactFlowProvider>
-              <div className="flex-1">
-                <ReactFlow
-                  nodes={processedNodes}
-                  edges={processedEdges}
-                  nodeTypes={nodeTypes}
-                  onNodeClick={onNodeClick}
-                  onPaneClick={onPaneClick}
-                  fitView
-                  fitViewOptions={{
-                    padding: 0.2,
-                    minZoom: 0.1,
-                    maxZoom: 2
-                  }}
-                  minZoom={0.1}
-                  maxZoom={2}
-                  attributionPosition="bottom-left"
-                  nodesDraggable={false}
-                  nodesConnectable={false}
-                  elementsSelectable={true}
-                  panOnDrag={true}
-                  zoomOnScroll={true}
-                  zoomOnPinch={true}
-                  zoomOnDoubleClick={false}
-                >
-                  <Controls showInteractive={false} />
-                  <Background />
-                </ReactFlow>
-              </div>
-              {showFlowInspector && selectedFlowNode && (
-                <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto">
-                  <div className="space-y-4">
-                    <div className="border-b pb-2">
-                      <h3 className="text-lg font-semibold">Execution Form</h3>
-                      <p className="text-sm text-gray-600 font-mono">
-                        {(() => {
-                          const typeMap: { [key: string]: string } = {
-                            'startNode': 'Início',
-                            'endNode': 'Fim',
-                            'actionNode': 'Ação',
-                            'documentNode': 'Documento',
-                            'integrationNode': 'Integração',
-                            'switchNode': 'Condição'
-                          };
-                          return typeMap[selectedFlowNode.type] || selectedFlowNode.type;
-                        })()} - {selectedFlowNode.id}
-                      </p>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-sm font-medium text-gray-700">Status de Execução</p>
-                        <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                          selectedFlowNode.data.isExecuted === 'TRUE' 
-                            ? 'bg-blue-100 text-blue-800' 
-                            : selectedFlowNode.data.isPendingConnected
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {selectedFlowNode.data.isExecuted === 'TRUE' 
-                            ? 'Executado' 
-                            : selectedFlowNode.data.isPendingConnected
-                            ? 'Pendente Conectado'
-                            : 'Não Executado'}
-                        </div>
-                      </div>
-
-                      {selectedFlowNode.data.actionType && (
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Tipo de Ação</p>
-                          <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.actionType}</p>
-                        </div>
-                      )}
-
-                      {selectedFlowNode.data.description && (
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Descrição</p>
-                          <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded border">
-                            {selectedFlowNode.data.description}
-                          </p>
-                        </div>
-                      )}
-
-                      {selectedFlowNode.data.docType && (
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Tipo de Documento</p>
-                          <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.docType}</p>
-                        </div>
-                      )}
-
-                      {selectedFlowNode.data.integrType && (
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Tipo de Integração</p>
-                          <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.integrType}</p>
-                        </div>
-                      )}
-
-                      {selectedFlowNode.data.service && (
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Serviço</p>
-                          <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.service}</p>
-                        </div>
-                      )}
-
-                      {selectedFlowNode.data.FromType && (
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Tipo de Origem</p>
-                          <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.FromType}</p>
-                        </div>
-                      )}
-
-                      {selectedFlowNode.data.To_Flow_id && (
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Fluxo de Destino</p>
-                          <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.To_Flow_id}</p>
-                        </div>
-                      )}
-
-                      {selectedFlowNode.data.isAproved && (
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Status de Aprovação</p>
-                          <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                            selectedFlowNode.data.isAproved === 'TRUE' 
-                              ? 'bg-green-100 text-green-800' 
-                              : selectedFlowNode.data.isAproved === 'FALSE'
-                              ? 'bg-red-100 text-red-800'
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {selectedFlowNode.data.isAproved === 'TRUE' 
-                              ? 'Aprovado' 
-                              : selectedFlowNode.data.isAproved === 'FALSE'
-                              ? 'Rejeitado'
-                              : 'Indefinido'}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="pt-4 border-t">
-                      <Button 
-                        onClick={() => setShowFlowInspector(false)}
-                        variant="outline"
-                        size="sm"
-                        className="w-full"
-                      >
-                        Fechar Inspetor
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              )}
+              <FlowWithAutoFitView 
+                flowData={flowDiagramModal.flowData}
+                showFlowInspector={showFlowInspector}
+                setShowFlowInspector={setShowFlowInspector}
+                setSelectedFlowNode={setSelectedFlowNode}
+                selectedFlowNode={selectedFlowNode}
+              />
             </ReactFlowProvider>
           </div>
           <DialogFooter>
