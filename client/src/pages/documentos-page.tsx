@@ -4936,10 +4936,23 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
     // Função para verificar se todos os campos obrigatórios estão preenchidos
     const areAllFieldsFilled = () => {
+      // Só valida se há um nó selecionado e é um actionNode
+      if (!selectedFlowNode || selectedFlowNode.type !== 'actionNode') {
+        return true;
+      }
+
+      // Só valida se o nó está pendente de execução
+      if (!selectedFlowNode.data.isPendingConnected) {
+        return true;
+      }
+
       const fieldsData = getFormFields();
       const fieldNames = Object.keys(fieldsData);
       
       console.log('🔍 Validação de campos:', {
+        nodeId: selectedFlowNode.id,
+        nodeType: selectedFlowNode.type,
+        isPending: selectedFlowNode.data.isPendingConnected,
         fieldsData,
         fieldNames,
         formValues,
