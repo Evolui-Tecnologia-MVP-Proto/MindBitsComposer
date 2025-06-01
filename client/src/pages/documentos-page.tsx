@@ -4994,7 +4994,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       // Verifica se todos os campos têm valores preenchidos
       const allFilled = fieldNames.every(fieldName => {
         const value = formValues[fieldName];
-        const isFilled = value && value.trim() !== '';
+        // Para campos select, verificar se não está vazio ou "Selecione uma opção"
+        const isFilled = value && value.trim() !== '' && value !== 'Selecione uma opção';
         console.log(`Campo ${fieldName}: valor="${value}", preenchido=${isFilled}`);
         return isFilled;
       });
@@ -5639,6 +5640,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   {Array.isArray(fieldValue) ? (
                                     <select 
                                       disabled={isReadonly}
+                                      value={formValues[fieldName] || ''}
+                                      onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
                                       className={`${baseClasses} ${readonlyClasses}`}
                                     >
                                       <option value="">Selecione uma opção</option>
@@ -5651,6 +5654,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                       type="text"
                                       placeholder={fieldValue || `Digite ${fieldName.toLowerCase()}`}
                                       readOnly={isReadonly}
+                                      value={formValues[fieldName] || ''}
+                                      onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
                                       className={`${baseClasses} ${readonlyClasses}`}
                                     />
                                   )}
@@ -5677,6 +5682,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   {Array.isArray(fieldValue) ? (
                                     <select 
                                       disabled={isReadonly}
+                                      value={formValues[fieldName] || ''}
+                                      onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
                                       className={`${baseClasses} ${readonlyClasses}`}
                                     >
                                       <option value="">Selecione uma opção</option>
@@ -5689,6 +5696,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                       type="text"
                                       placeholder={fieldValue || `Digite ${fieldName.toLowerCase()}`}
                                       readOnly={isReadonly}
+                                      value={formValues[fieldName] || ''}
+                                      onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
                                       className={`${baseClasses} ${readonlyClasses}`}
                                     />
                                   )}
