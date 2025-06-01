@@ -601,6 +601,10 @@ export default function DocumentosPage() {
   const [isFlowModalOpen, setIsFlowModalOpen] = useState(false);
   const [currentFlowData, setCurrentFlowData] = useState<any>(null);
   const [currentDocTitle, setCurrentDocTitle] = useState("");
+
+  // Estado para controlar o side panel do inspector
+  const [showFlowInspector, setShowFlowInspector] = useState(false);
+  const [selectedFlowNode, setSelectedFlowNode] = useState<any>(null);
   // Função para resetar o formulário
   const resetFormData = () => {
     console.log("🧹 LIMPANDO CAMPOS DO FORMULÁRIO");
@@ -4786,10 +4790,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       </Dialog>
     );
   }
-
-  // Estado para controlar o side panel do inspector
-  const [showFlowInspector, setShowFlowInspector] = useState(false);
-  const [selectedFlowNode, setSelectedFlowNode] = useState<any>(null);
 
   // Função para renderizar o inspector de propriedades do fluxo
   const renderFlowInspector = () => {
