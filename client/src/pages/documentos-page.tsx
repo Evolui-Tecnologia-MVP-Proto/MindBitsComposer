@@ -5075,28 +5075,28 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               
               <div className="space-y-3">
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Status de Execução</p>
-                  <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                    selectedFlowNode.data.isExecuted === 'TRUE' 
-                      ? 'bg-blue-100 text-blue-800' 
-                      : selectedFlowNode.data.isPendingConnected
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {selectedFlowNode.data.isExecuted === 'TRUE' 
-                      ? 'Executado' 
-                      : selectedFlowNode.data.isPendingConnected
-                      ? 'Pendente Conectado'
-                      : 'Não Executado'}
+                  <p className="text-sm font-medium text-gray-700">Status Exec./Tipo</p>
+                  <div className="flex space-x-2">
+                    <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                      selectedFlowNode.data.isExecuted === 'TRUE' 
+                        ? 'bg-blue-100 text-blue-800' 
+                        : selectedFlowNode.data.isPendingConnected
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {selectedFlowNode.data.isExecuted === 'TRUE' 
+                        ? 'Executado' 
+                        : selectedFlowNode.data.isPendingConnected
+                        ? 'Pendente Conectado'
+                        : 'Não Executado'}
+                    </div>
+                    {selectedFlowNode.data.actionType && (
+                      <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                        {selectedFlowNode.data.actionType}
+                      </div>
+                    )}
                   </div>
                 </div>
-
-                {selectedFlowNode.data.actionType && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">Tipo de Ação</p>
-                    <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.actionType}</p>
-                  </div>
-                )}
 
                 {selectedFlowNode.data.description && (
                   <div>
