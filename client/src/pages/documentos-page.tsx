@@ -5197,7 +5197,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
 
-                {selectedFlowNode.data.isAproved && (
+                {selectedFlowNode.type === 'actionNode' && selectedFlowNode.data.isAproved !== undefined && (
                   <div>
                     <p className="text-sm font-medium text-gray-700 mb-2">Status de Aprovação</p>
                     <div className="flex space-x-2 mb-2">
