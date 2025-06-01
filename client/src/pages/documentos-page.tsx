@@ -5366,55 +5366,45 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
 
-                {/* Formulário dinâmico baseado no attached_form */}
-                {selectedFlowNode.type === 'actionNode' && (
+                {/* Formulário dinâmico baseado no attached_Form */}
+                {selectedFlowNode.type === 'actionNode' && (selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form) && (
                   <div>
-                    {/* Debug: Mostrar informações do nó */}
-                    <div className="text-xs text-gray-500 mb-2">
-                      Debug - Node ID: {selectedFlowNode.id}, attached_form: {selectedFlowNode.data.attached_form || 'undefined'}
+                    <p className="text-sm font-medium text-gray-700 mb-3">Execution Form</p>
+                    <div className="bg-gray-50 p-4 rounded border space-y-4">
+                      {(() => {
+                        try {
+                          // Verifica tanto attached_Form (maiúsculo) quanto attached_form (minúsculo)
+                          const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+                          const formData = JSON.parse(attachedFormData);
+                          return Object.entries(formData).map(([fieldName, fieldValue]) => (
+                            <div key={fieldName} className="space-y-2">
+                              <label className="text-sm font-medium text-gray-700">{fieldName}</label>
+                              {Array.isArray(fieldValue) ? (
+                                <select className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                  <option value="">Selecione uma opção</option>
+                                  {fieldValue.map((option, index) => (
+                                    <option key={index} value={option}>{option}</option>
+                                  ))}
+                                </select>
+                              ) : (
+                                <input
+                                  type="text"
+                                  placeholder={fieldValue || `Digite ${fieldName.toLowerCase()}`}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                />
+                              )}
+                            </div>
+                          ));
+                        } catch (e) {
+                          const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+                          return (
+                            <div className="text-sm text-red-600">
+                              Erro ao processar formulário: {attachedFormData}
+                            </div>
+                          );
+                        }
+                      })()}
                     </div>
-                    
-                    {selectedFlowNode.data.attached_form ? (
-                      <div>
-                        <p className="text-sm font-medium text-gray-700 mb-3">Execution Form</p>
-                        <div className="bg-gray-50 p-4 rounded border space-y-4">
-                          {(() => {
-                            try {
-                              const formData = JSON.parse(selectedFlowNode.data.attached_form);
-                              return Object.entries(formData).map(([fieldName, fieldValue]) => (
-                                <div key={fieldName} className="space-y-2">
-                                  <label className="text-sm font-medium text-gray-700">{fieldName}</label>
-                                  {Array.isArray(fieldValue) ? (
-                                    <select className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                      <option value="">Selecione uma opção</option>
-                                      {fieldValue.map((option, index) => (
-                                        <option key={index} value={option}>{option}</option>
-                                      ))}
-                                    </select>
-                                  ) : (
-                                    <input
-                                      type="text"
-                                      placeholder={fieldValue || `Digite ${fieldName.toLowerCase()}`}
-                                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    />
-                                  )}
-                                </div>
-                              ));
-                            } catch (e) {
-                              return (
-                                <div className="text-sm text-red-600">
-                                  Erro ao processar formulário: {selectedFlowNode.data.attached_form}
-                                </div>
-                              );
-                            }
-                          })()}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-xs text-gray-500">
-                        Nenhum attached_form encontrado para este actionNode
-                      </div>
-                    )}
                   </div>
                 )}
 
