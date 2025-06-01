@@ -76,3 +76,6 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+
+# Attached assets (user uploads and temporary files)
+attached_assets/
