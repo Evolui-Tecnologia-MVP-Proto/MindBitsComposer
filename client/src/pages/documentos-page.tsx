@@ -4933,10 +4933,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         
         if (!attachedFormData) return {};
         
-        const correctedData = attachedFormData
-          .replace(/\[\"([^"]+)\"\:\s*\[/g, '"$1":[')
-          .replace(/\]\s*,\s*\"([^"]+)\"\:\s*\[/g, '],"$1":[')
-          .replace(/\]\s*\]/g, ']}');
+        // Corrigir o formato JSON malformado específico
+        let correctedData = attachedFormData;
+        
+        // Verificar se precisa de correção de formato
+        if (attachedFormData.includes('["') && attachedFormData.includes('": [')) {
+          correctedData = attachedFormData
+            .replace(/\[\"([^"]+)\"\:\s*\[/g, '"$1":[')
+            .replace(/\]\s*,\s*\"([^"]+)\"\:\s*\[/g, '],"$1":[')
+            .replace(/\]\s*\]/g, ']}');
+          
+          console.log('🔍 getFormFields: dados corrigidos', correctedData);
+        }
         
         const parsedData = JSON.parse(correctedData);
         const fields = parsedData.Fields || {};
