@@ -4852,17 +4852,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     const [showApprovalAlert, setShowApprovalAlert] = useState(false);
     const [pendingApprovalAction, setPendingApprovalAction] = useState<{nodeId: string, status: string} | null>(null);
 
-    // Função para iniciar o processo de aprovação/rejeição (mostra alerta)
-    const initiateApprovalAction = (nodeId: string, newStatus: string) => {
-      setPendingApprovalAction({ nodeId, status: newStatus });
-      setShowApprovalAlert(true);
-    };
-
-    // Função para confirmar e executar a alteração de status de aprovação
-    const confirmApprovalAction = () => {
-      if (!pendingApprovalAction) return;
-      
-      const { nodeId, status } = pendingApprovalAction;
+    // Função para alterar o status de aprovação (altera estado imediatamente e mostra alerta)
+    const updateApprovalStatus = (nodeId: string, newStatus: string) => {
       const currentNodes = getNodes();
       const updatedNodes = currentNodes.map(node => {
         if (node.id === nodeId) {
@@ -4870,7 +4861,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             ...node,
             data: {
               ...node.data,
-              isAproved: status
+              isAproved: newStatus
             }
           };
         }
@@ -4884,20 +4875,22 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           ...selectedFlowNode,
           data: {
             ...selectedFlowNode.data,
-            isAproved: status
+            isAproved: newStatus
           }
         });
       }
 
-      // Fechar o alerta e limpar ação pendente
-      setShowApprovalAlert(false);
-      setPendingApprovalAction(null);
+      // Mostrar alerta para persistir alterações
+      setShowApprovalAlert(true);
     };
 
-    // Função para cancelar a ação de aprovação
-    const cancelApprovalAction = () => {
+    // Função para persistir as alterações no banco de dados
+    const saveChangesToDatabase = () => {
+      // Aqui seria implementada a lógica para salvar no banco de dados
+      console.log('Salvando alterações no banco de dados...');
+      
+      // Fechar o alerta
       setShowApprovalAlert(false);
-      setPendingApprovalAction(null);
     };
 
     // Effect para executar fit view quando o painel inspector é aberto/fechado
@@ -5210,7 +5203,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     <div className="flex space-x-2 mb-2">
                       <button
                         onClick={() => {
-                          initiateApprovalAction(selectedFlowNode.id, 'TRUE');
+                          updateApprovalStatus(selectedFlowNode.id, 'TRUE');
                         }}
                         className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all flex-1 justify-center ${
                           selectedFlowNode.data.isAproved === 'TRUE'
@@ -5224,7 +5217,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       
                       <button
                         onClick={() => {
-                          initiateApprovalAction(selectedFlowNode.id, 'FALSE');
+                          updateApprovalStatus(selectedFlowNode.id, 'FALSE');
                         }}
                         className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all flex-1 justify-center ${
                           selectedFlowNode.data.isAproved === 'FALSE'
@@ -5253,16 +5246,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             </p>
                             <div className="flex space-x-2">
                               <button
-                                onClick={confirmApprovalAction}
+                                onClick={saveChangesToDatabase}
                                 className="px-3 py-1.5 bg-orange-600 text-white text-xs font-medium rounded hover:bg-orange-700 transition-colors"
                               >
                                 Salvar Alterações
-                              </button>
-                              <button
-                                onClick={cancelApprovalAction}
-                                className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded hover:bg-gray-50 transition-colors"
-                              >
-                                Cancelar
                               </button>
                             </div>
                           </div>
