@@ -5018,9 +5018,31 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     for (const edge of edges) {
       // Se o nó de origem está executado e o nó de destino não está executado
       if (executedNodes.has(edge.source)) {
+        const sourceNode = nodes.find((n: any) => n.id === edge.source);
         const targetNode = nodes.find((n: any) => n.id === edge.target);
+        
         if (targetNode && targetNode.data?.isExecuted !== 'TRUE') {
-          pendingConnectedNodes.add(edge.target);
+          // Verificar se o nó de origem é um switchNode
+          if (sourceNode?.type === 'switchNode') {
+            // Para switchNodes, verificar se a conexão está no handle correto
+            const { inputSwitch, redSwitch, greenSwitch } = sourceNode.data;
+            
+            // Determinar qual handle deveria estar ativo baseado no inputSwitch
+            let shouldBeActive = false;
+            if (edge.sourceHandle === 'a' && inputSwitch === redSwitch) {
+              shouldBeActive = true; // Handle vermelho ativo
+            } else if (edge.sourceHandle === 'c' && inputSwitch === greenSwitch) {
+              shouldBeActive = true; // Handle verde ativo
+            }
+            
+            // Apenas marcar como pendente se a conexão está no handle correto
+            if (shouldBeActive) {
+              pendingConnectedNodes.add(edge.target);
+            }
+          } else {
+            // Para outros tipos de nós, aplicar lógica normal
+            pendingConnectedNodes.add(edge.target);
+          }
         }
       }
       
