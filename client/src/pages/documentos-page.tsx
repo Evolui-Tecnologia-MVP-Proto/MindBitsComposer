@@ -5924,7 +5924,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 {selectedFlowNode.data.callType?.toLowerCase() === 'manual' && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
                   <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <div className="mb-3">
-                      <p className="text-sm text-yellow-800 mb-2">
+                      <p className="text-xs text-yellow-800 mb-2">
                         {(() => {
                           // Extrair informações do jobId
                           let functionCaption = selectedFlowNode.data.callType || 'callJob';
@@ -5945,7 +5945,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           
                           const displayName = functionName ? `${functionCaption} [${functionName}]` : functionCaption;
                           
-                          return `Ao clicar no botão você executará a função ${displayName} que ${selectedFlowNode.data.integrType || 'Atualiza Dados'} com o serviço ${selectedFlowNode.data.service || 'externo'}. Pressione para continuar.`;
+                          return (
+                            <>
+                              Ao clicar no botão você executará a função{' '}
+                              <span className="font-mono font-semibold bg-yellow-100 px-1 py-0.5 rounded text-yellow-900">
+                                {displayName}
+                              </span>
+                              {' '}que {selectedFlowNode.data.integrType || 'Atualiza Dados'} com o serviço {selectedFlowNode.data.service || 'externo'}. Pressione para continuar.
+                            </>
+                          );
                         })()}
                       </p>
                     </div>
