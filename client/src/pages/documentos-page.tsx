@@ -5424,7 +5424,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
                 {(selectedFlowNode.data.integrType || selectedFlowNode.type === 'integrationNode') && (
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Status Exec./Tipo Integr.</p>
+                    <p className="text-sm font-medium text-gray-700">Status Exec./Dir.Integr./Tipo Integr.</p>
                     <div className="flex space-x-2">
                       <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
                         selectedFlowNode.data.isExecuted === 'TRUE' 
@@ -5442,6 +5442,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       {selectedFlowNode.data.integrType && (
                         <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
                           {selectedFlowNode.data.integrType}
+                        </div>
+                      )}
+                      {selectedFlowNode.data.callType && (
+                        <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                          {selectedFlowNode.data.callType}
                         </div>
                       )}
                     </div>
