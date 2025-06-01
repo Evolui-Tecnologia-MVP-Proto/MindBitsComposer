@@ -4910,9 +4910,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   }
 
   // Componente interno que usa useReactFlow para fit view automático
-  function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode, showApprovalAlert, setShowApprovalAlert }: any) {
+  function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode, showApprovalAlert, setShowApprovalAlert, isPinned }: any) {
     const { fitView, getNodes, setNodes } = useReactFlow();
-    const [isPinned, setIsPinned] = useState(false);
 
     // Função para alterar o status de aprovação (altera estado imediatamente e mostra alerta)
     const updateApprovalStatus = (nodeId: string, newStatus: string) => {
@@ -5316,11 +5315,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   })()} - {selectedFlowNode.id}
                 </p>
                 <button
-                  onClick={() => {
-                    console.log("🔴 Clique no botão pin - Estado atual:", isFlowInspectorPinned);
-                    setIsFlowInspectorPinned(!isFlowInspectorPinned);
-                    console.log("🔴 Novo estado do pin:", !isFlowInspectorPinned);
-                  }}
+                  onClick={() => setIsFlowInspectorPinned(!isFlowInspectorPinned)}
                   className={`absolute top-0 right-0 p-1 rounded transition-colors ${
                     isFlowInspectorPinned 
                       ? 'text-blue-600 bg-blue-100 hover:bg-blue-200' 
@@ -5824,13 +5819,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
     // Handler para clique no painel (fechar inspector apenas se não estiver pinado)
     const onPaneClick = () => {
-      console.log("🔴 Clique no painel - Pin status:", isFlowInspectorPinned);
-      if (!isFlowInspectorPinned) {
-        console.log("🔴 Fechando inspector - não está pinado");
+      if (!isPinned) {
         setShowFlowInspector(false);
         setSelectedFlowNode(null);
-      } else {
-        console.log("🔴 Inspector está pinado - mantendo aberto");
       }
     };
 
@@ -6026,6 +6017,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 selectedFlowNode={selectedFlowNode}
                 showApprovalAlert={showApprovalAlert}
                 setShowApprovalAlert={setShowApprovalAlert}
+                isPinned={isFlowInspectorPinned}
               />
             </ReactFlowProvider>
           </div>
