@@ -5108,7 +5108,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto">
                   <div className="space-y-4">
                     <div className="border-b pb-2">
-                      <h3 className="text-lg font-semibold">Inspetor de Propriedades</h3>
+                      <h3 className="text-lg font-semibold">Execution Form</h3>
                       <p className="text-sm text-gray-600 font-mono">
                         {(() => {
                           const typeMap: { [key: string]: string } = {
