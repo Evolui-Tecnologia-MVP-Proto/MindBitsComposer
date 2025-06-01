@@ -2403,6 +2403,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.log("Fluxo encontrado:", flow[0].name);
 
+      console.log("Processando flow_tasks para atualizar nós de execução");
+      // Processar o flowData para atualizar os nós iniciais
+      let updatedFlowTasks = { ...flow[0].flowData } || {};
+      
+      if (updatedFlowTasks.nodes && Array.isArray(updatedFlowTasks.nodes)) {
+        // 1. Encontrar o startNode e marcar como executado
+        const startNodeIndex = updatedFlowTasks.nodes.findIndex((node: any) => node.type === 'startNode');
+        if (startNodeIndex !== -1) {
+          console.log("StartNode encontrado, marcando como executado");
+          updatedFlowTasks.nodes[startNodeIndex].data.isExecuted = 'TRUE';
+          
+          // 2. Verificar se existe integrationNode conectado diretamente ao startNode
+          const startNodeId = updatedFlowTasks.nodes[startNodeIndex].id;
+          
+          // Procurar por uma edge que conecta o startNode a um integrationNode
+          if (updatedFlowTasks.edges && Array.isArray(updatedFlowTasks.edges)) {
+            const connectedEdge = updatedFlowTasks.edges.find((edge: any) => 
+              edge.source === startNodeId
+            );
+            
+            if (connectedEdge) {
+              const targetNodeIndex = updatedFlowTasks.nodes.findIndex((node: any) => 
+                node.id === connectedEdge.target && node.type === 'integrationNode'
+              );
+              
+              if (targetNodeIndex !== -1) {
+                console.log("IntegrationNode conectado encontrado, marcando como executado");
+                updatedFlowTasks.nodes[targetNodeIndex].data.isExecuted = 'TRUE';
+              }
+            }
+          }
+        }
+      }
+
       console.log("Criando registro de execução de fluxo");
       // Criar registro de execução de fluxo
       const flowExecution = await db.insert(documentFlowExecutions)
@@ -2416,7 +2450,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             documentTitle: documento.objeto,
             initiatedAt: new Date().toISOString()
           },
-          flowTasks: flow[0].flowData || {}
+          flowTasks: updatedFlowTasks
         })
         .returning();
 
