@@ -5298,15 +5298,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             message: 'Falha na execução da integração. Tente novamente.'
           });
         }
-      } catch (error) {
-        setIntegrationResult({
-          status: 'error',
-          message: 'Erro durante a execução da integração'
-        });
-        console.error('Erro na integração:', error);
-      } finally {
-        setIsExecutingIntegration(false);
-      }
     };
 
     // Função para alterar o status de aprovação (altera estado imediatamente e mostra alerta)
