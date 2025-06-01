@@ -189,13 +189,13 @@ const EndNodeComponent = (props: any) => {
       {props.data.configured && props.data.showLabel === false && (
         <div className="text-xs font-medium font-mono">
           {props.data.FromType && (
-            <div className="px-2 py-1 rounded font-mono bg-white text-black">
+            <div className={`px-2 py-1 rounded font-mono ${getTextColor()}`}>
               {props.data.FromType === 'Init' ? 'Encerramento Direto' : 
                props.data.FromType === 'flow_init' ? 'Transferência para Fluxo' : props.data.FromType}
             </div>
           )}
           {props.data.To_Flow_id && (
-            <div className="mt-1 px-2 py-1 rounded font-mono bg-white text-black">
+            <div className={`mt-1 px-2 py-1 rounded font-mono ${getTextColor()}`}>
               {flowInfo ? (
                 <>
                   <div className="font-bold">{flowInfo.code}</div>
@@ -206,7 +206,7 @@ const EndNodeComponent = (props: any) => {
               )}
             </div>
           )}
-          {!props.data.FromType && !props.data.To_Flow_id && <div className="font-mono text-black">✓ Configurado</div>}
+          {!props.data.FromType && !props.data.To_Flow_id && <div className={`font-mono ${getTextColor()}`}>✓ Configurado</div>}
         </div>
       )}
       <Handle 
