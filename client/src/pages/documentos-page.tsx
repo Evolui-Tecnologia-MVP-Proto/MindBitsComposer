@@ -4965,6 +4965,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         }
 
         console.log('Alterações salvas com sucesso');
+        console.log('Atualizando estado local com:', updatedFlowTasks);
 
         // 6. Atualizar estado local e recarregar diagrama
         setFlowDiagramModal(prev => ({
@@ -4974,6 +4975,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             flowTasks: updatedFlowTasks
           }
         }));
+        
+        console.log('Estado local atualizado');
 
         // Fechar o alerta
         setShowApprovalAlert(false);
