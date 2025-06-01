@@ -4895,6 +4895,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       }
 
       console.log('Salvando alterações no banco de dados...');
+      console.log('selectedFlowNode:', selectedFlowNode);
+      console.log('flowData:', flowData);
       
       try {
         // 1. Marcar o actionNode atual como executado

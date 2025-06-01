@@ -3563,10 +3563,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Update a flow
   app.put("/api/documents-flows/:id", async (req: Request, res: Response) => {
-    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    console.log("PUT /api/documents-flows/:id - Recebida requisição para:", req.params.id);
+    console.log("Dados recebidos:", JSON.stringify(req.body, null, 2));
+    
+    if (!req.isAuthenticated()) {
+      console.log("Usuário não autenticado");
+      return res.status(401).send("Não autorizado");
+    }
     
     try {
       const { name, code, description, flowData } = req.body;
+      console.log("Processando flowData com", flowData?.nodes?.length || 0, "nodes");
       
       // Generate UUIDs for nodes and edges if they don't have them
       const processedFlowData = {
