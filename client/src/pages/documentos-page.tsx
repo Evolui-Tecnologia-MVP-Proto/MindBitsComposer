@@ -640,6 +640,9 @@ export default function DocumentosPage() {
     fileUrl: "",
   });
 
+  // Estado para o sistema de aprovação
+  const [showApprovalAlert, setShowApprovalAlert] = useState(false);
+
   // Estado para modal do diagrama de fluxo
   const [flowDiagramModal, setFlowDiagramModal] = useState<{
     isOpen: boolean;
@@ -4844,9 +4847,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       </Dialog>
     );
   }
-
-  // Estado para o sistema de aprovação
-  const [showApprovalAlert, setShowApprovalAlert] = useState(false);
 
   // Componente interno que usa useReactFlow para fit view automático
   function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode, showApprovalAlert, setShowApprovalAlert }: any) {
