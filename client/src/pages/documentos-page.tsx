@@ -5353,7 +5353,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         {selectedFlowNode.data.isExecuted === 'TRUE' 
                           ? 'Executado' 
                           : selectedFlowNode.data.isPendingConnected
-                          ? 'Pendente Conectado'
+                          ? 'Pendente'
                           : 'N.Exec.'}
                       </div>
                     </div>
@@ -5436,7 +5436,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
 
-                {/* Layout tabular 3x2 para DocumentNode */}
+                {/* Layout tabular para DocumentNode - 2 colunas */}
                 {selectedFlowNode.type === 'documentNode' && (
                   <div>
                     <div className="border border-gray-200 rounded-lg overflow-hidden">
@@ -5444,8 +5444,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         <thead>
                           <tr className="bg-gray-50">
                             <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Status Exec.</th>
-                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Tipo Documento</th>
-                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 text-xs">Template Info</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 text-xs">Tipo Documento</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -5461,23 +5460,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                 {selectedFlowNode.data.isExecuted === 'TRUE' 
                                   ? 'Executado' 
                                   : selectedFlowNode.data.isPendingConnected
-                                  ? 'Pendente Conectado'
+                                  ? 'Pendente'
                                   : 'N.Exec.'}
                               </div>
                             </td>
-                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                            <td className="px-2 py-1.5 text-center">
                               {selectedFlowNode.data.docType ? (
                                 <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                                   {selectedFlowNode.data.docType}
-                                </div>
-                              ) : (
-                                <span className="text-gray-400 text-xs">-</span>
-                              )}
-                            </td>
-                            <td className="px-2 py-1.5 text-center">
-                              {selectedFlowNode.data.docType ? (
-                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                  Template
                                 </div>
                               ) : (
                                 <span className="text-gray-400 text-xs">-</span>
@@ -5514,7 +5504,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                 {selectedFlowNode.data.isExecuted === 'TRUE' 
                                   ? 'Executado' 
                                   : selectedFlowNode.data.isPendingConnected
-                                  ? 'Pendente Conectado'
+                                  ? 'Pendente'
                                   : 'N.Exec.'}
                               </div>
                             </td>
@@ -5586,7 +5576,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                 {selectedFlowNode.data.isExecuted === 'TRUE' 
                                   ? 'Executado' 
                                   : selectedFlowNode.data.isPendingConnected
-                                  ? 'Pendente Conectado'
+                                  ? 'Pendente'
                                   : 'N.Exec.'}
                               </div>
                             </td>
@@ -5627,7 +5617,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                 {selectedFlowNode.data.isExecuted === 'TRUE' 
                                   ? 'Executado' 
                                   : selectedFlowNode.data.isPendingConnected
-                                  ? 'Pendente Conectado'
+                                  ? 'Pendente'
                                   : 'N.Exec.'}
                               </div>
                             </td>
@@ -5682,7 +5672,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                 {selectedFlowNode.data.isExecuted === 'TRUE' 
                                   ? 'Executado' 
                                   : selectedFlowNode.data.isPendingConnected
-                                  ? 'Pendente Conectado'
+                                  ? 'Pendente'
                                   : 'N.Exec.'}
                               </div>
                             </td>
@@ -5840,7 +5830,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 {selectedFlowNode.data.isExecuted === 'TRUE' 
                   ? 'Executado' 
                   : selectedFlowNode.data.isPendingConnected
-                  ? 'Pendente Conectado'
+                  ? 'Pendente'
                   : 'N.Exec.'}
               </div>
             </div>
