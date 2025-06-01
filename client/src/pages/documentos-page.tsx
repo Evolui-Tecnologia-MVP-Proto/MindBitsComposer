@@ -5925,7 +5925,28 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <div className="mb-3">
                       <p className="text-sm text-yellow-800 mb-2">
-                        Ao clicar no botão você executará a função <span className="font-semibold">{selectedFlowNode.data.callType || 'callJob'}</span> que <span className="font-semibold">{selectedFlowNode.data.integrType || 'sincroniza dados'}</span> com o serviço <span className="font-semibold">{selectedFlowNode.data.service || 'externo'}</span>. Pressione para continuar.
+                        {(() => {
+                          // Extrair informações do jobId
+                          let functionCaption = selectedFlowNode.data.callType || 'callJob';
+                          let functionName = '';
+                          
+                          if (selectedFlowNode.data.jobId) {
+                            try {
+                              const jobData = JSON.parse(selectedFlowNode.data.jobId);
+                              const firstKey = Object.keys(jobData)[0];
+                              if (firstKey) {
+                                functionCaption = firstKey;
+                                functionName = jobData[firstKey];
+                              }
+                            } catch (e) {
+                              console.log('Erro ao fazer parse do jobId:', e);
+                            }
+                          }
+                          
+                          const displayName = functionName ? `${functionCaption} [${functionName}]` : functionCaption;
+                          
+                          return `Ao clicar no botão você executará a função ${displayName} que ${selectedFlowNode.data.integrType || 'Atualiza Dados'} com o serviço ${selectedFlowNode.data.service || 'externo'}. Pressione para continuar.`;
+                        })()}
                       </p>
                     </div>
 
