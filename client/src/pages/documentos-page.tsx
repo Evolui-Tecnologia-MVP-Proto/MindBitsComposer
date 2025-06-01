@@ -5748,12 +5748,52 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       
       let edgeColor = '#6b7280'; // cor padrão
       
+      // Função para verificar se a conexão é válida para um switchNode
+      const isValidSwitchConnection = (switchNode: any, targetNode: any, edge: any) => {
+        if (switchNode.type !== 'switchNode') return true;
+        
+        const inputSwitch = switchNode.data?.inputSwitch;
+        if (!inputSwitch) return false;
+        
+        const redSwitch = switchNode.data?.redSwitch;
+        const greenSwitch = switchNode.data?.greenSwitch;
+        
+        // Verificar se inputSwitch corresponde ao redSwitch
+        if (redSwitch && (
+          (Array.isArray(redSwitch) && redSwitch.includes(inputSwitch)) ||
+          (typeof redSwitch === 'string' && redSwitch === inputSwitch)
+        )) {
+          return edge.sourceHandle === 'red' || edge.sourceHandle === null;
+        }
+        
+        // Verificar se inputSwitch corresponde ao greenSwitch
+        if (greenSwitch && (
+          (Array.isArray(greenSwitch) && greenSwitch.includes(inputSwitch)) ||
+          (typeof greenSwitch === 'string' && greenSwitch === inputSwitch)
+        )) {
+          return edge.sourceHandle === 'green' || edge.sourceHandle === null;
+        }
+        
+        return false;
+      };
+      
       // Se ambos os nós estão executados
       if (sourceExecuted && targetExecuted) {
         edgeColor = '#21639a';
       }
-      // Se há conexão entre executado e pendente
-      else if ((sourceExecuted && targetPending) || (targetExecuted && sourcePending)) {
+      // Se há conexão entre executado e pendente conectado
+      else if (sourceExecuted && targetPending) {
+        // Se source é switchNode, verificar se a conexão é válida
+        if (sourceNode?.type === 'switchNode') {
+          if (isValidSwitchConnection(sourceNode, targetNode, edge)) {
+            edgeColor = '#fbbf24'; // amarelo para conexão válida
+          }
+        } else {
+          edgeColor = '#fbbf24'; // amarelo para outros tipos de nós
+        }
+      }
+      // Se há conexão entre pendente conectado e executado
+      else if (sourcePending && targetExecuted) {
         edgeColor = '#fbbf24'; // amarelo
       }
       
