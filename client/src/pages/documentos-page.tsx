@@ -4938,8 +4938,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         
         // Verificar se precisa de correção de formato
         if (attachedFormData.includes('["') && attachedFormData.includes('": [')) {
-          correctedData = attachedFormData
-            .replace(/\[\"([^"]+)\"\:\s*\[/g, '"$1":[')
+          // Primeiro, substituir a estrutura Fields
+          correctedData = attachedFormData.replace(
+            /"Fields":\s*\[/g, 
+            '"Fields":{'
+          );
+          
+          // Corrigir os campos individuais
+          correctedData = correctedData
+            .replace(/\"([^"]+)\"\:\s*\[/g, '"$1":[')
             .replace(/\]\s*,\s*\"([^"]+)\"\:\s*\[/g, '],"$1":[')
             .replace(/\]\s*\]/g, ']}');
           
