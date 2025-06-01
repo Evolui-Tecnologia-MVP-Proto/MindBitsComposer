@@ -5340,9 +5340,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               <div className="space-y-3">
                 {/* Status Exec./Tipo apenas para ActionNode */}
                 {selectedFlowNode.type === 'actionNode' && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">Status Exec./Tipo</p>
-                    <div className="flex space-x-2">
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div>
+                      <p className="text-xs font-medium text-gray-700 mb-1">Status Exec.</p>
                       <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
                         selectedFlowNode.data.isExecuted === 'TRUE' 
                           ? 'bg-blue-100 text-blue-800' 
@@ -5356,9 +5356,30 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           ? 'Pendente Conectado'
                           : 'Não Executado'}
                       </div>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-gray-700 mb-1">Tipo Ação</p>
                       {selectedFlowNode.data.actionType && (
                         <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
                           {selectedFlowNode.data.actionType}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-gray-700 mb-1">Aprovação</p>
+                      {selectedFlowNode.data.isAproved && (
+                        <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                          selectedFlowNode.data.isAproved === 'TRUE' 
+                            ? 'bg-green-100 text-green-800'
+                            : selectedFlowNode.data.isAproved === 'FALSE'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {selectedFlowNode.data.isAproved === 'TRUE' 
+                            ? 'Aprovado' 
+                            : selectedFlowNode.data.isAproved === 'FALSE'
+                            ? 'Rejeitado'
+                            : 'Indefinido'}
                         </div>
                       )}
                     </div>
