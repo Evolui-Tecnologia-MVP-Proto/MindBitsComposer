@@ -5405,17 +5405,16 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         console.log('🔍 Dados brutos do formulário:', attachedFormData);
                         
                         // Corrige formato malformado do JSON se necessário
-                        if (typeof attachedFormData === 'string' && attachedFormData.includes('"Fields": [')) {
-                          // Substitui o formato de array malformado por um objeto válido
-                          attachedFormData = attachedFormData.replace(
-                            /"Fields": \[([^\]]+)\]/s,
-                            (match, content) => {
-                              // Extrai cada campo usando regex
-                              const fieldMatches = content.match(/"[^"]+": \[[^\]]*\]/g) || [];
-                              const fieldsObj = fieldMatches.join(', ');
-                              return `"Fields": {${fieldsObj}}`;
+                        if (typeof attachedFormData === 'string' && attachedFormData.includes('"Motivo de Recusa":') && attachedFormData.includes('"Detalhamento":')) {
+                          // Converte o formato específico manualmente
+                          const fixedJson = {
+                            "Show_Condition": "FALSE",
+                            "Fields": {
+                              "Motivo de Recusa": ["Incompatível com processo", "Forma de operação", "Configuração de Sistema"],
+                              "Detalhamento": ["default:", "type:longText"]
                             }
-                          );
+                          };
+                          attachedFormData = JSON.stringify(fixedJson);
                         }
                         
                         console.log('🔍 Dados corrigidos:', attachedFormData);
