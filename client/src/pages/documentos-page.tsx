@@ -5444,7 +5444,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         <thead>
                           <tr className="bg-gray-50">
                             <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Status Exec.</th>
-                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 text-xs">Tipo Documento</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 text-xs">ID Template</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -5466,11 +5466,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             </td>
                             <td className="px-2 py-1.5 text-center">
                               {selectedFlowNode.data.docType ? (
-                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 font-mono">
                                   {selectedFlowNode.data.docType}
                                 </div>
                               ) : (
-                                <span className="text-gray-400 text-xs">-</span>
+                                <span className="text-gray-400 text-xs font-mono">-</span>
                               )}
                             </td>
                           </tr>
@@ -5592,7 +5592,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
 
-                {/* Layout tabular 3x2 para EndNode */}
+                {/* Layout tabular para EndNode - 2 colunas */}
                 {selectedFlowNode.type === 'endNode' && (
                   <div>
                     <div className="border border-gray-200 rounded-lg overflow-hidden">
@@ -5600,8 +5600,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         <thead>
                           <tr className="bg-gray-50">
                             <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Status Exec.</th>
-                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Tipo</th>
-                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 text-xs">Fluxo Destino</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 text-xs">Tipo</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -5621,20 +5620,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   : 'N.Exec.'}
                               </div>
                             </td>
-                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                            <td className="px-2 py-1.5 text-center">
                               {selectedFlowNode.data.FromType ? (
                                 <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                   {selectedFlowNode.data.FromType === 'Init' ? 'Encerramento Direto' : 
                                    selectedFlowNode.data.FromType === 'flow_init' ? 'Transferência para Fluxo' : selectedFlowNode.data.FromType}
-                                </div>
-                              ) : (
-                                <span className="text-gray-400 text-xs">-</span>
-                              )}
-                            </td>
-                            <td className="px-2 py-1.5 text-center">
-                              {selectedFlowNode.data.To_Flow_id ? (
-                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                  Fluxo
                                 </div>
                               ) : (
                                 <span className="text-gray-400 text-xs">-</span>
@@ -5708,7 +5698,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
 
-                {selectedFlowNode.type === 'actionNode' && selectedFlowNode.data.isAproved !== undefined && (
+                {selectedFlowNode.type === 'actionNode' && selectedFlowNode.data.actionType === 'Intern_Aprove' && selectedFlowNode.data.isAproved !== undefined && (
                   <div>
                     <p className="text-sm font-medium text-gray-700 mb-2">Status de Aprovação</p>
                     <div className="flex space-x-2 mb-2">
