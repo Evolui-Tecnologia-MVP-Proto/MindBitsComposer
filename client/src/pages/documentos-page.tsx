@@ -15,7 +15,7 @@ import ReactFlow, {
   Position 
 } from 'reactflow';
 // Importing icons for custom nodes
-import { Play, Square, Cloud, Pin } from 'lucide-react';
+import { Play, Square, Cloud, Pin, X } from 'lucide-react';
 import 'reactflow/dist/style.css';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -73,7 +73,6 @@ import {
   ChevronDown,
   Database,
   Image,
-  Check,
   BookOpen,
   Zap,
   GitBranch,
@@ -4793,8 +4792,37 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   // Componente interno que usa useReactFlow para fit view automático
   function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode }: any) {
-    const { fitView } = useReactFlow();
+    const { fitView, getNodes, setNodes } = useReactFlow();
     const [isPinned, setIsPinned] = useState(false);
+
+    // Função para atualizar o status de aprovação de um nó
+    const updateNodeApprovalStatus = (nodeId: string, newStatus: string) => {
+      const currentNodes = getNodes();
+      const updatedNodes = currentNodes.map(node => {
+        if (node.id === nodeId) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              isAproved: newStatus
+            }
+          };
+        }
+        return node;
+      });
+      setNodes(updatedNodes);
+      
+      // Atualizar também o nó selecionado para refletir a mudança no painel
+      if (selectedFlowNode && selectedFlowNode.id === nodeId) {
+        setSelectedFlowNode({
+          ...selectedFlowNode,
+          data: {
+            ...selectedFlowNode.data,
+            isAproved: newStatus
+          }
+        });
+      }
+    };
 
     // Effect para executar fit view quando o painel inspector é aberto/fechado
     useEffect(() => {
@@ -5061,19 +5089,48 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
                 {selectedFlowNode.data.isAproved && (
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Status de Aprovação</p>
-                    <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                      selectedFlowNode.data.isAproved === 'TRUE' 
-                        ? 'bg-green-100 text-green-800' 
-                        : selectedFlowNode.data.isAproved === 'FALSE'
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {selectedFlowNode.data.isAproved === 'TRUE' 
-                        ? 'Aprovado' 
-                        : selectedFlowNode.data.isAproved === 'FALSE'
-                        ? 'Rejeitado'
-                        : 'Indefinido'}
+                    <p className="text-sm font-medium text-gray-700 mb-2">Status de Aprovação</p>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => {
+                            updateNodeApprovalStatus(selectedFlowNode.id, 'TRUE');
+                          }}
+                          className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all ${
+                            selectedFlowNode.data.isAproved === 'TRUE'
+                              ? 'bg-green-100 border-green-300 text-green-800'
+                              : 'bg-white border-gray-300 text-gray-600 hover:bg-green-50 hover:border-green-300'
+                          }`}
+                        >
+                          <CircleCheck className="w-4 h-4" />
+                          <span className="text-sm font-medium">Aprovar</span>
+                        </button>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => {
+                            // Função para rejeitar o status no diagrama
+                            console.log('Rejeitar nó:', selectedFlowNode.id);
+                          }}
+                          className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all ${
+                            selectedFlowNode.data.isAproved === 'FALSE'
+                              ? 'bg-red-100 border-red-300 text-red-800'
+                              : 'bg-white border-gray-300 text-gray-600 hover:bg-red-50 hover:border-red-300'
+                          }`}
+                        >
+                          <X className="w-4 h-4" />
+                          <span className="text-sm font-medium">Rejeitar</span>
+                        </button>
+                      </div>
+                      
+                      <div className="text-xs text-gray-500 mt-2">
+                        Status atual: {selectedFlowNode.data.isAproved === 'TRUE' 
+                          ? 'Aprovado' 
+                          : selectedFlowNode.data.isAproved === 'FALSE'
+                          ? 'Rejeitado'
+                          : 'Indefinido'}
+                      </div>
                     </div>
                   </div>
                 )}
