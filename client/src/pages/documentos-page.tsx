@@ -5367,7 +5367,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         }`}
                       >
                         <CircleCheck className="w-4 h-4" />
-                        <span className="text-sm font-medium">Aprovar</span>
+                        <span className="text-sm font-medium">SIM</span>
                       </button>
                       
                       <button
@@ -5386,7 +5386,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         }`}
                       >
                         <X className="w-4 h-4" />
-                        <span className="text-sm font-medium">Rejeitar</span>
+                        <span className="text-sm font-medium">NÃO</span>
                       </button>
                     </div>
                     
@@ -5418,11 +5418,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     )}
                     
                     <div className="text-xs text-gray-500">
-                      Status atual: {selectedFlowNode.data.isAproved === 'TRUE' 
-                        ? 'Aprovado' 
-                        : selectedFlowNode.data.isAproved === 'FALSE'
-                        ? 'Rejeitado'
-                        : 'Indefinido'}
+                      Status atual: {selectedFlowNode.data.isAproved || 'UNDEF'}
                     </div>
                   </div>
                 )}
