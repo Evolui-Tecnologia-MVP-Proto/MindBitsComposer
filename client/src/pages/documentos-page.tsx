@@ -5382,6 +5382,41 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               </div>
             )}
 
+            {selectedFlowNode.type === 'switchNode' && selectedFlowNode.data.switchField && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Campo de Condição</p>
+                <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.switchField}</p>
+              </div>
+            )}
+
+            {selectedFlowNode.type === 'switchNode' && (selectedFlowNode.data.redSwitch || selectedFlowNode.data.greenSwitch) && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Valores de Switch</p>
+                <div className="space-y-2">
+                  {selectedFlowNode.data.redSwitch && (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <span className="text-sm text-gray-900 font-mono">
+                        {Array.isArray(selectedFlowNode.data.redSwitch) 
+                          ? selectedFlowNode.data.redSwitch.join(', ') 
+                          : selectedFlowNode.data.redSwitch}
+                      </span>
+                    </div>
+                  )}
+                  {selectedFlowNode.data.greenSwitch && (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span className="text-sm text-gray-900 font-mono">
+                        {Array.isArray(selectedFlowNode.data.greenSwitch) 
+                          ? selectedFlowNode.data.greenSwitch.join(', ') 
+                          : selectedFlowNode.data.greenSwitch}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {selectedFlowNode.data.isAproved && (
               <div>
                 <p className="text-sm font-medium text-gray-700">Status de Aprovação</p>
