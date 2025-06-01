@@ -5398,108 +5398,176 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 {/* Formulário dinâmico baseado no attached_Form */}
                 {selectedFlowNode.type === 'actionNode' && (selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form) && (
                   <div>
-                    <div className="bg-gray-50 p-4 rounded border space-y-4">
-                      {(() => {
-                        try {
-                          // Verifica tanto attached_Form (maiúsculo) quanto attached_form (minúsculo)
-                          const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
-                          const formData = JSON.parse(attachedFormData);
-                          return Object.entries(formData).map(([fieldName, fieldValue]) => {
-                            // Verifica se é um array de configuração com default e type
-                            if (Array.isArray(fieldValue) && fieldValue.length === 2 && 
-                                typeof fieldValue[0] === 'string' && fieldValue[0].startsWith('default:') &&
-                                typeof fieldValue[1] === 'string' && fieldValue[1].startsWith('type:')) {
-                              
-                              const defaultValue = fieldValue[0].replace('default:', '');
-                              const fieldType = fieldValue[1].replace('type:', '');
-                              
-                              return (
-                                <div key={fieldName} className="space-y-2">
-                                  <label className="text-sm font-medium text-gray-700">{fieldName}</label>
-                                  {(() => {
-                                    if (fieldType === 'longText') {
-                                      return (
+                    {(() => {
+                      try {
+                        // Verifica tanto attached_Form (maiúsculo) quanto attached_form (minúsculo)
+                        const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+                        const formData = JSON.parse(attachedFormData);
+                        
+                        // Verifica se é um formulário com condição
+                        if (formData.Show_Condition !== undefined && formData.Fields) {
+                          const showCondition = formData.Show_Condition;
+                          const isApprovalNode = selectedFlowNode.data.actionType === 'Intern_Aprove';
+                          const approvalStatus = selectedFlowNode.data.isAproved;
+                          
+                          // Determina se deve mostrar o formulário baseado na condição
+                          let shouldShowForm = false;
+                          if (isApprovalNode && approvalStatus !== 'UNDEF') {
+                            if (showCondition === 'TRUE' && approvalStatus === 'TRUE') {
+                              shouldShowForm = true;
+                            } else if (showCondition === 'FALSE' && approvalStatus === 'FALSE') {
+                              shouldShowForm = true;
+                            } else if (showCondition === 'BOTH' && (approvalStatus === 'TRUE' || approvalStatus === 'FALSE')) {
+                              shouldShowForm = true;
+                            }
+                          }
+                          
+                          if (!shouldShowForm) {
+                            return null;
+                          }
+                          
+                          return (
+                            <div className="bg-gray-50 p-4 rounded border space-y-4">
+                              {Object.entries(formData.Fields).map(([fieldName, fieldValue]) => {
+                                // Verifica se é um array de configuração com default e type
+                                if (Array.isArray(fieldValue) && fieldValue.length === 2 && 
+                                    typeof fieldValue[0] === 'string' && fieldValue[0].startsWith('default:') &&
+                                    typeof fieldValue[1] === 'string' && fieldValue[1].startsWith('type:')) {
+                                  
+                                  const defaultValue = fieldValue[0].replace('default:', '');
+                                  const fieldType = fieldValue[1].replace('type:', '');
+                                  const isReadonly = !selectedFlowNode.data.isPendingConnected;
+                                  const baseClasses = "w-full px-3 py-2 border rounded-md text-xs font-mono";
+                                  const readonlyClasses = isReadonly 
+                                    ? "bg-gray-50 border-gray-200 text-gray-600 cursor-not-allowed" 
+                                    : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+                                  
+                                  return (
+                                    <div key={fieldName} className="space-y-2">
+                                      <label className="text-sm font-medium text-gray-700">{fieldName}</label>
+                                      {fieldType === 'longText' ? (
                                         <textarea
                                           rows={4}
                                           placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
-                                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono resize-vertical"
+                                          readOnly={isReadonly}
+                                          className={`${baseClasses} ${readonlyClasses} resize-vertical`}
                                         />
-                                      );
-                                    } else if (fieldType.startsWith('char(')) {
-                                      const maxLength = parseInt(fieldType.match(/\d+/)?.[0] || '255');
-                                      return (
+                                      ) : fieldType.startsWith('char(') ? (
                                         <input
                                           type="text"
-                                          maxLength={maxLength}
-                                          placeholder={defaultValue || `Digite ${fieldName.toLowerCase()} (máx. ${maxLength} caracteres)`}
-                                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"
+                                          maxLength={parseInt(fieldType.match(/\d+/)?.[0] || '255')}
+                                          placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
+                                          readOnly={isReadonly}
+                                          className={`${baseClasses} ${readonlyClasses}`}
                                         />
-                                      );
-                                    } else if (fieldType === 'int') {
-                                      return (
+                                      ) : fieldType === 'int' ? (
                                         <input
                                           type="number"
                                           step="1"
                                           placeholder={defaultValue || `Digite um número inteiro`}
-                                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"
+                                          readOnly={isReadonly}
+                                          className={`${baseClasses} ${readonlyClasses}`}
                                         />
-                                      );
-                                    } else if (fieldType.startsWith('number(')) {
-                                      const precision = parseInt(fieldType.match(/\d+/)?.[0] || '2');
-                                      const step = Math.pow(10, -precision);
-                                      return (
+                                      ) : fieldType.startsWith('number(') ? (
                                         <input
                                           type="number"
-                                          step={step}
-                                          placeholder={defaultValue || `Digite um número (${precision} decimais)`}
-                                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"
+                                          step={Math.pow(10, -parseInt(fieldType.match(/\d+/)?.[0] || '2'))}
+                                          placeholder={defaultValue || `Digite um número`}
+                                          readOnly={isReadonly}
+                                          className={`${baseClasses} ${readonlyClasses}`}
                                         />
-                                      );
-                                    } else {
-                                      return (
+                                      ) : (
                                         <input
                                           type="text"
                                           placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
-                                          className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"
+                                          readOnly={isReadonly}
+                                          className={`${baseClasses} ${readonlyClasses}`}
                                         />
-                                      );
-                                    }
-                                  })()}
-                                </div>
-                              );
-                            }
-                            
-                            // Comportamento original para arrays simples ou strings
-                            return (
-                              <div key={fieldName} className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">{fieldName}</label>
-                                {Array.isArray(fieldValue) ? (
-                                  <select className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono">
-                                    <option value="">Selecione uma opção</option>
-                                    {fieldValue.map((option, index) => (
-                                      <option key={index} value={option}>{option}</option>
-                                    ))}
-                                  </select>
-                                ) : (
-                                  <input
-                                    type="text"
-                                    placeholder={fieldValue || `Digite ${fieldName.toLowerCase()}`}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"
-                                  />
-                                )}
-                              </div>
-                            );
-                          });
-                        } catch (e) {
-                          const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
-                          return (
-                            <div className="text-sm text-red-600">
-                              Erro ao processar formulário: {attachedFormData}
+                                      )}
+                                    </div>
+                                  );
+                                }
+                                
+                                // Comportamento original para arrays simples ou strings
+                                const isReadonly = !selectedFlowNode.data.isPendingConnected;
+                                const baseClasses = "w-full px-3 py-2 border rounded-md text-xs font-mono";
+                                const readonlyClasses = isReadonly 
+                                  ? "bg-gray-50 border-gray-200 text-gray-600 cursor-not-allowed" 
+                                  : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+                                
+                                return (
+                                  <div key={fieldName} className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-700">{fieldName}</label>
+                                    {Array.isArray(fieldValue) ? (
+                                      <select 
+                                        disabled={isReadonly}
+                                        className={`${baseClasses} ${readonlyClasses}`}
+                                      >
+                                        <option value="">Selecione uma opção</option>
+                                        {fieldValue.map((option, index) => (
+                                          <option key={index} value={option}>{option}</option>
+                                        ))}
+                                      </select>
+                                    ) : (
+                                      <input
+                                        type="text"
+                                        placeholder={fieldValue || `Digite ${fieldName.toLowerCase()}`}
+                                        readOnly={isReadonly}
+                                        className={`${baseClasses} ${readonlyClasses}`}
+                                      />
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
                           );
                         }
-                      })()}
-                    </div>
+                        
+                        // Comportamento legado para formulários sem condição
+                        return (
+                          <div className="bg-gray-50 p-4 rounded border space-y-4">
+                            {Object.entries(formData).map(([fieldName, fieldValue]) => {
+                              const isReadonly = !selectedFlowNode.data.isPendingConnected;
+                              const baseClasses = "w-full px-3 py-2 border rounded-md text-xs font-mono";
+                              const readonlyClasses = isReadonly 
+                                ? "bg-gray-50 border-gray-200 text-gray-600 cursor-not-allowed" 
+                                : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+                              
+                              return (
+                                <div key={fieldName} className="space-y-2">
+                                  <label className="text-sm font-medium text-gray-700">{fieldName}</label>
+                                  {Array.isArray(fieldValue) ? (
+                                    <select 
+                                      disabled={isReadonly}
+                                      className={`${baseClasses} ${readonlyClasses}`}
+                                    >
+                                      <option value="">Selecione uma opção</option>
+                                      {fieldValue.map((option, index) => (
+                                        <option key={index} value={option}>{option}</option>
+                                      ))}
+                                    </select>
+                                  ) : (
+                                    <input
+                                      type="text"
+                                      placeholder={fieldValue || `Digite ${fieldName.toLowerCase()}`}
+                                      readOnly={isReadonly}
+                                      className={`${baseClasses} ${readonlyClasses}`}
+                                    />
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        );
+                      } catch (e) {
+                        const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+                        return (
+                          <div className="text-sm text-red-600">
+                            Erro ao processar formulário: {attachedFormData}
+                          </div>
+                        );
+                      }
+                    })()}
                   </div>
                 )}
 
