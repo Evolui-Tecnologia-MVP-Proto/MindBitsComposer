@@ -5918,6 +5918,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       const targetPending = pendingConnectedNodes.has(edge.target);
       
       let edgeColor = '#6b7280'; // cor padrão
+      let shouldAnimate = false; // controlar animação
       
       // Função para verificar se a conexão é válida para um switchNode
       const isValidSwitchConnection = (switchNode: any, targetNode: any, edge: any) => {
@@ -5951,6 +5952,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       // Se ambos os nós estão executados
       if (sourceExecuted && targetExecuted) {
         edgeColor = '#21639a';
+        shouldAnimate = true; // animar conexões executadas (azuis)
       }
       // Se há conexão entre executado e pendente conectado
       else if (sourceExecuted && targetPending) {
@@ -5958,14 +5960,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         if (sourceNode?.type === 'switchNode') {
           if (isValidSwitchConnection(sourceNode, targetNode, edge)) {
             edgeColor = '#fbbf24'; // amarelo para conexão válida
+            shouldAnimate = true; // animar conexões pendentes válidas (amarelas)
           }
         } else {
           edgeColor = '#fbbf24'; // amarelo para outros tipos de nós
+          shouldAnimate = true; // animar conexões pendentes (amarelas)
         }
       }
       // Se há conexão entre pendente conectado e executado
       else if (sourcePending && targetExecuted) {
         edgeColor = '#fbbf24'; // amarelo
+        shouldAnimate = true; // animar conexões pendentes (amarelas)
       }
       
       return {
