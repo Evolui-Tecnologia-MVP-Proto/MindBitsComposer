@@ -4845,13 +4845,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   }
 
-  // Estado para o sistema de aprovação
-  const [showApprovalAlert, setShowApprovalAlert] = useState(false);
-  
   // Componente interno que usa useReactFlow para fit view automático
   function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode }: any) {
     const { fitView, getNodes, setNodes } = useReactFlow();
     const [isPinned, setIsPinned] = useState(false);
+    const [showApprovalAlert, setShowApprovalAlert] = useState(false);
 
     // Função para alterar o status de aprovação (altera estado imediatamente e mostra alerta)
     const updateApprovalStatus = (nodeId: string, newStatus: string) => {
