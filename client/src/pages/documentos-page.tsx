@@ -4792,7 +4792,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   }
 
   // Componente interno que usa useReactFlow para fit view automático
-  const FlowWithAutoFitView = ({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode }: any) => {
+  function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode }: any) {
     const { fitView } = useReactFlow();
 
     // Effect para executar fit view quando o painel inspector é aberto/fechado
@@ -4817,12 +4817,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     const processedEdges = flowData.flowTasks.edges || [];
 
     const nodeTypes = useMemo(() => ({
-      startNode: StartNode,
-      endNode: EndNode,
-      actionNode: ActionNode,
-      documentNode: DocumentNode,
-      integrationNode: IntegrationNode,
-      switchNode: SwitchNode
+      startNode: StartNodeComponent,
+      endNode: EndNodeComponent,
+      actionNode: ActionNodeComponent,
+      documentNode: DocumentNodeComponent,
+      integrationNode: IntegrationNodeComponent,
+      switchNode: SwitchNodeComponent
     }), []);
 
     const onNodeClick = (event: any, node: any) => {
