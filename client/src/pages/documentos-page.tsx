@@ -5921,7 +5921,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
 
-                {selectedFlowNode.data.callType?.toLowerCase() === 'manual' && selectedFlowNode.data.isPendingConnected && (
+                {selectedFlowNode.data.callType?.toLowerCase() === 'manual' && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
                   <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <div className="mb-3">
                       <p className="text-sm text-yellow-800 mb-2">
