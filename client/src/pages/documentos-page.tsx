@@ -4809,12 +4809,89 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       return () => clearTimeout(timeoutId);
     }, [showFlowInspector, fitView]);
 
-    const processedNodes = flowData.flowTasks.nodes.map((node: any) => ({
-      ...node,
-      data: { ...node.data, isReadonly: true }
-    }));
+    // Implementar lógica de "pendente em processo"
+    const nodes = flowData.flowTasks.nodes || [];
+    const edges = flowData.flowTasks.edges || [];
 
-    const processedEdges = flowData.flowTasks.edges || [];
+    // Encontrar nós executados
+    const executedNodes = new Set(
+      nodes.filter((node: any) => node.data?.isExecuted === 'TRUE').map((node: any) => node.id)
+    );
+
+    // Encontrar nós pendentes conectados aos executados
+    const pendingConnectedNodes = new Set<string>();
+    
+    for (const edge of edges) {
+      // Se o nó de origem está executado e o nó de destino não está executado
+      if (executedNodes.has(edge.source)) {
+        const targetNode = nodes.find((n: any) => n.id === edge.target);
+        if (targetNode && targetNode.data?.isExecuted !== 'TRUE') {
+          pendingConnectedNodes.add(edge.target);
+        }
+      }
+      
+      // Se o nó de destino está executado e o nó de origem não está executado
+      if (executedNodes.has(edge.target)) {
+        const sourceNode = nodes.find((n: any) => n.id === edge.source);
+        if (sourceNode && sourceNode.data?.isExecuted !== 'TRUE') {
+          pendingConnectedNodes.add(edge.source);
+        }
+      }
+    }
+
+    // Processar nós para adicionar destaque amarelo aos pendentes conectados
+    const processedNodes = nodes.map((node: any) => {
+      if (pendingConnectedNodes.has(node.id)) {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            isPendingConnected: true,
+            isReadonly: true
+          },
+        };
+      }
+      return {
+        ...node,
+        data: { ...node.data, isReadonly: true }
+      };
+    });
+
+    // Processar edges para colorir conexões
+    const processedEdges = edges.map((edge: any) => {
+      const sourceNode = nodes.find((n: any) => n.id === edge.source);
+      const targetNode = nodes.find((n: any) => n.id === edge.target);
+      
+      const sourceExecuted = sourceNode?.data?.isExecuted === 'TRUE';
+      const targetExecuted = targetNode?.data?.isExecuted === 'TRUE';
+      
+      const sourcePending = pendingConnectedNodes.has(edge.source);
+      const targetPending = pendingConnectedNodes.has(edge.target);
+      
+      let edgeColor = '#6b7280'; // cor padrão
+      
+      // Se ambos os nós estão executados
+      if (sourceExecuted && targetExecuted) {
+        edgeColor = '#21639a';
+      }
+      // Se há conexão entre executado e pendente
+      else if ((sourceExecuted && targetPending) || (targetExecuted && sourcePending)) {
+        edgeColor = '#fbbf24'; // amarelo
+      }
+      
+      return {
+        ...edge,
+        style: {
+          stroke: edgeColor,
+          strokeWidth: 3,
+          strokeDasharray: 'none'
+        },
+        markerEnd: {
+          type: 'arrowclosed',
+          color: edgeColor,
+        },
+      };
+    });
 
     const nodeTypes = useMemo(() => ({
       startNode: StartNodeComponent,
