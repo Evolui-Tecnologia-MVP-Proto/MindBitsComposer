@@ -5991,8 +5991,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           }
         }}
       >
-        <DialogContent className="max-w-[90vw] max-h-[90vh] w-[90vw] h-[90vh] overflow-hidden">
-          <DialogHeader>
+        <DialogContent className="max-w-[90vw] max-h-[90vh] w-[90vw] h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle className="flex items-center gap-2">
               <GitBranch className="h-5 w-5" />
               Diagrama do Fluxo - {flowDiagramModal.documentTitle}
@@ -6001,7 +6001,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               Visualização do diagrama de fluxo de trabalho aplicado ao documento
             </DialogDescription>
           </DialogHeader>
-          <div className="flex-1 w-full border rounded-lg" style={{ height: 'calc(90vh - 120px)' }}>
+          
+          <div className="flex-1 w-full border rounded-lg overflow-hidden">
             <ReactFlowProvider>
               <FlowWithAutoFitView 
                 flowData={flowDiagramModal.flowData}
@@ -6014,20 +6015,23 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               />
             </ReactFlowProvider>
           </div>
-          <DialogFooter>
-            <Button 
-              onClick={() => {
-                console.log("🔴 Botão fechar clicado");
-                setFlowDiagramModal({
-                  isOpen: false,
-                  flowData: null,
-                  documentTitle: "",
-                });
-              }}
-            >
-              Fechar
-            </Button>
-          </DialogFooter>
+          
+          <div className="flex-shrink-0 border-t bg-white p-4 mt-4">
+            <div className="flex justify-end">
+              <Button 
+                onClick={() => {
+                  console.log("🔴 Botão fechar clicado");
+                  setFlowDiagramModal({
+                    isOpen: false,
+                    flowData: null,
+                    documentTitle: "",
+                  });
+                }}
+              >
+                Fechar
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     );
