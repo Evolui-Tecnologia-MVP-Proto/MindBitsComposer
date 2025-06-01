@@ -4912,6 +4912,19 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   // Componente interno que usa useReactFlow para fit view automático
   function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode, showApprovalAlert, setShowApprovalAlert, isPinned }: any) {
     const { fitView, getNodes, setNodes } = useReactFlow();
+    
+    // Estado para controlar os valores dos campos do formulário
+    const [formValues, setFormValues] = useState<Record<string, string>>({});
+    
+    // Função para verificar se todos os campos obrigatórios estão preenchidos
+    const areAllFieldsFilled = (fieldsData: any) => {
+      if (!fieldsData || typeof fieldsData !== 'object') return false;
+      
+      return Object.keys(fieldsData).every(fieldName => {
+        const value = formValues[fieldName];
+        return value && value.trim() !== '';
+      });
+    };
 
     // Função para alterar o status de aprovação (altera estado imediatamente e mostra alerta)
     const updateApprovalStatus = (nodeId: string, newStatus: string) => {
@@ -5488,6 +5501,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                         rows={4}
                                         placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
                                         readOnly={isReadonly}
+                                        value={formValues[fieldName] || ''}
+                                        onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
                                         className={`${baseClasses} ${readonlyClasses} resize-vertical`}
                                       />
                                     ) : fieldType.startsWith('char(') ? (
@@ -5496,6 +5511,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                         maxLength={parseInt(fieldType.match(/\d+/)?.[0] || '255')}
                                         placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
                                         readOnly={isReadonly}
+                                        value={formValues[fieldName] || ''}
+                                        onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
                                         className={`${baseClasses} ${readonlyClasses}`}
                                       />
                                     ) : fieldType === 'int' ? (
@@ -5504,6 +5521,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                         step="1"
                                         placeholder={defaultValue || `Digite um número inteiro`}
                                         readOnly={isReadonly}
+                                        value={formValues[fieldName] || ''}
+                                        onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
                                         className={`${baseClasses} ${readonlyClasses}`}
                                       />
                                     ) : fieldType.startsWith('number(') ? (
@@ -5512,6 +5531,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                         step={Math.pow(10, -parseInt(fieldType.match(/\d+/)?.[0] || '2'))}
                                         placeholder={defaultValue || `Digite um número`}
                                         readOnly={isReadonly}
+                                        value={formValues[fieldName] || ''}
+                                        onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
                                         className={`${baseClasses} ${readonlyClasses}`}
                                       />
                                     ) : (
@@ -5519,6 +5540,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                         type="text"
                                         placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
                                         readOnly={isReadonly}
+                                        value={formValues[fieldName] || ''}
+                                        onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
                                         className={`${baseClasses} ${readonlyClasses}`}
                                       />
                                     )}
