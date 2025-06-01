@@ -4849,9 +4849,20 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode }: any) {
     const { fitView, getNodes, setNodes } = useReactFlow();
     const [isPinned, setIsPinned] = useState(false);
+    const [showApprovalAlert, setShowApprovalAlert] = useState(false);
+    const [pendingApprovalAction, setPendingApprovalAction] = useState<{nodeId: string, status: string} | null>(null);
 
-    // Função para atualizar o status de aprovação de um nó
-    const updateNodeApprovalStatus = (nodeId: string, newStatus: string) => {
+    // Função para iniciar o processo de aprovação/rejeição (mostra alerta)
+    const initiateApprovalAction = (nodeId: string, newStatus: string) => {
+      setPendingApprovalAction({ nodeId, status: newStatus });
+      setShowApprovalAlert(true);
+    };
+
+    // Função para confirmar e executar a alteração de status de aprovação
+    const confirmApprovalAction = () => {
+      if (!pendingApprovalAction) return;
+      
+      const { nodeId, status } = pendingApprovalAction;
       const currentNodes = getNodes();
       const updatedNodes = currentNodes.map(node => {
         if (node.id === nodeId) {
@@ -4859,7 +4870,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             ...node,
             data: {
               ...node.data,
-              isAproved: newStatus
+              isAproved: status
             }
           };
         }
@@ -4873,10 +4884,20 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           ...selectedFlowNode,
           data: {
             ...selectedFlowNode.data,
-            isAproved: newStatus
+            isAproved: status
           }
         });
       }
+
+      // Fechar o alerta e limpar ação pendente
+      setShowApprovalAlert(false);
+      setPendingApprovalAction(null);
+    };
+
+    // Função para cancelar a ação de aprovação
+    const cancelApprovalAction = () => {
+      setShowApprovalAlert(false);
+      setPendingApprovalAction(null);
     };
 
     // Effect para executar fit view quando o painel inspector é aberto/fechado
@@ -5189,7 +5210,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     <div className="flex space-x-2 mb-2">
                       <button
                         onClick={() => {
-                          updateNodeApprovalStatus(selectedFlowNode.id, 'TRUE');
+                          initiateApprovalAction(selectedFlowNode.id, 'TRUE');
                         }}
                         className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all flex-1 justify-center ${
                           selectedFlowNode.data.isAproved === 'TRUE'
@@ -5203,7 +5224,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       
                       <button
                         onClick={() => {
-                          updateNodeApprovalStatus(selectedFlowNode.id, 'FALSE');
+                          initiateApprovalAction(selectedFlowNode.id, 'FALSE');
                         }}
                         className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all flex-1 justify-center ${
                           selectedFlowNode.data.isAproved === 'FALSE'
@@ -5215,6 +5236,39 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         <span className="text-sm font-medium">Rejeitar</span>
                       </button>
                     </div>
+                    
+                    {/* Caixa de alerta para confirmação */}
+                    {showApprovalAlert && (
+                      <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                        <div className="flex items-start space-x-2">
+                          <div className="flex-shrink-0">
+                            <svg className="w-5 h-5 text-orange-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-sm font-medium text-orange-800 mb-1">ATENÇÃO</h4>
+                            <p className="text-xs text-orange-700 mb-3">
+                              Ao executar esta ação o fluxo passará automaticamente para o próximo estágio definido conforme o diagrama, esta ação pode ser irreversível caso ações posteriores no workflow sejam executadas.
+                            </p>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={confirmApprovalAction}
+                                className="px-3 py-1.5 bg-orange-600 text-white text-xs font-medium rounded hover:bg-orange-700 transition-colors"
+                              >
+                                Salvar Alterações
+                              </button>
+                              <button
+                                onClick={cancelApprovalAction}
+                                className="px-3 py-1.5 bg-white border border-gray-300 text-gray-700 text-xs font-medium rounded hover:bg-gray-50 transition-colors"
+                              >
+                                Cancelar
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                     
                     <div className="text-xs text-gray-500">
                       Status atual: {selectedFlowNode.data.isAproved === 'TRUE' 
