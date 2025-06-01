@@ -531,6 +531,7 @@ const SwitchNodeComponent = (props: any) => {
   
   const isExecuted = props.data.isExecuted === 'TRUE';
   const isPendingConnected = props.data.isPendingConnected;
+  const isSelected = props.selected;
   
   let backgroundColor = 'white';
   if (isExecuted) backgroundColor = '#21639a';
@@ -538,8 +539,19 @@ const SwitchNodeComponent = (props: any) => {
   
   const textClass = isExecuted ? 'text-white' : 'text-black';
   
+  // Configurações para realce do nó selecionado
+  const borderStyle = isSelected ? '4px solid #f97316' : '2px solid black';
+  const boxShadowStyle = isSelected 
+    ? '0 8px 12px -2px rgba(249, 115, 22, 0.3), 0 4px 8px rgba(249, 115, 22, 0.4)' 
+    : '0 4px 6px -1px rgba(0, 0, 0, 0.1)';
+  const scaleTransform = isSelected ? 'scale(1.05)' : 'scale(1)';
+  const containerTransform = `${scaleTransform}`;
+  const nodeTransform = isSelected 
+    ? 'rotateX(60deg) rotateZ(45deg) scale(1.02)' 
+    : 'rotateX(60deg) rotateZ(45deg)';
+  
   return (
-    <div className="relative" style={{ width: `${dynamicWidth}px`, height: `${dynamicHeight}px` }}>
+    <div className="relative transition-transform duration-200" style={{ width: `${dynamicWidth}px`, height: `${dynamicHeight}px`, transform: containerTransform }}>
       <GitBranch className="absolute top-1 left-1 h-6 w-6 text-blue-600 z-20" />
       <Handle 
         type="target" 
@@ -548,15 +560,15 @@ const SwitchNodeComponent = (props: any) => {
         style={{ top: '2px', left: '50%', transform: 'translateX(-50%)' }}
       />
       <div
-        className="absolute"
+        className="absolute transition-all duration-200"
         style={{
           width: '100%',
           height: '100%',
           backgroundColor: backgroundColor,
-          border: '2px solid black',
+          border: borderStyle,
           transformStyle: 'preserve-3d',
-          transform: 'rotateX(60deg) rotateZ(45deg)',
-          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+          transform: nodeTransform,
+          boxShadow: boxShadowStyle,
         }}
       >
         <div 
