@@ -4946,17 +4946,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           nodes: updatedNodes
         };
 
-        // 5. Enviar para o servidor
-        const response = await fetch(`/api/documents-flows/${flowData.flowId}`, {
+        // 5. Enviar para o servidor (atualizar execução do fluxo, não o template)
+        const response = await fetch(`/api/document-flow-executions/${flowData.documentId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            name: flowData.flowName,
-            code: flowData.flowCode,
-            description: flowData.description || '',
-            flowData: updatedFlowTasks
+            flowTasks: updatedFlowTasks
           }),
         });
 

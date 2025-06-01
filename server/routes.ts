@@ -3662,6 +3662,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update flow execution tasks
+  app.put("/api/document-flow-executions/:documentId", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { documentId } = req.params;
+      const { flowTasks } = req.body;
+      
+      console.log('🔄 Atualizando execução de fluxo para documento:', documentId);
+      console.log('🔄 Dados recebidos:', { flowTasks });
+      
+      // Verificar se existe uma execução ativa para este documento
+      const execution = await db.select()
+        .from(documentFlowExecutions)
+        .innerJoin(documentsFlows, eq(documentFlowExecutions.flowId, documentsFlows.id))
+        .where(and(
+          eq(documentFlowExecutions.documentId, documentId),
+          eq(documentsFlows.userId, req.user.id)
+        ))
+        .limit(1);
+      
+      if (execution.length === 0) {
+        return res.status(404).json({ error: "Execução de fluxo não encontrada" });
+      }
+      
+      // Atualizar as tarefas do fluxo
+      const updated = await db.update(documentFlowExecutions)
+        .set({
+          flowTasks,
+          updatedAt: new Date()
+        })
+        .where(eq(documentFlowExecutions.documentId, documentId))
+        .returning();
+      
+      console.log('✅ Execução atualizada com sucesso');
+      res.json(updated[0]);
+    } catch (error) {
+      console.error("Erro ao atualizar execução de fluxo:", error);
+      res.status(500).json({ error: "Erro ao atualizar execução" });
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 
