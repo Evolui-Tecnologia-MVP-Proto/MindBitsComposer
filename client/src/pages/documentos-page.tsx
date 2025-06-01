@@ -4849,7 +4849,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   const [showApprovalAlert, setShowApprovalAlert] = useState(false);
 
   // Componente interno que usa useReactFlow para fit view automático
-  function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode }: any) {
+  function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode, showApprovalAlert, setShowApprovalAlert }: any) {
     const { fitView, getNodes, setNodes } = useReactFlow();
     const [isPinned, setIsPinned] = useState(false);
 
@@ -5567,6 +5567,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 setShowFlowInspector={setShowFlowInspector}
                 setSelectedFlowNode={setSelectedFlowNode}
                 selectedFlowNode={selectedFlowNode}
+                showApprovalAlert={showApprovalAlert}
+                setShowApprovalAlert={setShowApprovalAlert}
               />
             </ReactFlowProvider>
           </div>
