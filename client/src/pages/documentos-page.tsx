@@ -5424,31 +5424,53 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
                 {(selectedFlowNode.data.integrType || selectedFlowNode.type === 'integrationNode') && (
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Status Exec./Dir.Integr./Tipo Integr.</p>
-                    <div className="flex space-x-2">
-                      <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                        selectedFlowNode.data.isExecuted === 'TRUE' 
-                          ? 'bg-blue-100 text-blue-800' 
-                          : selectedFlowNode.data.isPendingConnected
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {selectedFlowNode.data.isExecuted === 'TRUE' 
-                          ? 'Executado' 
-                          : selectedFlowNode.data.isPendingConnected
-                          ? 'Pendente Conectado'
-                          : 'Não Executado'}
-                      </div>
-                      {selectedFlowNode.data.integrType && (
-                        <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                          {selectedFlowNode.data.integrType}
-                        </div>
-                      )}
-                      {selectedFlowNode.data.callType && (
-                        <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                          {selectedFlowNode.data.callType}
-                        </div>
-                      )}
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th className="px-3 py-2 text-left font-medium text-gray-700 border-r border-gray-200">Status Exec.</th>
+                            <th className="px-3 py-2 text-left font-medium text-gray-700 border-r border-gray-200">Dir.Integr.</th>
+                            <th className="px-3 py-2 text-left font-medium text-gray-700">Tipo Integr.</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="bg-white">
+                            <td className="px-3 py-2 border-r border-gray-200">
+                              <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                                selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'bg-blue-100 text-blue-800' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'Executado' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'Pendente Conectado'
+                                  : 'Não Executado'}
+                              </div>
+                            </td>
+                            <td className="px-3 py-2 border-r border-gray-200">
+                              {selectedFlowNode.data.callType ? (
+                                <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                  {selectedFlowNode.data.callType}
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-xs">-</span>
+                              )}
+                            </td>
+                            <td className="px-3 py-2">
+                              {selectedFlowNode.data.integrType ? (
+                                <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                  {selectedFlowNode.data.integrType}
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-xs">-</span>
+                              )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 )}
