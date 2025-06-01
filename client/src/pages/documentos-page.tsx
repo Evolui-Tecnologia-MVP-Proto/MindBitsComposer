@@ -5430,6 +5430,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           let fieldsData = formData.Fields;
                           if (Array.isArray(formData.Fields)) {
                             fieldsData = {};
+                            // O array está no formato: [fieldName1, fieldValue1, fieldName2, fieldValue2, ...]
                             for (let i = 0; i < formData.Fields.length; i += 2) {
                               const fieldName = formData.Fields[i];
                               const fieldValue = formData.Fields[i + 1];
@@ -5438,6 +5439,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               }
                             }
                           }
+                          
+                          console.log('🟡 Dados do formulário processados:', fieldsData);
                           
                           return (
                             <div className="bg-gray-50 p-4 rounded border space-y-4">
