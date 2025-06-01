@@ -4871,13 +4871,25 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       
       let edgeColor = '#6b7280'; // cor padrão
       
-      // Se ambos os nós estão executados
-      if (sourceExecuted && targetExecuted) {
-        edgeColor = '#21639a';
+      // Verificar se a conexão parte de um SwitchNode e aplicar cor específica do handle
+      if (sourceNode?.type === 'switchNode') {
+        // Verificar qual handle está sendo usado baseado no sourceHandle
+        if (edge.sourceHandle === 'a') {
+          edgeColor = '#dc2626'; // Vermelho para conector direito (id="a")
+        } else if (edge.sourceHandle === 'c') {
+          edgeColor = '#16a34a'; // Verde para conector esquerdo (id="c")
+        }
       }
-      // Se há conexão entre executado e pendente
-      else if ((sourceExecuted && targetPending) || (targetExecuted && sourcePending)) {
-        edgeColor = '#fbbf24'; // amarelo
+      // Se não é switch node, aplicar lógica de execução
+      else {
+        // Se ambos os nós estão executados
+        if (sourceExecuted && targetExecuted) {
+          edgeColor = '#21639a';
+        }
+        // Se há conexão entre executado e pendente
+        else if ((sourceExecuted && targetPending) || (targetExecuted && sourcePending)) {
+          edgeColor = '#fbbf24'; // amarelo
+        }
       }
       
       return {
