@@ -5316,7 +5316,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   })()} - {selectedFlowNode.id}
                 </p>
                 <button
-                  onClick={() => setIsFlowInspectorPinned(!isFlowInspectorPinned)}
+                  onClick={() => {
+                    console.log("🔴 Clique no botão pin - Estado atual:", isFlowInspectorPinned);
+                    setIsFlowInspectorPinned(!isFlowInspectorPinned);
+                    console.log("🔴 Novo estado do pin:", !isFlowInspectorPinned);
+                  }}
                   className={`absolute top-0 right-0 p-1 rounded transition-colors ${
                     isFlowInspectorPinned 
                       ? 'text-blue-600 bg-blue-100 hover:bg-blue-200' 
