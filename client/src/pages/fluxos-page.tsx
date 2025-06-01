@@ -1527,8 +1527,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                                     [key]: newValue, 
                                     configured: true, 
                                     showLabel: false,
-                                    // Se for EndNode e FromType = 'Init' (Encerramento Direto), limpar To_Flow_id
-                                    ...(selectedNode.type === 'endNode' && key === 'FromType' && newValue === 'Init' 
+                                    // Se for EndNode e To_Type = 'Direct_finish' (Encerramento Direto), limpar To_Flow_id
+                                    ...(selectedNode.type === 'endNode' && key === 'To_Type' && newValue === 'Direct_finish' 
                                       ? { To_Flow_id: '' } 
                                       : {})
                                   }
