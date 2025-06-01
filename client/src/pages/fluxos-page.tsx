@@ -962,7 +962,18 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     const flowType = flowTypes.find((type: any) => type.id === flowTypeId);
     console.log('flowType encontrado:', flowType);
     
-    const nodeMetadataObj = flowType?.nodeMetadata || flowType?.node_metadata;
+    let nodeMetadataObj = flowType?.nodeMetadata || flowType?.node_metadata;
+    
+    // Se nodeMetadata for string, fazer parse do JSON
+    if (typeof nodeMetadataObj === 'string') {
+      try {
+        nodeMetadataObj = JSON.parse(nodeMetadataObj);
+      } catch (e) {
+        console.log('Erro ao fazer parse do nodeMetadata JSON:', e);
+        return null;
+      }
+    }
+    
     if (!nodeMetadataObj?.nodeTypes) {
       console.log('nodeMetadata ou nodeTypes não encontrado:', { nodeMetadata: flowType?.nodeMetadata, node_metadata: flowType?.node_metadata });
       return null;
