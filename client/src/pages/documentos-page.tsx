@@ -5389,7 +5389,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 {selectedFlowNode.data.description && (
                   <div>
                     <p className="text-sm font-medium text-gray-700">Descrição</p>
-                    <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded border">
+                    <p className="text-xs text-gray-900 bg-gray-50 p-2 rounded border font-mono">
                       {selectedFlowNode.data.description}
                     </p>
                   </div>
