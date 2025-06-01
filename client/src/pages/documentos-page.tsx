@@ -5401,8 +5401,25 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     {(() => {
                       try {
                         // Verifica tanto attached_Form (maiúsculo) quanto attached_form (minúsculo)
-                        const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+                        let attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
                         console.log('🔍 Dados brutos do formulário:', attachedFormData);
+                        
+                        // Corrige formato malformado do JSON se necessário
+                        if (typeof attachedFormData === 'string' && attachedFormData.includes('"Motivo de Recusa":') && attachedFormData.includes('"Detalhamento":')) {
+                          // Corrige o formato específico que está sendo usado
+                          attachedFormData = attachedFormData.replace(
+                            /"Fields": \[([^\]]+)\]/,
+                            (match, fieldsContent) => {
+                              // Converte "FieldName": [values] para "FieldName": [values],
+                              let corrected = fieldsContent
+                                .replace(/"([^"]+)":\s*\[([^\]]+)\]/g, '"$1": [$2]')
+                                .replace(/\]\s*,?\s*"/g, '], "');
+                              return `"Fields": {${corrected}}`;
+                            }
+                          );
+                        }
+                        
+                        console.log('🔍 Dados corrigidos:', attachedFormData);
                         const formData = JSON.parse(attachedFormData);
                         console.log('🔍 Dados parseados:', formData);
                         
