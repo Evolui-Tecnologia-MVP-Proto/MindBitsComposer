@@ -4881,6 +4881,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       }
 
       // Mostrar alerta para persistir alterações
+      console.log('🔴 Definindo showApprovalAlert para true');
       setShowApprovalAlert(true);
     };
 
@@ -5231,6 +5232,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     </div>
                     
                     {/* Caixa de alerta para confirmação */}
+                    {console.log('🔴 showApprovalAlert:', showApprovalAlert)}
                     {showApprovalAlert && (
                       <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
                         <div className="flex items-start space-x-2">
