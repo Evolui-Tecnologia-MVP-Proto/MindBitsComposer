@@ -5642,13 +5642,60 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       const sourceExecuted = sourceNode?.data?.isExecuted === 'TRUE';
       const targetExecuted = targetNode?.data?.isExecuted === 'TRUE';
       
+      // Função para verificar se switchNode pode conectar com target
+      const canSwitchNodeConnect = (switchNode: any, targetNode: any, edge: any) => {
+        if (switchNode.type !== 'switchNode') return true;
+        
+        const inputSwitch = switchNode.data?.inputSwitch;
+        if (!inputSwitch) return false;
+        
+        // Verificar se o inputSwitch corresponde a redSwitch ou greenSwitch
+        const redSwitch = switchNode.data?.redSwitch;
+        const greenSwitch = switchNode.data?.greenSwitch;
+        
+        // Se inputSwitch corresponde ao redSwitch, conexão pelo conector vermelho
+        if (redSwitch && (
+          (Array.isArray(redSwitch) && redSwitch.includes(inputSwitch)) ||
+          (typeof redSwitch === 'string' && redSwitch === inputSwitch)
+        )) {
+          return edge.sourceHandle === 'red' || edge.sourceHandle === null; // null para compatibilidade
+        }
+        
+        // Se inputSwitch corresponde ao greenSwitch, conexão pelo conector verde
+        if (greenSwitch && (
+          (Array.isArray(greenSwitch) && greenSwitch.includes(inputSwitch)) ||
+          (typeof greenSwitch === 'string' && greenSwitch === inputSwitch)
+        )) {
+          return edge.sourceHandle === 'green' || edge.sourceHandle === null; // null para compatibilidade
+        }
+        
+        return false;
+      };
+      
       // Se source executado e target não executado
       if (sourceExecuted && !targetExecuted) {
-        pendingConnectedNodes.add(edge.target);
+        // Se source é switchNode, verificar regras específicas
+        if (sourceNode?.type === 'switchNode') {
+          if (canSwitchNodeConnect(sourceNode, targetNode, edge)) {
+            pendingConnectedNodes.add(edge.target);
+          }
+        } else {
+          // Para outros tipos de nós, aplicar regra normal
+          pendingConnectedNodes.add(edge.target);
+        }
       }
+      
       // Se target executado e source não executado
       if (targetExecuted && !sourceExecuted) {
-        pendingConnectedNodes.add(edge.source);
+        // Se target é switchNode, verificar regras específicas (conexão reversa)
+        if (targetNode?.type === 'switchNode') {
+          if (canSwitchNodeConnect(targetNode, sourceNode, {...edge, source: edge.target, target: edge.source})) {
+            pendingConnectedNodes.add(edge.source);
+          }
+        } else {
+          // Para outros tipos de nós, aplicar regra normal
+          pendingConnectedNodes.add(edge.source);
+        }
       }
     });
 
