@@ -5193,6 +5193,33 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
 
+                {/* Status Exec./Campo Switch apenas para SwitchNode */}
+                {selectedFlowNode.type === 'switchNode' && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Status Exec./Campo Switch</p>
+                    <div className="flex space-x-2">
+                      <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                        selectedFlowNode.data.isExecuted === 'TRUE' 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : selectedFlowNode.data.isPendingConnected
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {selectedFlowNode.data.isExecuted === 'TRUE' 
+                          ? 'Executado' 
+                          : selectedFlowNode.data.isPendingConnected
+                          ? 'Pendente Conectado'
+                          : 'Não Executado'}
+                      </div>
+                      {selectedFlowNode.data.switchField && (
+                        <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                          {selectedFlowNode.data.switchField}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {selectedFlowNode.data.To_Flow_id && (
                   <div>
                     <p className="text-sm font-medium text-gray-700">Fluxo de Destino</p>
