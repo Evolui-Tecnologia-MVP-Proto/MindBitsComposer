@@ -5099,8 +5099,43 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             }
           });
 
-          // Salvar alterações no banco de dados
-          await saveChangesToDatabase();
+          // Salvar alterações no banco de dados - atualizando fluxo completo
+          try {
+            const finalFlowTasks = {
+              ...flowDiagramModal.flowData.flowTasks,
+              nodes: updatedNodes
+            };
+
+            const response = await fetch(`/api/document-flow-executions/${flowDiagramModal.flowData.documentId}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                flowTasks: finalFlowTasks
+              }),
+            });
+
+            if (!response.ok) {
+              throw new Error('Erro ao salvar alterações no banco');
+            }
+
+            console.log('✅ Alterações da integração manual salvas no banco de dados');
+            
+            // Atualizar estado local
+            setFlowDiagramModal(prev => ({
+              ...prev,
+              flowData: {
+                ...prev.flowData,
+                flowTasks: finalFlowTasks
+              }
+            }));
+
+            // Recarregar dados
+            queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
+          } catch (error) {
+            console.error('❌ Erro ao salvar integração manual:', error);
+          }
         }
       } else {
         setIntegrationResult({
