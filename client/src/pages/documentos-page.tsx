@@ -5316,16 +5316,16 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   })()} - {selectedFlowNode.id}
                 </p>
                 <button
-                  onClick={() => setIsPinned(!isPinned)}
+                  onClick={() => setIsFlowInspectorPinned(!isFlowInspectorPinned)}
                   className={`absolute top-0 right-0 p-1 rounded transition-colors ${
-                    isPinned 
+                    isFlowInspectorPinned 
                       ? 'text-blue-600 bg-blue-100 hover:bg-blue-200' 
                       : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
                   }`}
-                  title={isPinned ? "Desafixar painel" : "Fixar painel"}
+                  title={isFlowInspectorPinned ? "Desafixar painel" : "Fixar painel"}
                 >
                   <Pin 
-                    className={`w-4 h-4 transition-transform ${isPinned ? 'rotate-45' : 'rotate-0'}`}
+                    className={`w-4 h-4 transition-transform ${isFlowInspectorPinned ? 'rotate-45' : 'rotate-0'}`}
                   />
                 </button>
               </div>
@@ -5748,7 +5748,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
           <div className="pt-4 border-t">
             <Button 
-              onClick={() => setShowFlowInspector(false)}
+              onClick={() => {
+                setShowFlowInspector(false);
+                setSelectedFlowNode(null);
+                setIsFlowInspectorPinned(false);
+              }}
               variant="outline"
               size="sm"
               className="w-full"
