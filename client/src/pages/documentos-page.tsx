@@ -5402,7 +5402,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       try {
                         // Verifica tanto attached_Form (maiúsculo) quanto attached_form (minúsculo)
                         const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+                        console.log('🔍 Dados brutos do formulário:', attachedFormData);
                         const formData = JSON.parse(attachedFormData);
+                        console.log('🔍 Dados parseados:', formData);
                         
                         // Verifica se é um formulário com condição
                         if (formData.Show_Condition !== undefined && formData.Fields) {
