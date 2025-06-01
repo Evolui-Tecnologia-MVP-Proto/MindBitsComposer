@@ -6001,7 +6001,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               Visualização do diagrama de fluxo de trabalho aplicado ao documento
             </DialogDescription>
           </DialogHeader>
-          <div className="h-[500px] w-full border rounded-lg">
+          <div className="flex-1 w-full border rounded-lg" style={{ height: 'calc(90vh - 120px)' }}>
             <ReactFlowProvider>
               <FlowWithAutoFitView 
                 flowData={flowDiagramModal.flowData}
