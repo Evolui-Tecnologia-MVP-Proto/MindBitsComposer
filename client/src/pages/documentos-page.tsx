@@ -4916,6 +4916,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     // Estado para controlar os valores dos campos do formulário
     const [formValues, setFormValues] = useState<Record<string, string>>({});
     
+    // Carregar dados salvos quando um nó é selecionado
+    useEffect(() => {
+      if (selectedFlowNode && selectedFlowNode.data.formData) {
+        console.log('🔄 Carregando dados salvos do formulário:', selectedFlowNode.data.formData);
+        setFormValues(selectedFlowNode.data.formData);
+      } else {
+        // Limpar formulário se não há dados salvos
+        setFormValues({});
+      }
+    }, [selectedFlowNode?.id, selectedFlowNode?.data.formData]);
+    
     // Função helper para extrair dados do formulário
     const getFormFields = () => {
       try {
