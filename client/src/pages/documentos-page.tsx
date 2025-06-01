@@ -5236,6 +5236,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       
       return {
         ...edge,
+        type: 'smoothstep', // garantir que o tipo seja definido
         animated: shouldAnimate, // aplicar animação baseada na lógica
         style: {
           stroke: edgeColor,
