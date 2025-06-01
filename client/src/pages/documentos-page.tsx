@@ -5242,6 +5242,56 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               message: 'Erro ao salvar alterações no banco de dados'
             });
           }
+
+          setNodes(updatedNodes);
+          
+          // Atualizar nó selecionado
+          setSelectedFlowNode({
+            ...selectedFlowNode,
+            data: {
+              ...selectedFlowNode.data,
+              isExecuted: 'TRUE',
+              isPendingConnected: false
+            }
+          });
+
+          // Salvar alterações no banco de dados
+          try {
+            const finalFlowTasks = {
+              ...flowDiagramModal.flowData.flowTasks,
+              nodes: updatedNodes
+            };
+
+            const response = await fetch(`/api/document-flow-executions/${flowDiagramModal.flowData.documentId}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ flowTasks: finalFlowTasks }),
+            });
+
+            if (!response.ok) {
+              throw new Error('Erro ao salvar alterações no banco');
+            }
+
+            console.log('✅ Alterações da integração manual salvas no banco de dados');
+            
+            // Atualizar estado local
+            setFlowDiagramModal(prev => ({
+              ...prev,
+              flowData: {
+                ...prev.flowData!,
+                flowTasks: finalFlowTasks
+              }
+            }));
+
+          } catch (error) {
+            console.error('Erro ao salvar alterações:', error);
+            setIntegrationResult({
+              status: 'error',
+              message: 'Erro ao salvar alterações no banco de dados'
+            });
+          }
         } else {
           setIntegrationResult({
             status: 'error',
@@ -5261,8 +5311,35 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
     // Função para alterar o status de aprovação (altera estado imediatamente e mostra alerta)
     const updateApprovalStatus = (nodeId: string, newStatus: string) => {
-                  console.log(`🔄 GATILHO AUTOMÁTICO: Processando endNode de encerramento direto: ${node.id}`);
-                  hasDirectEndNodeChanges = true;
+      const currentNodes = getNodes();
+      const updatedNodes = currentNodes.map(node => {
+        if (node.id === nodeId) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              isAproved: newStatus
+            }
+          };
+        }
+        return node;
+      });
+      setNodes(updatedNodes);
+      
+      // Atualizar também o nó selecionado para refletir a mudança no painel
+      if (selectedFlowNode && selectedFlowNode.id === nodeId) {
+        setSelectedFlowNode({
+          ...selectedFlowNode,
+          data: {
+            ...selectedFlowNode.data,
+            isAproved: newStatus
+          }
+        });
+      }
+
+      // Mostrar alerta para persistir alterações
+      console.log('🔴 Definindo showApprovalAlert para true');
+      setShowApprovalAlert(true);
                   
                   updatedNodes[index] = {
                     ...node,
