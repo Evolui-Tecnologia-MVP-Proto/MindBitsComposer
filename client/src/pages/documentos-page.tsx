@@ -5426,9 +5426,22 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             return null;
                           }
                           
+                          // Converte Fields para objeto se for array
+                          let fieldsData = formData.Fields;
+                          if (Array.isArray(formData.Fields)) {
+                            fieldsData = {};
+                            for (let i = 0; i < formData.Fields.length; i += 2) {
+                              const fieldName = formData.Fields[i];
+                              const fieldValue = formData.Fields[i + 1];
+                              if (fieldName && fieldValue !== undefined) {
+                                fieldsData[fieldName] = fieldValue;
+                              }
+                            }
+                          }
+                          
                           return (
                             <div className="bg-gray-50 p-4 rounded border space-y-4">
-                              {Object.entries(formData.Fields).map(([fieldName, fieldValue]) => {
+                              {Object.entries(fieldsData).map(([fieldName, fieldValue]) => {
                                 // Verifica se é um array de configuração com default e type
                                 if (Array.isArray(fieldValue) && fieldValue.length === 2 && 
                                     typeof fieldValue[0] === 'string' && fieldValue[0].startsWith('default:') &&
