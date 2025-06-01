@@ -5057,6 +5057,108 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       setShowApprovalAlert(true);
     };
 
+    // Função para executar encerramento direto do fluxo
+    const executeDirectFlowConclusion = async () => {
+      if (!selectedFlowNode || selectedFlowNode.type !== 'endNode' || selectedFlowNode.data.FromType !== 'Init') {
+        console.log('Nenhum endNode de encerramento direto selecionado');
+        return;
+      }
+
+      console.log('Executando encerramento direto do fluxo...');
+      
+      try {
+        // Marcar o nó como executado
+        const updatedNodes = [...nodes];
+        const nodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
+        if (nodeIndex !== -1) {
+          updatedNodes[nodeIndex] = {
+            ...updatedNodes[nodeIndex],
+            data: {
+              ...updatedNodes[nodeIndex].data,
+              isExecuted: 'TRUE',
+              isPendingConnected: false,
+              isReadonly: true
+            }
+          };
+          setNodes(updatedNodes);
+          
+          // Atualizar nó selecionado
+          setSelectedFlowNode({
+            ...selectedFlowNode,
+            data: {
+              ...selectedFlowNode.data,
+              isExecuted: 'TRUE',
+              isPendingConnected: false,
+              isReadonly: true
+            }
+          });
+
+          // Salvar alterações no banco de dados - marcando como concluído
+          const finalFlowTasks = {
+            ...flowDiagramModal.flowData.flowTasks,
+            nodes: updatedNodes
+          };
+
+          const response = await fetch(`/api/document-flow-executions/${flowDiagramModal.flowData.documentId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              flowTasks: finalFlowTasks,
+              status: 'concluded',
+              completedAt: new Date().toISOString()
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Erro ao salvar encerramento no banco');
+          }
+
+          // Atualizar status do documento para "Concluido"
+          const docResponse = await fetch(`/api/documentos/${flowDiagramModal.flowData.documentId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              status: 'Concluido'
+            }),
+          });
+
+          if (!docResponse.ok) {
+            throw new Error('Erro ao atualizar status do documento');
+          }
+
+          console.log('✅ Fluxo encerrado e documento marcado como concluído');
+          
+          setIntegrationResult({
+            status: 'success',
+            message: 'Fluxo encerrado com sucesso! O documento foi marcado como concluído e enviado para a aba [Concluídos].'
+          });
+          
+          // Atualizar estado local
+          setFlowDiagramModal(prev => ({
+            ...prev,
+            flowData: {
+              ...prev.flowData,
+              flowTasks: finalFlowTasks
+            }
+          }));
+
+          // Recarregar dados
+          queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
+          queryClient.invalidateQueries({ queryKey: ['/api/documentos'] });
+        }
+      } catch (error) {
+        console.error('❌ Erro ao executar encerramento direto:', error);
+        setIntegrationResult({
+          status: 'error',
+          message: 'Falha ao encerrar o fluxo. Tente novamente.'
+        });
+      }
+    };
+
     // Função para executar integração manual
     const executeManualIntegration = async () => {
       if (!selectedFlowNode || selectedFlowNode.type !== 'integrationNode') {
@@ -6068,6 +6170,45 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       }`}
                     >
                       {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Já Executado' : 'Executar'}
+                    </button>
+                  </div>
+                )}
+
+                {/* Manual execution form para EndNode de Encerramento Direto */}
+                {selectedFlowNode.type === 'endNode' && selectedFlowNode.data.FromType === 'Init' && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
+                  <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="mb-3">
+                      <p className="text-xs text-red-800 mb-2">
+                        Ao pressionar o botão você encerrará este fluxo vinculado ao documento, bem como marcará o documento como encerrado e o enviará para a tab [Concluídos] da página [Documentos]. Pressione para continuar.
+                      </p>
+                    </div>
+
+                    {integrationResult.status && (
+                      <div className={`mb-3 p-3 rounded-md ${
+                        integrationResult.status === 'success' 
+                          ? 'bg-green-50 border border-green-200' 
+                          : 'bg-red-50 border border-red-200'
+                      }`}>
+                        <p className={`text-sm ${
+                          integrationResult.status === 'success' 
+                            ? 'text-green-800' 
+                            : 'text-red-800'
+                        }`}>
+                          {integrationResult.message}
+                        </p>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={executeDirectFlowConclusion}
+                      disabled={selectedFlowNode.data.isExecuted === 'TRUE'}
+                      className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                        selectedFlowNode.data.isExecuted === 'TRUE'
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+                      }`}
+                    >
+                      {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Já Concluído' : 'Concluir Fluxo'}
                     </button>
                   </div>
                 )}
