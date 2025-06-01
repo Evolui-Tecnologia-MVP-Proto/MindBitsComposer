@@ -5408,7 +5408,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             <div key={fieldName} className="space-y-2">
                               <label className="text-sm font-medium text-gray-700">{fieldName}</label>
                               {Array.isArray(fieldValue) ? (
-                                <select className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <select className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono">
                                   <option value="">Selecione uma opção</option>
                                   {fieldValue.map((option, index) => (
                                     <option key={index} value={option}>{option}</option>
@@ -5418,7 +5418,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                 <input
                                   type="text"
                                   placeholder={fieldValue || `Digite ${fieldName.toLowerCase()}`}
-                                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono"
                                 />
                               )}
                             </div>
