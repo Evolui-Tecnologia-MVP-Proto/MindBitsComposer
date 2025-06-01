@@ -4914,35 +4914,98 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           console.log('Nó atual atualizado com isAproved:', selectedFlowNode.data.isAproved);
         }
 
-        // 2. Encontrar nós diretamente conectados ao actionNode (originating from actionNode)
-        const connectedTargetNodeIds = edges
-          .filter(edge => edge.source === selectedFlowNode.id)
-          .map(edge => edge.target);
+        // 2. Encontrar nós conectados APENAS pelas conexões de SAÍDA do actionNode
+        const outgoingConnections = edges.filter(edge => edge.source === selectedFlowNode.id);
+        console.log('Conexões de saída do actionNode encontradas:', outgoingConnections);
 
-        console.log('Nós conectados encontrados:', connectedTargetNodeIds);
+        // 3. Processar apenas os nós que recebem conexões diretas do actionNode
+        outgoingConnections.forEach(edge => {
+          const targetNodeIndex = updatedNodes.findIndex(n => n.id === edge.target);
+          if (targetNodeIndex !== -1) {
+            const targetNode = updatedNodes[targetNodeIndex];
+            
+            // Se for switchNode, apenas definir inputSwitch (não marcar como executado ainda)
+            if (targetNode.type === 'switchNode') {
+              updatedNodes[targetNodeIndex] = {
+                ...targetNode,
+                data: {
+                  ...targetNode.data,
+                  isExecuted: 'TRUE',
+                  inputSwitch: selectedFlowNode.data.isAproved
+                }
+              };
+            } else {
+              // Para outros tipos de nós, marcar como executado
+              updatedNodes[targetNodeIndex] = {
+                ...targetNode,
+                data: {
+                  ...targetNode.data,
+                  isExecuted: 'TRUE'
+                }
+              };
+            }
+          }
+        });
 
-        // 3. Processar cada nó conectado
-        connectedTargetNodeIds.forEach(nodeId => {
+        // 4. Agora processar a lógica de "pendente conectado" baseada apenas nas conexões de SAÍDA
+        const pendingConnectedNodeIds = new Set<string>();
+        
+        // Para cada conexão de saída do actionNode, verificar os nós conectados
+        outgoingConnections.forEach(edge => {
+          const connectedNode = updatedNodes.find(n => n.id === edge.target);
+          
+          if (connectedNode?.type === 'switchNode') {
+            // Para switchNodes, encontrar as próximas conexões baseadas no inputSwitch
+            const switchOutgoingEdges = edges.filter(e => e.source === connectedNode.id);
+            
+            switchOutgoingEdges.forEach(switchEdge => {
+              const { inputSwitch, redSwitch, greenSwitch } = connectedNode.data;
+              let shouldActivateConnection = false;
+              
+              // Verificar se a conexão deve estar ativa baseada no inputSwitch
+              if (switchEdge.sourceHandle === 'a' && inputSwitch === redSwitch) {
+                shouldActivateConnection = true;
+              } else if (switchEdge.sourceHandle === 'c' && inputSwitch === greenSwitch) {
+                shouldActivateConnection = true;
+              }
+              
+              // Se a conexão deve estar ativa, marcar o nó de destino como pendente conectado
+              if (shouldActivateConnection) {
+                const finalTargetNode = updatedNodes.find(n => n.id === switchEdge.target);
+                if (finalTargetNode && finalTargetNode.data?.isExecuted !== 'TRUE') {
+                  pendingConnectedNodeIds.add(switchEdge.target);
+                }
+              }
+            });
+          } else {
+            // Para outros tipos de nós, verificar suas conexões de saída
+            const nodeOutgoingEdges = edges.filter(e => e.source === connectedNode.id);
+            nodeOutgoingEdges.forEach(nodeEdge => {
+              const finalTargetNode = updatedNodes.find(n => n.id === nodeEdge.target);
+              if (finalTargetNode && finalTargetNode.data?.isExecuted !== 'TRUE') {
+                pendingConnectedNodeIds.add(nodeEdge.target);
+              }
+            });
+          }
+        });
+
+        // 5. Aplicar o status "pendente conectado" apenas aos nós identificados
+        pendingConnectedNodeIds.forEach(nodeId => {
           const nodeIndex = updatedNodes.findIndex(n => n.id === nodeId);
           if (nodeIndex !== -1) {
-            const node = updatedNodes[nodeIndex];
-            
-            // Marcar como executado
             updatedNodes[nodeIndex] = {
-              ...node,
+              ...updatedNodes[nodeIndex],
               data: {
-                ...node.data,
-                isExecuted: 'TRUE',
-                // Se for switchNode, definir inputSwitch igual ao isAproved do actionNode
-                ...(node.type === 'switchNode' ? {
-                  inputSwitch: selectedFlowNode.data.isAproved
-                } : {})
+                ...updatedNodes[nodeIndex].data,
+                isPendingConnected: true
               }
             };
           }
         });
 
-        // 4. Preparar dados para envio ao servidor
+        console.log('Nós marcados como pendente conectado:', Array.from(pendingConnectedNodeIds));
+
+        // 6. Preparar dados para envio ao servidor
         const updatedFlowTasks = {
           ...flowData.flowTasks,
           nodes: updatedNodes
