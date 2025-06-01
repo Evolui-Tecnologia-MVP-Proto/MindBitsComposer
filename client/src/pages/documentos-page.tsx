@@ -5477,8 +5477,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
                 {selectedFlowNode.data.service && (
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Serviço</p>
-                    <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.service}</p>
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium text-gray-700">Serviço:</span> {selectedFlowNode.data.service}
+                    </p>
                   </div>
                 )}
 
