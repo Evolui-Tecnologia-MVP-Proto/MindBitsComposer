@@ -181,7 +181,7 @@ const EndNodeComponent = (props: any) => {
       getBackgroundColor()
     } ${
       getTextColor()
-    } border-black border-2`}>
+    } ${borderStyle} ${selectionStyle}`}>
       <Square className="absolute -top-4 -left-5 h-6 w-6 text-red-600" />
       {props.data.showLabel !== false && (
         <div className="font-medium font-mono">{props.data.label}</div>
@@ -339,12 +339,21 @@ const ActionNodeComponent = (props: any) => {
 const DocumentNodeComponent = (props: any) => {
   const isExecuted = props.data.isExecuted === 'TRUE';
   const isPendingConnected = props.data.isPendingConnected;
+  const isSelected = props.selected;
   
   let fillColor = 'white';
   if (isExecuted) fillColor = '#21639a';
   else if (isPendingConnected) fillColor = '#fef3cd'; // amarelo claro
   
   const textClass = isExecuted ? 'text-white' : 'text-black';
+  
+  // Configurações para realce do nó selecionado
+  const strokeColor = isSelected ? '#f97316' : 'black'; // laranja quando selecionado
+  const strokeWidth = isSelected ? '4' : '2';
+  const dropShadowFilter = isSelected 
+    ? 'drop-shadow(0 4px 8px rgba(249, 115, 22, 0.4))' 
+    : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))';
+  const scaleTransform = isSelected ? 'scale(1.05)' : 'scale(1)';
   
   // Hook para buscar templates
   const { data: templatesList } = useQuery({
@@ -387,7 +396,7 @@ const DocumentNodeComponent = (props: any) => {
   const dynamicHeight = calculateHeight();
   
   return (
-    <div className="relative" style={{ width: '140px', height: `${dynamicHeight}px` }}>
+    <div className="relative transition-transform duration-200" style={{ width: '140px', height: `${dynamicHeight}px`, transform: scaleTransform }}>
       <svg 
         className="absolute inset-0 pointer-events-none"
         width="140" 
@@ -397,10 +406,10 @@ const DocumentNodeComponent = (props: any) => {
         <polygon
           points={`0,0 140,0 140,${dynamicHeight - 16} 112,${dynamicHeight} 28,${dynamicHeight - 16} 0,${dynamicHeight - 16}`}
           fill={fillColor}
-          stroke="black"
-          strokeWidth="2"
+          stroke={strokeColor}
+          strokeWidth={strokeWidth}
           style={{
-            filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+            filter: dropShadowFilter
           }}
         />
       </svg>
@@ -445,6 +454,7 @@ const DocumentNodeComponent = (props: any) => {
 const IntegrationNodeComponent = (props: any) => {
   const isExecuted = props.data.isExecuted === 'TRUE';
   const isPendingConnected = props.data.isPendingConnected;
+  const isSelected = props.selected;
   
   let fillColor = 'white';
   if (isExecuted) fillColor = '#21639a';
@@ -452,8 +462,16 @@ const IntegrationNodeComponent = (props: any) => {
   
   const textClass = isExecuted ? 'text-white' : 'text-black';
   
+  // Configurações para realce do nó selecionado
+  const strokeColor = isSelected ? '#f97316' : 'black'; // laranja quando selecionado
+  const strokeWidth = isSelected ? '4' : '2';
+  const dropShadowFilter = isSelected 
+    ? 'drop-shadow(0 4px 8px rgba(249, 115, 22, 0.4))' 
+    : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))';
+  const scaleTransform = isSelected ? 'scale(1.05)' : 'scale(1)';
+  
   return (
-    <div className="relative" style={{ width: '140px', height: '80px' }}>
+    <div className="relative transition-transform duration-200" style={{ width: '140px', height: '80px', transform: scaleTransform }}>
       <svg 
         className="absolute inset-0 pointer-events-none"
         width="140" 
@@ -463,10 +481,10 @@ const IntegrationNodeComponent = (props: any) => {
         <polygon
           points="28,0 140,0 112,80 0,80"
           fill={fillColor}
-          stroke="black"
-          strokeWidth="2"
+          stroke={strokeColor}
+          strokeWidth={strokeWidth}
           style={{
-            filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+            filter: dropShadowFilter
           }}
         />
       </svg>
