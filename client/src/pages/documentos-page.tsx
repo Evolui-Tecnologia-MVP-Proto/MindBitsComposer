@@ -5098,6 +5098,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               isPendingConnected: false
             }
           });
+
+          // Salvar alterações no banco de dados
+          await saveChangesToDatabase();
         }
       } else {
         setIntegrationResult({
@@ -5228,6 +5231,44 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
         console.log('Nós marcados como pendente conectado:', Array.from(pendingConnectedNodeIds));
 
+        // 5.1. Processar endNodes de "encerramento direto" automaticamente
+        let hasDirectEndNodeChanges = false;
+        let documentCompleted = false;
+        
+        updatedNodes.forEach((node, index) => {
+          if (node.type === 'endNode' && 
+              node.data.endType === 'Encerramento Direto' && 
+              node.data.isPendingConnected && 
+              node.data.isExecuted !== 'TRUE') {
+            
+            console.log(`🔄 Processando endNode de encerramento direto automaticamente: ${node.id}`);
+            hasDirectEndNodeChanges = true;
+            
+            updatedNodes[index] = {
+              ...node,
+              data: {
+                ...node.data,
+                isExecuted: 'TRUE',
+                isPendingConnected: false,
+                status: 'completed',
+                completedAt: new Date().toISOString()
+              }
+            };
+          }
+        });
+
+        // Verificar se todos os nós estão executados para marcar o fluxo como completo
+        if (hasDirectEndNodeChanges) {
+          const allNodesExecuted = updatedNodes.every(node => 
+            node.data.isExecuted === 'TRUE' || node.type === 'startNode'
+          );
+
+          if (allNodesExecuted) {
+            console.log('🎯 Fluxo completo detectado - marcando documento como completed');
+            documentCompleted = true;
+          }
+        }
+
         // 6. Preparar dados para envio ao servidor
         const updatedFlowTasks = {
           ...flowData.flowTasks,
@@ -5235,14 +5276,22 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         };
 
         // 5. Enviar para o servidor (atualizar execução do fluxo, não o template)
+        const requestBody = {
+          flowTasks: updatedFlowTasks
+        };
+
+        // Se o documento foi marcado como completo, adicionar status e timestamp
+        if (documentCompleted) {
+          requestBody.status = 'completed';
+          requestBody.completedAt = new Date().toISOString();
+        }
+
         const response = await fetch(`/api/document-flow-executions/${flowData.documentId}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            flowTasks: updatedFlowTasks
-          }),
+          body: JSON.stringify(requestBody),
         });
 
         if (!response.ok) {

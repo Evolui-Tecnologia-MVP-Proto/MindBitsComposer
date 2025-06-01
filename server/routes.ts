@@ -3668,10 +3668,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const { documentId } = req.params;
-      const { flowTasks } = req.body;
+      const { flowTasks, status, completedAt } = req.body;
       
       console.log('🔄 Atualizando execução de fluxo para documento:', documentId);
-      console.log('🔄 Dados recebidos:', { flowTasks });
+      console.log('🔄 Dados recebidos:', { flowTasks, status, completedAt });
       
       // Verificar se existe uma execução ativa para este documento
       const execution = await db.select()
@@ -3687,12 +3687,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Execução de fluxo não encontrada" });
       }
       
+      // Preparar dados para atualização
+      const updateData: any = {
+        flowTasks,
+        updatedAt: new Date()
+      };
+      
+      // Se status for fornecido, incluir na atualização
+      if (status) {
+        updateData.status = status;
+        console.log(`🎯 Atualizando status para: ${status}`);
+      }
+      
+      // Se completedAt for fornecido, incluir na atualização
+      if (completedAt) {
+        updateData.completedAt = new Date(completedAt);
+        console.log(`📅 Marcando como completo em: ${completedAt}`);
+      }
+      
       // Atualizar as tarefas do fluxo
       const updated = await db.update(documentFlowExecutions)
-        .set({
-          flowTasks,
-          updatedAt: new Date()
-        })
+        .set(updateData)
         .where(eq(documentFlowExecutions.documentId, documentId))
         .returning();
       
