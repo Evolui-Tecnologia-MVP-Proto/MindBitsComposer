@@ -4836,8 +4836,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     };
 
     return (
-      <div className="flex-1 flex">
-        <div className="flex-1">
+      <div className="flex-1 flex h-full w-full">
+        <div className="flex-1 h-full w-full">
           <ReactFlow
             nodes={processedNodes}
             edges={processedEdges}
