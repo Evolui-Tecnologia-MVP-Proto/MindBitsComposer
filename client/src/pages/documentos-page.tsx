@@ -5430,14 +5430,19 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           let fieldsData = formData.Fields;
                           if (Array.isArray(formData.Fields)) {
                             fieldsData = {};
-                            // O array está no formato: [fieldName1, fieldValue1, fieldName2, fieldValue2, ...]
-                            for (let i = 0; i < formData.Fields.length; i += 2) {
-                              const fieldName = formData.Fields[i];
-                              const fieldValue = formData.Fields[i + 1];
-                              if (fieldName && fieldValue !== undefined) {
-                                fieldsData[fieldName] = fieldValue;
+                            // Trata diferentes formatos de array
+                            formData.Fields.forEach((item, index) => {
+                              if (typeof item === 'string') {
+                                // Formato: [fieldName1, fieldValue1, fieldName2, fieldValue2, ...]
+                                const nextItem = formData.Fields[index + 1];
+                                if (nextItem !== undefined && index % 2 === 0) {
+                                  fieldsData[item] = nextItem;
+                                }
+                              } else if (typeof item === 'object' && item !== null) {
+                                // Formato: [{fieldName: fieldValue}, ...]
+                                Object.assign(fieldsData, item);
                               }
-                            }
+                            });
                           }
                           
                           console.log('🟡 Dados do formulário processados:', fieldsData);
