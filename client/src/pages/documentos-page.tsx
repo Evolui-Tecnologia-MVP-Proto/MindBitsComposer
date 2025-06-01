@@ -4951,7 +4951,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            flowTasks: updatedFlowTasks
+            name: flowData.flowName,
+            code: flowData.flowCode,
+            description: flowData.description || '',
+            flowData: updatedFlowTasks
           }),
         });
 
