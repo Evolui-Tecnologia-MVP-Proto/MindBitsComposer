@@ -5049,7 +5049,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       console.log('flowData:', flowData);
       
       try {
-        // 1. Marcar o actionNode atual como executado e preservar o isAproved
+        // 1. Marcar o actionNode atual como executado, preservar o isAproved e salvar formValues
         const updatedNodes = [...nodes];
         const actionNodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
         if (actionNodeIndex !== -1) {
@@ -5058,10 +5058,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             data: {
               ...updatedNodes[actionNodeIndex].data,
               isExecuted: 'TRUE',
-              isAproved: selectedFlowNode.data.isAproved // Preservar o valor de aprovação
+              isAproved: selectedFlowNode.data.isAproved, // Preservar o valor de aprovação
+              formData: formValues, // Salvar os dados do formulário
+              isPendingConnected: false // Marcar como não mais editável
             }
           };
           console.log('Nó atual atualizado com isAproved:', selectedFlowNode.data.isAproved);
+          console.log('Dados do formulário salvos:', formValues);
         }
 
         // 2. Encontrar nós conectados APENAS pelas conexões de SAÍDA do actionNode
@@ -5187,6 +5190,20 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             flowTasks: updatedFlowTasks
           }
         }));
+        
+        // 7. Atualizar o nó selecionado para refletir as mudanças imediatamente
+        setSelectedFlowNode({
+          ...selectedFlowNode,
+          data: {
+            ...selectedFlowNode.data,
+            isExecuted: 'TRUE',
+            formData: formValues,
+            isPendingConnected: false
+          }
+        });
+
+        // 8. Limpar o formValues para mostrar que foi salvo
+        setFormValues({});
         
         console.log('Estado local atualizado');
 
