@@ -5179,9 +5179,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
     // Processar nós para adicionar destaque amarelo aos pendentes conectados
     const processedNodes = nodes.map((node: any) => {
+      const isSelected = selectedFlowNode?.id === node.id;
+      
       if (pendingConnectedNodes.has(node.id)) {
         return {
           ...node,
+          selected: isSelected,
           data: {
             ...node.data,
             isPendingConnected: true,
@@ -5191,6 +5194,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       }
       return {
         ...node,
+        selected: isSelected,
         data: { ...node.data, isReadonly: true }
       };
     });
