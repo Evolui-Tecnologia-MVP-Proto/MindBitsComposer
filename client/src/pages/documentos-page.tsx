@@ -5193,10 +5193,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
 
-                {/* Status Exec./Campo Switch apenas para SwitchNode */}
+                {/* Status Exec./Campo Switch/Input apenas para SwitchNode */}
                 {selectedFlowNode.type === 'switchNode' && (
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Status Exec./Campo Switch</p>
+                    <p className="text-sm font-medium text-gray-700">Status Exec./Campo Switch/Input</p>
                     <div className="flex space-x-2">
                       <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
                         selectedFlowNode.data.isExecuted === 'TRUE' 
@@ -5214,6 +5214,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       {selectedFlowNode.data.switchField && (
                         <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
                           {selectedFlowNode.data.switchField}
+                        </div>
+                      )}
+                      {selectedFlowNode.data.inputSwitch && (
+                        <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800">
+                          {selectedFlowNode.data.inputSwitch}
                         </div>
                       )}
                     </div>
