@@ -5101,34 +5101,47 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
           // Verificar endNodes de "encerramento direto" após integração manual
           console.log('🔍 VERIFICANDO endNodes para gatilho automático após integração manual...');
+          console.log(`📊 Total de nós no fluxo: ${updatedNodes.length}`);
+          
           let hasDirectEndNodeChanges = false;
           let documentCompleted = false;
+          let endNodesFound = 0;
+          let endNodesDirectClose = 0;
           
           updatedNodes.forEach((node, index) => {
-            console.log(`🔍 Nó ${node.id} - tipo: ${node.type}, endType: ${node.data?.endType}, isPendingConnected: ${node.data?.isPendingConnected}, isExecuted: ${node.data?.isExecuted}`);
-            
-            if (node.type === 'endNode' && 
-                node.data.endType === 'Encerramento Direto' && 
-                node.data.isPendingConnected && 
-                node.data.isExecuted !== 'TRUE') {
+            if (node.type === 'endNode') {
+              endNodesFound++;
+              console.log(`🔍 EndNode encontrado: ${node.id} - endType: ${node.data?.endType}, isPendingConnected: ${node.data?.isPendingConnected}, isExecuted: ${node.data?.isExecuted}`);
               
-              console.log(`🔄 GATILHO AUTOMÁTICO: Processando endNode de encerramento direto: ${node.id}`);
-              hasDirectEndNodeChanges = true;
-              
-              updatedNodes[index] = {
-                ...node,
-                data: {
-                  ...node.data,
-                  isExecuted: 'TRUE',
-                  isPendingConnected: false,
-                  status: 'completed',
-                  completedAt: new Date().toISOString()
+              if (node.data.endType === 'Encerramento Direto') {
+                endNodesDirectClose++;
+                
+                if (node.data.isPendingConnected && node.data.isExecuted !== 'TRUE') {
+                  console.log(`🔄 GATILHO AUTOMÁTICO: Processando endNode de encerramento direto: ${node.id}`);
+                  hasDirectEndNodeChanges = true;
+                  
+                  updatedNodes[index] = {
+                    ...node,
+                    data: {
+                      ...node.data,
+                      isExecuted: 'TRUE',
+                      isPendingConnected: false,
+                      status: 'completed',
+                      completedAt: new Date().toISOString()
+                    }
+                  };
+                  
+                  console.log(`✅ EndNode ${node.id} automaticamente marcado como encerrado`);
+                } else {
+                  console.log(`ℹ️ EndNode ${node.id} não está pendente ou já foi executado`);
                 }
-              };
-              
-              console.log(`✅ EndNode ${node.id} automaticamente marcado como encerrado`);
+              }
+            } else {
+              console.log(`📋 Nó ${node.id} - tipo: ${node.type}, isExecuted: ${node.data?.isExecuted}`);
             }
           });
+          
+          console.log(`📈 Estatísticas: ${endNodesFound} endNodes encontrados, ${endNodesDirectClose} de encerramento direto`);
           
           if (!hasDirectEndNodeChanges) {
             console.log('⚠️ Nenhum endNode de encerramento direto encontrado para processamento automático');
