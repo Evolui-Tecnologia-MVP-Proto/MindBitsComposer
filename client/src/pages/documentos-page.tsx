@@ -5451,18 +5451,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               </div>
                             </td>
                             <td className="px-3 py-2 border-r border-gray-200">
-                              {selectedFlowNode.data.callType ? (
-                                <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                  {selectedFlowNode.data.callType}
+                              {selectedFlowNode.data.integrType ? (
+                                <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                  {selectedFlowNode.data.integrType}
                                 </div>
                               ) : (
                                 <span className="text-gray-400 text-xs">-</span>
                               )}
                             </td>
                             <td className="px-3 py-2">
-                              {selectedFlowNode.data.integrType ? (
-                                <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                                  {selectedFlowNode.data.integrType}
+                              {selectedFlowNode.data.callType ? (
+                                <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                  {selectedFlowNode.data.callType}
                                 </div>
                               ) : (
                                 <span className="text-gray-400 text-xs">-</span>
