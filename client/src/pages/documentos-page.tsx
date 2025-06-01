@@ -5114,10 +5114,29 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
 
-                {selectedFlowNode.data.integrType && (
+                {(selectedFlowNode.data.integrType || selectedFlowNode.type === 'integrationNode') && (
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Tipo de Integração</p>
-                    <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.integrType}</p>
+                    <p className="text-sm font-medium text-gray-700">Status Exec./Tipo Integr.</p>
+                    <div className="flex space-x-2">
+                      <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                        selectedFlowNode.data.isExecuted === 'TRUE' 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : selectedFlowNode.data.isPendingConnected
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {selectedFlowNode.data.isExecuted === 'TRUE' 
+                          ? 'Executado' 
+                          : selectedFlowNode.data.isPendingConnected
+                          ? 'Pendente Conectado'
+                          : 'Não Executado'}
+                      </div>
+                      {selectedFlowNode.data.integrType && (
+                        <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                          {selectedFlowNode.data.integrType}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -5128,10 +5147,29 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
 
-                {selectedFlowNode.data.FromType && (
+                {(selectedFlowNode.data.FromType || selectedFlowNode.type === 'startNode') && (
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Tipo de Origem</p>
-                    <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.FromType}</p>
+                    <p className="text-sm font-medium text-gray-700">Status Exec./Tipo Origem</p>
+                    <div className="flex space-x-2">
+                      <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                        selectedFlowNode.data.isExecuted === 'TRUE' 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : selectedFlowNode.data.isPendingConnected
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {selectedFlowNode.data.isExecuted === 'TRUE' 
+                          ? 'Executado' 
+                          : selectedFlowNode.data.isPendingConnected
+                          ? 'Pendente Conectado'
+                          : 'Não Executado'}
+                      </div>
+                      {selectedFlowNode.data.FromType && (
+                        <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          {selectedFlowNode.data.FromType}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
