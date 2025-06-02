@@ -5949,6 +5949,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       
       const sourcePending = pendingConnectedNodes.has(edge.source);
       const targetPending = pendingConnectedNodes.has(edge.target);
+      const sourceInternalActivity = internalActivityNodes.has(edge.source);
+      const targetInternalActivity = internalActivityNodes.has(edge.target);
       
       let edgeColor = '#6b7280'; // cor padrão
       let shouldAnimate = false; // nova variável para controlar animação
@@ -5959,7 +5961,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         edgeColor = '#21639a';
         shouldAnimate = true; // animar conexões executadas (azuis)
       }
-      // Se há conexão entre executado e pendente conectado (PRIORIDADE MÁXIMA)
+      // Se há conexão entre executado e atividade interna (lilás)
+      else if ((sourceExecuted && targetInternalActivity) || (sourceInternalActivity && targetExecuted)) {
+        edgeColor = '#a855f7'; // lilás
+        shouldAnimate = true; // animar conexões de atividade interna (lilás)
+      }
+      // Se há conexão entre executado e pendente conectado (amarelo)
       else if ((sourceExecuted && targetPending) || (sourcePending && targetExecuted)) {
         edgeColor = '#fbbf24'; // amarelo
         shouldAnimate = true; // animar conexões pendentes (amarelas)
