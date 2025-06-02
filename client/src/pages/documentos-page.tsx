@@ -6579,6 +6579,23 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
 
+                {/* Manual execution form para DocumentNode em Atv.Interna */}
+                {selectedFlowNode.type === 'documentNode' && selectedFlowNode.data.isInternalActivity && (
+                  <div className="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                    <div className="mb-3">
+                      <p className="text-xs text-purple-800 mb-2">
+                        Pressione o botão para que o documento seja disponibilizado no editor, uma vez enviado ele deve ser listado no editor para iniciar o processo de composição.
+                      </p>
+                    </div>
+
+                    <button
+                      className="w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                    >
+                      Encaminhar para Edição
+                    </button>
+                  </div>
+                )}
+
                 {/* Layout tabular para StartNode - 2 colunas */}
                 {selectedFlowNode.type === 'startNode' && (
                   <div>
