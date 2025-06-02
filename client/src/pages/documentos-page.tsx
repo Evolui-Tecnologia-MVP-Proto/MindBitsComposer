@@ -6435,10 +6435,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               </div>
                             </td>
                             <td className="px-2 py-1.5 text-center">
-                              {selectedFlowNode.data.FromType ? (
+                              {selectedFlowNode.data.To_Type ? (
                                 <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                  {selectedFlowNode.data.FromType === 'Init' ? 'Encerramento Direto' : 
-                                   selectedFlowNode.data.FromType === 'flow_init' ? 'Transferência para Fluxo' : selectedFlowNode.data.FromType}
+                                  {selectedFlowNode.data.To_Type === 'Direct_finish' ? 'Encerramento Direto' : 
+                                   selectedFlowNode.data.To_Type === 'flow_Finish' ? 'Transferência para Fluxo' : selectedFlowNode.data.To_Type}
                                 </div>
                               ) : (
                                 <span className="text-gray-400 text-xs">-</span>
