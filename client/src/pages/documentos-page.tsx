@@ -2296,7 +2296,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
-                  {activeTab === "em-processo" && (
+                  {(activeTab === "em-processo" || activeTab === "concluidos") && (
                     <Button
                       variant="ghost"
                       size="icon"
@@ -2320,7 +2320,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       <GitBranch className="h-4 w-4 text-purple-500" />
                     </Button>
                   )}
-                  {activeTab !== "integrados" && activeTab !== "em-processo" && (
+                  {activeTab !== "integrados" && activeTab !== "em-processo" && activeTab !== "concluidos" && (
                     <>
                       <Button
                         variant="ghost"
