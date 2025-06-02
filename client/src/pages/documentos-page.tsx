@@ -6635,11 +6635,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
                     <button
                       onClick={() => {
-                        if (selectedFlowNode && flowDiagramModal.documentTitle) {
-                          const documentId = flowDiagramModal.documentTitle; // Usando título como ID temporário
+                        if (selectedFlowNode && selectedExecution) {
                           forwardToEditMutation.mutate({
                             nodeId: selectedFlowNode.id,
-                            documentId: documentId
+                            documentId: selectedExecution.documentId
                           });
                         }
                       }}
