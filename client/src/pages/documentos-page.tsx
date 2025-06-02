@@ -5146,6 +5146,107 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       setShowApprovalAlert(true);
     };
 
+    // Função para executar transferência de fluxo
+    const executeFlowTransfer = async () => {
+      if (!selectedFlowNode || selectedFlowNode.type !== 'endNode' || selectedFlowNode.data.FromType !== 'flow_init') {
+        console.log('Nenhum endNode de transferência selecionado');
+        return;
+      }
+
+      console.log('Executando transferência de fluxo...');
+      
+      try {
+        // Verificar se existe fluxo destino
+        if (!selectedFlowNode.data.To_Flow_id) {
+          setIntegrationResult({
+            status: 'error',
+            message: 'Fluxo de destino não definido para transferência.'
+          });
+          return;
+        }
+
+        // Marcar o nó como executado
+        const updatedNodes = [...nodes];
+        const nodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
+        if (nodeIndex !== -1) {
+          updatedNodes[nodeIndex] = {
+            ...updatedNodes[nodeIndex],
+            data: {
+              ...updatedNodes[nodeIndex].data,
+              isExecuted: 'TRUE',
+              isPendingConnected: false,
+              isReadonly: true
+            }
+          };
+          setNodes(updatedNodes);
+          
+          // Atualizar nó selecionado
+          setSelectedFlowNode({
+            ...selectedFlowNode,
+            data: {
+              ...selectedFlowNode.data,
+              isExecuted: 'TRUE',
+              isPendingConnected: false,
+              isReadonly: true
+            }
+          });
+        }
+
+        // Preparar dados atualizados do fluxo
+        const updatedFlowTasks = {
+          nodes: updatedNodes,
+          edges: edges,
+          viewport: flowData.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
+        };
+
+        // Chamar API para transferir fluxo
+        const response = await fetch(`/api/document-flow-executions/transfer`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            currentDocumentId: flowData.documentId,
+            targetFlowId: selectedFlowNode.data.To_Flow_id,
+            flowTasks: updatedFlowTasks
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Erro ao transferir fluxo');
+        }
+
+        const result = await response.json();
+        
+        console.log('Transferência de fluxo concluída com sucesso');
+
+        // Atualizar estado local
+        setFlowDiagramModal(prev => ({
+          ...prev,
+          flowData: {
+            ...prev.flowData,
+            flowTasks: updatedFlowTasks
+          }
+        }));
+
+        // Mostrar resultado de sucesso
+        setIntegrationResult({
+          status: 'success',
+          message: `Fluxo transferido com sucesso. Nova execução criada: ${result.newExecutionId}`
+        });
+
+        // Recarregar dados
+        queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
+        
+      } catch (error) {
+        console.error('❌ Erro ao transferir fluxo:', error);
+        setIntegrationResult({
+          status: 'error',
+          message: 'Falha na transferência do fluxo. Verifique os logs e tente novamente.'
+        });
+      }
+    };
+
     // Função para executar encerramento direto do fluxo
     const executeDirectFlowConclusion = async () => {
       if (!selectedFlowNode || selectedFlowNode.type !== 'endNode' || selectedFlowNode.data.FromType !== 'Init') {
@@ -6365,6 +6466,45 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             </div>
                           )}
                         </div>
+                      </div>
+                    )}
+
+                    {/* Manual execution form para EndNode de Transferência para Fluxo */}
+                    {selectedFlowNode.data.FromType === 'flow_init' && selectedFlowNode.data.To_Flow_id && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
+                      <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="mb-3">
+                          <p className="text-xs text-blue-800 mb-2">
+                            Ao pressionar o botão você confirma o encerramento deste fluxo e a abertura do novo fluxo vinculado. Ao confirmar, o sistema: 1- Encerra o fluxo corrente, 2- Cria uma nova instância com o fluxo indicado vinculado ao presente documento, 3- Inicia o fluxo no novo documento. Confirma estas ações?
+                          </p>
+                        </div>
+
+                        {integrationResult.status && (
+                          <div className={`mb-3 p-3 rounded-md ${
+                            integrationResult.status === 'success' 
+                              ? 'bg-green-50 border border-green-200' 
+                              : 'bg-red-50 border border-red-200'
+                          }`}>
+                            <p className={`text-sm ${
+                              integrationResult.status === 'success' 
+                                ? 'text-green-800' 
+                                : 'text-red-800'
+                            }`}>
+                              {integrationResult.message}
+                            </p>
+                          </div>
+                        )}
+
+                        <button
+                          onClick={executeFlowTransfer}
+                          disabled={selectedFlowNode.data.isExecuted === 'TRUE'}
+                          className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                            selectedFlowNode.data.isExecuted === 'TRUE'
+                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                              : 'bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+                          }`}
+                        >
+                          {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Transferência Concluída' : 'Transferir Fluxo'}
+                        </button>
                       </div>
                     )}
 
