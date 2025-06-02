@@ -2384,7 +2384,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           </Button>
                           
                           {flowHistoryDropdown === documento.id && (
-                            <div className="absolute right-0 top-10 z-[9999] w-80 bg-white border border-gray-200 rounded-lg shadow-xl p-4">
+                            <div className="fixed right-4 top-20 z-[99999] w-80 bg-white border border-gray-200 rounded-lg shadow-xl p-4">
                               <div className="flex items-center justify-between mb-3">
                                 <h4 className="font-semibold text-sm">Histórico de Fluxos</h4>
                                 <Button
