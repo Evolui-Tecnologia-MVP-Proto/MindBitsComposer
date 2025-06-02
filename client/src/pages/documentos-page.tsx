@@ -2325,13 +2325,25 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 </TableCell>
               )}
               <TableCell>
-                <Badge
-                  variant={getStatusBadgeVariant(documento.status) as any}
-                  className="flex items-center gap-1 whitespace-nowrap"
-                >
-                  {getStatusIcon(documento.status)}
-                  {documento.status}
-                </Badge>
+                <div className="flex flex-col gap-1">
+                  <Badge
+                    variant={getStatusBadgeVariant(documento.status) as any}
+                    className="flex items-center gap-1 whitespace-nowrap"
+                  >
+                    {getStatusIcon(documento.status)}
+                    {documento.status}
+                  </Badge>
+                  {activeTab === "em-processo" && (
+                    <Badge
+                      variant="secondary"
+                      className="text-xs bg-gray-100 text-gray-700"
+                    >
+                      {documento.taskStatus && documento.taskStatus !== "Pendente" 
+                        ? documento.taskStatus 
+                        : "Pendente"}
+                    </Badge>
+                  )}
+                </div>
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end space-x-2">
