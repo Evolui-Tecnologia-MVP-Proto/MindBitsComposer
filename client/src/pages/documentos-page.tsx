@@ -6384,12 +6384,16 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               <div className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${
                                 selectedFlowNode.data.isExecuted === 'TRUE' 
                                   ? 'bg-blue-100 text-blue-800' 
+                                  : selectedFlowNode.data.isInternalActivity
+                                  ? 'bg-purple-100 text-purple-800'
                                   : selectedFlowNode.data.isPendingConnected
                                   ? 'bg-yellow-100 text-yellow-800'
                                   : 'bg-gray-100 text-gray-800'
                               }`}>
                                 {selectedFlowNode.data.isExecuted === 'TRUE' 
                                   ? 'Executado' 
+                                  : selectedFlowNode.data.isInternalActivity
+                                  ? 'Atv.Interna'
                                   : selectedFlowNode.data.isPendingConnected
                                   ? 'Pendente'
                                   : 'N.Exec.'}
