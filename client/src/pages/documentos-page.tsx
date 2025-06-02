@@ -5032,33 +5032,85 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         return true;
       }
 
-      const fieldsData = getFormFields();
-      const fieldNames = Object.keys(fieldsData);
-      
-      console.log('🔍 Validação de campos:', {
-        nodeId: selectedFlowNode.id,
-        nodeType: selectedFlowNode.type,
-        isPending: selectedFlowNode.data.isPendingConnected,
-        fieldsData,
-        fieldNames,
-        formValues,
-        hasFields: fieldNames.length > 0
-      });
-      
-      // Se não há campos, permite salvar
-      if (fieldNames.length === 0) return true;
-      
-      // Verifica se todos os campos têm valores preenchidos
-      const allFilled = fieldNames.every(fieldName => {
-        const value = formValues[fieldName];
-        // Para campos select, verificar se não está vazio ou "Selecione uma opção"
-        const isFilled = value && value.trim() !== '' && value !== 'Selecione uma opção';
-        console.log(`Campo ${fieldName}: valor="${value}", preenchido=${isFilled}`);
-        return isFilled;
-      });
-      
-      console.log('🔍 Resultado da validação:', allFilled);
-      return allFilled;
+      // Verifica se existe formulário anexado
+      const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+      if (!attachedFormData) {
+        return true; // Sem formulário, pode salvar
+      }
+
+      try {
+        // Parse do formulário anexado
+        let formData;
+        if (typeof attachedFormData === 'string' && attachedFormData.includes('"Motivo de Recusa":') && attachedFormData.includes('"Detalhamento":')) {
+          // Converte o formato específico manualmente
+          formData = {
+            "Show_Condition": "FALSE",
+            "Fields": {
+              "Motivo de Recusa": ["Incompatível com processo", "Forma de operação", "Configuração de Sistema"],
+              "Detalhamento": ["default:", "type:longText"]
+            }
+          };
+        } else {
+          formData = JSON.parse(attachedFormData);
+        }
+
+        // Verifica se é um formulário com condição
+        if (formData.Show_Condition !== undefined && formData.Fields) {
+          const showCondition = formData.Show_Condition;
+          const isApprovalNode = selectedFlowNode.data.actionType === 'Intern_Aprove';
+          const approvalStatus = selectedFlowNode.data.isAproved;
+          
+          // Determina se deve mostrar o formulário baseado na condição
+          let shouldShowForm = false;
+          if (isApprovalNode && approvalStatus !== 'UNDEF') {
+            if (showCondition === 'TRUE' && approvalStatus === 'TRUE') {
+              shouldShowForm = true;
+            } else if (showCondition === 'FALSE' && approvalStatus === 'FALSE') {
+              shouldShowForm = true;
+            } else if (showCondition === 'BOTH' && (approvalStatus === 'TRUE' || approvalStatus === 'FALSE')) {
+              shouldShowForm = true;
+            }
+          }
+          
+          // Se o formulário não deve ser exibido devido à condição, permite salvar
+          if (!shouldShowForm) {
+            console.log('🔍 Formulário oculto por condição de aprovação, permitindo salvar');
+            return true;
+          }
+        }
+
+        // Se chegou até aqui, o formulário deve ser exibido, então valida os campos
+        const fieldsData = getFormFields();
+        const fieldNames = Object.keys(fieldsData);
+        
+        console.log('🔍 Validação de campos:', {
+          nodeId: selectedFlowNode.id,
+          nodeType: selectedFlowNode.type,
+          isPending: selectedFlowNode.data.isPendingConnected,
+          fieldsData,
+          fieldNames,
+          formValues,
+          hasFields: fieldNames.length > 0
+        });
+        
+        // Se não há campos, permite salvar
+        if (fieldNames.length === 0) return true;
+        
+        // Verifica se todos os campos têm valores preenchidos
+        const allFilled = fieldNames.every(fieldName => {
+          const value = formValues[fieldName];
+          // Para campos select, verificar se não está vazio ou "Selecione uma opção"
+          const isFilled = value && value.trim() !== '' && value !== 'Selecione uma opção';
+          console.log(`Campo ${fieldName}: valor="${value}", preenchido=${isFilled}`);
+          return isFilled;
+        });
+        
+        console.log('🔍 Resultado da validação:', allFilled);
+        return allFilled;
+      } catch (e) {
+        console.log('🔍 Erro na validação do formulário:', e);
+        return true; // Em caso de erro, permite salvar
+      }
     };
 
     // Função para alterar o status de aprovação (altera estado imediatamente e mostra alerta)
