@@ -648,6 +648,7 @@ export default function DocumentosPage() {
     useState(false);
   const [optimisticSyncState, setOptimisticSyncState] = useState<string | null>(null);
   const [selectedFlowId, setSelectedFlowId] = useState<string>("");
+  const [flowHistoryDropdown, setFlowHistoryDropdown] = useState<string | null>(null);
 
 
   const [editingDocument, setEditingDocument] = useState<Documento | null>(
@@ -1745,6 +1746,22 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     }
   };
 
+  // Função para obter histórico de fluxos de um documento
+  const getDocumentFlowHistory = (documentId: string) => {
+    if (!flowExecutions) return [];
+    
+    return (flowExecutions as any[])
+      .filter((execution: any) => execution.documentId === documentId)
+      .sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      .map((execution: any) => ({
+        id: execution.flowId,
+        name: execution.flowName,
+        status: execution.status,
+        createdAt: execution.createdAt,
+        completedAt: execution.completedAt
+      }));
+  };
+
   // Funções auxiliares para artefatos
   const resetArtifactForm = () => {
     setArtifactFormData({
@@ -2317,39 +2334,108 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     <Eye className="h-4 w-4" />
                   </Button>
                   {(activeTab === "em-processo" || activeTab === "concluidos") && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => {
-                        console.log("🔴 BOTÃO CLICADO! Documento:", documento.objeto);
-                        
-                        let flowToShow = null;
-                        
-                        if (activeTab === "concluidos") {
-                          // Para documentos concluídos, busca o último fluxo concluído
-                          flowToShow = getConcludedFlow(documento.id);
-                          console.log("🔴 Fluxo concluído encontrado:", flowToShow);
-                        } else {
-                          // Para documentos em processo, busca o fluxo ativo
-                          flowToShow = getActiveFlow(documento.id);
-                          console.log("🔴 Fluxo ativo encontrado:", flowToShow);
-                        }
-                        
-                        if (flowToShow) {
-                          console.log("🔴 Abrindo modal com fluxo");
-                          openFlowDiagramModal({
-                            flowTasks: flowToShow,
-                            document: { objeto: documento.objeto }
-                          });
-                        } else {
-                          console.log(`🔴 Nenhum fluxo ${activeTab === "concluidos" ? "concluído" : "ativo"} encontrado para:`, documento.id);
-                        }
-                      }}
-                      title="Mostrar diagrama do fluxo"
-                    >
-                      <GitBranch className="h-4 w-4 text-purple-500" />
-                    </Button>
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => {
+                          console.log("🔴 BOTÃO CLICADO! Documento:", documento.objeto);
+                          
+                          let flowToShow = null;
+                          
+                          if (activeTab === "concluidos") {
+                            // Para documentos concluídos, busca o último fluxo concluído
+                            flowToShow = getConcludedFlow(documento.id);
+                            console.log("🔴 Fluxo concluído encontrado:", flowToShow);
+                          } else {
+                            // Para documentos em processo, busca o fluxo ativo
+                            flowToShow = getActiveFlow(documento.id);
+                            console.log("🔴 Fluxo ativo encontrado:", flowToShow);
+                          }
+                          
+                          if (flowToShow) {
+                            console.log("🔴 Abrindo modal com fluxo");
+                            openFlowDiagramModal({
+                              flowTasks: flowToShow,
+                              document: { objeto: documento.objeto }
+                            });
+                          } else {
+                            console.log(`🔴 Nenhum fluxo ${activeTab === "concluidos" ? "concluído" : "ativo"} encontrado para:`, documento.id);
+                          }
+                        }}
+                        title="Mostrar diagrama do fluxo"
+                      >
+                        <GitBranch className="h-4 w-4 text-purple-500" />
+                      </Button>
+                      
+                      {activeTab === "em-processo" && (
+                        <div className="relative">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => {
+                              setFlowHistoryDropdown(flowHistoryDropdown === documento.id ? null : documento.id);
+                            }}
+                            title="Histórico de fluxos"
+                          >
+                            <Clock className="h-4 w-4 text-orange-500" />
+                          </Button>
+                          
+                          {flowHistoryDropdown === documento.id && (
+                            <div className="absolute right-0 top-10 z-50 w-80 bg-white border border-gray-200 rounded-lg shadow-lg p-4">
+                              <div className="flex items-center justify-between mb-3">
+                                <h4 className="font-semibold text-sm">Histórico de Fluxos</h4>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6"
+                                  onClick={() => setFlowHistoryDropdown(null)}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              
+                              <div className="space-y-2 max-h-64 overflow-y-auto">
+                                {getDocumentFlowHistory(documento.id).map((flow: any, index: number) => (
+                                  <div key={flow.id + index} className="p-2 border border-gray-100 rounded-md bg-gray-50">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <span className="font-medium text-xs text-gray-800">{flow.name}</span>
+                                      <Badge 
+                                        variant="outline"
+                                        className={`text-xs ${
+                                          flow.status === 'completed' ? 'bg-green-100 text-green-800 border-green-200' :
+                                          flow.status === 'initiated' ? 'bg-blue-100 text-blue-800 border-blue-200' :
+                                          flow.status === 'transfered' ? 'bg-orange-100 text-orange-800 border-orange-200' :
+                                          'bg-gray-100 text-gray-800 border-gray-200'
+                                        }`}
+                                      >
+                                        {flow.status === 'completed' ? 'Concluído' :
+                                         flow.status === 'initiated' ? 'Iniciado' :
+                                         flow.status === 'transfered' ? 'Transferido' : flow.status}
+                                      </Badge>
+                                    </div>
+                                    <div className="text-xs text-gray-600">
+                                      <div>Início: {new Date(flow.createdAt).toLocaleDateString("pt-BR")} às {new Date(flow.createdAt).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}</div>
+                                      {flow.completedAt && (
+                                        <div>Fim: {new Date(flow.completedAt).toLocaleDateString("pt-BR")} às {new Date(flow.completedAt).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}</div>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                                
+                                {getDocumentFlowHistory(documento.id).length === 0 && (
+                                  <div className="text-center py-4 text-gray-500 text-sm">
+                                    Nenhum fluxo encontrado para este documento
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </>
                   )}
                   {activeTab !== "integrados" && activeTab !== "em-processo" && activeTab !== "concluidos" && (
                     <>
