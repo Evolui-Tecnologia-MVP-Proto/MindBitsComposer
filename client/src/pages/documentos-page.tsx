@@ -5850,6 +5850,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
     // Encontrar nós pendentes conectados aos executados
     const pendingConnectedNodes = new Set<string>();
+    const internalActivityNodes = new Set<string>(); // Novo: nós em atividade interna
     
     for (const edge of edges) {
       // Se o nó de origem está executado e o nó de destino não está executado
@@ -5873,13 +5874,23 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             
             // Apenas marcar como pendente se a conexão está no handle correto
             if (shouldBeActive) {
-              pendingConnectedNodes.add(edge.target);
+              // Se for documentNode, marcar como atividade interna (lilás)
+              if (targetNode.type === 'documentNode') {
+                internalActivityNodes.add(edge.target);
+              } else {
+                pendingConnectedNodes.add(edge.target);
+              }
             }
           } else {
             // Para outros tipos de nós, aplicar lógica normal
             // EXCETO para endNode - endNode nunca deve ser marcado como pendente
             if (targetNode.type !== 'endNode') {
-              pendingConnectedNodes.add(edge.target);
+              // Se for documentNode, marcar como atividade interna (lilás)
+              if (targetNode.type === 'documentNode') {
+                internalActivityNodes.add(edge.target);
+              } else {
+                pendingConnectedNodes.add(edge.target);
+              }
             }
           }
         }
@@ -5897,7 +5908,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             // Não marcar integrationNode como pendente se conectado a endNode executado
             continue;
           } else {
-            pendingConnectedNodes.add(edge.source);
+            // Se for documentNode, marcar como atividade interna (lilás)
+            if (sourceNode.type === 'documentNode') {
+              internalActivityNodes.add(edge.source);
+            } else {
+              pendingConnectedNodes.add(edge.source);
+            }
           }
         }
       }
