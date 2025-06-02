@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users } from "@shared/schema";
+import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentsEditions } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc, and, gte, lte, isNull, or } from "drizzle-orm";
