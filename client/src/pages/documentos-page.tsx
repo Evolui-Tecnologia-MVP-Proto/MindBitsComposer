@@ -341,7 +341,6 @@ const DocumentNodeComponent = (props: any) => {
   const isPendingConnected = props.data.isPendingConnected;
   const isInternalActivity = props.data.isInternalActivity;
   const isSelected = props.selected;
-  const isEditing = props.data.isEditing; // Novo: status de edição
   
   let fillColor = 'white';
   let baseStrokeColor = 'black';
@@ -423,11 +422,6 @@ const DocumentNodeComponent = (props: any) => {
         />
       </svg>
     <FileText className="absolute top-1 left-1 h-6 w-6 text-purple-600 z-10" />
-    {isEditing && (
-      <div className="absolute top-1 right-1 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold z-20">
-        Editando
-      </div>
-    )}
     <div className="absolute inset-0 flex items-center justify-center" style={{ pointerEvents: 'none' }}>
       <div className="text-center pt-2">
         {props.data.showLabel !== false && (
@@ -663,7 +657,6 @@ export default function DocumentosPage() {
   const [optimisticSyncState, setOptimisticSyncState] = useState<string | null>(null);
   const [selectedFlowId, setSelectedFlowId] = useState<string>("");
   const [flowHistoryDropdown, setFlowHistoryDropdown] = useState<string | null>(null);
-  const [editingNodes, setEditingNodes] = useState<Set<string>>(new Set());
 
 
   const [editingDocument, setEditingDocument] = useState<Documento | null>(
@@ -1712,41 +1705,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     },
   });
 
-  // Mutation para encaminhar documento para edição
-  const forwardToEditMutation = useMutation({
-    mutationFn: async ({ nodeId, documentId, templateId }: { nodeId: string; documentId: string; templateId?: string }) => {
-      const response = await fetch('/api/documents-editions/forward', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ nodeId, documentId, templateId }),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Erro ao encaminhar para edição');
-      }
-      
-      return response.json();
-    },
-    onSuccess: (data, variables) => {
-      // Adicionar o nó à lista de nós em edição
-      setEditingNodes(prev => new Set(prev).add(variables.nodeId));
-      toast({
-        title: "Sucesso",
-        description: "Documento encaminhado para edição!",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Erro",
-        description: error.message || "Falha ao encaminhar para edição",
-        variant: "destructive",
-      });
-    },
-  });
-
   // Filtrar documentos por status
   const documentosIntegrados = useMemo(
     () => documentos.filter((doc) => doc.status === "Integrado"),
@@ -1998,10 +1956,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     if (execution) {
       setFlowDiagramModal({
         isOpen: true,
-        flowData: {
-          ...(execution.flowTasks || execution),
-          documentId: execution.documentId || execution.document?.id
-        },
+        flowData: execution.flowTasks || execution,
         documentTitle: execution.document?.objeto || execution.flowName || "Documento"
       });
       console.log("🔴 Estado atualizado:", {
@@ -2420,7 +2375,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             console.log("🔴 Abrindo modal com fluxo");
                             openFlowDiagramModal({
                               flowTasks: flowToShow.flowTasks,
-                              documentId: documento.id,
                               document: { objeto: documento.objeto }
                             });
                           } else {
@@ -2511,7 +2465,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                     if (fullFlowExecution && fullFlowExecution.flowTasks) {
                                       openFlowDiagramModal({
                                         flowTasks: fullFlowExecution.flowTasks,
-                                        documentId: documento.id,
                                         document: { objeto: documento.objeto }
                                       });
                                       setFlowHistoryDropdown(null); // Fechar o dropdown
@@ -5978,7 +5931,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             ...node.data,
             isPendingConnected: true,
             isInternalActivity: false,
-            isEditing: editingNodes.has(node.id),
           }
         };
       } else if (internalActivityNodes.has(node.id)) {
@@ -5989,7 +5941,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             ...node.data,
             isPendingConnected: false,
             isInternalActivity: true,
-            isEditing: editingNodes.has(node.id),
             isReadonly: true
           },
         };
@@ -6001,7 +5952,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           ...node.data, 
           isPendingConnected: false,
           isInternalActivity: false,
-          isEditing: editingNodes.has(node.id),
           isReadonly: true 
         }
       };
@@ -6639,25 +6589,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     </div>
 
                     <button
-                      onClick={() => {
-                        if (selectedFlowNode && flowDiagramModal.flowData) {
-                          forwardToEditMutation.mutate({
-                            nodeId: selectedFlowNode.id,
-                            documentId: flowDiagramModal.flowData.documentId,
-                            templateId: selectedFlowNode.data.docType
-                          });
-                        }
-                      }}
-                      disabled={forwardToEditMutation.isPending || editingNodes.has(selectedFlowNode?.id)}
-                      className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                        forwardToEditMutation.isPending || editingNodes.has(selectedFlowNode?.id)
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : 'bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2'
-                      }`}
+                      className="w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                     >
-                      {forwardToEditMutation.isPending ? 'Encaminhando...' : 
-                       editingNodes.has(selectedFlowNode?.id) ? 'Já Encaminhado' : 
-                       'Encaminhar para Edição'}
+                      Encaminhar para Edição
                     </button>
                   </div>
                 )}
