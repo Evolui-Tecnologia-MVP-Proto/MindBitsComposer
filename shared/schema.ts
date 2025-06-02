@@ -381,35 +381,6 @@ export const insertDocumentsFlowSchema = createInsertSchema(documentsFlows).omit
 export type InsertDocumentsFlow = z.infer<typeof insertDocumentsFlowSchema>;
 export type DocumentsFlow = typeof documentsFlows.$inferSelect;
 
-// Documents Editions table
-export const documentsEditions = pgTable("documents_editions", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  nodeId: text("node_id").notNull(),
-  docCod: text("doc_cod").notNull(),
-  docName: text("doc_name").notNull(),
-  dateEdit: timestamp("date_edit"),
-  datePublish: timestamp("date_publish"),
-  lexFile: json("lex_file").$type<Record<string, any>>(),
-  binaryFile: text("binary_file"), // PostgreSQL doesn't have BLOB, using TEXT for base64 encoded data
-  mdFile: text("md_file"), // Using TEXT instead of LONGTEXT (MySQL specific)
-  documentFlowExecutionId: uuid("document_flow_execution_id").references(() => documentFlowExecutions.id, { onDelete: "cascade" }),
-  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
-  repoStructureId: uuid("repo_structure_id").references(() => repoStructure.uid, { onDelete: "cascade" }),
-  templateId: uuid("template_id").references(() => templates.id, { onDelete: "cascade" }),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-// Documents Editions schema
-export const insertDocumentsEditionSchema = createInsertSchema(documentsEditions).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export type InsertDocumentsEdition = z.infer<typeof insertDocumentsEditionSchema>;
-export type DocumentsEdition = typeof documentsEditions.$inferSelect;
-
 // Relations
 export const repoStructureRelations = {
   parent: {

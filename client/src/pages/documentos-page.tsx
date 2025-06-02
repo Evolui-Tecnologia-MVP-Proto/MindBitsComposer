@@ -2325,7 +2325,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 </TableCell>
               )}
               <TableCell>
-                <div className="flex flex-col gap-1 items-center">
+                <div className="flex flex-col gap-1">
                   <Badge
                     variant={getStatusBadgeVariant(documento.status) as any}
                     className="flex items-center gap-1 whitespace-nowrap"
@@ -2336,11 +2336,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   {activeTab === "em-processo" && (
                     <Badge
                       variant="secondary"
-                      className={`text-xs w-full text-center hover:bg-yellow-100 ${
-                        documento.taskStatus && documento.taskStatus !== "Pendente"
-                          ? "bg-gray-100 text-gray-700 hover:bg-gray-100"
-                          : "bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
-                      }`}
+                      className="text-xs bg-gray-100 text-gray-700"
                     >
                       {documento.taskStatus && documento.taskStatus !== "Pendente" 
                         ? documento.taskStatus 
@@ -6575,23 +6571,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       }`}
                     >
                       {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Já Executado' : 'Executar'}
-                    </button>
-                  </div>
-                )}
-
-                {/* Manual execution form para DocumentNode em Atv.Interna */}
-                {selectedFlowNode.type === 'documentNode' && selectedFlowNode.data.isInternalActivity && (
-                  <div className="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
-                    <div className="mb-3">
-                      <p className="text-xs text-purple-800 mb-2">
-                        Pressione o botão para que o documento seja disponibilizado no editor, uma vez enviado ele deve ser listado no editor para iniciar o processo de composição.
-                      </p>
-                    </div>
-
-                    <button
-                      className="w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
-                    >
-                      Encaminhar para Edição
                     </button>
                   </div>
                 )}
