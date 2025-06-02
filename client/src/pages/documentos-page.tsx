@@ -2375,67 +2375,76 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setFlowHistoryDropdown(flowHistoryDropdown === documento.id ? null : documento.id);
                             }}
                             title="Histórico de fluxos"
                           >
                             <Clock className="h-4 w-4 text-orange-500" />
                           </Button>
-                          
-                          {flowHistoryDropdown === documento.id && (
-                            <div className="fixed right-4 top-20 z-[99999] w-80 bg-white border border-gray-200 rounded-lg shadow-xl p-4">
-                              <div className="flex items-center justify-between mb-3">
-                                <h4 className="font-semibold text-sm">Histórico de Fluxos</h4>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-6 w-6"
-                                  onClick={() => setFlowHistoryDropdown(null)}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              </div>
-                              
-                              <div className="space-y-2 max-h-64 overflow-y-auto">
-                                {getDocumentFlowHistory(documento.id).map((flow: any, index: number) => (
-                                  <div key={flow.id + index} className="p-2 border border-gray-100 rounded-md bg-gray-50">
-                                    <div className="flex items-center justify-between mb-1">
-                                      <span className="font-medium text-xs text-gray-800">{flow.name}</span>
-                                      <Badge 
-                                        variant="outline"
-                                        className={`text-xs ${
-                                          flow.status === 'completed' ? 'bg-green-100 text-green-800 border-green-200' :
-                                          flow.status === 'initiated' ? 'bg-blue-100 text-blue-800 border-blue-200' :
-                                          flow.status === 'transfered' ? 'bg-orange-100 text-orange-800 border-orange-200' :
-                                          'bg-gray-100 text-gray-800 border-gray-200'
-                                        }`}
-                                      >
-                                        {flow.status === 'completed' ? 'Concluído' :
-                                         flow.status === 'initiated' ? 'Iniciado' :
-                                         flow.status === 'transfered' ? 'Transferido' : flow.status}
-                                      </Badge>
-                                    </div>
-                                    <div className="text-xs text-gray-600">
-                                      <div>Início: {new Date(flow.createdAt).toLocaleDateString("pt-BR")} às {new Date(flow.createdAt).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}</div>
-                                      {flow.completedAt && (
-                                        <div>Fim: {new Date(flow.completedAt).toLocaleDateString("pt-BR")} às {new Date(flow.completedAt).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}</div>
-                                      )}
-                                    </div>
-                                  </div>
-                                ))}
-                                
-                                {getDocumentFlowHistory(documento.id).length === 0 && (
-                                  <div className="text-center py-4 text-gray-500 text-sm">
-                                    Nenhum fluxo encontrado para este documento
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          )}
                         </div>
                       )}
                     </>
+                  )}
+                  
+                  {/* Dropdown de histórico de fluxos renderizado fora da tabela */}
+                  {flowHistoryDropdown === documento.id && activeTab === "em-processo" && (
+                    <div 
+                      className="fixed z-[99999] w-80 bg-white border border-gray-200 rounded-lg shadow-xl p-4"
+                      style={{
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)'
+                      }}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-semibold text-sm">Histórico de Fluxos</h4>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => setFlowHistoryDropdown(null)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      
+                      <div className="space-y-2 max-h-64 overflow-y-auto">
+                        {getDocumentFlowHistory(documento.id).map((flow: any, index: number) => (
+                          <div key={flow.id + index} className="p-2 border border-gray-100 rounded-md bg-gray-50">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="font-medium text-xs text-gray-800">{flow.name}</span>
+                              <Badge 
+                                variant="outline"
+                                className={`text-xs ${
+                                  flow.status === 'completed' ? 'bg-green-100 text-green-800 border-green-200' :
+                                  flow.status === 'initiated' ? 'bg-blue-100 text-blue-800 border-blue-200' :
+                                  flow.status === 'transfered' ? 'bg-orange-100 text-orange-800 border-orange-200' :
+                                  'bg-gray-100 text-gray-800 border-gray-200'
+                                }`}
+                              >
+                                {flow.status === 'completed' ? 'Concluído' :
+                                 flow.status === 'initiated' ? 'Iniciado' :
+                                 flow.status === 'transfered' ? 'Transferido' : flow.status}
+                              </Badge>
+                            </div>
+                            <div className="text-xs text-gray-600">
+                              <div>Início: {new Date(flow.createdAt).toLocaleDateString("pt-BR")} às {new Date(flow.createdAt).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}</div>
+                              {flow.completedAt && (
+                                <div>Fim: {new Date(flow.completedAt).toLocaleDateString("pt-BR")} às {new Date(flow.completedAt).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}</div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                        
+                        {getDocumentFlowHistory(documento.id).length === 0 && (
+                          <div className="text-center py-4 text-gray-500 text-sm">
+                            Nenhum fluxo encontrado para este documento
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   )}
                   {activeTab !== "integrados" && activeTab !== "em-processo" && activeTab !== "concluidos" && (
                     <>
@@ -2462,16 +2471,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               </TableCell>
             </TableRow>
           ))}
-          {documentos.length === 0 && (
-            <TableRow>
-              <TableCell
-                colSpan={activeTab === "integrados" ? 8 : 7}
-                className="text-center py-6 text-gray-500"
-              >
-                Nenhum documento encontrado nesta categoria.
-              </TableCell>
-            </TableRow>
-          )}
         </TableBody>
       </Table>
     );
