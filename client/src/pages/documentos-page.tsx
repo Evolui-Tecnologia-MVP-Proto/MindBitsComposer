@@ -3474,6 +3474,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             <TabsTrigger value="incluidos">Incluídos</TabsTrigger>
             <TabsTrigger value="integrados">Integrados</TabsTrigger>
             <TabsTrigger value="em-processo">Em Processo</TabsTrigger>
+            <TabsTrigger value="concluidos">Concluídos</TabsTrigger>
             <TabsTrigger value="repositorio">Repositório</TabsTrigger>
           </TabsList>
 
@@ -3770,7 +3771,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             )}
           </TabsContent>
 
-          <TabsContent value="distribuidos" className="slide-in">
+          <TabsContent value="concluidos" className="slide-in">
             {isLoading ? (
               <div className="text-center py-6">Carregando documentos...</div>
             ) : (
