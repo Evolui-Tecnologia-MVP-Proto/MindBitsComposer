@@ -2393,9 +2393,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     <div 
                       className="fixed z-[99999] w-80 bg-white border border-gray-200 rounded-lg shadow-xl p-4"
                       style={{
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)'
+                        top: '120px',
+                        right: '20px'
                       }}
                     >
                       <div className="flex items-center justify-between mb-3">
