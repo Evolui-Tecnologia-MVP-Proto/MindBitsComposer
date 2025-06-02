@@ -11,7 +11,7 @@ import { systemLogs } from "@shared/schema";
 import { ZodError } from "zod";
 import fetch from "node-fetch";
 import { jobManager } from "./job-manager";
-import { SystemLogger } from "./logger";
+import { SystemLogger, EventTypes } from "./logger";
 import path from "path";
 import fs from "fs";
 import multer from "multer";
@@ -3741,10 +3741,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('🔄 Documento atual:', currentDocumentId);
       console.log('🔄 Fluxo destino:', targetFlowId);
       
-      // 1. Marcar execução atual como transferida
+      // 1. Marcar execução atual como completed (transferida)
       const currentExecution = await db.update(documentFlowExecutions)
         .set({
-          status: 'transfered',
+          status: 'completed',
           completedAt: new Date(),
           flowTasks,
           updatedAt: new Date()
@@ -3779,6 +3779,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           status: 'initiated',
           flowTasks: targetFlow[0].flowData,
           startedBy: req.user.id,
+          executionData: {
+            flowName: targetFlow[0].name,
+            transferredFrom: currentExecution[0].flowId,
+            transferredAt: new Date().toISOString()
+          },
           createdAt: new Date(),
           updatedAt: new Date()
         })

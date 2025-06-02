@@ -5213,12 +5213,32 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         });
 
         if (!response.ok) {
-          throw new Error('Erro ao transferir fluxo');
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Erro ao transferir fluxo');
         }
 
         const result = await response.json();
         
         console.log('Transferência de fluxo concluída com sucesso');
+
+        // Primeiro, salvar as alterações do nó executado no fluxo atual
+        const saveCurrentResponse = await fetch(`/api/document-flow-executions/${flowData.documentId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            flowTasks: updatedFlowTasks,
+            status: 'completed',
+            completedAt: new Date().toISOString()
+          }),
+        });
+
+        if (!saveCurrentResponse.ok) {
+          console.warn('Aviso: Não foi possível salvar o estado final do fluxo atual');
+        } else {
+          console.log('✅ Estado do fluxo atual salvo com sucesso');
+        }
 
         // Atualizar estado local
         setFlowDiagramModal(prev => ({
@@ -5232,11 +5252,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         // Mostrar resultado de sucesso
         setIntegrationResult({
           status: 'success',
-          message: `Fluxo transferido com sucesso. Nova execução criada: ${result.newExecutionId}`
+          message: `Fluxo transferido com sucesso para "${result.targetFlowName}". Nova execução criada.`
         });
 
         // Recarregar dados
         queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/documentos'] });
         
       } catch (error) {
         console.error('❌ Erro ao transferir fluxo:', error);
