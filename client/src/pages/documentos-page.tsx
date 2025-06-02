@@ -1748,23 +1748,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   // Função para obter histórico de fluxos de um documento
   const getDocumentFlowHistory = (documentId: string) => {
-    if (!flowExecutions) {
-      console.log("🔍 flowExecutions não disponível");
-      return [];
-    }
+    if (!flowExecutions) return [];
     
-    console.log("🔍 Buscando histórico para documento:", documentId);
-    console.log("🔍 Total de execuções disponíveis:", (flowExecutions as any[]).length);
-    
-    const filteredExecutions = (flowExecutions as any[])
-      .filter((execution: any) => {
-        console.log("🔍 Verificando execução:", execution.documentId, "===", documentId, execution.documentId === documentId);
-        return execution.documentId === documentId;
-      });
-    
-    console.log("🔍 Execuções filtradas para o documento:", filteredExecutions.length, filteredExecutions);
-    
-    return filteredExecutions
+    return (flowExecutions as any[])
+      .filter((execution: any) => execution.documentId === documentId)
       .sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
       .map((execution: any) => ({
         id: execution.flowId,

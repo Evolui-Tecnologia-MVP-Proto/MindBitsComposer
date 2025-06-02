@@ -3663,7 +3663,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .innerJoin(documentsFlows, eq(documentFlowExecutions.flowId, documentsFlows.id))
         .where(or(
           eq(documentFlowExecutions.status, "initiated"),
-          eq(documentFlowExecutions.status, "completed")
+          eq(documentFlowExecutions.status, "completed"),
+          eq(documentFlowExecutions.status, "transfered"),
+          eq(documentFlowExecutions.status, "in_progress"),
+          eq(documentFlowExecutions.status, "failed")
         ));
       
       res.json(executions);
