@@ -657,6 +657,7 @@ export default function DocumentosPage() {
   const [optimisticSyncState, setOptimisticSyncState] = useState<string | null>(null);
   const [selectedFlowId, setSelectedFlowId] = useState<string>("");
   const [flowHistoryDropdown, setFlowHistoryDropdown] = useState<string | null>(null);
+  const [editingNodes, setEditingNodes] = useState<Set<string>>(new Set());
 
 
   const [editingDocument, setEditingDocument] = useState<Documento | null>(
@@ -1701,6 +1702,41 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       toast({
         title: "Anexo excluído!",
         description: "O anexo foi removido com sucesso.",
+      });
+    },
+  });
+
+  // Mutation para encaminhar documento para edição
+  const forwardToEditMutation = useMutation({
+    mutationFn: async ({ nodeId, documentId }: { nodeId: string; documentId: string }) => {
+      const response = await fetch('/api/documents-editions/forward', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nodeId, documentId }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao encaminhar para edição');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data, variables) => {
+      // Adicionar o nó à lista de nós em edição
+      setEditingNodes(prev => new Set(prev).add(variables.nodeId));
+      toast({
+        title: "Sucesso",
+        description: "Documento encaminhado para edição!",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro",
+        description: error.message || "Falha ao encaminhar para edição",
+        variant: "destructive",
       });
     },
   });
