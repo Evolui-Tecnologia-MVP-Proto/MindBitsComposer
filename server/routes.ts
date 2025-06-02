@@ -3821,6 +3821,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Forward document to editing
+  app.post("/api/documents-editions/forward", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { nodeId, documentId } = req.body;
+      
+      console.log('📝 Encaminhando documento para edição:', { nodeId, documentId });
+      
+      // Buscar documento
+      const documento = await db.select()
+        .from(documentos)
+        .where(eq(documentos.id, documentId))
+        .limit(1);
+      
+      if (documento.length === 0) {
+        return res.status(404).json({ error: "Documento não encontrado" });
+      }
+      
+      // Criar registro na tabela documents_editions
+      const editionRecord = await db.insert(documentsEditions)
+        .values({
+          nodeId: nodeId,
+          docCod: documento[0].id,
+          docName: documento[0].objeto,
+          dateEdit: new Date(),
+          userId: req.user.id
+        })
+        .returning();
+      
+      console.log('✅ Documento encaminhado para edição:', editionRecord[0]);
+      
+      res.json({
+        success: true,
+        editionRecord: editionRecord[0],
+        message: "Documento encaminhado para edição com sucesso!"
+      });
+      
+    } catch (error) {
+      console.error("Erro ao encaminhar documento para edição:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 

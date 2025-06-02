@@ -341,6 +341,7 @@ const DocumentNodeComponent = (props: any) => {
   const isPendingConnected = props.data.isPendingConnected;
   const isInternalActivity = props.data.isInternalActivity;
   const isSelected = props.selected;
+  const isEditing = props.data.isEditing; // Novo: status de edição
   
   let fillColor = 'white';
   let baseStrokeColor = 'black';
@@ -422,6 +423,11 @@ const DocumentNodeComponent = (props: any) => {
         />
       </svg>
     <FileText className="absolute top-1 left-1 h-6 w-6 text-purple-600 z-10" />
+    {isEditing && (
+      <div className="absolute top-1 right-1 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold z-20">
+        Editando
+      </div>
+    )}
     <div className="absolute inset-0 flex items-center justify-center" style={{ pointerEvents: 'none' }}>
       <div className="text-center pt-2">
         {props.data.showLabel !== false && (
@@ -6625,9 +6631,25 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     </div>
 
                     <button
-                      className="w-full px-4 py-2 text-sm font-medium rounded-md transition-colors bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                      onClick={() => {
+                        if (selectedFlowNode && flowDiagramModal.documentTitle) {
+                          const documentId = flowDiagramModal.documentTitle; // Usando título como ID temporário
+                          forwardToEditMutation.mutate({
+                            nodeId: selectedFlowNode.id,
+                            documentId: documentId
+                          });
+                        }
+                      }}
+                      disabled={forwardToEditMutation.isPending || editingNodes.has(selectedFlowNode?.id)}
+                      className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                        forwardToEditMutation.isPending || editingNodes.has(selectedFlowNode?.id)
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2'
+                      }`}
                     >
-                      Encaminhar para Edição
+                      {forwardToEditMutation.isPending ? 'Encaminhando...' : 
+                       editingNodes.has(selectedFlowNode?.id) ? 'Já Encaminhado' : 
+                       'Encaminhar para Edição'}
                     </button>
                   </div>
                 )}
