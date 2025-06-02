@@ -6346,6 +6346,28 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       </table>
                     </div>
 
+                    {/* Exibição do fluxo destino para EndNode de Transferência */}
+                    {selectedFlowNode.data.FromType === 'flow_init' && selectedFlowNode.data.To_Flow_id && (
+                      <div className="mt-4">
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <div className="mb-2">
+                            <p className="text-xs font-medium text-blue-800 mb-1">Fluxo Destino:</p>
+                            <p className="text-xs text-blue-700 font-mono bg-white px-2 py-1 rounded border">
+                              {selectedFlowNode.data.To_Flow_id}
+                            </p>
+                          </div>
+                          {(selectedFlowNode.data.To_Flow_code || selectedFlowNode.data.To_Flow_name) && (
+                            <div>
+                              <p className="text-xs font-medium text-blue-800 mb-1">Detalhes:</p>
+                              <p className="text-xs text-blue-700 font-mono bg-white px-2 py-1 rounded border">
+                                [{selectedFlowNode.data.To_Flow_code}] - {selectedFlowNode.data.To_Flow_name}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     {/* Manual execution form para EndNode de Encerramento Direto */}
                     {selectedFlowNode.data.FromType === 'Init' && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
                       <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
