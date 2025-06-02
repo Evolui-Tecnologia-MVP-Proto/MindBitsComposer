@@ -2325,9 +2325,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const documento = await storage.updateDocumento(req.params.id, req.body);
       console.log("✅ Documento atualizado com sucesso:", documento);
       
+      // Converter BigInt para string antes de enviar como JSON
+      const documentoResponse = {
+        ...documento,
+        idOrigem: documento.idOrigem ? documento.idOrigem.toString() : null
+      };
+      
       return res.status(200).json({
         success: true,
-        data: documento,
+        data: documentoResponse,
         message: "Documento atualizado com sucesso"
       });
     } catch (error: any) {
