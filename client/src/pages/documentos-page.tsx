@@ -339,16 +339,24 @@ const ActionNodeComponent = (props: any) => {
 const DocumentNodeComponent = (props: any) => {
   const isExecuted = props.data.isExecuted === 'TRUE';
   const isPendingConnected = props.data.isPendingConnected;
+  const isInternalActivity = props.data.isInternalActivity;
   const isSelected = props.selected;
   
   let fillColor = 'white';
-  if (isExecuted) fillColor = '#21639a';
-  else if (isPendingConnected) fillColor = '#fef3cd'; // amarelo claro
+  let baseStrokeColor = 'black';
+  if (isExecuted) {
+    fillColor = '#21639a';
+  } else if (isInternalActivity) {
+    fillColor = '#f3e8ff'; // lilás claro
+    baseStrokeColor = '#a855f7'; // lilás mais escuro para a borda
+  } else if (isPendingConnected) {
+    fillColor = '#fef3cd'; // amarelo claro
+  }
   
   const textClass = isExecuted ? 'text-white' : 'text-black';
   
   // Configurações para realce do nó selecionado
-  const strokeColor = isSelected ? '#f97316' : 'black'; // laranja quando selecionado
+  const strokeColor = isSelected ? '#f97316' : baseStrokeColor; // laranja quando selecionado ou cor base
   const strokeWidth = isSelected ? '4' : '2';
   const dropShadowFilter = isSelected 
     ? 'drop-shadow(0 4px 8px rgba(249, 115, 22, 0.4))' 
@@ -5824,6 +5832,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
     // Encontrar nós pendentes conectados aos executados
     const pendingConnectedNodes = new Set<string>();
+    const internalActivityNodes = new Set<string>(); // Novo: nós em atividade interna
     
     for (const edge of edges) {
       // Se o nó de origem está executado e o nó de destino não está executado
@@ -5847,13 +5856,23 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             
             // Apenas marcar como pendente se a conexão está no handle correto
             if (shouldBeActive) {
-              pendingConnectedNodes.add(edge.target);
+              // Se for documentNode, marcar como atividade interna (lilás)
+              if (targetNode.type === 'documentNode') {
+                internalActivityNodes.add(edge.target);
+              } else {
+                pendingConnectedNodes.add(edge.target);
+              }
             }
           } else {
             // Para outros tipos de nós, aplicar lógica normal
             // EXCETO para endNode - endNode nunca deve ser marcado como pendente
             if (targetNode.type !== 'endNode') {
-              pendingConnectedNodes.add(edge.target);
+              // Se for documentNode, marcar como atividade interna (lilás)
+              if (targetNode.type === 'documentNode') {
+                internalActivityNodes.add(edge.target);
+              } else {
+                pendingConnectedNodes.add(edge.target);
+              }
             }
           }
         }
@@ -5871,13 +5890,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             // Não marcar integrationNode como pendente se conectado a endNode executado
             continue;
           } else {
-            pendingConnectedNodes.add(edge.source);
+            // Se for documentNode, marcar como atividade interna (lilás)
+            if (sourceNode.type === 'documentNode') {
+              internalActivityNodes.add(edge.source);
+            } else {
+              pendingConnectedNodes.add(edge.source);
+            }
           }
         }
       }
     }
 
-    // Processar nós para adicionar destaque amarelo aos pendentes conectados
+    // Processar nós para adicionar destaque amarelo aos pendentes conectados e lilás aos de atividade interna
     const processedNodes = nodes.map((node: any) => {
       const isSelected = selectedFlowNode?.id === node.id;
       
@@ -5888,6 +5912,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           data: {
             ...node.data,
             isPendingConnected: true,
+            isInternalActivity: false,
+          }
+        };
+      } else if (internalActivityNodes.has(node.id)) {
+        return {
+          ...node,
+          selected: isSelected,
+          data: {
+            ...node.data,
+            isPendingConnected: false,
+            isInternalActivity: true,
             isReadonly: true
           },
         };
@@ -5895,7 +5930,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       return {
         ...node,
         selected: isSelected,
-        data: { ...node.data, isReadonly: true }
+        data: { 
+          ...node.data, 
+          isPendingConnected: false,
+          isInternalActivity: false,
+          isReadonly: true 
+        }
       };
     });
 
