@@ -2431,10 +2431,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                       (execution: any) => execution.flowId === flow.id && execution.documentId === documento.id
                                     );
                                     if (fullFlowExecution && fullFlowExecution.flowTasks) {
-                                      setFlowDiagramModal({
-                                        isOpen: true,
-                                        flowData: fullFlowExecution.flowTasks,
-                                        documentTitle: documento.objeto || ""
+                                      openFlowDiagramModal({
+                                        flowTasks: fullFlowExecution.flowTasks,
+                                        document: { objeto: documento.objeto }
                                       });
                                       setFlowHistoryDropdown(null); // Fechar o dropdown
                                     }
