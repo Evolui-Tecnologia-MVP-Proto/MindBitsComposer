@@ -6646,12 +6646,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               </div>
             )}
 
-            {selectedFlowNode.data.To_Flow_id && (
-              <div>
-                <p className="text-sm font-medium text-gray-700">Fluxo de Destino</p>
-                <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.To_Flow_id}</p>
-              </div>
-            )}
+
 
             {selectedFlowNode.type === 'switchNode' && selectedFlowNode.data.switchField && (
               <div>
