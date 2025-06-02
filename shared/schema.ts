@@ -209,6 +209,7 @@ export const documentos = pgTable("documentos", {
   generalColumns: json("general_columns").$type<Record<string, any>>().default({}), // Armazena dados extras do sistema de origem
   mondayItemValues: json("monday_item_values").$type<Record<string, any>>().default({}), // Armazena valores dos itens do Monday.com
   assetsSynced: boolean("assets_synced").default(false), // Indica se os anexos foram sincronizados com sucesso
+  taskStatus: text("task_status"), // Status da tarefa/atividade
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
