@@ -2271,7 +2271,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             <TableHead>Nome</TableHead>
             <TableHead>Incluído</TableHead>
             <TableHead>Iniciado</TableHead>
-            <TableHead>Fluxo Atual</TableHead>
+            {activeTab !== "concluidos" && <TableHead>Fluxo Atual</TableHead>}
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Ações</TableHead>
           </TableRow>
@@ -2305,23 +2305,25 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   {formatDate(documento.updatedAt)}
                 </div>
               </TableCell>
-              <TableCell>
-                {(() => {
-                  const activeFlow = getActiveFlow(documento.id);
-                  if (activeFlow) {
+              {activeTab !== "concluidos" && (
+                <TableCell>
+                  {(() => {
+                    const activeFlow = getActiveFlow(documento.id);
+                    if (activeFlow) {
+                      return (
+                        <div className="flex items-center text-gray-500 text-sm">
+                          [{activeFlow.flowCode}] - {activeFlow.flowName}
+                        </div>
+                      );
+                    }
                     return (
-                      <div className="flex items-center text-gray-500 text-sm">
-                        [{activeFlow.flowCode}] - {activeFlow.flowName}
+                      <div className="text-xs text-gray-400">
+                        -
                       </div>
                     );
-                  }
-                  return (
-                    <div className="text-xs text-gray-400">
-                      -
-                    </div>
-                  );
-                })()}
-              </TableCell>
+                  })()}
+                </TableCell>
+              )}
               <TableCell>
                 <Badge
                   variant={getStatusBadgeVariant(documento.status) as any}
