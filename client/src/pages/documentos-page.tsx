@@ -2422,7 +2422,24 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             </TableHeader>
                             <TableBody>
                               {getDocumentFlowHistory(documento.id).map((flow: any, index: number) => (
-                                <TableRow key={flow.id + index} className="text-xs hover:bg-gray-50">
+                                <TableRow 
+                                  key={flow.id + index} 
+                                  className="text-xs hover:bg-gray-50 cursor-pointer"
+                                  onClick={() => {
+                                    // Buscar os dados completos do fluxo
+                                    const fullFlowExecution = (flowExecutions as any[]).find(
+                                      (execution: any) => execution.flowId === flow.id && execution.documentId === documento.id
+                                    );
+                                    if (fullFlowExecution && fullFlowExecution.flowTasks) {
+                                      setFlowModalData({
+                                        isOpen: true,
+                                        flowData: fullFlowExecution.flowTasks,
+                                        documentTitle: documento.objeto || ""
+                                      });
+                                      setFlowHistoryDropdown(null); // Fechar o dropdown
+                                    }
+                                  }}
+                                >
                                   <TableCell className="p-2 font-medium text-gray-800">
                                     {flow.name}
                                   </TableCell>
