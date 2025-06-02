@@ -3741,10 +3741,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('🔄 Documento atual:', currentDocumentId);
       console.log('🔄 Fluxo destino:', targetFlowId);
       
-      // 1. Marcar execução atual como completed (transferida)
+      // 1. Marcar execução atual como transferida
       const currentExecution = await db.update(documentFlowExecutions)
         .set({
-          status: 'completed',
+          status: 'transfered',
           completedAt: new Date(),
           flowTasks,
           updatedAt: new Date()
@@ -3784,6 +3784,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             transferredFrom: currentExecution[0].flowId,
             transferredAt: new Date().toISOString()
           },
+          completedAt: null,
           createdAt: new Date(),
           updatedAt: new Date()
         })

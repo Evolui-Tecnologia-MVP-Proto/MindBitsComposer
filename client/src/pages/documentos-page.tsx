@@ -5229,7 +5229,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           },
           body: JSON.stringify({
             flowTasks: updatedFlowTasks,
-            status: 'completed',
+            status: 'transfered',
             completedAt: new Date().toISOString()
           }),
         });
