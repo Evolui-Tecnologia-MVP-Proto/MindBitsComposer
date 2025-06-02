@@ -2391,7 +2391,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   {/* Dropdown de histórico de fluxos renderizado fora da tabela */}
                   {flowHistoryDropdown === documento.id && activeTab === "em-processo" && (
                     <div 
-                      className="fixed z-[99999] w-[480px] bg-white border border-gray-200 rounded-lg shadow-xl p-4"
+                      className="fixed z-[99999] w-[624px] bg-white border border-gray-200 rounded-lg shadow-xl p-4"
                       style={{
                         top: '200px',
                         right: '20px'
@@ -2409,35 +2409,61 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         </Button>
                       </div>
                       
-                      <div className="space-y-2 max-h-64 overflow-y-auto">
-                        {getDocumentFlowHistory(documento.id).map((flow: any, index: number) => (
-                          <div key={flow.id + index} className="p-2 border border-gray-100 rounded-md bg-gray-50">
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="font-medium text-xs text-gray-800">{flow.name}</span>
-                              <Badge 
-                                variant="outline"
-                                className={`text-xs ${
-                                  flow.status === 'completed' ? 'bg-green-100 text-green-800 border-green-200' :
-                                  flow.status === 'initiated' ? 'bg-blue-100 text-blue-800 border-blue-200' :
-                                  flow.status === 'transfered' ? 'bg-orange-100 text-orange-800 border-orange-200' :
-                                  'bg-gray-100 text-gray-800 border-gray-200'
-                                }`}
-                              >
-                                {flow.status === 'completed' ? 'Concluído' :
-                                 flow.status === 'initiated' ? 'Iniciado' :
-                                 flow.status === 'transfered' ? 'Transferido' : flow.status}
-                              </Badge>
-                            </div>
-                            <div className="text-xs text-gray-600">
-                              <div>Início: {new Date(flow.createdAt).toLocaleDateString("pt-BR")} às {new Date(flow.createdAt).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}</div>
-                              {flow.completedAt && (
-                                <div>Fim: {new Date(flow.completedAt).toLocaleDateString("pt-BR")} às {new Date(flow.completedAt).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}</div>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                        
-                        {getDocumentFlowHistory(documento.id).length === 0 && (
+                      <div className="max-h-64 overflow-y-auto">
+                        {getDocumentFlowHistory(documento.id).length > 0 ? (
+                          <Table>
+                            <TableHeader>
+                              <TableRow className="text-xs">
+                                <TableHead className="text-xs font-medium p-2">Nome do Fluxo</TableHead>
+                                <TableHead className="text-xs font-medium p-2 w-24">Status</TableHead>
+                                <TableHead className="text-xs font-medium p-2 w-32">Data Início</TableHead>
+                                <TableHead className="text-xs font-medium p-2 w-32">Data Fim</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {getDocumentFlowHistory(documento.id).map((flow: any, index: number) => (
+                                <TableRow key={flow.id + index} className="text-xs hover:bg-gray-50">
+                                  <TableCell className="p-2 font-medium text-gray-800">
+                                    {flow.name}
+                                  </TableCell>
+                                  <TableCell className="p-2">
+                                    <Badge 
+                                      variant="outline"
+                                      className={`text-xs ${
+                                        flow.status === 'completed' ? 'bg-green-100 text-green-800 border-green-200' :
+                                        flow.status === 'initiated' ? 'bg-blue-100 text-blue-800 border-blue-200' :
+                                        flow.status === 'transfered' ? 'bg-orange-100 text-orange-800 border-orange-200' :
+                                        'bg-gray-100 text-gray-800 border-gray-200'
+                                      }`}
+                                    >
+                                      {flow.status === 'completed' ? 'Concluído' :
+                                       flow.status === 'initiated' ? 'Iniciado' :
+                                       flow.status === 'transfered' ? 'Transferido' : flow.status}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="p-2 text-gray-600">
+                                    <div>{new Date(flow.createdAt).toLocaleDateString("pt-BR")}</div>
+                                    <div className="text-xs text-gray-500">
+                                      {new Date(flow.createdAt).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="p-2 text-gray-600">
+                                    {flow.completedAt ? (
+                                      <>
+                                        <div>{new Date(flow.completedAt).toLocaleDateString("pt-BR")}</div>
+                                        <div className="text-xs text-gray-500">
+                                          {new Date(flow.completedAt).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}
+                                        </div>
+                                      </>
+                                    ) : (
+                                      <span className="text-gray-400 text-xs">Em andamento</span>
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        ) : (
                           <div className="text-center py-4 text-gray-500 text-sm">
                             Nenhum fluxo encontrado para este documento
                           </div>
