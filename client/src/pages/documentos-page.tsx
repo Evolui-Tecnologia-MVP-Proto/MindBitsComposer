@@ -2420,6 +2420,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             console.log("🔴 Abrindo modal com fluxo");
                             openFlowDiagramModal({
                               flowTasks: flowToShow.flowTasks,
+                              documentId: documento.id,
                               document: { objeto: documento.objeto }
                             });
                           } else {
@@ -2510,6 +2511,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                     if (fullFlowExecution && fullFlowExecution.flowTasks) {
                                       openFlowDiagramModal({
                                         flowTasks: fullFlowExecution.flowTasks,
+                                        documentId: documento.id,
                                         document: { objeto: documento.objeto }
                                       });
                                       setFlowHistoryDropdown(null); // Fechar o dropdown
