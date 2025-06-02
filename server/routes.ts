@@ -3826,9 +3826,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      const { nodeId, documentId } = req.body;
+      const { nodeId, documentId, templateId } = req.body;
       
-      console.log('📝 Encaminhando documento para edição:', { nodeId, documentId });
+      console.log('📝 Encaminhando documento para edição:', { nodeId, documentId, templateId });
       
       // Buscar documento
       const documento = await db.select()
@@ -3840,15 +3840,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Documento não encontrado" });
       }
       
+      // Buscar template para obter o código
+      let templateCode = 'DOC-01';
+      if (templateId) {
+        const template = await db.select()
+          .from(templates)
+          .where(eq(templates.id, templateId))
+          .limit(1);
+        
+        if (template.length > 0) {
+          templateCode = template[0].code;
+        }
+      }
+      
       // Criar registro na tabela documents_editions
-      // Como não temos templateId direto, vamos usar o tipo do documento como referência
       const editionRecord = await db.insert(documentsEditions)
         .values({
           nodeId: nodeId,
-          docCod: documento[0].tipo || 'DOC-01', // Usar o tipo do documento como código
+          docCod: templateCode,
           docName: documento[0].objeto,
           dateEdit: new Date(),
-          userId: req.user.id
+          userId: req.user.id,
+          templateId: templateId || null
         })
         .returning();
       

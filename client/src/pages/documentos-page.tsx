@@ -1714,13 +1714,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   // Mutation para encaminhar documento para edição
   const forwardToEditMutation = useMutation({
-    mutationFn: async ({ nodeId, documentId }: { nodeId: string; documentId: string }) => {
+    mutationFn: async ({ nodeId, documentId, templateId }: { nodeId: string; documentId: string; templateId?: string }) => {
       const response = await fetch('/api/documents-editions/forward', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ nodeId, documentId }),
+        body: JSON.stringify({ nodeId, documentId, templateId }),
       });
       
       if (!response.ok) {
@@ -6643,7 +6643,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         if (selectedFlowNode && flowDiagramModal.flowData) {
                           forwardToEditMutation.mutate({
                             nodeId: selectedFlowNode.id,
-                            documentId: flowDiagramModal.flowData.documentId
+                            documentId: flowDiagramModal.flowData.documentId,
+                            templateId: selectedFlowNode.data.docType
                           });
                         }
                       }}
