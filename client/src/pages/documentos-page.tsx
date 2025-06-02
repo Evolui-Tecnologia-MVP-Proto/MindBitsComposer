@@ -2333,7 +2333,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   >
                     <Eye className="h-4 w-4" />
                   </Button>
-                  {(activeTab === "em-processo" || activeTab === "concluidos") && (
+                  {activeTab === "em-processo" && (
                     <>
                       <Button
                         variant="ghost"
@@ -2342,17 +2342,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         onClick={() => {
                           console.log("🔴 BOTÃO CLICADO! Documento:", documento.objeto);
                           
-                          let flowToShow = null;
-                          
-                          if (activeTab === "concluidos") {
-                            // Para documentos concluídos, busca o último fluxo concluído
-                            flowToShow = getConcludedFlow(documento.id);
-                            console.log("🔴 Fluxo concluído encontrado:", flowToShow);
-                          } else {
-                            // Para documentos em processo, busca o fluxo ativo
-                            flowToShow = getActiveFlow(documento.id);
-                            console.log("🔴 Fluxo ativo encontrado:", flowToShow);
-                          }
+                          const flowToShow = getActiveFlow(documento.id);
+                          console.log("🔴 Fluxo ativo encontrado:", flowToShow);
                           
                           if (flowToShow && flowToShow.flowTasks) {
                             console.log("🔴 Abrindo modal com fluxo");
@@ -2361,35 +2352,50 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               document: { objeto: documento.objeto }
                             });
                           } else {
-                            console.log(`🔴 Nenhum fluxo ${activeTab === "concluidos" ? "concluído" : "ativo"} encontrado para:`, documento.id);
+                            console.log("🔴 Nenhum fluxo ativo encontrado para:", documento.id);
                           }
                         }}
-                        title="Mostrar diagrama do fluxo"
+                        title="Mostrar diagrama do fluxo ativo"
                       >
                         <GitBranch className="h-4 w-4 text-purple-500" />
                       </Button>
                       
-                      {activeTab === "em-processo" && (
-                        <div className="relative">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setFlowHistoryDropdown(flowHistoryDropdown === documento.id ? null : documento.id);
-                            }}
-                            title="Histórico de fluxos"
-                          >
-                            <Clock className="h-4 w-4 text-orange-500" />
-                          </Button>
-                        </div>
-                      )}
+                      <div className="relative">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFlowHistoryDropdown(flowHistoryDropdown === documento.id ? null : documento.id);
+                          }}
+                          title="Histórico de fluxos"
+                        >
+                          <Clock className="h-4 w-4 text-orange-500" />
+                        </Button>
+                      </div>
                     </>
                   )}
                   
+                  {activeTab === "concluidos" && (
+                    <div className="relative">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFlowHistoryDropdown(flowHistoryDropdown === documento.id ? null : documento.id);
+                        }}
+                        title="Histórico de fluxos"
+                      >
+                        <Clock className="h-4 w-4 text-orange-500" />
+                      </Button>
+                    </div>
+                  )}
+                  
                   {/* Dropdown de histórico de fluxos renderizado fora da tabela */}
-                  {flowHistoryDropdown === documento.id && activeTab === "em-processo" && (
+                  {flowHistoryDropdown === documento.id && (activeTab === "em-processo" || activeTab === "concluidos") && (
                     <div 
                       className="fixed z-[99999] w-[624px] bg-white border border-gray-200 rounded-lg shadow-xl p-4"
                       style={{
