@@ -1998,7 +1998,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     if (execution) {
       setFlowDiagramModal({
         isOpen: true,
-        flowData: execution.flowTasks || execution,
+        flowData: {
+          ...(execution.flowTasks || execution),
+          documentId: execution.documentId || execution.document?.id
+        },
         documentTitle: execution.document?.objeto || execution.flowName || "Documento"
       });
       console.log("🔴 Estado atualizado:", {
