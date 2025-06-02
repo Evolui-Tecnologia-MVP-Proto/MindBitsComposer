@@ -1907,9 +1907,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   // Função para obter o último fluxo concluído de um documento
   const getConcludedFlow = (documentId: string) => {
-    const concludedExecutions = flowExecutions.filter((execution: any) => 
-      execution.documentId === documentId && execution.status === "concluded"
-    );
+    console.log("🔴 DEBUG: Buscando fluxo concluído para documentId:", documentId);
+    console.log("🔴 DEBUG: flowExecutions disponíveis:", flowExecutions);
+    
+    const concludedExecutions = flowExecutions.filter((execution: any) => {
+      console.log("🔴 DEBUG: Verificando execução:", execution);
+      console.log("🔴 DEBUG: execution.documentId:", execution.documentId);
+      console.log("🔴 DEBUG: execution.status:", execution.status);
+      return execution.documentId === documentId && execution.status === "concluded";
+    });
+    
+    console.log("🔴 DEBUG: Execuções concluídas encontradas:", concludedExecutions);
+    
     // Retorna a execução mais recente (ordenado por updatedAt)
     return concludedExecutions.sort((a: any, b: any) => 
       new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
