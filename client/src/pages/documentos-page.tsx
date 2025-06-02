@@ -2354,10 +2354,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             console.log("🔴 Fluxo ativo encontrado:", flowToShow);
                           }
                           
-                          if (flowToShow) {
+                          if (flowToShow && flowToShow.flowTasks) {
                             console.log("🔴 Abrindo modal com fluxo");
                             openFlowDiagramModal({
-                              flowTasks: flowToShow,
+                              flowTasks: flowToShow.flowTasks,
                               document: { objeto: documento.objeto }
                             });
                           } else {
