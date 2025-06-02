@@ -1905,6 +1905,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   };
 
+  // Função para obter o último fluxo concluído de um documento
+  const getConcludedFlow = (documentId: string) => {
+    const concludedExecutions = flowExecutions.filter((execution: any) => 
+      execution.documentId === documentId && execution.status === "concluded"
+    );
+    // Retorna a execução mais recente (ordenado por updatedAt)
+    return concludedExecutions.sort((a: any, b: any) => 
+      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    )[0];
+  };
+
   // Função para abrir modal do diagrama de fluxo
   const openFlowDiagramModal = (execution: any) => {
     console.log("🔴 Dados recebidos na função:", execution);
@@ -2303,16 +2314,27 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       className="h-8 w-8"
                       onClick={() => {
                         console.log("🔴 BOTÃO CLICADO! Documento:", documento.objeto);
-                        const activeFlow = getActiveFlow(documento.id);
-                        console.log("🔴 Active flow encontrado:", activeFlow);
-                        if (activeFlow) {
-                          console.log("🔴 Abrindo modal com fluxo ativo");
+                        
+                        let flowToShow = null;
+                        
+                        if (activeTab === "concluidos") {
+                          // Para documentos concluídos, busca o último fluxo concluído
+                          flowToShow = getConcludedFlow(documento.id);
+                          console.log("🔴 Fluxo concluído encontrado:", flowToShow);
+                        } else {
+                          // Para documentos em processo, busca o fluxo ativo
+                          flowToShow = getActiveFlow(documento.id);
+                          console.log("🔴 Fluxo ativo encontrado:", flowToShow);
+                        }
+                        
+                        if (flowToShow) {
+                          console.log("🔴 Abrindo modal com fluxo");
                           openFlowDiagramModal({
-                            flowTasks: activeFlow,
+                            flowTasks: flowToShow,
                             document: { objeto: documento.objeto }
                           });
                         } else {
-                          console.log("🔴 Nenhum fluxo ativo encontrado para:", documento.id);
+                          console.log(`🔴 Nenhum fluxo ${activeTab === "concluidos" ? "concluído" : "ativo"} encontrado para:`, documento.id);
                         }
                       }}
                       title="Mostrar diagrama do fluxo"
