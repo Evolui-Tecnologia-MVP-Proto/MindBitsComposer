@@ -206,7 +206,7 @@ const EndNodeComponent = (props: any) => {
               )}
             </div>
           )}
-          {!props.data.FromType && !props.data.To_Flow_id && <div className={`font-mono ${getTextColor()}`}>✓ Configurado</div>}
+
         </div>
       )}
       <Handle 
