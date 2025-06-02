@@ -5219,26 +5219,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
         const result = await response.json();
         
-        console.log('Transferência de fluxo concluída com sucesso');
-
-        // Primeiro, salvar as alterações do nó executado no fluxo atual
-        const saveCurrentResponse = await fetch(`/api/document-flow-executions/${flowData.documentId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            flowTasks: updatedFlowTasks,
-            status: 'transfered',
-            completedAt: new Date().toISOString()
-          }),
-        });
-
-        if (!saveCurrentResponse.ok) {
-          console.warn('Aviso: Não foi possível salvar o estado final do fluxo atual');
-        } else {
-          console.log('✅ Estado do fluxo atual salvo com sucesso');
-        }
+        console.log('✅ Transferência de fluxo concluída com sucesso pelo backend');
 
         // Atualizar estado local
         setFlowDiagramModal(prev => ({
