@@ -5973,6 +5973,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             ...node.data,
             isPendingConnected: true,
             isInternalActivity: false,
+            isEditing: editingNodes.has(node.id),
           }
         };
       } else if (internalActivityNodes.has(node.id)) {
@@ -5983,6 +5984,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             ...node.data,
             isPendingConnected: false,
             isInternalActivity: true,
+            isEditing: editingNodes.has(node.id),
             isReadonly: true
           },
         };
@@ -5994,6 +5996,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           ...node.data, 
           isPendingConnected: false,
           isInternalActivity: false,
+          isEditing: editingNodes.has(node.id),
           isReadonly: true 
         }
       };
