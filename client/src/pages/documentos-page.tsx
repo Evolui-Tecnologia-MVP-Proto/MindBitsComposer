@@ -5846,7 +5846,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             }
           } else {
             // Para outros tipos de nós, aplicar lógica normal
-            pendingConnectedNodes.add(edge.target);
+            // EXCETO para endNode - endNode nunca deve ser marcado como pendente
+            if (targetNode.type !== 'endNode') {
+              pendingConnectedNodes.add(edge.target);
+            }
           }
         }
       }
@@ -5854,8 +5857,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       // Se o nó de destino está executado e o nó de origem não está executado
       if (executedNodes.has(edge.target)) {
         const sourceNode = nodes.find((n: any) => n.id === edge.source);
+        const targetNode = nodes.find((n: any) => n.id === edge.target);
+        
         if (sourceNode && sourceNode.data?.isExecuted !== 'TRUE') {
-          pendingConnectedNodes.add(edge.source);
+          // Para integrationNode conectado a endNode executado, não marcar como pendente
+          // pois a integração já foi processada quando o endNode foi executado
+          if (sourceNode.type === 'integrationNode' && targetNode?.type === 'endNode') {
+            // Não marcar integrationNode como pendente se conectado a endNode executado
+            continue;
+          } else {
+            pendingConnectedNodes.add(edge.source);
+          }
         }
       }
     }
