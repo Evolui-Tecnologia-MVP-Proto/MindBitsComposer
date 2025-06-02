@@ -2391,7 +2391,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   {/* Dropdown de histórico de fluxos renderizado fora da tabela */}
                   {flowHistoryDropdown === documento.id && activeTab === "em-processo" && (
                     <div 
-                      className="fixed z-[99999] w-80 bg-white border border-gray-200 rounded-lg shadow-xl p-4"
+                      className="fixed z-[99999] w-[480px] bg-white border border-gray-200 rounded-lg shadow-xl p-4"
                       style={{
                         top: '200px',
                         right: '20px'
