@@ -5,7 +5,7 @@ import { storage } from "./storage";
 import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
-import { eq, sql, desc, and, gte, lte, isNull } from "drizzle-orm";
+import { eq, sql, desc, and, gte, lte, isNull, or } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { systemLogs } from "@shared/schema";
 import { ZodError } from "zod";
@@ -3643,7 +3643,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get active flow executions for documents
+  // Get flow executions for documents (both active and concluded)
   app.get("/api/document-flow-executions", async (req: Request, res: Response) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
@@ -3653,13 +3653,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         flowId: documentFlowExecutions.flowId,
         status: documentFlowExecutions.status,
         createdAt: documentFlowExecutions.createdAt,
+        updatedAt: documentFlowExecutions.updatedAt,
+        completedAt: documentFlowExecutions.completedAt,
         flowName: documentsFlows.name,
         flowCode: documentsFlows.code,
         flowTasks: documentFlowExecutions.flowTasks
       })
         .from(documentFlowExecutions)
         .innerJoin(documentsFlows, eq(documentFlowExecutions.flowId, documentsFlows.id))
-        .where(eq(documentFlowExecutions.status, "initiated"));
+        .where(or(
+          eq(documentFlowExecutions.status, "initiated"),
+          eq(documentFlowExecutions.status, "completed")
+        ));
       
       res.json(executions);
     } catch (error) {
