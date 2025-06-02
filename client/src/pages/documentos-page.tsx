@@ -2325,7 +2325,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 </TableCell>
               )}
               <TableCell>
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 items-center">
                   <Badge
                     variant={getStatusBadgeVariant(documento.status) as any}
                     className="flex items-center gap-1 whitespace-nowrap"
@@ -2336,10 +2336,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   {activeTab === "em-processo" && (
                     <Badge
                       variant="secondary"
-                      className={`text-xs text-center ${
+                      className={`text-xs w-full text-center hover:bg-yellow-100 ${
                         documento.taskStatus && documento.taskStatus !== "Pendente"
-                          ? "bg-gray-100 text-gray-700"
-                          : "bg-yellow-100 text-yellow-700"
+                          ? "bg-gray-100 text-gray-700 hover:bg-gray-100"
+                          : "bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
                       }`}
                     >
                       {documento.taskStatus && documento.taskStatus !== "Pendente" 
