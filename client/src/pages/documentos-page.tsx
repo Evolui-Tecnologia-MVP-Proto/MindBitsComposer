@@ -6174,45 +6174,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
 
-                {/* Manual execution form para EndNode de Encerramento Direto */}
-                {selectedFlowNode.type === 'endNode' && selectedFlowNode.data.FromType === 'Init' && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
-                  <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <div className="mb-3">
-                      <p className="text-xs text-red-800 mb-2">
-                        Ao pressionar o botão você encerrará este fluxo vinculado ao documento, bem como marcará o documento como encerrado e o enviará para a tab [Concluídos] da página [Documentos]. Pressione para continuar.
-                      </p>
-                    </div>
-
-                    {integrationResult.status && (
-                      <div className={`mb-3 p-3 rounded-md ${
-                        integrationResult.status === 'success' 
-                          ? 'bg-green-50 border border-green-200' 
-                          : 'bg-red-50 border border-red-200'
-                      }`}>
-                        <p className={`text-sm ${
-                          integrationResult.status === 'success' 
-                            ? 'text-green-800' 
-                            : 'text-red-800'
-                        }`}>
-                          {integrationResult.message}
-                        </p>
-                      </div>
-                    )}
-
-                    <button
-                      onClick={executeDirectFlowConclusion}
-                      disabled={selectedFlowNode.data.isExecuted === 'TRUE'}
-                      className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                        selectedFlowNode.data.isExecuted === 'TRUE'
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                          : 'bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
-                      }`}
-                    >
-                      {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Já Concluído' : 'Concluir Fluxo'}
-                    </button>
-                  </div>
-                )}
-
                 {/* Layout tabular para StartNode - 2 colunas */}
                 {selectedFlowNode.type === 'startNode' && (
                   <div>
@@ -6295,6 +6256,45 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         </tbody>
                       </table>
                     </div>
+
+                    {/* Manual execution form para EndNode de Encerramento Direto */}
+                    {selectedFlowNode.data.FromType === 'Init' && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
+                      <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <div className="mb-3">
+                          <p className="text-xs text-red-800 mb-2">
+                            Ao pressionar o botão você encerrará este fluxo vinculado ao documento, bem como marcará o documento como encerrado e o enviará para a tab [Concluídos] da página [Documentos]. Pressione para continuar.
+                          </p>
+                        </div>
+
+                        {integrationResult.status && (
+                          <div className={`mb-3 p-3 rounded-md ${
+                            integrationResult.status === 'success' 
+                              ? 'bg-green-50 border border-green-200' 
+                              : 'bg-red-50 border border-red-200'
+                          }`}>
+                            <p className={`text-sm ${
+                              integrationResult.status === 'success' 
+                                ? 'text-green-800' 
+                                : 'text-red-800'
+                            }`}>
+                              {integrationResult.message}
+                            </p>
+                          </div>
+                        )}
+
+                        <button
+                          onClick={executeDirectFlowConclusion}
+                          disabled={selectedFlowNode.data.isExecuted === 'TRUE'}
+                          className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                            selectedFlowNode.data.isExecuted === 'TRUE'
+                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                              : 'bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+                          }`}
+                        >
+                          {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Já Concluído' : 'Concluir Fluxo'}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
 
