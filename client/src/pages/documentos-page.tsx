@@ -2336,7 +2336,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   {activeTab === "em-processo" && (
                     <Badge
                       variant="secondary"
-                      className="text-xs bg-gray-100 text-gray-700"
+                      className={`text-xs text-center ${
+                        documento.taskStatus && documento.taskStatus !== "Pendente"
+                          ? "bg-gray-100 text-gray-700"
+                          : "bg-yellow-100 text-yellow-700"
+                      }`}
                     >
                       {documento.taskStatus && documento.taskStatus !== "Pendente" 
                         ? documento.taskStatus 
