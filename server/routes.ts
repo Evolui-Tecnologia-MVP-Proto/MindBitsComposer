@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentsEditions } from "@shared/schema";
+import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentsEditions, templates } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc, and, gte, lte, isNull, or } from "drizzle-orm";
@@ -3841,10 +3841,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Criar registro na tabela documents_editions
+      // Como não temos templateId direto, vamos usar o tipo do documento como referência
       const editionRecord = await db.insert(documentsEditions)
         .values({
           nodeId: nodeId,
-          docCod: documento[0].id,
+          docCod: documento[0].tipo || 'DOC-01', // Usar o tipo do documento como código
           docName: documento[0].objeto,
           dateEdit: new Date(),
           userId: req.user.id
