@@ -3538,7 +3538,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { name, code, description, flowTypeId, flowData } = req.body;
       
       // Generate UUIDs for nodes and edges if they don't have them
-      const processedFlowData = {
+      // For new flows created from the modal, flowData might be undefined
+      const processedFlowData = flowData ? {
         ...flowData,
         nodes: flowData.nodes?.map((node: any) => ({
           ...node,
@@ -3548,6 +3549,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ...edge,
           id: edge.id || crypto.randomUUID()
         })) || []
+      } : {
+        nodes: [],
+        edges: []
       };
       
       const newFlow = await db.insert(documentsFlows)
