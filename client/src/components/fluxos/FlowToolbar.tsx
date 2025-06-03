@@ -164,63 +164,10 @@ export const FlowToolbar = ({
             Propriedades
           </Button>
           
-          <Button 
-            onClick={onOpenEditModal} 
-            variant="outline" 
-            size="sm"
-            disabled={!currentFlowId || isFlowLocked}
-            title={isFlowLocked ? "Fluxo bloqueado para edição" : ""}
-          >
-            <Edit className="mr-1 h-4 w-4" />
-            Editar Metadados
-          </Button>
+
         </div>
         
         <div className="flex space-x-2">
-          <NewFlowModal
-            isOpen={isNewFlowModalOpen}
-            onOpenChange={onOpenNewFlowModal}
-            newFlowTypeId={newFlowTypeId}
-            newFlowCode={newFlowCode}
-            newFlowName={newFlowName}
-            newFlowDescription={newFlowDescription}
-            flowTypes={flowTypes}
-            onFlowTypeChange={onFlowTypeChange}
-            onCodeChange={onCodeChange}
-            onNameChange={onNameChange}
-            onDescriptionChange={onDescriptionChange}
-            onCreateFlow={onCreateFlow}
-            onCancel={onCancelNewFlow}
-          />
-        
-        {/* Modal para editar metadados do fluxo */}
-        <FlowMetadataModal
-          isOpen={isEditModalOpen}
-          onClose={onCancelEdit}
-          flowData={{
-            code: editFlowCode,
-            name: editFlowName,
-            description: editFlowDescription,
-          }}
-          flowTypes={[]}
-          onSave={(data) => {
-            onEditNameChange(data.name);
-            onEditDescriptionChange(data.description);
-            onSaveEdit();
-          }}
-          isEditing={true}
-        />
-        
-          <Button 
-            onClick={onDeleteFlow} 
-            variant="destructive" 
-            size="sm"
-            disabled={!currentFlowId || isFlowLocked}
-            title={isFlowLocked ? "Fluxo bloqueado para edição" : ""}
-          >
-            <Trash2 className="mr-1 h-4 w-4" />
-            Excluir
-          </Button>
           <Button 
             onClick={onSaveFlow} 
             size="sm"
