@@ -72,7 +72,15 @@ const nodeTypes: NodeTypes = {
   integrationNode: IntegrationNode,
 };
 
-const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: string, name: string} | null) => void }) => {
+const FlowCanvas = ({ 
+  onFlowInfoChange, 
+  persistedFlowData, 
+  onFlowDataChange 
+}: { 
+  onFlowInfoChange: (info: {code: string, name: string} | null) => void;
+  persistedFlowData: any;
+  onFlowDataChange: (data: any) => void;
+}) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -83,6 +91,25 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
   const [showInspector, setShowInspector] = useState<boolean>(false);
   const [showMiniMap, setShowMiniMap] = useState<boolean>(false);
+  const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
+  
+  // Restaurar dados persistidos do fluxo quando o componente for montado
+  useEffect(() => {
+    if (persistedFlowData) {
+      if (persistedFlowData.nodes) {
+        setNodes(persistedFlowData.nodes);
+      }
+      if (persistedFlowData.edges) {
+        setEdges(persistedFlowData.edges);
+      }
+      if (persistedFlowData.flowName) {
+        setFlowName(persistedFlowData.flowName);
+      }
+      if (persistedFlowData.currentFlowId) {
+        setCurrentFlowId(persistedFlowData.currentFlowId);
+      }
+    }
+  }, [persistedFlowData, setNodes, setEdges]);
   
   // Aplicar estilo de seleção às edges
   const styledEdges = edges.map((edge: Edge) => {
@@ -122,7 +149,6 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       interactionWidth: 20
     };
   });
-  const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
   const [currentFlowLocked, setCurrentFlowLocked] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isNewFlowModalOpen, setIsNewFlowModalOpen] = useState(false);
@@ -1171,6 +1197,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
 
 export default function FluxosPage() {
   const [currentFlowInfo, setCurrentFlowInfo] = useState<{code: string, name: string} | null>(null);
+  const [persistedFlowData, setPersistedFlowData] = useState<any>(null);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -1200,7 +1227,11 @@ export default function FluxosPage() {
           
           <TabsContent value="editor" className="flex-1 mt-4 min-h-0">
             <ReactFlowProvider>
-              <FlowCanvas onFlowInfoChange={setCurrentFlowInfo} />
+              <FlowCanvas 
+                onFlowInfoChange={setCurrentFlowInfo}
+                persistedFlowData={persistedFlowData}
+                onFlowDataChange={setPersistedFlowData}
+              />
             </ReactFlowProvider>
           </TabsContent>
           
