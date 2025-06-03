@@ -1,15 +1,45 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Copy, Edit } from "lucide-react";
+import { BookOpen, Copy, Edit, Trash2 } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 export const BibliotecaFluxos = () => {
+  const queryClient = useQueryClient();
+  
   const { data: savedFlows, isLoading: isLoadingFlows } = useQuery<any[]>({
     queryKey: ["/api/documents-flows"],
   });
   
   const { data: flowTypes } = useQuery<any[]>({
     queryKey: ["/api/flow-types"],
+  });
+
+  // Mutation para excluir fluxo
+  const deleteFlowMutation = useMutation({
+    mutationFn: async (flowId: string) => {
+      const response = await fetch(`/api/documents-flows/${flowId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        throw new Error("Erro ao excluir fluxo");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documents-flows"] });
+      toast({
+        title: "Fluxo excluído",
+        description: "O fluxo foi excluído com sucesso.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Não foi possível excluir o fluxo.",
+        variant: "destructive",
+      });
+    },
   });
 
   // Função para contar nós em um fluxo
@@ -110,12 +140,11 @@ export const BibliotecaFluxos = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center gap-2">
+                  <div className="grid grid-cols-3 gap-2">
                     <Button 
                       size="sm" 
                       variant="outline"
                       onClick={() => duplicateFlow(flow)}
-                      className="flex-1"
                     >
                       <Copy className="mr-1 h-3 w-3" />
                       Duplicar
@@ -144,10 +173,23 @@ export const BibliotecaFluxos = () => {
                           }, 100);
                         }
                       }}
-                      className="flex-1"
                     >
                       <Edit className="mr-1 h-3 w-3" />
                       Editar
+                    </Button>
+
+                    <Button 
+                      size="sm" 
+                      variant="destructive"
+                      onClick={() => {
+                        if (confirm(`Tem certeza que deseja excluir o fluxo "${flow.name}"? Esta ação não pode ser desfeita.`)) {
+                          deleteFlowMutation.mutate(flow.id);
+                        }
+                      }}
+                      disabled={deleteFlowMutation.isPending}
+                    >
+                      <Trash2 className="mr-1 h-3 w-3" />
+                      Excluir
                     </Button>
                   </div>
                   
