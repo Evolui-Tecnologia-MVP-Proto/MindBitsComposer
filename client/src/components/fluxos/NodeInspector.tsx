@@ -18,6 +18,7 @@ interface NodeInspectorProps {
   savedFlows: any[];
   templatesData: any[];
   applyInspectorChanges: () => void;
+  onNodeChange?: () => void;
 }
 
 export function NodeInspector({
@@ -27,7 +28,8 @@ export function NodeInspector({
   getNodeMetadata,
   savedFlows,
   templatesData,
-  applyInspectorChanges
+  applyInspectorChanges,
+  onNodeChange
 }: NodeInspectorProps) {
   if (!selectedNode) {
     return (
@@ -105,6 +107,7 @@ export function NodeInspector({
                             ? { ...node, data: { ...node.data, [key]: e.target.value } }
                             : node
                         ));
+                        onNodeChange?.();
                       }}
                       className="!text-xs font-mono h-6 px-1 text-left"
                       placeholder={`Digite o valor para ${key}`}
@@ -130,6 +133,7 @@ export function NodeInspector({
                             ? { ...node, data: { ...node.data, [key]: e.target.value } }
                             : node
                         ));
+                        onNodeChange?.();
                       }}
                       className="!text-xs font-mono h-6 px-1 text-left"
                       placeholder={`Digite o valor para ${key}`}
@@ -174,6 +178,7 @@ export function NodeInspector({
                                 }
                               : node
                           ));
+                          onNodeChange?.();
                         }}
                       >
                         <SelectTrigger className="!text-xs font-mono h-6 px-1 text-left">
