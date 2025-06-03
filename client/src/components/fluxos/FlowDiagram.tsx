@@ -46,6 +46,7 @@ interface FlowDiagramProps {
   savedFlows: any[];
   templatesData: any[];
   applyInspectorChanges: () => void;
+  onNodeChange?: () => void;
   
   // Flow state
   isFlowLocked?: boolean;
@@ -76,6 +77,7 @@ export const FlowDiagram = ({
   savedFlows,
   templatesData,
   applyInspectorChanges,
+  onNodeChange,
   isFlowLocked = false,
   showMiniMap = false
 }: FlowDiagramProps) => {
@@ -134,6 +136,7 @@ export const FlowDiagram = ({
               savedFlows={savedFlows}
               templatesData={templatesData}
               applyInspectorChanges={applyInspectorChanges}
+              onNodeChange={onNodeChange}
             />
           </ResizablePanel>
         </ResizablePanelGroup>

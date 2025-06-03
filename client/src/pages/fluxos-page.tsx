@@ -559,6 +559,11 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     }
   });
 
+  // Função para detectar mudanças nas propriedades dos nós
+  const handleNodePropertyChange = useCallback(() => {
+    setHasUnsavedChanges(true);
+  }, []);
+
   const onConnect = useCallback((params: any) => {
     // Salvar estado atual no histórico antes de adicionar nova conexão
     addToHistory(nodes, edges);
