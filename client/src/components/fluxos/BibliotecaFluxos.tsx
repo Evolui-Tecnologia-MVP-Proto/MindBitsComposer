@@ -121,9 +121,9 @@ export const BibliotecaFluxos = () => {
     return { steps, decisions };
   };
 
-  // Função para duplicar um fluxo existente
-  const duplicateFlow = async (originalFlow: any) => {
-    try {
+  // Mutation para duplicar fluxo
+  const duplicateFlowMutation = useMutation({
+    mutationFn: async (originalFlow: any) => {
       const response = await fetch("/api/documents-flows", {
         method: "POST",
         headers: {
@@ -138,14 +138,26 @@ export const BibliotecaFluxos = () => {
         }),
       });
 
-      if (response.ok) {
-        // Recarregar a lista de fluxos
-        window.location.reload();
+      if (!response.ok) {
+        throw new Error("Erro ao duplicar fluxo");
       }
-    } catch (error) {
-      console.error("Erro ao duplicar fluxo:", error);
-    }
-  };
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documents-flows"] });
+      toast({
+        title: "Fluxo duplicado",
+        description: "O fluxo foi duplicado com sucesso.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Não foi possível duplicar o fluxo.",
+        variant: "destructive",
+      });
+    },
+  });
 
   if (isLoadingFlows) {
     return (
@@ -208,7 +220,8 @@ export const BibliotecaFluxos = () => {
                     <Button 
                       size="sm" 
                       variant="outline"
-                      onClick={() => duplicateFlow(flow)}
+                      onClick={() => duplicateFlowMutation.mutate(flow)}
+                      disabled={duplicateFlowMutation.isPending}
                     >
                       <Copy className="mr-1 h-3 w-3" />
                       Duplicar
