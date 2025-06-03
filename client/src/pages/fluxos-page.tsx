@@ -83,6 +83,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
   const [showInspector, setShowInspector] = useState<boolean>(false);
   const [showMiniMap, setShowMiniMap] = useState<boolean>(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
+  const [showExitConfirmModal, setShowExitConfirmModal] = useState<boolean>(false);
   
   // Aplicar estilo de seleção às edges
   const styledEdges = edges.map((edge: Edge) => {
@@ -300,6 +302,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     
     if (hasSignificantChange) {
       addToHistory(nodes, edges);
+      setHasUnsavedChanges(true);
     }
     
     onNodesChange(changes);
@@ -313,6 +316,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     
     if (hasSignificantChange) {
       addToHistory(nodes, edges);
+      setHasUnsavedChanges(true);
     }
     
     onEdgesChange(changes);
@@ -498,6 +502,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
   const onConnect = useCallback((params: any) => {
     // Salvar estado atual no histórico antes de adicionar nova conexão
     addToHistory(nodes, edges);
+    setHasUnsavedChanges(true);
     
     setEdges((eds) =>
       addEdge(
@@ -535,6 +540,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
   const onEdgeUpdate = useCallback((oldEdge: Edge, newConnection: any) => {
     // Salvar estado atual no histórico antes de atualizar edge
     addToHistory(nodes, edges);
+    setHasUnsavedChanges(true);
     setEdges((eds) => eds.map((edge) => (edge.id === oldEdge.id ? { ...edge, ...newConnection } : edge)));
   }, [setEdges, nodes, edges, addToHistory]);
 
