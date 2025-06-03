@@ -52,12 +52,6 @@ export function NewFlowModal({
 }: NewFlowModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <PlusCircle className="mr-1 h-4 w-4" />
-          + Novo Fluxo
-        </Button>
-      </DialogTrigger>
       <DialogContent className="sm:max-w-[550px]">
         <DialogHeader>
           <DialogTitle>Criar Novo Fluxo</DialogTitle>
