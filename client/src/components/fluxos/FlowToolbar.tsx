@@ -15,7 +15,8 @@ import {
   AlignCenter, 
   Undo2, 
   Redo2, 
-  RotateCcw 
+  RotateCcw,
+  Map
 } from "lucide-react";
 import { FlowMetadataModal } from "./FlowMetadataModal";
 import { NewFlowModal } from "./NewFlowModal";
@@ -29,6 +30,10 @@ interface FlowToolbarProps {
   // Inspector
   showInspector: boolean;
   onToggleInspector: () => void;
+  
+  // MiniMap
+  showMiniMap: boolean;
+  onToggleMiniMap: () => void;
   
   // Flow state
   isFlowLocked?: boolean;
@@ -88,6 +93,8 @@ export const FlowToolbar = ({
   onFlowSelect,
   showInspector,
   onToggleInspector,
+  showMiniMap,
+  onToggleMiniMap,
   isFlowLocked = false,
   isNewFlowModalOpen,
   onOpenNewFlowModal,
@@ -240,6 +247,15 @@ export const FlowToolbar = ({
         </div>
         
         <div className="flex space-x-2">
+          <Button
+            variant={showMiniMap ? "default" : "outline"}
+            size="sm"
+            onClick={onToggleMiniMap}
+            disabled={!currentFlowId || isFlowLocked}
+            title={isFlowLocked ? "Fluxo bloqueado para edição" : "Mostrar/ocultar mini mapa"}
+          >
+            <Map className="h-4 w-4" />
+          </Button>
           <Button 
             onClick={onAutoAlign} 
             variant="outline" 

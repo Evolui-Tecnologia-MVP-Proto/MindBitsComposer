@@ -118,6 +118,7 @@ export const FlowDiagram = ({
               >
                 <Controls />
                 <Background color="#f0f0f0" gap={12} size={1} />
+                {showMiniMap && <MiniMap />}
               </ReactFlow>
             </div>
           </ResizablePanel>
@@ -171,6 +172,7 @@ export const FlowDiagram = ({
           >
             <Controls />
             <Background color="#f0f0f0" gap={12} size={1} />
+            {showMiniMap && <MiniMap />}
           </ReactFlow>
         </div>
       )}
