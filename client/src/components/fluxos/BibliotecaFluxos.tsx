@@ -280,61 +280,68 @@ export const BibliotecaFluxos = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {/* Layout expandido para 5 colunas */}
-                  <div className="grid grid-cols-5 gap-1">
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => duplicateFlowMutation.mutate(flow)}
-                      disabled={duplicateFlowMutation.isPending}
-                      className="flex items-center justify-center p-2"
-                      title="Duplicar fluxo"
-                    >
-                      <Copy className="h-3 w-3" />
-                    </Button>
-                    
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      onClick={() => setEditingFlow(flow)}
-                      className="flex items-center justify-center p-2"
-                      title="Editar metadados"
-                    >
-                      <FileEdit className="h-3 w-3" />
-                    </Button>
+                  {/* Barra de botões com separador */}
+                  <div className="flex items-center gap-1">
+                    <div className="flex gap-1">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => duplicateFlowMutation.mutate(flow)}
+                        disabled={duplicateFlowMutation.isPending}
+                        className="flex items-center justify-center p-2"
+                        title="Duplicar fluxo"
+                      >
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                      
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => setEditingFlow(flow)}
+                        className="flex items-center justify-center p-2"
+                        title="Editar metadados"
+                      >
+                        <FileEdit className="h-3 w-3" />
+                      </Button>
 
-                    <Button 
-                      size="sm" 
-                      variant="destructive"
-                      onClick={() => confirmDelete(flow)}
-                      disabled={deleteFlowMutation.isPending}
-                      className="flex items-center justify-center p-2"
-                      title="Excluir fluxo"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
+                      <Button 
+                        size="sm" 
+                        variant="destructive"
+                        onClick={() => confirmDelete(flow)}
+                        disabled={deleteFlowMutation.isPending}
+                        className="flex items-center justify-center p-2"
+                        title="Excluir fluxo"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
 
-                    <Button 
-                      size="sm" 
-                      variant={flow.isEnabled ? "outline" : "secondary"}
-                      onClick={() => toggleEnabledMutation.mutate(flow.id)}
-                      disabled={toggleEnabledMutation.isPending}
-                      className="flex items-center justify-center p-2"
-                      title={flow.isEnabled ? "Desabilitar fluxo" : "Habilitar fluxo"}
-                    >
-                      {flow.isEnabled ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
-                    </Button>
+                    {/* Separador vertical */}
+                    <div className="h-6 w-px bg-border mx-1"></div>
 
-                    <Button 
-                      size="sm" 
-                      variant={flow.isLocked ? "destructive" : "outline"}
-                      onClick={() => toggleLockMutation.mutate(flow.id)}
-                      disabled={toggleLockMutation.isPending}
-                      className="flex items-center justify-center p-2"
-                      title={flow.isLocked ? "Desbloquear fluxo" : "Bloquear fluxo"}
-                    >
-                      {flow.isLocked ? <Unlock className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button 
+                        size="sm" 
+                        variant={flow.isEnabled ? "outline" : "secondary"}
+                        onClick={() => toggleEnabledMutation.mutate(flow.id)}
+                        disabled={toggleEnabledMutation.isPending}
+                        className="flex items-center justify-center p-2"
+                        title={flow.isEnabled ? "Desabilitar fluxo" : "Habilitar fluxo"}
+                      >
+                        {flow.isEnabled ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+                      </Button>
+
+                      <Button 
+                        size="sm" 
+                        variant={flow.isLocked ? "destructive" : "outline"}
+                        onClick={() => toggleLockMutation.mutate(flow.id)}
+                        disabled={toggleLockMutation.isPending}
+                        className="flex items-center justify-center p-2"
+                        title={flow.isLocked ? "Desbloquear fluxo" : "Bloquear fluxo"}
+                      >
+                        {flow.isLocked ? <Unlock className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Link para o editor - separado */}
