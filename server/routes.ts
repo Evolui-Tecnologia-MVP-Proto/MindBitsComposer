@@ -3533,7 +3533,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      const { name, code, description, flowData } = req.body;
+      const { name, code, description, flowTypeId, flowData } = req.body;
       
       // Generate UUIDs for nodes and edges if they don't have them
       const processedFlowData = {
@@ -3553,6 +3553,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           name,
           code,
           description: description || null,
+          flowTypeId: flowTypeId || null,
           flowData: processedFlowData,
           userId: req.user.id,
           createdBy: req.user.id,
