@@ -89,27 +89,23 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
           </div>
           
           <div className="sidebar-item-container">
-            <Link href="/documentos">
-              <div 
-                className={`sidebar-item ${activeItem === "documentos" ? "sidebar-active" : ""}`}
-                onClick={closeMobileMenu}
-              >
-                <File className="mr-3 h-6 w-6" />
-                Documentos
-              </div>
-            </Link>
+            <div 
+              className={`sidebar-item ${activeItem === "documentos" ? "sidebar-active" : ""}`}
+              onClick={() => handleNavigation("/documentos")}
+            >
+              <File className="mr-3 h-6 w-6" />
+              Documentos
+            </div>
           </div>
           
           <div className="sidebar-item-container">
-            <Link href="/plugins">
-              <div 
-                className={`sidebar-item ${activeItem === "plugins" ? "sidebar-active" : ""}`}
-                onClick={closeMobileMenu}
-              >
-                <Puzzle className="mr-3 h-6 w-6" />
-                Plugins
-              </div>
-            </Link>
+            <div 
+              className={`sidebar-item ${activeItem === "plugins" ? "sidebar-active" : ""}`}
+              onClick={() => handleNavigation("/plugins")}
+            >
+              <Puzzle className="mr-3 h-6 w-6" />
+              Plugins
+            </div>
           </div>
 
         </nav>
