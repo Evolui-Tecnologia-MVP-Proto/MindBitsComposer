@@ -144,30 +144,16 @@ export const FlowToolbar = ({
 
 
   const handleFlowChangeAttempt = (newFlowId: string) => {
-    console.log('=== handleFlowChangeAttempt called ===');
-    console.log('newFlowId:', newFlowId);
-    console.log('currentFlowId:', currentFlowId);
-    console.log('hasUnsavedChanges prop:', hasUnsavedChanges);
-    console.log('checkUnsavedChanges function:', !!checkUnsavedChanges);
-    
     // Se é o mesmo fluxo, não fazer nada
     if (newFlowId === currentFlowId) {
-      console.log('Same flow selected, ignoring');
       return;
     }
     
-    // Verificar alterações não salvas - usar diretamente a prop hasUnsavedChanges primeiro
-    const hasChanges = hasUnsavedChanges || (checkUnsavedChanges ? checkUnsavedChanges() : false);
-    console.log('Has unsaved changes:', hasChanges);
-    console.log('showUnsavedModal state before:', showUnsavedModal);
-    
-    if (hasChanges) {
-      console.log('SHOWING MODAL - Setting pending flow change and showing modal');
+    // Verificar alterações não salvas
+    if (hasUnsavedChanges) {
       setPendingFlowChange(newFlowId);
       setShowUnsavedModal(true);
-      console.log('Modal should be visible now');
     } else {
-      console.log('No changes, proceeding with flow change');
       onFlowSelect(newFlowId);
     }
   };
