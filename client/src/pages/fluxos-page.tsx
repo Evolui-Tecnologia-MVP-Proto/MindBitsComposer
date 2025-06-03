@@ -86,6 +86,11 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
   const [showExitConfirmModal, setShowExitConfirmModal] = useState<boolean>(false);
   
+  // Debug: Log sempre que hasUnsavedChanges mudar
+  useEffect(() => {
+    console.log('hasUnsavedChanges changed to:', hasUnsavedChanges);
+  }, [hasUnsavedChanges]);
+  
   // Aplicar estilo de seleção às edges
   const styledEdges = edges.map((edge: Edge) => {
     // Detectar se a conexão parte de um SwitchNode e de qual conector
@@ -1143,6 +1148,13 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
         savedFlows={savedFlows || []}
         onFlowSelect={(flowId) => {
           console.log('Flow selection triggered - hasUnsavedChanges:', hasUnsavedChanges);
+          console.log('Current flow ID:', currentFlowId, 'Selected flow ID:', flowId);
+          
+          // Se está selecionando o mesmo fluxo, não fazer nada
+          if (flowId === currentFlowId) {
+            console.log('Same flow selected, returning');
+            return;
+          }
           
           // Verificar alterações não salvas antes de mudar de fluxo
           if (hasUnsavedChanges) {
