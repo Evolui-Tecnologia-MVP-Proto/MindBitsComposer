@@ -5007,23 +5007,20 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
       // Verificar se o formulário está visível baseado na Show_Condition
       try {
-        // Usar exatamente a mesma lógica de correção que funciona no getFormFields
-        let correctedData = attachedFormData
-          .replace(/\[([^[\]]+)\]/g, '{"$1"}')
-          .replace(/\"([^"]+)\"\:\s*\[/g, '"$1":[')
-          .replace(/\]\s*,\s*\"([^"]+)\"\:\s*\[/g, '],"$1":[')
-          .replace(/\]\s*\]/g, ']}');
+        // Extrair Show_Condition diretamente do JSON original usando regex
+        const showConditionMatch = attachedFormData.match(/"Show_Condition":\s*"([^"]+)"/);
         
-        console.log('🔍 Dados corretos para Show_Condition:', correctedData);
-        const parsedData = JSON.parse(correctedData);
-        const showCondition = parsedData.Show_Condition;
-        
-        console.log('🔍 Show_Condition encontrada:', showCondition, 'tipo:', typeof showCondition);
-        
-        // Se Show_Condition é FALSE, o formulário não está visível, permite salvar
-        if (showCondition === 'FALSE' || showCondition === false) {
-          console.log('🔍 Formulário não está visível (Show_Condition: FALSE), permitindo salvar');
-          return true;
+        if (showConditionMatch) {
+          const showCondition = showConditionMatch[1];
+          console.log('🔍 Show_Condition encontrada:', showCondition, 'tipo:', typeof showCondition);
+          
+          // Se Show_Condition é FALSE, o formulário não está visível, permite salvar
+          if (showCondition === 'FALSE' || showCondition === 'false') {
+            console.log('🔍 Formulário não está visível (Show_Condition: FALSE), permitindo salvar');
+            return true;
+          }
+        } else {
+          console.log('🔍 Show_Condition não encontrada no JSON');
         }
       } catch (e) {
         console.log('🔍 Erro ao verificar Show_Condition:', e);
