@@ -92,10 +92,13 @@ const FlowCanvas = ({
   const [showInspector, setShowInspector] = useState<boolean>(false);
   const [showMiniMap, setShowMiniMap] = useState<boolean>(false);
   const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
+  const [isRestoringData, setIsRestoringData] = useState<boolean>(false);
   
   // Restaurar dados persistidos do fluxo quando o componente for montado
   useEffect(() => {
     if (persistedFlowData) {
+      setIsRestoringData(true);
+      
       if (persistedFlowData.nodes) {
         setNodes(persistedFlowData.nodes);
       }
@@ -108,19 +111,27 @@ const FlowCanvas = ({
       if (persistedFlowData.currentFlowId) {
         setCurrentFlowId(persistedFlowData.currentFlowId);
       }
+      
+      // Após a restauração, aguardar um ciclo antes de permitir atualizações
+      setTimeout(() => {
+        setIsRestoringData(false);
+      }, 100);
     }
   }, [persistedFlowData, setNodes, setEdges]);
 
   // Atualizar dados persistidos sempre que houver mudanças no fluxo
   useEffect(() => {
-    const flowData = {
-      nodes,
-      edges,
-      flowName,
-      currentFlowId
-    };
-    onFlowDataChange(flowData);
-  }, [nodes, edges, flowName, currentFlowId, onFlowDataChange]);
+    // Só atualizar se não estiver restaurando dados e houver dados válidos
+    if (!isRestoringData && (nodes.length > 0 || edges.length > 0 || currentFlowId)) {
+      const flowData = {
+        nodes,
+        edges,
+        flowName,
+        currentFlowId
+      };
+      onFlowDataChange(flowData);
+    }
+  }, [nodes, edges, flowName, currentFlowId, isRestoringData]);
   
   // Aplicar estilo de seleção às edges
   const styledEdges = edges.map((edge: Edge) => {
