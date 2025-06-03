@@ -1434,14 +1434,26 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
           </div>
           
           <div className="space-y-3">
-            <div>
-              <Label className="text-sm font-medium">Rótulo do Nó</Label>
-              <Input 
-                value={selectedNode.data.label || nodeMetadata?.label || ''}
-                readOnly
-                className="mt-1 bg-gray-50 font-mono"
-                placeholder={nodeMetadata?.label || 'Rótulo do nó'}
-              />
+            {/* Tabela de informações básicas do nó */}
+            <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <table className="w-full text-xs">
+                <tbody>
+                  <tr className="bg-white">
+                    <td className="px-2 py-1.5 border-r border-gray-200 text-left">
+                      <div className="text-xs font-medium text-gray-700 font-mono">label</div>
+                      <div className="text-sm text-gray-900 font-mono bg-gray-50 px-1 py-0.5 rounded">
+                        {selectedNode.data.label || nodeMetadata?.label || '-'}
+                      </div>
+                    </td>
+                    <td className="px-2 py-1.5 text-left">
+                      <div className="text-xs font-medium text-gray-700 font-mono">type</div>
+                      <div className="text-sm text-gray-900 font-mono bg-gray-50 px-1 py-0.5 rounded">
+                        {selectedNode.type}
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
             {nodeMetadata?.metadata && Object.entries(nodeMetadata.metadata).map(([key, value]) => {
