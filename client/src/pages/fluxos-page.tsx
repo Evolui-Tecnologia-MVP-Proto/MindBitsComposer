@@ -1941,29 +1941,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       </div>
 
       <BibliotecaFluxos />
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  return (
-    <div className="flex flex-col h-full">
-      <div className="mb-4 bg-white p-4 rounded-lg shadow-sm space-y-3">
-        {/* Primeira linha - Seleção de fluxo e botões principais */}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <div className="w-64">
-              <Select value={currentFlowId || ""} onValueChange={(value) => {
-                if (value && savedFlows) {
-                  const selectedFlow = savedFlows.find(flow => flow.id === value);
-                  if (selectedFlow) {
-                    loadFlow(selectedFlow);
-                  }
-                }
-              }}>
-                <SelectTrigger id="flow-select" className="text-left font-mono">
-                  <SelectValue placeholder="Carregar fluxo existente" />
+    </div>
+  );
                 </SelectTrigger>
                 <SelectContent>
                   {savedFlows?.map((flow) => (
