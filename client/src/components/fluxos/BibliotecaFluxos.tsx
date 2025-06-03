@@ -204,7 +204,7 @@ export const BibliotecaFluxos = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-3 gap-2">
                     <Button 
                       size="sm" 
                       variant="outline"
@@ -216,39 +216,10 @@ export const BibliotecaFluxos = () => {
                     
                     <Button 
                       size="sm" 
-                      onClick={() => {
-                        // Navegar para a aba editor e carregar o fluxo
-                        const editorTab = document.querySelector('[data-value="editor"]') as HTMLElement;
-                        if (editorTab) {
-                          editorTab.click();
-                          // Pequeno delay para garantir que a aba foi mudada
-                          setTimeout(() => {
-                            const flowSelect = document.getElementById('flow-select') as HTMLElement;
-                            if (flowSelect) {
-                              flowSelect.click();
-                              // Encontrar e clicar no item do fluxo
-                              setTimeout(() => {
-                                const flowItem = document.querySelector(`[data-value="${flow.id}"]`) as HTMLElement;
-                                if (flowItem) {
-                                  flowItem.click();
-                                }
-                              }, 100);
-                            }
-                          }, 100);
-                        }
-                      }}
+                      onClick={() => setEditingFlow(flow)}
                     >
                       <Edit className="mr-1 h-3 w-3" />
                       Editar
-                    </Button>
-
-                    <Button 
-                      size="sm" 
-                      variant="secondary"
-                      onClick={() => setEditingFlow(flow)}
-                    >
-                      <FileEdit className="mr-1 h-3 w-3" />
-                      Metadata
                     </Button>
 
                     <Button 
