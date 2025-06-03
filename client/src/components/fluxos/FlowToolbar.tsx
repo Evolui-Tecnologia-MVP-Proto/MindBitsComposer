@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
 import { 
   Settings, 
   Edit, 
@@ -137,56 +138,60 @@ export const FlowToolbar = ({
   onAutoAlign,
   nodeCount
 }: FlowToolbarProps) => {
+  const [pendingFlowChange, setPendingFlowChange] = useState<string | null>(null);
+  const [showUnsavedModal, setShowUnsavedModal] = useState(false);
+
+  const handleFlowChangeAttempt = (newFlowId: string) => {
+    console.log('handleFlowChangeAttempt called with:', newFlowId);
+    
+    // Se é o mesmo fluxo, não fazer nada
+    if (newFlowId === currentFlowId) {
+      console.log('Same flow selected, ignoring');
+      return;
+    }
+    
+    // Verificar alterações não salvas
+    const hasChanges = checkUnsavedChanges ? checkUnsavedChanges() : false;
+    console.log('Has unsaved changes:', hasChanges);
+    
+    if (hasChanges) {
+      console.log('Setting pending flow change and showing modal');
+      setPendingFlowChange(newFlowId);
+      setShowUnsavedModal(true);
+    } else {
+      console.log('No changes, proceeding with flow change');
+      onFlowSelect(newFlowId);
+    }
+  };
+
+  const handleConfirmChange = (shouldSave: boolean) => {
+    console.log('handleConfirmChange called with shouldSave:', shouldSave);
+    
+    if (shouldSave && onSave) {
+      onSave();
+    }
+    
+    if (pendingFlowChange) {
+      onFlowSelect(pendingFlowChange);
+    }
+    
+    setPendingFlowChange(null);
+    setShowUnsavedModal(false);
+  };
+
+  const handleCancelChange = () => {
+    console.log('handleCancelChange called');
+    setPendingFlowChange(null);
+    setShowUnsavedModal(false);
+  };
+
   return (
     <div className="mb-4 bg-white p-4 rounded-lg shadow-sm space-y-3">
       {/* Primeira linha - Seleção de fluxo e botões principais */}
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <div className="w-64">
-            <Select value={currentFlowId || ""} onValueChange={(value) => {
-              if (value) {
-                console.log('Select onValueChange triggered, value:', value);
-                console.log('Current flow:', currentFlowId);
-                
-                // Se é o mesmo fluxo, não fazer nada
-                if (value === currentFlowId) {
-                  console.log('Same flow selected, ignoring');
-                  return;
-                }
-                
-                // Verificar alterações não salvas
-                const hasChanges = checkUnsavedChanges ? checkUnsavedChanges() : false;
-                console.log('Has unsaved changes:', hasChanges);
-                
-                if (hasChanges) {
-                  console.log('FlowToolbar: Detectadas alterações não salvas - mostrando modal');
-                  
-                  // Usar setTimeout para garantir que o modal apareça após o render
-                  setTimeout(() => {
-                    try {
-                      const shouldSave = window.confirm(
-                        "Atenção, ao sair do editor você perderá todo conteúdo editado que ainda não foi salvo. Deseja salvar o fluxo antes de sair?\n\nClique em 'OK' para salvar ou 'Cancelar' para descartar as alterações."
-                      );
-                      console.log('User choice:', shouldSave);
-                      
-                      if (shouldSave && onSave) {
-                        onSave();
-                      }
-                      
-                      // Continuar com a seleção do fluxo após a decisão do usuário
-                      onFlowSelect(value);
-                    } catch (error) {
-                      console.error('Erro ao mostrar modal:', error);
-                      // Em caso de erro, continuar com a seleção
-                      onFlowSelect(value);
-                    }
-                  }, 100);
-                } else {
-                  // Sem alterações, pode trocar diretamente
-                  onFlowSelect(value);
-                }
-              }
-            }}>
+            <Select value={currentFlowId || ""} onValueChange={handleFlowChangeAttempt}>
               <SelectTrigger id="flow-select" className="!text-xs text-left font-mono">
                 <SelectValue placeholder="Carregar fluxo existente" />
               </SelectTrigger>
@@ -341,6 +346,38 @@ export const FlowToolbar = ({
           </Button>
         </div>
       </div>
+
+      {/* Modal de confirmação para alterações não salvas */}
+      {showUnsavedModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold mb-4">Alterações não salvas</h3>
+            <p className="text-gray-600 mb-6">
+              Atenção, ao sair do editor você perderá todo conteúdo editado que ainda não foi salvo. 
+              Deseja salvar o fluxo antes de sair?
+            </p>
+            <div className="flex space-x-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={handleCancelChange}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => handleConfirmChange(false)}
+              >
+                Descartar
+              </Button>
+              <Button
+                onClick={() => handleConfirmChange(true)}
+              >
+                Salvar e trocar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
