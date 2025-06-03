@@ -600,8 +600,9 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     const isLocked = flow.isLocked === true;
     setCurrentFlowLocked(isLocked);
     
-    // Se o fluxo está bloqueado, mostrar aviso
+    // Se o fluxo está bloqueado, mostrar aviso e fechar inspetor
     if (isLocked) {
+      setShowInspector(false); // Fechar inspetor se estiver aberto
       toast({
         title: "Fluxo Bloqueado",
         description: "Este fluxo está bloqueado para edição. Apenas visualização é permitida.",

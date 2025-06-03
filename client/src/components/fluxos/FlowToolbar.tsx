@@ -157,7 +157,8 @@ export const FlowToolbar = ({
             variant={showInspector ? "default" : "outline"}
             size="sm"
             onClick={onToggleInspector}
-            disabled={!currentFlowId}
+            disabled={!currentFlowId || isFlowLocked}
+            title={isFlowLocked ? "Fluxo bloqueado para edição" : ""}
           >
             <Settings className="h-4 w-4 mr-2" />
             Propriedades
