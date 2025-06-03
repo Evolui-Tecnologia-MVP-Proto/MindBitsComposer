@@ -90,9 +90,11 @@ interface FlowCanvasRef {
 interface FlowCanvasProps {
   onFlowInfoChange: (info: {code: string, name: string} | null) => void;
   onDiscardRequest?: () => void;
+  pendingFlowId?: string | null;
+  onPendingFlowHandled?: () => void;
 }
 
-const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChange, onDiscardRequest }, ref) => {
+const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChange, onDiscardRequest, pendingFlowId, onPendingFlowHandled }, ref) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -149,6 +151,22 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
   useEffect(() => {
     setSaveFunction(() => handleSave);
   }, [setSaveFunction]);
+
+  // Lidar com pendingFlowId (seleção de fluxo vinda da Biblioteca)
+  useEffect(() => {
+    if (pendingFlowId && savedFlows) {
+      const selectedFlow = savedFlows.find(flow => flow.id === pendingFlowId);
+      if (selectedFlow) {
+        // Carregar o fluxo selecionado
+        setHasUnsavedChanges(false);
+        hasUnsavedChangesRef.current = false;
+        loadFlow(selectedFlow);
+        
+        // Notificar que o pendingFlowId foi processado
+        onPendingFlowHandled?.();
+      }
+    }
+  }, [pendingFlowId, savedFlows, onPendingFlowHandled]);
   
   // Aplicar estilo de seleção às edges
   const styledEdges = edges.map((edge: Edge) => {
@@ -1425,6 +1443,8 @@ export default function FluxosPage() {
                 ref={flowCanvasRef}
                 onFlowInfoChange={setCurrentFlowInfo}
                 onDiscardRequest={handleDiscardRequest}
+                pendingFlowId={pendingFlowId}
+                onPendingFlowHandled={() => setPendingFlowId(null)}
               />
             </ReactFlowProvider>
           </TabsContent>

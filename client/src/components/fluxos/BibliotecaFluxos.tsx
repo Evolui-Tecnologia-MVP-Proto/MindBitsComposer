@@ -473,7 +473,7 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
                   <Button
                     size="sm"
                     variant="default"
-                    onClick={() => window.open(`/fluxos?flow=${flow.id}`, '_blank')}
+                    onClick={() => onEditFlow?.(flow.id)}
                     disabled={flow.isLocked}
                     className="w-full flex items-center gap-2"
                   >
