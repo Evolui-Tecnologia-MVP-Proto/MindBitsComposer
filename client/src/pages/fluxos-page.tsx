@@ -1344,7 +1344,7 @@ export default function FluxosPage() {
   const [currentFlowInfo, setCurrentFlowInfo] = useState<{code: string, name: string} | null>(null);
   const [activeTab, setActiveTab] = useState("editor");
   const [showDiscardModal, setShowDiscardModal] = useState<boolean>(false);
-  const flowCanvasRef = useRef<any>(null);
+  const flowCanvasRef = useRef<FlowCanvasRef>(null);
   const { hasUnsavedChanges } = useNavigationGuard();
 
   const handleTabChange = (newTab: string) => {
