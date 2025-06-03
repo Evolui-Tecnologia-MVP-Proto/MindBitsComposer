@@ -5006,6 +5006,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       }
 
       // Verificar se o formulário está visível baseado na Show_Condition
+      let isFormVisible = true; // Por padrão, assume que o formulário está visível
+      
       try {
         // Extrair Show_Condition diretamente do JSON original usando regex
         const showConditionMatch = attachedFormData.match(/"Show_Condition":\s*"([^"]+)"/);
@@ -5014,17 +5016,25 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           const showCondition = showConditionMatch[1];
           console.log('🔍 Show_Condition encontrada:', showCondition, 'tipo:', typeof showCondition);
           
-          // Se Show_Condition é FALSE, o formulário não está visível, permite salvar
+          // Se Show_Condition é FALSE, o formulário não está visível
           if (showCondition === 'FALSE' || showCondition === 'false') {
             console.log('🔍 Formulário não está visível (Show_Condition: FALSE), permitindo salvar');
-            return true;
+            isFormVisible = false;
+          } else {
+            console.log('🔍 Formulário está visível (Show_Condition: TRUE), validando campos');
+            isFormVisible = true;
           }
         } else {
-          console.log('🔍 Show_Condition não encontrada no JSON');
+          console.log('🔍 Show_Condition não encontrada no JSON, assumindo formulário visível');
         }
       } catch (e) {
         console.log('🔍 Erro ao verificar Show_Condition:', e);
         console.log('🔍 Assumindo formulário visível por segurança');
+      }
+      
+      // Se o formulário não está visível, permite salvar
+      if (!isFormVisible) {
+        return true;
       }
 
       const fieldsData = getFormFields();
