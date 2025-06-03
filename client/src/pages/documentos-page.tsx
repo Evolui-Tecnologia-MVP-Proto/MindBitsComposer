@@ -5005,31 +5005,25 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         return true;
       }
 
-      // Verificar se o formulário está visível baseado na Show_Condition
-      let isFormVisible = true; // Por padrão, assume que o formulário está visível
+      // Verificar se o formulário está realmente visível na interface
+      // A visibilidade é determinada pelos botões de status de aprovação
+      let isFormVisible = false;
       
-      try {
-        // Extrair Show_Condition diretamente do JSON original usando regex
-        const showConditionMatch = attachedFormData.match(/"Show_Condition":\s*"([^"]+)"/);
-        
-        if (showConditionMatch) {
-          const showCondition = showConditionMatch[1];
-          console.log('🔍 Show_Condition encontrada:', showCondition, 'tipo:', typeof showCondition);
-          
-          // Lógica da Show_Condition:
-          // Show_Condition FALSE = formulário NÃO visível = botão habilitado
-          // Show_Condition TRUE = formulário visível = validar campos obrigatórios
-          if (showCondition === 'FALSE' || showCondition === 'false') {
-            isFormVisible = false;
-          } else {
-            isFormVisible = true;
-          }
-        } else {
-          console.log('🔍 Show_Condition não encontrada no JSON, assumindo formulário visível');
-        }
-      } catch (e) {
-        console.log('🔍 Erro ao verificar Show_Condition:', e);
-        console.log('🔍 Assumindo formulário visível por segurança');
+      // Verificar se o nó está em estado pendente (aguardando aprovação)
+      // Isso indica que o formulário deveria estar visível
+      if (selectedFlowNode.data.isPendingConnected) {
+        isFormVisible = true;
+        console.log('🔍 Nó em estado pendente - formulário deve estar visível');
+      } else if (selectedFlowNode.data.isAproved === "TRUE") {
+        isFormVisible = false;
+        console.log('🔍 Nó já aprovado - formulário oculto');
+      } else if (selectedFlowNode.data.isAproved === "FALSE") {
+        isFormVisible = false;
+        console.log('🔍 Nó rejeitado - formulário oculto');
+      } else {
+        // Se não há estado de aprovação definido, assumir que formulário está visível
+        isFormVisible = true;
+        console.log('🔍 Estado de aprovação indefinido - assumindo formulário visível');
       }
       
       // Se o formulário não está visível, permite salvar
