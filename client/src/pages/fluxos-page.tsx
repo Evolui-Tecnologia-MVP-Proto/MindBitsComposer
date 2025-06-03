@@ -151,22 +151,6 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
   useEffect(() => {
     setSaveFunction(() => handleSave);
   }, [setSaveFunction]);
-
-  // Lidar com pendingFlowId (seleção de fluxo vinda da Biblioteca)
-  useEffect(() => {
-    if (pendingFlowId && savedFlows) {
-      const selectedFlow = savedFlows.find(flow => flow.id === pendingFlowId);
-      if (selectedFlow) {
-        // Carregar o fluxo selecionado
-        setHasUnsavedChanges(false);
-        hasUnsavedChangesRef.current = false;
-        loadFlow(selectedFlow);
-        
-        // Notificar que o pendingFlowId foi processado
-        onPendingFlowHandled?.();
-      }
-    }
-  }, [pendingFlowId, savedFlows, onPendingFlowHandled]);
   
   // Aplicar estilo de seleção às edges
   const styledEdges = edges.map((edge: Edge) => {
@@ -810,6 +794,22 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
       description: `Fluxo "${flow.name}" carregado com sucesso!`
     });
   }, [reactFlowInstance, setNodes, setEdges, resetHistory, onFlowInfoChange, savedFlows]);
+
+  // Lidar com pendingFlowId (seleção de fluxo vinda da Biblioteca)
+  useEffect(() => {
+    if (pendingFlowId && savedFlows) {
+      const selectedFlow = savedFlows.find((flow: any) => flow.id === pendingFlowId);
+      if (selectedFlow) {
+        // Carregar o fluxo selecionado
+        setHasUnsavedChanges(false);
+        hasUnsavedChangesRef.current = false;
+        loadFlow(selectedFlow);
+        
+        // Notificar que o pendingFlowId foi processado
+        onPendingFlowHandled?.();
+      }
+    }
+  }, [pendingFlowId, savedFlows, loadFlow, onPendingFlowHandled]);
 
   // Função para criar novo fluxo
   const newFlow = useCallback(() => {
