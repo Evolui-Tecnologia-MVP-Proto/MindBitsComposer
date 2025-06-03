@@ -1345,6 +1345,7 @@ export default function FluxosPage() {
   const [currentFlowInfo, setCurrentFlowInfo] = useState<{code: string, name: string} | null>(null);
   const [activeTab, setActiveTab] = useState("editor");
   const [showDiscardModal, setShowDiscardModal] = useState<boolean>(false);
+  const [pendingFlowId, setPendingFlowId] = useState<string | null>(null);
   const flowCanvasRef = useRef<FlowCanvasRef>(null);
   const { hasUnsavedChanges } = useNavigationGuard();
 
@@ -1355,6 +1356,20 @@ export default function FluxosPage() {
       return;
     }
     setActiveTab(newTab);
+  };
+
+  // Função para navegar do Biblioteca para o Editor com um fluxo específico
+  const handleEditFlowFromBiblioteca = (flowId: string) => {
+    if (hasUnsavedChanges) {
+      // Se há alterações não salvas, armazenar o ID pendente e mostrar modal
+      setPendingFlowId(flowId);
+      setShowDiscardModal(true);
+      return;
+    }
+    
+    // Se não há alterações, ir direto para o editor
+    setPendingFlowId(flowId);
+    setActiveTab("editor");
   };
 
   // Função para abrir modal de descarte
@@ -1368,6 +1383,13 @@ export default function FluxosPage() {
     // Chamar a função de descarte do FlowCanvas através da referência
     if (flowCanvasRef.current && flowCanvasRef.current.handleDiscard) {
       flowCanvasRef.current.handleDiscard();
+    }
+    
+    // Se há um fluxo pendente para ser editado, navegar para o editor
+    if (pendingFlowId) {
+      setActiveTab("editor");
+      // O pendingFlowId será usado pelo FlowCanvas para carregar o fluxo
+      // Não limpar aqui, deixar o FlowCanvas gerenciar
     }
   };
 
@@ -1408,7 +1430,7 @@ export default function FluxosPage() {
           </TabsContent>
           
           <TabsContent value="biblioteca" className="flex-1 mt-4 min-h-0 overflow-y-auto">
-            <BibliotecaFluxos />
+            <BibliotecaFluxos onEditFlow={handleEditFlowFromBiblioteca} />
           </TabsContent>
         </Tabs>
       </div>

@@ -7,7 +7,11 @@ import { useState, useCallback } from "react";
 import { FlowMetadataModal } from './FlowMetadataModal';
 import { NewFlowModal } from './NewFlowModal';
 
-export const BibliotecaFluxos = () => {
+interface BibliotecaFluxosProps {
+  onEditFlow?: (flowId: string) => void;
+}
+
+export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
   const queryClient = useQueryClient();
   const [editingFlow, setEditingFlow] = useState<any | null>(null);
   const [flowToDelete, setFlowToDelete] = useState<any | null>(null);
@@ -430,7 +434,7 @@ export const BibliotecaFluxos = () => {
                         variant="destructive"
                         onClick={() => confirmDelete(flow)}
                         disabled={deleteFlowMutation.isPending}
-                        className="flex items-center justify-center p-2"
+                        className="gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-destructive/90 h-9 rounded-md flex items-center justify-center p-2 bg-[#ffffffe6] text-[#ff0000]"
                         title="Excluir fluxo"
                       >
                         <Trash2 className="h-3 w-3" />
