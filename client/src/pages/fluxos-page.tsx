@@ -1110,21 +1110,11 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     });
   }, [getSelectedNode, setNodes]);
 
-  // Função para avisar sobre alterações não salvas
+  // Função para verificar se há alterações não salvas
   const checkUnsavedChanges = useCallback(() => {
-    if (hasUnsavedChanges) {
-      const shouldSave = window.confirm(
-        "Atenção, ao sair do editor você perderá todo conteúdo editado que ainda não foi salvo. Deseja salvar o fluxo antes de sair?\n\nClique em 'OK' para salvar ou 'Cancelar' para descartar as alterações."
-      );
-      
-      if (shouldSave) {
-        handleSave();
-        setHasUnsavedChanges(false);
-      } else {
-        setHasUnsavedChanges(false);
-      }
-    }
-  }, [hasUnsavedChanges, handleSave]);
+    console.log('checkUnsavedChanges called, hasUnsavedChanges:', hasUnsavedChanges);
+    return hasUnsavedChanges;
+  }, [hasUnsavedChanges]);
 
   // Interceptar tentativas de sair da página
   useEffect(() => {
