@@ -209,7 +209,6 @@ export const documentos = pgTable("documentos", {
   generalColumns: json("general_columns").$type<Record<string, any>>().default({}), // Armazena dados extras do sistema de origem
   mondayItemValues: json("monday_item_values").$type<Record<string, any>>().default({}), // Armazena valores dos itens do Monday.com
   assetsSynced: boolean("assets_synced").default(false), // Indica se os anexos foram sincronizados com sucesso
-  taskStatus: text("task_status"), // Status da tarefa/atividade
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -340,7 +339,7 @@ export const documentFlowExecutions = pgTable("document_flow_executions", {
   id: uuid("id").defaultRandom().primaryKey(),
   documentId: uuid("document_id").notNull().references(() => documentos.id, { onDelete: "cascade" }),
   flowId: uuid("flow_id").notNull().references(() => documentsFlows.id, { onDelete: "cascade" }),
-  status: text("status", { enum: ["initiated", "in_progress", "completed", "failed", "transfered"] }).notNull().default("initiated"),
+  status: text("status", { enum: ["initiated", "in_progress", "completed", "failed"] }).notNull().default("initiated"),
   executionData: json("execution_data").$type<Record<string, any>>().default({}),
   flowTasks: json("flow_tasks").$type<Record<string, any>>().default({}),
   startedBy: integer("started_by").notNull().references(() => users.id),

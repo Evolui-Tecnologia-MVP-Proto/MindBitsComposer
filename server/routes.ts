@@ -5,13 +5,13 @@ import { storage } from "./storage";
 import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
-import { eq, sql, desc, and, gte, lte, isNull, or } from "drizzle-orm";
+import { eq, sql, desc, and, gte, lte, isNull } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { systemLogs } from "@shared/schema";
 import { ZodError } from "zod";
 import fetch from "node-fetch";
 import { jobManager } from "./job-manager";
-import { SystemLogger, EventTypes } from "./logger";
+import { SystemLogger } from "./logger";
 import path from "path";
 import fs from "fs";
 import multer from "multer";
@@ -3643,7 +3643,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get flow executions for documents (both active and concluded)
+  // Get active flow executions for documents
   app.get("/api/document-flow-executions", async (req: Request, res: Response) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
@@ -3653,21 +3653,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         flowId: documentFlowExecutions.flowId,
         status: documentFlowExecutions.status,
         createdAt: documentFlowExecutions.createdAt,
-        updatedAt: documentFlowExecutions.updatedAt,
-        completedAt: documentFlowExecutions.completedAt,
         flowName: documentsFlows.name,
         flowCode: documentsFlows.code,
         flowTasks: documentFlowExecutions.flowTasks
       })
         .from(documentFlowExecutions)
         .innerJoin(documentsFlows, eq(documentFlowExecutions.flowId, documentsFlows.id))
-        .where(or(
-          eq(documentFlowExecutions.status, "initiated"),
-          eq(documentFlowExecutions.status, "completed"),
-          eq(documentFlowExecutions.status, "transfered"),
-          eq(documentFlowExecutions.status, "in_progress"),
-          eq(documentFlowExecutions.status, "failed")
-        ));
+        .where(eq(documentFlowExecutions.status, "initiated"));
       
       res.json(executions);
     } catch (error) {
@@ -3730,94 +3722,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erro ao atualizar execução de fluxo:", error);
       res.status(500).json({ error: "Erro ao atualizar execução" });
-    }
-  });
-
-  // Transfer flow execution route
-  app.post("/api/document-flow-executions/transfer", async (req: Request, res: Response) => {
-    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
-    
-    try {
-      const { currentDocumentId, targetFlowId, flowTasks } = req.body;
-      
-      console.log('🔄 Processando transferência de fluxo');
-      console.log('🔄 Documento atual:', currentDocumentId);
-      console.log('🔄 Fluxo destino:', targetFlowId);
-      
-      // 1. Marcar execução atual como transferida
-      const currentExecution = await db.update(documentFlowExecutions)
-        .set({
-          status: 'transfered',
-          completedAt: new Date(),
-          flowTasks,
-          updatedAt: new Date()
-        })
-        .where(eq(documentFlowExecutions.documentId, currentDocumentId))
-        .returning();
-      
-      if (currentExecution.length === 0) {
-        return res.status(404).json({ error: "Execução atual não encontrada" });
-      }
-      
-      console.log('✅ Execução atual marcada como transferida');
-      
-      // 2. Buscar dados do fluxo destino
-      const targetFlow = await db.select()
-        .from(documentsFlows)
-        .where(eq(documentsFlows.id, targetFlowId))
-        .limit(1);
-      
-      if (targetFlow.length === 0) {
-        console.log('❌ Fluxo destino não encontrado:', targetFlowId);
-        return res.status(404).json({ error: "Fluxo destino não encontrado" });
-      }
-      
-      console.log('✅ Fluxo destino encontrado:', targetFlow[0].name);
-      
-      // 3. Criar nova execução com o fluxo destino
-      const newExecution = await db.insert(documentFlowExecutions)
-        .values({
-          documentId: currentDocumentId,
-          flowId: targetFlowId,
-          status: 'initiated',
-          flowTasks: targetFlow[0].flowData,
-          startedBy: req.user.id,
-          executionData: {
-            flowName: targetFlow[0].name,
-            transferredFrom: currentExecution[0].flowId,
-            transferredAt: new Date().toISOString()
-          },
-          completedAt: null,
-          createdAt: new Date(),
-          updatedAt: new Date()
-        })
-        .returning();
-      
-      console.log('✅ Nova execução criada:', newExecution[0].id);
-      
-      // Log da transferência
-      await SystemLogger.log({
-        eventType: EventTypes.FLOW_TRANSFER,
-        message: `Fluxo transferido do ID ${currentExecution[0].flowId} para ${targetFlowId}`,
-        parameters: {
-          documentId: currentDocumentId,
-          fromFlowId: currentExecution[0].flowId,
-          toFlowId: targetFlowId,
-          newExecutionId: newExecution[0].id
-        },
-        userId: req.user?.id
-      });
-      
-      res.json({
-        success: true,
-        newExecutionId: newExecution[0].id,
-        targetFlowName: targetFlow[0].name,
-        message: 'Transferência de fluxo concluída com sucesso'
-      });
-      
-    } catch (error) {
-      console.error('❌ Erro na transferência de fluxo:', error);
-      res.status(500).json({ error: "Erro interno do servidor" });
     }
   });
 

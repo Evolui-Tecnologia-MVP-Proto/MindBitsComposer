@@ -21,7 +21,7 @@ import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PlusCircle, Save, RotateCcw, BookOpen, Edit, Trash2, Undo2, Redo2, Settings, Play, GitBranch, Zap, FileText, Link, Square, Copy, AlignCenter } from 'lucide-react';
+import { PlusCircle, Save, RotateCcw, BookOpen, Edit, Trash2, Undo2, Redo2, Settings, Play, GitBranch, Zap, FileText, Link, Square, Copy } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -570,97 +570,6 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       });
     }
   }, [history, historyIndex, setNodes, setEdges]);
-
-  // Função para auto alinhar/organizar nós
-  const handleAutoAlign = useCallback(() => {
-    if (!reactFlowInstance) return;
-    
-    // Salvar estado atual no histórico antes de auto alinhar
-    addToHistory(nodes, edges);
-    
-    // Algoritmo simples de auto alinhamento em grid
-    const nodeSpacing = 200;
-    const startX = 100;
-    const startY = 100;
-    
-    // Separar nós por tipo para melhor organização
-    const startNodes = nodes.filter(node => node.type === 'startNode');
-    const actionNodes = nodes.filter(node => node.type === 'actionNode');
-    const documentNodes = nodes.filter(node => node.type === 'documentNode');
-    const switchNodes = nodes.filter(node => node.type === 'switchNode');
-    const integrationNodes = nodes.filter(node => node.type === 'integrationNode');
-    const endNodes = nodes.filter(node => node.type === 'endNode');
-    
-    let currentX = startX;
-    let currentY = startY;
-    
-    const organizedNodes = [];
-    
-    // Posicionar nós de início
-    startNodes.forEach((node, index) => {
-      organizedNodes.push({
-        ...node,
-        position: { x: currentX, y: currentY + (index * nodeSpacing) }
-      });
-    });
-    
-    currentX += nodeSpacing;
-    
-    // Posicionar nós de documento
-    documentNodes.forEach((node, index) => {
-      organizedNodes.push({
-        ...node,
-        position: { x: currentX, y: currentY + (index * nodeSpacing) }
-      });
-    });
-    
-    currentX += nodeSpacing;
-    
-    // Posicionar nós de integração
-    integrationNodes.forEach((node, index) => {
-      organizedNodes.push({
-        ...node,
-        position: { x: currentX, y: currentY + (index * nodeSpacing) }
-      });
-    });
-    
-    currentX += nodeSpacing;
-    
-    // Posicionar nós de ação
-    actionNodes.forEach((node, index) => {
-      organizedNodes.push({
-        ...node,
-        position: { x: currentX, y: currentY + (index * nodeSpacing) }
-      });
-    });
-    
-    currentX += nodeSpacing;
-    
-    // Posicionar nós de switch
-    switchNodes.forEach((node, index) => {
-      organizedNodes.push({
-        ...node,
-        position: { x: currentX, y: currentY + (index * nodeSpacing) }
-      });
-    });
-    
-    currentX += nodeSpacing;
-    
-    // Posicionar nós de fim
-    endNodes.forEach((node, index) => {
-      organizedNodes.push({
-        ...node,
-        position: { x: currentX, y: currentY + (index * nodeSpacing) }
-      });
-    });
-    
-    setNodes(organizedNodes);
-    
-    toast({
-      title: 'Nós organizados',
-      description: 'Os nós foram automaticamente alinhados em grid',
-    });
-  }, [reactFlowInstance, nodes, edges, addToHistory, setNodes]);
 
   // Handlers personalizados para capturar mudanças
   const handleNodesChange = useCallback((changes: any[]) => {
@@ -2032,16 +1941,6 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
           </div>
           
           <div className="flex space-x-2">
-            <Button 
-              onClick={handleAutoAlign} 
-              variant="outline" 
-              size="sm"
-              disabled={!currentFlowId || nodes.length === 0}
-              title="Organizar nós automaticamente"
-            >
-              <AlignCenter className="mr-1 h-4 w-4" />
-              Auto Alinhar
-            </Button>
             <Button 
               onClick={handleUndo} 
               variant="outline" 

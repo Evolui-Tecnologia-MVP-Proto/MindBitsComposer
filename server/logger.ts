@@ -46,9 +46,6 @@ export const EventTypes = {
   TEMPLATE_CREATED: "TEMPLATE_CREATED",
   TEMPLATE_UPDATED: "TEMPLATE_UPDATED",
   TEMPLATE_DELETED: "TEMPLATE_DELETED",
-  
-  // Flow events
-  FLOW_TRANSFER: "FLOW_TRANSFER",
 } as const;
 
 export type EventType = typeof EventTypes[keyof typeof EventTypes];
