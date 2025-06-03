@@ -4996,6 +4996,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         return true;
       }
 
+      // Verificar se há formulário anexado
+      const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+      
+      // Se não há formulário anexado, permite salvar
+      if (!attachedFormData || attachedFormData.trim() === '') {
+        console.log('🔍 Nenhum formulário anexado, permitindo salvar');
+        return true;
+      }
+
       const fieldsData = getFormFields();
       const fieldNames = Object.keys(fieldsData);
       
@@ -5003,14 +5012,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         nodeId: selectedFlowNode.id,
         nodeType: selectedFlowNode.type,
         isPending: selectedFlowNode.data.isPendingConnected,
+        attachedFormData,
         fieldsData,
         fieldNames,
         formValues,
         hasFields: fieldNames.length > 0
       });
       
-      // Se não há campos, permite salvar
-      if (fieldNames.length === 0) return true;
+      // Se não há campos no formulário, permite salvar
+      if (fieldNames.length === 0) {
+        console.log('🔍 Formulário sem campos válidos, permitindo salvar');
+        return true;
+      }
       
       // Verifica se todos os campos têm valores preenchidos
       const allFilled = fieldNames.every(fieldName => {
