@@ -714,9 +714,16 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
 
   // Função para carregar fluxo
   const loadFlow = useCallback((flow: any) => {
-    if (!reactFlowInstance || !flow.flowData) return;
+    console.log('loadFlow called with:', flow.name);
+    console.log('reactFlowInstance:', !!reactFlowInstance);
+    console.log('flow.flowData:', !!flow.flowData);
     
-    console.log('Loading flow:', flow.name);
+    if (!flow.flowData) {
+      console.log('No flowData found, returning');
+      return;
+    }
+    
+    console.log('Processing flow data...');
     
     // Verificar se o fluxo está bloqueado
     const isLocked = flow.isLocked === true;
@@ -733,6 +740,8 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
     }
     
     const { nodes: flowNodes, edges: flowEdges, viewport } = flow.flowData;
+    console.log('Flow nodes count:', flowNodes?.length || 0);
+    console.log('Flow edges count:', flowEdges?.length || 0);
     
     // Atualizar nós EndNode que têm To_Flow_id mas não têm To_Flow_code/To_Flow_name
     const updatedNodes = (flowNodes || []).map((node: any) => {
@@ -767,6 +776,7 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
       animated: false
     }));
     
+    console.log('Setting nodes and edges...');
     setNodes(updatedNodes);
     setEdges(styledEdges);
     setFlowName(flow.name);
@@ -785,8 +795,12 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
     setHasUnsavedChanges(false);
     console.log('Flow loaded - hasUnsavedChanges reset to false');
     
-    if (viewport) {
+    // Definir viewport se reactFlowInstance estiver disponível
+    if (reactFlowInstance && viewport) {
+      console.log('Setting viewport:', viewport);
       reactFlowInstance.setViewport(viewport);
+    } else if (!reactFlowInstance) {
+      console.log('ReactFlow instance not available yet');
     }
 
     toast({
