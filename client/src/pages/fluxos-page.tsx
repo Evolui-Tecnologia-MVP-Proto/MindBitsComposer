@@ -45,6 +45,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { NodeInspector } from '@/components/fluxos/NodeInspector';
+import { FlowMetadataModal } from '@/components/fluxos/FlowMetadataModal';
 import { 
   StartNode, 
   EndNode, 
@@ -1163,50 +1164,17 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
           </Dialog>
           
           {/* Modal para editar metadados do fluxo */}
-          <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>
-                  Editar Metadados do Fluxo - [{editFlowCode}]
-                </DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-6 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="edit-name">Nome do Fluxo</Label>
-                  <Input
-                    id="edit-name"
-                    value={editFlowName}
-                    onChange={(e) => setEditFlowName(e.target.value)}
-                    placeholder="Digite o nome do fluxo"
-                    className="w-full"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="edit-description">Descrição (opcional)</Label>
-                  <Textarea
-                    id="edit-description"
-                    value={editFlowDescription}
-                    onChange={(e) => setEditFlowDescription(e.target.value)}
-                    placeholder="Descreva o propósito deste fluxo"
-                    rows={4}
-                    className="w-full resize-none"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button 
-                  type="button" 
-                  variant="outline"
-                  onClick={() => setIsEditModalOpen(false)}
-                >
-                  Cancelar
-                </Button>
-                <Button type="button" onClick={handleEditFlow}>
-                  Salvar Alterações
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <FlowMetadataModal
+            isOpen={isEditModalOpen}
+            onOpenChange={setIsEditModalOpen}
+            editFlowCode={editFlowCode}
+            editFlowName={editFlowName}
+            editFlowDescription={editFlowDescription}
+            onNameChange={setEditFlowName}
+            onDescriptionChange={setEditFlowDescription}
+            onSave={handleEditFlow}
+            onCancel={() => setIsEditModalOpen(false)}
+          />
           
             <Button 
               onClick={handleDeleteFlow} 
