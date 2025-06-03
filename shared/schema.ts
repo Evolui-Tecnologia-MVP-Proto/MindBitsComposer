@@ -330,6 +330,8 @@ export const documentsFlows = pgTable("documents_flows", {
   userId: integer("user_id").notNull().references(() => users.id),
   createdBy: integer("created_by").notNull().references(() => users.id),
   updatedBy: integer("updated_by").notNull().references(() => users.id),
+  isLocked: boolean("is_locked").default(false), // Impede edição no editor
+  isEnabled: boolean("is_enabled").default(true), // Controla se aparece em seleções
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

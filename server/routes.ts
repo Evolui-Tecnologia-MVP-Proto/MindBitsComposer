@@ -3486,6 +3486,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: documentsFlows.userId,
         createdBy: documentsFlows.createdBy,
         updatedBy: documentsFlows.updatedBy,
+        isLocked: documentsFlows.isLocked,
+        isEnabled: documentsFlows.isEnabled,
         createdAt: documentsFlows.createdAt,
         updatedAt: documentsFlows.updatedAt,
         createdByName: usersCreated.name,
@@ -3661,6 +3663,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erro ao atualizar fluxo:", error);
       res.status(500).json({ error: "Erro ao atualizar fluxo" });
+    }
+  });
+
+  // Toggle flow lock status
+  app.patch("/api/documents-flows/:id/toggle-lock", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      // First get the current status
+      const currentFlow = await db.select({
+        isLocked: documentsFlows.isLocked
+      })
+        .from(documentsFlows)
+        .where(and(
+          eq(documentsFlows.id, req.params.id),
+          eq(documentsFlows.userId, req.user.id)
+        ))
+        .limit(1);
+      
+      if (currentFlow.length === 0) {
+        return res.status(404).json({ error: "Fluxo não encontrado" });
+      }
+      
+      // Toggle the lock status
+      const updatedFlow = await db.update(documentsFlows)
+        .set({
+          isLocked: !currentFlow[0].isLocked,
+          updatedBy: req.user.id,
+          updatedAt: new Date()
+        })
+        .where(and(
+          eq(documentsFlows.id, req.params.id),
+          eq(documentsFlows.userId, req.user.id)
+        ))
+        .returning();
+      
+      res.json(updatedFlow[0]);
+    } catch (error) {
+      console.error("Erro ao alterar status de bloqueio:", error);
+      res.status(500).json({ error: "Erro ao alterar status de bloqueio" });
+    }
+  });
+
+  // Toggle flow enabled status
+  app.patch("/api/documents-flows/:id/toggle-enabled", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      // First get the current status
+      const currentFlow = await db.select({
+        isEnabled: documentsFlows.isEnabled
+      })
+        .from(documentsFlows)
+        .where(and(
+          eq(documentsFlows.id, req.params.id),
+          eq(documentsFlows.userId, req.user.id)
+        ))
+        .limit(1);
+      
+      if (currentFlow.length === 0) {
+        return res.status(404).json({ error: "Fluxo não encontrado" });
+      }
+      
+      // Toggle the enabled status
+      const updatedFlow = await db.update(documentsFlows)
+        .set({
+          isEnabled: !currentFlow[0].isEnabled,
+          updatedBy: req.user.id,
+          updatedAt: new Date()
+        })
+        .where(and(
+          eq(documentsFlows.id, req.params.id),
+          eq(documentsFlows.userId, req.user.id)
+        ))
+        .returning();
+      
+      res.json(updatedFlow[0]);
+    } catch (error) {
+      console.error("Erro ao alterar status de habilitação:", error);
+      res.status(500).json({ error: "Erro ao alterar status de habilitação" });
     }
   });
 

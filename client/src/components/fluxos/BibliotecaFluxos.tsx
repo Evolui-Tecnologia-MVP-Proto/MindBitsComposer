@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Copy, Edit, Trash2, FileEdit } from "lucide-react";
+import { BookOpen, Copy, Edit, Trash2, FileEdit, Lock, Unlock, Eye, EyeOff } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { FlowMetadataModal } from './FlowMetadataModal';
@@ -154,6 +154,64 @@ export const BibliotecaFluxos = () => {
       toast({
         title: "Erro",
         description: "Não foi possível duplicar o fluxo.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation para alternar bloqueio
+  const toggleLockMutation = useMutation({
+    mutationFn: async (flowId: string) => {
+      const response = await fetch(`/api/documents-flows/${flowId}/toggle-lock`, {
+        method: "PATCH",
+      });
+      if (!response.ok) {
+        throw new Error("Erro ao alterar status de bloqueio");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documents-flows"] });
+      toast({
+        title: data.isLocked ? "Fluxo bloqueado" : "Fluxo desbloqueado",
+        description: data.isLocked 
+          ? "O fluxo não pode mais ser editado no editor." 
+          : "O fluxo pode ser editado novamente no editor.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Não foi possível alterar o status de bloqueio.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation para alternar habilitação
+  const toggleEnabledMutation = useMutation({
+    mutationFn: async (flowId: string) => {
+      const response = await fetch(`/api/documents-flows/${flowId}/toggle-enabled`, {
+        method: "PATCH",
+      });
+      if (!response.ok) {
+        throw new Error("Erro ao alterar status de habilitação");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documents-flows"] });
+      toast({
+        title: data.isEnabled ? "Fluxo habilitado" : "Fluxo desabilitado",
+        description: data.isEnabled 
+          ? "O fluxo aparecerá nas seleções do sistema." 
+          : "O fluxo não aparecerá mais nas seleções do sistema.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Não foi possível alterar o status de habilitação.",
         variant: "destructive",
       });
     },
