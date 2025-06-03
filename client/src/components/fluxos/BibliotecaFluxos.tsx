@@ -262,7 +262,7 @@ export const BibliotecaFluxos = () => {
               <CardHeader>
                 <div>
                   <div className="flex items-center gap-2">
-                    <CardTitle className="text-lg font-mono">
+                    <CardTitle className="font-semibold tracking-tight font-mono text-[14px]">
                       [{flow.code}] {flow.name}
                     </CardTitle>
                     {/* Indicadores de status */}
@@ -273,7 +273,7 @@ export const BibliotecaFluxos = () => {
                       <EyeOff className="h-4 w-4 text-gray-500" title="Fluxo desabilitado" />
                     )}
                   </div>
-                  <CardDescription className="mt-1">
+                  <CardDescription className="text-muted-foreground mt-1 text-[12px]">
                     {flow.description || "Sem descrição"}
                   </CardDescription>
                 </div>
