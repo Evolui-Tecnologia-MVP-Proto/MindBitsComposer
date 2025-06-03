@@ -77,7 +77,7 @@ export const BibliotecaFluxos = () => {
   // Mutation para atualizar metadata do fluxo
   const updateFlowMutation = useMutation({
     mutationFn: async ({ flowId, data }: { flowId: string; data: any }) => {
-      const response = await fetch(`/api/documents-flows/${flowId}`, {
+      const response = await fetch(`/api/documents-flows/${flowId}/metadata`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -85,7 +85,7 @@ export const BibliotecaFluxos = () => {
         body: JSON.stringify(data),
       });
       if (!response.ok) {
-        throw new Error("Erro ao atualizar fluxo");
+        throw new Error("Erro ao atualizar metadados do fluxo");
       }
       return response.json();
     },
@@ -93,14 +93,14 @@ export const BibliotecaFluxos = () => {
       queryClient.invalidateQueries({ queryKey: ["/api/documents-flows"] });
       setEditingFlow(null);
       toast({
-        title: "Fluxo atualizado",
-        description: "Os metadados do fluxo foram atualizados com sucesso.",
+        title: "Metadados atualizados",
+        description: "O nome e descrição do fluxo foram atualizados com sucesso.",
       });
     },
     onError: () => {
       toast({
         title: "Erro",
-        description: "Não foi possível atualizar o fluxo.",
+        description: "Não foi possível atualizar os metadados do fluxo.",
         variant: "destructive",
       });
     },

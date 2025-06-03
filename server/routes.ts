@@ -3568,7 +3568,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Update a flow
+  // Update flow metadata only (name and description)
+  app.put("/api/documents-flows/:id/metadata", async (req: Request, res: Response) => {
+    console.log("PUT /api/documents-flows/:id/metadata - Recebida requisição para:", req.params.id);
+    console.log("Dados recebidos:", JSON.stringify(req.body, null, 2));
+    
+    if (!req.isAuthenticated()) {
+      console.log("Usuário não autenticado");
+      return res.status(401).send("Não autorizado");
+    }
+    
+    try {
+      const { name, description } = req.body;
+      
+      const updatedFlow = await db.update(documentsFlows)
+        .set({
+          name,
+          description: description || "",
+          updatedBy: req.user.id,
+          updatedAt: new Date()
+        })
+        .where(and(
+          eq(documentsFlows.id, req.params.id),
+          eq(documentsFlows.userId, req.user.id)
+        ))
+        .returning();
+      
+      if (updatedFlow.length === 0) {
+        return res.status(404).json({ error: "Fluxo não encontrado" });
+      }
+      
+      res.json(updatedFlow[0]);
+    } catch (error) {
+      console.error("Erro ao atualizar metadados do fluxo:", error);
+      res.status(500).json({ error: "Erro ao atualizar metadados do fluxo" });
+    }
+  });
+
+  // Update a flow (complete flowData)
   app.put("/api/documents-flows/:id", async (req: Request, res: Response) => {
     console.log("PUT /api/documents-flows/:id - Recebida requisição para:", req.params.id);
     console.log("Dados recebidos:", JSON.stringify(req.body, null, 2));
@@ -3582,28 +3619,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { name, code, description, flowData } = req.body;
       console.log("Processando flowData com", flowData?.nodes?.length || 0, "nodes");
       
-      // Generate UUIDs for nodes and edges if they don't have them
-      const processedFlowData = {
-        ...flowData,
-        nodes: flowData.nodes?.map((node: any) => ({
-          ...node,
-          id: node.id || crypto.randomUUID()
-        })) || [],
-        edges: flowData.edges?.map((edge: any) => ({
-          ...edge,
-          id: edge.id || crypto.randomUUID()
-        })) || []
+      // Only process flowData if it exists
+      let processedFlowData = null;
+      if (flowData) {
+        processedFlowData = {
+          ...flowData,
+          nodes: flowData.nodes?.map((node: any) => ({
+            ...node,
+            id: node.id || crypto.randomUUID()
+          })) || [],
+          edges: flowData.edges?.map((edge: any) => ({
+            ...edge,
+            id: edge.id || crypto.randomUUID()
+          })) || []
+        };
+      }
+      
+      const updateData: any = {
+        updatedBy: req.user.id,
+        updatedAt: new Date()
       };
       
+      if (name !== undefined) updateData.name = name;
+      if (code !== undefined) updateData.code = code;
+      if (description !== undefined) updateData.description = description;
+      if (processedFlowData) updateData.flowData = processedFlowData;
+      
       const updatedFlow = await db.update(documentsFlows)
-        .set({
-          name,
-          code,
-          description: description || "",
-          flowData: processedFlowData,
-          updatedBy: req.user.id,
-          updatedAt: new Date()
-        })
+        .set(updateData)
         .where(and(
           eq(documentsFlows.id, req.params.id),
           eq(documentsFlows.userId, req.user.id)
