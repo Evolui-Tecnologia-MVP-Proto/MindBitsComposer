@@ -1144,23 +1144,18 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
         }}
         onSave={handleSave}
         onFlowSelect={(flowId) => {
-          console.log('Flow selection triggered - hasUnsavedChanges state:', hasUnsavedChanges);
-          console.log('Flow selection triggered - hasUnsavedChanges ref:', hasUnsavedChangesRef.current);
-          console.log('Current flow ID:', currentFlowId, 'Selected flow ID:', flowId);
-          
           // Se está selecionando o mesmo fluxo, não fazer nada
           if (flowId === currentFlowId) {
-            console.log('Same flow selected, returning');
             return;
           }
           
-          // Reset do estado após a verificação no FlowToolbar
-          setHasUnsavedChanges(false);
-          hasUnsavedChangesRef.current = false;
-          
+          // Aqui só executamos a troca, o reset será feito no modal
           if (savedFlows) {
             const selectedFlow = savedFlows.find(flow => flow.id === flowId);
             if (selectedFlow) {
+              // Reset do estado apenas quando efetivamente trocar
+              setHasUnsavedChanges(false);
+              hasUnsavedChangesRef.current = false;
               loadFlow(selectedFlow);
             }
           }
