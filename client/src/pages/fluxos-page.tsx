@@ -1491,6 +1491,20 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                 );
               }
               
+              // Verificar se é uma string com conteúdo (não vazia)
+              if (typeof value === 'string' && value !== '' && !value.includes('{{')) {
+                return (
+                  <tr key={key} className="bg-white border-b border-gray-100">
+                    <td className="px-2 py-1.5 border-r border-gray-200 text-left">
+                      <div className="text-xs font-medium text-gray-700 font-mono">{key}</div>
+                    </td>
+                    <td className="px-2 py-1.5 text-left">
+                      <div className="text-xs font-mono text-gray-800">{value}</div>
+                    </td>
+                  </tr>
+                );
+              }
+              
               // Verificar se é um campo de referência com marcadores {{ }}
               if (typeof value === 'string' && value.includes('{{') && value.includes('}}')) {
                 console.log('Campo com marcadores detectado:', key, value);
