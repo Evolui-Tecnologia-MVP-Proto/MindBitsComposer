@@ -1,0 +1,309 @@
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { 
+  Settings, 
+  Edit, 
+  Trash2, 
+  Save, 
+  Play, 
+  GitBranch, 
+  Zap, 
+  FileText, 
+  Link, 
+  Square, 
+  PlusCircle, 
+  AlignCenter, 
+  Undo2, 
+  Redo2, 
+  RotateCcw 
+} from "lucide-react";
+import { FlowMetadataModal } from "./FlowMetadataModal";
+import { NewFlowModal } from "./NewFlowModal";
+
+interface FlowToolbarProps {
+  // Flow selection
+  currentFlowId: string | null;
+  savedFlows: any[];
+  onFlowSelect: (flowId: string) => void;
+  
+  // Inspector
+  showInspector: boolean;
+  onToggleInspector: () => void;
+  
+  // Modals
+  isNewFlowModalOpen: boolean;
+  onOpenNewFlowModal: (open: boolean) => void;
+  isEditModalOpen: boolean;
+  onOpenEditModal: () => void;
+  
+  // New flow modal props
+  newFlowTypeId: string;
+  newFlowCode: string;
+  newFlowName: string;
+  newFlowDescription: string;
+  flowTypes: any[];
+  onFlowTypeChange: (typeId: string) => void;
+  onCodeChange: (code: string) => void;
+  onNameChange: (name: string) => void;
+  onDescriptionChange: (description: string) => void;
+  onCreateFlow: () => void;
+  onCancelNewFlow: () => void;
+  
+  // Edit flow modal props
+  editFlowCode: string;
+  editFlowName: string;
+  editFlowDescription: string;
+  onEditNameChange: (name: string) => void;
+  onEditDescriptionChange: (description: string) => void;
+  onSaveEdit: () => void;
+  onCancelEdit: () => void;
+  
+  // Flow actions
+  onDeleteFlow: () => void;
+  onSaveFlow: () => void;
+  
+  // Node selection
+  selectedNodeType: string;
+  onNodeTypeChange: (type: string) => void;
+  onAddNode: () => void;
+  
+  // History controls
+  historyIndex: number;
+  historyLength: number;
+  onUndo: () => void;
+  onRedo: () => void;
+  onReset: () => void;
+  onAutoAlign: () => void;
+  
+  // Node count for auto align
+  nodeCount: number;
+}
+
+export const FlowToolbar = ({
+  currentFlowId,
+  savedFlows,
+  onFlowSelect,
+  showInspector,
+  onToggleInspector,
+  isNewFlowModalOpen,
+  onOpenNewFlowModal,
+  isEditModalOpen,
+  onOpenEditModal,
+  newFlowTypeId,
+  newFlowCode,
+  newFlowName,
+  newFlowDescription,
+  flowTypes,
+  onFlowTypeChange,
+  onCodeChange,
+  onNameChange,
+  onDescriptionChange,
+  onCreateFlow,
+  onCancelNewFlow,
+  editFlowCode,
+  editFlowName,
+  editFlowDescription,
+  onEditNameChange,
+  onEditDescriptionChange,
+  onSaveEdit,
+  onCancelEdit,
+  onDeleteFlow,
+  onSaveFlow,
+  selectedNodeType,
+  onNodeTypeChange,
+  onAddNode,
+  historyIndex,
+  historyLength,
+  onUndo,
+  onRedo,
+  onReset,
+  onAutoAlign,
+  nodeCount
+}: FlowToolbarProps) => {
+  return (
+    <div className="mb-4 bg-white p-4 rounded-lg shadow-sm space-y-3">
+      {/* Primeira linha - Seleção de fluxo e botões principais */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-4">
+          <div className="w-64">
+            <Select value={currentFlowId || ""} onValueChange={(value) => {
+              if (value) {
+                onFlowSelect(value);
+              }
+            }}>
+              <SelectTrigger id="flow-select" className="!text-xs text-left font-mono">
+                <SelectValue placeholder="Carregar fluxo existente" />
+              </SelectTrigger>
+              <SelectContent className="!text-xs">
+                {savedFlows?.map((flow) => (
+                  <SelectItem key={flow.id} value={flow.id} className="!text-xs font-mono">
+                    {flow.code} - {flow.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <Button
+            variant={showInspector ? "default" : "outline"}
+            size="sm"
+            onClick={onToggleInspector}
+            disabled={!currentFlowId}
+          >
+            <Settings className="h-4 w-4 mr-2" />
+            Propriedades
+          </Button>
+          
+          <Button 
+            onClick={onOpenEditModal} 
+            variant="outline" 
+            size="sm"
+            disabled={!currentFlowId}
+          >
+            <Edit className="mr-1 h-4 w-4" />
+            Editar Metadados
+          </Button>
+        </div>
+        
+        <div className="flex space-x-2">
+          <NewFlowModal
+            isOpen={isNewFlowModalOpen}
+            onOpenChange={onOpenNewFlowModal}
+            newFlowTypeId={newFlowTypeId}
+            newFlowCode={newFlowCode}
+            newFlowName={newFlowName}
+            newFlowDescription={newFlowDescription}
+            flowTypes={flowTypes}
+            onFlowTypeChange={onFlowTypeChange}
+            onCodeChange={onCodeChange}
+            onNameChange={onNameChange}
+            onDescriptionChange={onDescriptionChange}
+            onCreateFlow={onCreateFlow}
+            onCancel={onCancelNewFlow}
+          />
+        
+        {/* Modal para editar metadados do fluxo */}
+        <FlowMetadataModal
+          isOpen={isEditModalOpen}
+          onOpenChange={() => {}}
+          editFlowCode={editFlowCode}
+          editFlowName={editFlowName}
+          editFlowDescription={editFlowDescription}
+          onNameChange={onEditNameChange}
+          onDescriptionChange={onEditDescriptionChange}
+          onSave={onSaveEdit}
+          onCancel={onCancelEdit}
+        />
+        
+          <Button 
+            onClick={onDeleteFlow} 
+            variant="destructive" 
+            size="sm"
+            disabled={!currentFlowId}
+          >
+            <Trash2 className="mr-1 h-4 w-4" />
+            Excluir
+          </Button>
+          <Button onClick={onSaveFlow} size="sm">
+            <Save className="mr-1 h-4 w-4" />
+            Salvar
+          </Button>
+        </div>
+      </div>
+      
+      {/* Segunda linha - Seleção de nós e controles de histórico */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <div className="w-64">
+              <Select onValueChange={onNodeTypeChange} disabled={!currentFlowId}>
+                <SelectTrigger id="node-type">
+                  <SelectValue placeholder="Selecione um nó" />
+                </SelectTrigger>
+                <SelectContent className="!text-xs">
+                  <SelectItem value="startNode" className="!text-xs">
+                    <div className="flex items-center space-x-2">
+                      <Play className="h-4 w-4 text-green-600" />
+                      <span>Start</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="switchNode" className="!text-xs">
+                    <div className="flex items-center space-x-2">
+                      <GitBranch className="h-4 w-4 text-blue-600" />
+                      <span>Switch</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="actionNode" className="!text-xs">
+                    <div className="flex items-center space-x-2">
+                      <Zap className="h-4 w-4 text-yellow-600" />
+                      <span>Action</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="documentNode" className="!text-xs">
+                    <div className="flex items-center space-x-2">
+                      <FileText className="h-4 w-4 text-purple-600" />
+                      <span>Document</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="integrationNode" className="!text-xs">
+                    <div className="flex items-center space-x-2">
+                      <Link className="h-4 w-4 text-orange-600" />
+                      <span>Integration</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="endNode" className="!text-xs">
+                    <div className="flex items-center space-x-2">
+                      <Square className="h-4 w-4 text-red-600" />
+                      <span>Finish</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button onClick={onAddNode} size="sm" disabled={!selectedNodeType || !currentFlowId}>
+              <PlusCircle className="mr-1 h-4 w-4" />
+              Adicionar Nó
+            </Button>
+          </div>
+        </div>
+        
+        <div className="flex space-x-2">
+          <Button 
+            onClick={onAutoAlign} 
+            variant="outline" 
+            size="sm"
+            disabled={!currentFlowId || nodeCount === 0}
+            title="Organizar nós automaticamente"
+          >
+            <AlignCenter className="mr-1 h-4 w-4" />
+            Auto Alinhar
+          </Button>
+          <Button 
+            onClick={onUndo} 
+            variant="outline" 
+            size="sm"
+            disabled={historyIndex <= 0}
+            title="Desfazer última ação"
+          >
+            <Undo2 className="mr-1 h-4 w-4" />
+            Desfazer
+          </Button>
+          <Button 
+            onClick={onRedo} 
+            variant="outline" 
+            size="sm"
+            disabled={historyIndex >= historyLength - 1}
+            title="Refazer última ação"
+          >
+            <Redo2 className="mr-1 h-4 w-4" />
+            Refazer
+          </Button>
+          <Button onClick={onReset} variant="outline" size="sm" disabled={!currentFlowId}>
+            <RotateCcw className="mr-1 h-4 w-4" />
+            Reiniciar
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};

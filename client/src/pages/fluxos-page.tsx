@@ -47,6 +47,7 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/componen
 import { NodeInspector } from '@/components/fluxos/NodeInspector';
 import { FlowMetadataModal } from '@/components/fluxos/FlowMetadataModal';
 import { NewFlowModal } from '@/components/fluxos/NewFlowModal';
+import { FlowToolbar } from '@/components/fluxos/FlowToolbar';
 import { 
   StartNode, 
   EndNode, 
@@ -1067,193 +1068,54 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
 
   return (
     <div className="flex flex-col h-full">
-      <div className="mb-4 bg-white p-4 rounded-lg shadow-sm space-y-3">
-        {/* Primeira linha - Seleção de fluxo e botões principais */}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <div className="w-64">
-              <Select value={currentFlowId || ""} onValueChange={(value) => {
-                if (value && savedFlows) {
-                  const selectedFlow = savedFlows.find(flow => flow.id === value);
-                  if (selectedFlow) {
-                    loadFlow(selectedFlow);
-                  }
-                }
-              }}>
-                <SelectTrigger id="flow-select" className="!text-xs text-left font-mono">
-                  <SelectValue placeholder="Carregar fluxo existente" />
-                </SelectTrigger>
-                <SelectContent className="!text-xs">
-                  {savedFlows?.map((flow) => (
-                    <SelectItem key={flow.id} value={flow.id} className="!text-xs font-mono">
-                      {flow.code} - {flow.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <Button
-              variant={showInspector ? "default" : "outline"}
-              size="sm"
-              onClick={() => setShowInspector(!showInspector)}
-              disabled={!currentFlowId}
-            >
-              <Settings className="h-4 w-4 mr-2" />
-              Propriedades
-            </Button>
-            
-            <Button 
-              onClick={openEditModal} 
-              variant="outline" 
-              size="sm"
-              disabled={!currentFlowId}
-            >
-              <Edit className="mr-1 h-4 w-4" />
-              Editar Metadados
-            </Button>
-          </div>
-          
-          <div className="flex space-x-2">
-            <NewFlowModal
-              isOpen={isNewFlowModalOpen}
-              onOpenChange={setIsNewFlowModalOpen}
-              newFlowTypeId={newFlowTypeId}
-              newFlowCode={newFlowCode}
-              newFlowName={newFlowName}
-              newFlowDescription={newFlowDescription}
-              flowTypes={flowTypes || []}
-              onFlowTypeChange={setNewFlowTypeId}
-              onCodeChange={handleCodeChange}
-              onNameChange={setNewFlowName}
-              onDescriptionChange={setNewFlowDescription}
-              onCreateFlow={createNewFlow}
-              onCancel={() => setIsNewFlowModalOpen(false)}
-            />
-          
-          {/* Modal para editar metadados do fluxo */}
-          <FlowMetadataModal
-            isOpen={isEditModalOpen}
-            onOpenChange={setIsEditModalOpen}
-            editFlowCode={editFlowCode}
-            editFlowName={editFlowName}
-            editFlowDescription={editFlowDescription}
-            onNameChange={setEditFlowName}
-            onDescriptionChange={setEditFlowDescription}
-            onSave={handleEditFlow}
-            onCancel={() => setIsEditModalOpen(false)}
-          />
-          
-            <Button 
-              onClick={handleDeleteFlow} 
-              variant="destructive" 
-              size="sm"
-              disabled={!currentFlowId}
-            >
-              <Trash2 className="mr-1 h-4 w-4" />
-              Excluir
-            </Button>
-            <Button onClick={handleSave} size="sm">
-              <Save className="mr-1 h-4 w-4" />
-              Salvar
-            </Button>
-          </div>
-        </div>
-        
-        {/* Segunda linha - Seleção de nós e controles de histórico */}
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <div className="w-64">
-                <Select onValueChange={setSelectedNodeType} disabled={!currentFlowId}>
-                  <SelectTrigger id="node-type">
-                    <SelectValue placeholder="Selecione um nó" />
-                  </SelectTrigger>
-                  <SelectContent className="!text-xs">
-                    <SelectItem value="startNode" className="!text-xs">
-                      <div className="flex items-center space-x-2">
-                        <Play className="h-4 w-4 text-green-600" />
-                        <span>Start</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="switchNode" className="!text-xs">
-                      <div className="flex items-center space-x-2">
-                        <GitBranch className="h-4 w-4 text-blue-600" />
-                        <span>Switch</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="actionNode" className="!text-xs">
-                      <div className="flex items-center space-x-2">
-                        <Zap className="h-4 w-4 text-yellow-600" />
-                        <span>Action</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="documentNode" className="!text-xs">
-                      <div className="flex items-center space-x-2">
-                        <FileText className="h-4 w-4 text-purple-600" />
-                        <span>Document</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="integrationNode" className="!text-xs">
-                      <div className="flex items-center space-x-2">
-                        <Link className="h-4 w-4 text-orange-600" />
-                        <span>Integration</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="endNode" className="!text-xs">
-                      <div className="flex items-center space-x-2">
-                        <Square className="h-4 w-4 text-red-600" />
-                        <span>Finish</span>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <Button onClick={handleAddNode} size="sm" disabled={!selectedNodeType || !currentFlowId}>
-                <PlusCircle className="mr-1 h-4 w-4" />
-                Adicionar Nó
-              </Button>
-            </div>
-          </div>
-          
-          <div className="flex space-x-2">
-            <Button 
-              onClick={handleAutoAlign} 
-              variant="outline" 
-              size="sm"
-              disabled={!currentFlowId || nodes.length === 0}
-              title="Organizar nós automaticamente"
-            >
-              <AlignCenter className="mr-1 h-4 w-4" />
-              Auto Alinhar
-            </Button>
-            <Button 
-              onClick={handleUndo} 
-              variant="outline" 
-              size="sm"
-              disabled={historyIndex <= 0}
-              title="Desfazer última ação"
-            >
-              <Undo2 className="mr-1 h-4 w-4" />
-              Desfazer
-            </Button>
-            <Button 
-              onClick={handleRedo} 
-              variant="outline" 
-              size="sm"
-              disabled={historyIndex >= history.length - 1}
-              title="Refazer última ação"
-            >
-              <Redo2 className="mr-1 h-4 w-4" />
-              Refazer
-            </Button>
-            <Button onClick={handleReset} variant="outline" size="sm" disabled={!currentFlowId}>
-              <RotateCcw className="mr-1 h-4 w-4" />
-              Reiniciar
-            </Button>
-          </div>
-        </div>
-      </div>
+      <FlowToolbar
+        currentFlowId={currentFlowId}
+        savedFlows={savedFlows || []}
+        onFlowSelect={(flowId) => {
+          if (savedFlows) {
+            const selectedFlow = savedFlows.find(flow => flow.id === flowId);
+            if (selectedFlow) {
+              loadFlow(selectedFlow);
+            }
+          }
+        }}
+        showInspector={showInspector}
+        onToggleInspector={() => setShowInspector(!showInspector)}
+        isNewFlowModalOpen={isNewFlowModalOpen}
+        onOpenNewFlowModal={setIsNewFlowModalOpen}
+        isEditModalOpen={isEditModalOpen}
+        onOpenEditModal={openEditModal}
+        newFlowTypeId={newFlowTypeId}
+        newFlowCode={newFlowCode}
+        newFlowName={newFlowName}
+        newFlowDescription={newFlowDescription}
+        flowTypes={flowTypes || []}
+        onFlowTypeChange={setNewFlowTypeId}
+        onCodeChange={handleCodeChange}
+        onNameChange={setNewFlowName}
+        onDescriptionChange={setNewFlowDescription}
+        onCreateFlow={createNewFlow}
+        onCancelNewFlow={() => setIsNewFlowModalOpen(false)}
+        editFlowCode={editFlowCode}
+        editFlowName={editFlowName}
+        editFlowDescription={editFlowDescription}
+        onEditNameChange={setEditFlowName}
+        onEditDescriptionChange={setEditFlowDescription}
+        onSaveEdit={handleEditFlow}
+        onCancelEdit={() => setIsEditModalOpen(false)}
+        onDeleteFlow={handleDeleteFlow}
+        onSaveFlow={handleSave}
+        selectedNodeType={selectedNodeType}
+        onNodeTypeChange={setSelectedNodeType}
+        onAddNode={handleAddNode}
+        historyIndex={historyIndex}
+        historyLength={history.length}
+        onUndo={handleUndo}
+        onRedo={handleRedo}
+        onReset={handleReset}
+        onAutoAlign={handleAutoAlign}
+        nodeCount={nodes.length}
+      />
       
       <div className="flex flex-1 overflow-hidden border border-gray-200 rounded-md">
         {showInspector ? (
