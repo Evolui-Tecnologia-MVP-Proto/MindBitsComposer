@@ -1556,9 +1556,9 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                           <SelectTrigger className="!text-xs font-mono h-6 px-1 text-left">
                             <SelectValue placeholder="Selecione o fluxo" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="!text-xs">
                             {savedFlows && savedFlows.map((flow: any) => (
-                              <SelectItem key={flow.id} value={flow.id} className="font-mono">
+                              <SelectItem key={flow.id} value={flow.id} className="!text-xs font-mono">
                                 [{flow.code}] - {flow.name}
                               </SelectItem>
                             ))}
@@ -1624,7 +1624,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                             <SelectTrigger className="!text-xs font-mono h-6 px-1 text-left">
                               <SelectValue placeholder="Selecione template" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="!text-xs">
                               {templatesData && templatesData
                                 .filter((template: any) => {
                                   // Aplicar filtros se definidos
@@ -1633,7 +1633,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                                   );
                                 })
                                 .map((template: any) => (
-                                  <SelectItem key={template.id} value={template.id} className="font-mono">
+                                  <SelectItem key={template.id} value={template.id} className="!text-xs font-mono">
                                     [{template.code}] - {template.name}
                                   </SelectItem>
                                 ))}
@@ -1681,12 +1681,12 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                           <SelectTrigger className="!text-xs font-mono h-6 px-1 text-left">
                             <SelectValue placeholder="Selecione opção" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="!text-xs">
                             {options.map(([optionKey, optionValue]) => (
                               <SelectItem 
                                 key={optionKey} 
                                 value={optionKey}
-                                className="font-mono"
+                                className="!text-xs font-mono"
                               >
                                 {String(optionValue)}
                               </SelectItem>
@@ -1720,18 +1720,18 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                         <SelectTrigger className="!text-xs font-mono h-6 px-1 text-left">
                           <SelectValue placeholder="Selecione valor" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="!text-xs">
                           {value.map((option: any, index: number) => {
                             if (typeof option === 'string') {
                               return (
-                                <SelectItem key={index} value={option} className="font-mono">
+                                <SelectItem key={index} value={option} className="!text-xs font-mono">
                                   {option}
                                 </SelectItem>
                               );
                             } else if (option.type && option.name) {
                               // Para docType que tem estrutura {type, name, template}
                               return (
-                                <SelectItem key={index} value={option.type} className="font-mono">
+                                <SelectItem key={index} value={option.type} className="!text-xs font-mono">
                                   {option.name} ({option.type})
                                 </SelectItem>
                               );
@@ -1764,9 +1764,9 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                         <SelectTrigger className="!text-xs font-mono h-6 px-1 text-left">
                           <SelectValue placeholder="Selecione valor" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="!text-xs">
                           {Object.entries(value as Record<string, any>).map(([optKey, optValue]) => (
-                            <SelectItem key={optKey} value={optKey} className="font-mono">
+                            <SelectItem key={optKey} value={optKey} className="!text-xs font-mono">
                               {String(optValue)}
                             </SelectItem>
                           ))}
@@ -1816,12 +1816,12 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                   }
                 }
               }}>
-                <SelectTrigger id="flow-select" className="text-left font-mono">
+                <SelectTrigger id="flow-select" className="!text-xs text-left font-mono">
                   <SelectValue placeholder="Carregar fluxo existente" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="!text-xs">
                   {savedFlows?.map((flow) => (
-                    <SelectItem key={flow.id} value={flow.id} className="font-mono">
+                    <SelectItem key={flow.id} value={flow.id} className="!text-xs font-mono">
                       {flow.code} - {flow.name}
                     </SelectItem>
                   ))}
@@ -1876,9 +1876,9 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                         )}
                       </SelectValue>
                     </SelectTrigger>
-                    <SelectContent className="w-[500px]">
+                    <SelectContent className="!text-xs w-[500px]">
                       {flowTypes?.map((flowType: any) => (
-                        <SelectItem key={flowType.id} value={flowType.id} className="h-auto py-3 min-h-[60px]">
+                        <SelectItem key={flowType.id} value={flowType.id} className="!text-xs h-auto py-3 min-h-[60px]">
                           <div className="flex flex-col w-full space-y-1">
                             <span className="font-medium text-left whitespace-normal">{flowType.name}</span>
                             <span className="text-sm text-gray-500 text-left whitespace-normal break-words leading-tight">{flowType.description}</span>
@@ -2010,38 +2010,38 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                   <SelectTrigger id="node-type">
                     <SelectValue placeholder="Selecione um nó" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="startNode">
+                  <SelectContent className="!text-xs">
+                    <SelectItem value="startNode" className="!text-xs">
                       <div className="flex items-center space-x-2">
                         <Play className="h-4 w-4 text-green-600" />
                         <span>Start</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="switchNode">
+                    <SelectItem value="switchNode" className="!text-xs">
                       <div className="flex items-center space-x-2">
                         <GitBranch className="h-4 w-4 text-blue-600" />
                         <span>Switch</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="actionNode">
+                    <SelectItem value="actionNode" className="!text-xs">
                       <div className="flex items-center space-x-2">
                         <Zap className="h-4 w-4 text-yellow-600" />
                         <span>Action</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="documentNode">
+                    <SelectItem value="documentNode" className="!text-xs">
                       <div className="flex items-center space-x-2">
                         <FileText className="h-4 w-4 text-purple-600" />
                         <span>Document</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="integrationNode">
+                    <SelectItem value="integrationNode" className="!text-xs">
                       <div className="flex items-center space-x-2">
                         <Link className="h-4 w-4 text-orange-600" />
                         <span>Integration</span>
                       </div>
                     </SelectItem>
-                    <SelectItem value="endNode">
+                    <SelectItem value="endNode" className="!text-xs">
                       <div className="flex items-center space-x-2">
                         <Square className="h-4 w-4 text-red-600" />
                         <span>Finish</span>
