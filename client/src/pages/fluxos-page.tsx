@@ -72,7 +72,15 @@ const nodeTypes: NodeTypes = {
   integrationNode: IntegrationNode,
 };
 
-const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: string, name: string} | null) => void }) => {
+const FlowCanvas = ({ 
+  onFlowInfoChange, 
+  persistedFlowData, 
+  onFlowDataChange 
+}: { 
+  onFlowInfoChange: (info: {code: string, name: string} | null) => void;
+  persistedFlowData: any;
+  onFlowDataChange: (data: any) => void;
+}) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -83,9 +91,103 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
   const [showInspector, setShowInspector] = useState<boolean>(false);
   const [showMiniMap, setShowMiniMap] = useState<boolean>(false);
+  const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
+  const [isRestoringData, setIsRestoringData] = useState<boolean>(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
-  const [showExitConfirmModal, setShowExitConfirmModal] = useState<boolean>(false);
+  const [lastSavedState, setLastSavedState] = useState<{nodes: any[], edges: any[]} | null>(null);
   
+  // Restaurar dados persistidos do fluxo quando o componente for montado
+  useEffect(() => {
+    if (persistedFlowData) {
+      setIsRestoringData(true);
+      
+      // Restaurar dados do fluxo
+      if (persistedFlowData.nodes) {
+        setNodes(persistedFlowData.nodes);
+      }
+      if (persistedFlowData.edges) {
+        setEdges(persistedFlowData.edges);
+      }
+      if (persistedFlowData.flowName) {
+        setFlowName(persistedFlowData.flowName);
+      }
+      if (persistedFlowData.currentFlowId) {
+        setCurrentFlowId(persistedFlowData.currentFlowId);
+      }
+      
+      // Restaurar estado do editor
+      if (persistedFlowData.selectedNodeId !== undefined) {
+        setSelectedNodeId(persistedFlowData.selectedNodeId);
+      }
+      if (persistedFlowData.selectedEdgeId !== undefined) {
+        setSelectedEdgeId(persistedFlowData.selectedEdgeId);
+      }
+      if (persistedFlowData.selectedNodeType !== undefined) {
+        setSelectedNodeType(persistedFlowData.selectedNodeType);
+      }
+      if (persistedFlowData.showInspector !== undefined) {
+        setShowInspector(persistedFlowData.showInspector);
+      }
+      if (persistedFlowData.showMiniMap !== undefined) {
+        setShowMiniMap(persistedFlowData.showMiniMap);
+      }
+      
+      // Restaurar estado de alterações não salvas
+      if (persistedFlowData.hasUnsavedChanges !== undefined) {
+        setHasUnsavedChanges(persistedFlowData.hasUnsavedChanges);
+      }
+      if (persistedFlowData.lastSavedState) {
+        setLastSavedState(persistedFlowData.lastSavedState);
+      }
+      
+      // Restaurar viewport (zoom e pan) após o ReactFlow estar pronto
+      if (persistedFlowData.viewport && reactFlowInstance) {
+        setTimeout(() => {
+          reactFlowInstance.setViewport(persistedFlowData.viewport);
+        }, 150);
+      }
+      
+      // Após a restauração, aguardar um ciclo antes de permitir atualizações
+      setTimeout(() => {
+        setIsRestoringData(false);
+      }, 200);
+    }
+  }, [persistedFlowData, setNodes, setEdges, reactFlowInstance]);
+
+  // Atualizar dados persistidos sempre que houver mudanças no fluxo
+  useEffect(() => {
+    // Só atualizar se não estiver restaurando dados
+    if (!isRestoringData) {
+      const flowData = {
+        nodes,
+        edges,
+        flowName,
+        currentFlowId,
+        // Persistir estado do editor
+        selectedNodeId,
+        selectedEdgeId,
+        selectedNodeType,
+        showInspector,
+        showMiniMap,
+        // Persistir estado de alterações não salvas
+        hasUnsavedChanges,
+        lastSavedState,
+        // Persistir viewport se disponível
+        viewport: reactFlowInstance?.getViewport() || { x: 0, y: 0, zoom: 1 }
+      };
+      onFlowDataChange(flowData);
+    }
+  }, [nodes, edges, flowName, currentFlowId, selectedNodeId, selectedEdgeId, selectedNodeType, showInspector, showMiniMap, hasUnsavedChanges, lastSavedState, reactFlowInstance, isRestoringData]);
+
+  // Detectar alterações não salvas comparando com o último estado salvo
+  useEffect(() => {
+    if (!isRestoringData && lastSavedState) {
+      const currentState = JSON.stringify({ nodes, edges });
+      const savedState = JSON.stringify(lastSavedState);
+      setHasUnsavedChanges(currentState !== savedState);
+    }
+  }, [nodes, edges, lastSavedState, isRestoringData]);
+
   // Aplicar estilo de seleção às edges
   const styledEdges = edges.map((edge: Edge) => {
     // Detectar se a conexão parte de um SwitchNode e de qual conector
@@ -124,7 +226,6 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       interactionWidth: 20
     };
   });
-  const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
   const [currentFlowLocked, setCurrentFlowLocked] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isNewFlowModalOpen, setIsNewFlowModalOpen] = useState(false);
@@ -302,7 +403,6 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     
     if (hasSignificantChange) {
       addToHistory(nodes, edges);
-      setHasUnsavedChanges(true);
     }
     
     onNodesChange(changes);
@@ -316,7 +416,6 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     
     if (hasSignificantChange) {
       addToHistory(nodes, edges);
-      setHasUnsavedChanges(true);
     }
     
     onEdgesChange(changes);
@@ -419,7 +518,6 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/documents-flows'] });
-      setHasUnsavedChanges(false);
       toast({
         title: "Sucesso",
         description: "Fluxo salvo com sucesso!"
@@ -503,7 +601,6 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
   const onConnect = useCallback((params: any) => {
     // Salvar estado atual no histórico antes de adicionar nova conexão
     addToHistory(nodes, edges);
-    setHasUnsavedChanges(true);
     
     setEdges((eds) =>
       addEdge(
@@ -541,7 +638,6 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
   const onEdgeUpdate = useCallback((oldEdge: Edge, newConnection: any) => {
     // Salvar estado atual no histórico antes de atualizar edge
     addToHistory(nodes, edges);
-    setHasUnsavedChanges(true);
     setEdges((eds) => eds.map((edge) => (edge.id === oldEdge.id ? { ...edge, ...newConnection } : edge)));
   }, [setEdges, nodes, edges, addToHistory]);
 
@@ -555,13 +651,11 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       if (selectedNodeId) {
         // Salvar estado atual no histórico antes de remover nó
         addToHistory(nodes, edges);
-        setHasUnsavedChanges(true);
         setNodes((nds) => nds.filter((node) => node.id !== selectedNodeId));
         setSelectedNodeId(null);
       } else if (selectedEdgeId) {
         // Salvar estado atual no histórico antes de remover edge
         addToHistory(nodes, edges);
-        setHasUnsavedChanges(true);
         setEdges((eds) => eds.filter((edge) => edge.id !== selectedEdgeId));
         setSelectedEdgeId(null);
       }
@@ -934,8 +1028,6 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
           data: { label },
         };
 
-        addToHistory(nodes, edges);
-        setHasUnsavedChanges(true);
         setNodes((nds) => nds.concat(newNode));
       }
     },
@@ -993,6 +1085,17 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       code: currentFlow?.code || `FLX-${Math.floor(Math.random() * 100).toString().padStart(2, '0')}`,
       description: currentFlow?.description || `Fluxo atualizado em ${new Date().toLocaleString('pt-BR')}`,
       flowData: processedFlowData
+    }, {
+      onSuccess: () => {
+        // Atualizar estado salvo e limpar flag de alterações não salvas
+        setLastSavedState({ nodes, edges });
+        setHasUnsavedChanges(false);
+        
+        toast({
+          title: 'Fluxo salvo',
+          description: 'Todas as alterações foram salvas com sucesso.',
+        });
+      }
     });
   };
 
@@ -1060,7 +1163,6 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       const newNodes = nds.concat(newNode);
       // Adiciona ao histórico após adicionar o nó
       addToHistory(nodes, edges);
-      setHasUnsavedChanges(true);
       return newNodes;
     });
     
@@ -1094,21 +1196,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     });
   }, [getSelectedNode, setNodes]);
 
-  // Função para avisar sobre alterações não salvas
-  const checkUnsavedChanges = useCallback(() => {
-    if (hasUnsavedChanges) {
-      const shouldSave = window.confirm(
-        "Atenção, ao sair do editor você perderá todo conteúdo editado que ainda não foi salvo. Deseja salvar o fluxo antes de sair?\n\nClique em 'OK' para salvar ou 'Cancelar' para descartar as alterações."
-      );
-      
-      if (shouldSave) {
-        handleSave();
-        setHasUnsavedChanges(false);
-      } else {
-        setHasUnsavedChanges(false);
-      }
-    }
-  }, [hasUnsavedChanges, handleSave]);
+  // Função para renderizar o inspector de propriedades
 
   return (
     <div className="flex flex-col h-full">
@@ -1128,7 +1216,6 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
         showMiniMap={showMiniMap}
         onToggleMiniMap={() => setShowMiniMap(!showMiniMap)}
         isFlowLocked={savedFlows?.find(flow => flow.id === currentFlowId)?.isLocked || false}
-        hasUnsavedChanges={hasUnsavedChanges}
         isNewFlowModalOpen={isNewFlowModalOpen}
         onOpenNewFlowModal={setIsNewFlowModalOpen}
         isEditModalOpen={isEditModalOpen}
@@ -1198,6 +1285,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
 
 export default function FluxosPage() {
   const [currentFlowInfo, setCurrentFlowInfo] = useState<{code: string, name: string} | null>(null);
+  const [persistedFlowData, setPersistedFlowData] = useState<any>(null);
+  const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -1227,7 +1316,11 @@ export default function FluxosPage() {
           
           <TabsContent value="editor" className="flex-1 mt-4 min-h-0">
             <ReactFlowProvider>
-              <FlowCanvas onFlowInfoChange={setCurrentFlowInfo} />
+              <FlowCanvas 
+                onFlowInfoChange={setCurrentFlowInfo}
+                persistedFlowData={persistedFlowData}
+                onFlowDataChange={setPersistedFlowData}
+              />
             </ReactFlowProvider>
           </TabsContent>
           
@@ -1236,8 +1329,6 @@ export default function FluxosPage() {
           </TabsContent>
         </Tabs>
       </div>
-
-
     </div>
   );
 }
