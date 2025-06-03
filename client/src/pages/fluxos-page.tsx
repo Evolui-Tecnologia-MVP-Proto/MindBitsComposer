@@ -96,7 +96,6 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
   const [showMiniMap, setShowMiniMap] = useState<boolean>(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
   const [showExitConfirmModal, setShowExitConfirmModal] = useState<boolean>(false);
-  const [showDiscardModal, setShowDiscardModal] = useState<boolean>(false);
   const hasUnsavedChangesRef = useRef<boolean>(false);
   
   // Referencias para detectar mudanças
@@ -565,13 +564,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     setHasUnsavedChanges(true);
   }, []);
 
-  // Função para descartar alterações
+  // Função para descartar alterações (passada para o componente principal)
   const handleDiscard = useCallback(() => {
-    setShowDiscardModal(true);
-  }, []);
-
-  // Função para confirmar descarte de alterações
-  const confirmDiscard = useCallback(() => {
     // Reinicializar o canvas
     setNodes([]);
     setEdges([]);
@@ -593,9 +587,6 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     
     // Notificar o componente pai sobre o reset
     onFlowInfoChange(null);
-    
-    // Fechar modal
-    setShowDiscardModal(false);
     
     toast({
       title: "Alterações descartadas",
@@ -1242,7 +1233,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
           return hasUnsavedChangesRef.current;
         }}
         onSave={handleSave}
-        onDiscard={handleDiscard}
+        onDiscard={handleDiscardRequest}
         onFlowSelect={(flowId) => {
           // Se está selecionando o mesmo fluxo, não fazer nada
           if (flowId === currentFlowId) {
@@ -1337,6 +1328,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
 export default function FluxosPage() {
   const [currentFlowInfo, setCurrentFlowInfo] = useState<{code: string, name: string} | null>(null);
   const [activeTab, setActiveTab] = useState("editor");
+  const [showDiscardModal, setShowDiscardModal] = useState<boolean>(false);
   const { hasUnsavedChanges } = useNavigationGuard();
 
   const handleTabChange = (newTab: string) => {
@@ -1346,6 +1338,21 @@ export default function FluxosPage() {
       return;
     }
     setActiveTab(newTab);
+  };
+
+  // Função para abrir modal de descarte
+  const handleDiscardRequest = () => {
+    setShowDiscardModal(true);
+  };
+
+  // Função para confirmar descarte de alterações
+  const confirmDiscard = () => {
+    setShowDiscardModal(false);
+    // A lógica de descarte será delegada para o FlowCanvas
+    toast({
+      title: "Alterações descartadas",
+      description: "As alterações foram descartadas. Selecione um fluxo para continuar."
+    });
   };
 
   return (
