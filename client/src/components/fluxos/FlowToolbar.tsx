@@ -145,18 +145,46 @@ export const FlowToolbar = ({
           <div className="w-64">
             <Select value={currentFlowId || ""} onValueChange={(value) => {
               if (value) {
-                // Verificar alterações não salvas antes de trocar fluxo
-                if (checkUnsavedChanges && checkUnsavedChanges()) {
-                  console.log('FlowToolbar: Detectadas alterações não salvas');
-                  const shouldSave = window.confirm(
-                    "Atenção, ao sair do editor você perderá todo conteúdo editado que ainda não foi salvo. Deseja salvar o fluxo antes de sair?\n\nClique em 'OK' para salvar ou 'Cancelar' para descartar as alterações."
-                  );
-                  
-                  if (shouldSave && onSave) {
-                    onSave();
-                  }
+                console.log('Select onValueChange triggered, value:', value);
+                console.log('Current flow:', currentFlowId);
+                
+                // Se é o mesmo fluxo, não fazer nada
+                if (value === currentFlowId) {
+                  console.log('Same flow selected, ignoring');
+                  return;
                 }
-                onFlowSelect(value);
+                
+                // Verificar alterações não salvas
+                const hasChanges = checkUnsavedChanges ? checkUnsavedChanges() : false;
+                console.log('Has unsaved changes:', hasChanges);
+                
+                if (hasChanges) {
+                  console.log('FlowToolbar: Detectadas alterações não salvas - mostrando modal');
+                  
+                  // Usar setTimeout para garantir que o modal apareça após o render
+                  setTimeout(() => {
+                    try {
+                      const shouldSave = window.confirm(
+                        "Atenção, ao sair do editor você perderá todo conteúdo editado que ainda não foi salvo. Deseja salvar o fluxo antes de sair?\n\nClique em 'OK' para salvar ou 'Cancelar' para descartar as alterações."
+                      );
+                      console.log('User choice:', shouldSave);
+                      
+                      if (shouldSave && onSave) {
+                        onSave();
+                      }
+                      
+                      // Continuar com a seleção do fluxo após a decisão do usuário
+                      onFlowSelect(value);
+                    } catch (error) {
+                      console.error('Erro ao mostrar modal:', error);
+                      // Em caso de erro, continuar com a seleção
+                      onFlowSelect(value);
+                    }
+                  }, 100);
+                } else {
+                  // Sem alterações, pode trocar diretamente
+                  onFlowSelect(value);
+                }
               }
             }}>
               <SelectTrigger id="flow-select" className="!text-xs text-left font-mono">
