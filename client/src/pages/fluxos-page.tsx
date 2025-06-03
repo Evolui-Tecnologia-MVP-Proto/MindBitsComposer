@@ -43,6 +43,16 @@ import {
   DialogTrigger,
   DialogFooter,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { NodeInspector } from '@/components/fluxos/NodeInspector';
@@ -1245,6 +1255,44 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
 
 export default function FluxosPage() {
   const [currentFlowInfo, setCurrentFlowInfo] = useState<{code: string, name: string} | null>(null);
+  const [activeTab, setActiveTab] = useState("editor");
+  const [pendingTab, setPendingTab] = useState<string | null>(null);
+  const [showTabModal, setShowTabModal] = useState(false);
+  const { hasUnsavedChanges, setSaveFunction } = useNavigationGuard();
+
+  const handleTabChange = (newTab: string) => {
+    if (hasUnsavedChanges && activeTab !== newTab) {
+      setPendingTab(newTab);
+      setShowTabModal(true);
+      return;
+    }
+    setActiveTab(newTab);
+  };
+
+  const handleTabConfirm = (shouldSave: boolean) => {
+    if (shouldSave && saveFunction.current) {
+      saveFunction.current();
+    }
+    
+    setShowTabModal(false);
+    
+    if (pendingTab) {
+      setActiveTab(pendingTab);
+      setPendingTab(null);
+    }
+  };
+
+  const handleTabCancel = () => {
+    setShowTabModal(false);
+    setPendingTab(null);
+  };
+
+  // Configurar função de salvamento para o sistema de proteção
+  const saveFunction = useRef<(() => void) | null>(null);
+  
+  useEffect(() => {
+    setSaveFunction(() => saveFunction.current);
+  }, [setSaveFunction]);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -1260,7 +1308,7 @@ export default function FluxosPage() {
       
       {/* Área das abas - ocupa todo o espaço restante */}
       <div className="flex-1 px-6 pb-6 min-h-0">
-        <Tabs defaultValue="editor" className="flex flex-col h-full">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="flex flex-col h-full">
           <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
             <TabsTrigger value="editor" className="flex items-center space-x-2">
               <Edit className="h-4 w-4" />
@@ -1274,7 +1322,12 @@ export default function FluxosPage() {
           
           <TabsContent value="editor" className="flex-1 mt-4 min-h-0">
             <ReactFlowProvider>
-              <FlowCanvas onFlowInfoChange={setCurrentFlowInfo} />
+              <FlowCanvas 
+                onFlowInfoChange={setCurrentFlowInfo}
+                onSaveFunctionChange={(saveFn) => {
+                  saveFunction.current = saveFn;
+                }}
+              />
             </ReactFlowProvider>
           </TabsContent>
           
@@ -1284,7 +1337,28 @@ export default function FluxosPage() {
         </Tabs>
       </div>
 
-
+      {/* Modal de confirmação para mudança de aba */}
+      <AlertDialog open={showTabModal} onOpenChange={setShowTabModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Alterações não salvas</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você tem alterações não salvas no fluxo atual. Deseja salvar antes de continuar?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleTabCancel}>
+              Cancelar
+            </AlertDialogCancel>
+            <Button variant="outline" onClick={() => handleTabConfirm(false)}>
+              Continuar sem salvar
+            </Button>
+            <AlertDialogAction onClick={() => handleTabConfirm(true)}>
+              Salvar e continuar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
