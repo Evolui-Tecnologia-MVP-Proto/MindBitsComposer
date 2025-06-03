@@ -1491,7 +1491,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                 );
               }
               
-              // Verificar se é uma string com conteúdo (não vazia)
+              // Verificar se é uma string com conteúdo (não vazia) - renderizar como Input para edição
               if (typeof value === 'string' && value !== '' && !value.includes('{{')) {
                 return (
                   <tr key={key} className="bg-white border-b border-gray-100">
@@ -1499,7 +1499,18 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                       <div className="text-xs font-medium text-gray-700 font-mono">{key}</div>
                     </td>
                     <td className="px-2 py-1.5 text-left">
-                      <div className="text-xs font-mono text-gray-800">{value}</div>
+                      <Input 
+                        value={selectedNode.data[key] || value} 
+                        onChange={(e) => {
+                          setNodes(nds => nds.map(node => 
+                            node.id === selectedNode.id 
+                              ? { ...node, data: { ...node.data, [key]: e.target.value } }
+                              : node
+                          ));
+                        }}
+                        className="text-xs font-mono h-6 px-1 text-left"
+                        placeholder={`Digite o valor para ${key}`}
+                      />
                     </td>
                   </tr>
                 );
