@@ -16,6 +16,7 @@ import ReactFlow, {
 } from 'reactflow';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { NodeInspector } from './NodeInspector';
+import { Network } from 'lucide-react';
 
 interface FlowDiagramProps {
   // Flow state
@@ -81,12 +82,28 @@ export const FlowDiagram = ({
   isFlowLocked = false,
   showMiniMap = false
 }: FlowDiagramProps) => {
+  const hasNodes = nodes.length > 0;
+
+  // Componente de estado vazio
+  const EmptyState = () => (
+    <div className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none">
+      <Network 
+        size={100} 
+        className="text-gray-300 mb-4"
+      />
+      <p className="text-gray-500 text-lg font-medium">
+        Selecione um fluxo para começar a editar...
+      </p>
+    </div>
+  );
+
   return (
     <div className="flex flex-1 overflow-hidden border border-gray-200 rounded-md">
       {showInspector ? (
         <ResizablePanelGroup direction="horizontal" className="flex-1">
           <ResizablePanel defaultSize={70} minSize={50}>
-            <div className="h-full" ref={reactFlowWrapper}>
+            <div className="h-full relative" ref={reactFlowWrapper}>
+              {!hasNodes && <EmptyState />}
               <ReactFlow
                 nodes={nodes}
                 edges={styledEdges}
@@ -141,7 +158,8 @@ export const FlowDiagram = ({
           </ResizablePanel>
         </ResizablePanelGroup>
       ) : (
-        <div className="flex-1 h-full" ref={reactFlowWrapper}>
+        <div className="flex-1 h-full relative" ref={reactFlowWrapper}>
+          {!hasNodes && <EmptyState />}
           <ReactFlow
             nodes={nodes}
             edges={styledEdges}
