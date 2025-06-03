@@ -1,11 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Copy, Edit, Trash2 } from "lucide-react";
+import { BookOpen, Copy, Edit, Trash2, Settings } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { FlowMetadataModal } from './FlowMetadataModal';
 
 export const BibliotecaFluxos = () => {
   const queryClient = useQueryClient();
+  const [editingFlow, setEditingFlow] = useState<any | null>(null);
   
   const { data: savedFlows, isLoading: isLoadingFlows } = useQuery<any[]>({
     queryKey: ["/api/documents-flows"],
@@ -37,6 +40,38 @@ export const BibliotecaFluxos = () => {
       toast({
         title: "Erro",
         description: "Não foi possível excluir o fluxo.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation para atualizar metadata do fluxo
+  const updateFlowMutation = useMutation({
+    mutationFn: async ({ flowId, data }: { flowId: string; data: any }) => {
+      const response = await fetch(`/api/documents-flows/${flowId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error("Erro ao atualizar fluxo");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documents-flows"] });
+      setEditingFlow(null);
+      toast({
+        title: "Fluxo atualizado",
+        description: "Os metadados do fluxo foram atualizados com sucesso.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Não foi possível atualizar o fluxo.",
         variant: "destructive",
       });
     },
@@ -140,7 +175,7 @@ export const BibliotecaFluxos = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     <Button 
                       size="sm" 
                       variant="outline"
@@ -180,6 +215,15 @@ export const BibliotecaFluxos = () => {
 
                     <Button 
                       size="sm" 
+                      variant="secondary"
+                      onClick={() => setEditingFlow(flow)}
+                    >
+                      <Settings className="mr-1 h-3 w-3" />
+                      Metadata
+                    </Button>
+
+                    <Button 
+                      size="sm" 
                       variant="destructive"
                       onClick={() => {
                         if (confirm(`Tem certeza que deseja excluir o fluxo "${flow.name}"? Esta ação não pode ser desfeita.`)) {
@@ -204,6 +248,28 @@ export const BibliotecaFluxos = () => {
           );
         })}
       </div>
+
+      {/* Modal de edição de metadata */}
+      {editingFlow && (
+        <FlowMetadataModal
+          isOpen={true}
+          onClose={() => setEditingFlow(null)}
+          flowData={{
+            code: editingFlow.code,
+            name: editingFlow.name,
+            description: editingFlow.description,
+            flowTypeId: editingFlow.flowTypeId || editingFlow.flow_type_id,
+          }}
+          flowTypes={flowTypes || []}
+          onSave={(data) => {
+            updateFlowMutation.mutate({
+              flowId: editingFlow.id,
+              data,
+            });
+          }}
+          isEditing={true}
+        />
+      )}
     </div>
   );
 };
