@@ -4,42 +4,68 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useState, useEffect } from 'react';
 
 interface FlowMetadataModalProps {
   isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  editFlowCode: string;
-  editFlowName: string;
-  editFlowDescription: string;
-  onNameChange: (name: string) => void;
-  onDescriptionChange: (description: string) => void;
-  onSave: () => void;
-  onCancel: () => void;
+  onClose: () => void;
+  flowData: {
+    code: string;
+    name: string;
+    description?: string;
+    flowTypeId?: string;
+  };
+  flowTypes: any[];
+  onSave: (data: any) => void;
+  isEditing?: boolean;
 }
 
 export function FlowMetadataModal({
   isOpen,
-  onOpenChange,
-  editFlowCode,
-  editFlowName,
-  editFlowDescription,
-  onNameChange,
-  onDescriptionChange,
+  onClose,
+  flowData,
+  flowTypes,
   onSave,
-  onCancel
+  isEditing = false
 }: FlowMetadataModalProps) {
+  const [editFlowName, setEditFlowName] = useState('');
+  const [editFlowDescription, setEditFlowDescription] = useState('');
+
+  useEffect(() => {
+    if (isOpen && flowData) {
+      setEditFlowName(flowData.name || '');
+      setEditFlowDescription(flowData.description || '');
+    }
+  }, [isOpen, flowData]);
+
+  const handleSave = () => {
+    onSave({
+      name: editFlowName,
+      description: editFlowDescription,
+    });
+    onClose();
+  };
+
+  if (!flowData) {
+    return null;
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            Editar Metadados do Fluxo - [{editFlowCode}]
+            Editar Metadados do Fluxo - [{flowData.code || 'N/A'}]
           </DialogTitle>
+          <DialogDescription>
+            Altere o nome e a descrição do fluxo conforme necessário.
+          </DialogDescription>
         </DialogHeader>
         <div className="grid gap-6 py-4">
           <div className="space-y-2">
@@ -47,7 +73,7 @@ export function FlowMetadataModal({
             <Input
               id="edit-name"
               value={editFlowName}
-              onChange={(e) => onNameChange(e.target.value)}
+              onChange={(e) => setEditFlowName(e.target.value)}
               placeholder="Digite o nome do fluxo"
               className="w-full"
             />
@@ -57,7 +83,7 @@ export function FlowMetadataModal({
             <Textarea
               id="edit-description"
               value={editFlowDescription}
-              onChange={(e) => onDescriptionChange(e.target.value)}
+              onChange={(e) => setEditFlowDescription(e.target.value)}
               placeholder="Descreva o propósito deste fluxo"
               rows={4}
               className="w-full resize-none"
@@ -68,11 +94,11 @@ export function FlowMetadataModal({
           <Button 
             type="button" 
             variant="outline"
-            onClick={onCancel}
+            onClick={onClose}
           >
             Cancelar
           </Button>
-          <Button type="button" onClick={onSave}>
+          <Button type="button" onClick={handleSave}>
             Salvar Alterações
           </Button>
         </DialogFooter>

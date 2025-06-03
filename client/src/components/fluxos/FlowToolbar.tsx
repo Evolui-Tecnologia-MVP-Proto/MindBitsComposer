@@ -185,14 +185,19 @@ export const FlowToolbar = ({
         {/* Modal para editar metadados do fluxo */}
         <FlowMetadataModal
           isOpen={isEditModalOpen}
-          onOpenChange={() => {}}
-          editFlowCode={editFlowCode}
-          editFlowName={editFlowName}
-          editFlowDescription={editFlowDescription}
-          onNameChange={onEditNameChange}
-          onDescriptionChange={onEditDescriptionChange}
-          onSave={onSaveEdit}
-          onCancel={onCancelEdit}
+          onClose={onCancelEdit}
+          flowData={{
+            code: editFlowCode,
+            name: editFlowName,
+            description: editFlowDescription,
+          }}
+          flowTypes={[]}
+          onSave={(data) => {
+            onEditNameChange(data.name);
+            onEditDescriptionChange(data.description);
+            onSaveEdit();
+          }}
+          isEditing={true}
         />
         
           <Button 
