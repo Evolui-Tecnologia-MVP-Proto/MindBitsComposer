@@ -30,6 +30,9 @@ interface FlowToolbarProps {
   showInspector: boolean;
   onToggleInspector: () => void;
   
+  // Flow state
+  isFlowLocked?: boolean;
+  
   // Modals
   isNewFlowModalOpen: boolean;
   onOpenNewFlowModal: (open: boolean) => void;
@@ -85,6 +88,7 @@ export const FlowToolbar = ({
   onFlowSelect,
   showInspector,
   onToggleInspector,
+  isFlowLocked = false,
   isNewFlowModalOpen,
   onOpenNewFlowModal,
   isEditModalOpen,
@@ -163,7 +167,8 @@ export const FlowToolbar = ({
             onClick={onOpenEditModal} 
             variant="outline" 
             size="sm"
-            disabled={!currentFlowId}
+            disabled={!currentFlowId || isFlowLocked}
+            title={isFlowLocked ? "Fluxo bloqueado para edição" : ""}
           >
             <Edit className="mr-1 h-4 w-4" />
             Editar Metadados
@@ -209,12 +214,18 @@ export const FlowToolbar = ({
             onClick={onDeleteFlow} 
             variant="destructive" 
             size="sm"
-            disabled={!currentFlowId}
+            disabled={!currentFlowId || isFlowLocked}
+            title={isFlowLocked ? "Fluxo bloqueado para edição" : ""}
           >
             <Trash2 className="mr-1 h-4 w-4" />
             Excluir
           </Button>
-          <Button onClick={onSaveFlow} size="sm">
+          <Button 
+            onClick={onSaveFlow} 
+            size="sm"
+            disabled={isFlowLocked}
+            title={isFlowLocked ? "Fluxo bloqueado para edição" : ""}
+          >
             <Save className="mr-1 h-4 w-4" />
             Salvar
           </Button>
@@ -226,9 +237,9 @@ export const FlowToolbar = ({
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2">
             <div className="w-64">
-              <Select onValueChange={onNodeTypeChange} disabled={!currentFlowId}>
+              <Select onValueChange={onNodeTypeChange} disabled={!currentFlowId || isFlowLocked}>
                 <SelectTrigger id="node-type">
-                  <SelectValue placeholder="Selecione um nó" />
+                  <SelectValue placeholder={isFlowLocked ? "Fluxo bloqueado" : "Selecione um nó"} />
                 </SelectTrigger>
                 <SelectContent className="!text-xs">
                   <SelectItem value="startNode" className="!text-xs">
@@ -270,7 +281,12 @@ export const FlowToolbar = ({
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={onAddNode} size="sm" disabled={!selectedNodeType || !currentFlowId}>
+            <Button 
+              onClick={onAddNode} 
+              size="sm" 
+              disabled={!selectedNodeType || !currentFlowId || isFlowLocked}
+              title={isFlowLocked ? "Fluxo bloqueado para edição" : ""}
+            >
               <PlusCircle className="mr-1 h-4 w-4" />
               Adicionar Nó
             </Button>
