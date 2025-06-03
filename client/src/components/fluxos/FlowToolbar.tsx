@@ -135,11 +135,16 @@ export const FlowToolbar = ({
                 <SelectValue placeholder="Carregar fluxo existente" />
               </SelectTrigger>
               <SelectContent className="!text-xs">
-                {savedFlows?.map((flow) => (
-                  <SelectItem key={flow.id} value={flow.id} className="!text-xs font-mono">
-                    {flow.code} - {flow.name}
-                  </SelectItem>
-                ))}
+                {savedFlows
+                  ?.filter((flow) => flow.isEnabled !== false) // Filtra apenas fluxos habilitados
+                  ?.map((flow) => (
+                    <SelectItem key={flow.id} value={flow.id} className="!text-xs font-mono">
+                      <span className={flow.isLocked ? "text-red-600" : ""}>
+                        {flow.code} - {flow.name}
+                        {flow.isLocked && " (Bloqueado)"}
+                      </span>
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
           </div>

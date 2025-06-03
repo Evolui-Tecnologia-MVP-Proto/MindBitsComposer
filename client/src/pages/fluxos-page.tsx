@@ -122,6 +122,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     };
   });
   const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
+  const [currentFlowLocked, setCurrentFlowLocked] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isNewFlowModalOpen, setIsNewFlowModalOpen] = useState(false);
   const [newFlowName, setNewFlowName] = useState('');
@@ -594,6 +595,19 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
   // Função para carregar fluxo
   const loadFlow = useCallback((flow: any) => {
     if (!reactFlowInstance || !flow.flowData) return;
+    
+    // Verificar se o fluxo está bloqueado
+    const isLocked = flow.isLocked === true;
+    setCurrentFlowLocked(isLocked);
+    
+    // Se o fluxo está bloqueado, mostrar aviso
+    if (isLocked) {
+      toast({
+        title: "Fluxo Bloqueado",
+        description: "Este fluxo está bloqueado para edição. Apenas visualização é permitida.",
+        variant: "destructive"
+      });
+    }
     
     const { nodes: flowNodes, edges: flowEdges, viewport } = flow.flowData;
     
