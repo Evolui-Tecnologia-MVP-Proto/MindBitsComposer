@@ -606,6 +606,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
   const loadFlow = useCallback((flow: any) => {
     if (!reactFlowInstance || !flow.flowData) return;
     
+    console.log('Loading flow:', flow.name);
+    
     // Verificar se o fluxo está bloqueado
     const isLocked = flow.isLocked === true;
     setCurrentFlowLocked(isLocked);
@@ -665,6 +667,10 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     
     // Reset do histórico com o novo estado
     resetHistory(flowNodes || [], styledEdges);
+    
+    // Reset do estado de alterações não salvas após carregar
+    setHasUnsavedChanges(false);
+    console.log('Flow loaded - hasUnsavedChanges reset to false');
     
     if (viewport) {
       reactFlowInstance.setViewport(viewport);
@@ -1136,8 +1142,11 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
         currentFlowId={currentFlowId}
         savedFlows={savedFlows || []}
         onFlowSelect={(flowId) => {
+          console.log('Flow selection triggered - hasUnsavedChanges:', hasUnsavedChanges);
+          
           // Verificar alterações não salvas antes de mudar de fluxo
           if (hasUnsavedChanges) {
+            console.log('Showing unsaved changes modal');
             const shouldSave = window.confirm(
               "Atenção, ao sair do editor você perderá todo conteúdo editado que ainda não foi salvo. Deseja salvar o fluxo antes de sair?\n\nClique em 'OK' para salvar ou 'Cancelar' para descartar as alterações."
             );
