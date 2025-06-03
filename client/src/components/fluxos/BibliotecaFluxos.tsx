@@ -247,9 +247,6 @@ export const BibliotecaFluxos = () => {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-xl font-semibold">Biblioteca de Fluxos</h2>
-          <p className="text-muted-foreground">
-            {savedFlows.length} fluxo{savedFlows.length !== 1 ? 's' : ''} disponível{savedFlows.length !== 1 ? 'veis' : ''} para uso
-          </p>
         </div>
       </div>
       
