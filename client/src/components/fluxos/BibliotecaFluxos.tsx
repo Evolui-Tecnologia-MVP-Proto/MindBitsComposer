@@ -305,13 +305,13 @@ export const BibliotecaFluxos = () => {
 
                     <Button 
                       size="sm" 
-                      variant={flow.isLocked ? "destructive" : "outline"}
-                      onClick={() => toggleLockMutation.mutate(flow.id)}
-                      disabled={toggleLockMutation.isPending}
+                      variant="destructive"
+                      onClick={() => confirmDelete(flow)}
+                      disabled={deleteFlowMutation.isPending}
                       className="flex items-center justify-center p-2"
-                      title={flow.isLocked ? "Desbloquear fluxo" : "Bloquear fluxo"}
+                      title="Excluir fluxo"
                     >
-                      {flow.isLocked ? <Unlock className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+                      <Trash2 className="h-3 w-3" />
                     </Button>
 
                     <Button 
@@ -327,13 +327,13 @@ export const BibliotecaFluxos = () => {
 
                     <Button 
                       size="sm" 
-                      variant="destructive"
-                      onClick={() => confirmDelete(flow)}
-                      disabled={deleteFlowMutation.isPending}
+                      variant={flow.isLocked ? "destructive" : "outline"}
+                      onClick={() => toggleLockMutation.mutate(flow.id)}
+                      disabled={toggleLockMutation.isPending}
                       className="flex items-center justify-center p-2"
-                      title="Excluir fluxo"
+                      title={flow.isLocked ? "Desbloquear fluxo" : "Bloquear fluxo"}
                     >
-                      <Trash2 className="h-3 w-3" />
+                      {flow.isLocked ? <Unlock className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
                     </Button>
                   </div>
 
