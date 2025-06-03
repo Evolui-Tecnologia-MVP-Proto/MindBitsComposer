@@ -89,9 +89,10 @@ interface FlowCanvasRef {
 
 interface FlowCanvasProps {
   onFlowInfoChange: (info: {code: string, name: string} | null) => void;
+  onDiscardRequest?: () => void;
 }
 
-const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChange }, ref) => {
+const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChange, onDiscardRequest }, ref) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -1246,7 +1247,7 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
           return hasUnsavedChangesRef.current;
         }}
         onSave={handleSave}
-        onDiscard={handleDiscardRequest}
+        onDiscard={handleDiscard}
         onFlowSelect={(flowId) => {
           // Se está selecionando o mesmo fluxo, não fazer nada
           if (flowId === currentFlowId) {
