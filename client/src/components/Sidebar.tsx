@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Settings, FileText, Edit, GitBranch, File, Cog, Puzzle } from "lucide-react";
+import { useNavigationGuard } from "@/hooks/use-navigation-guard";
 
 type SidebarProps = {
   isMobileOpen: boolean;
@@ -10,6 +11,7 @@ type SidebarProps = {
 export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps) {
   const [location] = useLocation();
   const [activeItem, setActiveItem] = useState("");
+  const { checkAndNavigate } = useNavigationGuard();
 
   useEffect(() => {
     if (location.startsWith("/admin")) {
@@ -35,6 +37,11 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
     setIsMobileOpen(false);
   };
 
+  const handleNavigation = (path: string) => {
+    checkAndNavigate(path);
+    closeMobileMenu();
+  };
+
   return (
     <>
       <aside 
@@ -42,51 +49,43 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
       >
         <nav className="mt-5 px-2 space-y-1">
           <div className="sidebar-item-container">
-            <Link href="/admin">
-              <div 
-                className={`sidebar-item ${activeItem === "admin" ? "sidebar-active" : ""}`}
-                onClick={closeMobileMenu}
-              >
-                <Settings className="mr-3 h-6 w-6" />
-                Administração
-              </div>
-            </Link>
+            <div 
+              className={`sidebar-item ${activeItem === "admin" ? "sidebar-active" : ""}`}
+              onClick={() => handleNavigation("/admin")}
+            >
+              <Settings className="mr-3 h-6 w-6" />
+              Administração
+            </div>
           </div>
           
           <div className="sidebar-item-container">
-            <Link href="/templates">
-              <div 
-                className={`sidebar-item ${activeItem === "templates" ? "sidebar-active" : ""}`}
-                onClick={closeMobileMenu}
-              >
-                <FileText className="mr-3 h-6 w-6" />
-                Templates
-              </div>
-            </Link>
+            <div 
+              className={`sidebar-item ${activeItem === "templates" ? "sidebar-active" : ""}`}
+              onClick={() => handleNavigation("/templates")}
+            >
+              <FileText className="mr-3 h-6 w-6" />
+              Templates
+            </div>
           </div>
           
           <div className="sidebar-item-container">
-            <Link href="/editor">
-              <div 
-                className={`sidebar-item ${activeItem === "editor" ? "sidebar-active" : ""}`}
-                onClick={closeMobileMenu}
-              >
-                <Edit className="mr-3 h-6 w-6" />
-                Editor
-              </div>
-            </Link>
+            <div 
+              className={`sidebar-item ${activeItem === "editor" ? "sidebar-active" : ""}`}
+              onClick={() => handleNavigation("/editor")}
+            >
+              <Edit className="mr-3 h-6 w-6" />
+              Editor
+            </div>
           </div>
           
           <div className="sidebar-item-container">
-            <Link href="/fluxos">
-              <div 
-                className={`sidebar-item ${activeItem === "fluxos" ? "sidebar-active" : ""}`}
-                onClick={closeMobileMenu}
-              >
-                <GitBranch className="mr-3 h-6 w-6" />
-                Fluxos
-              </div>
-            </Link>
+            <div 
+              className={`sidebar-item ${activeItem === "fluxos" ? "sidebar-active" : ""}`}
+              onClick={() => handleNavigation("/fluxos")}
+            >
+              <GitBranch className="mr-3 h-6 w-6" />
+              Fluxos
+            </div>
           </div>
           
           <div className="sidebar-item-container">

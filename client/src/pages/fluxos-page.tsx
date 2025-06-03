@@ -88,11 +88,20 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
   const [showExitConfirmModal, setShowExitConfirmModal] = useState<boolean>(false);
   const hasUnsavedChangesRef = useRef<boolean>(false);
   
-  // Debug: Log sempre que hasUnsavedChanges mudar
+  // Hook de proteção de navegação
+  const { setHasUnsavedChanges: setGlobalUnsavedChanges, setSaveFunction } = useNavigationGuard();
+  
+  // Sincronizar estado local com sistema global de proteção de navegação
   useEffect(() => {
     console.log('hasUnsavedChanges changed to:', hasUnsavedChanges);
     hasUnsavedChangesRef.current = hasUnsavedChanges;
-  }, [hasUnsavedChanges]);
+    setGlobalUnsavedChanges(hasUnsavedChanges);
+  }, [hasUnsavedChanges, setGlobalUnsavedChanges]);
+
+  // Configurar função de salvamento para o sistema de proteção
+  useEffect(() => {
+    setSaveFunction(() => handleSave);
+  }, [setSaveFunction]);
   
   // Aplicar estilo de seleção às edges
   const styledEdges = edges.map((edge: Edge) => {
