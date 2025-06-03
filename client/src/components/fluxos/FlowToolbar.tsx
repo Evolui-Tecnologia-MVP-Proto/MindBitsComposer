@@ -144,16 +144,26 @@ export const FlowToolbar = ({
 
 
   const handleFlowChangeAttempt = (newFlowId: string) => {
+    console.log('🔍 FLOW CHANGE ATTEMPT');
+    console.log('  newFlowId:', newFlowId);
+    console.log('  currentFlowId:', currentFlowId);
+    console.log('  hasUnsavedChanges:', hasUnsavedChanges);
+    console.log('  showUnsavedModal:', showUnsavedModal);
+    
     // Se é o mesmo fluxo, não fazer nada
     if (newFlowId === currentFlowId) {
+      console.log('  ❌ Same flow, returning');
       return;
     }
     
     // Verificar alterações não salvas
     if (hasUnsavedChanges) {
+      console.log('  ✅ HAS CHANGES - SHOWING MODAL');
       setPendingFlowChange(newFlowId);
       setShowUnsavedModal(true);
+      console.log('  Modal state set to true');
     } else {
+      console.log('  ❌ No changes, proceeding');
       onFlowSelect(newFlowId);
     }
   };
