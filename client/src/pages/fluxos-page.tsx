@@ -1099,6 +1099,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
         }}
         showInspector={showInspector}
         onToggleInspector={() => setShowInspector(!showInspector)}
+        showMiniMap={showMiniMap}
+        onToggleMiniMap={() => setShowMiniMap(!showMiniMap)}
         isFlowLocked={savedFlows?.find(flow => flow.id === currentFlowId)?.isLocked || false}
         isNewFlowModalOpen={isNewFlowModalOpen}
         onOpenNewFlowModal={setIsNewFlowModalOpen}
@@ -1159,6 +1161,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
         templatesData={templatesData || []}
         applyInspectorChanges={applyInspectorChanges}
         isFlowLocked={savedFlows?.find(flow => flow.id === currentFlowId)?.isLocked || false}
+        showMiniMap={showMiniMap}
       />
     </div>
   );
