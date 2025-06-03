@@ -262,7 +262,7 @@ export const BibliotecaFluxos = () => {
               <CardHeader>
                 <div>
                   <div className="flex items-center gap-2">
-                    <CardTitle className="font-semibold tracking-tight font-mono text-[14px]">
+                    <CardTitle className="font-semibold tracking-tight text-[14px]">
                       [{flow.code}] {flow.name}
                     </CardTitle>
                     {/* Indicadores de status */}
