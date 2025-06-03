@@ -281,7 +281,7 @@ export const BibliotecaFluxos = () => {
               <CardContent>
                 <div className="space-y-3">
                   {/* Barra de botões com separador */}
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center gap-1 justify-end">
                     <div className="flex gap-1">
                       <Button 
                         size="sm" 
