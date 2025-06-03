@@ -1483,7 +1483,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                               : node
                           ));
                         }}
-                        className="text-xs font-mono h-6 px-1"
+                        className="text-xs font-mono h-6 px-1 text-left"
                         placeholder={`Digite o valor para ${key}`}
                       />
                     </td>
@@ -1528,7 +1528,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                             ));
                           }}
                         >
-                          <SelectTrigger className="text-xs font-mono h-6 px-1">
+                          <SelectTrigger className="text-xs font-mono h-6 px-1 text-left">
                             <SelectValue placeholder="Selecione o fluxo" />
                           </SelectTrigger>
                           <SelectContent>
@@ -1596,7 +1596,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                               ));
                             }}
                           >
-                            <SelectTrigger className="text-xs font-mono h-6 px-1">
+                            <SelectTrigger className="text-xs font-mono h-6 px-1 text-left">
                               <SelectValue placeholder="Selecione template" />
                             </SelectTrigger>
                             <SelectContent>
@@ -1653,7 +1653,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                             ));
                           }}
                         >
-                          <SelectTrigger className="text-xs font-mono h-6 px-1">
+                          <SelectTrigger className="text-xs font-mono h-6 px-1 text-left">
                             <SelectValue placeholder="Selecione opção" />
                           </SelectTrigger>
                           <SelectContent>
@@ -1692,7 +1692,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                           ));
                         }}
                       >
-                        <SelectTrigger className="text-xs font-mono h-6 px-1">
+                        <SelectTrigger className="text-xs font-mono h-6 px-1 text-left">
                           <SelectValue placeholder="Selecione valor" />
                         </SelectTrigger>
                         <SelectContent>
