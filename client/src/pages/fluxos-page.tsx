@@ -1094,26 +1094,21 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     });
   }, [getSelectedNode, setNodes]);
 
-  // Função para confirmar saída com alterações não salvas
-  const confirmExitWithUnsavedChanges = useCallback(() => {
+  // Função para avisar sobre alterações não salvas
+  const checkUnsavedChanges = useCallback(() => {
     if (hasUnsavedChanges) {
-      setShowExitConfirmModal(true);
-      return false;
+      const shouldSave = window.confirm(
+        "Atenção, ao sair do editor você perderá todo conteúdo editado que ainda não foi salvo. Deseja salvar o fluxo antes de sair?\n\nClique em 'OK' para salvar ou 'Cancelar' para descartar as alterações."
+      );
+      
+      if (shouldSave) {
+        handleSave();
+        setHasUnsavedChanges(false);
+      } else {
+        setHasUnsavedChanges(false);
+      }
     }
-    return true;
-  }, [hasUnsavedChanges]);
-
-  // Função para salvar e sair
-  const handleSaveAndExit = useCallback(() => {
-    handleSave();
-    setShowExitConfirmModal(false);
-    setHasUnsavedChanges(false);
-  }, [handleSave]);
-
-  // Função para cancelar saída
-  const handleCancelExit = useCallback(() => {
-    setShowExitConfirmModal(false);
-  }, []);
+  }, [hasUnsavedChanges, handleSave]);
 
   return (
     <div className="flex flex-col h-full">
@@ -1241,27 +1236,7 @@ export default function FluxosPage() {
         </Tabs>
       </div>
 
-      {/* Modal de confirmação para alterações não salvas */}
-      <Dialog open={showExitConfirmModal} onOpenChange={setShowExitConfirmModal}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Alterações não salvas</DialogTitle>
-          </DialogHeader>
-          <div className="py-4">
-            <p className="text-sm text-muted-foreground">
-              Atenção, ao sair do editor você perderá todo conteúdo editado que ainda não foi salvo. Deseja salvar o fluxo antes de sair?
-            </p>
-          </div>
-          <DialogFooter className="flex gap-2">
-            <Button variant="outline" onClick={handleCancelExit}>
-              Cancelar
-            </Button>
-            <Button onClick={handleSaveAndExit} className="bg-blue-600 hover:bg-blue-700">
-              Salvar
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+
     </div>
   );
 }

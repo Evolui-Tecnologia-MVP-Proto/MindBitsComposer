@@ -37,6 +37,7 @@ interface FlowToolbarProps {
   
   // Flow state
   isFlowLocked?: boolean;
+  hasUnsavedChanges?: boolean;
   
   // Modals
   isNewFlowModalOpen: boolean;
@@ -96,6 +97,7 @@ export const FlowToolbar = ({
   showMiniMap,
   onToggleMiniMap,
   isFlowLocked = false,
+  hasUnsavedChanges = false,
   isNewFlowModalOpen,
   onOpenNewFlowModal,
   isEditModalOpen,
