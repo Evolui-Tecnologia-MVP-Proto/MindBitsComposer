@@ -45,6 +45,9 @@ interface FlowDiagramProps {
   savedFlows: any[];
   templatesData: any[];
   applyInspectorChanges: () => void;
+  
+  // Flow state
+  isFlowLocked?: boolean;
 }
 
 export const FlowDiagram = ({
@@ -68,7 +71,8 @@ export const FlowDiagram = ({
   getNodeMetadata,
   savedFlows,
   templatesData,
-  applyInspectorChanges
+  applyInspectorChanges,
+  isFlowLocked = false
 }: FlowDiagramProps) => {
   return (
     <div className="flex flex-1 overflow-hidden border border-gray-200 rounded-md">
@@ -79,26 +83,29 @@ export const FlowDiagram = ({
               <ReactFlow
                 nodes={nodes}
                 edges={styledEdges}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
-                onConnect={onConnect}
-                onEdgeUpdate={onEdgeUpdate}
+                onNodesChange={isFlowLocked ? undefined : onNodesChange}
+                onEdgesChange={isFlowLocked ? undefined : onEdgesChange}
+                onConnect={isFlowLocked ? undefined : onConnect}
+                onEdgeUpdate={isFlowLocked ? undefined : onEdgeUpdate}
                 onInit={onInit}
-                onDrop={onDrop}
-                onDragOver={onDragOver}
-                onNodeClick={onNodeClick}
-                onEdgeClick={onEdgeClick}
-                onPaneClick={onPaneClick}
+                onDrop={isFlowLocked ? undefined : onDrop}
+                onDragOver={isFlowLocked ? undefined : onDragOver}
+                onNodeClick={isFlowLocked ? undefined : onNodeClick}
+                onEdgeClick={isFlowLocked ? undefined : onEdgeClick}
+                onPaneClick={isFlowLocked ? undefined : onPaneClick}
                 nodeTypes={nodeTypes}
                 defaultEdgeOptions={{
                   type: 'smoothstep',
                   markerEnd: {
                     type: MarkerType.ArrowClosed,
                   },
-                  updatable: true,
+                  updatable: !isFlowLocked,
                 }}
-                edgesUpdatable={true}
-                edgesFocusable={true}
+                edgesUpdatable={!isFlowLocked}
+                edgesFocusable={!isFlowLocked}
+                nodesDraggable={!isFlowLocked}
+                nodesConnectable={!isFlowLocked}
+                elementsSelectable={!isFlowLocked}
                 fitView
                 minZoom={0.1}
                 maxZoom={2}
@@ -129,26 +136,29 @@ export const FlowDiagram = ({
           <ReactFlow
             nodes={nodes}
             edges={styledEdges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onEdgeUpdate={onEdgeUpdate}
+            onNodesChange={isFlowLocked ? undefined : onNodesChange}
+            onEdgesChange={isFlowLocked ? undefined : onEdgesChange}
+            onConnect={isFlowLocked ? undefined : onConnect}
+            onEdgeUpdate={isFlowLocked ? undefined : onEdgeUpdate}
             onInit={onInit}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            onNodeClick={onNodeClick}
-            onEdgeClick={onEdgeClick}
-            onPaneClick={onPaneClick}
+            onDrop={isFlowLocked ? undefined : onDrop}
+            onDragOver={isFlowLocked ? undefined : onDragOver}
+            onNodeClick={isFlowLocked ? undefined : onNodeClick}
+            onEdgeClick={isFlowLocked ? undefined : onEdgeClick}
+            onPaneClick={isFlowLocked ? undefined : onPaneClick}
             nodeTypes={nodeTypes}
             defaultEdgeOptions={{
               type: 'smoothstep',
               markerEnd: {
                 type: MarkerType.ArrowClosed,
               },
-              updatable: true,
+              updatable: !isFlowLocked,
             }}
-            edgesUpdatable={true}
-            edgesFocusable={true}
+            edgesUpdatable={!isFlowLocked}
+            edgesFocusable={!isFlowLocked}
+            nodesDraggable={!isFlowLocked}
+            nodesConnectable={!isFlowLocked}
+            elementsSelectable={!isFlowLocked}
             fitView
             minZoom={0.1}
             maxZoom={2}

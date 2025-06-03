@@ -1157,6 +1157,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
         savedFlows={savedFlows || []}
         templatesData={templatesData || []}
         applyInspectorChanges={applyInspectorChanges}
+        isFlowLocked={savedFlows?.find(flow => flow.id === currentFlowId)?.isLocked || false}
       />
     </div>
   );
