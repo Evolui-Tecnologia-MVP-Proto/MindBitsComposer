@@ -5016,12 +5016,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           const showCondition = showConditionMatch[1];
           console.log('🔍 Show_Condition encontrada:', showCondition, 'tipo:', typeof showCondition);
           
-          // Se Show_Condition é FALSE, o formulário não está visível
-          if (showCondition === 'FALSE' || showCondition === 'false') {
-            console.log('🔍 Formulário não está visível (Show_Condition: FALSE), permitindo salvar');
+          // Investigando a lógica da Show_Condition
+          console.log('🔍 INVESTIGAÇÃO: Show_Condition =', showCondition);
+          console.log('🔍 INVESTIGAÇÃO: O formulário está realmente visível na tela?');
+          
+          // TESTANDO: Talvez a lógica esteja invertida
+          // Se Show_Condition é FALSE, talvez o formulário DEVERIA estar visível
+          if (showCondition === 'TRUE' || showCondition === 'true') {
+            console.log('🔍 Show_Condition TRUE - assumindo formulário oculto');
             isFormVisible = false;
           } else {
-            console.log('🔍 Formulário está visível (Show_Condition: TRUE), validando campos');
+            console.log('🔍 Show_Condition FALSE - assumindo formulário visível, validando campos');
             isFormVisible = true;
           }
         } else {
