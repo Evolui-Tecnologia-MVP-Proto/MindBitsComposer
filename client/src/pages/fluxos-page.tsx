@@ -1779,6 +1779,34 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
               </div>
             )}
 
+            {selectedNode.data.description && (
+              <div className="p-3 bg-yellow-50 rounded-md">
+                <p className="text-xs text-yellow-600 font-medium font-mono">description</p>
+                <p className="text-xs text-yellow-800 font-mono">{selectedNode.data.description}</p>
+              </div>
+            )}
+
+            {selectedNode.data.attached_Form && (
+              <div className="p-3 bg-orange-50 rounded-md">
+                <p className="text-xs text-orange-600 font-medium font-mono">attached_Form</p>
+                <p className="text-xs text-orange-800 font-mono">{selectedNode.data.attached_Form}</p>
+              </div>
+            )}
+
+            {selectedNode.data.isAproved && (
+              <div className="p-3 bg-red-50 rounded-md">
+                <p className="text-xs text-red-600 font-medium font-mono">isAproved</p>
+                <p className="text-xs text-red-800 font-mono">{selectedNode.data.isAproved}</p>
+              </div>
+            )}
+
+            {selectedNode.data.isExecuted && (
+              <div className="p-3 bg-gray-50 rounded-md">
+                <p className="text-xs text-gray-600 font-medium font-mono">isExecuted</p>
+                <p className="text-xs text-gray-800 font-mono">{selectedNode.data.isExecuted}</p>
+              </div>
+            )}
+
             {/* Botão para aplicar alterações */}
             <div className="pt-4 border-t">
               <Button 
