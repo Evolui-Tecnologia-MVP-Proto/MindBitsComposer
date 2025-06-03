@@ -40,7 +40,7 @@ export function NodeInspector({
     );
   }
 
-  const nodeMetadata = getNodeMetadata(selectedNode?.type || '');
+  const nodeMetadata = getNodeMetadata(selectedNode.type);
   
   return (
     <div className="w-full h-full bg-white border-l border-gray-200 p-4 overflow-y-auto">
