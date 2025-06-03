@@ -1546,8 +1546,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
 
                     return (
                       <div key={key}>
-                        <Label className="text-sm font-medium capitalize">
-                          {key === 'docType' ? 'Tipo de Documento' : key}
+                        <Label className="text-sm font-medium font-mono">
+                          {key}
                         </Label>
                         <Select 
                           value={selectedNode.data[key] || ''} 
@@ -1656,12 +1656,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                 // Renderizar como Select para arrays simples
                 return (
                   <div key={key}>
-                    <Label className="text-sm font-medium capitalize">
-                      {key === 'integrType' ? 'Tipo de Integração' : 
-                       key === 'service' ? 'Serviço' :
-                       key === 'actionType' ? 'Tipo de Ação' :
-                       key === 'docType' ? 'Tipo de Documento' :
-                       key === 'isExecuted' ? 'Status de Execução' : key}
+                    <Label className="text-sm font-medium font-mono">
+                      {key}
                     </Label>
                     <Select 
                       value={selectedNode.data[key] || ''} 
@@ -1706,8 +1702,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                 // Renderizar como Select para objetos (chave-valor)
                 return (
                   <div key={key}>
-                    <Label className="text-sm font-medium capitalize">
-                      {key === 'actionType' ? 'Tipo de Ação' : key}
+                    <Label className="text-sm font-medium font-mono">
+                      {key}
                     </Label>
                     <Select 
                       value={selectedNode.data[key] || ''} 
@@ -1739,21 +1735,21 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
             {/* Informações adicionais quando uma propriedade é selecionada */}
             {selectedNode.data.docType && (
               <div className="p-3 bg-blue-50 rounded-md">
-                <p className="text-xs text-blue-600 font-medium">Tipo de Documento Selecionado</p>
+                <p className="text-xs text-blue-600 font-medium font-mono">docType</p>
                 <p className="text-sm text-blue-800 font-mono">{selectedNode.data.docType}</p>
               </div>
             )}
 
             {selectedNode.data.service && (
               <div className="p-3 bg-green-50 rounded-md">
-                <p className="text-xs text-green-600 font-medium">Serviço Selecionado</p>
+                <p className="text-xs text-green-600 font-medium font-mono">service</p>
                 <p className="text-sm text-green-800 font-mono">{selectedNode.data.service}</p>
               </div>
             )}
 
             {selectedNode.data.actionType && (
               <div className="p-3 bg-purple-50 rounded-md">
-                <p className="text-xs text-purple-600 font-medium">Tipo de Ação Selecionado</p>
+                <p className="text-xs text-purple-600 font-medium font-mono">actionType</p>
                 <p className="text-sm text-purple-800 font-mono">{selectedNode.data.actionType}</p>
               </div>
             )}
