@@ -5005,6 +5005,26 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         return true;
       }
 
+      // Verificar se o formulário está visível baseado na Show_Condition
+      try {
+        const correctedData = attachedFormData
+          .replace(/\[([^[\]]+)\]/g, '{"$1"}')
+          .replace(/\"([^"]+)\"\:\s*\[/g, '"$1":[')
+          .replace(/\]\s*,\s*\"([^"]+)\"\:\s*\[/g, '],"$1":[')
+          .replace(/\]\s*\]/g, ']}');
+        
+        const parsedData = JSON.parse(correctedData);
+        const showCondition = parsedData.Show_Condition;
+        
+        // Se Show_Condition é FALSE, o formulário não está visível, permite salvar
+        if (showCondition === 'FALSE' || showCondition === false) {
+          console.log('🔍 Formulário não está visível (Show_Condition: FALSE), permitindo salvar');
+          return true;
+        }
+      } catch (e) {
+        console.log('🔍 Erro ao verificar Show_Condition, assumindo formulário visível');
+      }
+
       const fieldsData = getFormFields();
       const fieldNames = Object.keys(fieldsData);
       
