@@ -797,12 +797,9 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
 
   // Lidar com pendingFlowId (seleção de fluxo vinda da Biblioteca)
   useEffect(() => {
-    console.log('FlowCanvas pendingFlowId effect:', { pendingFlowId, savedFlows: !!savedFlows });
     if (pendingFlowId && savedFlows) {
       const selectedFlow = savedFlows.find((flow: any) => flow.id === pendingFlowId);
-      console.log('Found selected flow:', selectedFlow);
       if (selectedFlow) {
-        console.log('Loading flow from pendingFlowId:', selectedFlow.name);
         // Carregar o fluxo selecionado
         setHasUnsavedChanges(false);
         hasUnsavedChangesRef.current = false;
@@ -1381,19 +1378,14 @@ export default function FluxosPage() {
 
   // Função para navegar do Biblioteca para o Editor com um fluxo específico
   const handleEditFlowFromBiblioteca = (flowId: string) => {
-    console.log('handleEditFlowFromBiblioteca called with flowId:', flowId);
-    console.log('hasUnsavedChanges:', hasUnsavedChanges);
-    
     if (hasUnsavedChanges) {
       // Se há alterações não salvas, armazenar o ID pendente e mostrar modal
-      console.log('Setting pendingFlowId and showing discard modal');
       setPendingFlowId(flowId);
       setShowDiscardModal(true);
       return;
     }
     
     // Se não há alterações, ir direto para o editor
-    console.log('Setting pendingFlowId and switching to editor tab');
     setPendingFlowId(flowId);
     setActiveTab("editor");
   };
