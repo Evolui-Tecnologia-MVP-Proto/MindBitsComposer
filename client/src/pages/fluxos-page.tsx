@@ -1256,43 +1256,16 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
 export default function FluxosPage() {
   const [currentFlowInfo, setCurrentFlowInfo] = useState<{code: string, name: string} | null>(null);
   const [activeTab, setActiveTab] = useState("editor");
-  const [pendingTab, setPendingTab] = useState<string | null>(null);
-  const [showTabModal, setShowTabModal] = useState(false);
-  const { hasUnsavedChanges, setSaveFunction } = useNavigationGuard();
+  const { hasUnsavedChanges } = useNavigationGuard();
 
   const handleTabChange = (newTab: string) => {
     if (hasUnsavedChanges && activeTab !== newTab) {
-      setPendingTab(newTab);
-      setShowTabModal(true);
+      // Bloqueia a mudança de aba se há alterações não salvas
+      // O usuário precisa salvar primeiro ou usar o menu para navegar
       return;
     }
     setActiveTab(newTab);
   };
-
-  const handleTabConfirm = (shouldSave: boolean) => {
-    if (shouldSave && saveFunction.current) {
-      saveFunction.current();
-    }
-    
-    setShowTabModal(false);
-    
-    if (pendingTab) {
-      setActiveTab(pendingTab);
-      setPendingTab(null);
-    }
-  };
-
-  const handleTabCancel = () => {
-    setShowTabModal(false);
-    setPendingTab(null);
-  };
-
-  // Configurar função de salvamento para o sistema de proteção
-  const saveFunction = useRef<(() => void) | null>(null);
-  
-  useEffect(() => {
-    setSaveFunction(() => saveFunction.current);
-  }, [setSaveFunction]);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -1322,12 +1295,7 @@ export default function FluxosPage() {
           
           <TabsContent value="editor" className="flex-1 mt-4 min-h-0">
             <ReactFlowProvider>
-              <FlowCanvas 
-                onFlowInfoChange={setCurrentFlowInfo}
-                onSaveFunctionChange={(saveFn) => {
-                  saveFunction.current = saveFn;
-                }}
-              />
+              <FlowCanvas onFlowInfoChange={setCurrentFlowInfo} />
             </ReactFlowProvider>
           </TabsContent>
           
@@ -1336,29 +1304,6 @@ export default function FluxosPage() {
           </TabsContent>
         </Tabs>
       </div>
-
-      {/* Modal de confirmação para mudança de aba */}
-      <AlertDialog open={showTabModal} onOpenChange={setShowTabModal}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Alterações não salvas</AlertDialogTitle>
-            <AlertDialogDescription>
-              Você tem alterações não salvas no fluxo atual. Deseja salvar antes de continuar?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleTabCancel}>
-              Cancelar
-            </AlertDialogCancel>
-            <Button variant="outline" onClick={() => handleTabConfirm(false)}>
-              Continuar sem salvar
-            </Button>
-            <AlertDialogAction onClick={() => handleTabConfirm(true)}>
-              Salvar e continuar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }
