@@ -48,6 +48,7 @@ import { NodeInspector } from '@/components/fluxos/NodeInspector';
 import { FlowMetadataModal } from '@/components/fluxos/FlowMetadataModal';
 import { NewFlowModal } from '@/components/fluxos/NewFlowModal';
 import { FlowToolbar } from '@/components/fluxos/FlowToolbar';
+import { FlowDiagram } from '@/components/fluxos/FlowDiagram';
 import { 
   StartNode, 
   EndNode, 
@@ -1117,95 +1118,29 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
         nodeCount={nodes.length}
       />
       
-      <div className="flex flex-1 overflow-hidden border border-gray-200 rounded-md">
-        {showInspector ? (
-          <ResizablePanelGroup direction="horizontal" className="flex-1">
-            <ResizablePanel defaultSize={70} minSize={50}>
-              <div className="h-full" ref={reactFlowWrapper}>
-                <ReactFlow
-                  nodes={nodes}
-                  edges={styledEdges}
-                  onNodesChange={handleNodesChange}
-                  onEdgesChange={handleEdgesChange}
-                  onConnect={onConnect}
-                  onEdgeUpdate={onEdgeUpdate}
-                  onInit={setReactFlowInstance}
-                  onDrop={onDrop}
-                  onDragOver={onDragOver}
-                  onNodeClick={onNodeClick}
-                  onEdgeClick={onEdgeClick}
-                  onPaneClick={onPaneClick}
-                  nodeTypes={nodeTypes}
-                  defaultEdgeOptions={{
-                    type: 'smoothstep',
-                    markerEnd: {
-                      type: MarkerType.ArrowClosed,
-                    },
-                    updatable: true,
-                  }}
-                  edgesUpdatable={true}
-                  edgesFocusable={true}
-                  fitView
-                  minZoom={0.1}
-                  maxZoom={2}
-                  connectionLineType={ConnectionLineType.SmoothStep}
-                >
-                  <Controls />
-                  <Background color="#f0f0f0" gap={12} size={1} />
-                </ReactFlow>
-              </div>
-            </ResizablePanel>
-            
-            <ResizableHandle withHandle />
-            
-            <ResizablePanel defaultSize={30} minSize={20} maxSize={50}>
-              <NodeInspector
-                selectedNode={getSelectedNode()}
-                nodes={nodes}
-                setNodes={setNodes}
-                getNodeMetadata={getNodeMetadata}
-                savedFlows={savedFlows}
-                templatesData={templatesData}
-                applyInspectorChanges={applyInspectorChanges}
-              />
-            </ResizablePanel>
-          </ResizablePanelGroup>
-        ) : (
-          <div className="flex-1 h-full" ref={reactFlowWrapper}>
-            <ReactFlow
-              nodes={nodes}
-              edges={styledEdges}
-              onNodesChange={handleNodesChange}
-              onEdgesChange={handleEdgesChange}
-              onConnect={onConnect}
-              onEdgeUpdate={onEdgeUpdate}
-              onInit={setReactFlowInstance}
-              onDrop={onDrop}
-              onDragOver={onDragOver}
-              onNodeClick={onNodeClick}
-              onEdgeClick={onEdgeClick}
-              onPaneClick={onPaneClick}
-              nodeTypes={nodeTypes}
-              defaultEdgeOptions={{
-                type: 'smoothstep',
-                markerEnd: {
-                  type: MarkerType.ArrowClosed,
-                },
-                updatable: true,
-              }}
-              edgesUpdatable={true}
-              edgesFocusable={true}
-              fitView
-              minZoom={0.1}
-              maxZoom={2}
-              connectionLineType={ConnectionLineType.SmoothStep}
-            >
-              <Controls />
-              <Background color="#f0f0f0" gap={12} size={1} />
-            </ReactFlow>
-          </div>
-        )}
-      </div>
+      <FlowDiagram
+        nodes={nodes}
+        styledEdges={styledEdges}
+        onNodesChange={handleNodesChange}
+        onEdgesChange={handleEdgesChange}
+        onConnect={onConnect}
+        onEdgeUpdate={onEdgeUpdate}
+        onInit={setReactFlowInstance}
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+        onNodeClick={onNodeClick}
+        onEdgeClick={onEdgeClick}
+        onPaneClick={onPaneClick}
+        nodeTypes={nodeTypes}
+        reactFlowWrapper={reactFlowWrapper}
+        showInspector={showInspector}
+        getSelectedNode={getSelectedNode}
+        setNodes={setNodes}
+        getNodeMetadata={getNodeMetadata}
+        savedFlows={savedFlows || []}
+        templatesData={templatesData || []}
+        applyInspectorChanges={applyInspectorChanges}
+      />
     </div>
   );
 };
