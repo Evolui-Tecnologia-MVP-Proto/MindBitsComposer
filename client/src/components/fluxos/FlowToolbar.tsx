@@ -153,18 +153,6 @@ export const FlowToolbar = ({
             </Select>
           </div>
           
-          <Button
-            variant={showInspector ? "default" : "outline"}
-            size="sm"
-            onClick={onToggleInspector}
-            disabled={!currentFlowId || isFlowLocked}
-            title={isFlowLocked ? "Fluxo bloqueado para edição" : ""}
-          >
-            <Settings className="h-4 w-4 mr-2" />
-            Propriedades
-          </Button>
-          
-
         </div>
         
         <div className="flex space-x-2">
@@ -236,7 +224,17 @@ export const FlowToolbar = ({
               title={isFlowLocked ? "Fluxo bloqueado para edição" : ""}
             >
               <PlusCircle className="mr-1 h-4 w-4" />
-              Adicionar Nó
+              Adicionar
+            </Button>
+            <Button
+              variant={showInspector ? "default" : "outline"}
+              size="sm"
+              onClick={onToggleInspector}
+              disabled={!currentFlowId || isFlowLocked}
+              title={isFlowLocked ? "Fluxo bloqueado para edição" : ""}
+            >
+              <Settings className="h-4 w-4 mr-2" />
+              Propriedades dos nós
             </Button>
           </div>
         </div>
