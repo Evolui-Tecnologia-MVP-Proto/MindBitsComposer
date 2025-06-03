@@ -1,15 +1,23 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Copy, Edit, Trash2, FileEdit, Lock, Unlock, Eye, EyeOff } from "lucide-react";
+import { BookOpen, Copy, Edit, Trash2, FileEdit, Lock, Unlock, Eye, EyeOff, PlusCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { FlowMetadataModal } from './FlowMetadataModal';
+import { NewFlowModal } from './NewFlowModal';
 
 export const BibliotecaFluxos = () => {
   const queryClient = useQueryClient();
   const [editingFlow, setEditingFlow] = useState<any | null>(null);
   const [flowToDelete, setFlowToDelete] = useState<any | null>(null);
+  
+  // Estado para o modal de novo fluxo
+  const [showNewFlowModal, setShowNewFlowModal] = useState<boolean>(false);
+  const [newFlowTypeId, setNewFlowTypeId] = useState<string>('');
+  const [newFlowCode, setNewFlowCode] = useState<string>('');
+  const [newFlowName, setNewFlowName] = useState<string>('');
+  const [newFlowDescription, setNewFlowDescription] = useState<string>('');
   
   const { data: savedFlows, isLoading: isLoadingFlows } = useQuery<any[]>({
     queryKey: ["/api/documents-flows"],
@@ -217,6 +225,109 @@ export const BibliotecaFluxos = () => {
     },
   });
 
+  // Mutation para criar novo fluxo
+  const createFlowMutation = useMutation({
+    mutationFn: async (flowData: { 
+      flowTypeId: string; 
+      code: string; 
+      name: string; 
+      description?: string; 
+    }) => {
+      const response = await fetch('/api/documents-flows', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(flowData),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(errorData || 'Erro ao criar fluxo');
+      }
+      
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documents-flows"] });
+      toast({
+        title: "Fluxo criado",
+        description: "O novo fluxo foi criado com sucesso.",
+      });
+      // Reset do modal
+      setShowNewFlowModal(false);
+      setNewFlowTypeId('');
+      setNewFlowCode('');
+      setNewFlowName('');
+      setNewFlowDescription('');
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao criar fluxo",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Função para formatar código XXX-99
+  const formatCode = useCallback((value: string) => {
+    const cleaned = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    
+    if (cleaned.length <= 3) {
+      return cleaned.replace(/[^A-Z]/g, '');
+    } else {
+      const letters = cleaned.slice(0, 3).replace(/[^A-Z]/g, '');
+      const numbers = cleaned.slice(3, 5).replace(/[^0-9]/g, '');
+      return letters + (numbers ? '-' + numbers : '');
+    }
+  }, []);
+
+  // Função para validar código XXX-99
+  const validateCode = useCallback((code: string) => {
+    const codeRegex = /^[A-Z]{3}-[0-9]{2}$/;
+    return codeRegex.test(code);
+  }, []);
+
+  // Callbacks para o modal de novo fluxo
+  const handleCreateFlow = () => {
+    if (!newFlowTypeId || !newFlowCode || !newFlowName) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Preencha todos os campos obrigatórios.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!validateCode(newFlowCode)) {
+      toast({
+        title: "Código inválido",
+        description: "O código deve seguir o formato XXX-99 (3 letras maiúsculas + hífen + 2 números).",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    createFlowMutation.mutate({
+      flowTypeId: newFlowTypeId,
+      code: newFlowCode,
+      name: newFlowName,
+      description: newFlowDescription,
+    });
+  };
+
+  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatCode(e.target.value);
+    setNewFlowCode(formatted);
+  };
+
+  const handleCancelNewFlow = () => {
+    setShowNewFlowModal(false);
+    setNewFlowTypeId('');
+    setNewFlowCode('');
+    setNewFlowName('');
+    setNewFlowDescription('');
+  };
+
   if (isLoadingFlows) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -247,7 +358,17 @@ export const BibliotecaFluxos = () => {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-xl font-semibold">Biblioteca de Fluxos</h2>
+          <p className="text-muted-foreground">
+            Gerencie todos os seus fluxos de documentos
+          </p>
         </div>
+        <Button
+          onClick={() => setShowNewFlowModal(true)}
+          className="flex items-center space-x-2"
+        >
+          <PlusCircle className="h-4 w-4" />
+          <span>Novo Fluxo</span>
+        </Button>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -389,6 +510,23 @@ export const BibliotecaFluxos = () => {
           isEditing={true}
         />
       )}
+      
+      {/* Modal para criar novo fluxo */}
+      <NewFlowModal
+        isOpen={showNewFlowModal}
+        onOpenChange={setShowNewFlowModal}
+        newFlowTypeId={newFlowTypeId}
+        newFlowCode={newFlowCode}
+        newFlowName={newFlowName}
+        newFlowDescription={newFlowDescription}
+        flowTypes={flowTypes || []}
+        onFlowTypeChange={setNewFlowTypeId}
+        onCodeChange={handleCodeChange}
+        onNameChange={setNewFlowName}
+        onDescriptionChange={setNewFlowDescription}
+        onCreateFlow={handleCreateFlow}
+        onCancel={handleCancelNewFlow}
+      />
     </div>
   );
 };
