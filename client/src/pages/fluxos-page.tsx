@@ -1626,53 +1626,50 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                 const options = Object.entries(value);
                 if (options.length > 0) {
                   return (
-                    <div key={key}>
-                      <Label className="text-sm font-medium capitalize">
-                        {key === 'FromType' ? 'Tipo de Início' : 
-                         key === 'To_Type' ? 'Tipo de Encerramento' : key}
-                      </Label>
-                      <Select 
-                        value={selectedNode.data[key] || ''} 
-                        onValueChange={(newValue) => {
-                          setNodes(nds => nds.map(node => 
-                            node.id === selectedNode.id 
-                              ? { 
-                                  ...node, 
-                                  data: { 
-                                    ...node.data, 
-                                    [key]: newValue, 
-                                    configured: true, 
-                                    showLabel: false,
-                                    // Se for EndNode e To_Type = 'Direct_finish' (Encerramento Direto), limpar To_Flow_id
-                                    ...(selectedNode.type === 'endNode' && key === 'To_Type' && newValue === 'Direct_finish' 
-                                      ? { To_Flow_id: '' } 
-                                      : {})
+                    <tr key={key} className="bg-white border-b border-gray-100">
+                      <td className="px-2 py-1.5 border-r border-gray-200 text-left">
+                        <div className="text-xs font-medium text-gray-700 font-mono">{key}</div>
+                      </td>
+                      <td className="px-2 py-1.5 text-left">
+                        <Select 
+                          value={selectedNode.data[key] || ''} 
+                          onValueChange={(newValue) => {
+                            setNodes(nds => nds.map(node => 
+                              node.id === selectedNode.id 
+                                ? { 
+                                    ...node, 
+                                    data: { 
+                                      ...node.data, 
+                                      [key]: newValue, 
+                                      configured: true, 
+                                      showLabel: false,
+                                      // Se for EndNode e To_Type = 'Direct_finish' (Encerramento Direto), limpar To_Flow_id
+                                      ...(selectedNode.type === 'endNode' && key === 'To_Type' && newValue === 'Direct_finish' 
+                                        ? { To_Flow_id: '' } 
+                                        : {})
+                                    }
                                   }
-                                }
-                              : node
-                          ));
-                        }}
-                      >
-                        <SelectTrigger className="mt-1 text-left font-mono">
-                          <SelectValue placeholder={`Selecione ${key === 'FromType' ? 'tipo de início' : 
-                            key === 'To_Type' ? 'tipo de encerramento' : key}`} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {options.map(([optionKey, optionValue]) => (
-                            <SelectItem 
-                              key={optionKey} 
-                              value={optionKey}
-                              className={key === 'FromType' && optionKey === 'Init' ? 
-                                'bg-green-50 text-green-800 hover:bg-green-100' : 
-                                key === 'FromType' ? 'bg-blue-50 text-blue-800 hover:bg-blue-100' : ''
-                              }
-                            >
-                              {String(optionValue)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                                : node
+                            ));
+                          }}
+                        >
+                          <SelectTrigger className="text-xs font-mono h-6 px-1">
+                            <SelectValue placeholder="Selecione opção" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {options.map(([optionKey, optionValue]) => (
+                              <SelectItem 
+                                key={optionKey} 
+                                value={optionKey}
+                                className="font-mono"
+                              >
+                                {String(optionValue)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </td>
+                    </tr>
                   );
                 }
               }
@@ -1680,78 +1677,78 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
               if (Array.isArray(value)) {
                 // Renderizar como Select para arrays simples
                 return (
-                  <div key={key}>
-                    <Label className="text-sm font-medium font-mono">
-                      {key}
-                    </Label>
-                    <Select 
-                      value={selectedNode.data[key] || ''} 
-                      onValueChange={(newValue) => {
-                        setNodes(nds => nds.map(node => 
-                          node.id === selectedNode.id 
-                            ? { ...node, data: { ...node.data, [key]: newValue } }
-                            : node
-                        ));
-                      }}
-                    >
-                      <SelectTrigger className="mt-1 text-left font-mono">
-                        <SelectValue placeholder={`Selecione ${key === 'integrType' ? 'tipo de integração' : 
-                                                                key === 'service' ? 'serviço' :
-                                                                key === 'actionType' ? 'tipo de ação' :
-                                                                key === 'docType' ? 'tipo de documento' :
-                                                                key === 'isExecuted' ? 'status de execução' : key}`} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {value.map((option: any, index: number) => {
-                          if (typeof option === 'string') {
-                            return (
-                              <SelectItem key={index} value={option}>
-                                {option}
-                              </SelectItem>
-                            );
-                          } else if (option.type && option.name) {
-                            // Para docType que tem estrutura {type, name, template}
-                            return (
-                              <SelectItem key={index} value={option.type}>
-                                {option.name} ({option.type})
-                              </SelectItem>
-                            );
-                          }
-                          return null;
-                        })}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <tr key={key} className="bg-white border-b border-gray-100">
+                    <td className="px-2 py-1.5 border-r border-gray-200 text-left">
+                      <div className="text-xs font-medium text-gray-700 font-mono">{key}</div>
+                    </td>
+                    <td className="px-2 py-1.5 text-left">
+                      <Select 
+                        value={selectedNode.data[key] || ''} 
+                        onValueChange={(newValue) => {
+                          setNodes(nds => nds.map(node => 
+                            node.id === selectedNode.id 
+                              ? { ...node, data: { ...node.data, [key]: newValue } }
+                              : node
+                          ));
+                        }}
+                      >
+                        <SelectTrigger className="text-xs font-mono h-6 px-1">
+                          <SelectValue placeholder="Selecione valor" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {value.map((option: any, index: number) => {
+                            if (typeof option === 'string') {
+                              return (
+                                <SelectItem key={index} value={option} className="font-mono">
+                                  {option}
+                                </SelectItem>
+                              );
+                            } else if (option.type && option.name) {
+                              // Para docType que tem estrutura {type, name, template}
+                              return (
+                                <SelectItem key={index} value={option.type} className="font-mono">
+                                  {option.name} ({option.type})
+                                </SelectItem>
+                              );
+                            }
+                            return null;
+                          })}
+                        </SelectContent>
+                      </Select>
+                    </td>
+                  </tr>
                 );
               } else if (typeof value === 'object' && value !== null) {
                 // Renderizar como Select para objetos (chave-valor)
                 return (
-                  <div key={key}>
-                    <Label className="text-sm font-medium font-mono">
-                      {key}
-                    </Label>
-                    <Select 
-                      value={selectedNode.data[key] || ''} 
-                      onValueChange={(newValue) => {
-                        setNodes(nds => nds.map(node => 
-                          node.id === selectedNode.id 
-                            ? { ...node, data: { ...node.data, [key]: newValue } }
-                            : node
-                        ));
-                      }}
-                    >
-                      <SelectTrigger className="mt-1 text-left font-mono">
-                        <SelectValue placeholder={`Selecione ${key === 'actionType' ? 'tipo de ação' : key}`} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(value as Record<string, any>).map(([optKey, optValue]) => (
-                          <SelectItem key={optKey} value={optKey}>
-                            {String(optValue)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <tr key={key} className="bg-white border-b border-gray-100">
+                    <td className="px-2 py-1.5 border-r border-gray-200 text-left">
+                      <div className="text-xs font-medium text-gray-700 font-mono">{key}</div>
+                    </td>
+                    <td className="px-2 py-1.5 text-left">
+                      <Select 
+                        value={selectedNode.data[key] || ''} 
+                        onValueChange={(newValue) => {
+                          setNodes(nds => nds.map(node => 
+                            node.id === selectedNode.id 
+                              ? { ...node, data: { ...node.data, [key]: newValue } }
+                              : node
+                          ));
+                        }}
+                      >
+                        <SelectTrigger className="text-xs font-mono h-6 px-1">
+                          <SelectValue placeholder="Selecione valor" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(value as Record<string, any>).map(([optKey, optValue]) => (
+                            <SelectItem key={optKey} value={optKey} className="font-mono">
+                              {String(optValue)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </td>
+                  </tr>
                 );
               }
               return null;
