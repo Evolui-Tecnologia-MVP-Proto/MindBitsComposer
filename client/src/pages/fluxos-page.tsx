@@ -1444,7 +1444,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                       <div className="text-xs font-medium text-gray-700 font-mono">label</div>
                     </td>
                     <td className="px-2 py-1.5 text-left">
-                      <div className="text-sm text-gray-900 font-mono bg-gray-50 px-1 py-0.5 rounded">
+                      <div className="text-xs text-gray-900 font-mono bg-gray-50 px-1 py-0.5 rounded">
                         {selectedNode.data.label || nodeMetadata?.label || '-'}
                       </div>
                     </td>
@@ -1456,7 +1456,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                       <div className="text-xs font-medium text-gray-700 font-mono">type</div>
                     </td>
                     <td className="px-2 py-1.5 text-left">
-                      <div className="text-sm text-gray-900 font-mono bg-gray-50 px-1 py-0.5 rounded">
+                      <div className="text-xs text-gray-900 font-mono bg-gray-50 px-1 py-0.5 rounded">
                         {selectedNode.type}
                       </div>
                     </td>
@@ -1761,21 +1761,21 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
             {selectedNode.data.docType && (
               <div className="p-3 bg-blue-50 rounded-md">
                 <p className="text-xs text-blue-600 font-medium font-mono">docType</p>
-                <p className="text-sm text-blue-800 font-mono">{selectedNode.data.docType}</p>
+                <p className="text-xs text-blue-800 font-mono">{selectedNode.data.docType}</p>
               </div>
             )}
 
             {selectedNode.data.service && (
               <div className="p-3 bg-green-50 rounded-md">
                 <p className="text-xs text-green-600 font-medium font-mono">service</p>
-                <p className="text-sm text-green-800 font-mono">{selectedNode.data.service}</p>
+                <p className="text-xs text-green-800 font-mono">{selectedNode.data.service}</p>
               </div>
             )}
 
             {selectedNode.data.actionType && (
               <div className="p-3 bg-purple-50 rounded-md">
                 <p className="text-xs text-purple-600 font-medium font-mono">actionType</p>
-                <p className="text-sm text-purple-800 font-mono">{selectedNode.data.actionType}</p>
+                <p className="text-xs text-purple-800 font-mono">{selectedNode.data.actionType}</p>
               </div>
             )}
 
