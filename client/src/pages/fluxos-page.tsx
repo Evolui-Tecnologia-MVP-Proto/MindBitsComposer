@@ -1128,6 +1128,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
         showMiniMap={showMiniMap}
         onToggleMiniMap={() => setShowMiniMap(!showMiniMap)}
         isFlowLocked={savedFlows?.find(flow => flow.id === currentFlowId)?.isLocked || false}
+        hasUnsavedChanges={hasUnsavedChanges}
         isNewFlowModalOpen={isNewFlowModalOpen}
         onOpenNewFlowModal={setIsNewFlowModalOpen}
         isEditModalOpen={isEditModalOpen}
