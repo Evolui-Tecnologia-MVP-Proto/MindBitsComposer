@@ -1433,6 +1433,37 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
             </p>
           </div>
           
+          {/* Tabela de propriedades */}
+          <div className="border border-gray-200 rounded-lg overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-gray-50">
+                  <th className="px-3 py-2 text-left font-medium text-gray-700 border-r border-gray-200">Propriedade</th>
+                  <th className="px-3 py-2 text-left font-medium text-gray-700">Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                {/* Linha para o label do nó */}
+                <tr className="border-b border-gray-100">
+                  <td className="px-3 py-2 border-r border-gray-200 font-mono text-xs">label</td>
+                  <td className="px-3 py-2">
+                    <span className="text-xs font-mono">{selectedNode.data.label || nodeMetadata?.label || '-'}</span>
+                  </td>
+                </tr>
+                
+                {/* Linhas para cada propriedade do metadata */}
+                {nodeMetadata?.metadata && Object.entries(nodeMetadata.metadata).map(([key, value]) => (
+                  <tr key={key} className="border-b border-gray-100">
+                    <td className="px-3 py-2 border-r border-gray-200 font-mono text-xs">{key}</td>
+                    <td className="px-3 py-2">
+                      <span className="text-xs font-mono">{selectedNode.data[key] || '-'}</span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
           <div className="space-y-3">
             <div>
               <Label className="text-sm font-medium">Rótulo do Nó</Label>
@@ -1450,23 +1481,23 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
               // Verificar se é uma string vazia - criar campo de input
               if (typeof value === 'string' && value === '') {
                 return (
-                  <div key={key}>
-                    <Label className="text-sm font-medium capitalize font-mono">
-                      {key === 'switchField' ? 'Campo de Decisão' : key}
-                    </Label>
-                    <Input 
-                      value={selectedNode.data[key] || ''} 
-                      onChange={(e) => {
-                        setNodes(nds => nds.map(node => 
-                          node.id === selectedNode.id 
-                            ? { ...node, data: { ...node.data, [key]: e.target.value } }
-                            : node
-                        ));
-                      }}
-                      className="mt-1 font-mono"
-                      placeholder={`Digite o valor para ${key === 'switchField' ? 'campo de decisão' : key}`}
-                    />
-                  </div>
+                  <tr key={key} className="border-b border-gray-100">
+                    <td className="px-3 py-2 border-r border-gray-200 font-mono text-xs">{key}</td>
+                    <td className="px-3 py-2">
+                      <Input 
+                        value={selectedNode.data[key] || ''} 
+                        onChange={(e) => {
+                          setNodes(nds => nds.map(node => 
+                            node.id === selectedNode.id 
+                              ? { ...node, data: { ...node.data, [key]: e.target.value } }
+                              : node
+                          ));
+                        }}
+                        className="h-7 font-mono text-xs"
+                        placeholder={`Digite o valor para ${key}`}
+                      />
+                    </td>
+                  </tr>
                 );
               }
               
@@ -1699,72 +1730,217 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                   </div>
                 );
               } else if (typeof value === 'object' && value !== null) {
-                // Renderizar como Select para objetos (chave-valor)
+                // Renderizar como linha da tabela para objetos (chave-valor)
                 return (
-                  <div key={key}>
-                    <Label className="text-sm font-medium font-mono">
-                      {key}
-                    </Label>
-                    <Select 
-                      value={selectedNode.data[key] || ''} 
-                      onValueChange={(newValue) => {
-                        setNodes(nds => nds.map(node => 
-                          node.id === selectedNode.id 
-                            ? { ...node, data: { ...node.data, [key]: newValue } }
-                            : node
-                        ));
-                      }}
-                    >
-                      <SelectTrigger className="mt-1 text-left font-mono">
-                        <SelectValue placeholder={`Selecione ${key === 'actionType' ? 'tipo de ação' : key}`} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(value as Record<string, any>).map(([optKey, optValue]) => (
-                          <SelectItem key={optKey} value={optKey}>
-                            {String(optValue)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <tr key={key} className="border-b border-gray-100">
+                    <td className="px-3 py-2 border-r border-gray-200 font-mono text-xs">{key}</td>
+                    <td className="px-3 py-2">
+                      <Select 
+                        value={selectedNode.data[key] || ''} 
+                        onValueChange={(newValue) => {
+                          setNodes(nds => nds.map(node => 
+                            node.id === selectedNode.id 
+                              ? { ...node, data: { ...node.data, [key]: newValue } }
+                              : node
+                          ));
+                        }}
+                      >
+                        <SelectTrigger className="h-7 text-left font-mono text-xs">
+                          <SelectValue placeholder={`Selecione ${key}`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(value as Record<string, any>).map(([optKey, optValue]) => (
+                            <SelectItem key={optKey} value={optKey}>
+                              {String(optValue)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </td>
+                  </tr>
                 );
               }
               return null;
             })}
+          </div>
 
-            {/* Informações adicionais quando uma propriedade é selecionada */}
-            {selectedNode.data.docType && (
-              <div className="p-3 bg-blue-50 rounded-md">
-                <p className="text-xs text-blue-600 font-medium font-mono">docType</p>
-                <p className="text-sm text-blue-800 font-mono">{selectedNode.data.docType}</p>
-              </div>
-            )}
+          {/* Botão para aplicar alterações */}
+          <div className="pt-4 border-t">
+            <Button 
+              onClick={applyInspectorChanges}
+              className="w-full"
+              size="sm"
+            >
+              <Settings className="h-4 w-4 mr-2" />
+              Aplicar Alterações
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
-            {selectedNode.data.service && (
-              <div className="p-3 bg-green-50 rounded-md">
-                <p className="text-xs text-green-600 font-medium font-mono">service</p>
-                <p className="text-sm text-green-800 font-mono">{selectedNode.data.service}</p>
-              </div>
-            )}
+  return (
+    <div className="flex flex-col h-full">
+      <div className="mb-4 bg-white p-4 rounded-lg shadow-sm space-y-3">
+        {/* Primeira linha - Seleção de fluxo e botões principais */}
+        <div className="flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <div className="w-64">
+              <Select value={currentFlowId || ""} onValueChange={(value) => {
+                if (value && savedFlows) {
+                  const selectedFlow = (savedFlows as any[]).find(flow => flow.id === value);
+                  if (selectedFlow) {
+                    loadFlow(selectedFlow);
+                  }
+                }
+              }}>
+                <SelectTrigger id="flow-select" className="text-left font-mono">
+                  <SelectValue placeholder="Carregar fluxo existente" />
+                </SelectTrigger>
+                <SelectContent>
+                  {savedFlows && (savedFlows as any[]).map((flow) => (
+                    <SelectItem key={flow.id} value={flow.id} className="font-mono">
+                      {flow.code} - {flow.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-            {selectedNode.data.actionType && (
-              <div className="p-3 bg-purple-50 rounded-md">
-                <p className="text-xs text-purple-600 font-medium font-mono">actionType</p>
-                <p className="text-sm text-purple-800 font-mono">{selectedNode.data.actionType}</p>
-              </div>
-            )}
+            <Button 
+              onClick={duplicateFlow}
+              variant="outline" 
+              size="sm"
+              disabled={!currentFlowId}
+              className="font-mono"
+            >
+              <Copy className="h-4 w-4 mr-2" />
+              Duplicar
+            </Button>
+          </div>
 
-            {/* Botão para aplicar alterações */}
-            <div className="pt-4 border-t">
+          <div className="flex items-center space-x-2">
+            <Button 
+              onClick={handleSave}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-mono"
+              size="sm"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Salvar
+            </Button>
+            
+            <Button 
+              onClick={createNewFlow}
+              className="bg-green-600 hover:bg-green-700 text-white font-mono"
+              size="sm"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Novo
+            </Button>
+
+            <Button 
+              onClick={() => setShowInspector(!showInspector)}
+              variant={showInspector ? "default" : "outline"}
+              size="sm"
+              className="font-mono"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              {showInspector ? 'Ocultar' : 'Mostrar'} Inspector
+            </Button>
+          </div>
+        </div>
+
+        {/* Segunda linha - Formulário de criação de novo fluxo */}
+        {showNewFlowForm && (
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3 p-4 bg-gray-50 rounded-lg border">
+            <div>
+              <Label htmlFor="flow-name" className="text-sm font-medium">Nome do Fluxo</Label>
+              <Input
+                id="flow-name"
+                value={newFlowName}
+                onChange={(e) => setNewFlowName(e.target.value)}
+                placeholder="Digite o nome do fluxo"
+                className="mt-1 font-mono"
+              />
+            </div>
+            <div>
+              <Label htmlFor="flow-code" className="text-sm font-medium">Código</Label>
+              <Input
+                id="flow-code"
+                value={newFlowCode}
+                onChange={(e) => setNewFlowCode(e.target.value)}
+                placeholder="Ex: FLX-01"
+                className="mt-1 font-mono"
+              />
+            </div>
+            <div>
+              <Label htmlFor="flow-type" className="text-sm font-medium">Tipo de Fluxo</Label>
+              <Select value={newFlowTypeId} onValueChange={setNewFlowTypeId}>
+                <SelectTrigger id="flow-type" className="mt-1 font-mono">
+                  <SelectValue placeholder="Selecione o tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  {flowTypesData && (flowTypesData as any[]).map((type) => (
+                    <SelectItem key={type.id} value={type.id} className="font-mono">
+                      {type.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-end gap-2">
               <Button 
-                onClick={applyInspectorChanges}
-                className="w-full"
+                onClick={handleCreateNewFlow}
+                disabled={!newFlowName || !newFlowCode || !newFlowTypeId}
+                className="bg-green-600 hover:bg-green-700 text-white font-mono"
                 size="sm"
               >
-                <Settings className="h-4 w-4 mr-2" />
-                Aplicar Alterações
+                <Plus className="h-4 w-4 mr-2" />
+                Criar
+              </Button>
+              <Button 
+                onClick={() => {
+                  setShowNewFlowForm(false);
+                  setNewFlowName('');
+                  setNewFlowCode('');
+                  setNewFlowDescription('');
+                  setNewFlowTypeId('');
+                }}
+                variant="outline"
+                size="sm"
+                className="font-mono"
+              >
+                Cancelar
               </Button>
             </div>
+          </div>
+        )}
+
+        {/* Terceira linha - Descrição do fluxo atual */}
+        {currentFlowId && (
+          <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded-lg border border-blue-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-medium font-mono">Fluxo Atual:</span>
+                <span className="ml-2 font-mono">{currentFlowInfo?.code} - {currentFlowInfo?.name}</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-1 relative">
+        {/* Canvas principal */}
+        <div className="flex-1 bg-gray-50">
+          <FlowCanvas onFlowInfoChange={setCurrentFlowInfo} />
+        </div>
+
+        {/* Inspector lateral */}
+        {renderInspector()}
+      </div>
+
+      <BibliotecaFluxos />
           </div>
         </div>
       </div>
