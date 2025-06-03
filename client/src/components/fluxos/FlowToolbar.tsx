@@ -251,8 +251,8 @@ export const FlowToolbar = ({
             variant={showMiniMap ? "default" : "outline"}
             size="sm"
             onClick={onToggleMiniMap}
-            disabled={!currentFlowId || isFlowLocked}
-            title={isFlowLocked ? "Fluxo bloqueado para edição" : "Mostrar/ocultar mini mapa"}
+            disabled={!currentFlowId}
+            title="Mostrar/ocultar mini mapa"
           >
             <Map className="h-4 w-4" />
           </Button>
