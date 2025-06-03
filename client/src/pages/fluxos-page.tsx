@@ -85,10 +85,12 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
   const [showMiniMap, setShowMiniMap] = useState<boolean>(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
   const [showExitConfirmModal, setShowExitConfirmModal] = useState<boolean>(false);
+  const hasUnsavedChangesRef = useRef<boolean>(false);
   
   // Debug: Log sempre que hasUnsavedChanges mudar
   useEffect(() => {
     console.log('hasUnsavedChanges changed to:', hasUnsavedChanges);
+    hasUnsavedChangesRef.current = hasUnsavedChanges;
   }, [hasUnsavedChanges]);
   
   // Aplicar estilo de seleção às edges
@@ -1147,7 +1149,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
         currentFlowId={currentFlowId}
         savedFlows={savedFlows || []}
         onFlowSelect={(flowId) => {
-          console.log('Flow selection triggered - hasUnsavedChanges:', hasUnsavedChanges);
+          console.log('Flow selection triggered - hasUnsavedChanges state:', hasUnsavedChanges);
+          console.log('Flow selection triggered - hasUnsavedChanges ref:', hasUnsavedChangesRef.current);
           console.log('Current flow ID:', currentFlowId, 'Selected flow ID:', flowId);
           
           // Se está selecionando o mesmo fluxo, não fazer nada
@@ -1156,8 +1159,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
             return;
           }
           
-          // Verificar alterações não salvas antes de mudar de fluxo
-          if (hasUnsavedChanges) {
+          // Verificar alterações não salvas usando a referência
+          if (hasUnsavedChangesRef.current) {
             console.log('Showing unsaved changes modal');
             const shouldSave = window.confirm(
               "Atenção, ao sair do editor você perderá todo conteúdo editado que ainda não foi salvo. Deseja salvar o fluxo antes de sair?\n\nClique em 'OK' para salvar ou 'Cancelar' para descartar as alterações."
@@ -1167,6 +1170,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
               handleSave();
             }
             setHasUnsavedChanges(false);
+            hasUnsavedChangesRef.current = false;
           }
           
           if (savedFlows) {
