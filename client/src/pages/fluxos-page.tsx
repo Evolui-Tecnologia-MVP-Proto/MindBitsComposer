@@ -110,6 +110,17 @@ const FlowCanvas = ({
       }
     }
   }, [persistedFlowData, setNodes, setEdges]);
+
+  // Atualizar dados persistidos sempre que houver mudanças no fluxo
+  useEffect(() => {
+    const flowData = {
+      nodes,
+      edges,
+      flowName,
+      currentFlowId
+    };
+    onFlowDataChange(flowData);
+  }, [nodes, edges, flowName, currentFlowId, onFlowDataChange]);
   
   // Aplicar estilo de seleção às edges
   const styledEdges = edges.map((edge: Edge) => {
@@ -1198,6 +1209,7 @@ const FlowCanvas = ({
 export default function FluxosPage() {
   const [currentFlowInfo, setCurrentFlowInfo] = useState<{code: string, name: string} | null>(null);
   const [persistedFlowData, setPersistedFlowData] = useState<any>(null);
+  const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
