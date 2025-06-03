@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, memo, useEffect } from 'react';
+import { useState, useCallback, useRef, memo, useEffect, forwardRef, useImperativeHandle } from 'react';
 import ReactFlow, {
   ReactFlowProvider,
   Controls,
@@ -83,7 +83,15 @@ const nodeTypes: NodeTypes = {
   integrationNode: IntegrationNode,
 };
 
-const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: string, name: string} | null) => void }) => {
+interface FlowCanvasRef {
+  handleDiscard: () => void;
+}
+
+interface FlowCanvasProps {
+  onFlowInfoChange: (info: {code: string, name: string} | null) => void;
+}
+
+const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChange }, ref) => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -593,6 +601,11 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       description: "O canvas foi reinicializado. Selecione um fluxo para continuar."
     });
   }, [setNodes, setEdges, resetHistory, onFlowInfoChange, setGlobalUnsavedChanges]);
+
+  // Expor a função handleDiscard através do ref
+  useImperativeHandle(ref, () => ({
+    handleDiscard
+  }));
 
   const onConnect = useCallback((params: any) => {
     // Salvar estado atual no histórico antes de adicionar nova conexão
@@ -1321,7 +1334,9 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       />
     </div>
   );
-};
+});
+
+FlowCanvas.displayName = 'FlowCanvas';
 
 
 
@@ -1329,6 +1344,7 @@ export default function FluxosPage() {
   const [currentFlowInfo, setCurrentFlowInfo] = useState<{code: string, name: string} | null>(null);
   const [activeTab, setActiveTab] = useState("editor");
   const [showDiscardModal, setShowDiscardModal] = useState<boolean>(false);
+  const flowCanvasRef = useRef<any>(null);
   const { hasUnsavedChanges } = useNavigationGuard();
 
   const handleTabChange = (newTab: string) => {
@@ -1348,11 +1364,10 @@ export default function FluxosPage() {
   // Função para confirmar descarte de alterações
   const confirmDiscard = () => {
     setShowDiscardModal(false);
-    // A lógica de descarte será delegada para o FlowCanvas
-    toast({
-      title: "Alterações descartadas",
-      description: "As alterações foram descartadas. Selecione um fluxo para continuar."
-    });
+    // Chamar a função de descarte do FlowCanvas através da referência
+    if (flowCanvasRef.current && flowCanvasRef.current.handleDiscard) {
+      flowCanvasRef.current.handleDiscard();
+    }
   };
 
   return (
@@ -1383,7 +1398,10 @@ export default function FluxosPage() {
           
           <TabsContent value="editor" className="flex-1 mt-4 min-h-0">
             <ReactFlowProvider>
-              <FlowCanvas onFlowInfoChange={setCurrentFlowInfo} />
+              <FlowCanvas 
+                ref={flowCanvasRef}
+                onFlowInfoChange={setCurrentFlowInfo} 
+              />
             </ReactFlowProvider>
           </TabsContent>
           
