@@ -1483,7 +1483,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                               : node
                           ));
                         }}
-                        className="text-xs font-mono h-6 px-1 text-left"
+                        className="!text-xs font-mono h-6 px-1 text-left"
                         placeholder={`Digite o valor para ${key}`}
                       />
                     </td>
@@ -1508,7 +1508,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
                               : node
                           ));
                         }}
-                        className="text-xs font-mono h-6 px-1 text-left"
+                        className="!text-xs font-mono h-6 px-1 text-left"
                         placeholder={`Digite o valor para ${key}`}
                       />
                     </td>
