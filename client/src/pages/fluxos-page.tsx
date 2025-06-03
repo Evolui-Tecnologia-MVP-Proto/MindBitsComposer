@@ -1242,6 +1242,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
           return hasUnsavedChangesRef.current;
         }}
         onSave={handleSave}
+        onDiscard={handleDiscard}
         onFlowSelect={(flowId) => {
           // Se está selecionando o mesmo fluxo, não fazer nada
           if (flowId === currentFlowId) {
@@ -1384,6 +1385,32 @@ export default function FluxosPage() {
           </TabsContent>
         </Tabs>
       </div>
+      
+      {/* Modal de confirmação para descarte de alterações */}
+      {showDiscardModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold mb-4">Descartar alterações</h3>
+            <p className="text-gray-600 mb-6">
+              Tem certeza que deseja descartar todas as alterações não salvas? Esta ação não pode ser desfeita e o canvas será reinicializado.
+            </p>
+            <div className="flex space-x-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setShowDiscardModal(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmDiscard}
+              >
+                Descartar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
