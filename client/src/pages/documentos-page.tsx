@@ -5007,17 +5007,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
       // Verificar se o formulário está visível baseado na Show_Condition
       try {
-        // Usar a mesma lógica de correção de dados que funciona no getFormFields
-        let correctedData = attachedFormData;
-        
-        // Corrigir formato de array mal formado
-        if (correctedData.includes('[') && correctedData.includes(']:')) {
-          correctedData = correctedData
-            .replace(/\[([^[\]]+)\]/g, '{"$1"}')
-            .replace(/\"([^"]+)\"\:\s*\[/g, '"$1":[')
-            .replace(/\]\s*,\s*\"([^"]+)\"\:\s*\[/g, '],"$1":[')
-            .replace(/\]\s*\]/g, ']}');
-        }
+        // Usar exatamente a mesma lógica de correção que funciona no getFormFields
+        let correctedData = attachedFormData
+          .replace(/\[([^[\]]+)\]/g, '{"$1"}')
+          .replace(/\"([^"]+)\"\:\s*\[/g, '"$1":[')
+          .replace(/\]\s*,\s*\"([^"]+)\"\:\s*\[/g, '],"$1":[')
+          .replace(/\]\s*\]/g, ']}');
         
         console.log('🔍 Dados corretos para Show_Condition:', correctedData);
         const parsedData = JSON.parse(correctedData);
