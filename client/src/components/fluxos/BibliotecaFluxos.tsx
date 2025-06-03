@@ -264,9 +264,18 @@ export const BibliotecaFluxos = () => {
             <Card key={flow.id} className="hover:shadow-md transition-shadow">
               <CardHeader>
                 <div>
-                  <CardTitle className="text-lg font-mono">
-                    [{flow.code}] {flow.name}
-                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <CardTitle className="text-lg font-mono">
+                      [{flow.code}] {flow.name}
+                    </CardTitle>
+                    {/* Indicadores de status */}
+                    {flow.isLocked && (
+                      <Lock className="h-4 w-4 text-red-500" title="Fluxo bloqueado" />
+                    )}
+                    {!flow.isEnabled && (
+                      <EyeOff className="h-4 w-4 text-gray-500" title="Fluxo desabilitado" />
+                    )}
+                  </div>
                   <CardDescription className="mt-1">
                     {flow.description || "Sem descrição"}
                   </CardDescription>
@@ -274,23 +283,49 @@ export const BibliotecaFluxos = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  <div className="grid grid-cols-3 gap-2">
+                  {/* Layout expandido para 5 colunas */}
+                  <div className="grid grid-cols-5 gap-1">
                     <Button 
                       size="sm" 
                       variant="outline"
                       onClick={() => duplicateFlowMutation.mutate(flow)}
                       disabled={duplicateFlowMutation.isPending}
+                      className="flex items-center justify-center p-2"
+                      title="Duplicar fluxo"
                     >
-                      <Copy className="mr-1 h-3 w-3" />
-                      Duplicar
+                      <Copy className="h-3 w-3" />
                     </Button>
                     
                     <Button 
                       size="sm" 
+                      variant="outline"
                       onClick={() => setEditingFlow(flow)}
+                      className="flex items-center justify-center p-2"
+                      title="Editar metadados"
                     >
-                      <Edit className="mr-1 h-3 w-3" />
-                      Editar
+                      <FileEdit className="h-3 w-3" />
+                    </Button>
+
+                    <Button 
+                      size="sm" 
+                      variant={flow.isLocked ? "destructive" : "outline"}
+                      onClick={() => toggleLockMutation.mutate(flow.id)}
+                      disabled={toggleLockMutation.isPending}
+                      className="flex items-center justify-center p-2"
+                      title={flow.isLocked ? "Desbloquear fluxo" : "Bloquear fluxo"}
+                    >
+                      {flow.isLocked ? <Unlock className="h-3 w-3" /> : <Lock className="h-3 w-3" />}
+                    </Button>
+
+                    <Button 
+                      size="sm" 
+                      variant={flow.isEnabled ? "outline" : "secondary"}
+                      onClick={() => toggleEnabledMutation.mutate(flow.id)}
+                      disabled={toggleEnabledMutation.isPending}
+                      className="flex items-center justify-center p-2"
+                      title={flow.isEnabled ? "Desabilitar fluxo" : "Habilitar fluxo"}
+                    >
+                      {flow.isEnabled ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
                     </Button>
 
                     <Button 
@@ -298,11 +333,24 @@ export const BibliotecaFluxos = () => {
                       variant="destructive"
                       onClick={() => confirmDelete(flow)}
                       disabled={deleteFlowMutation.isPending}
+                      className="flex items-center justify-center p-2"
+                      title="Excluir fluxo"
                     >
-                      <Trash2 className="mr-1 h-3 w-3" />
-                      Excluir
+                      <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
+
+                  {/* Link para o editor - separado */}
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={() => window.open(`/fluxos?flow=${flow.id}`, '_blank')}
+                    disabled={flow.isLocked}
+                    className="w-full flex items-center gap-2"
+                  >
+                    <Edit className="h-3 w-3" />
+                    {flow.isLocked ? "Editor (Bloqueado)" : "Abrir no Editor"}
+                  </Button>
                   
                   {flow.createdAt && (
                     <div className="text-xs text-muted-foreground pt-1 border-t">
