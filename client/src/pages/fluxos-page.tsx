@@ -357,11 +357,45 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     enabled: true
   });
 
-  // Mutation para salvar fluxo
+  // Mutation para criar novo fluxo
+  const createFlowMutation = useMutation({
+    mutationFn: async (flowData: any) => {
+      const response = await fetch('/api/documents-flows', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(flowData),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erro ao criar fluxo');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setCurrentFlowId(data.id);
+      queryClient.invalidateQueries({ queryKey: ['/api/documents-flows'] });
+      toast({
+        title: "Sucesso",
+        description: "Fluxo criado com sucesso!"
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Erro ao criar fluxo",
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Mutation para salvar fluxo existente
   const saveFlowMutation = useMutation({
     mutationFn: async (flowData: any) => {
-      const response = await fetch(currentFlowId ? `/api/documents-flows/${currentFlowId}` : '/api/documents-flows', {
-        method: currentFlowId ? 'PUT' : 'POST',
+      const response = await fetch(`/api/documents-flows/${currentFlowId}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -375,7 +409,6 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       return response.json();
     },
     onSuccess: (data) => {
-      setCurrentFlowId(data.id);
       queryClient.invalidateQueries({ queryKey: ['/api/documents-flows'] });
       toast({
         title: "Sucesso",
@@ -815,7 +848,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     
 
 
-    saveFlowMutation.mutate(newFlowData, {
+    createFlowMutation.mutate(newFlowData, {
       onSuccess: (data) => {
         setNodes([]);
         setEdges([]);
