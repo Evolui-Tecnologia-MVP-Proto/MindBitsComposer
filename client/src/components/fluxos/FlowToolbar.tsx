@@ -37,6 +37,7 @@ interface FlowToolbarProps {
   
   // Flow state
   isFlowLocked?: boolean;
+  hasUnsavedChanges?: boolean;
   
   // Modals
   isNewFlowModalOpen: boolean;
@@ -96,6 +97,7 @@ export const FlowToolbar = ({
   showMiniMap,
   onToggleMiniMap,
   isFlowLocked = false,
+  hasUnsavedChanges = false,
   isNewFlowModalOpen,
   onOpenNewFlowModal,
   isEditModalOpen,
@@ -167,10 +169,12 @@ export const FlowToolbar = ({
             onClick={onSaveFlow} 
             size="sm"
             disabled={isFlowLocked}
-            title={isFlowLocked ? "Fluxo bloqueado para edição" : ""}
+            variant={hasUnsavedChanges ? "default" : "outline"}
+            className={hasUnsavedChanges ? "bg-orange-600 hover:bg-orange-700 text-white" : ""}
+            title={isFlowLocked ? "Fluxo bloqueado para edição" : hasUnsavedChanges ? "Existem alterações não salvas" : "Salvar fluxo"}
           >
-            <Save className="mr-1 h-4 w-4" />
-            Salvar
+            <Save className={`mr-1 h-4 w-4 ${hasUnsavedChanges ? "text-white animate-pulse" : ""}`} />
+            {hasUnsavedChanges ? "Salvar*" : "Salvar"}
           </Button>
         </div>
       </div>
