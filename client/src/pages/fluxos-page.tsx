@@ -98,8 +98,36 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
   const [showExitConfirmModal, setShowExitConfirmModal] = useState<boolean>(false);
   const hasUnsavedChangesRef = useRef<boolean>(false);
   
+  // Referencias para detectar mudanças
+  const initialNodesSnapshot = useRef<Node[]>([]);
+  const initialEdgesSnapshot = useRef<Edge[]>([]);
+  const lastSavedSnapshot = useRef<{nodes: Node[], edges: Edge[]}>({nodes: [], edges: []});
+  
   // Hook de proteção de navegação
   const { setHasUnsavedChanges: setGlobalUnsavedChanges, setSaveFunction } = useNavigationGuard();
+  
+  // Função para detectar mudanças completas
+  const detectChanges = useCallback(() => {
+    const currentSnapshot = {nodes, edges};
+    const savedSnapshot = lastSavedSnapshot.current;
+    
+    // Verificar se há diferenças nos nós (posição, propriedades, quantidade)
+    const nodesChanged = JSON.stringify(currentSnapshot.nodes) !== JSON.stringify(savedSnapshot.nodes);
+    
+    // Verificar se há diferenças nas edges
+    const edgesChanged = JSON.stringify(currentSnapshot.edges) !== JSON.stringify(savedSnapshot.edges);
+    
+    const hasChanges = nodesChanged || edgesChanged;
+    
+    if (hasChanges !== hasUnsavedChanges) {
+      setHasUnsavedChanges(hasChanges);
+    }
+  }, [nodes, edges, hasUnsavedChanges]);
+  
+  // Detectar mudanças sempre que nodes ou edges mudarem
+  useEffect(() => {
+    detectChanges();
+  }, [detectChanges]);
   
   // Sincronizar estado local com sistema global de proteção de navegação
   useEffect(() => {
@@ -446,6 +474,10 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/documents-flows'] });
+      
+      // Atualizar snapshot após salvamento bem-sucedido
+      lastSavedSnapshot.current = { nodes: [...nodes], edges: [...edges] };
+      
       setHasUnsavedChanges(false);
       toast({
         title: "Sucesso",
@@ -694,6 +726,9 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     
     // Reset do histórico com o novo estado
     resetHistory(flowNodes || [], styledEdges);
+    
+    // Atualizar snapshot com o estado carregado
+    lastSavedSnapshot.current = { nodes: updatedNodes, edges: styledEdges };
     
     // Reset do estado de alterações não salvas após carregar
     setHasUnsavedChanges(false);
