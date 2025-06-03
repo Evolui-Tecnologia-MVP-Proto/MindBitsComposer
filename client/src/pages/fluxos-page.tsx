@@ -1247,7 +1247,7 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
           return hasUnsavedChangesRef.current;
         }}
         onSave={handleSave}
-        onDiscard={handleDiscard}
+        onDiscard={onDiscardRequest}
         onFlowSelect={(flowId) => {
           // Se está selecionando o mesmo fluxo, não fazer nada
           if (flowId === currentFlowId) {
@@ -1401,7 +1401,8 @@ export default function FluxosPage() {
             <ReactFlowProvider>
               <FlowCanvas 
                 ref={flowCanvasRef}
-                onFlowInfoChange={setCurrentFlowInfo} 
+                onFlowInfoChange={setCurrentFlowInfo}
+                onDiscardRequest={handleDiscardRequest}
               />
             </ReactFlowProvider>
           </TabsContent>
