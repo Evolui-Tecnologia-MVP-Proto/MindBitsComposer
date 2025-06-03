@@ -96,6 +96,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
   const [showMiniMap, setShowMiniMap] = useState<boolean>(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
   const [showExitConfirmModal, setShowExitConfirmModal] = useState<boolean>(false);
+  const [showDiscardModal, setShowDiscardModal] = useState<boolean>(false);
   const hasUnsavedChangesRef = useRef<boolean>(false);
   
   // Referencias para detectar mudanças
@@ -563,6 +564,44 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
   const handleNodePropertyChange = useCallback(() => {
     setHasUnsavedChanges(true);
   }, []);
+
+  // Função para descartar alterações
+  const handleDiscard = useCallback(() => {
+    setShowDiscardModal(true);
+  }, []);
+
+  // Função para confirmar descarte de alterações
+  const confirmDiscard = useCallback(() => {
+    // Reinicializar o canvas
+    setNodes([]);
+    setEdges([]);
+    setFlowName('Novo Fluxo');
+    setCurrentFlowId(null);
+    setSelectedNodeId(null);
+    setSelectedEdgeId(null);
+    
+    // Reset do estado de alterações não salvas
+    setHasUnsavedChanges(false);
+    hasUnsavedChangesRef.current = false;
+    setGlobalUnsavedChanges(false);
+    
+    // Reset do histórico
+    resetHistory([], []);
+    
+    // Atualizar snapshot
+    lastSavedSnapshot.current = { nodes: [], edges: [] };
+    
+    // Notificar o componente pai sobre o reset
+    onFlowInfoChange(null);
+    
+    // Fechar modal
+    setShowDiscardModal(false);
+    
+    toast({
+      title: "Alterações descartadas",
+      description: "O canvas foi reinicializado. Selecione um fluxo para continuar."
+    });
+  }, [setNodes, setEdges, resetHistory, onFlowInfoChange, setGlobalUnsavedChanges]);
 
   const onConnect = useCallback((params: any) => {
     // Salvar estado atual no histórico antes de adicionar nova conexão

@@ -29,6 +29,7 @@ interface FlowToolbarProps {
   onFlowSelect: (flowId: string) => void;
   checkUnsavedChanges?: () => boolean;
   onSave?: () => void;
+  onDiscard?: () => void;
   
   // Inspector
   showInspector: boolean;
@@ -97,6 +98,7 @@ export const FlowToolbar = ({
   onFlowSelect,
   checkUnsavedChanges,
   onSave,
+  onDiscard,
   showInspector,
   onToggleInspector,
   showMiniMap,
@@ -231,6 +233,17 @@ export const FlowToolbar = ({
             <Save className={`mr-1 h-4 w-4 ${hasUnsavedChanges ? "text-white animate-pulse" : ""}`} />
             {hasUnsavedChanges ? "Salvar*" : "Salvar"}
           </Button>
+          {hasUnsavedChanges && onDiscard && (
+            <Button 
+              onClick={onDiscard} 
+              size="sm"
+              variant="destructive"
+              title="Descartar todas as alterações e reinicializar o canvas"
+            >
+              <RotateCcw className="mr-1 h-4 w-4" />
+              Descartar
+            </Button>
+          )}
         </div>
       </div>
       
