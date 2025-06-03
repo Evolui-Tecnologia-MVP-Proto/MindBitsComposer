@@ -333,6 +333,12 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     };
   }, [handleUndo, handleRedo]);
   
+  // Query para buscar usuário atual
+  const { data: currentUser } = useQuery({
+    queryKey: ['/api/user'],
+    enabled: true
+  });
+
   // Query para buscar fluxos salvos
   const { data: savedFlows } = useQuery({
     queryKey: ['/api/documents-flows'],
@@ -804,7 +810,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       description: newFlowDescription,
       flowTypeId: newFlowTypeId,
       flowData: { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
-      userId: 1 // Placeholder - deveria vir do contexto de autenticação
+      userId: currentUser?.id || 1
     };
     
 
