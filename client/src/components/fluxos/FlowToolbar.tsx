@@ -298,8 +298,8 @@ export const FlowToolbar = ({
             onClick={onAutoAlign} 
             variant="outline" 
             size="sm"
-            disabled={!currentFlowId || nodeCount === 0}
-            title="Organizar nós automaticamente"
+            disabled={!currentFlowId || nodeCount === 0 || isFlowLocked}
+            title={isFlowLocked ? "Fluxo bloqueado para edição" : "Organizar nós automaticamente"}
           >
             <AlignCenter className="mr-1 h-4 w-4" />
             Auto Alinhar
@@ -308,8 +308,8 @@ export const FlowToolbar = ({
             onClick={onUndo} 
             variant="outline" 
             size="sm"
-            disabled={historyIndex <= 0}
-            title="Desfazer última ação"
+            disabled={historyIndex <= 0 || isFlowLocked}
+            title={isFlowLocked ? "Fluxo bloqueado para edição" : "Desfazer última ação"}
           >
             <Undo2 className="mr-1 h-4 w-4" />
             Desfazer
@@ -318,13 +318,19 @@ export const FlowToolbar = ({
             onClick={onRedo} 
             variant="outline" 
             size="sm"
-            disabled={historyIndex >= historyLength - 1}
-            title="Refazer última ação"
+            disabled={historyIndex >= historyLength - 1 || isFlowLocked}
+            title={isFlowLocked ? "Fluxo bloqueado para edição" : "Refazer última ação"}
           >
             <Redo2 className="mr-1 h-4 w-4" />
             Refazer
           </Button>
-          <Button onClick={onReset} variant="outline" size="sm" disabled={!currentFlowId}>
+          <Button 
+            onClick={onReset} 
+            variant="outline" 
+            size="sm" 
+            disabled={!currentFlowId || isFlowLocked}
+            title={isFlowLocked ? "Fluxo bloqueado para edição" : "Limpar todos os nós"}
+          >
             <RotateCcw className="mr-1 h-4 w-4" />
             Reiniciar
           </Button>

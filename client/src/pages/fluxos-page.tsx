@@ -1097,6 +1097,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
         }}
         showInspector={showInspector}
         onToggleInspector={() => setShowInspector(!showInspector)}
+        isFlowLocked={savedFlows?.find(flow => flow.id === currentFlowId)?.isLocked || false}
         isNewFlowModalOpen={isNewFlowModalOpen}
         onOpenNewFlowModal={setIsNewFlowModalOpen}
         isEditModalOpen={isEditModalOpen}
