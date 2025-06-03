@@ -5034,9 +5034,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       
       // Se o formulário não está visível, permite salvar
       if (!isFormVisible) {
+        console.log('🔍 Formulário oculto - botão habilitado');
         return true;
       }
 
+      console.log('🔍 Formulário visível - validando campos obrigatórios');
       const fieldsData = getFormFields();
       const fieldNames = Object.keys(fieldsData);
       
@@ -5044,6 +5046,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         nodeId: selectedFlowNode.id,
         nodeType: selectedFlowNode.type,
         isPending: selectedFlowNode.data.isPendingConnected,
+        isFormVisible,
         attachedFormData,
         fieldsData,
         fieldNames,
