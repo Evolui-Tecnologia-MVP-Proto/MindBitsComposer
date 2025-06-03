@@ -45,12 +45,14 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { NodeInspector } from '@/components/fluxos/NodeInspector';
-import { StartNode } from '@/components/fluxos/nodes/StartNode';
-import { EndNode } from '@/components/fluxos/nodes/EndNode';
-import { SwitchNode } from '@/components/fluxos/nodes/SwitchNode';
-import { ActionNode } from '@/components/fluxos/nodes/ActionNode';
-import { DocumentNode } from '@/components/fluxos/nodes/DocumentNode';
-import { IntegrationNode } from '@/components/fluxos/nodes/IntegrationNode';
+import { 
+  StartNode, 
+  EndNode, 
+  SwitchNode, 
+  ActionNode, 
+  DocumentNode, 
+  IntegrationNode 
+} from '@/components/fluxos/nodes';
 
 // Componentes de nós personalizados já extraídos para arquivos separados
 
