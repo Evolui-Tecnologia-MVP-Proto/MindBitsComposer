@@ -1148,6 +1148,11 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       <FlowToolbar
         currentFlowId={currentFlowId}
         savedFlows={savedFlows || []}
+        checkUnsavedChanges={() => {
+          console.log('FlowToolbar checkUnsavedChanges called - ref value:', hasUnsavedChangesRef.current);
+          return hasUnsavedChangesRef.current;
+        }}
+        onSave={handleSave}
         onFlowSelect={(flowId) => {
           console.log('Flow selection triggered - hasUnsavedChanges state:', hasUnsavedChanges);
           console.log('Flow selection triggered - hasUnsavedChanges ref:', hasUnsavedChangesRef.current);
@@ -1159,19 +1164,9 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
             return;
           }
           
-          // Verificar alterações não salvas usando a referência
-          if (hasUnsavedChangesRef.current) {
-            console.log('Showing unsaved changes modal');
-            const shouldSave = window.confirm(
-              "Atenção, ao sair do editor você perderá todo conteúdo editado que ainda não foi salvo. Deseja salvar o fluxo antes de sair?\n\nClique em 'OK' para salvar ou 'Cancelar' para descartar as alterações."
-            );
-            
-            if (shouldSave) {
-              handleSave();
-            }
-            setHasUnsavedChanges(false);
-            hasUnsavedChangesRef.current = false;
-          }
+          // Reset do estado após a verificação no FlowToolbar
+          setHasUnsavedChanges(false);
+          hasUnsavedChangesRef.current = false;
           
           if (savedFlows) {
             const selectedFlow = savedFlows.find(flow => flow.id === flowId);

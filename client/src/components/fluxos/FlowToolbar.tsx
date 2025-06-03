@@ -26,6 +26,8 @@ interface FlowToolbarProps {
   currentFlowId: string | null;
   savedFlows: any[];
   onFlowSelect: (flowId: string) => void;
+  checkUnsavedChanges?: () => boolean;
+  onSave?: () => void;
   
   // Inspector
   showInspector: boolean;
@@ -92,6 +94,8 @@ export const FlowToolbar = ({
   currentFlowId,
   savedFlows,
   onFlowSelect,
+  checkUnsavedChanges,
+  onSave,
   showInspector,
   onToggleInspector,
   showMiniMap,
@@ -141,6 +145,17 @@ export const FlowToolbar = ({
           <div className="w-64">
             <Select value={currentFlowId || ""} onValueChange={(value) => {
               if (value) {
+                // Verificar alterações não salvas antes de trocar fluxo
+                if (checkUnsavedChanges && checkUnsavedChanges()) {
+                  console.log('FlowToolbar: Detectadas alterações não salvas');
+                  const shouldSave = window.confirm(
+                    "Atenção, ao sair do editor você perderá todo conteúdo editado que ainda não foi salvo. Deseja salvar o fluxo antes de sair?\n\nClique em 'OK' para salvar ou 'Cancelar' para descartar as alterações."
+                  );
+                  
+                  if (shouldSave && onSave) {
+                    onSave();
+                  }
+                }
                 onFlowSelect(value);
               }
             }}>
