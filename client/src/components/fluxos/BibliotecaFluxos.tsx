@@ -9,6 +9,7 @@ import { FlowMetadataModal } from './FlowMetadataModal';
 export const BibliotecaFluxos = () => {
   const queryClient = useQueryClient();
   const [editingFlow, setEditingFlow] = useState<any | null>(null);
+  const [flowToDelete, setFlowToDelete] = useState<any | null>(null);
   
   const { data: savedFlows, isLoading: isLoadingFlows } = useQuery<any[]>({
     queryKey: ["/api/documents-flows"],
@@ -17,6 +18,34 @@ export const BibliotecaFluxos = () => {
   const { data: flowTypes } = useQuery<any[]>({
     queryKey: ["/api/flow-types"],
   });
+
+  // Função para confirmar exclusão com toast
+  const confirmDelete = (flow: any) => {
+    toast({
+      title: "Confirmar exclusão",
+      description: `Tem certeza que deseja excluir o fluxo "${flow.name}"?`,
+      action: (
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={() => deleteFlowMutation.mutate(flow.id)}
+          >
+            Excluir
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              // Toast será automaticamente fechado
+            }}
+          >
+            Cancelar
+          </Button>
+        </div>
+      ),
+    });
+  };
 
   // Mutation para excluir fluxo
   const deleteFlowMutation = useMutation({
@@ -225,11 +254,7 @@ export const BibliotecaFluxos = () => {
                     <Button 
                       size="sm" 
                       variant="destructive"
-                      onClick={() => {
-                        if (confirm(`Tem certeza que deseja excluir o fluxo "${flow.name}"? Esta ação não pode ser desfeita.`)) {
-                          deleteFlowMutation.mutate(flow.id);
-                        }
-                      }}
+                      onClick={() => confirmDelete(flow)}
                       disabled={deleteFlowMutation.isPending}
                     >
                       <Trash2 className="mr-1 h-3 w-3" />
