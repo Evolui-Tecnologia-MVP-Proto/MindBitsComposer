@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentsEditions, templates } from "@shared/schema";
+import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc, and, gte, lte, isNull, or } from "drizzle-orm";
@@ -3663,10 +3663,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .innerJoin(documentsFlows, eq(documentFlowExecutions.flowId, documentsFlows.id))
         .where(or(
           eq(documentFlowExecutions.status, "initiated"),
-          eq(documentFlowExecutions.status, "completed"),
-          eq(documentFlowExecutions.status, "transfered"),
-          eq(documentFlowExecutions.status, "in_progress"),
-          eq(documentFlowExecutions.status, "failed")
+          eq(documentFlowExecutions.status, "completed")
         ));
       
       res.json(executions);
@@ -3817,64 +3814,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
     } catch (error) {
       console.error('❌ Erro na transferência de fluxo:', error);
-      res.status(500).json({ error: "Erro interno do servidor" });
-    }
-  });
-
-  // Forward document to editing
-  app.post("/api/documents-editions/forward", async (req: Request, res: Response) => {
-    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
-    
-    try {
-      const { nodeId, documentId, templateId } = req.body;
-      
-      console.log('📝 Encaminhando documento para edição:', { nodeId, documentId, templateId });
-      
-      // Buscar documento
-      const documento = await db.select()
-        .from(documentos)
-        .where(eq(documentos.id, documentId))
-        .limit(1);
-      
-      if (documento.length === 0) {
-        return res.status(404).json({ error: "Documento não encontrado" });
-      }
-      
-      // Buscar template para obter o código
-      let templateCode = 'DOC-01';
-      if (templateId) {
-        const template = await db.select()
-          .from(templates)
-          .where(eq(templates.id, templateId))
-          .limit(1);
-        
-        if (template.length > 0) {
-          templateCode = template[0].code;
-        }
-      }
-      
-      // Criar registro na tabela documents_editions
-      const editionRecord = await db.insert(documentsEditions)
-        .values({
-          nodeId: nodeId,
-          docCod: templateCode,
-          docName: documento[0].objeto,
-          dateEdit: new Date(),
-          userId: req.user.id,
-          templateId: templateId || null
-        })
-        .returning();
-      
-      console.log('✅ Documento encaminhado para edição:', editionRecord[0]);
-      
-      res.json({
-        success: true,
-        editionRecord: editionRecord[0],
-        message: "Documento encaminhado para edição com sucesso!"
-      });
-      
-    } catch (error) {
-      console.error("Erro ao encaminhar documento para edição:", error);
       res.status(500).json({ error: "Erro interno do servidor" });
     }
   });
