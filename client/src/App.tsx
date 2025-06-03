@@ -16,6 +16,7 @@ import DocumentosPage from "@/pages/documentos-page";
 import PluginsPage from "@/pages/plugins-page";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "./lib/protected-route";
+import { NavigationGuardProvider } from "@/hooks/use-navigation-guard";
 
 function Router() {
   return (
@@ -39,10 +40,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+        <NavigationGuardProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </NavigationGuardProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

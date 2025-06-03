@@ -34,6 +34,7 @@ import {
 import { toast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
+import { useNavigationGuard } from '@/hooks/use-navigation-guard';
 import {
   Dialog,
   DialogContent,
