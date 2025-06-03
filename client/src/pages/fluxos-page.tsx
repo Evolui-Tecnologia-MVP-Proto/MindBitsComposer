@@ -1056,13 +1056,16 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       data: { label: labelMap[selectedNodeType] || 'Novo Nó' },
     };
 
+    // Adiciona ao histórico ANTES de adicionar o nó
+    addToHistory(nodes, edges);
+    
     setNodes((nds) => {
       const newNodes = nds.concat(newNode);
-      // Adiciona ao histórico após adicionar o nó
-      addToHistory(nodes, edges);
-      setHasUnsavedChanges(true);
       return newNodes;
     });
+    
+    setHasUnsavedChanges(true);
+    console.log('Node added - hasUnsavedChanges set to:', true);
     
     toast({
       title: 'Nó adicionado',
@@ -1109,6 +1112,23 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       }
     }
   }, [hasUnsavedChanges, handleSave]);
+
+  // Interceptar tentativas de sair da página
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = "Você tem alterações não salvas. Tem certeza que deseja sair?";
+        return "Você tem alterações não salvas. Tem certeza que deseja sair?";
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [hasUnsavedChanges]);
 
   return (
     <div className="flex flex-col h-full">
