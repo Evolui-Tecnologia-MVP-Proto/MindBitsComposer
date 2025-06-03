@@ -1437,11 +1437,15 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
           <div className="space-y-3">
             {/* Tabela de propriedades do nó */}
             <div className="border border-gray-200 rounded-lg overflow-hidden">
-              <table className="w-full text-xs">
+              <table className="w-full text-xs table-fixed">
+                <colgroup>
+                  <col className="w-24" />
+                  <col />
+                </colgroup>
                 <tbody>
                   {/* Linha fixa: label */}
                   <tr className="bg-white border-b border-gray-100">
-                    <td className="px-2 py-1.5 border-r border-gray-200 text-left w-1/2">
+                    <td className="px-2 py-1.5 border-r border-gray-200 text-left">
                       <div className="text-xs font-medium text-gray-700 font-mono">label</div>
                     </td>
                     <td className="px-2 py-1.5 text-left">
