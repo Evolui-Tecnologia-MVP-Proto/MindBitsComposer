@@ -419,6 +419,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/documents-flows'] });
+      setHasUnsavedChanges(false);
       toast({
         title: "Sucesso",
         description: "Fluxo salvo com sucesso!"
@@ -554,11 +555,13 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       if (selectedNodeId) {
         // Salvar estado atual no histórico antes de remover nó
         addToHistory(nodes, edges);
+        setHasUnsavedChanges(true);
         setNodes((nds) => nds.filter((node) => node.id !== selectedNodeId));
         setSelectedNodeId(null);
       } else if (selectedEdgeId) {
         // Salvar estado atual no histórico antes de remover edge
         addToHistory(nodes, edges);
+        setHasUnsavedChanges(true);
         setEdges((eds) => eds.filter((edge) => edge.id !== selectedEdgeId));
         setSelectedEdgeId(null);
       }
@@ -931,6 +934,8 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
           data: { label },
         };
 
+        addToHistory(nodes, edges);
+        setHasUnsavedChanges(true);
         setNodes((nds) => nds.concat(newNode));
       }
     },
@@ -1055,6 +1060,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
       const newNodes = nds.concat(newNode);
       // Adiciona ao histórico após adicionar o nó
       addToHistory(nodes, edges);
+      setHasUnsavedChanges(true);
       return newNodes;
     });
     
@@ -1088,7 +1094,26 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     });
   }, [getSelectedNode, setNodes]);
 
-  // Função para renderizar o inspector de propriedades
+  // Função para confirmar saída com alterações não salvas
+  const confirmExitWithUnsavedChanges = useCallback(() => {
+    if (hasUnsavedChanges) {
+      setShowExitConfirmModal(true);
+      return false;
+    }
+    return true;
+  }, [hasUnsavedChanges]);
+
+  // Função para salvar e sair
+  const handleSaveAndExit = useCallback(() => {
+    handleSave();
+    setShowExitConfirmModal(false);
+    setHasUnsavedChanges(false);
+  }, [handleSave]);
+
+  // Função para cancelar saída
+  const handleCancelExit = useCallback(() => {
+    setShowExitConfirmModal(false);
+  }, []);
 
   return (
     <div className="flex flex-col h-full">
@@ -1215,6 +1240,28 @@ export default function FluxosPage() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Modal de confirmação para alterações não salvas */}
+      <Dialog open={showExitConfirmModal} onOpenChange={setShowExitConfirmModal}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Alterações não salvas</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-sm text-muted-foreground">
+              Atenção, ao sair do editor você perderá todo conteúdo editado que ainda não foi salvo. Deseja salvar o fluxo antes de sair?
+            </p>
+          </div>
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" onClick={handleCancelExit}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveAndExit} className="bg-blue-600 hover:bg-blue-700">
+              Salvar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
