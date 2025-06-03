@@ -92,16 +92,10 @@ const FlowCanvas = ({
   const [showInspector, setShowInspector] = useState<boolean>(false);
   const [showMiniMap, setShowMiniMap] = useState<boolean>(false);
   const [currentFlowId, setCurrentFlowId] = useState<string | null>(null);
-  const [isRestoringData, setIsRestoringData] = useState<boolean>(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
-  const [lastSavedState, setLastSavedState] = useState<{nodes: any[], edges: any[]} | null>(null);
   
   // Restaurar dados persistidos do fluxo quando o componente for montado
   useEffect(() => {
     if (persistedFlowData) {
-      setIsRestoringData(true);
-      
-      // Restaurar dados do fluxo
       if (persistedFlowData.nodes) {
         setNodes(persistedFlowData.nodes);
       }
@@ -114,80 +108,20 @@ const FlowCanvas = ({
       if (persistedFlowData.currentFlowId) {
         setCurrentFlowId(persistedFlowData.currentFlowId);
       }
-      
-      // Restaurar estado do editor
-      if (persistedFlowData.selectedNodeId !== undefined) {
-        setSelectedNodeId(persistedFlowData.selectedNodeId);
-      }
-      if (persistedFlowData.selectedEdgeId !== undefined) {
-        setSelectedEdgeId(persistedFlowData.selectedEdgeId);
-      }
-      if (persistedFlowData.selectedNodeType !== undefined) {
-        setSelectedNodeType(persistedFlowData.selectedNodeType);
-      }
-      if (persistedFlowData.showInspector !== undefined) {
-        setShowInspector(persistedFlowData.showInspector);
-      }
-      if (persistedFlowData.showMiniMap !== undefined) {
-        setShowMiniMap(persistedFlowData.showMiniMap);
-      }
-      
-      // Restaurar estado de alterações não salvas
-      if (persistedFlowData.hasUnsavedChanges !== undefined) {
-        setHasUnsavedChanges(persistedFlowData.hasUnsavedChanges);
-      }
-      if (persistedFlowData.lastSavedState) {
-        setLastSavedState(persistedFlowData.lastSavedState);
-      }
-      
-      // Restaurar viewport (zoom e pan) após o ReactFlow estar pronto
-      if (persistedFlowData.viewport && reactFlowInstance) {
-        setTimeout(() => {
-          reactFlowInstance.setViewport(persistedFlowData.viewport);
-        }, 150);
-      }
-      
-      // Após a restauração, aguardar um ciclo antes de permitir atualizações
-      setTimeout(() => {
-        setIsRestoringData(false);
-      }, 200);
     }
-  }, [persistedFlowData, setNodes, setEdges, reactFlowInstance]);
+  }, [persistedFlowData, setNodes, setEdges]);
 
   // Atualizar dados persistidos sempre que houver mudanças no fluxo
   useEffect(() => {
-    // Só atualizar se não estiver restaurando dados
-    if (!isRestoringData) {
-      const flowData = {
-        nodes,
-        edges,
-        flowName,
-        currentFlowId,
-        // Persistir estado do editor
-        selectedNodeId,
-        selectedEdgeId,
-        selectedNodeType,
-        showInspector,
-        showMiniMap,
-        // Persistir estado de alterações não salvas
-        hasUnsavedChanges,
-        lastSavedState,
-        // Persistir viewport se disponível
-        viewport: reactFlowInstance?.getViewport() || { x: 0, y: 0, zoom: 1 }
-      };
-      onFlowDataChange(flowData);
-    }
-  }, [nodes, edges, flowName, currentFlowId, selectedNodeId, selectedEdgeId, selectedNodeType, showInspector, showMiniMap, hasUnsavedChanges, lastSavedState, reactFlowInstance, isRestoringData]);
-
-  // Detectar alterações não salvas comparando com o último estado salvo
-  useEffect(() => {
-    if (!isRestoringData && lastSavedState) {
-      const currentState = JSON.stringify({ nodes, edges });
-      const savedState = JSON.stringify(lastSavedState);
-      setHasUnsavedChanges(currentState !== savedState);
-    }
-  }, [nodes, edges, lastSavedState, isRestoringData]);
-
+    const flowData = {
+      nodes,
+      edges,
+      flowName,
+      currentFlowId
+    };
+    onFlowDataChange(flowData);
+  }, [nodes, edges, flowName, currentFlowId, onFlowDataChange]);
+  
   // Aplicar estilo de seleção às edges
   const styledEdges = edges.map((edge: Edge) => {
     // Detectar se a conexão parte de um SwitchNode e de qual conector
@@ -1085,17 +1019,6 @@ const FlowCanvas = ({
       code: currentFlow?.code || `FLX-${Math.floor(Math.random() * 100).toString().padStart(2, '0')}`,
       description: currentFlow?.description || `Fluxo atualizado em ${new Date().toLocaleString('pt-BR')}`,
       flowData: processedFlowData
-    }, {
-      onSuccess: () => {
-        // Atualizar estado salvo e limpar flag de alterações não salvas
-        setLastSavedState({ nodes, edges });
-        setHasUnsavedChanges(false);
-        
-        toast({
-          title: 'Fluxo salvo',
-          description: 'Todas as alterações foram salvas com sucesso.',
-        });
-      }
     });
   };
 
