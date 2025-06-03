@@ -147,6 +147,7 @@ export const FlowToolbar = ({
     console.log('=== handleFlowChangeAttempt called ===');
     console.log('newFlowId:', newFlowId);
     console.log('currentFlowId:', currentFlowId);
+    console.log('hasUnsavedChanges prop:', hasUnsavedChanges);
     console.log('checkUnsavedChanges function:', !!checkUnsavedChanges);
     
     // Se é o mesmo fluxo, não fazer nada
@@ -155,8 +156,8 @@ export const FlowToolbar = ({
       return;
     }
     
-    // Verificar alterações não salvas
-    const hasChanges = checkUnsavedChanges ? checkUnsavedChanges() : false;
+    // Verificar alterações não salvas - usar diretamente a prop hasUnsavedChanges primeiro
+    const hasChanges = hasUnsavedChanges || (checkUnsavedChanges ? checkUnsavedChanges() : false);
     console.log('Has unsaved changes:', hasChanges);
     console.log('showUnsavedModal state before:', showUnsavedModal);
     
