@@ -141,6 +141,13 @@ export const FlowToolbar = ({
   const [pendingFlowChange, setPendingFlowChange] = useState<string | null>(null);
   const [showUnsavedModal, setShowUnsavedModal] = useState(false);
 
+  // Teste: adicionar botão para forçar o modal aparecer
+  const testModal = () => {
+    console.log('Test modal button clicked');
+    setShowUnsavedModal(true);
+    setPendingFlowChange('test');
+  };
+
   const handleFlowChangeAttempt = (newFlowId: string) => {
     console.log('=== handleFlowChangeAttempt called ===');
     console.log('newFlowId:', newFlowId);
@@ -348,6 +355,16 @@ export const FlowToolbar = ({
             title={isFlowLocked ? "Fluxo bloqueado para edição" : "Limpar todos os nós"}
           >
             <RotateCcw className="h-4 w-4" />
+          </Button>
+          
+          {/* Botão de teste temporário */}
+          <Button 
+            onClick={testModal} 
+            variant="outline" 
+            size="sm"
+            style={{backgroundColor: 'red', color: 'white'}}
+          >
+            TEST MODAL
           </Button>
         </div>
       </div>
