@@ -1116,6 +1116,18 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
         currentFlowId={currentFlowId}
         savedFlows={savedFlows || []}
         onFlowSelect={(flowId) => {
+          // Verificar alterações não salvas antes de mudar de fluxo
+          if (hasUnsavedChanges) {
+            const shouldSave = window.confirm(
+              "Atenção, ao sair do editor você perderá todo conteúdo editado que ainda não foi salvo. Deseja salvar o fluxo antes de sair?\n\nClique em 'OK' para salvar ou 'Cancelar' para descartar as alterações."
+            );
+            
+            if (shouldSave) {
+              handleSave();
+            }
+            setHasUnsavedChanges(false);
+          }
+          
           if (savedFlows) {
             const selectedFlow = savedFlows.find(flow => flow.id === flowId);
             if (selectedFlow) {
