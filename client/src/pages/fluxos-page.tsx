@@ -714,16 +714,7 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
 
   // Função para carregar fluxo
   const loadFlow = useCallback((flow: any) => {
-    console.log('loadFlow called with:', flow.name);
-    console.log('reactFlowInstance:', !!reactFlowInstance);
-    console.log('flow.flowData:', !!flow.flowData);
-    
-    if (!flow.flowData) {
-      console.log('No flowData found, returning');
-      return;
-    }
-    
-    console.log('Processing flow data...');
+    if (!flow.flowData) return;
     
     // Verificar se o fluxo está bloqueado
     const isLocked = flow.isLocked === true;
@@ -740,8 +731,6 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
     }
     
     const { nodes: flowNodes, edges: flowEdges, viewport } = flow.flowData;
-    console.log('Flow nodes count:', flowNodes?.length || 0);
-    console.log('Flow edges count:', flowEdges?.length || 0);
     
     // Atualizar nós EndNode que têm To_Flow_id mas não têm To_Flow_code/To_Flow_name
     const updatedNodes = (flowNodes || []).map((node: any) => {
@@ -776,7 +765,6 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
       animated: false
     }));
     
-    console.log('Setting nodes and edges...');
     setNodes(updatedNodes);
     setEdges(styledEdges);
     setFlowName(flow.name);
@@ -793,14 +781,10 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
     
     // Reset do estado de alterações não salvas após carregar
     setHasUnsavedChanges(false);
-    console.log('Flow loaded - hasUnsavedChanges reset to false');
     
     // Definir viewport se reactFlowInstance estiver disponível
     if (reactFlowInstance && viewport) {
-      console.log('Setting viewport:', viewport);
       reactFlowInstance.setViewport(viewport);
-    } else if (!reactFlowInstance) {
-      console.log('ReactFlow instance not available yet');
     }
 
     toast({
@@ -811,12 +795,9 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
 
   // Lidar com pendingFlowId (seleção de fluxo vinda da Biblioteca)
   useEffect(() => {
-    console.log('FlowCanvas useEffect pendingFlowId:', pendingFlowId, 'savedFlows:', !!savedFlows);
     if (pendingFlowId && savedFlows) {
       const selectedFlow = savedFlows.find((flow: any) => flow.id === pendingFlowId);
-      console.log('selectedFlow found:', selectedFlow?.name);
       if (selectedFlow) {
-        console.log('Calling loadFlow for:', selectedFlow.name);
         // Carregar o fluxo selecionado
         setHasUnsavedChanges(false);
         hasUnsavedChangesRef.current = false;
@@ -1395,19 +1376,14 @@ export default function FluxosPage() {
 
   // Função para navegar do Biblioteca para o Editor com um fluxo específico
   const handleEditFlowFromBiblioteca = (flowId: string) => {
-    console.log('handleEditFlowFromBiblioteca called with flowId:', flowId);
-    console.log('hasUnsavedChanges:', hasUnsavedChanges);
-    
     if (hasUnsavedChanges) {
       // Se há alterações não salvas, armazenar o ID pendente e mostrar modal
-      console.log('Setting pendingFlowId and showing discard modal');
       setPendingFlowId(flowId);
       setShowDiscardModal(true);
       return;
     }
     
     // Se não há alterações, ir direto para o editor
-    console.log('Setting pendingFlowId and switching to editor tab');
     setPendingFlowId(flowId);
     setActiveTab("editor");
   };
