@@ -1178,11 +1178,6 @@ export default function FluxosPage() {
       <div className="flex-shrink-0 p-6 pb-4">
         <h1 className="text-3xl font-bold tracking-tight">
           Fluxos de Documentos
-          {currentFlowInfo && (
-            <span className="text-xl font-normal text-blue-600 ml-2">
-              - [{currentFlowInfo.code}] - {currentFlowInfo.name} (Editando)
-            </span>
-          )}
         </h1>
         <p className="text-muted-foreground">
           Defina e gerencie fluxos de trabalho para seus documentos
