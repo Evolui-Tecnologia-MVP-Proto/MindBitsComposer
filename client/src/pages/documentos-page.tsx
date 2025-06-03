@@ -188,10 +188,10 @@ const EndNodeComponent = (props: any) => {
       )}
       {props.data.configured && props.data.showLabel === false && (
         <div className="text-xs font-medium font-mono">
-          {props.data.FromType && (
+          {props.data.To_Type && (
             <div className={`px-2 py-1 rounded font-mono ${getTextColor()}`}>
-              {props.data.FromType === 'Init' ? 'Encerramento Direto' : 
-               props.data.FromType === 'flow_init' ? 'Transferência para Fluxo' : props.data.FromType}
+              {props.data.To_Type === 'Direct_finish' ? 'Encerramento Direto' : 
+               props.data.To_Type === 'flow_Finish' ? 'Transferência para Fluxo' : props.data.To_Type}
             </div>
           )}
           {props.data.To_Flow_id && (
@@ -206,7 +206,7 @@ const EndNodeComponent = (props: any) => {
               )}
             </div>
           )}
-          {!props.data.FromType && !props.data.To_Flow_id && <div className={`font-mono ${getTextColor()}`}>✓ Configurado</div>}
+
         </div>
       )}
       <Handle 
@@ -339,16 +339,25 @@ const ActionNodeComponent = (props: any) => {
 const DocumentNodeComponent = (props: any) => {
   const isExecuted = props.data.isExecuted === 'TRUE';
   const isPendingConnected = props.data.isPendingConnected;
+  const isInternalActivity = props.data.isInternalActivity;
   const isSelected = props.selected;
+  const isEditing = props.data.isEditing; // Novo: status de edição
   
   let fillColor = 'white';
-  if (isExecuted) fillColor = '#21639a';
-  else if (isPendingConnected) fillColor = '#fef3cd'; // amarelo claro
+  let baseStrokeColor = 'black';
+  if (isExecuted) {
+    fillColor = '#21639a';
+  } else if (isInternalActivity) {
+    fillColor = '#f3e8ff'; // lilás claro
+    baseStrokeColor = '#a855f7'; // lilás mais escuro para a borda
+  } else if (isPendingConnected) {
+    fillColor = '#fef3cd'; // amarelo claro
+  }
   
   const textClass = isExecuted ? 'text-white' : 'text-black';
   
   // Configurações para realce do nó selecionado
-  const strokeColor = isSelected ? '#f97316' : 'black'; // laranja quando selecionado
+  const strokeColor = isSelected ? '#f97316' : baseStrokeColor; // laranja quando selecionado ou cor base
   const strokeWidth = isSelected ? '4' : '2';
   const dropShadowFilter = isSelected 
     ? 'drop-shadow(0 4px 8px rgba(249, 115, 22, 0.4))' 
@@ -414,6 +423,11 @@ const DocumentNodeComponent = (props: any) => {
         />
       </svg>
     <FileText className="absolute top-1 left-1 h-6 w-6 text-purple-600 z-10" />
+    {isEditing && (
+      <div className="absolute top-1 right-1 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold z-20">
+        Editando
+      </div>
+    )}
     <div className="absolute inset-0 flex items-center justify-center" style={{ pointerEvents: 'none' }}>
       <div className="text-center pt-2">
         {props.data.showLabel !== false && (
@@ -648,6 +662,8 @@ export default function DocumentosPage() {
     useState(false);
   const [optimisticSyncState, setOptimisticSyncState] = useState<string | null>(null);
   const [selectedFlowId, setSelectedFlowId] = useState<string>("");
+  const [flowHistoryDropdown, setFlowHistoryDropdown] = useState<string | null>(null);
+  const [editingNodes, setEditingNodes] = useState<Set<string>>(new Set());
 
 
   const [editingDocument, setEditingDocument] = useState<Documento | null>(
@@ -1696,6 +1712,41 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     },
   });
 
+  // Mutation para encaminhar documento para edição
+  const forwardToEditMutation = useMutation({
+    mutationFn: async ({ nodeId, documentId, templateId }: { nodeId: string; documentId: string; templateId?: string }) => {
+      const response = await fetch('/api/documents-editions/forward', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ nodeId, documentId, templateId }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erro ao encaminhar para edição');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data, variables) => {
+      // Adicionar o nó à lista de nós em edição
+      setEditingNodes(prev => new Set(prev).add(variables.nodeId));
+      toast({
+        title: "Sucesso",
+        description: "Documento encaminhado para edição!",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro",
+        description: error.message || "Falha ao encaminhar para edição",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Filtrar documentos por status
   const documentosIntegrados = useMemo(
     () => documentos.filter((doc) => doc.status === "Integrado"),
@@ -1743,6 +1794,22 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         data: formData,
       });
     }
+  };
+
+  // Função para obter histórico de fluxos de um documento
+  const getDocumentFlowHistory = (documentId: string) => {
+    if (!flowExecutions) return [];
+    
+    return (flowExecutions as any[])
+      .filter((execution: any) => execution.documentId === documentId)
+      .sort((a: any, b: any) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      .map((execution: any) => ({
+        id: execution.flowId,
+        name: execution.flowName,
+        status: execution.status,
+        createdAt: execution.createdAt,
+        completedAt: execution.completedAt
+      }));
   };
 
   // Funções auxiliares para artefatos
@@ -1905,13 +1972,36 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   };
 
+  // Função para obter o último fluxo concluído de um documento
+  const getConcludedFlow = (documentId: string) => {
+    console.log("🔴 DEBUG: Buscando fluxo concluído para documentId:", documentId);
+    console.log("🔴 DEBUG: flowExecutions disponíveis:", flowExecutions);
+    
+    const concludedExecutions = flowExecutions.filter((execution: any) => {
+      console.log("🔴 DEBUG: Verificando execução:", execution);
+      console.log("🔴 DEBUG: execution.documentId:", execution.documentId);
+      console.log("🔴 DEBUG: execution.status:", execution.status);
+      return execution.documentId === documentId && execution.status === "completed";
+    });
+    
+    console.log("🔴 DEBUG: Execuções concluídas encontradas:", concludedExecutions);
+    
+    // Retorna a execução mais recente (ordenado por updatedAt)
+    return concludedExecutions.sort((a: any, b: any) => 
+      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    )[0];
+  };
+
   // Função para abrir modal do diagrama de fluxo
   const openFlowDiagramModal = (execution: any) => {
     console.log("🔴 Dados recebidos na função:", execution);
     if (execution) {
       setFlowDiagramModal({
         isOpen: true,
-        flowData: execution.flowTasks || execution,
+        flowData: {
+          ...(execution.flowTasks || execution),
+          documentId: execution.documentId || execution.document?.id
+        },
         documentTitle: execution.document?.objeto || execution.flowName || "Documento"
       });
       console.log("🔴 Estado atualizado:", {
@@ -2226,7 +2316,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             <TableHead>Nome</TableHead>
             <TableHead>Incluído</TableHead>
             <TableHead>Iniciado</TableHead>
-            <TableHead>Fluxo Atual</TableHead>
+            {activeTab !== "concluidos" && <TableHead>Fluxo Atual</TableHead>}
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Ações</TableHead>
           </TableRow>
@@ -2260,31 +2350,49 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   {formatDate(documento.updatedAt)}
                 </div>
               </TableCell>
-              <TableCell>
-                {(() => {
-                  const activeFlow = getActiveFlow(documento.id);
-                  if (activeFlow) {
+              {activeTab !== "concluidos" && (
+                <TableCell>
+                  {(() => {
+                    const activeFlow = getActiveFlow(documento.id);
+                    if (activeFlow) {
+                      return (
+                        <div className="flex items-center text-gray-500 text-sm">
+                          [{activeFlow.flowCode}] - {activeFlow.flowName}
+                        </div>
+                      );
+                    }
                     return (
-                      <div className="flex items-center text-gray-500 text-sm">
-                        [{activeFlow.flowCode}] - {activeFlow.flowName}
+                      <div className="text-xs text-gray-400">
+                        -
                       </div>
                     );
-                  }
-                  return (
-                    <div className="text-xs text-gray-400">
-                      -
-                    </div>
-                  );
-                })()}
-              </TableCell>
+                  })()}
+                </TableCell>
+              )}
               <TableCell>
-                <Badge
-                  variant={getStatusBadgeVariant(documento.status) as any}
-                  className="flex items-center gap-1 whitespace-nowrap"
-                >
-                  {getStatusIcon(documento.status)}
-                  {documento.status}
-                </Badge>
+                <div className="flex flex-col gap-1 items-center">
+                  <Badge
+                    variant={getStatusBadgeVariant(documento.status) as any}
+                    className="flex items-center gap-1 whitespace-nowrap"
+                  >
+                    {getStatusIcon(documento.status)}
+                    {documento.status}
+                  </Badge>
+                  {activeTab === "em-processo" && (
+                    <Badge
+                      variant="secondary"
+                      className={`text-xs w-full text-center hover:bg-yellow-100 ${
+                        documento.taskStatus && documento.taskStatus !== "Pendente"
+                          ? "bg-gray-100 text-gray-700 hover:bg-gray-100"
+                          : "bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
+                      }`}
+                    >
+                      {documento.taskStatus && documento.taskStatus !== "Pendente" 
+                        ? documento.taskStatus 
+                        : "Pendente"}
+                    </Badge>
+                  )}
+                </div>
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex justify-end space-x-2">
@@ -2297,30 +2405,168 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     <Eye className="h-4 w-4" />
                   </Button>
                   {activeTab === "em-processo" && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() => {
-                        console.log("🔴 BOTÃO CLICADO! Documento:", documento.objeto);
-                        const activeFlow = getActiveFlow(documento.id);
-                        console.log("🔴 Active flow encontrado:", activeFlow);
-                        if (activeFlow) {
-                          console.log("🔴 Abrindo modal com fluxo ativo");
-                          openFlowDiagramModal({
-                            flowTasks: activeFlow,
-                            document: { objeto: documento.objeto }
-                          });
-                        } else {
-                          console.log("🔴 Nenhum fluxo ativo encontrado para:", documento.id);
-                        }
-                      }}
-                      title="Mostrar diagrama do fluxo"
-                    >
-                      <GitBranch className="h-4 w-4 text-purple-500" />
-                    </Button>
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => {
+                          console.log("🔴 BOTÃO CLICADO! Documento:", documento.objeto);
+                          
+                          const flowToShow = getActiveFlow(documento.id);
+                          console.log("🔴 Fluxo ativo encontrado:", flowToShow);
+                          
+                          if (flowToShow && flowToShow.flowTasks) {
+                            console.log("🔴 Abrindo modal com fluxo");
+                            openFlowDiagramModal({
+                              flowTasks: flowToShow.flowTasks,
+                              documentId: documento.id,
+                              document: { objeto: documento.objeto }
+                            });
+                          } else {
+                            console.log("🔴 Nenhum fluxo ativo encontrado para:", documento.id);
+                          }
+                        }}
+                        title="Mostrar diagrama do fluxo ativo"
+                      >
+                        <GitBranch className="h-4 w-4 text-purple-500" />
+                      </Button>
+                      
+                      <div className="relative">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFlowHistoryDropdown(flowHistoryDropdown === documento.id ? null : documento.id);
+                          }}
+                          title="Histórico de fluxos"
+                        >
+                          <Clock className="h-4 w-4 text-orange-500" />
+                        </Button>
+                      </div>
+                    </>
                   )}
-                  {activeTab !== "integrados" && activeTab !== "em-processo" && (
+                  
+                  {activeTab === "concluidos" && (
+                    <div className="relative">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFlowHistoryDropdown(flowHistoryDropdown === documento.id ? null : documento.id);
+                        }}
+                        title="Histórico de fluxos"
+                      >
+                        <Clock className="h-4 w-4 text-orange-500" />
+                      </Button>
+                    </div>
+                  )}
+                  
+                  {/* Dropdown de histórico de fluxos renderizado fora da tabela */}
+                  {flowHistoryDropdown === documento.id && (activeTab === "em-processo" || activeTab === "concluidos") && (
+                    <div 
+                      className="fixed z-[99999] w-[624px] bg-white border border-gray-200 rounded-lg shadow-xl p-4"
+                      style={{
+                        top: '200px',
+                        right: '20px'
+                      }}
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="font-semibold text-sm">Histórico de Fluxos</h4>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => setFlowHistoryDropdown(null)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      
+                      <div className="max-h-64 overflow-y-auto">
+                        {getDocumentFlowHistory(documento.id).length > 0 ? (
+                          <Table>
+                            <TableHeader>
+                              <TableRow className="text-xs">
+                                <TableHead className="text-xs font-medium p-2">Nome do Fluxo</TableHead>
+                                <TableHead className="text-xs font-medium p-2 w-24">Status</TableHead>
+                                <TableHead className="text-xs font-medium p-2 w-32">Data Início</TableHead>
+                                <TableHead className="text-xs font-medium p-2 w-32">Data Fim</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {getDocumentFlowHistory(documento.id).map((flow: any, index: number) => (
+                                <TableRow 
+                                  key={flow.id + index} 
+                                  className="text-xs hover:bg-gray-50 cursor-pointer"
+                                  onClick={() => {
+                                    // Buscar os dados completos do fluxo
+                                    const fullFlowExecution = (flowExecutions as any[]).find(
+                                      (execution: any) => execution.flowId === flow.id && execution.documentId === documento.id
+                                    );
+                                    if (fullFlowExecution && fullFlowExecution.flowTasks) {
+                                      openFlowDiagramModal({
+                                        flowTasks: fullFlowExecution.flowTasks,
+                                        documentId: documento.id,
+                                        document: { objeto: documento.objeto }
+                                      });
+                                      setFlowHistoryDropdown(null); // Fechar o dropdown
+                                    }
+                                  }}
+                                >
+                                  <TableCell className="p-2 font-medium text-gray-800">
+                                    {flow.name}
+                                  </TableCell>
+                                  <TableCell className="p-2">
+                                    <Badge 
+                                      variant="outline"
+                                      className={`text-xs ${
+                                        flow.status === 'completed' ? 'bg-green-100 text-green-800 border-green-200' :
+                                        flow.status === 'initiated' ? 'bg-blue-100 text-blue-800 border-blue-200' :
+                                        flow.status === 'transfered' ? 'bg-orange-100 text-orange-800 border-orange-200' :
+                                        'bg-gray-100 text-gray-800 border-gray-200'
+                                      }`}
+                                    >
+                                      {flow.status === 'completed' ? 'Concluído' :
+                                       flow.status === 'initiated' ? 'Iniciado' :
+                                       flow.status === 'transfered' ? 'Transferido' : flow.status}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="p-2 text-gray-600">
+                                    <div>{new Date(flow.createdAt).toLocaleDateString("pt-BR")}</div>
+                                    <div className="text-xs text-gray-500">
+                                      {new Date(flow.createdAt).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}
+                                    </div>
+                                  </TableCell>
+                                  <TableCell className="p-2 text-gray-600">
+                                    {flow.completedAt ? (
+                                      <>
+                                        <div>{new Date(flow.completedAt).toLocaleDateString("pt-BR")}</div>
+                                        <div className="text-xs text-gray-500">
+                                          {new Date(flow.completedAt).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' })}
+                                        </div>
+                                      </>
+                                    ) : (
+                                      <span className="text-gray-400 text-xs">Em andamento</span>
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        ) : (
+                          <div className="text-center py-4 text-gray-500 text-sm">
+                            Nenhum fluxo encontrado para este documento
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  {activeTab !== "integrados" && activeTab !== "em-processo" && activeTab !== "concluidos" && (
                     <>
                       <Button
                         variant="ghost"
@@ -2345,16 +2591,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               </TableCell>
             </TableRow>
           ))}
-          {documentos.length === 0 && (
-            <TableRow>
-              <TableCell
-                colSpan={activeTab === "integrados" ? 8 : 7}
-                className="text-center py-6 text-gray-500"
-              >
-                Nenhum documento encontrado nesta categoria.
-              </TableCell>
-            </TableRow>
-          )}
         </TableBody>
       </Table>
     );
@@ -4682,7 +4918,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 <SelectContent>
                   {documentsFlows.map((flow: any) => (
                     <SelectItem key={flow.id} value={flow.id}>
-                      {flow.name}
+                      <span className="font-mono text-sm">
+                        [{flow.code}]
+                      </span>
+                      <span className="ml-2">
+                        {flow.name}
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -4996,75 +5237,85 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         return true;
       }
 
-      // Verificar se há formulário anexado
+      // Verifica se existe formulário anexado
       const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
-      
-      // Se não há formulário anexado, permite salvar
-      if (!attachedFormData || attachedFormData.trim() === '') {
-        console.log('🔍 Nenhum formulário anexado, permitindo salvar');
-        return true;
+      if (!attachedFormData) {
+        return true; // Sem formulário, pode salvar
       }
 
-      // Verificar se o formulário está realmente visível na interface
-      // A visibilidade é determinada pelos botões de status de aprovação
-      let isFormVisible = false;
-      
-      // Verificar se o nó está em estado pendente (aguardando aprovação)
-      // Isso indica que o formulário deveria estar visível
-      if (selectedFlowNode.data.isPendingConnected) {
-        isFormVisible = true;
-        console.log('🔍 Nó em estado pendente - formulário deve estar visível');
-      } else if (selectedFlowNode.data.isAproved === "TRUE") {
-        isFormVisible = false;
-        console.log('🔍 Nó já aprovado - formulário oculto');
-      } else if (selectedFlowNode.data.isAproved === "FALSE") {
-        isFormVisible = false;
-        console.log('🔍 Nó rejeitado - formulário oculto');
-      } else {
-        // Se não há estado de aprovação definido, assumir que formulário está visível
-        isFormVisible = true;
-        console.log('🔍 Estado de aprovação indefinido - assumindo formulário visível');
-      }
-      
-      // Se o formulário não está visível, permite salvar
-      if (!isFormVisible) {
-        console.log('🔍 Formulário oculto - botão habilitado');
-        return true;
-      }
+      try {
+        // Parse do formulário anexado
+        let formData;
+        if (typeof attachedFormData === 'string' && attachedFormData.includes('"Motivo de Recusa":') && attachedFormData.includes('"Detalhamento":')) {
+          // Converte o formato específico manualmente
+          formData = {
+            "Show_Condition": "FALSE",
+            "Fields": {
+              "Motivo de Recusa": ["Incompatível com processo", "Forma de operação", "Configuração de Sistema"],
+              "Detalhamento": ["default:", "type:longText"]
+            }
+          };
+        } else {
+          formData = JSON.parse(attachedFormData);
+        }
 
-      console.log('🔍 Formulário visível - validando campos obrigatórios');
-      const fieldsData = getFormFields();
-      const fieldNames = Object.keys(fieldsData);
-      
-      console.log('🔍 Validação de campos:', {
-        nodeId: selectedFlowNode.id,
-        nodeType: selectedFlowNode.type,
-        isPending: selectedFlowNode.data.isPendingConnected,
-        isFormVisible,
-        attachedFormData,
-        fieldsData,
-        fieldNames,
-        formValues,
-        hasFields: fieldNames.length > 0
-      });
-      
-      // Se não há campos no formulário, permite salvar
-      if (fieldNames.length === 0) {
-        console.log('🔍 Formulário sem campos válidos, permitindo salvar');
-        return true;
+        // Verifica se é um formulário com condição
+        if (formData.Show_Condition !== undefined && formData.Fields) {
+          const showCondition = formData.Show_Condition;
+          const isApprovalNode = selectedFlowNode.data.actionType === 'Intern_Aprove';
+          const approvalStatus = selectedFlowNode.data.isAproved;
+          
+          // Determina se deve mostrar o formulário baseado na condição
+          let shouldShowForm = false;
+          if (isApprovalNode && approvalStatus !== 'UNDEF') {
+            if (showCondition === 'TRUE' && approvalStatus === 'TRUE') {
+              shouldShowForm = true;
+            } else if (showCondition === 'FALSE' && approvalStatus === 'FALSE') {
+              shouldShowForm = true;
+            } else if (showCondition === 'BOTH' && (approvalStatus === 'TRUE' || approvalStatus === 'FALSE')) {
+              shouldShowForm = true;
+            }
+          }
+          
+          // Se o formulário não deve ser exibido devido à condição, permite salvar
+          if (!shouldShowForm) {
+            console.log('🔍 Formulário oculto por condição de aprovação, permitindo salvar');
+            return true;
+          }
+        }
+
+        // Se chegou até aqui, o formulário deve ser exibido, então valida os campos
+        const fieldsData = getFormFields();
+        const fieldNames = Object.keys(fieldsData);
+        
+        console.log('🔍 Validação de campos:', {
+          nodeId: selectedFlowNode.id,
+          nodeType: selectedFlowNode.type,
+          isPending: selectedFlowNode.data.isPendingConnected,
+          fieldsData,
+          fieldNames,
+          formValues,
+          hasFields: fieldNames.length > 0
+        });
+        
+        // Se não há campos, permite salvar
+        if (fieldNames.length === 0) return true;
+        
+        // Verifica se todos os campos têm valores preenchidos
+        const allFilled = fieldNames.every(fieldName => {
+          const value = formValues[fieldName];
+          // Para campos select, verificar se não está vazio ou "Selecione uma opção"
+          const isFilled = value && value.trim() !== '' && value !== 'Selecione uma opção';
+          console.log(`Campo ${fieldName}: valor="${value}", preenchido=${isFilled}`);
+          return isFilled;
+        });
+        
+        console.log('🔍 Resultado da validação:', allFilled);
+        return allFilled;
+      } catch (e) {
+        console.log('🔍 Erro na validação do formulário:', e);
+        return true; // Em caso de erro, permite salvar
       }
-      
-      // Verifica se todos os campos têm valores preenchidos
-      const allFilled = fieldNames.every(fieldName => {
-        const value = formValues[fieldName];
-        // Para campos select, verificar se não está vazio ou "Selecione uma opção"
-        const isFilled = value && value.trim() !== '' && value !== 'Selecione uma opção';
-        console.log(`Campo ${fieldName}: valor="${value}", preenchido=${isFilled}`);
-        return isFilled;
-      });
-      
-      console.log('🔍 Resultado da validação:', allFilled);
-      return allFilled;
     };
 
     // Função para alterar o status de aprovação (altera estado imediatamente e mostra alerta)
@@ -5098,6 +5349,109 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       // Mostrar alerta para persistir alterações
       console.log('🔴 Definindo showApprovalAlert para true');
       setShowApprovalAlert(true);
+    };
+
+    // Função para executar transferência de fluxo
+    const executeFlowTransfer = async () => {
+      if (!selectedFlowNode || selectedFlowNode.type !== 'endNode' || selectedFlowNode.data.FromType !== 'flow_init') {
+        console.log('Nenhum endNode de transferência selecionado');
+        return;
+      }
+
+      console.log('Executando transferência de fluxo...');
+      
+      try {
+        // Verificar se existe fluxo destino
+        if (!selectedFlowNode.data.To_Flow_id) {
+          setIntegrationResult({
+            status: 'error',
+            message: 'Fluxo de destino não definido para transferência.'
+          });
+          return;
+        }
+
+        // Marcar o nó como executado
+        const updatedNodes = [...nodes];
+        const nodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
+        if (nodeIndex !== -1) {
+          updatedNodes[nodeIndex] = {
+            ...updatedNodes[nodeIndex],
+            data: {
+              ...updatedNodes[nodeIndex].data,
+              isExecuted: 'TRUE',
+              isPendingConnected: false,
+              isReadonly: true
+            }
+          };
+          setNodes(updatedNodes);
+          
+          // Atualizar nó selecionado
+          setSelectedFlowNode({
+            ...selectedFlowNode,
+            data: {
+              ...selectedFlowNode.data,
+              isExecuted: 'TRUE',
+              isPendingConnected: false,
+              isReadonly: true
+            }
+          });
+        }
+
+        // Preparar dados atualizados do fluxo
+        const updatedFlowTasks = {
+          nodes: updatedNodes,
+          edges: edges,
+          viewport: flowData.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
+        };
+
+        // Chamar API para transferir fluxo
+        const response = await fetch(`/api/document-flow-executions/transfer`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            currentDocumentId: flowData.documentId,
+            targetFlowId: selectedFlowNode.data.To_Flow_id,
+            flowTasks: updatedFlowTasks
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Erro ao transferir fluxo');
+        }
+
+        const result = await response.json();
+        
+        console.log('✅ Transferência de fluxo concluída com sucesso pelo backend');
+
+        // Atualizar estado local
+        setFlowDiagramModal(prev => ({
+          ...prev,
+          flowData: {
+            ...prev.flowData,
+            flowTasks: updatedFlowTasks
+          }
+        }));
+
+        // Mostrar resultado de sucesso
+        setIntegrationResult({
+          status: 'success',
+          message: `Fluxo transferido com sucesso para "${result.targetFlowName}". Nova execução criada.`
+        });
+
+        // Recarregar dados
+        queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/documentos'] });
+        
+      } catch (error) {
+        console.error('❌ Erro ao transferir fluxo:', error);
+        setIntegrationResult({
+          status: 'error',
+          message: 'Falha na transferência do fluxo. Verifique os logs e tente novamente.'
+        });
+      }
     };
 
     // Função para executar encerramento direto do fluxo
@@ -5533,8 +5887,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     }, [showFlowInspector, fitView]);
 
     // Implementar lógica de "pendente em processo"
-    const nodes = flowData.flowTasks.nodes || [];
-    const edges = flowData.flowTasks.edges || [];
+    const nodes = flowData.nodes || [];
+    const edges = flowData.edges || [];
 
     // Encontrar nós executados
     const executedNodes = new Set(
@@ -5543,6 +5897,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
     // Encontrar nós pendentes conectados aos executados
     const pendingConnectedNodes = new Set<string>();
+    const internalActivityNodes = new Set<string>(); // Novo: nós em atividade interna
     
     for (const edge of edges) {
       // Se o nó de origem está executado e o nó de destino não está executado
@@ -5566,11 +5921,24 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             
             // Apenas marcar como pendente se a conexão está no handle correto
             if (shouldBeActive) {
-              pendingConnectedNodes.add(edge.target);
+              // Se for documentNode, marcar como atividade interna (lilás)
+              if (targetNode.type === 'documentNode') {
+                internalActivityNodes.add(edge.target);
+              } else {
+                pendingConnectedNodes.add(edge.target);
+              }
             }
           } else {
             // Para outros tipos de nós, aplicar lógica normal
-            pendingConnectedNodes.add(edge.target);
+            // EXCETO para endNode - endNode nunca deve ser marcado como pendente
+            if (targetNode.type !== 'endNode') {
+              // Se for documentNode, marcar como atividade interna (lilás)
+              if (targetNode.type === 'documentNode') {
+                internalActivityNodes.add(edge.target);
+              } else {
+                pendingConnectedNodes.add(edge.target);
+              }
+            }
           }
         }
       }
@@ -5578,13 +5946,27 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       // Se o nó de destino está executado e o nó de origem não está executado
       if (executedNodes.has(edge.target)) {
         const sourceNode = nodes.find((n: any) => n.id === edge.source);
+        const targetNode = nodes.find((n: any) => n.id === edge.target);
+        
         if (sourceNode && sourceNode.data?.isExecuted !== 'TRUE') {
-          pendingConnectedNodes.add(edge.source);
+          // Para integrationNode conectado a endNode executado, não marcar como pendente
+          // pois a integração já foi processada quando o endNode foi executado
+          if (sourceNode.type === 'integrationNode' && targetNode?.type === 'endNode') {
+            // Não marcar integrationNode como pendente se conectado a endNode executado
+            continue;
+          } else {
+            // Se for documentNode, marcar como atividade interna (lilás)
+            if (sourceNode.type === 'documentNode') {
+              internalActivityNodes.add(edge.source);
+            } else {
+              pendingConnectedNodes.add(edge.source);
+            }
+          }
         }
       }
     }
 
-    // Processar nós para adicionar destaque amarelo aos pendentes conectados
+    // Processar nós para adicionar destaque amarelo aos pendentes conectados e lilás aos de atividade interna
     const processedNodes = nodes.map((node: any) => {
       const isSelected = selectedFlowNode?.id === node.id;
       
@@ -5595,6 +5977,19 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           data: {
             ...node.data,
             isPendingConnected: true,
+            isInternalActivity: false,
+            isEditing: editingNodes.has(node.id),
+          }
+        };
+      } else if (internalActivityNodes.has(node.id)) {
+        return {
+          ...node,
+          selected: isSelected,
+          data: {
+            ...node.data,
+            isPendingConnected: false,
+            isInternalActivity: true,
+            isEditing: editingNodes.has(node.id),
             isReadonly: true
           },
         };
@@ -5602,7 +5997,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       return {
         ...node,
         selected: isSelected,
-        data: { ...node.data, isReadonly: true }
+        data: { 
+          ...node.data, 
+          isPendingConnected: false,
+          isInternalActivity: false,
+          isEditing: editingNodes.has(node.id),
+          isReadonly: true 
+        }
       };
     });
 
@@ -5616,6 +6017,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       
       const sourcePending = pendingConnectedNodes.has(edge.source);
       const targetPending = pendingConnectedNodes.has(edge.target);
+      const sourceInternalActivity = internalActivityNodes.has(edge.source);
+      const targetInternalActivity = internalActivityNodes.has(edge.target);
       
       let edgeColor = '#6b7280'; // cor padrão
       let shouldAnimate = false; // nova variável para controlar animação
@@ -5626,7 +6029,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         edgeColor = '#21639a';
         shouldAnimate = true; // animar conexões executadas (azuis)
       }
-      // Se há conexão entre executado e pendente conectado (PRIORIDADE MÁXIMA)
+      // Se há conexão entre executado e atividade interna (lilás)
+      else if ((sourceExecuted && targetInternalActivity) || (sourceInternalActivity && targetExecuted)) {
+        edgeColor = '#a855f7'; // lilás
+        shouldAnimate = true; // animar conexões de atividade interna (lilás)
+      }
+      // Se há conexão entre executado e pendente conectado (amarelo)
       else if ((sourceExecuted && targetPending) || (sourcePending && targetExecuted)) {
         edgeColor = '#fbbf24'; // amarelo
         shouldAnimate = true; // animar conexões pendentes (amarelas)
@@ -6051,12 +6459,16 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               <div className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${
                                 selectedFlowNode.data.isExecuted === 'TRUE' 
                                   ? 'bg-blue-100 text-blue-800' 
+                                  : selectedFlowNode.data.isInternalActivity
+                                  ? 'bg-purple-100 text-purple-800'
                                   : selectedFlowNode.data.isPendingConnected
                                   ? 'bg-yellow-100 text-yellow-800'
                                   : 'bg-gray-100 text-gray-800'
                               }`}>
                                 {selectedFlowNode.data.isExecuted === 'TRUE' 
                                   ? 'Executado' 
+                                  : selectedFlowNode.data.isInternalActivity
+                                  ? 'Atv.Interna'
                                   : selectedFlowNode.data.isPendingConnected
                                   ? 'Pendente'
                                   : 'N.Exec.'}
@@ -6217,6 +6629,39 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
 
+                {/* Manual execution form para DocumentNode em Atv.Interna */}
+                {selectedFlowNode.type === 'documentNode' && selectedFlowNode.data.isInternalActivity && (
+                  <div className="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                    <div className="mb-3">
+                      <p className="text-xs text-purple-800 mb-2">
+                        Pressione o botão para que o documento seja disponibilizado no editor, uma vez enviado ele deve ser listado no editor para iniciar o processo de composição.
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        if (selectedFlowNode && flowDiagramModal.flowData) {
+                          forwardToEditMutation.mutate({
+                            nodeId: selectedFlowNode.id,
+                            documentId: flowDiagramModal.flowData.documentId,
+                            templateId: selectedFlowNode.data.docType
+                          });
+                        }
+                      }}
+                      disabled={forwardToEditMutation.isPending || editingNodes.has(selectedFlowNode?.id)}
+                      className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                        forwardToEditMutation.isPending || editingNodes.has(selectedFlowNode?.id)
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-purple-600 text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2'
+                      }`}
+                    >
+                      {forwardToEditMutation.isPending ? 'Encaminhando...' : 
+                       editingNodes.has(selectedFlowNode?.id) ? 'Já Encaminhado' : 
+                       'Encaminhar para Edição'}
+                    </button>
+                  </div>
+                )}
+
                 {/* Layout tabular para StartNode - 2 colunas */}
                 {selectedFlowNode.type === 'startNode' && (
                   <div>
@@ -6286,10 +6731,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               </div>
                             </td>
                             <td className="px-2 py-1.5 text-center">
-                              {selectedFlowNode.data.FromType ? (
+                              {selectedFlowNode.data.To_Type ? (
                                 <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                  {selectedFlowNode.data.FromType === 'Init' ? 'Encerramento Direto' : 
-                                   selectedFlowNode.data.FromType === 'flow_init' ? 'Transferência para Fluxo' : selectedFlowNode.data.FromType}
+                                  {selectedFlowNode.data.To_Type === 'Direct_finish' ? 'Encerramento Direto' : 
+                                   selectedFlowNode.data.To_Type === 'flow_Finish' ? 'Transferência para Fluxo' : selectedFlowNode.data.To_Type}
                                 </div>
                               ) : (
                                 <span className="text-gray-400 text-xs">-</span>
@@ -6299,6 +6744,67 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         </tbody>
                       </table>
                     </div>
+
+                    {/* Exibição do fluxo destino para EndNode de Transferência */}
+                    {selectedFlowNode.data.FromType === 'flow_init' && selectedFlowNode.data.To_Flow_id && (
+                      <div className="mt-4">
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <div className="mb-2">
+                            <p className="text-xs font-medium text-blue-800 mb-1">Fluxo Destino:</p>
+                            <p className="text-xs text-blue-700 font-mono bg-white px-2 py-1 rounded border">
+                              {selectedFlowNode.data.To_Flow_id}
+                            </p>
+                          </div>
+                          {(selectedFlowNode.data.To_Flow_code || selectedFlowNode.data.To_Flow_name) && (
+                            <div>
+                              <p className="text-xs font-medium text-blue-800 mb-1">Detalhes:</p>
+                              <p className="text-xs text-blue-700 font-mono bg-white px-2 py-1 rounded border">
+                                [{selectedFlowNode.data.To_Flow_code}] - {selectedFlowNode.data.To_Flow_name}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Manual execution form para EndNode de Transferência para Fluxo */}
+                    {selectedFlowNode.data.FromType === 'flow_init' && selectedFlowNode.data.To_Flow_id && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
+                      <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="mb-3">
+                          <p className="text-xs text-blue-800 mb-2">
+                            Ao pressionar o botão você confirma o encerramento deste fluxo e a abertura do novo fluxo vinculado. Ao confirmar, o sistema: 1- Encerra o fluxo corrente, 2- Cria uma nova instância com o fluxo indicado vinculado ao presente documento, 3- Inicia o fluxo no novo documento. Confirma estas ações?
+                          </p>
+                        </div>
+
+                        {integrationResult.status && (
+                          <div className={`mb-3 p-3 rounded-md ${
+                            integrationResult.status === 'success' 
+                              ? 'bg-green-50 border border-green-200' 
+                              : 'bg-red-50 border border-red-200'
+                          }`}>
+                            <p className={`text-sm ${
+                              integrationResult.status === 'success' 
+                                ? 'text-green-800' 
+                                : 'text-red-800'
+                            }`}>
+                              {integrationResult.message}
+                            </p>
+                          </div>
+                        )}
+
+                        <button
+                          onClick={executeFlowTransfer}
+                          disabled={selectedFlowNode.data.isExecuted === 'TRUE'}
+                          className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                            selectedFlowNode.data.isExecuted === 'TRUE'
+                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                              : 'bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+                          }`}
+                        >
+                          {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Transferência Concluída' : 'Transferir Fluxo'}
+                        </button>
+                      </div>
+                    )}
 
                     {/* Manual execution form para EndNode de Encerramento Direto */}
                     {selectedFlowNode.data.FromType === 'Init' && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
@@ -6395,12 +6901,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   </div>
                 )}
 
-                {selectedFlowNode.data.To_Flow_id && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">Fluxo de Destino</p>
-                    <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.To_Flow_id}</p>
-                  </div>
-                )}
+
 
                 {selectedFlowNode.type === 'actionNode' && selectedFlowNode.data.actionType === 'Intern_Aprove' && selectedFlowNode.data.isAproved !== undefined && (
                   <div>
@@ -6578,12 +7079,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               </div>
             )}
 
-            {selectedFlowNode.data.To_Flow_id && (
-              <div>
-                <p className="text-sm font-medium text-gray-700">Fluxo de Destino</p>
-                <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.To_Flow_id}</p>
-              </div>
-            )}
+
 
             {selectedFlowNode.type === 'switchNode' && selectedFlowNode.data.switchField && (
               <div>

@@ -209,6 +209,7 @@ export const documentos = pgTable("documentos", {
   generalColumns: json("general_columns").$type<Record<string, any>>().default({}), // Armazena dados extras do sistema de origem
   mondayItemValues: json("monday_item_values").$type<Record<string, any>>().default({}), // Armazena valores dos itens do Monday.com
   assetsSynced: boolean("assets_synced").default(false), // Indica se os anexos foram sincronizados com sucesso
+  taskStatus: text("task_status"), // Status da tarefa/atividade
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -339,7 +340,7 @@ export const documentFlowExecutions = pgTable("document_flow_executions", {
   id: uuid("id").defaultRandom().primaryKey(),
   documentId: uuid("document_id").notNull().references(() => documentos.id, { onDelete: "cascade" }),
   flowId: uuid("flow_id").notNull().references(() => documentsFlows.id, { onDelete: "cascade" }),
-  status: text("status", { enum: ["initiated", "in_progress", "completed", "failed"] }).notNull().default("initiated"),
+  status: text("status", { enum: ["initiated", "in_progress", "completed", "failed", "transfered"] }).notNull().default("initiated"),
   executionData: json("execution_data").$type<Record<string, any>>().default({}),
   flowTasks: json("flow_tasks").$type<Record<string, any>>().default({}),
   startedBy: integer("started_by").notNull().references(() => users.id),
@@ -379,6 +380,35 @@ export const insertDocumentsFlowSchema = createInsertSchema(documentsFlows).omit
 
 export type InsertDocumentsFlow = z.infer<typeof insertDocumentsFlowSchema>;
 export type DocumentsFlow = typeof documentsFlows.$inferSelect;
+
+// Documents Editions table
+export const documentsEditions = pgTable("documents_editions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  nodeId: text("node_id").notNull(),
+  docCod: text("doc_cod").notNull(),
+  docName: text("doc_name").notNull(),
+  dateEdit: timestamp("date_edit"),
+  datePublish: timestamp("date_publish"),
+  lexFile: json("lex_file").$type<Record<string, any>>(),
+  binaryFile: text("binary_file"), // PostgreSQL doesn't have BLOB, using TEXT for base64 encoded data
+  mdFile: text("md_file"), // Using TEXT instead of LONGTEXT (MySQL specific)
+  documentFlowExecutionId: uuid("document_flow_execution_id").references(() => documentFlowExecutions.id, { onDelete: "cascade" }),
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }),
+  repoStructureId: uuid("repo_structure_id").references(() => repoStructure.uid, { onDelete: "cascade" }),
+  templateId: uuid("template_id").references(() => templates.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Documents Editions schema
+export const insertDocumentsEditionSchema = createInsertSchema(documentsEditions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertDocumentsEdition = z.infer<typeof insertDocumentsEditionSchema>;
+export type DocumentsEdition = typeof documentsEditions.$inferSelect;
 
 // Relations
 export const repoStructureRelations = {
