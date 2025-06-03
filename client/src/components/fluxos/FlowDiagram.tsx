@@ -2,6 +2,7 @@ import React, { RefObject } from 'react';
 import ReactFlow, {
   Controls,
   Background,
+  MiniMap,
   MarkerType,
   ConnectionLineType,
   type Node,
@@ -48,6 +49,9 @@ interface FlowDiagramProps {
   
   // Flow state
   isFlowLocked?: boolean;
+  
+  // MiniMap
+  showMiniMap?: boolean;
 }
 
 export const FlowDiagram = ({
@@ -72,7 +76,8 @@ export const FlowDiagram = ({
   savedFlows,
   templatesData,
   applyInspectorChanges,
-  isFlowLocked = false
+  isFlowLocked = false,
+  showMiniMap = false
 }: FlowDiagramProps) => {
   return (
     <div className="flex flex-1 overflow-hidden border border-gray-200 rounded-md">
