@@ -1425,7 +1425,7 @@ const FlowCanvas = ({ onFlowInfoChange }: { onFlowInfoChange: (info: {code: stri
     const nodeMetadata = getNodeMetadata(selectedNode.type);
     
     return (
-      <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto">
+      <div className="w-full h-full bg-white border-l border-gray-200 p-4 overflow-y-auto">
         <div className="space-y-4">
           <div className="border-b pb-2">
             <h3 className="text-lg font-semibold">Inspector de Propriedades</h3>
