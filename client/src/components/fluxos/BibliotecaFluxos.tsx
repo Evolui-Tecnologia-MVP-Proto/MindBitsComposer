@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Copy, Edit, Trash2, Settings } from "lucide-react";
+import { BookOpen, Copy, Edit, Trash2, FileEdit } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { FlowMetadataModal } from './FlowMetadataModal';
@@ -218,7 +218,7 @@ export const BibliotecaFluxos = () => {
                       variant="secondary"
                       onClick={() => setEditingFlow(flow)}
                     >
-                      <Settings className="mr-1 h-3 w-3" />
+                      <FileEdit className="mr-1 h-3 w-3" />
                       Metadata
                     </Button>
 
