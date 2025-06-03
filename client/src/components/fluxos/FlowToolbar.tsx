@@ -198,7 +198,10 @@ export const FlowToolbar = ({
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-4">
           <div className="w-64">
-            <Select value={currentFlowId || ""} onValueChange={handleFlowChangeAttempt}>
+            <Select value={currentFlowId || ""} onValueChange={(value) => {
+              console.log('Select onValueChange triggered with value:', value);
+              handleFlowChangeAttempt(value);
+            }}>
               <SelectTrigger id="flow-select" className="!text-xs text-left font-mono">
                 <SelectValue placeholder="Carregar fluxo existente" />
               </SelectTrigger>
