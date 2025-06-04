@@ -4193,11 +4193,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      const edition = await storage.createDocumentEdition(req.body);
+      console.log("📋 Dados recebidos para criar document_edition:", JSON.stringify(req.body, null, 2));
+      
+      // Validar dados obrigatórios
+      if (!req.body.documentId) {
+        return res.status(400).json({ error: "documentId é obrigatório" });
+      }
+      if (!req.body.templateId) {
+        return res.status(400).json({ error: "templateId é obrigatório" });
+      }
+      
+      // Preparar dados para inserção
+      const insertData = {
+        documentId: req.body.documentId,
+        templateId: req.body.templateId,
+        status: req.body.status || "in_progress",
+        init: new Date(),
+        lexFile: req.body.lexFile || null,
+        jsonFile: req.body.jsonFile || {},
+        mdFile: req.body.mdFile || null,
+        publish: req.body.publish || null
+      };
+      
+      console.log("📋 Dados preparados para inserção:", JSON.stringify(insertData, null, 2));
+      
+      const edition = await storage.createDocumentEdition(insertData);
+      console.log("✅ Document edition criada com sucesso:", edition.id);
       res.status(201).json(edition);
     } catch (error) {
-      console.error("Erro ao criar edição de documento:", error);
-      res.status(500).send("Erro ao criar edição de documento");
+      console.error("❌ Erro detalhado ao criar edição de documento:", error);
+      console.error("❌ Stack trace:", error.stack);
+      res.status(500).json({ 
+        error: "Erro ao criar edição de documento",
+        details: error.message 
+      });
     }
   });
 
