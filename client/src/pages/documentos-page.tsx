@@ -6382,11 +6382,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   // Salvar alterações no banco de dados imediatamente
                                   const updatedFlowTasks = {
                                     nodes: updatedNodes,
-                                    edges: getEdges(),
-                                    viewport: { x: 0, y: 0, zoom: 1 }
+                                    edges: flowDiagramModal.flowData?.flowTasks?.edges || [],
+                                    viewport: flowDiagramModal.flowData?.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
                                   };
 
-                                  const response = await fetch(`/api/document-flow-executions/${flowData.documentId}`, {
+                                  const response = await fetch(`/api/document-flow-executions/${flowDiagramModal.flowData?.documentId}`, {
                                     method: 'PUT',
                                     headers: {
                                       'Content-Type': 'application/json',
