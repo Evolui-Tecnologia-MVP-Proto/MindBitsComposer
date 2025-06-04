@@ -5,7 +5,7 @@ import { storage } from "./storage";
 import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
-import { eq, sql, desc, and, gte, lte, isNull, or } from "drizzle-orm";
+import { eq, sql, desc, and, gte, lte, isNull, or, ne } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { systemLogs } from "@shared/schema";
 import { ZodError } from "zod";
@@ -3647,9 +3647,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       
       if (name !== undefined) updateData.name = name;
-      if (code !== undefined) updateData.code = code;
       if (description !== undefined) updateData.description = description;
       if (processedFlowData) updateData.flowData = processedFlowData;
+      
+      // Só atualizar o código se ele foi fornecido E é diferente do atual
+      if (code !== undefined) {
+        // Verificar se o código já existe em outro fluxo
+        const existingFlow = await db.select()
+          .from(documentsFlows)
+          .where(and(
+            eq(documentsFlows.code, code),
+            ne(documentsFlows.id, req.params.id),
+            eq(documentsFlows.userId, req.user.id)
+          ));
+          
+        if (existingFlow.length > 0) {
+          return res.status(400).json({ error: `Código '${code}' já está sendo usado por outro fluxo` });
+        }
+        
+        updateData.code = code;
+      }
       
       const updatedFlow = await db.update(documentsFlows)
         .set(updateData)

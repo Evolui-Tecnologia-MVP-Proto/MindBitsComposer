@@ -1136,13 +1136,9 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
       }))
     };
 
-    // Buscar dados do fluxo atual para preservar nome e código
-    const currentFlow = savedFlows?.find(flow => flow.id === currentFlowId);
-    
+    // Para salvamento de fluxo existente, enviar apenas flowData
+    // Nome, código e descrição não devem ser alterados em salvamentos regulares
     saveFlowMutation.mutate({
-      name: currentFlow?.name || flowName,
-      code: currentFlow?.code || `FLX-${Math.floor(Math.random() * 100).toString().padStart(2, '0')}`,
-      description: currentFlow?.description || `Fluxo atualizado em ${new Date().toLocaleString('pt-BR')}`,
       flowData: processedFlowData
     });
   };
