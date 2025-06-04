@@ -54,6 +54,7 @@ export const templates = pgTable("templates", {
   description: text("description").notNull(),
   type: text("type", { enum: ["struct", "output"] }).notNull(),
   structure: json("structure").notNull(),
+  mappings: json("mappings").$type<Record<string, string>>().default({}),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

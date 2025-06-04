@@ -17,6 +17,7 @@ type TemplateFormValues = {
   description: string;
   type: string;
   structure: string | object;
+  mappings?: Record<string, string>;
 };
 
 const emptyTemplate: TemplateFormValues = {
@@ -25,6 +26,7 @@ const emptyTemplate: TemplateFormValues = {
   description: "",
   type: "struct",
   structure: "{}",
+  mappings: {},
 };
 
 interface TemplateFormModalProps {
@@ -54,6 +56,7 @@ export default function TemplateFormModal({
           structure: typeof template.structure === 'object' 
             ? JSON.stringify(template.structure, null, 2) 
             : "{}",
+          mappings: template.mappings || {},
         }
       : { 
           ...emptyTemplate, 
@@ -102,7 +105,7 @@ export default function TemplateFormModal({
     }
   };
 
-  // Atualiza os mapeamentos quando a estrutura muda
+  // Atualiza os mapeamentos quando a estrutura muda ou template é carregado
   useEffect(() => {
     const fields = extractFieldsFromStructure(
       typeof formData.structure === 'string' ? formData.structure : JSON.stringify(formData.structure)
@@ -110,12 +113,12 @@ export default function TemplateFormModal({
     
     const newMappings: Record<string, string> = {};
     fields.forEach(field => {
-      // Preserva valores existentes ou inicializa vazio
-      newMappings[field] = fieldMappings[field] || '';
+      // Preserva valores existentes do template ou do estado local
+      newMappings[field] = formData.mappings?.[field] || fieldMappings[field] || '';
     });
     
     setFieldMappings(newMappings);
-  }, [formData.structure]);
+  }, [formData.structure, formData.mappings]);
 
   // Função para atualizar valor de mapeamento
   const handleMappingChange = (field: string, value: string) => {
