@@ -524,7 +524,7 @@ export default function BasicTextEditor() {
 
           <Separator orientation="vertical" className="h-6" />
 
-          <FileText className="h-4 w-4 text-gray-500" />
+          <Database className="h-4 w-4 text-gray-500" />
           <Select value={selectedDocumentEdition} onValueChange={handleDocumentEditionSelect}>
             <SelectTrigger className="w-[200px] font-mono">
               <SelectValue placeholder="Selecionar documento..." />
