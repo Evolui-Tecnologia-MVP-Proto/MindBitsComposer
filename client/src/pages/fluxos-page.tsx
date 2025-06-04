@@ -147,10 +147,7 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
     setGlobalUnsavedChanges(hasUnsavedChanges);
   }, [hasUnsavedChanges, setGlobalUnsavedChanges]);
 
-  // Configurar função de salvamento para o sistema de proteção
-  useEffect(() => {
-    setSaveFunction(() => () => handleSave(true)); // forceExit = true para navegação
-  }, [setSaveFunction, handleSave]);
+
   
   // Função para determinar cor do handle do switchNode
   const getSwitchHandleColor = (switchValue: any) => {
@@ -1154,6 +1151,11 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
       flowData: processedFlowData
     });
   };
+
+  // Configurar função de salvamento para o sistema de proteção de navegação
+  useEffect(() => {
+    setSaveFunction(() => () => handleSave(true)); // forceExit = true para navegação
+  }, [setSaveFunction]);
 
   const handleReset = () => {
     toast({
