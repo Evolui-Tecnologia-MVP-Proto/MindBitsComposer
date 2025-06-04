@@ -912,6 +912,19 @@ export default function DocumentosPage() {
     queryKey: ["/api/monday/mappings"],
   });
 
+  // Buscar templates para exibir informações nos documentNodes
+  const { data: templatesList = [] } = useQuery({
+    queryKey: ['/api/templates/struct'],
+    enabled: true
+  });
+
+  // Função auxiliar para obter informações do template
+  const getTemplateInfo = (templateId: string) => {
+    if (!templatesList || !templateId) return null;
+    const template = (templatesList as any[]).find((t: any) => t.id === templateId);
+    return template ? { code: template.code, name: template.name } : null;
+  };
+
   // Buscar todas as colunas Monday de todos os mapeamentos
   const { data: allMondayColumns = [] } = useQuery({
     queryKey: ["/api/monday/columns/all"],
@@ -6326,6 +6339,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               <span className="font-mono font-medium">
                                 {(() => {
                                   if (selectedFlowNode.data.docType) {
+                                    const templateInfo = getTemplateInfo(selectedFlowNode.data.docType);
+                                    if (templateInfo) {
+                                      return `${templateInfo.code} - ${templateInfo.name}`;
+                                    }
+                                    // Fallback: tentar extrair do formato já processado
                                     const parts = selectedFlowNode.data.docType.split('-');
                                     return parts.length >= 2 ? `${parts[0]} - ${parts[1]}` : selectedFlowNode.data.docType;
                                   }
@@ -6393,6 +6411,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               <span className="font-mono font-medium">
                                 {(() => {
                                   if (selectedFlowNode.data.docType) {
+                                    const templateInfo = getTemplateInfo(selectedFlowNode.data.docType);
+                                    if (templateInfo) {
+                                      return `${templateInfo.code} - ${templateInfo.name}`;
+                                    }
+                                    // Fallback: tentar extrair do formato já processado
                                     const parts = selectedFlowNode.data.docType.split('-');
                                     return parts.length >= 2 ? `${parts[0]} - ${parts[1]}` : selectedFlowNode.data.docType;
                                   }
