@@ -4220,6 +4220,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const edition = await storage.createDocumentEdition(insertData);
       console.log("✅ Document edition criada com sucesso:", edition.id);
+      
+      // Atualizar o task_state do documento para "in_doc" quando uma edição é iniciada
+      await storage.updateDocumento(insertData.documentId, { taskState: "in_doc" });
+      console.log("✅ Task state do documento atualizado para 'in_doc'");
+      
       res.status(201).json(edition);
     } catch (error) {
       console.error("❌ Erro detalhado ao criar edição de documento:", error);

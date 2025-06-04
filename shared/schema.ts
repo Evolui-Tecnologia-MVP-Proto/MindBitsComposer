@@ -204,6 +204,7 @@ export const documentos = pgTable("documentos", {
   solicitante: text("solicitante").notNull().default(""),
   aprovador: text("aprovador").notNull().default(""),
   agente: text("agente").notNull().default(""),
+  taskState: text("task_state"), // Estado da tarefa: null/branco="Ação Pendente", "in_doc"="Documentando", "in_apr"="Em aprovação"
   idOrigem: bigint("id_origem", { mode: "bigint" }), // Campo para mapeamento com Monday.com
   idOrigemTxt: text("id_origem_txt"), // Campo texto para IDs externos (evita problemas de conversão)
   generalColumns: json("general_columns").$type<Record<string, any>>().default({}), // Armazena dados extras do sistema de origem
