@@ -387,6 +387,7 @@ export const documentEditions = pgTable("document_editions", {
   id: uuid("id").defaultRandom().primaryKey(),
   documentId: uuid("document_id").notNull().references(() => documentos.id, { onDelete: "cascade" }),
   templateId: uuid("template_id").notNull().references(() => templates.id, { onDelete: "cascade" }),
+  startedBy: integer("started_by").notNull().references(() => users.id, { onDelete: "cascade" }),
   status: text("status", { enum: ["draft", "in_progress", "review", "published", "archived"] }).notNull().default("draft"),
   lexFile: text("lex_file"), // Texto base64 para armazenar arquivo LEX
   jsonFile: json("json_file").$type<Record<string, any>>().default({}), // JSON estruturado

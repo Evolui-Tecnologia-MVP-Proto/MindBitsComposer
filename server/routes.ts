@@ -4207,6 +4207,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const insertData = {
         documentId: req.body.documentId,
         templateId: req.body.templateId,
+        startedBy: req.user!.id, // ID do usuário logado
         status: req.body.status || "in_progress",
         init: new Date(),
         lexFile: req.body.lexFile || null,
