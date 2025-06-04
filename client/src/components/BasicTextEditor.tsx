@@ -117,7 +117,7 @@ export default function BasicTextEditor() {
   });
 
   // Buscar document editions com objetos dos documentos
-  const { data: documentEditions } = useQuery<Array<{ id: string; documentId: string; documentObject?: string; status: string; init: string | null }>>({
+  const { data: documentEditions } = useQuery<Array<{ id: string; documentId: string; documentObject?: string; status: string; init: string | null; templateCode?: string }>>({
     queryKey: ["/api/document-editions-with-objects"],
   });
 
@@ -551,12 +551,20 @@ export default function BasicTextEditor() {
           <Database className="h-4 w-4 text-gray-500" />
           <Select value={selectedDocumentEdition} onValueChange={handleDocumentEditionSelect}>
             <SelectTrigger className="w-[200px] font-mono">
-              <SelectValue placeholder="Selecionar documento..." />
+              <SelectValue placeholder="Selecionar documento...">
+                {selectedDocumentEdition && (() => {
+                  const selectedEdition = documentEditions?.find(edition => edition.id === selectedDocumentEdition);
+                  if (selectedEdition) {
+                    return `${selectedEdition.templateCode ? `[${selectedEdition.templateCode}] - ` : ''}${selectedEdition.documentObject || 'Documento sem título'}`;
+                  }
+                  return "Selecionar documento...";
+                })()}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent className="font-mono">
               {documentEditions?.map((edition) => (
                 <SelectItem key={edition.id} value={edition.id} className="font-mono">
-                  {edition.documentObject || 'Documento sem título'}
+                  {edition.templateCode ? `[${edition.templateCode}] - ` : ''}{edition.documentObject || 'Documento sem título'}
                 </SelectItem>
               ))}
             </SelectContent>

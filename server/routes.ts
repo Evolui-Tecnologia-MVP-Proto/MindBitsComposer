@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions } from "@shared/schema";
+import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, templates } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc, and, gte, lte, isNull, or, ne } from "drizzle-orm";
@@ -4199,10 +4199,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           documentId: documentEditions.documentId,
           status: documentEditions.status,
           init: documentEditions.init,
-          documentObject: documentos.objeto
+          documentObject: documentos.objeto,
+          templateCode: templates.code
         })
         .from(documentEditions)
         .leftJoin(documentos, eq(documentEditions.documentId, documentos.id))
+        .leftJoin(templates, eq(documentEditions.templateId, templates.id))
         .orderBy(desc(documentEditions.createdAt));
       
       res.json(editions);
