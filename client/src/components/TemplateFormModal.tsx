@@ -229,7 +229,7 @@ export default function TemplateFormModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] flex flex-col">
+      <DialogContent className="sm:max-w-[780px] max-h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>
             {mode === "create" ? "Novo Template" : "Editar Template"}
