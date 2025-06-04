@@ -5553,13 +5553,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             const switchOutgoingEdges = edges.filter(e => e.source === connectedNode.id);
             
             switchOutgoingEdges.forEach(switchEdge => {
-              const { inputSwitch, redSwitch, greenSwitch } = connectedNode.data;
+              const { inputSwitch, leftSwitch, rightSwitch } = connectedNode.data;
               let shouldActivateConnection = false;
               
               // Verificar se a conexão deve estar ativa baseada no inputSwitch
-              if (switchEdge.sourceHandle === 'a' && inputSwitch === redSwitch) {
+              if (switchEdge.sourceHandle === 'a' && inputSwitch === rightSwitch) {
                 shouldActivateConnection = true;
-              } else if (switchEdge.sourceHandle === 'c' && inputSwitch === greenSwitch) {
+              } else if (switchEdge.sourceHandle === 'c' && inputSwitch === leftSwitch) {
                 shouldActivateConnection = true;
               }
               
@@ -5742,14 +5742,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           // Verificar se o nó de origem é um switchNode
           if (sourceNode?.type === 'switchNode') {
             // Para switchNodes, verificar se a conexão está no handle correto
-            const { inputSwitch, redSwitch, greenSwitch } = sourceNode.data;
+            const { inputSwitch, leftSwitch, rightSwitch } = sourceNode.data;
             
             // Determinar qual handle deveria estar ativo baseado no inputSwitch
             let shouldBeActive = false;
-            if (edge.sourceHandle === 'a' && inputSwitch === redSwitch) {
-              shouldBeActive = true; // Handle vermelho ativo
-            } else if (edge.sourceHandle === 'c' && inputSwitch === greenSwitch) {
-              shouldBeActive = true; // Handle verde ativo
+            if (edge.sourceHandle === 'a' && inputSwitch === rightSwitch) {
+              shouldBeActive = true; // Handle direito ativo
+            } else if (edge.sourceHandle === 'c' && inputSwitch === leftSwitch) {
+              shouldBeActive = true; // Handle esquerdo ativo
             }
             
             // Apenas marcar como pendente se a conexão está no handle correto
@@ -6849,27 +6849,27 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               </div>
             )}
 
-            {selectedFlowNode.type === 'switchNode' && (selectedFlowNode.data.redSwitch || selectedFlowNode.data.greenSwitch) && (
+            {selectedFlowNode.type === 'switchNode' && (selectedFlowNode.data.leftSwitch || selectedFlowNode.data.rightSwitch) && (
               <div>
                 <p className="text-sm font-medium text-gray-700">Valores de Switch</p>
                 <div className="space-y-2">
-                  {selectedFlowNode.data.redSwitch && (
+                  {selectedFlowNode.data.leftSwitch && (
                     <div className="flex items-center space-x-2">
                       <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                       <span className="text-sm text-gray-900 font-mono">
-                        {Array.isArray(selectedFlowNode.data.redSwitch) 
-                          ? selectedFlowNode.data.redSwitch.join(', ') 
-                          : selectedFlowNode.data.redSwitch}
+                        {Array.isArray(selectedFlowNode.data.leftSwitch) 
+                          ? selectedFlowNode.data.leftSwitch.join(', ') 
+                          : selectedFlowNode.data.leftSwitch}
                       </span>
                     </div>
                   )}
-                  {selectedFlowNode.data.greenSwitch && (
+                  {selectedFlowNode.data.rightSwitch && (
                     <div className="flex items-center space-x-2">
                       <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                       <span className="text-sm text-gray-900 font-mono">
-                        {Array.isArray(selectedFlowNode.data.greenSwitch) 
-                          ? selectedFlowNode.data.greenSwitch.join(', ') 
-                          : selectedFlowNode.data.greenSwitch}
+                        {Array.isArray(selectedFlowNode.data.rightSwitch) 
+                          ? selectedFlowNode.data.rightSwitch.join(', ') 
+                          : selectedFlowNode.data.rightSwitch}
                       </span>
                     </div>
                   )}
