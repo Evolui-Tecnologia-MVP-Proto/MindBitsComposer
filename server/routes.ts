@@ -3635,6 +3635,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Flow Types Routes
   
   // Get all flow types
+  // Endpoint para obter colunas da tabela documentos dinamicamente
+  app.get("/api/schema/documentos/columns", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      // Consulta para obter informações das colunas da tabela documentos
+      const result = await db.execute(sql`
+        SELECT column_name, data_type, is_nullable
+        FROM information_schema.columns 
+        WHERE table_name = 'documentos' 
+        AND table_schema = 'public'
+        ORDER BY ordinal_position
+      `);
+      
+      const columns = result.rows.map((row: any) => ({
+        name: row.column_name,
+        type: row.data_type,
+        nullable: row.is_nullable === 'YES'
+      }));
+      
+      res.json(columns);
+    } catch (error) {
+      console.error("Erro ao obter colunas da tabela documentos:", error);
+      res.status(500).json({ message: "Erro ao obter colunas da tabela" });
+    }
+  });
+
   app.get("/api/flow-types", async (req: Request, res: Response) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     

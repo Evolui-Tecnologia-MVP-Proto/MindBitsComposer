@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -64,6 +65,12 @@ export default function TemplateFormModal({
   const [structureError, setStructureError] = useState("");
   const [fieldMappings, setFieldMappings] = useState<Record<string, string>>({});
   const { toast } = useToast();
+
+  // Query para obter colunas da tabela documentos
+  const { data: documentosColumns = [] } = useQuery({
+    queryKey: ["/api/schema/documentos/columns"],
+    enabled: isOpen, // Só executa quando a modal está aberta
+  });
 
   // Função para extrair campos do JSON da estrutura
   const extractFieldsFromStructure = (structureString: string): string[] => {
@@ -370,12 +377,24 @@ export default function TemplateFormModal({
                                     Seção de agrupamento
                                   </span>
                                 ) : (
-                                  <Input
+                                  <Select
                                     value={value}
-                                    onChange={(e) => handleMappingChange(field, e.target.value)}
-                                    placeholder="Digite o valor de mapeamento"
-                                    className="w-full"
-                                  />
+                                    onValueChange={(selectedValue) => handleMappingChange(field, selectedValue)}
+                                  >
+                                    <SelectTrigger className="w-full">
+                                      <SelectValue placeholder="Selecione uma coluna" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {documentosColumns.map((column: any) => (
+                                        <SelectItem key={column.name} value={column.name}>
+                                          <div className="flex flex-col">
+                                            <span className="font-mono text-sm">{column.name}</span>
+                                            <span className="text-xs text-gray-500">{column.type}</span>
+                                          </div>
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
                                 )}
                               </TableCell>
                             </TableRow>
