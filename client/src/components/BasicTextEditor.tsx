@@ -604,7 +604,7 @@ export default function BasicTextEditor() {
                       });
                     }}
                     placeholder={`Escreva o conteúdo para ${section.name}...`}
-                    className="w-full h-32 min-h-[8rem] resize-y border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full h-32 min-h-[8rem] resize-y border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-left"
                   />
                 </CollapsibleContent>
               </Collapsible>
@@ -617,7 +617,7 @@ export default function BasicTextEditor() {
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Comece a escrever seu documento ou selecione um template..."
-            className="w-full min-h-[300px] resize-none border-none outline-none text-gray-900 placeholder-gray-400"
+            className="w-full min-h-[300px] resize-none border-none outline-none text-gray-900 placeholder-gray-400 text-left"
             style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
           />
         )}
