@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BookOpen, Copy, Edit, Trash2, FileEdit, Lock, Unlock, Eye, EyeOff, PlusCircle, Download, Upload } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useState, useCallback } from "react";
@@ -531,6 +533,16 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
                       <Button 
                         size="sm" 
                         variant="outline"
+                        onClick={() => openImportModal(flow)}
+                        className="flex items-center justify-center p-2"
+                        title="Importar JSON para este fluxo"
+                      >
+                        <Upload className="h-3 w-3" />
+                      </Button>
+                      
+                      <Button 
+                        size="sm" 
+                        variant="outline"
                         onClick={() => setEditingFlow(flow)}
                         className="flex items-center justify-center p-2"
                         title="Editar metadados"
@@ -640,6 +652,66 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
         onCreateFlow={handleCreateFlow}
         onCancel={handleCancelNewFlow}
       />
+
+      {/* Modal de Importação de JSON */}
+      <Dialog open={showImportModal} onOpenChange={setShowImportModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Importar JSON para Fluxo</DialogTitle>
+            <DialogDescription>
+              Selecione um arquivo JSON salvo para importar para o fluxo "{flowToImport?.name}".
+              Isso substituirá completamente o conteúdo atual do fluxo.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {isLoadingJsonFiles ? (
+              <div className="flex items-center justify-center p-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                <span className="ml-2">Carregando arquivos...</span>
+              </div>
+            ) : (
+              <div>
+                <label className="text-sm font-medium">Arquivo JSON:</label>
+                <Select value={selectedJsonFile} onValueChange={setSelectedJsonFile}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione um arquivo JSON" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {savedJsonFiles?.files?.length > 0 ? (
+                      savedJsonFiles.files.map((file: any) => (
+                        <SelectItem key={file.name} value={file.name}>
+                          {file.name} ({(file.size / 1024).toFixed(1)} KB) - {new Date(file.created).toLocaleDateString('pt-BR')}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="" disabled>
+                        Nenhum arquivo JSON encontrado
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowImportModal(false)}
+              disabled={importFlowJsonMutation.isPending}
+            >
+              Cancelar
+            </Button>
+            <Button
+              onClick={confirmImport}
+              disabled={!selectedJsonFile || importFlowJsonMutation.isPending}
+            >
+              {importFlowJsonMutation.isPending ? "Importando..." : "Importar"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
