@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { BookOpen, Copy, Edit, Trash2, FileEdit, Lock, Unlock, Eye, EyeOff, PlusCircle, Download, Upload } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useState, useCallback } from "react";
@@ -29,6 +30,7 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
   const [showImportModal, setShowImportModal] = useState<boolean>(false);
   const [flowToImport, setFlowToImport] = useState<any | null>(null);
   const [selectedJsonFile, setSelectedJsonFile] = useState<string>('');
+  const [filterByFlowId, setFilterByFlowId] = useState<boolean>(true);
   
   const { data: savedFlows, isLoading: isLoadingFlows } = useQuery<any[]>({
     queryKey: ["/api/documents-flows"],
@@ -38,15 +40,16 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
     queryKey: ["/api/flow-types"],
   });
 
-  // Query para listar arquivos JSON salvos (filtrados por flowId)
+  // Query para listar arquivos JSON salvos (filtrados condicionalmente por flowId)
   const { data: savedJsonFiles, isLoading: isLoadingJsonFiles } = useQuery({
-    queryKey: ["/api/documents-flows/saved-json-files", flowToImport?.id],
+    queryKey: ["/api/documents-flows/saved-json-files", flowToImport?.id, filterByFlowId],
     queryFn: () => {
-      if (!flowToImport?.id) return { files: [] };
-      return fetch(`/api/documents-flows/saved-json-files?flowId=${flowToImport.id}`)
-        .then(res => res.json());
+      const url = filterByFlowId && flowToImport?.id 
+        ? `/api/documents-flows/saved-json-files?flowId=${flowToImport.id}`
+        : `/api/documents-flows/saved-json-files`;
+      return fetch(url).then(res => res.json());
     },
-    enabled: showImportModal && !!flowToImport?.id,
+    enabled: showImportModal,
   });
 
   // Função para confirmar exclusão com toast
@@ -339,6 +342,7 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
       setShowImportModal(false);
       setFlowToImport(null);
       setSelectedJsonFile('');
+      setFilterByFlowId(true); // Reset para o estado padrão
       toast({
         title: "JSON importado",
         description: `JSON importado com sucesso para o fluxo`,
@@ -666,10 +670,32 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
             <DialogDescription>
               Selecione um arquivo JSON salvo para importar para o fluxo "{flowToImport?.name}".
               Isso substituirá completamente o conteúdo atual do fluxo.
+              {filterByFlowId && (
+                <span className="block text-sm text-muted-foreground mt-1">
+                  Exibindo apenas arquivos deste fluxo.
+                </span>
+              )}
             </DialogDescription>
           </DialogHeader>
           
           <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="filter-by-flow"
+                checked={filterByFlowId}
+                onCheckedChange={(checked) => {
+                  setFilterByFlowId(checked === true);
+                  setSelectedJsonFile(''); // Reset seleção quando mudar filtro
+                }}
+              />
+              <label 
+                htmlFor="filter-by-flow" 
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Listar somente deste fluxo
+              </label>
+            </div>
+
             {isLoadingJsonFiles ? (
               <div className="flex items-center justify-center p-4">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
@@ -690,7 +716,7 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
                         </SelectItem>
                       ))
                     ) : (
-                      <SelectItem value="" disabled>
+                      <SelectItem value="no-files" disabled>
                         Nenhum arquivo JSON encontrado para este fluxo
                       </SelectItem>
                     )}
