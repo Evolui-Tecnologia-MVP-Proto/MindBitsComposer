@@ -6409,12 +6409,42 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                     }
                                   }));
 
+                                  // Criar registro em document_editions
+                                  try {
+                                    const templateId = selectedFlowNode.data.docType; // Este é o ID do template
+                                    const documentId = flowDiagramModal.flowData?.documentId;
+                                    
+                                    if (templateId && documentId) {
+                                      const editionResponse = await fetch('/api/document-editions', {
+                                        method: 'POST',
+                                        headers: {
+                                          'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                          documentId: documentId,
+                                          templateId: templateId,
+                                          status: 'in_progress',
+                                          init: new Date().toISOString()
+                                        }),
+                                      });
+                                      
+                                      if (editionResponse.ok) {
+                                        const editionData = await editionResponse.json();
+                                        console.log('✅ Registro criado em document_editions:', editionData);
+                                      } else {
+                                        console.error('❌ Erro ao criar registro em document_editions:', await editionResponse.text());
+                                      }
+                                    }
+                                  } catch (editionError) {
+                                    console.error('❌ Erro ao criar edição de documento:', editionError);
+                                  }
+
                                   // Recarregar dados
                                   queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
 
                                   toast({
                                     title: "Documentação iniciada",
-                                    description: "O documento foi marcado como 'In Progress' e salvo no banco de dados.",
+                                    description: "O documento foi marcado como 'In Progress' e registro de edição criado no banco de dados.",
                                   });
                                 } catch (error) {
                                   console.error('Erro ao salvar alterações:', error);
