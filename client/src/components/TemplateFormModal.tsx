@@ -114,6 +114,13 @@ export default function TemplateFormModal({
     }
   };
 
+  // Reseta acordions quando a modal é aberta
+  useEffect(() => {
+    if (isOpen) {
+      setOpenAccordions({});
+    }
+  }, [isOpen]);
+
   // Atualiza os mapeamentos quando a estrutura muda ou template é carregado
   useEffect(() => {
     const fields = extractFieldsFromStructure(
@@ -438,12 +445,12 @@ export default function TemplateFormModal({
                         return (
                           <Collapsible
                             key={groupKey}
-                            open={openAccordions[groupKey] ?? true}
+                            open={openAccordions[groupKey] ?? false}
                             onOpenChange={() => toggleAccordion(groupKey)}
                           >
                             <CollapsibleTrigger className="flex items-center justify-between w-full p-3 text-left bg-gray-50 hover:bg-gray-100 rounded-lg border transition-colors">
                               <div className="flex items-center gap-2">
-                                {openAccordions[groupKey] ?? true ? (
+                                {openAccordions[groupKey] ?? false ? (
                                   <ChevronDown className="h-4 w-4 text-gray-500" />
                                 ) : (
                                   <ChevronRight className="h-4 w-4 text-gray-500" />
