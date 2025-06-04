@@ -6332,11 +6332,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             <h4 className="text-sm font-medium text-blue-800 mb-2">
                               Iniciar Documentação
                             </h4>
-                            <p className="text-sm text-blue-700 mb-3 leading-relaxed">
+                            <p className="text-xs text-blue-700 mb-3 leading-relaxed">
                               Selecione o botão de iniciar edição para enviar este documento para início de documentação no editor. 
                               Ao selecionar este elemento do fluxo indicará modo "In Progress", acesse o editor e selecione o documento 
                               para dar prosseguimento ao processo de edição da documentação. O documento a ser editado será o{' '}
-                              <span className="font-mono font-medium">
+                              <span className="font-mono font-medium text-xs">
                                 {(() => {
                                   if (selectedFlowNode.data.docType) {
                                     const templateInfo = getTemplateInfo(selectedFlowNode.data.docType);
@@ -6406,9 +6406,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                             <h4 className="text-sm font-medium text-purple-800 mb-2">
                               Documentação em Progresso
                             </h4>
-                            <p className="text-sm text-purple-700">
+                            <p className="text-xs text-purple-700">
                               Este documento está sendo editado no editor. Acesse a página de fluxos para continuar o processo de documentação do{' '}
-                              <span className="font-mono font-medium">
+                              <span className="font-mono font-medium text-xs">
                                 {(() => {
                                   if (selectedFlowNode.data.docType) {
                                     const templateInfo = getTemplateInfo(selectedFlowNode.data.docType);

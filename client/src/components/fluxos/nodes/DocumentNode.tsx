@@ -65,6 +65,13 @@ export const DocumentNode = memo(({ data, selected, ...nodeProps }: NodeProps) =
       </svg>
       {/* Ícone no canto superior esquerdo */}
       <FileText className="absolute top-1 left-1 h-6 w-6 text-purple-600 z-10" />
+      
+      {/* Badge "In Progress" no canto superior direito */}
+      {data.isInProcess === "TRUE" && (
+        <div className="absolute -top-1 -right-1 bg-purple-500 text-white text-[8px] font-mono px-2 py-1 rounded-md shadow-md z-20 whitespace-nowrap">
+          In Progress
+        </div>
+      )}
       {/* Conteúdo do nó */}
       <div
         className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
