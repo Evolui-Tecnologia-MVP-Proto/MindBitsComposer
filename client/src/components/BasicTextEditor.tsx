@@ -70,6 +70,7 @@ export default function BasicTextEditor() {
   const [selectedPlugin, setSelectedPlugin] = useState<Plugin | null>(null);
   const [isPluginModalOpen, setIsPluginModalOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<string>("");
+  const [selectedDocumentEdition, setSelectedDocumentEdition] = useState<string>("");
   const [templateSections, setTemplateSections] = useState<TemplateSection[]>([]);
   const [headerFields, setHeaderFields] = useState<HeaderField[]>([]);
   const [isMarkdownView, setIsMarkdownView] = useState<boolean>(false);
@@ -112,6 +113,11 @@ export default function BasicTextEditor() {
   // Buscar templates estruturais
   const { data: templates } = useQuery<Template[]>({
     queryKey: ["/api/templates/struct"],
+  });
+
+  // Buscar document editions com objetos dos documentos
+  const { data: documentEditions } = useQuery<Array<{ id: string; documentId: string; documentObject?: string; status: string; init: string | null }>>({
+    queryKey: ["/api/document-editions-with-objects"],
   });
 
   // Função genérica para abrir qualquer plugin

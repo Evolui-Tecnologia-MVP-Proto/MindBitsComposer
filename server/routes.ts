@@ -4162,6 +4162,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/document-editions-with-objects", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const editions = await db
+        .select({
+          id: documentEditions.id,
+          documentId: documentEditions.documentId,
+          templateId: documentEditions.templateId,
+          status: documentEditions.status,
+          init: documentEditions.init,
+          startedBy: documentEditions.startedBy,
+          completedAt: documentEditions.completedAt,
+          createdAt: documentEditions.createdAt,
+          updatedAt: documentEditions.updatedAt,
+          documentObject: documentos.objeto
+        })
+        .from(documentEditions)
+        .leftJoin(documentos, eq(documentEditions.documentId, documentos.id))
+        .orderBy(sql`${documentEditions.createdAt} DESC`);
+      
+      res.json(editions);
+    } catch (error) {
+      console.error("Erro ao buscar edições de documentos com objetos:", error);
+      res.status(500).send("Erro ao buscar edições de documentos com objetos");
+    }
+  });
+
   app.get("/api/document-editions/:id", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
