@@ -873,6 +873,106 @@ export class DatabaseStorage implements IStorage {
       .delete(repoStructure)
       .where(eq(repoStructure.uid, uid));
   }
+
+  // System Log operations
+  async createSystemLog(logData: InsertSystemLog): Promise<SystemLog> {
+    const [newLog] = await db
+      .insert(systemLogs)
+      .values(logData)
+      .returning();
+    return newLog;
+  }
+
+  async getSystemLogs(limit: number = 100): Promise<SystemLog[]> {
+    return await db
+      .select()
+      .from(systemLogs)
+      .orderBy(sql`${systemLogs.timestamp} DESC`)
+      .limit(limit);
+  }
+
+  async getSystemLogsByEventType(eventType: string, limit: number = 100): Promise<SystemLog[]> {
+    return await db
+      .select()
+      .from(systemLogs)
+      .where(eq(systemLogs.eventType, eventType))
+      .orderBy(sql`${systemLogs.timestamp} DESC`)
+      .limit(limit);
+  }
+
+  async getSystemLogsByUser(userId: number, limit: number = 100): Promise<SystemLog[]> {
+    return await db
+      .select()
+      .from(systemLogs)
+      .where(eq(systemLogs.userId, userId))
+      .orderBy(sql`${systemLogs.timestamp} DESC`)
+      .limit(limit);
+  }
+
+  // Document Edition operations
+  async getDocumentEdition(id: string): Promise<DocumentEdition | undefined> {
+    const [edition] = await db.select().from(documentEditions).where(eq(documentEditions.id, id));
+    return edition;
+  }
+
+  async getDocumentEditionsByDocumentId(documentId: string): Promise<DocumentEdition[]> {
+    return await db
+      .select()
+      .from(documentEditions)
+      .where(eq(documentEditions.documentId, documentId))
+      .orderBy(sql`${documentEditions.createdAt} DESC`);
+  }
+
+  async getAllDocumentEditions(): Promise<DocumentEdition[]> {
+    return await db
+      .select()
+      .from(documentEditions)
+      .orderBy(sql`${documentEditions.createdAt} DESC`);
+  }
+
+  async createDocumentEdition(insertEdition: InsertDocumentEdition): Promise<DocumentEdition> {
+    const [edition] = await db
+      .insert(documentEditions)
+      .values({
+        ...insertEdition,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })
+      .returning();
+    return edition;
+  }
+
+  async updateDocumentEdition(id: string, data: Partial<DocumentEdition>): Promise<DocumentEdition> {
+    const [edition] = await db
+      .update(documentEditions)
+      .set({
+        ...data,
+        updatedAt: new Date()
+      })
+      .where(eq(documentEditions.id, id))
+      .returning();
+    
+    if (!edition) {
+      throw new Error("Edição de documento não encontrada");
+    }
+    
+    return edition;
+  }
+
+  async updateDocumentEditionStatus(id: string, status: string): Promise<DocumentEdition> {
+    return await this.updateDocumentEdition(id, { status: status as any });
+  }
+
+  async publishDocumentEdition(id: string): Promise<DocumentEdition> {
+    return await this.updateDocumentEdition(id, { 
+      status: "published" as any,
+      publish: new Date()
+    });
+  }
+
+  async deleteDocumentEdition(id: string): Promise<void> {
+    await db.delete(documentEditions).where(eq(documentEditions.id, id));
+  }
 }
 
 export class MemStorage implements IStorage {
