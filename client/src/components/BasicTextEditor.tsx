@@ -242,13 +242,35 @@ export default function BasicTextEditor() {
     handlePluginClose();
   };
 
-  const handleDocumentEditionSelect = (editionId: string) => {
+  const handleDocumentEditionSelect = async (editionId: string) => {
     setSelectedDocumentEdition(editionId);
     
     const edition = documentEditions?.find(e => e.id === editionId);
     if (edition) {
       console.log("Document Edition selecionada:", edition);
-      // Aqui você pode adicionar lógica para carregar dados da edição selecionada
+      
+      // Buscar detalhes completos da edição para obter o templateId
+      try {
+        const response = await fetch(`/api/document-editions/${editionId}`);
+        if (response.ok) {
+          const editionDetails = await response.json();
+          console.log("Detalhes da edição:", editionDetails);
+          
+          if (editionDetails.templateId) {
+            // Selecionar automaticamente o template associado
+            setSelectedTemplate(editionDetails.templateId);
+            
+            // Carregar o template
+            const template = templates?.find(t => t.id === editionDetails.templateId);
+            if (template) {
+              console.log("Template automaticamente selecionado:", template);
+              handleTemplateSelect(editionDetails.templateId);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao buscar detalhes da edição:", error);
+      }
     }
   };
 
