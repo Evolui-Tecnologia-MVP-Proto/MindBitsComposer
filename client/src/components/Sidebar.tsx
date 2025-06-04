@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Settings, FileText, Edit, GitBranch, File, Cog, Puzzle } from "lucide-react";
+import { Settings, FileText, Edit, GitBranch, File, Cog, Puzzle, Home } from "lucide-react";
 import { useNavigationGuard } from "@/hooks/use-navigation-guard";
 
 type SidebarProps = {
@@ -14,7 +14,9 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
   const { checkAndNavigate } = useNavigationGuard();
 
   useEffect(() => {
-    if (location.startsWith("/admin")) {
+    if (location === "/" || location.startsWith("/home")) {
+      setActiveItem("home");
+    } else if (location.startsWith("/admin")) {
       setActiveItem("admin");
     } else if (location.startsWith("/templates")) {
       setActiveItem("templates");
@@ -48,6 +50,16 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
         className={`sidebar ${isMobileOpen ? "translate-x-0" : ""}`}
       >
         <nav className="mt-5 px-2 space-y-1">
+          <div className="sidebar-item-container">
+            <div 
+              className={`sidebar-item ${activeItem === "home" ? "sidebar-active" : ""}`}
+              onClick={() => handleNavigation("/")}
+            >
+              <Home className="mr-3 h-6 w-6" />
+              Home
+            </div>
+          </div>
+          
           <div className="sidebar-item-container">
             <div 
               className={`sidebar-item ${activeItem === "admin" ? "sidebar-active" : ""}`}
