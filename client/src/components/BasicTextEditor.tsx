@@ -418,7 +418,23 @@ export default function BasicTextEditor() {
     // Adicionar seções
     templateSections.forEach(section => {
       markdown += `## ${section.name}\n\n`;
-      markdown += `${section.content}\n\n`;
+      
+      // Se a seção tem campos específicos, adicionar como tabela
+      if (section.fields && section.fields.length > 0) {
+        markdown += `| Campo | Valor |\n`;
+        markdown += `|-------|-------|\n`;
+        section.fields.forEach(field => {
+          markdown += `| ${field.key} | ${field.value || ''} |\n`;
+        });
+        markdown += `\n`;
+      }
+      
+      // Adicionar conteúdo de texto livre da seção (se houver)
+      if (section.content && section.content.trim() !== '') {
+        markdown += `${section.content}\n\n`;
+      } else {
+        markdown += `\n`;
+      }
     });
 
     return markdown;
