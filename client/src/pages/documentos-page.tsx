@@ -531,16 +531,24 @@ const SwitchNodeComponent = (props: any) => {
   
   // Determinar cores dos handles baseado nas propriedades leftSwitch e rightSwitch
   const getHandleColor = (switchValue: any) => {
+    if (!switchValue) return 'gray'; // Se não está definido, cinza
+    
     if (Array.isArray(switchValue)) {
       // Se for array, verifica o primeiro valor
-      return switchValue[0] === 'TRUE' ? 'green' : 'red';
+      const firstValue = switchValue[0];
+      if (firstValue === 'TRUE') return 'green';
+      if (firstValue === 'FALSE') return 'red';
+      return 'gray'; // Se não for TRUE nem FALSE, cinza
     }
+    
     // Se for string ou outro valor
-    return switchValue === 'TRUE' ? 'green' : 'red';
+    if (switchValue === 'TRUE') return 'green';
+    if (switchValue === 'FALSE') return 'red';
+    return 'gray'; // Se não for TRUE nem FALSE, cinza
   };
   
-  const leftHandleColor = props.data.leftSwitch ? getHandleColor(props.data.leftSwitch) : 'green';
-  const rightHandleColor = props.data.rightSwitch ? getHandleColor(props.data.rightSwitch) : 'red';
+  const leftHandleColor = getHandleColor(props.data.leftSwitch);
+  const rightHandleColor = getHandleColor(props.data.rightSwitch);
   
   const isExecuted = props.data.isExecuted === 'TRUE';
   const isPendingConnected = props.data.isPendingConnected;
@@ -611,14 +619,22 @@ const SwitchNodeComponent = (props: any) => {
       <Handle 
         type="source" 
         position={Position.Right} 
-        className={`w-4 h-4 bg-white border-4 ${rightHandleColor === 'green' ? 'border-green-500' : 'border-red-500'}`}
+        className={`w-4 h-4 bg-white border-4 ${
+          rightHandleColor === 'green' ? 'border-green-500' : 
+          rightHandleColor === 'red' ? 'border-red-500' : 
+          'border-gray-400'
+        }`}
         id="a"
         style={{ top: '50%', right: '-33px', transform: 'translateY(-50%)' }}
       />
       <Handle 
         type="source" 
         position={Position.Left} 
-        className={`w-4 h-4 bg-white border-4 ${leftHandleColor === 'green' ? 'border-green-500' : 'border-red-500'}`}
+        className={`w-4 h-4 bg-white border-4 ${
+          leftHandleColor === 'green' ? 'border-green-500' : 
+          leftHandleColor === 'red' ? 'border-red-500' : 
+          'border-gray-400'
+        }`}
         id="c"
         style={{ top: '50%', left: '-33px', transform: 'translateY(-50%)' }}
       />
@@ -626,7 +642,11 @@ const SwitchNodeComponent = (props: any) => {
       {/* Mostrar valores dos switches abaixo dos nós de saída */}
       {props.data.configured && props.data.rightSwitch && (
         <div 
-          className={`absolute text-xs font-mono px-1 rounded ${rightHandleColor === 'green' ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100'}`}
+          className={`absolute text-xs font-mono px-1 rounded ${
+            rightHandleColor === 'green' ? 'text-green-700 bg-green-100' : 
+            rightHandleColor === 'red' ? 'text-red-700 bg-red-100' : 
+            'text-gray-700 bg-gray-100'
+          }`}
           style={{ top: 'calc(75% - 11px)', right: '-45px', transform: 'translateX(50%)', whiteSpace: 'nowrap' }}
         >
           {Array.isArray(props.data.rightSwitch) ? props.data.rightSwitch.join(',') : props.data.rightSwitch}
@@ -634,7 +654,11 @@ const SwitchNodeComponent = (props: any) => {
       )}
       {props.data.configured && props.data.leftSwitch && (
         <div 
-          className={`absolute text-xs font-mono px-1 rounded ${leftHandleColor === 'green' ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100'}`}
+          className={`absolute text-xs font-mono px-1 rounded ${
+            leftHandleColor === 'green' ? 'text-green-700 bg-green-100' : 
+            leftHandleColor === 'red' ? 'text-red-700 bg-red-100' : 
+            'text-gray-700 bg-gray-100'
+          }`}
           style={{ top: 'calc(75% - 11px)', left: '-45px', transform: 'translateX(-50%)', whiteSpace: 'nowrap' }}
         >
           {Array.isArray(props.data.leftSwitch) ? props.data.leftSwitch.join(',') : props.data.leftSwitch}
