@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { Template, TemplateType } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
@@ -67,6 +69,7 @@ export default function TemplateFormModal({
   const [isLoading, setIsLoading] = useState(false);
   const [structureError, setStructureError] = useState("");
   const [fieldMappings, setFieldMappings] = useState<Record<string, string>>({});
+  const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>({});
   const { toast } = useToast();
 
   // Query para obter colunas da tabela documentos
@@ -131,6 +134,49 @@ export default function TemplateFormModal({
     setFieldMappings(prev => ({
       ...prev,
       [field]: value
+    }));
+  };
+
+  // Função para agrupar campos de mapeamento
+  const groupFieldMappings = () => {
+    const groups: Record<string, Array<{ field: string; value: string }>> = {};
+    
+    Object.entries(fieldMappings).forEach(([field, value]) => {
+      if (field.startsWith('[SEÇÃO]')) {
+        return; // Pular seções de agrupamento
+      }
+      
+      // Determinar o grupo baseado no campo
+      let groupKey = 'Outros';
+      
+      if (field.startsWith('header.')) {
+        groupKey = 'Header';
+      } else if (field.startsWith('sections.')) {
+        const parts = field.split('.');
+        if (parts.length >= 2) {
+          groupKey = `Seção: ${parts[1]}`;
+        }
+      } else if (field === 'header') {
+        groupKey = 'Header';
+      } else if (field === 'sections') {
+        groupKey = 'Seções';
+      }
+      
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
+      
+      groups[groupKey].push({ field, value });
+    });
+    
+    return groups;
+  };
+
+  // Função para alternar estado do accordion
+  const toggleAccordion = (groupKey: string) => {
+    setOpenAccordions(prev => ({
+      ...prev,
+      [groupKey]: !prev[groupKey]
     }));
   };
 
@@ -359,58 +405,71 @@ export default function TemplateFormModal({
                   </div>
                   
                   {Object.keys(fieldMappings).length > 0 ? (
-                    <div className="border rounded-lg">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead className="w-1/2">Campo/Seção</TableHead>
-                            <TableHead className="w-1/2">Valor de Mapeamento</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {Object.entries(fieldMappings).map(([field, value]) => (
-                            <TableRow key={field}>
-                              <TableCell className={field.startsWith('[SEÇÃO]') ? 'font-semibold bg-gray-50' : ''}>
-                                {field.startsWith('[SEÇÃO]') ? (
-                                  <span className="text-blue-600">
-                                    {field.replace('[SEÇÃO] ', '')}
-                                  </span>
-                                ) : (
-                                  <span className="font-mono text-sm">
-                                    {field}
-                                  </span>
-                                )}
-                              </TableCell>
-                              <TableCell>
-                                {field.startsWith('[SEÇÃO]') ? (
-                                  <span className="text-gray-400 italic text-sm">
-                                    Seção de agrupamento
-                                  </span>
-                                ) : (
-                                  <Select
-                                    value={value}
-                                    onValueChange={(selectedValue) => handleMappingChange(field, selectedValue)}
-                                  >
-                                    <SelectTrigger className="w-full">
-                                      <SelectValue placeholder="Selecione uma coluna" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {documentosColumns.map((column: any) => (
-                                        <SelectItem key={column.name} value={column.name}>
-                                          <div className="flex flex-col">
-                                            <span className="font-mono text-sm">{column.name}</span>
-                                            <span className="text-xs text-gray-500">{column.type}</span>
-                                          </div>
-                                        </SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                )}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
+                    <div className="space-y-4">
+                      {Object.entries(groupFieldMappings()).map(([groupKey, fields]) => (
+                        <Collapsible
+                          key={groupKey}
+                          open={openAccordions[groupKey] ?? true}
+                          onOpenChange={() => toggleAccordion(groupKey)}
+                        >
+                          <CollapsibleTrigger className="flex items-center justify-between w-full p-3 text-left bg-gray-50 hover:bg-gray-100 rounded-lg border transition-colors">
+                            <div className="flex items-center gap-2">
+                              {openAccordions[groupKey] ?? true ? (
+                                <ChevronDown className="h-4 w-4 text-gray-500" />
+                              ) : (
+                                <ChevronRight className="h-4 w-4 text-gray-500" />
+                              )}
+                              <span className="font-medium text-gray-900">{groupKey}</span>
+                              <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
+                                {fields.length} campos
+                              </span>
+                            </div>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent className="border border-t-0 border-gray-200 rounded-b-lg">
+                            <div className="p-4">
+                              <Table>
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead className="w-1/2">Campo</TableHead>
+                                    <TableHead className="w-1/2">Mapeamento</TableHead>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {fields.map(({ field, value }) => (
+                                    <TableRow key={field}>
+                                      <TableCell>
+                                        <span className="font-mono text-sm text-gray-700">
+                                          {field}
+                                        </span>
+                                      </TableCell>
+                                      <TableCell>
+                                        <Select
+                                          value={value}
+                                          onValueChange={(selectedValue) => handleMappingChange(field, selectedValue)}
+                                        >
+                                          <SelectTrigger className="w-full">
+                                            <SelectValue placeholder="Selecione uma coluna" />
+                                          </SelectTrigger>
+                                          <SelectContent>
+                                            {documentosColumns.map((column: any) => (
+                                              <SelectItem key={column.name} value={column.name}>
+                                                <div className="flex flex-col">
+                                                  <span className="font-mono text-sm">{column.name}</span>
+                                                  <span className="text-xs text-gray-500">{column.type}</span>
+                                                </div>
+                                              </SelectItem>
+                                            ))}
+                                          </SelectContent>
+                                        </Select>
+                                      </TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          </CollapsibleContent>
+                        </Collapsible>
+                      ))}
                     </div>
                   ) : (
                     <div className="text-center py-8">
