@@ -517,17 +517,7 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
                   {/* Barra de botões com separador */}
                   <div className="flex items-center gap-1 justify-end">
                     <div className="flex gap-1">
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => duplicateFlowMutation.mutate(flow)}
-                        disabled={duplicateFlowMutation.isPending}
-                        className="flex items-center justify-center p-2"
-                        title="Duplicar fluxo"
-                      >
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                      
+                      {/* Primeiro grupo: Download e Upload */}
                       <Button 
                         size="sm" 
                         variant="outline"
@@ -547,6 +537,21 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
                         title="Importar JSON para este fluxo"
                       >
                         <Upload className="h-3 w-3" />
+                      </Button>
+                      
+                      {/* Separador */}
+                      <div className="w-px h-6 bg-border mx-1"></div>
+                      
+                      {/* Segundo grupo: Demais botões */}
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => duplicateFlowMutation.mutate(flow)}
+                        disabled={duplicateFlowMutation.isPending}
+                        className="flex items-center justify-center p-2"
+                        title="Duplicar fluxo"
+                      >
+                        <Copy className="h-3 w-3" />
                       </Button>
                       
                       <Button 
