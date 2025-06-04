@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Template, TemplateType } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
@@ -173,7 +174,7 @@ export default function TemplateFormModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[80vh]">
         <DialogHeader>
           <DialogTitle>
             {mode === "create" ? "Novo Template" : "Editar Template"}
@@ -183,93 +184,113 @@ export default function TemplateFormModal({
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">
-                Nome
-              </Label>
-              <Input
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full"
-                placeholder="Nome do template"
-                required
-              />
-            </div>
+          <Tabs defaultValue="formatacao" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="formatacao">Formatação</TabsTrigger>
+              <TabsTrigger value="mapeamento">Mapeamento</TabsTrigger>
+            </TabsList>
             
-            <div className="space-y-2">
-              <Label htmlFor="code">
-                Código
-              </Label>
-              <Input
-                id="code"
-                name="code"
-                value={formData.code}
-                onChange={handleChange}
-                className="w-full"
-                placeholder="XXX-99"
-                required
-                maxLength={6}
-              />
-              <p className="text-sm text-gray-500">
-                Formato: 3 letras maiúsculas + hífen + 2 números (ex: ABC-12)
-              </p>
-            </div>
+            <TabsContent value="formatacao" className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">
+                  Nome
+                </Label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full"
+                  placeholder="Nome do template"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="code">
+                  Código
+                </Label>
+                <Input
+                  id="code"
+                  name="code"
+                  value={formData.code}
+                  onChange={handleChange}
+                  className="w-full"
+                  placeholder="XXX-99"
+                  required
+                  maxLength={6}
+                />
+                <p className="text-sm text-gray-500">
+                  Formato: 3 letras maiúsculas + hífen + 2 números (ex: ABC-12)
+                </p>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="description">
+                  Descrição
+                </Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  className="w-full"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="type">
+                  Tipo
+                </Label>
+                <Select
+                  value={formData.type}
+                  onValueChange={handleTypeChange}
+                  disabled={mode === "edit"}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Selecione o tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="struct">Struct Template</SelectItem>
+                    <SelectItem value="output">Out Template</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="structure">
+                  Estrutura (JSON)
+                </Label>
+                <Textarea
+                  id="structure"
+                  name="structure"
+                  value={typeof formData.structure === 'string' 
+                    ? formData.structure 
+                    : JSON.stringify(formData.structure, null, 2)}
+                  onChange={handleStructureChange}
+                  className="font-mono text-sm h-32 w-full"
+                  required
+                />
+                {structureError && (
+                  <p className="text-sm text-red-500">{structureError}</p>
+                )}
+              </div>
+            </TabsContent>
             
-            <div className="space-y-2">
-              <Label htmlFor="description">
-                Descrição
-              </Label>
-              <Textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                className="w-full"
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="type">
-                Tipo
-              </Label>
-              <Select
-                value={formData.type}
-                onValueChange={handleTypeChange}
-                disabled={mode === "edit"}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecione o tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="struct">Struct Template</SelectItem>
-                  <SelectItem value="output">Out Template</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="structure">
-                Estrutura (JSON)
-              </Label>
-              <Textarea
-                id="structure"
-                name="structure"
-                value={typeof formData.structure === 'string' 
-                  ? formData.structure 
-                  : JSON.stringify(formData.structure, null, 2)}
-                onChange={handleStructureChange}
-                className="font-mono text-sm h-32 w-full"
-                required
-              />
-              {structureError && (
-                <p className="text-sm text-red-500">{structureError}</p>
-              )}
-            </div>
-          </div>
+            <TabsContent value="mapeamento" className="space-y-4 py-4">
+              <div className="text-center py-8">
+                <p className="text-gray-500 mb-4">Funcionalidade de mapeamento em desenvolvimento</p>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="text-sm text-gray-600">
+                    Esta aba permitirá configurar mapeamentos de campos do template 
+                    com sistemas externos e regras de transformação de dados.
+                  </p>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+          
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancelar
