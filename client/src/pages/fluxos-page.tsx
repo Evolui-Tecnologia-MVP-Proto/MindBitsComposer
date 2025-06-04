@@ -801,33 +801,45 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
       animated: false
     }));
     
+    console.log('  ✅ Setting nodes and edges');
     setNodes(updatedNodes);
     setEdges(styledEdges);
     setFlowName(flow.name);
     setCurrentFlowId(flow.id);
+    console.log('  ✅ Set flowName to:', flow.name);
+    console.log('  ✅ Set currentFlowId to:', flow.id);
     
     // Ocultar o editor de propriedades ao carregar um novo fluxo
     setShowInspector(false);
     setSelectedNodeId(null);
     setSelectedEdgeId(null);
+    console.log('  ✅ Hidden inspector and cleared selections');
     
     // Notificar o componente pai sobre o fluxo carregado
     onFlowInfoChange({ code: flow.code, name: flow.name });
+    console.log('  ✅ Notified parent about flow change');
     
     // Reset do histórico com o novo estado
     resetHistory(flowNodes || [], styledEdges);
+    console.log('  ✅ Reset history');
     
     // Atualizar snapshot com o estado carregado
     lastSavedSnapshot.current = { nodes: updatedNodes, edges: styledEdges };
+    console.log('  ✅ Updated snapshot');
     
     // Reset do estado de alterações não salvas após carregar
     setHasUnsavedChanges(false);
+    console.log('  ✅ Reset unsaved changes');
     
     // Definir viewport se reactFlowInstance estiver disponível
     if (reactFlowInstance && viewport) {
       reactFlowInstance.setViewport(viewport);
+      console.log('  ✅ Set viewport');
+    } else {
+      console.log('  ⚠️ No reactFlowInstance or viewport');
     }
 
+    console.log('  ✅ LOADFLOW COMPLETE');
     toast({
       title: "Sucesso",
       description: `Fluxo "${flow.name}" carregado com sucesso!`
