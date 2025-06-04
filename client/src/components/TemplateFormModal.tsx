@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Template, TemplateType } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
@@ -61,7 +62,61 @@ export default function TemplateFormModal({
   );
   const [isLoading, setIsLoading] = useState(false);
   const [structureError, setStructureError] = useState("");
+  const [fieldMappings, setFieldMappings] = useState<Record<string, string>>({});
   const { toast } = useToast();
+
+  // Função para extrair campos do JSON da estrutura
+  const extractFieldsFromStructure = (structureString: string): string[] => {
+    try {
+      const parsed = JSON.parse(structureString);
+      const fields: string[] = [];
+      
+      const extractFields = (obj: any, prefix = ''): void => {
+        if (typeof obj === 'object' && obj !== null) {
+          Object.keys(obj).forEach(key => {
+            const currentPath = prefix ? `${prefix}.${key}` : key;
+            
+            if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+              // Se é um objeto, adiciona a seção e continua recursivamente
+              fields.push(`[SEÇÃO] ${currentPath}`);
+              extractFields(obj[key], currentPath);
+            } else {
+              // Se é um campo final, adiciona o campo
+              fields.push(currentPath);
+            }
+          });
+        }
+      };
+      
+      extractFields(parsed);
+      return fields;
+    } catch (error) {
+      return [];
+    }
+  };
+
+  // Atualiza os mapeamentos quando a estrutura muda
+  useEffect(() => {
+    const fields = extractFieldsFromStructure(
+      typeof formData.structure === 'string' ? formData.structure : JSON.stringify(formData.structure)
+    );
+    
+    const newMappings: Record<string, string> = {};
+    fields.forEach(field => {
+      // Preserva valores existentes ou inicializa vazio
+      newMappings[field] = fieldMappings[field] || '';
+    });
+    
+    setFieldMappings(newMappings);
+  }, [formData.structure]);
+
+  // Função para atualizar valor de mapeamento
+  const handleMappingChange = (field: string, value: string) => {
+    setFieldMappings(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
   // Função para aplicar máscara no código XXX-99
   const applyCodeMask = (value: string) => {
@@ -281,14 +336,61 @@ export default function TemplateFormModal({
               </TabsContent>
               
               <TabsContent value="mapeamento" className="space-y-4 py-4">
-                <div className="text-center py-8">
-                  <p className="text-gray-500 mb-4">Funcionalidade de mapeamento em desenvolvimento</p>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-600">
-                      Esta aba permitirá configurar mapeamentos de campos do template 
-                      com sistemas externos e regras de transformação de dados.
-                    </p>
+                <div className="space-y-4">
+                  <div className="text-sm text-gray-600 mb-4">
+                    Configure valores para os campos extraídos da estrutura do template:
                   </div>
+                  
+                  {Object.keys(fieldMappings).length > 0 ? (
+                    <div className="border rounded-lg">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-1/2">Campo/Seção</TableHead>
+                            <TableHead className="w-1/2">Valor de Mapeamento</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {Object.entries(fieldMappings).map(([field, value]) => (
+                            <TableRow key={field}>
+                              <TableCell className={field.startsWith('[SEÇÃO]') ? 'font-semibold bg-gray-50' : ''}>
+                                {field.startsWith('[SEÇÃO]') ? (
+                                  <span className="text-blue-600">
+                                    {field.replace('[SEÇÃO] ', '')}
+                                  </span>
+                                ) : (
+                                  <span className="font-mono text-sm">
+                                    {field}
+                                  </span>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {field.startsWith('[SEÇÃO]') ? (
+                                  <span className="text-gray-400 italic text-sm">
+                                    Seção de agrupamento
+                                  </span>
+                                ) : (
+                                  <Input
+                                    value={value}
+                                    onChange={(e) => handleMappingChange(field, e.target.value)}
+                                    placeholder="Digite o valor de mapeamento"
+                                    className="w-full"
+                                  />
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500 mb-2">Nenhum campo encontrado</p>
+                      <p className="text-sm text-gray-400">
+                        Adicione uma estrutura JSON válida na aba "Formatação" para ver os campos aqui
+                      </p>
+                    </div>
+                  )}
                 </div>
               </TabsContent>
             </Tabs>
