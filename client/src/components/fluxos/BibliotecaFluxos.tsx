@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Copy, Edit, Trash2, FileEdit, Lock, Unlock, Eye, EyeOff, PlusCircle, Download } from "lucide-react";
+import { BookOpen, Copy, Edit, Trash2, FileEdit, Lock, Unlock, Eye, EyeOff, PlusCircle, Download, Upload } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useState, useCallback } from "react";
 import { FlowMetadataModal } from './FlowMetadataModal';
@@ -23,12 +23,23 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
   const [newFlowName, setNewFlowName] = useState<string>('');
   const [newFlowDescription, setNewFlowDescription] = useState<string>('');
   
+  // Estado para o modal de importar JSON
+  const [showImportModal, setShowImportModal] = useState<boolean>(false);
+  const [flowToImport, setFlowToImport] = useState<any | null>(null);
+  const [selectedJsonFile, setSelectedJsonFile] = useState<string>('');
+  
   const { data: savedFlows, isLoading: isLoadingFlows } = useQuery<any[]>({
     queryKey: ["/api/documents-flows"],
   });
   
   const { data: flowTypes } = useQuery<any[]>({
     queryKey: ["/api/flow-types"],
+  });
+
+  // Query para listar arquivos JSON salvos
+  const { data: savedJsonFiles, isLoading: isLoadingJsonFiles } = useQuery<any[]>({
+    queryKey: ["/api/documents-flows/saved-json-files"],
+    enabled: showImportModal, // Só busca quando o modal está aberto
   });
 
   // Função para confirmar exclusão com toast
@@ -289,17 +300,75 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
     onSuccess: (data) => {
       toast({
         title: "JSON salvo",
-        description: `Arquivo salvo em: ${data.filePath}`,
+        description: `Arquivo salvo: ${data.fileName}`,
       });
     },
-    onError: () => {
+    onError: (error: any) => {
       toast({
         title: "Erro",
-        description: "Erro ao salvar JSON do fluxo",
+        description: error.message || "Erro ao salvar JSON do fluxo",
         variant: "destructive",
       });
     },
   });
+
+  // Mutation para importar JSON do fluxo
+  const importFlowJsonMutation = useMutation({
+    mutationFn: async ({ flowId, jsonFileName }: { flowId: string; jsonFileName: string }) => {
+      const response = await fetch(`/api/documents-flows/${flowId}/import-json`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonFileName }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erro ao importar JSON do fluxo');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documents-flows"] });
+      setShowImportModal(false);
+      setFlowToImport(null);
+      setSelectedJsonFile('');
+      toast({
+        title: "JSON importado",
+        description: `JSON importado com sucesso para o fluxo`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro",
+        description: error.message || "Erro ao importar JSON do fluxo",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Função para abrir modal de importação
+  const openImportModal = (flow: any) => {
+    setFlowToImport(flow);
+    setShowImportModal(true);
+    setSelectedJsonFile('');
+  };
+
+  // Função para confirmar importação
+  const confirmImport = () => {
+    if (!flowToImport || !selectedJsonFile) {
+      toast({
+        title: "Erro",
+        description: "Selecione um arquivo JSON para importar",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    importFlowJsonMutation.mutate({
+      flowId: flowToImport.id,
+      jsonFileName: selectedJsonFile
+    });
+  };
 
   // Função para formatar código XXX-99
   const formatCode = useCallback((value: string) => {

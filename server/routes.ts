@@ -1522,6 +1522,112 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint para listar fluxos salvos em JSON
+  app.get("/api/documents-flows/saved-json-files", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const saveDir = path.join(process.cwd(), 'local_files', 'saved_fluxes');
+      
+      if (!fs.existsSync(saveDir)) {
+        return res.json({ files: [] });
+      }
+      
+      const files = fs.readdirSync(saveDir)
+        .filter((file: string) => file.endsWith('.json'))
+        .map((file: string) => {
+          const filepath = path.join(saveDir, file);
+          const stats = fs.statSync(filepath);
+          
+          // Extrair flowId do nome do arquivo
+          const flowId = file.split('_')[0];
+          
+          return {
+            name: file,
+            flowId: flowId,
+            size: stats.size,
+            created: stats.mtime,
+            path: filepath
+          };
+        })
+        .sort((a: any, b: any) => b.created - a.created);
+      
+      res.json({ files });
+    } catch (error) {
+      console.error("Erro ao listar arquivos JSON dos fluxos:", error);
+      res.status(500).json({ error: "Erro ao listar arquivos" });
+    }
+  });
+
+  // Endpoint para importar JSON de fluxo
+  app.post("/api/documents-flows/:id/import-json", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const flowId = req.params.id;
+      const { jsonFileName } = req.body;
+      
+      if (!jsonFileName) {
+        return res.status(400).json({ error: "Nome do arquivo JSON é obrigatório" });
+      }
+      
+      // Verificar se o fluxo existe
+      const existingFlow = await db
+        .select()
+        .from(documentsFlows)
+        .where(eq(documentsFlows.id, flowId))
+        .limit(1);
+        
+      if (!existingFlow || existingFlow.length === 0) {
+        return res.status(404).json({ error: "Fluxo não encontrado" });
+      }
+      
+      // Ler o arquivo JSON
+      const saveDir = path.join(process.cwd(), 'local_files', 'saved_fluxes');
+      const filePath = path.join(saveDir, jsonFileName);
+      
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: "Arquivo JSON não encontrado" });
+      }
+      
+      const jsonContent = fs.readFileSync(filePath, 'utf-8');
+      const flowData = JSON.parse(jsonContent);
+      
+      // Atualizar o flow_data do fluxo
+      await db
+        .update(documentsFlows)
+        .set({ 
+          flowData: flowData,
+          updatedAt: new Date()
+        })
+        .where(eq(documentsFlows.id, flowId));
+      
+      // Log da ação
+      await SystemLogger.logUserAction(
+        req.user?.id || 0,
+        'FLOW_IMPORT_JSON',
+        {
+          flowId: flowId,
+          flowName: existingFlow[0].name,
+          flowCode: existingFlow[0].code,
+          importedFileName: jsonFileName,
+          filePath: filePath
+        }
+      );
+      
+      res.json({
+        success: true,
+        message: "JSON importado com sucesso para o fluxo",
+        flowId: flowId,
+        importedFile: jsonFileName
+      });
+      
+    } catch (error) {
+      console.error("Erro ao importar JSON do fluxo:", error);
+      res.status(500).json({ error: "Erro ao importar JSON do fluxo" });
+    }
+  });
+
   // Endpoint para listar arquivos JSON salvos
   app.get("/api/monday/saved-json-files", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");

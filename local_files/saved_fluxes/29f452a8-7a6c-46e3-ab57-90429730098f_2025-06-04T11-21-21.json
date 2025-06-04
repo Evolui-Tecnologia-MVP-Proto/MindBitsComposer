@@ -1,0 +1,764 @@
+{
+  "nodes": [
+    {
+      "id": "startNode-1",
+      "type": "startNode",
+      "position": {
+        "x": 86.86338293365168,
+        "y": 4.080930504907997
+      },
+      "data": {
+        "label": "Start",
+        "FromType": "Init",
+        "configured": true,
+        "showLabel": false,
+        "isExecuted": "FALSE"
+      },
+      "width": 137,
+      "height": 43,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 86.86338293365168,
+        "y": 4.080930504907997
+      },
+      "dragging": false
+    },
+    {
+      "id": "actionNode-2",
+      "type": "actionNode",
+      "position": {
+        "x": 467.39921976687015,
+        "y": 69.77320783731443
+      },
+      "data": {
+        "label": "Action",
+        "actionType": "Intern_Aprove",
+        "configured": true,
+        "showLabel": false,
+        "isExecuted": "FALSE",
+        "description": "Análise de inclusão no contrato, ou cobrança adicional normal ou por USTs. SIM - Envia para analise de execução, NÃO - Envia para orçamento.",
+        "isAproved": "UNDEF",
+        "isInProcess": "FALSE"
+      },
+      "width": 235,
+      "height": 157,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 467.39921976687015,
+        "y": 69.77320783731443
+      },
+      "dragging": false
+    },
+    {
+      "id": "integrationNode-3",
+      "type": "integrationNode",
+      "position": {
+        "x": 84.97020228403153,
+        "y": 149.55255982104427
+      },
+      "data": {
+        "label": "Integration",
+        "integrType": "Obtem Dados",
+        "service": "Monday",
+        "configured": true,
+        "showLabel": false,
+        "isExecuted": "FALSE",
+        "callType": "Automatico",
+        "jobId": "d08420f2-219c-495f-816d-5e4ebe68c7e6"
+      },
+      "width": 140,
+      "height": 80,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 84.97020228403153,
+        "y": 149.55255982104427
+      },
+      "dragging": false
+    },
+    {
+      "id": "documentNode-4",
+      "type": "documentNode",
+      "position": {
+        "x": 249.99598380882753,
+        "y": 479.85060343789996
+      },
+      "data": {
+        "label": "Document",
+        "docType": "b5c0e8a1-6518-4ccc-96ef-0ce29b5bb44c",
+        "configured": true,
+        "showLabel": false,
+        "isExecuted": "FALSE",
+        "template_code": "ORC-01",
+        "template_name": "Orçamento para Customização Solicitada por Cliente",
+        "isInProcess": "FALSE"
+      },
+      "width": 140,
+      "height": 120,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 249.99598380882753,
+        "y": 479.85060343789996
+      },
+      "dragging": false
+    },
+    {
+      "id": "actionNode-5",
+      "type": "actionNode",
+      "position": {
+        "x": 202.66571807659102,
+        "y": 666.3567983814927
+      },
+      "data": {
+        "label": "Action",
+        "actionType": "Complete_Form",
+        "configured": true,
+        "showLabel": false,
+        "isExecuted": "FALSE",
+        "description": "Inclusão de dados comerciais referentes ao levantamento de custos, falor a faturar ou consumo de UST's",
+        "isAproved": "UNDEF"
+      },
+      "width": 235,
+      "height": 141,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 202.66571807659102,
+        "y": 666.3567983814927
+      },
+      "dragging": false
+    },
+    {
+      "id": "switchNode-6",
+      "type": "switchNode",
+      "position": {
+        "x": -142.58358691014521,
+        "y": 519.2989893748501
+      },
+      "data": {
+        "label": "Switch",
+        "switchField": "Aprovado?",
+        "greenSwitch": "TRUE",
+        "redSwitch": "FALSE",
+        "configured": true,
+        "showLabel": false,
+        "inputSwitch": "UNDEF",
+        "isExecuted": "FALSE",
+        "leftSwitch": "TRUE",
+        "rightSwitch": "FALSE"
+      },
+      "width": 154,
+      "height": 154,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -142.58358691014521,
+        "y": 519.2989893748501
+      },
+      "dragging": false
+    },
+    {
+      "id": "documentNode-7",
+      "type": "documentNode",
+      "position": {
+        "x": 250.96650723956247,
+        "y": 886.4776194256531
+      },
+      "data": {
+        "label": "Document",
+        "docType": "b5c0e8a1-6518-4ccc-96ef-0ce29b5bb44c",
+        "configured": true,
+        "showLabel": false,
+        "isExecuted": "FALSE",
+        "template_code": "ORC-01",
+        "template_name": "Orçamento para Customização Solicitada por Cliente",
+        "isInProcess": "FALSE"
+      },
+      "width": 140,
+      "height": 120,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 250.96650723956247,
+        "y": 886.4776194256531
+      },
+      "dragging": false
+    },
+    {
+      "id": "actionNode-8",
+      "type": "actionNode",
+      "position": {
+        "x": -183.68066296984102,
+        "y": 341.91916252265014
+      },
+      "data": {
+        "label": "Action",
+        "actionType": "Aprove_Doc",
+        "configured": true,
+        "showLabel": false,
+        "isExecuted": "FALSE",
+        "description": "Análise externa pelo cliente via notificação e aprovação/recusa integrada",
+        "isAproved": "UNDEF",
+        "isInProcess": "FALSE"
+      },
+      "width": 235,
+      "height": 109,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -183.68066296984102,
+        "y": 341.91916252265014
+      },
+      "dragging": false
+    },
+    {
+      "id": "endNode-9",
+      "type": "endNode",
+      "position": {
+        "x": 374.0098894609479,
+        "y": 1251.4240340426054
+      },
+      "data": {
+        "label": "Finish",
+        "FromType": "flow_init",
+        "configured": true,
+        "showLabel": false,
+        "To_Flow_id": "499e7d0e-b585-49b7-a96e-f4d303e73fa9",
+        "isExecuted": "FALSE",
+        "To_Flow_code": "EVD-01",
+        "To_Flow_name": "Elicitação Validada por Demanda [Cliente - Ajuste de Produto - LTH]",
+        "To_Type": "flow_Finish"
+      },
+      "width": 420,
+      "height": 84,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 374.0098894609479,
+        "y": 1251.4240340426054
+      },
+      "dragging": false
+    },
+    {
+      "id": "endNode-10",
+      "type": "endNode",
+      "position": {
+        "x": -150.89845620260076,
+        "y": 817.1388986382656
+      },
+      "data": {
+        "label": "Finish",
+        "FromType": "Init",
+        "configured": true,
+        "showLabel": false,
+        "To_Flow_id": "",
+        "isExecuted": "FALSE",
+        "To_Type": "Direct_finish"
+      },
+      "width": 177,
+      "height": 43,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -150.89845620260076,
+        "y": 817.1388986382656
+      },
+      "dragging": false
+    },
+    {
+      "id": "integrationNode-11",
+      "type": "integrationNode",
+      "position": {
+        "x": -437.4265981969198,
+        "y": 800.6520166859102
+      },
+      "data": {
+        "label": "Integration",
+        "integrType": "Atualiza Dados",
+        "service": "GitHub",
+        "configured": true,
+        "showLabel": false,
+        "isExecuted": "FALSE"
+      },
+      "width": 140,
+      "height": 80,
+      "selected": false,
+      "positionAbsolute": {
+        "x": -437.4265981969198,
+        "y": 800.6520166859102
+      },
+      "dragging": false
+    },
+    {
+      "id": "switchNode-12",
+      "type": "switchNode",
+      "position": {
+        "x": 499.30669187826106,
+        "y": 329.8302223752978
+      },
+      "data": {
+        "label": "Switch",
+        "switchField": "Incl.Contr.?",
+        "greenSwitch": "FALSE",
+        "redSwitch": "TRUE",
+        "configured": true,
+        "showLabel": false,
+        "isExecuted": "FALSE",
+        "inputSwitch": "UNDEF",
+        "rightSwitch": "TRUE",
+        "leftSwitch": "FALSE"
+      },
+      "width": 172,
+      "height": 172,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 499.30669187826106,
+        "y": 329.8302223752978
+      },
+      "dragging": false
+    },
+    {
+      "id": "endNode-13",
+      "type": "endNode",
+      "position": {
+        "x": 1056.2667702574156,
+        "y": 1166.2892433789827
+      },
+      "data": {
+        "label": "Finish",
+        "FromType": "Init",
+        "configured": true,
+        "showLabel": false,
+        "To_Flow_id": "",
+        "isExecuted": "FALSE",
+        "To_Type": "Direct_finish"
+      },
+      "width": 177,
+      "height": 43,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 1056.2667702574156,
+        "y": 1166.2892433789827
+      },
+      "dragging": false
+    },
+    {
+      "id": "switchNode-14",
+      "type": "switchNode",
+      "position": {
+        "x": 826.03672775564,
+        "y": 783.0818415858114
+      },
+      "data": {
+        "label": "Switch",
+        "switchField": "Viável ?",
+        "greenSwitch": "TRUE",
+        "redSwitch": "FALSE",
+        "configured": true,
+        "showLabel": false,
+        "isExecuted": "FALSE",
+        "inputSwitch": "UNDEF",
+        "rightSwitch": "FALSE",
+        "leftSwitch": "TRUE"
+      },
+      "width": 148,
+      "height": 148,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 826.03672775564,
+        "y": 783.0818415858114
+      },
+      "dragging": false
+    },
+    {
+      "id": "actionNode-15",
+      "type": "actionNode",
+      "position": {
+        "x": 782.5150363485575,
+        "y": 482.0773221658069
+      },
+      "data": {
+        "label": "Action",
+        "actionType": "Intern_Aprove",
+        "configured": true,
+        "showLabel": false,
+        "description": "Análise de viabilidade técnica de de aplicatibilidade (regra de negócio, forma de uso do sistema).SIM - Envia para desenvolvimento, NÃO - Encerra o processo e notifica o solicitante.",
+        "attached_Form": "{\"Show_Condition\": \"FALSE\", \"Fields\": [\"Motivo de Recusa\": [\"Incompatível com processo\", \"Forma de operação\", \"Configuração de Sistema\"], \"Detalhamento\": [\"default:\",\"type:longText\"]]}",
+        "isAproved": "UNDEF",
+        "isExecuted": "FALSE",
+        "isInProcess": "FALSE"
+      },
+      "width": 235,
+      "height": 189,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 782.5150363485575,
+        "y": 482.0773221658069
+      },
+      "dragging": false
+    },
+    {
+      "id": "integrationNode-16",
+      "type": "integrationNode",
+      "position": {
+        "x": 1075.8810558061757,
+        "y": 990.8425210470748
+      },
+      "data": {
+        "label": "Integration",
+        "integrType": "Atualiza Dados",
+        "service": "Monday",
+        "isExecuted": "FALSE",
+        "configured": true,
+        "showLabel": false,
+        "callType": "Manual",
+        "jobId": "{\"Atlz.Status Triagem\": \"callAtuTriagemMonday\"}"
+      },
+      "width": 140,
+      "height": 80,
+      "selected": false,
+      "positionAbsolute": {
+        "x": 1075.8810558061757,
+        "y": 990.8425210470748
+      },
+      "dragging": false
+    }
+  ],
+  "edges": [
+    {
+      "type": "smoothstep",
+      "markerEnd": {
+        "type": "arrowclosed",
+        "color": "#6b7280"
+      },
+      "updatable": true,
+      "source": "startNode-1",
+      "sourceHandle": null,
+      "target": "integrationNode-3",
+      "targetHandle": null,
+      "animated": false,
+      "style": {
+        "stroke": "#6b7280",
+        "strokeWidth": 3,
+        "strokeDasharray": "none"
+      },
+      "id": "reactflow__edge-startNode-1-integrationNode-3",
+      "focusable": true,
+      "interactionWidth": 20,
+      "selected": false
+    },
+    {
+      "type": "smoothstep",
+      "markerEnd": {
+        "type": "arrowclosed",
+        "color": "#6b7280"
+      },
+      "updatable": true,
+      "source": "integrationNode-3",
+      "sourceHandle": null,
+      "target": "actionNode-2",
+      "targetHandle": null,
+      "animated": false,
+      "style": {
+        "stroke": "#6b7280",
+        "strokeWidth": 3,
+        "strokeDasharray": "none"
+      },
+      "id": "reactflow__edge-integrationNode-3-actionNode-2",
+      "focusable": true,
+      "interactionWidth": 20
+    },
+    {
+      "type": "smoothstep",
+      "markerEnd": {
+        "type": "arrowclosed",
+        "color": "#6b7280"
+      },
+      "updatable": true,
+      "source": "documentNode-4",
+      "sourceHandle": null,
+      "target": "actionNode-5",
+      "targetHandle": null,
+      "animated": false,
+      "style": {
+        "stroke": "#6b7280",
+        "strokeWidth": 3,
+        "strokeDasharray": "none"
+      },
+      "id": "reactflow__edge-documentNode-4-actionNode-5",
+      "focusable": true,
+      "interactionWidth": 20
+    },
+    {
+      "type": "smoothstep",
+      "markerEnd": {
+        "type": "arrowclosed",
+        "color": "#6b7280"
+      },
+      "updatable": true,
+      "source": "actionNode-5",
+      "sourceHandle": null,
+      "target": "documentNode-7",
+      "targetHandle": null,
+      "animated": false,
+      "style": {
+        "stroke": "#6b7280",
+        "strokeWidth": 3,
+        "strokeDasharray": "none"
+      },
+      "id": "reactflow__edge-actionNode-5-documentNode-7",
+      "focusable": true,
+      "interactionWidth": 20
+    },
+    {
+      "type": "smoothstep",
+      "markerEnd": {
+        "type": "arrowclosed",
+        "color": "#6b7280"
+      },
+      "updatable": true,
+      "source": "documentNode-7",
+      "sourceHandle": null,
+      "target": "actionNode-8",
+      "targetHandle": null,
+      "animated": false,
+      "style": {
+        "stroke": "#6b7280",
+        "strokeWidth": 3,
+        "strokeDasharray": "none"
+      },
+      "id": "reactflow__edge-documentNode-7-actionNode-8",
+      "focusable": true,
+      "interactionWidth": 20
+    },
+    {
+      "type": "smoothstep",
+      "markerEnd": {
+        "type": "arrowclosed",
+        "color": "#6b7280"
+      },
+      "updatable": true,
+      "source": "actionNode-8",
+      "sourceHandle": null,
+      "target": "switchNode-6",
+      "targetHandle": null,
+      "animated": false,
+      "style": {
+        "stroke": "#6b7280",
+        "strokeWidth": 3,
+        "strokeDasharray": "none"
+      },
+      "id": "reactflow__edge-actionNode-8-switchNode-6",
+      "focusable": true,
+      "interactionWidth": 20
+    },
+    {
+      "type": "smoothstep",
+      "markerEnd": {
+        "type": "arrowclosed",
+        "color": "#10b981"
+      },
+      "updatable": true,
+      "source": "switchNode-6",
+      "sourceHandle": "c",
+      "target": "integrationNode-11",
+      "targetHandle": null,
+      "animated": false,
+      "style": {
+        "stroke": "#10b981",
+        "strokeWidth": 3,
+        "strokeDasharray": "none"
+      },
+      "id": "reactflow__edge-switchNode-6c-integrationNode-11",
+      "focusable": true,
+      "interactionWidth": 20
+    },
+    {
+      "type": "smoothstep",
+      "markerEnd": {
+        "type": "arrowclosed",
+        "color": "#ef4444"
+      },
+      "updatable": true,
+      "source": "switchNode-6",
+      "sourceHandle": "a",
+      "target": "endNode-10",
+      "targetHandle": null,
+      "animated": false,
+      "style": {
+        "stroke": "#ef4444",
+        "strokeWidth": 3,
+        "strokeDasharray": "none"
+      },
+      "id": "reactflow__edge-switchNode-6a-endNode-10",
+      "focusable": true,
+      "interactionWidth": 20
+    },
+    {
+      "type": "smoothstep",
+      "markerEnd": {
+        "type": "arrowclosed",
+        "color": "#6b7280"
+      },
+      "updatable": true,
+      "source": "integrationNode-11",
+      "sourceHandle": null,
+      "target": "endNode-9",
+      "targetHandle": null,
+      "animated": false,
+      "style": {
+        "stroke": "#6b7280",
+        "strokeWidth": 3,
+        "strokeDasharray": "none"
+      },
+      "id": "reactflow__edge-integrationNode-11-endNode-9",
+      "focusable": true,
+      "interactionWidth": 20
+    },
+    {
+      "type": "smoothstep",
+      "markerEnd": {
+        "type": "arrowclosed",
+        "color": "#6b7280"
+      },
+      "updatable": true,
+      "source": "actionNode-2",
+      "sourceHandle": null,
+      "target": "switchNode-12",
+      "targetHandle": null,
+      "animated": false,
+      "style": {
+        "stroke": "#6b7280",
+        "strokeWidth": 3,
+        "strokeDasharray": "none"
+      },
+      "id": "reactflow__edge-actionNode-2-switchNode-12",
+      "focusable": true,
+      "interactionWidth": 20
+    },
+    {
+      "type": "smoothstep",
+      "markerEnd": {
+        "type": "arrowclosed",
+        "color": "#ef4444"
+      },
+      "updatable": true,
+      "source": "switchNode-12",
+      "sourceHandle": "c",
+      "target": "documentNode-4",
+      "targetHandle": null,
+      "animated": false,
+      "style": {
+        "stroke": "#ef4444",
+        "strokeWidth": 3,
+        "strokeDasharray": "none"
+      },
+      "id": "reactflow__edge-switchNode-12c-documentNode-4",
+      "focusable": true,
+      "interactionWidth": 20
+    },
+    {
+      "type": "smoothstep",
+      "markerEnd": {
+        "type": "arrowclosed",
+        "color": "#10b981"
+      },
+      "updatable": true,
+      "source": "switchNode-14",
+      "sourceHandle": "c",
+      "target": "endNode-9",
+      "targetHandle": null,
+      "animated": false,
+      "style": {
+        "stroke": "#10b981",
+        "strokeWidth": 3,
+        "strokeDasharray": "none"
+      },
+      "id": "reactflow__edge-switchNode-14c-endNode-9",
+      "focusable": true,
+      "interactionWidth": 20
+    },
+    {
+      "type": "smoothstep",
+      "markerEnd": {
+        "type": "arrowclosed",
+        "color": "#10b981"
+      },
+      "updatable": true,
+      "source": "switchNode-12",
+      "sourceHandle": "a",
+      "target": "actionNode-15",
+      "targetHandle": null,
+      "animated": false,
+      "style": {
+        "stroke": "#10b981",
+        "strokeWidth": 3,
+        "strokeDasharray": "none"
+      },
+      "id": "reactflow__edge-switchNode-12a-actionNode-15",
+      "focusable": true,
+      "interactionWidth": 20
+    },
+    {
+      "type": "smoothstep",
+      "markerEnd": {
+        "type": "arrowclosed",
+        "color": "#6b7280"
+      },
+      "updatable": true,
+      "source": "actionNode-15",
+      "sourceHandle": null,
+      "target": "switchNode-14",
+      "targetHandle": null,
+      "animated": false,
+      "style": {
+        "stroke": "#6b7280",
+        "strokeWidth": 3,
+        "strokeDasharray": "none"
+      },
+      "id": "reactflow__edge-actionNode-15-switchNode-14",
+      "focusable": true,
+      "interactionWidth": 20
+    },
+    {
+      "type": "smoothstep",
+      "markerEnd": {
+        "type": "arrowclosed",
+        "color": "#ef4444"
+      },
+      "updatable": true,
+      "source": "switchNode-14",
+      "sourceHandle": "a",
+      "target": "integrationNode-16",
+      "targetHandle": null,
+      "animated": false,
+      "style": {
+        "stroke": "#ef4444",
+        "strokeWidth": 3,
+        "strokeDasharray": "none"
+      },
+      "id": "reactflow__edge-switchNode-14a-integrationNode-16",
+      "focusable": true,
+      "interactionWidth": 20
+    },
+    {
+      "type": "smoothstep",
+      "markerEnd": {
+        "type": "arrowclosed",
+        "color": "#6b7280"
+      },
+      "updatable": true,
+      "source": "integrationNode-16",
+      "sourceHandle": null,
+      "target": "endNode-13",
+      "targetHandle": null,
+      "animated": false,
+      "style": {
+        "stroke": "#6b7280",
+        "strokeWidth": 3,
+        "strokeDasharray": "none"
+      },
+      "id": "reactflow__edge-integrationNode-16-endNode-13",
+      "focusable": true,
+      "interactionWidth": 20
+    }
+  ],
+  "viewport": {
+    "x": 519.4666720576334,
+    "y": 17.74986026890602,
+    "zoom": 0.2840603726994931
+  }
+}
