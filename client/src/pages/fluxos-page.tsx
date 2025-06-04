@@ -603,6 +603,9 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
     setSelectedNodeId(null);
     setSelectedEdgeId(null);
     
+    // Ocultar o editor de propriedades
+    setShowInspector(false);
+    
     // Reset do estado de alterações não salvas
     setHasUnsavedChanges(false);
     hasUnsavedChangesRef.current = false;
@@ -788,6 +791,11 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
     setFlowName(flow.name);
     setCurrentFlowId(flow.id);
     
+    // Ocultar o editor de propriedades ao carregar um novo fluxo
+    setShowInspector(false);
+    setSelectedNodeId(null);
+    setSelectedEdgeId(null);
+    
     // Notificar o componente pai sobre o fluxo carregado
     onFlowInfoChange({ code: flow.code, name: flow.name });
     
@@ -833,6 +841,11 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
     setEdges([]);
     setFlowName('Novo Fluxo');
     setCurrentFlowId(null);
+    
+    // Ocultar o editor de propriedades ao criar novo fluxo
+    setShowInspector(false);
+    setSelectedNodeId(null);
+    setSelectedEdgeId(null);
     
     // Limpar informações do título
     onFlowInfoChange(null);
