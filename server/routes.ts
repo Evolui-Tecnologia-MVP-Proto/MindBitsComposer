@@ -4170,13 +4170,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .select({
           id: documentEditions.id,
           documentId: documentEditions.documentId,
-          templateId: documentEditions.templateId,
           status: documentEditions.status,
           init: documentEditions.init,
-          startedBy: documentEditions.startedBy,
-          completedAt: documentEditions.completedAt,
-          createdAt: documentEditions.createdAt,
-          updatedAt: documentEditions.updatedAt,
           documentObject: documentos.objeto
         })
         .from(documentEditions)
