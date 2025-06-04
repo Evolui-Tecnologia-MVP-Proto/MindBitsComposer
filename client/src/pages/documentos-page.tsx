@@ -6439,7 +6439,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                     }
                                   }));
 
-                                  // Criar registro em document_editions
+                                  // Criar registro em document_editions e atualizar task_state
                                   try {
                                     const templateId = selectedFlowNode.data.docType; // Este é o ID do template
                                     const documentId = flowDiagramModal.flowData?.documentId;
@@ -6461,6 +6461,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                       if (editionResponse.ok) {
                                         const editionData = await editionResponse.json();
                                         console.log('✅ Registro criado em document_editions:', editionData);
+                                        console.log('✅ Task state atualizado para "in_doc" automaticamente');
                                       } else {
                                         console.error('❌ Erro ao criar registro em document_editions:', await editionResponse.text());
                                       }
