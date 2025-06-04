@@ -5819,13 +5819,31 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         edgeColor = '#fbbf24'; // amarelo
         shouldAnimate = true; // animar conexões pendentes (amarelas)
       }
-      // SEGUNDA PRIORIDADE: Verificar se a conexão parte de um SwitchNode e aplicar cor específica do handle
+      // SEGUNDA PRIORIDADE: Verificar se a conexão parte de um SwitchNode e aplicar cor dinâmica do handle
       else if (sourceNode?.type === 'switchNode') {
-        // Verificar qual handle está sendo usado baseado no sourceHandle
+        // Função para determinar cor do handle do switchNode
+        const getSwitchHandleColor = (switchValue: any) => {
+          if (!switchValue) return '#9ca3af'; // gray-400
+          
+          if (Array.isArray(switchValue)) {
+            const firstValue = switchValue[0];
+            if (firstValue === 'TRUE') return '#10b981'; // green-500
+            if (firstValue === 'FALSE') return '#ef4444'; // red-500
+            return '#9ca3af'; // gray-400
+          }
+          
+          if (switchValue === 'TRUE') return '#10b981'; // green-500
+          if (switchValue === 'FALSE') return '#ef4444'; // red-500
+          return '#9ca3af'; // gray-400
+        };
+
+        // Verificar qual handle está sendo usado baseado no sourceHandle e usar cores dinâmicas
         if (edge.sourceHandle === 'a') {
-          edgeColor = '#dc2626'; // Vermelho para conector direito (id="a")
+          // Handle direito - usar cor baseada em rightSwitch
+          edgeColor = getSwitchHandleColor(sourceNode.data.rightSwitch);
         } else if (edge.sourceHandle === 'c') {
-          edgeColor = '#16a34a'; // Verde para conector esquerdo (id="c")
+          // Handle esquerdo - usar cor baseada em leftSwitch
+          edgeColor = getSwitchHandleColor(sourceNode.data.leftSwitch);
         }
       }
       
