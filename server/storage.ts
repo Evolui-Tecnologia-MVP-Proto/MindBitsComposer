@@ -1,10 +1,10 @@
-import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos, documentsArtifacts, repoStructure, systemLogs,
+import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos, documentsArtifacts, repoStructure, systemLogs, documentEditions,
   type User, type InsertUser, type Template, type InsertTemplate, 
   type MondayMapping, type InsertMondayMapping, type MondayColumn, type InsertMondayColumn, 
   type MappingColumn, type InsertMappingColumn, type ServiceConnection, type InsertServiceConnection,
   type Plugin, type InsertPlugin, type Documento, type InsertDocumento,
   type DocumentArtifact, type InsertDocumentArtifact, type RepoStructure, type InsertRepoStructure,
-  type SystemLog, type InsertSystemLog,
+  type SystemLog, type InsertSystemLog, type DocumentEdition, type InsertDocumentEdition,
   UserStatus, UserRole, TemplateType, PluginStatus, PluginType } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, isNull, sql } from "drizzle-orm";
@@ -118,6 +118,16 @@ export interface IStorage {
   getSystemLogs(limit?: number): Promise<SystemLog[]>;
   getSystemLogsByEventType(eventType: string, limit?: number): Promise<SystemLog[]>;
   getSystemLogsByUser(userId: number, limit?: number): Promise<SystemLog[]>;
+  
+  // Document Edition operations
+  getDocumentEdition(id: string): Promise<DocumentEdition | undefined>;
+  getDocumentEditionsByDocumentId(documentId: string): Promise<DocumentEdition[]>;
+  getAllDocumentEditions(): Promise<DocumentEdition[]>;
+  createDocumentEdition(edition: InsertDocumentEdition): Promise<DocumentEdition>;
+  updateDocumentEdition(id: string, data: Partial<DocumentEdition>): Promise<DocumentEdition>;
+  updateDocumentEditionStatus(id: string, status: string): Promise<DocumentEdition>;
+  publishDocumentEdition(id: string): Promise<DocumentEdition>;
+  deleteDocumentEdition(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1616,6 +1626,70 @@ export class MemStorage implements IStorage {
       .limit(limit);
   }
 
+  // Document Edition operations
+  async getDocumentEdition(id: string): Promise<DocumentEdition | undefined> {
+    const [edition] = await db.select().from(documentEditions).where(eq(documentEditions.id, id));
+    return edition;
+  }
+
+  async getDocumentEditionsByDocumentId(documentId: string): Promise<DocumentEdition[]> {
+    return await db
+      .select()
+      .from(documentEditions)
+      .where(eq(documentEditions.documentId, documentId))
+      .orderBy(sql`${documentEditions.createdAt} DESC`);
+  }
+
+  async getAllDocumentEditions(): Promise<DocumentEdition[]> {
+    return await db
+      .select()
+      .from(documentEditions)
+      .orderBy(sql`${documentEditions.createdAt} DESC`);
+  }
+
+  async createDocumentEdition(insertEdition: InsertDocumentEdition): Promise<DocumentEdition> {
+    const [edition] = await db
+      .insert(documentEditions)
+      .values({
+        ...insertEdition,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })
+      .returning();
+    return edition;
+  }
+
+  async updateDocumentEdition(id: string, data: Partial<DocumentEdition>): Promise<DocumentEdition> {
+    const [edition] = await db
+      .update(documentEditions)
+      .set({
+        ...data,
+        updatedAt: new Date()
+      })
+      .where(eq(documentEditions.id, id))
+      .returning();
+    
+    if (!edition) {
+      throw new Error("Edição de documento não encontrada");
+    }
+    
+    return edition;
+  }
+
+  async updateDocumentEditionStatus(id: string, status: string): Promise<DocumentEdition> {
+    return await this.updateDocumentEdition(id, { status: status as any });
+  }
+
+  async publishDocumentEdition(id: string): Promise<DocumentEdition> {
+    return await this.updateDocumentEdition(id, { 
+      status: "published" as any,
+      publish: new Date()
+    });
+  }
+
+  async deleteDocumentEdition(id: string): Promise<void> {
+    await db.delete(documentEditions).where(eq(documentEditions.id, id));
+  }
 
 }
 

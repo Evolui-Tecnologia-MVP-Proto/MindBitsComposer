@@ -4149,6 +4149,107 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Document Editions API routes
+  app.get("/api/document-editions", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const editions = await storage.getAllDocumentEditions();
+      res.json(editions);
+    } catch (error) {
+      console.error("Erro ao buscar edições de documentos:", error);
+      res.status(500).send("Erro ao buscar edições de documentos");
+    }
+  });
+
+  app.get("/api/document-editions/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const edition = await storage.getDocumentEdition(req.params.id);
+      if (!edition) {
+        return res.status(404).send("Edição de documento não encontrada");
+      }
+      res.json(edition);
+    } catch (error) {
+      console.error("Erro ao buscar edição de documento:", error);
+      res.status(500).send("Erro ao buscar edição de documento");
+    }
+  });
+
+  app.get("/api/documents/:documentId/editions", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const editions = await storage.getDocumentEditionsByDocumentId(req.params.documentId);
+      res.json(editions);
+    } catch (error) {
+      console.error("Erro ao buscar edições do documento:", error);
+      res.status(500).send("Erro ao buscar edições do documento");
+    }
+  });
+
+  app.post("/api/document-editions", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const edition = await storage.createDocumentEdition(req.body);
+      res.status(201).json(edition);
+    } catch (error) {
+      console.error("Erro ao criar edição de documento:", error);
+      res.status(500).send("Erro ao criar edição de documento");
+    }
+  });
+
+  app.put("/api/document-editions/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const edition = await storage.updateDocumentEdition(req.params.id, req.body);
+      res.json(edition);
+    } catch (error) {
+      console.error("Erro ao atualizar edição de documento:", error);
+      res.status(500).send("Erro ao atualizar edição de documento");
+    }
+  });
+
+  app.patch("/api/document-editions/:id/status", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { status } = req.body;
+      const edition = await storage.updateDocumentEditionStatus(req.params.id, status);
+      res.json(edition);
+    } catch (error) {
+      console.error("Erro ao atualizar status da edição:", error);
+      res.status(500).send("Erro ao atualizar status da edição");
+    }
+  });
+
+  app.patch("/api/document-editions/:id/publish", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const edition = await storage.publishDocumentEdition(req.params.id);
+      res.json(edition);
+    } catch (error) {
+      console.error("Erro ao publicar edição:", error);
+      res.status(500).send("Erro ao publicar edição");
+    }
+  });
+
+  app.delete("/api/document-editions/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      await storage.deleteDocumentEdition(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Erro ao excluir edição de documento:", error);
+      res.status(500).send("Erro ao excluir edição de documento");
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 
