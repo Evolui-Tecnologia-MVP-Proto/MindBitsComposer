@@ -139,7 +139,14 @@ export default function TemplateFormModal({
 
   // Função para agrupar campos de mapeamento
   const groupFieldMappings = () => {
-    const groups: Record<string, Array<{ field: string; value: string }>> = {};
+    const groups: Record<string, { 
+      type: 'simple';
+      fields: Array<{ field: string; value: string }>;
+    } | {
+      type: 'nested';
+      subgroups: Record<string, Array<{ field: string; value: string }>>;
+    }> = {};
+    
     const sectionsGroups: Record<string, Array<{ field: string; value: string }>> = {};
     
     Object.entries(fieldMappings).forEach(([field, value]) => {
@@ -150,9 +157,11 @@ export default function TemplateFormModal({
       // Determinar o grupo baseado no campo
       if (field.startsWith('header.') || field === 'header') {
         if (!groups['Header']) {
-          groups['Header'] = [];
+          groups['Header'] = { type: 'simple', fields: [] };
         }
-        groups['Header'].push({ field, value });
+        if (groups['Header'].type === 'simple') {
+          groups['Header'].fields.push({ field, value });
+        }
       } else if (field.startsWith('sections.')) {
         const parts = field.split('.');
         if (parts.length >= 2) {
@@ -163,26 +172,25 @@ export default function TemplateFormModal({
           sectionsGroups[sectionName].push({ field, value });
         }
       } else if (field === 'sections') {
-        if (!groups['Seções']) {
-          groups['Seções'] = [];
+        if (!groups['Outros']) {
+          groups['Outros'] = { type: 'simple', fields: [] };
         }
-        groups['Seções'].push({ field, value });
+        if (groups['Outros'].type === 'simple') {
+          groups['Outros'].fields.push({ field, value });
+        }
       } else {
         if (!groups['Outros']) {
-          groups['Outros'] = [];
+          groups['Outros'] = { type: 'simple', fields: [] };
         }
-        groups['Outros'].push({ field, value });
+        if (groups['Outros'].type === 'simple') {
+          groups['Outros'].fields.push({ field, value });
+        }
       }
     });
     
-    // Se há campos de seções, criar um grupo geral "Seções"
+    // Se há campos de seções, criar estrutura hierárquica
     if (Object.keys(sectionsGroups).length > 0) {
-      // Combinar todos os campos de seções em um único grupo
-      const allSectionFields: Array<{ field: string; value: string }> = [];
-      Object.values(sectionsGroups).forEach(sectionFields => {
-        allSectionFields.push(...sectionFields);
-      });
-      groups['Seções'] = allSectionFields;
+      groups['Seções'] = { type: 'nested', subgroups: sectionsGroups };
     }
     
     return groups;
@@ -422,70 +430,148 @@ export default function TemplateFormModal({
                   
                   {Object.keys(fieldMappings).length > 0 ? (
                     <div className="space-y-4">
-                      {Object.entries(groupFieldMappings()).map(([groupKey, fields]) => (
-                        <Collapsible
-                          key={groupKey}
-                          open={openAccordions[groupKey] ?? true}
-                          onOpenChange={() => toggleAccordion(groupKey)}
-                        >
-                          <CollapsibleTrigger className="flex items-center justify-between w-full p-3 text-left bg-gray-50 hover:bg-gray-100 rounded-lg border transition-colors">
-                            <div className="flex items-center gap-2">
-                              {openAccordions[groupKey] ?? true ? (
-                                <ChevronDown className="h-4 w-4 text-gray-500" />
-                              ) : (
-                                <ChevronRight className="h-4 w-4 text-gray-500" />
-                              )}
-                              <span className="font-medium text-gray-900">{groupKey}</span>
-                              <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
-                                {fields.length} campos
-                              </span>
-                            </div>
-                          </CollapsibleTrigger>
-                          <CollapsibleContent className="border border-t-0 border-gray-200 rounded-b-lg">
-                            <div className="p-4">
-                              <Table>
-                                <TableHeader>
-                                  <TableRow>
-                                    <TableHead className="w-1/2">Campo</TableHead>
-                                    <TableHead className="w-1/2">Mapeamento</TableHead>
-                                  </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                  {fields.map(({ field, value }) => (
-                                    <TableRow key={field}>
-                                      <TableCell>
-                                        <span className="font-mono text-sm text-gray-700">
-                                          {field}
-                                        </span>
-                                      </TableCell>
-                                      <TableCell>
-                                        <Select
-                                          value={value}
-                                          onValueChange={(selectedValue) => handleMappingChange(field, selectedValue)}
-                                        >
-                                          <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Selecione uma coluna" />
-                                          </SelectTrigger>
-                                          <SelectContent>
-                                            {documentosColumns.map((column: any) => (
-                                              <SelectItem key={column.name} value={column.name}>
-                                                <div className="flex flex-col">
-                                                  <span className="font-mono text-sm">{column.name}</span>
-                                                  <span className="text-xs text-gray-500">{column.type}</span>
-                                                </div>
-                                              </SelectItem>
-                                            ))}
-                                          </SelectContent>
-                                        </Select>
-                                      </TableCell>
-                                    </TableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
-                            </div>
-                          </CollapsibleContent>
-                        </Collapsible>
-                      ))}
+                      {Object.entries(groupFieldMappings()).map(([groupKey, groupData]) => {
+                        const isNested = groupData.type === 'nested';
+                        const fields = groupData.type === 'simple' ? groupData.fields : [];
+                        const subGroups = groupData.type === 'nested' ? groupData.subgroups : {} as Record<string, Array<{ field: string; value: string }>>;
+                        
+                        return (
+                          <Collapsible
+                            key={groupKey}
+                            open={openAccordions[groupKey] ?? true}
+                            onOpenChange={() => toggleAccordion(groupKey)}
+                          >
+                            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 text-left bg-gray-50 hover:bg-gray-100 rounded-lg border transition-colors">
+                              <div className="flex items-center gap-2">
+                                {openAccordions[groupKey] ?? true ? (
+                                  <ChevronDown className="h-4 w-4 text-gray-500" />
+                                ) : (
+                                  <ChevronRight className="h-4 w-4 text-gray-500" />
+                                )}
+                                <span className="font-medium text-gray-900">{groupKey}</span>
+                                <span className="text-xs text-gray-500 bg-gray-200 px-2 py-1 rounded-full">
+                                  {isNested 
+                                    ? `${Object.keys(subGroups).length} seções`
+                                    : `${fields.length} campos`
+                                  }
+                                </span>
+                              </div>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="border border-t-0 border-gray-200 rounded-b-lg">
+                              <div className="p-4">
+                                {isNested ? (
+                                  // Renderizar seções aninhadas
+                                  <div className="space-y-3">
+                                    {Object.entries(subGroups).map(([sectionName, sectionFields]) => (
+                                      <Collapsible
+                                        key={`${groupKey}-${sectionName}`}
+                                        open={openAccordions[`${groupKey}-${sectionName}`] ?? false}
+                                        onOpenChange={() => toggleAccordion(`${groupKey}-${sectionName}`)}
+                                      >
+                                        <CollapsibleTrigger className="flex items-center justify-between w-full p-2 text-left bg-blue-50 hover:bg-blue-100 rounded border transition-colors">
+                                          <div className="flex items-center gap-2">
+                                            {openAccordions[`${groupKey}-${sectionName}`] ?? false ? (
+                                              <ChevronDown className="h-3 w-3 text-blue-500" />
+                                            ) : (
+                                              <ChevronRight className="h-3 w-3 text-blue-500" />
+                                            )}
+                                            <span className="font-medium text-blue-700 text-sm">{sectionName}</span>
+                                            <span className="text-xs text-blue-500 bg-blue-200 px-2 py-1 rounded-full">
+                                              {sectionFields.length} campos
+                                            </span>
+                                          </div>
+                                        </CollapsibleTrigger>
+                                        <CollapsibleContent className="mt-2">
+                                          <Table>
+                                            <TableHeader>
+                                              <TableRow>
+                                                <TableHead className="w-1/2 text-xs">Campo</TableHead>
+                                                <TableHead className="w-1/2 text-xs">Mapeamento</TableHead>
+                                              </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                              {sectionFields.map(({ field, value }) => (
+                                                <TableRow key={field}>
+                                                  <TableCell className="py-2">
+                                                    <span className="font-mono text-xs text-gray-700">
+                                                      {field}
+                                                    </span>
+                                                  </TableCell>
+                                                  <TableCell className="py-2">
+                                                    <Select
+                                                      value={value}
+                                                      onValueChange={(selectedValue) => handleMappingChange(field, selectedValue)}
+                                                    >
+                                                      <SelectTrigger className="w-full h-8 text-xs">
+                                                        <SelectValue placeholder="Selecione uma coluna" />
+                                                      </SelectTrigger>
+                                                      <SelectContent>
+                                                        {documentosColumns.map((column: any) => (
+                                                          <SelectItem key={column.name} value={column.name}>
+                                                            <div className="flex flex-col">
+                                                              <span className="font-mono text-xs">{column.name}</span>
+                                                              <span className="text-xs text-gray-500">{column.type}</span>
+                                                            </div>
+                                                          </SelectItem>
+                                                        ))}
+                                                      </SelectContent>
+                                                    </Select>
+                                                  </TableCell>
+                                                </TableRow>
+                                              ))}
+                                            </TableBody>
+                                          </Table>
+                                        </CollapsibleContent>
+                                      </Collapsible>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  // Renderizar campos normais
+                                  <Table>
+                                    <TableHeader>
+                                      <TableRow>
+                                        <TableHead className="w-1/2">Campo</TableHead>
+                                        <TableHead className="w-1/2">Mapeamento</TableHead>
+                                      </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                      {fields.map(({ field, value }) => (
+                                        <TableRow key={field}>
+                                          <TableCell>
+                                            <span className="font-mono text-sm text-gray-700">
+                                              {field}
+                                            </span>
+                                          </TableCell>
+                                          <TableCell>
+                                            <Select
+                                              value={value}
+                                              onValueChange={(selectedValue) => handleMappingChange(field, selectedValue)}
+                                            >
+                                              <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Selecione uma coluna" />
+                                              </SelectTrigger>
+                                              <SelectContent>
+                                                {documentosColumns.map((column: any) => (
+                                                  <SelectItem key={column.name} value={column.name}>
+                                                    <div className="flex flex-col">
+                                                      <span className="font-mono text-sm">{column.name}</span>
+                                                      <span className="text-xs text-gray-500">{column.type}</span>
+                                                    </div>
+                                                  </SelectItem>
+                                                ))}
+                                              </SelectContent>
+                                            </Select>
+                                          </TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                )}
+                              </div>
+                            </CollapsibleContent>
+                          </Collapsible>
+                        );
+                      })}
                     </div>
                   ) : (
                     <div className="text-center py-8">
