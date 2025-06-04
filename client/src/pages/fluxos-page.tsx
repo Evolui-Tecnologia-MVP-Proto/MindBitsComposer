@@ -1098,8 +1098,14 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
     [reactFlowInstance, setNodes, nodes.length]
   );
 
-  const handleSave = () => {
-    if (nodes.length === 0) {
+  const handleSave = (forceExit = false) => {
+    // Se está forçando saída (navegando para outro menu) e não há fluxo em edição, apenas sair
+    if (forceExit && !currentFlowId) {
+      return;
+    }
+    
+    // Se não há nós e não está forçando saída, mostrar erro
+    if (nodes.length === 0 && !forceExit) {
       toast({
         title: 'Fluxo vazio',
         description: 'Adicione pelo menos um nó para salvar o fluxo',
@@ -1108,6 +1114,7 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
       return;
     }
 
+    // Se não há fluxo selecionado, não pode salvar
     if (!currentFlowId) {
       toast({
         title: 'Nenhum fluxo selecionado',

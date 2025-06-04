@@ -28,7 +28,7 @@ interface FlowToolbarProps {
   savedFlows: any[];
   onFlowSelect: (flowId: string) => void;
   checkUnsavedChanges?: () => boolean;
-  onSave?: () => void;
+  onSave?: (forceExit?: boolean) => void;
   onDiscard?: () => void;
   
   // Inspector
@@ -174,7 +174,10 @@ export const FlowToolbar = ({
     console.log('handleConfirmChange called with shouldSave:', shouldSave);
     
     if (shouldSave && onSave) {
-      onSave();
+      // Se há um fluxo pendente, está trocando de fluxo (forceExit = false)
+      // Se não há fluxo pendente, está saindo do editor (forceExit = true)
+      const isExitingEditor = !pendingFlowChange;
+      onSave(isExitingEditor);
     }
     
     if (pendingFlowChange) {
