@@ -382,6 +382,31 @@ export const insertDocumentsFlowSchema = createInsertSchema(documentsFlows).omit
 export type InsertDocumentsFlow = z.infer<typeof insertDocumentsFlowSchema>;
 export type DocumentsFlow = typeof documentsFlows.$inferSelect;
 
+// Document Editions table
+export const documentEditions = pgTable("document_editions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  documentId: uuid("document_id").notNull().references(() => documentos.id, { onDelete: "cascade" }),
+  templateId: uuid("template_id").notNull().references(() => templates.id, { onDelete: "cascade" }),
+  status: text("status", { enum: ["draft", "in_progress", "review", "published", "archived"] }).notNull().default("draft"),
+  lexFile: text("lex_file"), // Texto base64 para armazenar arquivo LEX
+  jsonFile: json("json_file").$type<Record<string, any>>().default({}), // JSON estruturado
+  mdFile: text("md_file"), // Longtext para arquivo Markdown
+  init: timestamp("init"), // Data/hora de início
+  publish: timestamp("publish"), // Data/hora de publicação
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Document Editions schema
+export const insertDocumentEditionSchema = createInsertSchema(documentEditions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertDocumentEdition = z.infer<typeof insertDocumentEditionSchema>;
+export type DocumentEdition = typeof documentEditions.$inferSelect;
+
 // Relations
 export const repoStructureRelations = {
   parent: {
