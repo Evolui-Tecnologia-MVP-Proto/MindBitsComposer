@@ -38,10 +38,15 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
     queryKey: ["/api/flow-types"],
   });
 
-  // Query para listar arquivos JSON salvos
-  const { data: savedJsonFiles, isLoading: isLoadingJsonFiles } = useQuery<any[]>({
-    queryKey: ["/api/documents-flows/saved-json-files"],
-    enabled: showImportModal, // Só busca quando o modal está aberto
+  // Query para listar arquivos JSON salvos (filtrados por flowId)
+  const { data: savedJsonFiles, isLoading: isLoadingJsonFiles } = useQuery({
+    queryKey: ["/api/documents-flows/saved-json-files", flowToImport?.id],
+    queryFn: () => {
+      if (!flowToImport?.id) return { files: [] };
+      return fetch(`/api/documents-flows/saved-json-files?flowId=${flowToImport.id}`)
+        .then(res => res.json());
+    },
+    enabled: showImportModal && !!flowToImport?.id,
   });
 
   // Função para confirmar exclusão com toast
@@ -678,7 +683,7 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
                     <SelectValue placeholder="Selecione um arquivo JSON" />
                   </SelectTrigger>
                   <SelectContent>
-                    {savedJsonFiles?.files?.length > 0 ? (
+                    {savedJsonFiles?.files && savedJsonFiles.files.length > 0 ? (
                       savedJsonFiles.files.map((file: any) => (
                         <SelectItem key={file.name} value={file.name}>
                           {file.name} ({(file.size / 1024).toFixed(1)} KB) - {new Date(file.created).toLocaleDateString('pt-BR')}
@@ -686,7 +691,7 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
                       ))
                     ) : (
                       <SelectItem value="" disabled>
-                        Nenhum arquivo JSON encontrado
+                        Nenhum arquivo JSON encontrado para este fluxo
                       </SelectItem>
                     )}
                   </SelectContent>

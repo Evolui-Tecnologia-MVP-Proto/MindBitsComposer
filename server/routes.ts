@@ -1527,30 +1527,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
+      const { flowId } = req.query;
       const saveDir = path.join(process.cwd(), 'local_files', 'saved_fluxes');
       
       if (!fs.existsSync(saveDir)) {
         return res.json({ files: [] });
       }
       
-      const files = fs.readdirSync(saveDir)
+      let files = fs.readdirSync(saveDir)
         .filter((file: string) => file.endsWith('.json'))
         .map((file: string) => {
           const filepath = path.join(saveDir, file);
           const stats = fs.statSync(filepath);
           
           // Extrair flowId do nome do arquivo
-          const flowId = file.split('_')[0];
+          const fileFlowId = file.split('_')[0];
           
           return {
             name: file,
-            flowId: flowId,
+            flowId: fileFlowId,
             size: stats.size,
             created: stats.mtime,
             path: filepath
           };
-        })
-        .sort((a: any, b: any) => b.created - a.created);
+        });
+
+      // Filtrar por flowId se fornecido
+      if (flowId) {
+        files = files.filter((file: any) => file.flowId === flowId);
+      }
+
+      // Ordenar por data de criação (mais recente primeiro)
+      files = files.sort((a: any, b: any) => b.created - a.created);
       
       res.json({ files });
     } catch (error) {
