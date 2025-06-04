@@ -59,6 +59,7 @@ interface TemplateSection {
   name: string;
   content: string;
   isOpen: boolean;
+  fields?: Array<{ key: string; value: string }>;
 }
 
 interface HeaderField {
@@ -309,11 +310,25 @@ export default function BasicTextEditor() {
             }));
           } else if (typeof structure.sections === 'object' && structure.sections !== null) {
             // Estrutura nova: sections como objeto
-            newSections = Object.keys(structure.sections).map((sectionName: string) => ({
-              name: sectionName,
-              content: '',
-              isOpen: false // Começar todas recolhidas
-            }));
+            newSections = Object.keys(structure.sections).map((sectionName: string) => {
+              const sectionData = structure.sections[sectionName];
+              let sectionFields: Array<{ key: string; value: string }> = [];
+              
+              // Se a seção contém campos (objeto), extrair os campos
+              if (typeof sectionData === 'object' && sectionData !== null && !Array.isArray(sectionData)) {
+                sectionFields = Object.keys(sectionData).map(fieldKey => ({
+                  key: fieldKey,
+                  value: sectionData[fieldKey] || ''
+                }));
+              }
+              
+              return {
+                name: sectionName,
+                content: '',
+                isOpen: false, // Começar todas recolhidas
+                fields: sectionFields.length > 0 ? sectionFields : undefined
+              };
+            });
           }
           
           if (newSections.length > 0) {
@@ -370,6 +385,19 @@ export default function BasicTextEditor() {
       prev.map((section, i) => 
         i === index ? { ...section, content: newContent } : section
       )
+    );
+  };
+
+  const updateSectionField = (sectionIndex: number, fieldIndex: number, value: string) => {
+    setTemplateSections(prev => 
+      prev.map((section, i) => {
+        if (i === sectionIndex && section.fields) {
+          const updatedFields = [...section.fields];
+          updatedFields[fieldIndex].value = value;
+          return { ...section, fields: updatedFields };
+        }
+        return section;
+      })
     );
   };
 
@@ -669,19 +697,76 @@ export default function BasicTextEditor() {
                   )}
                 </CollapsibleTrigger>
                 <CollapsibleContent className="p-4 border-t border-gray-200">
-                  <SimpleRichTextDisplay
-                    content={section.content}
-                    onContentChange={(newContent) => updateSectionContent(index, newContent)}
-                    onCursorCapture={(position) => {
-                      setLastCursorInfo({
-                        elementId: `section-${index}`,
-                        position: position,
-                        sectionIndex: index
-                      });
-                    }}
-                    placeholder={`Escreva o conteúdo para ${section.name}...`}
-                    className="w-full h-32 min-h-[8rem] resize-y border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-left"
-                  />
+                  {/* Se a seção tem campos específicos, renderizar como tabela */}
+                  {section.fields && section.fields.length > 0 ? (
+                    <div className="space-y-4">
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                        <h4 className="text-sm font-medium text-gray-700 mb-3">Campos da Seção</h4>
+                        <table className="w-full border-collapse">
+                          <thead>
+                            <tr className="bg-gray-100">
+                              <th className="border border-gray-300 px-3 py-2 text-left text-sm font-medium text-gray-700">
+                                Campo
+                              </th>
+                              <th className="border border-gray-300 px-3 py-2 text-left text-sm font-medium text-gray-700">
+                                Valor
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {section.fields.map((field, fieldIndex) => (
+                              <tr key={fieldIndex} className="hover:bg-gray-50">
+                                <td className="border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50">
+                                  {field.key}
+                                </td>
+                                <td className="border border-gray-300 px-3 py-2">
+                                  <input
+                                    type="text"
+                                    value={field.value}
+                                    onChange={(e) => updateSectionField(index, fieldIndex, e.target.value)}
+                                    className="w-full px-2 py-1 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+                                    placeholder={`Digite ${field.key}...`}
+                                  />
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      {/* Editor de texto livre da seção */}
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">Conteúdo Adicional</h4>
+                        <SimpleRichTextDisplay
+                          content={section.content}
+                          onContentChange={(newContent) => updateSectionContent(index, newContent)}
+                          onCursorCapture={(position) => {
+                            setLastCursorInfo({
+                              elementId: `section-${index}`,
+                              position: position,
+                              sectionIndex: index
+                            });
+                          }}
+                          placeholder={`Escreva conteúdo adicional para ${section.name}...`}
+                          className="w-full h-32 min-h-[8rem] resize-y border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-left"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    /* Se não há campos específicos, usar apenas editor de texto */
+                    <SimpleRichTextDisplay
+                      content={section.content}
+                      onContentChange={(newContent) => updateSectionContent(index, newContent)}
+                      onCursorCapture={(position) => {
+                        setLastCursorInfo({
+                          elementId: `section-${index}`,
+                          position: position,
+                          sectionIndex: index
+                        });
+                      }}
+                      placeholder={`Escreva o conteúdo para ${section.name}...`}
+                      className="w-full h-32 min-h-[8rem] resize-y border border-gray-300 rounded-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-left"
+                    />
+                  )}
                 </CollapsibleContent>
               </Collapsible>
             ))}
