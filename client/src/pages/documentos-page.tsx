@@ -2307,7 +2307,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             <TableHead>Nome</TableHead>
             <TableHead>Incluído</TableHead>
             <TableHead>Iniciado</TableHead>
-            <TableHead>Fluxo Atual</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Ações</TableHead>
           </TableRow>
@@ -2340,23 +2339,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   <Clock className="mr-1.5 h-3.5 w-3.5" />
                   {formatDate(documento.updatedAt)}
                 </div>
-              </TableCell>
-              <TableCell>
-                {(() => {
-                  const activeFlow = getActiveFlow(documento.id);
-                  if (activeFlow) {
-                    return (
-                      <div className="flex items-center text-gray-500 text-sm">
-                        [{activeFlow.flowCode}] - {activeFlow.flowName}
-                      </div>
-                    );
-                  }
-                  return (
-                    <div className="text-xs text-gray-400">
-                      -
-                    </div>
-                  );
-                })()}
               </TableCell>
               <TableCell>
                 <Badge
@@ -2440,7 +2422,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           {documentos.length === 0 && (
             <TableRow>
               <TableCell
-                colSpan={activeTab === "integrados" ? 7 : 7}
+                colSpan={activeTab === "integrados" ? 7 : 6}
                 className="text-center py-6 text-gray-500"
               >
                 Nenhum documento encontrado nesta categoria.
