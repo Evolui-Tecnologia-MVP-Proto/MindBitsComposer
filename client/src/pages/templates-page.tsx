@@ -154,6 +154,7 @@ export default function TemplatesPage() {
     mutationFn: async (template: Template) => {
       // Criar uma cópia do template com um novo código
       const newTemplate = {
+        name: `${template.name} (Cópia)`,
         code: `${template.code}-CÓPIA`,
         description: `${template.description} (Cópia)`,
         type: template.type,
