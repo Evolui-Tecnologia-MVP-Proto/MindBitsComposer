@@ -219,7 +219,8 @@ export default function TemplateFormModal({
         ...formData,
         structure: typeof formData.structure === 'string' 
           ? JSON.parse(formData.structure) 
-          : formData.structure
+          : formData.structure,
+        mappings: fieldMappings
       };
       
       console.log("Enviando template:", JSON.stringify(processedData, null, 2));
