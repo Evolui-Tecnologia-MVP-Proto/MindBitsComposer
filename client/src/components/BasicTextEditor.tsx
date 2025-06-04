@@ -297,17 +297,30 @@ export default function BasicTextEditor() {
         }
         
         // Processar seções
-        if (structure.sections && Array.isArray(structure.sections) && structure.sections.length > 0) {
-          // Criar seções colapsíveis baseadas no template
-          const newSections: TemplateSection[] = structure.sections.map((sectionName: string) => ({
-            name: sectionName,
-            content: '',
-            isOpen: false // Começar todas recolhidas
-          }));
+        if (structure.sections) {
+          let newSections: TemplateSection[] = [];
           
-          setTemplateSections(newSections);
-          setContent(''); // Limpar o editor principal
-          return;
+          if (Array.isArray(structure.sections) && structure.sections.length > 0) {
+            // Estrutura antiga: sections como array de strings
+            newSections = structure.sections.map((sectionName: string) => ({
+              name: sectionName,
+              content: '',
+              isOpen: false // Começar todas recolhidas
+            }));
+          } else if (typeof structure.sections === 'object' && structure.sections !== null) {
+            // Estrutura nova: sections como objeto
+            newSections = Object.keys(structure.sections).map((sectionName: string) => ({
+              name: sectionName,
+              content: '',
+              isOpen: false // Começar todas recolhidas
+            }));
+          }
+          
+          if (newSections.length > 0) {
+            setTemplateSections(newSections);
+            setContent(''); // Limpar o editor principal
+            return;
+          }
         }
       }
       
