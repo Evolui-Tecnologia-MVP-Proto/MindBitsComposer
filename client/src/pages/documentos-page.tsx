@@ -529,6 +529,19 @@ const SwitchNodeComponent = (props: any) => {
   const dynamicWidth = baseSize;
   const dynamicHeight = baseSize; // Altura igual à largura para manter proporção do paralelogramo
   
+  // Determinar cores dos handles baseado nas propriedades leftSwitch e rightSwitch
+  const getHandleColor = (switchValue: any) => {
+    if (Array.isArray(switchValue)) {
+      // Se for array, verifica o primeiro valor
+      return switchValue[0] === 'TRUE' ? 'green' : 'red';
+    }
+    // Se for string ou outro valor
+    return switchValue === 'TRUE' ? 'green' : 'red';
+  };
+  
+  const leftHandleColor = props.data.leftSwitch ? getHandleColor(props.data.leftSwitch) : 'green';
+  const rightHandleColor = props.data.rightSwitch ? getHandleColor(props.data.rightSwitch) : 'red';
+  
   const isExecuted = props.data.isExecuted === 'TRUE';
   const isPendingConnected = props.data.isPendingConnected;
   const isSelected = props.selected;
@@ -598,33 +611,33 @@ const SwitchNodeComponent = (props: any) => {
       <Handle 
         type="source" 
         position={Position.Right} 
-        className="w-4 h-4 bg-white border-4 border-red-500" 
+        className={`w-4 h-4 bg-white border-4 ${rightHandleColor === 'green' ? 'border-green-500' : 'border-red-500'}`}
         id="a"
         style={{ top: '50%', right: '-33px', transform: 'translateY(-50%)' }}
       />
       <Handle 
         type="source" 
         position={Position.Left} 
-        className="w-4 h-4 bg-white border-4 border-green-500" 
+        className={`w-4 h-4 bg-white border-4 ${leftHandleColor === 'green' ? 'border-green-500' : 'border-red-500'}`}
         id="c"
         style={{ top: '50%', left: '-33px', transform: 'translateY(-50%)' }}
       />
       
       {/* Mostrar valores dos switches abaixo dos nós de saída */}
-      {props.data.configured && props.data.redSwitch && (
+      {props.data.configured && props.data.rightSwitch && (
         <div 
-          className="absolute text-xs font-mono text-red-700 bg-red-100 px-1 rounded"
+          className={`absolute text-xs font-mono px-1 rounded ${rightHandleColor === 'green' ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100'}`}
           style={{ top: 'calc(75% - 11px)', right: '-45px', transform: 'translateX(50%)', whiteSpace: 'nowrap' }}
         >
-          {Array.isArray(props.data.redSwitch) ? props.data.redSwitch.join(',') : props.data.redSwitch}
+          {Array.isArray(props.data.rightSwitch) ? props.data.rightSwitch.join(',') : props.data.rightSwitch}
         </div>
       )}
-      {props.data.configured && props.data.greenSwitch && (
+      {props.data.configured && props.data.leftSwitch && (
         <div 
-          className="absolute text-xs font-mono text-green-700 bg-green-100 px-1 rounded"
+          className={`absolute text-xs font-mono px-1 rounded ${leftHandleColor === 'green' ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100'}`}
           style={{ top: 'calc(75% - 11px)', left: '-45px', transform: 'translateX(-50%)', whiteSpace: 'nowrap' }}
         >
-          {Array.isArray(props.data.greenSwitch) ? props.data.greenSwitch.join(',') : props.data.greenSwitch}
+          {Array.isArray(props.data.leftSwitch) ? props.data.leftSwitch.join(',') : props.data.leftSwitch}
         </div>
       )}
     </div>
