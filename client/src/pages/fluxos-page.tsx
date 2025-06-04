@@ -149,8 +149,8 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
 
   // Configurar função de salvamento para o sistema de proteção
   useEffect(() => {
-    setSaveFunction(() => handleSave);
-  }, [setSaveFunction]);
+    setSaveFunction(() => () => handleSave(true)); // forceExit = true para navegação
+  }, [setSaveFunction, handleSave]);
   
   // Função para determinar cor do handle do switchNode
   const getSwitchHandleColor = (switchValue: any) => {
