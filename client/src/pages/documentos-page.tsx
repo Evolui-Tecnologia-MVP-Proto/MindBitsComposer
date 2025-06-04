@@ -4707,14 +4707,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 Selecionar Fluxo de Documentação
               </Label>
               <Select value={selectedFlowId} onValueChange={setSelectedFlowId}>
-                <SelectTrigger id="flow-select">
+                <SelectTrigger id="flow-select" className="font-mono">
                   <SelectValue placeholder="Escolha um fluxo para a documentação" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="font-mono">
                   {documentsFlows
                     .filter((flow: any) => flow.isEnabled === true)
                     .map((flow: any) => (
-                    <SelectItem key={flow.id} value={flow.id}>
+                    <SelectItem key={flow.id} value={flow.id} className="font-mono">
                       <span className="font-mono text-sm">
                         [{flow.code}]
                       </span>
