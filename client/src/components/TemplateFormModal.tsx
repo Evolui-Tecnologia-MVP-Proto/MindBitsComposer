@@ -89,6 +89,12 @@ export default function TemplateFormModal({
             if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
               // Se é um objeto, adiciona a seção e continua recursivamente
               fields.push(`[SEÇÃO] ${currentPath}`);
+              
+              // Adicionar definição para o corpo da seção (conteúdo de texto livre)
+              if (prefix === 'sections' || currentPath.startsWith('sections.')) {
+                fields.push(`${currentPath}.body`);
+              }
+              
               extractFields(obj[key], currentPath);
             } else {
               // Se é um campo final, adiciona o campo
