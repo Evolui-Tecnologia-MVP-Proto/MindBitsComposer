@@ -6352,39 +6352,78 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               </span>
                             </p>
                             <Button
-                              onClick={() => {
-                                // Atualizar o nó para marcar como em processo
-                                const currentNodes = getNodes();
-                                const updatedNodes = currentNodes.map(node => {
-                                  if (node.id === selectedFlowNode.id) {
-                                    return {
-                                      ...node,
-                                      data: {
-                                        ...node.data,
-                                        isInProcess: 'TRUE'
-                                      }
-                                    };
-                                  }
-                                  return node;
-                                });
-                                setNodes(updatedNodes);
-                                
-                                // Atualizar também o nó selecionado para refletir a mudança no painel
-                                setSelectedFlowNode({
-                                  ...selectedFlowNode,
-                                  data: {
-                                    ...selectedFlowNode.data,
-                                    isInProcess: 'TRUE'
-                                  }
-                                });
+                              onClick={async () => {
+                                try {
+                                  // Atualizar o nó para marcar como em processo
+                                  const currentNodes = getNodes();
+                                  const updatedNodes = currentNodes.map(node => {
+                                    if (node.id === selectedFlowNode.id) {
+                                      return {
+                                        ...node,
+                                        data: {
+                                          ...node.data,
+                                          isInProcess: 'TRUE'
+                                        }
+                                      };
+                                    }
+                                    return node;
+                                  });
+                                  setNodes(updatedNodes);
+                                  
+                                  // Atualizar também o nó selecionado para refletir a mudança no painel
+                                  setSelectedFlowNode({
+                                    ...selectedFlowNode,
+                                    data: {
+                                      ...selectedFlowNode.data,
+                                      isInProcess: 'TRUE'
+                                    }
+                                  });
 
-                                // Mostrar alerta para persistir alterações
-                                setShowApprovalAlert(true);
+                                  // Salvar alterações no banco de dados imediatamente
+                                  const updatedFlowTasks = {
+                                    nodes: updatedNodes,
+                                    edges: getEdges(),
+                                    viewport: { x: 0, y: 0, zoom: 1 }
+                                  };
 
-                                toast({
-                                  title: "Documentação iniciada",
-                                  description: "O documento foi marcado como 'In Progress' e está pronto para edição no editor.",
-                                });
+                                  const response = await fetch(`/api/document-flow-executions/${flowData.documentId}`, {
+                                    method: 'PUT',
+                                    headers: {
+                                      'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                      flowTasks: updatedFlowTasks
+                                    }),
+                                  });
+
+                                  if (!response.ok) {
+                                    throw new Error('Erro ao salvar alterações');
+                                  }
+
+                                  // Atualizar estado local
+                                  setFlowDiagramModal(prev => ({
+                                    ...prev,
+                                    flowData: {
+                                      ...prev.flowData,
+                                      flowTasks: updatedFlowTasks
+                                    }
+                                  }));
+
+                                  // Recarregar dados
+                                  queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
+
+                                  toast({
+                                    title: "Documentação iniciada",
+                                    description: "O documento foi marcado como 'In Progress' e salvo no banco de dados.",
+                                  });
+                                } catch (error) {
+                                  console.error('Erro ao salvar alterações:', error);
+                                  toast({
+                                    title: "Erro",
+                                    description: "Falha ao salvar as alterações no banco de dados.",
+                                    variant: "destructive"
+                                  });
+                                }
                               }}
                               size="sm"
                               className="bg-blue-600 hover:bg-blue-700 text-white"
