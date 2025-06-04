@@ -43,15 +43,39 @@ export function NavigationGuardProvider({ children }: NavigationGuardProviderPro
 
   const handleConfirm = (shouldSave: boolean) => {
     if (shouldSave && saveFunction) {
-      saveFunction();
-    }
-    
-    setHasUnsavedChanges(false);
-    setShowModal(false);
-    
-    if (pendingNavigation) {
-      setLocation(pendingNavigation);
-      setPendingNavigation(null);
+      // Executar salvamento ANTES de navegar
+      try {
+        saveFunction();
+        // Aguardar um pequeno delay para garantir que o salvamento seja processado
+        setTimeout(() => {
+          setHasUnsavedChanges(false);
+          setShowModal(false);
+          
+          if (pendingNavigation) {
+            setLocation(pendingNavigation);
+            setPendingNavigation(null);
+          }
+        }, 100);
+      } catch (error) {
+        console.error('Erro ao salvar:', error);
+        // Em caso de erro, ainda permitir navegação
+        setHasUnsavedChanges(false);
+        setShowModal(false);
+        
+        if (pendingNavigation) {
+          setLocation(pendingNavigation);
+          setPendingNavigation(null);
+        }
+      }
+    } else {
+      // Se não vai salvar, navegar imediatamente
+      setHasUnsavedChanges(false);
+      setShowModal(false);
+      
+      if (pendingNavigation) {
+        setLocation(pendingNavigation);
+        setPendingNavigation(null);
+      }
     }
   };
 
