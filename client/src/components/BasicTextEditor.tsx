@@ -46,7 +46,9 @@ import {
   ArrowRight,
   ArrowLeft,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  FileCode2,
+  FileText
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import PluginModal from "@/components/plugin-modal";
@@ -663,8 +665,16 @@ export default function BasicTextEditor() {
               </Collapsible>
             ))}
           </div>
+        ) : content.trim() === '' ? (
+          /* Estado vazio - mostra ícone centralizado */
+          <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-gray-400">
+            <FileCode2 className="w-24 h-24 mb-4 text-gray-300" />
+            <p className="text-lg font-medium text-gray-500">
+              Selecione um documento ou template para começar a editar...
+            </p>
+          </div>
         ) : (
-          /* Editor simples quando não há template selecionado */
+          /* Editor simples quando não há template selecionado mas há conteúdo */
           <textarea
             id="editor-textarea"
             value={content}
