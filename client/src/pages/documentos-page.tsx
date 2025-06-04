@@ -79,6 +79,7 @@ import {
   FileText,
   Link,
   Check,
+  RefreshCw,
 } from "lucide-react";
 import {
   type Documento,
@@ -3520,16 +3521,33 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-3xl font-bold tracking-tight">Documentos</h2>
-          <Button
-            onClick={() => {
-              resetFormData();
-              setIsCreateModalOpen(true);
-            }}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Incluir Documento
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={() => {
+                queryClient.invalidateQueries({ queryKey: ['/api/documentos'] });
+                queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
+                toast({
+                  title: "Dados atualizados",
+                  description: "As informações das abas foram recarregadas com sucesso.",
+                });
+              }}
+              variant="outline"
+              className="border-gray-300 hover:bg-gray-50"
+            >
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Atualizar
+            </Button>
+            <Button
+              onClick={() => {
+                resetFormData();
+                setIsCreateModalOpen(true);
+              }}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Incluir Documento
+            </Button>
+          </div>
         </div>
 
         <Tabs
