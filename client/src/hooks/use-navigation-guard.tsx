@@ -14,7 +14,7 @@ import {
 interface NavigationGuardContextType {
   hasUnsavedChanges: boolean;
   setHasUnsavedChanges: (value: boolean) => void;
-  setSaveFunction: (fn: (() => void) | null) => void;
+  setSaveFunction: (fn: ((forceExit?: boolean) => void) | null) => void;
   checkAndNavigate: (path: string) => boolean;
 }
 
@@ -26,7 +26,7 @@ interface NavigationGuardProviderProps {
 
 export function NavigationGuardProvider({ children }: NavigationGuardProviderProps) {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const [saveFunction, setSaveFunction] = useState<(() => void) | null>(null);
+  const [saveFunction, setSaveFunction] = useState<((forceExit?: boolean) => void) | null>(null);
   const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [, setLocation] = useLocation();
@@ -43,7 +43,8 @@ export function NavigationGuardProvider({ children }: NavigationGuardProviderPro
 
   const handleConfirm = (shouldSave: boolean) => {
     if (shouldSave && saveFunction) {
-      saveFunction();
+      // Para navegação externa (saindo do editor), usar forceExit = true
+      saveFunction(true);
     }
     
     setHasUnsavedChanges(false);
