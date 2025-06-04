@@ -7028,12 +7028,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               <Button 
                 onClick={() => {
                   console.log("🔴 Botão fechar clicado");
-                  
-                  // Ocultar o editor de propriedades ao fechar o modal
-                  setShowFlowInspector(false);
-                  setSelectedFlowNode(null);
-                  setIsFlowInspectorPinned(false);
-                  
                   setFlowDiagramModal({
                     isOpen: false,
                     flowData: null,

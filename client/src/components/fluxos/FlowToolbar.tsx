@@ -158,16 +158,14 @@ export const FlowToolbar = ({
       return;
     }
     
-    // Verificar alterações não salvas usando checkUnsavedChanges se disponível
-    const actualUnsavedChanges = checkUnsavedChanges ? checkUnsavedChanges() : hasUnsavedChanges;
-    
-    if (actualUnsavedChanges) {
+    // Verificar alterações não salvas
+    if (hasUnsavedChanges) {
       console.log('  ✅ HAS CHANGES - SHOWING MODAL');
       setPendingFlowChange(newFlowId);
       setShowUnsavedModal(true);
       console.log('  Modal state set to true');
     } else {
-      console.log('  ❌ No changes, proceeding directly');
+      console.log('  ❌ No changes, proceeding');
       onFlowSelect(newFlowId);
     }
   };
