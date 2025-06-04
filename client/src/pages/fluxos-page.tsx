@@ -603,6 +603,9 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
     setSelectedNodeId(null);
     setSelectedEdgeId(null);
     
+    // Fechar painel de propriedades ao descartar alterações
+    setShowInspector(false);
+    
     // Reset do estado de alterações não salvas
     setHasUnsavedChanges(false);
     hasUnsavedChangesRef.current = false;
@@ -734,13 +737,15 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
   const loadFlow = useCallback((flow: any) => {
     if (!flow.flowData) return;
     
+    // Fechar painel de propriedades ao trocar de fluxo
+    setShowInspector(false);
+    
     // Verificar se o fluxo está bloqueado
     const isLocked = flow.isLocked === true;
     setCurrentFlowLocked(isLocked);
     
-    // Se o fluxo está bloqueado, mostrar aviso e fechar inspetor
+    // Se o fluxo está bloqueado, mostrar aviso
     if (isLocked) {
-      setShowInspector(false); // Fechar inspetor se estiver aberto
       toast({
         title: "Fluxo Bloqueado",
         description: "Este fluxo está bloqueado para edição. Apenas visualização é permitida.",
