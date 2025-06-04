@@ -140,6 +140,7 @@ export default function TemplateFormModal({
   // Função para agrupar campos de mapeamento
   const groupFieldMappings = () => {
     const groups: Record<string, Array<{ field: string; value: string }>> = {};
+    const sectionsGroups: Record<string, Array<{ field: string; value: string }>> = {};
     
     Object.entries(fieldMappings).forEach(([field, value]) => {
       if (field.startsWith('[SEÇÃO]')) {
@@ -147,27 +148,42 @@ export default function TemplateFormModal({
       }
       
       // Determinar o grupo baseado no campo
-      let groupKey = 'Outros';
-      
-      if (field.startsWith('header.')) {
-        groupKey = 'Header';
+      if (field.startsWith('header.') || field === 'header') {
+        if (!groups['Header']) {
+          groups['Header'] = [];
+        }
+        groups['Header'].push({ field, value });
       } else if (field.startsWith('sections.')) {
         const parts = field.split('.');
         if (parts.length >= 2) {
-          groupKey = `Seção: ${parts[1]}`;
+          const sectionName = parts[1];
+          if (!sectionsGroups[sectionName]) {
+            sectionsGroups[sectionName] = [];
+          }
+          sectionsGroups[sectionName].push({ field, value });
         }
-      } else if (field === 'header') {
-        groupKey = 'Header';
       } else if (field === 'sections') {
-        groupKey = 'Seções';
+        if (!groups['Seções']) {
+          groups['Seções'] = [];
+        }
+        groups['Seções'].push({ field, value });
+      } else {
+        if (!groups['Outros']) {
+          groups['Outros'] = [];
+        }
+        groups['Outros'].push({ field, value });
       }
-      
-      if (!groups[groupKey]) {
-        groups[groupKey] = [];
-      }
-      
-      groups[groupKey].push({ field, value });
     });
+    
+    // Se há campos de seções, criar um grupo geral "Seções"
+    if (Object.keys(sectionsGroups).length > 0) {
+      // Combinar todos os campos de seções em um único grupo
+      const allSectionFields: Array<{ field: string; value: string }> = [];
+      Object.values(sectionsGroups).forEach(sectionFields => {
+        allSectionFields.push(...sectionFields);
+      });
+      groups['Seções'] = allSectionFields;
+    }
     
     return groups;
   };
