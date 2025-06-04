@@ -415,6 +415,16 @@ const DocumentNodeComponent = (props: any) => {
         />
       </svg>
     <FileText className="absolute top-1 left-1 h-6 w-6 text-purple-600 z-10" />
+    
+    {/* Badge "In Progress" no canto superior direito quando isInProcess = TRUE */}
+    {props.data.isInProcess === 'TRUE' && (
+      <div className="absolute -top-1 -right-1 z-20">
+        <div className="bg-purple-500 text-white text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-sm shadow-md border border-purple-600">
+          In Progress
+        </div>
+      </div>
+    )}
+    
     <div className="absolute inset-0 flex items-center justify-center" style={{ pointerEvents: 'none' }}>
       <div className="text-center pt-2">
         {props.data.showLabel !== false && (
@@ -6260,7 +6270,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
                 {/* Layout tabular para DocumentNode - 2 colunas */}
                 {selectedFlowNode.type === 'documentNode' && (
-                  <div>
+                  <div className="space-y-4">
                     <div className="border border-gray-200 rounded-lg overflow-hidden">
                       <table className="w-full text-xs">
                         <thead>
@@ -6299,6 +6309,101 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         </tbody>
                       </table>
                     </div>
+
+                    {/* Mensagem e botão para iniciar edição quando isExecuted = FALSE e isInProcess = FALSE */}
+                    {selectedFlowNode.data.isExecuted === 'FALSE' && selectedFlowNode.data.isInProcess === 'FALSE' && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex items-start space-x-3">
+                          <BookOpen className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <h4 className="text-sm font-medium text-blue-800 mb-2">
+                              Iniciar Documentação
+                            </h4>
+                            <p className="text-sm text-blue-700 mb-3 leading-relaxed">
+                              Selecione o botão de iniciar edição para enviar este documento para início de documentação no editor. 
+                              Ao selecionar este elemento do fluxo indicará modo "In Progress", acesse o editor e selecione o documento 
+                              para dar prosseguimento ao processo de edição da documentação. O documento a ser editado será o{' '}
+                              <span className="font-mono font-medium">
+                                {(() => {
+                                  if (selectedFlowNode.data.docType) {
+                                    const parts = selectedFlowNode.data.docType.split('-');
+                                    return parts.length >= 2 ? `${parts[0]} - ${parts[1]}` : selectedFlowNode.data.docType;
+                                  }
+                                  return 'Documento não definido';
+                                })()}
+                              </span>
+                            </p>
+                            <Button
+                              onClick={() => {
+                                // Atualizar o nó para marcar como em processo
+                                const currentNodes = getNodes();
+                                const updatedNodes = currentNodes.map(node => {
+                                  if (node.id === selectedFlowNode.id) {
+                                    return {
+                                      ...node,
+                                      data: {
+                                        ...node.data,
+                                        isInProcess: 'TRUE'
+                                      }
+                                    };
+                                  }
+                                  return node;
+                                });
+                                setNodes(updatedNodes);
+                                
+                                // Atualizar também o nó selecionado para refletir a mudança no painel
+                                setSelectedFlowNode({
+                                  ...selectedFlowNode,
+                                  data: {
+                                    ...selectedFlowNode.data,
+                                    isInProcess: 'TRUE'
+                                  }
+                                });
+
+                                // Mostrar alerta para persistir alterações
+                                setShowApprovalAlert(true);
+
+                                toast({
+                                  title: "Documentação iniciada",
+                                  description: "O documento foi marcado como 'In Progress' e está pronto para edição no editor.",
+                                });
+                              }}
+                              size="sm"
+                              className="bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                              <BookOpen className="mr-1.5 h-3 w-3" />
+                              Iniciar Edição
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Mensagem informativa quando está em processo */}
+                    {selectedFlowNode.data.isInProcess === 'TRUE' && selectedFlowNode.data.isExecuted === 'FALSE' && (
+                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <div className="flex items-start space-x-3">
+                          <Zap className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <h4 className="text-sm font-medium text-purple-800 mb-2">
+                              Documentação em Progresso
+                            </h4>
+                            <p className="text-sm text-purple-700">
+                              Este documento está sendo editado no editor. Acesse a página de fluxos para continuar o processo de documentação do{' '}
+                              <span className="font-mono font-medium">
+                                {(() => {
+                                  if (selectedFlowNode.data.docType) {
+                                    const parts = selectedFlowNode.data.docType.split('-');
+                                    return parts.length >= 2 ? `${parts[0]} - ${parts[1]}` : selectedFlowNode.data.docType;
+                                  }
+                                  return 'Documento não definido';
+                                })()}
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
