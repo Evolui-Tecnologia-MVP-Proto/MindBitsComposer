@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookOpen, Copy, Edit, Trash2, FileEdit, Lock, Unlock, Eye, EyeOff, PlusCircle } from "lucide-react";
+import { BookOpen, Copy, Edit, Trash2, FileEdit, Lock, Unlock, Eye, EyeOff, PlusCircle, Download } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useState, useCallback } from "react";
 import { FlowMetadataModal } from './FlowMetadataModal';
@@ -272,6 +272,35 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
     },
   });
 
+  // Mutation para salvar JSON do fluxo
+  const saveFlowJsonMutation = useMutation({
+    mutationFn: async (flowId: string) => {
+      const response = await fetch(`/api/documents-flows/${flowId}/export-json`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erro ao salvar JSON do fluxo');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "JSON salvo",
+        description: `Arquivo salvo em: ${data.filePath}`,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Erro ao salvar JSON do fluxo",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Função para formatar código XXX-99
   const formatCode = useCallback((value: string) => {
     const cleaned = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -417,6 +446,17 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
                         title="Duplicar fluxo"
                       >
                         <Copy className="h-3 w-3" />
+                      </Button>
+                      
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => saveFlowJsonMutation.mutate(flow.id)}
+                        disabled={saveFlowJsonMutation.isPending}
+                        className="flex items-center justify-center p-2"
+                        title="Salvar JSON do fluxo"
+                      >
+                        <Download className="h-3 w-3" />
                       </Button>
                       
                       <Button 

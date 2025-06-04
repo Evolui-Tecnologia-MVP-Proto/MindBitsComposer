@@ -1452,6 +1452,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint para salvar JSON do fluxo
+  app.post("/api/documents-flows/:id/export-json", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const flowId = req.params.id;
+      
+      // Buscar o fluxo no banco de dados
+      const flow = await db
+        .select()
+        .from(documentsFlows)
+        .where(eq(documentsFlows.id, flowId))
+        .limit(1);
+        
+      if (!flow || flow.length === 0) {
+        return res.status(404).json({ error: "Fluxo não encontrado" });
+      }
+      
+      const flowData = flow[0];
+      
+      // Extrair apenas o flow_data (conteúdo JSON do fluxo)
+      const jsonContent = flowData.flowData || flowData.flow_data;
+      
+      if (!jsonContent) {
+        return res.status(400).json({ error: "Fluxo não possui dados para exportar" });
+      }
+      
+      // Criar nome do arquivo com timestamp
+      const now = new Date();
+      const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, -5); // Remove milissegundos e substitui : por -
+      const fileName = `${flowId}_${timestamp}.json`;
+      
+      // Criar diretório se não existir
+      const saveDir = path.join(process.cwd(), 'local_files', 'saved_fluxes');
+      if (!fs.existsSync(saveDir)) {
+        fs.mkdirSync(saveDir, { recursive: true });
+      }
+      
+      // Caminho completo do arquivo
+      const filePath = path.join(saveDir, fileName);
+      
+      // Salvar o arquivo JSON
+      fs.writeFileSync(filePath, JSON.stringify(jsonContent, null, 2), 'utf-8');
+      
+      // Log da ação
+      await SystemLogger.logUserAction(
+        req.user?.id || 0,
+        'FLOW_EXPORT_JSON',
+        {
+          flowId: flowId,
+          flowName: flowData.name,
+          flowCode: flowData.code,
+          fileName: fileName,
+          filePath: filePath
+        }
+      );
+      
+      res.json({
+        success: true,
+        fileName: fileName,
+        filePath: `local_files/saved_fluxes/${fileName}`,
+        message: "JSON do fluxo salvo com sucesso"
+      });
+      
+    } catch (error) {
+      console.error("Erro ao salvar JSON do fluxo:", error);
+      res.status(500).json({ error: "Erro ao salvar JSON do fluxo" });
+    }
+  });
+
   // Endpoint para listar arquivos JSON salvos
   app.get("/api/monday/saved-json-files", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
