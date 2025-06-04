@@ -735,7 +735,20 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
 
   // Função para carregar fluxo
   const loadFlow = useCallback((flow: any) => {
-    if (!flow.flowData) return;
+    console.log('🔄 LOADFLOW CALLED');
+    console.log('  flow:', flow);
+    console.log('  flow.flowData:', flow.flowData);
+    
+    if (!flow.flowData) {
+      console.log('  ❌ No flowData, returning');
+      return;
+    }
+    
+    console.log('  ✅ Has flowData, proceeding');
+    
+    // Definir currentFlowId primeiro
+    setCurrentFlowId(flow.id);
+    console.log('  ✅ Set currentFlowId to:', flow.id);
     
     // Verificar se o fluxo está bloqueado
     const isLocked = flow.isLocked === true;
@@ -752,6 +765,8 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
     }
     
     const { nodes: flowNodes, edges: flowEdges, viewport } = flow.flowData;
+    console.log('  flowNodes count:', flowNodes?.length || 0);
+    console.log('  flowEdges count:', flowEdges?.length || 0);
     
     // Atualizar nós EndNode que têm To_Flow_id mas não têm To_Flow_code/To_Flow_name
     const updatedNodes = (flowNodes || []).map((node: any) => {
