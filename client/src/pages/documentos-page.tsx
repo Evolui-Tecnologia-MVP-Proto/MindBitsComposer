@@ -2307,7 +2307,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             <TableHead>Nome</TableHead>
             <TableHead>Incluído</TableHead>
             <TableHead>Iniciado</TableHead>
+            {activeTab === "em-processo" && <TableHead>Fluxo Atual</TableHead>}
             <TableHead>Status</TableHead>
+            {activeTab === "em-processo" && <TableHead className="w-[120px]">Tsk.Status</TableHead>}
             <TableHead className="text-right">Ações</TableHead>
           </TableRow>
         </TableHeader>
@@ -2340,6 +2342,25 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   {formatDate(documento.updatedAt)}
                 </div>
               </TableCell>
+              {activeTab === "em-processo" && (
+                <TableCell>
+                  {(() => {
+                    const activeFlow = getActiveFlow(documento.id);
+                    if (activeFlow) {
+                      return (
+                        <div className="flex items-center text-gray-500 text-sm">
+                          [{activeFlow.flowCode}] - {activeFlow.flowName}
+                        </div>
+                      );
+                    }
+                    return (
+                      <div className="text-xs text-gray-400">
+                        -
+                      </div>
+                    );
+                  })()}
+                </TableCell>
+              )}
               <TableCell>
                 <Badge
                   variant={getStatusBadgeVariant(documento.status) as any}
@@ -2349,6 +2370,37 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   {documento.status}
                 </Badge>
               </TableCell>
+              {activeTab === "em-processo" && (
+                <TableCell>
+                  {(() => {
+                    if (!documento.taskState || documento.taskState === '') {
+                      return (
+                        <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200">
+                          Ação Pendente
+                        </Badge>
+                      );
+                    } else if (documento.taskState === 'in_doc') {
+                      return (
+                        <Badge variant="secondary" className="bg-purple-100 text-purple-800 border-purple-200">
+                          Documentando
+                        </Badge>
+                      );
+                    } else if (documento.taskState === 'in_apr') {
+                      return (
+                        <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
+                          Em aprovação
+                        </Badge>
+                      );
+                    } else {
+                      return (
+                        <Badge variant="secondary" className="bg-gray-100 text-gray-800 border-gray-200">
+                          {documento.taskState}
+                        </Badge>
+                      );
+                    }
+                  })()}
+                </TableCell>
+              )}
               <TableCell className="text-right">
                 <div className="flex justify-end space-x-2">
                   <Button
@@ -2422,7 +2474,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           {documentos.length === 0 && (
             <TableRow>
               <TableCell
-                colSpan={activeTab === "integrados" ? 7 : 6}
+                colSpan={activeTab === "integrados" ? 7 : activeTab === "em-processo" ? 8 : 6}
                 className="text-center py-6 text-gray-500"
               >
                 Nenhum documento encontrado nesta categoria.
