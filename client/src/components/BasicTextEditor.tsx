@@ -18,7 +18,6 @@ import {
   Bot,
   Brain,
   BarChart3,
-  FileText,
   Zap,
   Settings,
   Image,
@@ -241,6 +240,16 @@ export default function BasicTextEditor() {
     console.log('BasicTextEditor handleImageExport chamado com URL:', imageUrl);
     insertFreeHandLink(imageUrl);
     handlePluginClose();
+  };
+
+  const handleDocumentEditionSelect = (editionId: string) => {
+    setSelectedDocumentEdition(editionId);
+    
+    const edition = documentEditions?.find(e => e.id === editionId);
+    if (edition) {
+      console.log("Document Edition selecionada:", edition);
+      // Aqui você pode adicionar lógica para carregar dados da edição selecionada
+    }
   };
 
   const handleTemplateSelect = (templateId: string) => {
@@ -512,6 +521,22 @@ export default function BasicTextEditor() {
             {isMarkdownView ? <Eye className="h-4 w-4" /> : <Code className="h-4 w-4" />}
             {isMarkdownView ? "Lexical" : "Markdown"}
           </Button>
+
+          <Separator orientation="vertical" className="h-6" />
+
+          <FileText className="h-4 w-4 text-gray-500" />
+          <Select value={selectedDocumentEdition} onValueChange={handleDocumentEditionSelect}>
+            <SelectTrigger className="w-[200px] font-mono">
+              <SelectValue placeholder="Selecionar documento..." />
+            </SelectTrigger>
+            <SelectContent className="font-mono">
+              {documentEditions?.map((edition) => (
+                <SelectItem key={edition.id} value={edition.id} className="font-mono">
+                  {edition.documentObject || 'Documento sem título'}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
           <Separator orientation="vertical" className="h-6" />
 
