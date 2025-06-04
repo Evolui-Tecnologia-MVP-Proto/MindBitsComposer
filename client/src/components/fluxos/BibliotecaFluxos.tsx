@@ -729,7 +729,12 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
           <DialogFooter>
             <Button
               variant="outline"
-              onClick={() => setShowImportModal(false)}
+              onClick={() => {
+                setShowImportModal(false);
+                setFlowToImport(null);
+                setSelectedJsonFile('');
+                setFilterByFlowId(true); // Reset para o estado padrão
+              }}
               disabled={importFlowJsonMutation.isPending}
             >
               Cancelar
