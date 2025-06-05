@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -230,94 +231,108 @@ export default function LexicalPage() {
             <div className="space-y-6">
               <h3 className="text-lg font-semibold">Biblioteca</h3>
               
-              {/* Grupo 1: Templates Estruturais */}
-              <div className="space-y-2">
-                <h4 className="text-md font-medium text-gray-700 border-b pb-1">Templates Estruturais</h4>
-                {isLoadingTemplates ? (
-                  <div className="text-center py-2 text-sm">Carregando templates...</div>
-                ) : (
-                  <>
-                    {!structTemplates || structTemplates.length === 0 ? (
-                      <div className="text-center py-4 text-gray-500">
-                        <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                        <p className="text-xs">Nenhum template encontrado</p>
-                      </div>
-                    ) : (
-                      structTemplates.map((template: Template) => (
-                        <div
-                          key={template.id}
-                          className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 border-green-200 hover:border-green-300"
-                          onClick={() => {
-                            setTitle(template.name);
-                            setContent(template.code);
-                            setCurrentDocumentId(null);
-                          }}
-                        >
-                          <div className="flex-1">
-                            <h5 className="font-medium text-sm text-green-700">{template.name}</h5>
-                            <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                              {template.description}
-                            </p>
-                            <p className="text-xs text-gray-400 mt-2">
-                              Template • {new Date(template.updatedAt).toLocaleDateString()}
-                            </p>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </>
-                )}
-              </div>
-
-              {/* Grupo 2: Documentos Lexical */}
-              <div className="space-y-2">
-                <h4 className="text-md font-medium text-gray-700 border-b pb-1">Documentos Lexical</h4>
-                {isLoadingDocuments ? (
-                  <div className="text-center py-2 text-sm">Carregando documentos...</div>
-                ) : (
-                  <>
-                    {!documents || documents.length === 0 ? (
-                      <div className="text-center py-4 text-gray-500">
-                        <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                        <p className="text-xs">Nenhum documento encontrado</p>
-                      </div>
-                    ) : (
-                      documents.map((doc: LexicalDocument) => (
-                        <div
-                          key={doc.id}
-                          className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 ${
-                            currentDocumentId === doc.id ? 'border-blue-500 bg-blue-50' : ''
-                          }`}
-                          onClick={() => handleLoadDocument(doc)}
-                        >
-                          <div className="flex justify-between items-start">
-                            <div className="flex-1">
-                              <h5 className="font-medium text-sm">{doc.title}</h5>
-                              <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                                {doc.plainText || "Documento vazio"}
-                              </p>
-                              <p className="text-xs text-gray-400 mt-2">
-                                {new Date(doc.updatedAt).toLocaleDateString()}
-                              </p>
+              <Accordion type="multiple" defaultValue={["templates", "documents"]} className="w-full">
+                {/* Grupo 1: Templates Estruturais */}
+                <AccordionItem value="templates">
+                  <AccordionTrigger className="text-md font-medium text-gray-700 hover:no-underline">
+                    Templates Estruturais
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-2 pt-2">
+                      {isLoadingTemplates ? (
+                        <div className="text-center py-2 text-sm">Carregando templates...</div>
+                      ) : (
+                        <>
+                          {!structTemplates || structTemplates.length === 0 ? (
+                            <div className="text-center py-4 text-gray-500">
+                              <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                              <p className="text-xs">Nenhum template encontrado</p>
                             </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-6 w-6 p-0 hover:bg-red-100"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteDocument(doc.id);
-                              }}
-                            >
-                              <Trash2 className="w-3 h-3 text-red-600" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </>
-                )}
-              </div>
+                          ) : (
+                            structTemplates.map((template: Template) => (
+                              <div
+                                key={template.id}
+                                className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 border-green-200 hover:border-green-300"
+                                onClick={() => {
+                                  setTitle(template.name);
+                                  setContent(template.code);
+                                  setCurrentDocumentId(null);
+                                }}
+                              >
+                                <div className="flex-1">
+                                  <h5 className="font-medium text-sm text-green-700">{template.name}</h5>
+                                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                                    {template.description}
+                                  </p>
+                                  <p className="text-xs text-gray-400 mt-2">
+                                    Template • {new Date(template.updatedAt).toLocaleDateString()}
+                                  </p>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Grupo 2: Documentos Lexical */}
+                <AccordionItem value="documents">
+                  <AccordionTrigger className="text-md font-medium text-gray-700 hover:no-underline">
+                    Documentos Lexical
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-2 pt-2">
+                      {isLoadingDocuments ? (
+                        <div className="text-center py-2 text-sm">Carregando documentos...</div>
+                      ) : (
+                        <>
+                          {!documents || documents.length === 0 ? (
+                            <div className="text-center py-4 text-gray-500">
+                              <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                              <p className="text-xs">Nenhum documento encontrado</p>
+                            </div>
+                          ) : (
+                            documents.map((doc: LexicalDocument) => (
+                              <div
+                                key={doc.id}
+                                className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 ${
+                                  currentDocumentId === doc.id ? 'border-blue-500 bg-blue-50' : ''
+                                }`}
+                                onClick={() => handleLoadDocument(doc)}
+                              >
+                                <div className="flex justify-between items-start">
+                                  <div className="flex-1">
+                                    <h5 className="font-medium text-sm">{doc.title}</h5>
+                                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                                      {doc.plainText || "Documento vazio"}
+                                    </p>
+                                    <p className="text-xs text-gray-400 mt-2">
+                                      {new Date(doc.updatedAt).toLocaleDateString()}
+                                    </p>
+                                  </div>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 w-6 p-0 hover:bg-red-100"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteDocument(doc.id);
+                                    }}
+                                  >
+                                    <Trash2 className="w-3 h-3 text-red-600" />
+                                  </Button>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
           </div>
         )}
