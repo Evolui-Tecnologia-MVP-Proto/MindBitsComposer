@@ -441,6 +441,24 @@ function convertToMarkdown(editorState: any): string {
         const src = node.getSrc();
         const alt = node.getAltText();
         markdown += `![${alt}](${src})\n\n`;
+      } else if (node.getType() === 'collapsible-container') {
+        // Processar container colapsível
+        const containerChildren = node.getChildren();
+        containerChildren.forEach((child: any) => {
+          if (child.getType() === 'collapsible-title') {
+            const titleText = child.getTextContent();
+            markdown += `# ${titleText}\n\n`;
+          } else if (child.getType() === 'collapsible-content') {
+            // Processar conteúdo do container
+            const contentChildren = child.getChildren();
+            contentChildren.forEach((contentChild: any) => {
+              const contentText = contentChild.getTextContent();
+              if (contentText.trim()) {
+                markdown += contentText + '\n\n';
+              }
+            });
+          }
+        });
       } else {
         const text = node.getTextContent();
         if (text.trim()) {
