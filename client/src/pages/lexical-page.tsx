@@ -204,8 +204,9 @@ export default function LexicalPage() {
       // Usar a função existente para carregar template
       if (edition.templateStructure) {
         const templateSections = extractTemplateSections(template);
-        const templateContent = templateSections.join('\n\n');
-        setContent(templateContent);
+        console.log('Template sections:', templateSections);
+        // Usar as seções do template como templateSections para o plugin
+        setContent(''); // Deixar vazio para usar o plugin de template
       } else {
         setContent('');
       }
