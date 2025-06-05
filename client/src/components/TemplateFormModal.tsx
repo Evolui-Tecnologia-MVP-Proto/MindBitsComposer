@@ -425,24 +425,7 @@ export default function TemplateFormModal({
                   />
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="type">
-                    Tipo
-                  </Label>
-                  <Select
-                    value={formData.type}
-                    onValueChange={handleTypeChange}
-                    disabled={mode === "edit"}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Selecione o tipo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="struct">Struct Template</SelectItem>
-                      <SelectItem value="output">Out Template</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+
                 
                 <div className="space-y-2">
                   <Label htmlFor="structure">
