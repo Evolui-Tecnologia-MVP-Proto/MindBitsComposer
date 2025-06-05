@@ -830,42 +830,45 @@ export default function BasicTextEditor() {
                   )}
                 </CollapsibleTrigger>
                 <CollapsibleContent className="p-4 border-t border-gray-200">
-                  {/* Se a seção tem campos específicos, renderizar como tabela */}
-                  {section.fields && section.fields.length > 0 ? (
+                  {/* Se a seção tem campos específicos ou tabelas, renderizar interface estruturada */}
+                  {(section.fields && section.fields.length > 0) || (section.tables && section.tables.length > 0) ? (
                     <div className="space-y-4">
-                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                        <h4 className="text-sm font-medium text-gray-700 mb-3">Campos da Seção</h4>
-                        <table className="w-full border-collapse">
-                          <thead>
-                            <tr className="bg-gray-100">
-                              <th className="border border-gray-300 px-3 py-2 text-left text-sm font-medium text-gray-700">
-                                Campo
-                              </th>
-                              <th className="border border-gray-300 px-3 py-2 text-left text-sm font-medium text-gray-700">
-                                Valor
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {section.fields.map((field, fieldIndex) => (
-                              <tr key={fieldIndex} className="hover:bg-gray-50">
-                                <td className="border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50">
-                                  {field.key}
-                                </td>
-                                <td className="border border-gray-300 px-3 py-2">
-                                  <input
-                                    type="text"
-                                    value={field.value}
-                                    onChange={(e) => updateSectionField(index, fieldIndex, e.target.value)}
-                                    className="w-full px-2 py-1 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
-                                    placeholder={`Digite ${field.key}...`}
-                                  />
-                                </td>
+                      {/* Campos da seção (se existirem) */}
+                      {section.fields && section.fields.length > 0 && (
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                          <h4 className="text-sm font-medium text-gray-700 mb-3">Campos da Seção</h4>
+                          <table className="w-full border-collapse">
+                            <thead>
+                              <tr className="bg-gray-100">
+                                <th className="border border-gray-300 px-3 py-2 text-left text-sm font-medium text-gray-700">
+                                  Campo
+                                </th>
+                                <th className="border border-gray-300 px-3 py-2 text-left text-sm font-medium text-gray-700">
+                                  Valor
+                                </th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
+                            </thead>
+                            <tbody>
+                              {section.fields!.map((field, fieldIndex) => (
+                                <tr key={fieldIndex} className="hover:bg-gray-50">
+                                  <td className="border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50">
+                                    {field.key}
+                                  </td>
+                                  <td className="border border-gray-300 px-3 py-2">
+                                    <input
+                                      type="text"
+                                      value={field.value}
+                                      onChange={(e) => updateSectionField(index, fieldIndex, e.target.value)}
+                                      className="w-full px-2 py-1 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+                                      placeholder={`Digite ${field.key}...`}
+                                    />
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
                       
                       {/* Tabelas da seção */}
                       {section.tables && section.tables.map((table, tableIndex) => (
