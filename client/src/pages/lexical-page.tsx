@@ -428,13 +428,20 @@ export default function LexicalPage() {
                             Array.isArray(documentEditions) && documentEditions.map((edition: any) => (
                               <div
                                 key={edition.id}
-                                className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 ${
+                                className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 relative ${
                                   selectedEdition?.id === edition.id ? 'border-blue-500 bg-blue-50' : ''
                                 }`}
                                 onClick={() => handleSelectEdition(edition)}
                               >
+                                {edition.lexFile && (
+                                  <div className="absolute top-2 right-2">
+                                    <Badge className="bg-blue-500 text-white text-xs px-2 py-1">
+                                      Edit
+                                    </Badge>
+                                  </div>
+                                )}
                                 <div className="flex justify-between items-start">
-                                  <div className="flex-1">
+                                  <div className="flex-1 pr-8">
                                     <h5 className="font-medium text-sm text-blue-600">
                                       {edition.templateCode}
                                     </h5>
