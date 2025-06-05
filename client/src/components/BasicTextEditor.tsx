@@ -208,157 +208,187 @@ export default function BasicTextEditor() {
   };
 
   const insertFormatting = (format: string, content: string = '') => {
-    // Tentar encontrar o textarea que está em foco
-    const activeElement = document.activeElement as HTMLElement;
-    let targetTextarea: HTMLTextAreaElement | HTMLInputElement | null = null;
+    // Primeiro, tentar forçar qualquer SimpleRichTextDisplay visível a entrar em modo de edição
+    const richTextDisplays = document.querySelectorAll('[class*="SimpleRichTextDisplay"], div[class*="cursor-text"]');
+    richTextDisplays.forEach(display => {
+      const clickableDiv = display.querySelector('div[class*="cursor-text"]');
+      if (clickableDiv) {
+        (clickableDiv as HTMLElement).click();
+      }
+    });
 
-    // Verificar se o elemento ativo é um textarea ou input
-    if (activeElement && (activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'INPUT')) {
-      targetTextarea = activeElement as HTMLTextAreaElement | HTMLInputElement;
-    } else {
-      // Se não há foco, tentar encontrar um textarea visível
-      const textareas = document.querySelectorAll('textarea:not([hidden])');
-      if (textareas.length > 0) {
-        targetTextarea = textareas[0] as HTMLTextAreaElement;
+    // Aguardar um pouco para o textarea aparecer
+    setTimeout(() => {
+      // Tentar encontrar o textarea que está em foco ou visível
+      const activeElement = document.activeElement as HTMLElement;
+      let targetTextarea: HTMLTextAreaElement | HTMLInputElement | null = null;
+
+      // Verificar se o elemento ativo é um textarea ou input
+      if (activeElement && (activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'INPUT')) {
+        targetTextarea = activeElement as HTMLTextAreaElement | HTMLInputElement;
       } else {
-        // Fallback para o editor principal
-        const mainTextarea = document.getElementById('editor-textarea') as HTMLTextAreaElement;
-        if (mainTextarea) {
-          targetTextarea = mainTextarea;
+        // Se não há foco, tentar encontrar um textarea visível
+        const textareas = document.querySelectorAll('textarea:not([hidden])') as NodeListOf<HTMLTextAreaElement>;
+        if (textareas.length > 0) {
+          // Procurar por textarea que está realmente visível
+          for (const textarea of textareas) {
+            const rect = textarea.getBoundingClientRect();
+            if (rect.width > 0 && rect.height > 0) {
+              targetTextarea = textarea;
+              break;
+            }
+          }
+          // Se não encontrou um visível, usar o primeiro
+          if (!targetTextarea) {
+            targetTextarea = textareas[0];
+          }
+        } else {
+          // Fallback para o editor principal
+          const mainTextarea = document.getElementById('editor-textarea') as HTMLTextAreaElement;
+          if (mainTextarea) {
+            targetTextarea = mainTextarea;
+          }
         }
       }
-    }
 
-    if (!targetTextarea) {
-      console.log('Nenhum campo de texto encontrado para aplicar formatação');
-      return;
-    }
-
-    const start = targetTextarea.selectionStart || 0;
-    const end = targetTextarea.selectionEnd || 0;
-    const selectedText = targetTextarea.value.substring(start, end);
-    const beforeText = targetTextarea.value.substring(0, start);
-    const afterText = targetTextarea.value.substring(end);
-
-    let newText = '';
-    let cursorPosition = start;
-
-    switch (format) {
-      case 'h1':
-        newText = `${beforeText}# ${selectedText || content || 'Título 1'}\n${afterText}`;
-        cursorPosition = start + 2 + (selectedText || content || 'Título 1').length;
-        break;
-      case 'h2':
-        newText = `${beforeText}## ${selectedText || content || 'Título 2'}\n${afterText}`;
-        cursorPosition = start + 3 + (selectedText || content || 'Título 2').length;
-        break;
-      case 'h3':
-        newText = `${beforeText}### ${selectedText || content || 'Título 3'}\n${afterText}`;
-        cursorPosition = start + 4 + (selectedText || content || 'Título 3').length;
-        break;
-      case 'bold':
-        if (selectedText) {
-          newText = `${beforeText}**${selectedText}**${afterText}`;
-          cursorPosition = end + 4;
-        } else {
-          newText = `${beforeText}**texto em negrito**${afterText}`;
-          cursorPosition = start + 2;
-        }
-        break;
-      case 'italic':
-        if (selectedText) {
-          newText = `${beforeText}_${selectedText}_${afterText}`;
-          cursorPosition = end + 2;
-        } else {
-          newText = `${beforeText}_texto em itálico_${afterText}`;
-          cursorPosition = start + 1;
-        }
-        break;
-      case 'underline':
-        if (selectedText) {
-          newText = `${beforeText}<u>${selectedText}</u>${afterText}`;
-          cursorPosition = end + 7;
-        } else {
-          newText = `${beforeText}<u>texto sublinhado</u>${afterText}`;
-          cursorPosition = start + 3;
-        }
-        break;
-      case 'strikethrough':
-        if (selectedText) {
-          newText = `${beforeText}~~${selectedText}~~${afterText}`;
-          cursorPosition = end + 4;
-        } else {
-          newText = `${beforeText}~~texto riscado~~${afterText}`;
-          cursorPosition = start + 2;
-        }
-        break;
-      case 'code':
-        if (selectedText) {
-          newText = `${beforeText}\`${selectedText}\`${afterText}`;
-          cursorPosition = end + 2;
-        } else {
-          newText = `${beforeText}\`código\`${afterText}`;
-          cursorPosition = start + 1;
-        }
-        break;
-      case 'codeblock':
-        const codeContent = selectedText || content || 'código aqui';
-        newText = `${beforeText}\n\`\`\`\n${codeContent}\n\`\`\`\n${afterText}`;
-        cursorPosition = start + 5 + codeContent.length;
-        break;
-      case 'quote':
-        const textToQuote = selectedText || content || 'citação';
-        const quotedText = textToQuote.split('\n').map(line => `> ${line}`).join('\n');
-        newText = `${beforeText}${quotedText}\n${afterText}`;
-        cursorPosition = start + quotedText.length + 1;
-        break;
-      case 'comment':
-        const commentText = selectedText || content || 'comentário';
-        newText = `${beforeText}<!-- ${commentText} -->${afterText}`;
-        cursorPosition = selectedText ? end + 9 : start + 5;
-        break;
-      case 'ul':
-        const listContent = selectedText || content || 'Item da lista';
-        const ulText = listContent.split('\n').map(line => `- ${line.trim()}`).join('\n');
-        newText = `${beforeText}${ulText}\n${afterText}`;
-        cursorPosition = start + ulText.length + 1;
-        break;
-      case 'ol':
-        const numberedContent = selectedText || content || 'Item da lista';
-        const olText = numberedContent.split('\n').map((line, index) => `${index + 1}. ${line.trim()}`).join('\n');
-        newText = `${beforeText}${olText}\n${afterText}`;
-        cursorPosition = start + olText.length + 1;
-        break;
-      case 'table':
-        const tableText = `\n| Coluna 1 | Coluna 2 | Coluna 3 |\n|----------|----------|----------|\n| Linha 1  | Dado 1   | Dado 2   |\n| Linha 2  | Dado 3   | Dado 4   |\n`;
-        newText = `${beforeText}${tableText}${afterText}`;
-        cursorPosition = start + tableText.length;
-        break;
-      case 'link':
-        const linkText = selectedText || 'texto do link';
-        const url = content || 'https://exemplo.com';
-        newText = `${beforeText}[${linkText}](${url})${afterText}`;
-        cursorPosition = start + linkText.length + url.length + 4;
-        break;
-      default:
+      if (!targetTextarea) {
+        console.log('Nenhum campo de texto encontrado para aplicar formatação. Tente clicar em um campo de texto primeiro.');
         return;
-    }
+      }
 
-    targetTextarea.value = newText;
-    targetTextarea.focus();
-    
-    // Definir posição do cursor
-    if (targetTextarea.setSelectionRange) {
-      targetTextarea.setSelectionRange(cursorPosition, cursorPosition);
-    }
+      // Focar no textarea se não estiver focado
+      if (document.activeElement !== targetTextarea) {
+        targetTextarea.focus();
+      }
 
-    // Disparar evento de mudança para atualizar o estado
-    const inputEvent = new Event('input', { bubbles: true });
-    targetTextarea.dispatchEvent(inputEvent);
+      const start = targetTextarea.selectionStart || 0;
+      const end = targetTextarea.selectionEnd || 0;
+      const selectedText = targetTextarea.value.substring(start, end);
+      const beforeText = targetTextarea.value.substring(0, start);
+      const afterText = targetTextarea.value.substring(end);
 
-    // Para campos específicos de seções, pode ser necessário disparar onChange também
-    const changeEvent = new Event('change', { bubbles: true });
-    targetTextarea.dispatchEvent(changeEvent);
+      let newText = '';
+      let cursorPosition = start;
+
+      switch (format) {
+        case 'h1':
+          newText = `${beforeText}# ${selectedText || content || 'Título 1'}\n${afterText}`;
+          cursorPosition = start + 2 + (selectedText || content || 'Título 1').length;
+          break;
+        case 'h2':
+          newText = `${beforeText}## ${selectedText || content || 'Título 2'}\n${afterText}`;
+          cursorPosition = start + 3 + (selectedText || content || 'Título 2').length;
+          break;
+        case 'h3':
+          newText = `${beforeText}### ${selectedText || content || 'Título 3'}\n${afterText}`;
+          cursorPosition = start + 4 + (selectedText || content || 'Título 3').length;
+          break;
+        case 'bold':
+          if (selectedText) {
+            newText = `${beforeText}**${selectedText}**${afterText}`;
+            cursorPosition = end + 4;
+          } else {
+            newText = `${beforeText}**texto em negrito**${afterText}`;
+            cursorPosition = start + 2;
+          }
+          break;
+        case 'italic':
+          if (selectedText) {
+            newText = `${beforeText}_${selectedText}_${afterText}`;
+            cursorPosition = end + 2;
+          } else {
+            newText = `${beforeText}_texto em itálico_${afterText}`;
+            cursorPosition = start + 1;
+          }
+          break;
+        case 'underline':
+          if (selectedText) {
+            newText = `${beforeText}<u>${selectedText}</u>${afterText}`;
+            cursorPosition = end + 7;
+          } else {
+            newText = `${beforeText}<u>texto sublinhado</u>${afterText}`;
+            cursorPosition = start + 3;
+          }
+          break;
+        case 'strikethrough':
+          if (selectedText) {
+            newText = `${beforeText}~~${selectedText}~~${afterText}`;
+            cursorPosition = end + 4;
+          } else {
+            newText = `${beforeText}~~texto riscado~~${afterText}`;
+            cursorPosition = start + 2;
+          }
+          break;
+        case 'code':
+          if (selectedText) {
+            newText = `${beforeText}\`${selectedText}\`${afterText}`;
+            cursorPosition = end + 2;
+          } else {
+            newText = `${beforeText}\`código\`${afterText}`;
+            cursorPosition = start + 1;
+          }
+          break;
+        case 'codeblock':
+          const codeContent = selectedText || content || 'código aqui';
+          newText = `${beforeText}\n\`\`\`\n${codeContent}\n\`\`\`\n${afterText}`;
+          cursorPosition = start + 5 + codeContent.length;
+          break;
+        case 'quote':
+          const textToQuote = selectedText || content || 'citação';
+          const quotedText = textToQuote.split('\n').map(line => `> ${line}`).join('\n');
+          newText = `${beforeText}${quotedText}\n${afterText}`;
+          cursorPosition = start + quotedText.length + 1;
+          break;
+        case 'comment':
+          const commentText = selectedText || content || 'comentário';
+          newText = `${beforeText}<!-- ${commentText} -->${afterText}`;
+          cursorPosition = selectedText ? end + 9 : start + 5;
+          break;
+        case 'ul':
+          const listContent = selectedText || content || 'Item da lista';
+          const ulText = listContent.split('\n').map(line => `- ${line.trim()}`).join('\n');
+          newText = `${beforeText}${ulText}\n${afterText}`;
+          cursorPosition = start + ulText.length + 1;
+          break;
+        case 'ol':
+          const numberedContent = selectedText || content || 'Item da lista';
+          const olText = numberedContent.split('\n').map((line, index) => `${index + 1}. ${line.trim()}`).join('\n');
+          newText = `${beforeText}${olText}\n${afterText}`;
+          cursorPosition = start + olText.length + 1;
+          break;
+        case 'table':
+          const tableText = `\n| Coluna 1 | Coluna 2 | Coluna 3 |\n|----------|----------|----------|\n| Linha 1  | Dado 1   | Dado 2   |\n| Linha 2  | Dado 3   | Dado 4   |\n`;
+          newText = `${beforeText}${tableText}${afterText}`;
+          cursorPosition = start + tableText.length;
+          break;
+        case 'link':
+          const linkText = selectedText || 'texto do link';
+          const url = content || 'https://exemplo.com';
+          newText = `${beforeText}[${linkText}](${url})${afterText}`;
+          cursorPosition = start + linkText.length + url.length + 4;
+          break;
+        default:
+          return;
+      }
+
+      targetTextarea.value = newText;
+      targetTextarea.focus();
+      
+      // Definir posição do cursor
+      if (targetTextarea.setSelectionRange) {
+        targetTextarea.setSelectionRange(cursorPosition, cursorPosition);
+      }
+
+      // Disparar evento de mudança para atualizar o estado
+      const inputEvent = new Event('input', { bubbles: true });
+      targetTextarea.dispatchEvent(inputEvent);
+
+      // Para campos específicos de seções, pode ser necessário disparar onChange também
+      const changeEvent = new Event('change', { bubbles: true });
+      targetTextarea.dispatchEvent(changeEvent);
+      
+      console.log(`✅ Formatação ${format} aplicada com sucesso`);
+    }, 100); // Aguardar 100ms para o textarea aparecer
   };
 
   const openFreeHandCanvas = () => {
