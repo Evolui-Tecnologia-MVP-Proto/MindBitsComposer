@@ -563,7 +563,7 @@ export default function LexicalEditor({ content = '', onChange, className = '', 
             setViewMode={setViewMode}
             setMarkdownContent={setMarkdownContent}
           />
-          <div className="flex-1 p-4 max-h-full overflow-y-auto">
+          <div className="flex-1 p-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 30px)' }}>
             {viewMode === 'editor' ? (
               <RichTextPlugin
                 contentEditable={
