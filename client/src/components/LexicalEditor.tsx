@@ -492,12 +492,6 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
               container.append(title, content);
               
               root.append(container);
-              
-              // Adicionar parágrafo entre containers para navegação
-              if (index < sections.length - 1) {
-                const spacer = $createParagraphNode();
-                root.append(spacer);
-              }
             });
             
             // Adicionar parágrafo final para permitir edição após os containers
