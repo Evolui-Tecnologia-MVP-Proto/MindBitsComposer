@@ -90,15 +90,15 @@ export default function LexicalPage() {
     mutationFn: async (data: { title: string; content: string; plainText: string }) => {
       // Se há um document edition selecionado, salvar no lex_file
       if (selectedEdition) {
-        return apiRequest(`/api/document-editions/${selectedEdition.id}/lex-file`, "PUT", {
+        return apiRequest("PUT", `/api/document-editions/${selectedEdition.id}/lex-file`, {
           lexFile: data.content
         });
       }
       // Caso contrário, salvar como documento lexical normal
       else if (currentDocumentId) {
-        return apiRequest(`/api/lexical-documents/${currentDocumentId}`, "PUT", data);
+        return apiRequest("PUT", `/api/lexical-documents/${currentDocumentId}`, data);
       } else {
-        return apiRequest('/api/lexical-documents', "POST", data);
+        return apiRequest("POST", '/api/lexical-documents', data);
       }
     },
     onSuccess: (data: any) => {
