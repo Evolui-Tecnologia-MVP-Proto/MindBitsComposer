@@ -377,38 +377,40 @@ export default function TemplateFormModal({
               </TabsList>
               
               <TabsContent value="formatacao" className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">
-                    Nome
-                  </Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full"
-                    placeholder="Nome do template"
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="code">
-                    Código
-                  </Label>
-                  <Input
-                    id="code"
-                    name="code"
-                    value={formData.code}
-                    onChange={handleChange}
-                    className="w-full"
-                    placeholder="XXX-99"
-                    required
-                    maxLength={6}
-                  />
-                  <p className="text-sm text-gray-500">
-                    Formato: 3 letras maiúsculas + hífen + 2 números (ex: ABC-12)
-                  </p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="code">
+                      Código
+                    </Label>
+                    <Input
+                      id="code"
+                      name="code"
+                      value={formData.code}
+                      onChange={handleChange}
+                      className="w-full"
+                      placeholder="XXX-99"
+                      required
+                      maxLength={6}
+                    />
+                    <p className="text-sm text-gray-500">
+                      Formato: ABC-12
+                    </p>
+                  </div>
+                  
+                  <div className="md:col-span-2 space-y-2">
+                    <Label htmlFor="name">
+                      Nome
+                    </Label>
+                    <Input
+                      id="name"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      className="w-full"
+                      placeholder="Nome do template"
+                      required
+                    />
+                  </div>
                 </div>
                 
                 <div className="space-y-2">
