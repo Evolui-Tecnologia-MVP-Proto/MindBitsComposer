@@ -46,6 +46,7 @@ export default function LexicalPage() {
   const [viewMode, setViewMode] = useState<'editor' | 'preview'>('editor');
   const [selectedEdition, setSelectedEdition] = useState<any>(null);
   const [editorState, setEditorState] = useState<string>('');
+  const [initialEditorState, setInitialEditorState] = useState<string | undefined>(undefined);
   const { toast } = useToast();
 
   // Função para extrair seções do template
@@ -207,8 +208,9 @@ export default function LexicalPage() {
       setTitle(`${edition.templateCode} - ${edition.origem} - ${edition.objeto}`);
     } else {
       console.log('Carregando lex_file existente');
-      // Carregar conteúdo do lex_file
-      setContent(edition.lexFile);
+      // Carregar estado serializado do Lexical
+      setInitialEditorState(edition.lexFile);
+      setContent(''); // Limpar conteúdo pois usaremos o estado serializado
       setTitle(`${edition.templateCode} - ${edition.origem} - ${edition.objeto}`);
     }
     setShowDocumentList(false);
@@ -488,6 +490,7 @@ export default function LexicalPage() {
                   className="h-full"
                   templateSections={selectedTemplate ? extractTemplateSections(selectedTemplate) : undefined}
                   viewMode={viewMode}
+                  initialEditorState={initialEditorState}
                 />
               </CardContent>
             </Card>

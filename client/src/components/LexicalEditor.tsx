@@ -371,6 +371,7 @@ interface LexicalEditorProps {
   className?: string;
   templateSections?: string[];
   viewMode?: 'editor' | 'preview';
+  initialEditorState?: string; // Estado serializado do Lexical para restaurar
 }
 
 // Função para converter conteúdo Lexical para markdown
@@ -564,7 +565,7 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
 }
 
 // Componente principal do editor Lexical completo
-export default function LexicalEditor({ content = '', onChange, onEditorStateChange, className = '', templateSections, viewMode = 'editor' }: LexicalEditorProps): JSX.Element {
+export default function LexicalEditor({ content = '', onChange, onEditorStateChange, className = '', templateSections, viewMode = 'editor', initialEditorState }: LexicalEditorProps): JSX.Element {
   const [markdownContent, setMarkdownContent] = useState('');
   const [editorInstance, setEditorInstance] = useState<any>(null);
   
@@ -582,6 +583,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
     namespace: 'LexicalEditor',
     theme,
     onError,
+    editorState: initialEditorState ? initialEditorState : undefined,
     nodes: [
       HeadingNode,
       QuoteNode,
