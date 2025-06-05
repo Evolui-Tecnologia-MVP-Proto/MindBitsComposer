@@ -70,6 +70,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import PluginModal from "@/components/plugin-modal";
 import SimpleRichTextDisplay from "@/components/SimpleRichTextDisplay";
+import LexicalEditor from "@/components/LexicalEditor";
 import { Plugin, PluginType, PluginStatus, Template } from "@shared/schema";
 
 interface TemplateSection {
@@ -1304,16 +1305,12 @@ export default function BasicTextEditor() {
         {/* Lexical Tab Content */}
         <TabsContent value="lexical" className="m-0 p-0 flex-1 flex flex-col">
           <div className="w-full h-full flex flex-col">
-            <div className="flex-1 p-4 max-h-full overflow-y-auto">
-              <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-gray-400">
-                <FileCode2 className="w-24 h-24 mb-4 text-gray-300" />
-                <p className="text-lg font-medium text-gray-500">
-                  Editor Lexical em desenvolvimento...
-                </p>
-                <p className="text-sm text-gray-400 mt-2">
-                  Em breve você poderá usar o editor Lexical avançado aqui.
-                </p>
-              </div>
+            <div className="flex-1 max-h-full overflow-hidden">
+              <LexicalEditor
+                content={content}
+                onChange={setContent}
+                className="h-full"
+              />
             </div>
           </div>
         </TabsContent>
