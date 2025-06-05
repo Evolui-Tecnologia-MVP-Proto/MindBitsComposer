@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft } from "lucide-react";
+import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -39,6 +39,7 @@ export default function LexicalPage() {
   const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(null);
   const [title, setTitle] = useState("Novo Documento");
   const [showDocumentList, setShowDocumentList] = useState(false);
+  const [showAttachments, setShowAttachments] = useState(true);
   const { toast } = useToast();
 
   // Query para buscar documentos do usuário
@@ -207,6 +208,15 @@ export default function LexicalPage() {
               Biblioteca
             </Button>
             <Button
+              onClick={() => setShowAttachments(!showAttachments)}
+              variant={showAttachments ? "default" : "outline"}
+              size="sm"
+              className={showAttachments ? "bg-green-600 text-white hover:bg-green-700" : ""}
+            >
+              <Paperclip className={`w-4 h-4 mr-2 ${showAttachments ? "text-white" : ""}`} />
+              Anexos
+            </Button>
+            <Button
               onClick={handleSave}
               disabled={saveMutation.isPending}
               size="sm"
@@ -333,74 +343,76 @@ export default function LexicalPage() {
           </div>
         </div>
 
-        {/* Sidebar de controles */}
-        <div className="w-80 border-l bg-gray-50 p-4 space-y-4">
-          {/* Controles de documento */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm">Controles</CardTitle>
-              <CardDescription className="text-xs">
-                Gerencie seu documento
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button 
-                onClick={handleExport}
-                className="w-full"
-                variant="outline"
-                size="sm"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Exportar
-              </Button>
-              
-              <Button 
-                onClick={handleImport}
-                className="w-full"
-                variant="outline"
-                size="sm"
-              >
-                <Upload className="w-4 h-4 mr-2" />
-                Importar
-              </Button>
-              
-              <Button 
-                onClick={handleClear}
-                className="w-full"
-                variant="destructive"
-                size="sm"
-              >
-                <Trash2 className="w-4 h-4 mr-2" />
-                Limpar
-              </Button>
-            </CardContent>
-          </Card>
+        {/* Sidebar de controles (condicional) */}
+        {showAttachments && (
+          <div className="w-80 border-l bg-gray-50 p-4 space-y-4">
+            {/* Controles de documento */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Controles</CardTitle>
+                <CardDescription className="text-xs">
+                  Gerencie seu documento
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button 
+                  onClick={handleExport}
+                  className="w-full"
+                  variant="outline"
+                  size="sm"
+                >
+                  <Download className="w-4 h-4 mr-2" />
+                  Exportar
+                </Button>
+                
+                <Button 
+                  onClick={handleImport}
+                  className="w-full"
+                  variant="outline"
+                  size="sm"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Importar
+                </Button>
+                
+                <Button 
+                  onClick={handleClear}
+                  className="w-full"
+                  variant="destructive"
+                  size="sm"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Limpar
+                </Button>
+              </CardContent>
+            </Card>
 
-          {/* Estatísticas do Documento */}
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm">Estatísticas</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Caracteres:</span>
-                <span className="font-medium">{content.length}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Palavras:</span>
-                <span className="font-medium">
-                  {content.trim() ? content.trim().split(/\s+/).length : 0}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Linhas:</span>
-                <span className="font-medium">
-                  {content.split('\n').length}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            {/* Estatísticas do Documento */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Estatísticas</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Caracteres:</span>
+                  <span className="font-medium">{content.length}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Palavras:</span>
+                  <span className="font-medium">
+                    {content.trim() ? content.trim().split(/\s+/).length : 0}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">Linhas:</span>
+                  <span className="font-medium">
+                    {content.split('\n').length}
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );
