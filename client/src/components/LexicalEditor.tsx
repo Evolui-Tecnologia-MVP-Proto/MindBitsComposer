@@ -180,8 +180,9 @@ function ToolbarPlugin({
 
         for (let j = 0; j < 3; j++) {
           const cellNode = $createTableCellNode(0);
-          // Adicionar um parágrafo vazio em cada célula para torná-la editável
+          // Adicionar um parágrafo com texto de teste em cada célula
           const paragraphNode = $createParagraphNode();
+          paragraphNode.append($createTextNode(`Linha ${i + 1}, Coluna ${j + 1}`));
           cellNode.append(paragraphNode);
           rowNode.append(cellNode);
         }
