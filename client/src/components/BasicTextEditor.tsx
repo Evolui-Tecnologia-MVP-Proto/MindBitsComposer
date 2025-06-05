@@ -48,6 +48,22 @@ import {
   ArrowUp,
   ArrowDown,
   FileCode2,
+  Heading1,
+  Heading2,
+  Heading3,
+  Quote,
+  List,
+  ListOrdered,
+  Table,
+  MessageSquare,
+  Code2,
+  Underline,
+  Strikethrough,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Indent,
+  Outdent,
   FileText
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -144,6 +160,104 @@ export default function BasicTextEditor() {
     
     setSelectedPlugin(plugin);
     setIsPluginModalOpen(true);
+  };
+
+  // Funções de formatação para a barra de ferramentas
+  const insertFormatting = (format: string, content: string = '', sectionIndex?: number) => {
+    const targetTextarea = sectionIndex !== undefined 
+      ? document.querySelector(`textarea[data-section-index="${sectionIndex}"]`) as HTMLTextAreaElement
+      : document.activeElement as HTMLTextAreaElement;
+    
+    if (!targetTextarea || targetTextarea.tagName !== 'TEXTAREA') {
+      return;
+    }
+
+    const start = targetTextarea.selectionStart;
+    const end = targetTextarea.selectionEnd;
+    const selectedText = targetTextarea.value.substring(start, end);
+    const beforeText = targetTextarea.value.substring(0, start);
+    const afterText = targetTextarea.value.substring(end);
+
+    let newText = '';
+    let cursorPosition = start;
+
+    switch (format) {
+      case 'h1':
+        newText = `${beforeText}# ${selectedText || content}\n${afterText}`;
+        cursorPosition = start + 2 + (selectedText || content).length;
+        break;
+      case 'h2':
+        newText = `${beforeText}## ${selectedText || content}\n${afterText}`;
+        cursorPosition = start + 3 + (selectedText || content).length;
+        break;
+      case 'h3':
+        newText = `${beforeText}### ${selectedText || content}\n${afterText}`;
+        cursorPosition = start + 4 + (selectedText || content).length;
+        break;
+      case 'bold':
+        newText = `${beforeText}**${selectedText || content}**${afterText}`;
+        cursorPosition = selectedText ? end + 4 : start + 2;
+        break;
+      case 'italic':
+        newText = `${beforeText}_${selectedText || content}_${afterText}`;
+        cursorPosition = selectedText ? end + 2 : start + 1;
+        break;
+      case 'underline':
+        newText = `${beforeText}<u>${selectedText || content}</u>${afterText}`;
+        cursorPosition = selectedText ? end + 7 : start + 3;
+        break;
+      case 'strikethrough':
+        newText = `${beforeText}~~${selectedText || content}~~${afterText}`;
+        cursorPosition = selectedText ? end + 4 : start + 2;
+        break;
+      case 'code':
+        newText = `${beforeText}\`${selectedText || content}\`${afterText}`;
+        cursorPosition = selectedText ? end + 2 : start + 1;
+        break;
+      case 'codeblock':
+        newText = `${beforeText}\n\`\`\`\n${selectedText || content}\n\`\`\`\n${afterText}`;
+        cursorPosition = start + 5 + (selectedText || content).length;
+        break;
+      case 'quote':
+        const quotedText = (selectedText || content).split('\n').map(line => `> ${line}`).join('\n');
+        newText = `${beforeText}${quotedText}\n${afterText}`;
+        cursorPosition = start + quotedText.length + 1;
+        break;
+      case 'comment':
+        newText = `${beforeText}<!-- ${selectedText || content} -->${afterText}`;
+        cursorPosition = selectedText ? end + 9 : start + 5;
+        break;
+      case 'ul':
+        const ulText = (selectedText || content || 'Item da lista').split('\n').map(line => `- ${line}`).join('\n');
+        newText = `${beforeText}${ulText}\n${afterText}`;
+        cursorPosition = start + ulText.length + 1;
+        break;
+      case 'ol':
+        const olText = (selectedText || content || 'Item da lista').split('\n').map((line, index) => `${index + 1}. ${line}`).join('\n');
+        newText = `${beforeText}${olText}\n${afterText}`;
+        cursorPosition = start + olText.length + 1;
+        break;
+      case 'table':
+        const tableText = `\n| Coluna 1 | Coluna 2 | Coluna 3 |\n|----------|----------|----------|\n| Linha 1  | Dado 1   | Dado 2   |\n| Linha 2  | Dado 3   | Dado 4   |\n`;
+        newText = `${beforeText}${tableText}${afterText}`;
+        cursorPosition = start + tableText.length;
+        break;
+      case 'link':
+        const linkText = selectedText || 'texto do link';
+        newText = `${beforeText}[${linkText}](${content || 'https://exemplo.com'})${afterText}`;
+        cursorPosition = start + linkText.length + 3 + (content || 'https://exemplo.com').length;
+        break;
+      default:
+        return;
+    }
+
+    targetTextarea.value = newText;
+    targetTextarea.focus();
+    targetTextarea.setSelectionRange(cursorPosition, cursorPosition);
+
+    // Disparar evento de mudança para atualizar o estado
+    const event = new Event('input', { bubbles: true });
+    targetTextarea.dispatchEvent(event);
   };
 
   const openFreeHandCanvas = () => {
@@ -759,6 +873,189 @@ export default function BasicTextEditor() {
               ))}
             </SelectContent>
           </Select>
+        </div>
+      </div>
+
+      {/* Barra de ferramentas de formatação */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="flex flex-wrap items-center gap-1 p-3">
+          {/* Títulos */}
+          <div className="flex items-center gap-1 mr-3">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('h1', 'Título 1')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Título 1"
+            >
+              <Heading1 className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('h2', 'Título 2')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Título 2"
+            >
+              <Heading2 className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('h3', 'Título 3')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Título 3"
+            >
+              <Heading3 className="w-4 h-4" />
+            </Button>
+          </div>
+
+          <Separator orientation="vertical" className="h-6 mx-1" />
+
+          {/* Formatação de texto */}
+          <div className="flex items-center gap-1 mr-3">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('bold')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Negrito"
+            >
+              <Bold className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('italic')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Itálico"
+            >
+              <Italic className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('underline')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Sublinhado"
+            >
+              <Underline className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('strikethrough')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Riscado"
+            >
+              <Strikethrough className="w-4 h-4" />
+            </Button>
+          </div>
+
+          <Separator orientation="vertical" className="h-6 mx-1" />
+
+          {/* Código e citações */}
+          <div className="flex items-center gap-1 mr-3">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('code')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Código inline"
+            >
+              <Code className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('codeblock')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Bloco de código"
+            >
+              <Code2 className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('quote')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Citação"
+            >
+              <Quote className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('comment')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Comentário"
+            >
+              <MessageSquare className="w-4 h-4" />
+            </Button>
+          </div>
+
+          <Separator orientation="vertical" className="h-6 mx-1" />
+
+          {/* Listas */}
+          <div className="flex items-center gap-1 mr-3">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('ul')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Lista com marcadores"
+            >
+              <List className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('ol')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Lista numerada"
+            >
+              <ListOrdered className="w-4 h-4" />
+            </Button>
+          </div>
+
+          <Separator orientation="vertical" className="h-6 mx-1" />
+
+          {/* Tabela e link */}
+          <div className="flex items-center gap-1">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('table')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Inserir tabela"
+            >
+              <Table className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('link')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Inserir link"
+            >
+              <Link className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
       </div>
 
