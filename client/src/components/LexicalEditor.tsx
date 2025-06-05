@@ -488,7 +488,7 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
               const paragraph = $createParagraphNode();
               content.append(paragraph);
 
-              const container = $createCollapsibleContainerNode(true);
+              const container = $createCollapsibleContainerNode(false);
               container.append(title, content);
               
               root.append(container);
