@@ -197,6 +197,11 @@ export default function LexicalPage() {
           
           <div className="flex items-center space-x-2">
             <div className="flex items-center space-x-2">
+              {selectedTemplate && (
+                <Badge variant="secondary" className="text-xs">
+                  Template: {selectedTemplate.code}
+                </Badge>
+              )}
               <Button
                 onClick={() => setShowDocumentList(!showDocumentList)}
                 variant={showDocumentList ? "default" : "outline"}
@@ -206,11 +211,6 @@ export default function LexicalPage() {
                 <FolderOpen className={`w-4 h-4 mr-2 ${showDocumentList ? "text-white" : ""}`} />
                 Biblioteca
               </Button>
-              {selectedTemplate && (
-                <Badge variant="secondary" className="text-xs">
-                  Template: {selectedTemplate.code}
-                </Badge>
-              )}
             </div>
             <Button
               onClick={() => setShowAttachments(!showAttachments)}
