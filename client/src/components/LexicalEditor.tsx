@@ -563,16 +563,18 @@ export default function LexicalEditor({ content = '', onChange, className = '', 
             setViewMode={setViewMode}
             setMarkdownContent={setMarkdownContent}
           />
-          <div className="flex-1 relative overflow-hidden">
+          <div className="flex-1 relative" style={{ height: 'calc(100vh - 200px)', overflow: 'hidden' }}>
             {viewMode === 'editor' ? (
               <RichTextPlugin
                 contentEditable={
                   <ContentEditable 
-                    className="w-full h-full p-4 outline-none resize-none text-gray-900 overflow-y-auto overflow-x-hidden"
+                    className="w-full h-full p-4 outline-none resize-none text-gray-900"
                     style={{ 
                       fontFamily: 'system-ui, -apple-system, sans-serif',
-                      maxHeight: '100%',
-                      lineHeight: '1.6'
+                      lineHeight: '1.6',
+                      overflowY: 'auto',
+                      overflowX: 'hidden',
+                      height: '100%'
                     }}
                   />
                 }
