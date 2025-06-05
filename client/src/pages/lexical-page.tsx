@@ -66,7 +66,7 @@ export default function LexicalPage() {
   };
 
   // Query para buscar documentos do usuário
-  const { data: documents, isLoading: isLoadingDocuments } = useQuery({
+  const { data: documents = [], isLoading: isLoadingDocuments } = useQuery({
     queryKey: ['/api/lexical-documents'],
     enabled: showDocumentList
   });
@@ -279,7 +279,7 @@ export default function LexicalPage() {
                               <p className="text-xs">Nenhum template encontrado</p>
                             </div>
                           ) : (
-                            structTemplates.map((template: Template) => (
+                            Array.isArray(structTemplates) && structTemplates.map((template: Template) => (
                               <div
                                 key={template.id}
                                 className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 border-green-200 hover:border-green-300"
@@ -319,13 +319,13 @@ export default function LexicalPage() {
                         <div className="text-center py-2 text-sm">Carregando documentos...</div>
                       ) : (
                         <>
-                          {!documents || documents.length === 0 ? (
+                          {!documents || (Array.isArray(documents) && documents.length === 0) ? (
                             <div className="text-center py-4 text-gray-500">
                               <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
                               <p className="text-xs">Nenhum documento encontrado</p>
                             </div>
                           ) : (
-                            documents.map((doc: LexicalDocument) => (
+                            Array.isArray(documents) && documents.map((doc: LexicalDocument) => (
                               <div
                                 key={doc.id}
                                 className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 ${
