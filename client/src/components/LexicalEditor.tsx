@@ -44,7 +44,9 @@ import {
   ListOrdered,
   Table,
   ChevronDown,
-  Image
+  Image,
+  Eye,
+  Edit
 } from "lucide-react";
 
 // Tema simplificado para o Lexical
@@ -84,7 +86,15 @@ function onError(error: Error): void {
 }
 
 // Barra de ferramentas interativa
-function ToolbarPlugin(): JSX.Element {
+function ToolbarPlugin({ 
+  viewMode, 
+  setViewMode, 
+  setMarkdownContent 
+}: { 
+  viewMode: 'editor' | 'preview';
+  setViewMode: (mode: 'editor' | 'preview') => void;
+  setMarkdownContent: (content: string) => void;
+}): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
@@ -317,6 +327,34 @@ function ToolbarPlugin(): JSX.Element {
           onChange={handleFileChange}
           style={{ display: 'none' }}
         />
+        <Separator orientation="vertical" className="h-6" />
+        <Button
+          variant={viewMode === 'editor' ? 'default' : 'ghost'}
+          size="sm"
+          className="h-8 px-2 text-xs"
+          title="Modo Editor"
+          onClick={() => setViewMode('editor')}
+        >
+          <Edit className="w-4 h-4" />
+        </Button>
+        <Button
+          variant={viewMode === 'preview' ? 'default' : 'ghost'}
+          size="sm"
+          className="h-8 px-2 text-xs"
+          title="Visualizar Markdown"
+          onClick={() => {
+            if (viewMode === 'editor') {
+              // Capturar o estado atual do editor e converter para markdown
+              editor.getEditorState().read(() => {
+                const markdown = convertToMarkdown(editor.getEditorState());
+                setMarkdownContent(markdown);
+              });
+            }
+            setViewMode('preview');
+          }}
+        >
+          <Eye className="w-4 h-4" />
+        </Button>
       </div>
     </div>
   );
@@ -338,8 +376,61 @@ interface LexicalEditorProps {
   className?: string;
 }
 
+// Função para converter conteúdo Lexical para markdown
+function convertToMarkdown(editorState: any): string {
+  let markdown = '';
+  
+  editorState.read(() => {
+    const root = $getRoot();
+    const children = root.getChildren();
+    
+    children.forEach((node: any) => {
+      if (node.getType() === 'heading') {
+        const level = node.getTag().replace('h', '');
+        const text = node.getTextContent();
+        markdown += '#'.repeat(parseInt(level)) + ' ' + text + '\n\n';
+      } else if (node.getType() === 'quote') {
+        const text = node.getTextContent();
+        markdown += '> ' + text + '\n\n';
+      } else if (node.getType() === 'list') {
+        const items = node.getChildren();
+        items.forEach((item: any, index: number) => {
+          const text = item.getTextContent();
+          if (node.getListType() === 'bullet') {
+            markdown += '- ' + text + '\n';
+          } else {
+            markdown += (index + 1) + '. ' + text + '\n';
+          }
+        });
+        markdown += '\n';
+      } else if (node.getType() === 'code') {
+        const text = node.getTextContent();
+        markdown += '```\n' + text + '\n```\n\n';
+      } else if (node.getType() === 'paragraph') {
+        const text = node.getTextContent();
+        if (text.trim()) {
+          markdown += text + '\n\n';
+        }
+      } else if (node.getType() === 'image') {
+        const src = node.getSrc();
+        const alt = node.getAltText();
+        markdown += `![${alt}](${src})\n\n`;
+      } else {
+        const text = node.getTextContent();
+        if (text.trim()) {
+          markdown += text + '\n\n';
+        }
+      }
+    });
+  });
+  
+  return markdown.trim();
+}
+
 // Componente principal do editor Lexical completo
 export default function LexicalEditor({ content = '', onChange, className = '' }: LexicalEditorProps): JSX.Element {
+  const [viewMode, setViewMode] = useState<'editor' | 'preview'>('editor');
+  const [markdownContent, setMarkdownContent] = useState('');
   const initialConfig = {
     namespace: 'LexicalEditor',
     theme,
@@ -365,6 +456,11 @@ export default function LexicalEditor({ content = '', onChange, className = '' }
     editorState.read(() => {
       const root = $getRoot();
       const textContent = root.getTextContent();
+      
+      // Gerar markdown em tempo real
+      const markdown = convertToMarkdown(editorState);
+      setMarkdownContent(markdown);
+      
       if (onChange) {
         onChange(textContent);
       }
@@ -375,22 +471,36 @@ export default function LexicalEditor({ content = '', onChange, className = '' }
     <div className={`lexical-editor-container w-full h-full flex flex-col ${className}`}>
       <LexicalComposer initialConfig={initialConfig}>
         <div className="w-full h-full flex flex-col">
-          <ToolbarPlugin />
+          <ToolbarPlugin 
+            viewMode={viewMode}
+            setViewMode={setViewMode}
+            setMarkdownContent={setMarkdownContent}
+          />
           <div className="flex-1 relative overflow-hidden">
-            <RichTextPlugin
-              contentEditable={
-                <ContentEditable 
-                  className="w-full h-full p-4 outline-none resize-none text-gray-900 overflow-auto"
-                  style={{ 
-                    fontFamily: 'system-ui, -apple-system, sans-serif',
-                    minHeight: '100%',
-                    lineHeight: '1.6'
-                  }}
-                />
-              }
-              placeholder={<Placeholder />}
-              ErrorBoundary={LexicalErrorBoundary}
-            />
+            {viewMode === 'editor' ? (
+              <RichTextPlugin
+                contentEditable={
+                  <ContentEditable 
+                    className="w-full h-full p-4 outline-none resize-none text-gray-900 overflow-auto"
+                    style={{ 
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      minHeight: '100%',
+                      lineHeight: '1.6'
+                    }}
+                  />
+                }
+                placeholder={<Placeholder />}
+                ErrorBoundary={LexicalErrorBoundary}
+              />
+            ) : (
+              <div className="w-full h-full p-4 overflow-auto bg-gray-50">
+                <div className="max-w-none prose prose-gray">
+                  <pre className="whitespace-pre-wrap font-mono text-sm bg-white p-4 rounded border">
+                    {markdownContent || 'Nenhum conteúdo para visualizar'}
+                  </pre>
+                </div>
+              </div>
+            )}
           </div>
           <OnChangePlugin onChange={handleChange} />
           <HistoryPlugin />
