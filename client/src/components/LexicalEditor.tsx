@@ -390,7 +390,6 @@ function ToolbarPlugin({
 function Placeholder(): JSX.Element {
   return (
     <div className="editor-placeholder absolute top-4 left-4 text-gray-400 pointer-events-none">
-      Digite seu texto aqui no editor Lexical...
     </div>
   );
 }
