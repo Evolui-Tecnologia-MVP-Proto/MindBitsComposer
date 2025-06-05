@@ -47,9 +47,6 @@ export default function LexicalPage() {
 
   // Função para formatar template e criar elementos no editor
   const templateFormatter = (template: Template) => {
-    console.log('Template completo:', template);
-    console.log('Structure original:', template.structure);
-    
     try {
       let structure = template.structure;
       
@@ -58,27 +55,21 @@ export default function LexicalPage() {
         structure = JSON.parse(structure);
       }
       
-      console.log('Structure após parse:', structure);
-      
-      if (structure && structure.sections && Array.isArray(structure.sections)) {
+      if (structure && structure.sections) {
         let formattedContent = '';
         
-        console.log('Sections encontradas:', structure.sections);
+        // sections é um objeto, não array - usar Object.keys
+        const sectionNames = Object.keys(structure.sections);
         
         // Para cada section, criar um container colapsível
-        structure.sections.forEach((section: any, index: number) => {
-          console.log(`Section ${index}:`, section);
-          if (section.name) {
-            formattedContent += `[COLLAPSIBLE:${section.name}]\n\n[/COLLAPSIBLE]\n\n`;
-          }
+        sectionNames.forEach((sectionName: string) => {
+          formattedContent += `[COLLAPSIBLE:${sectionName}]\n\n[/COLLAPSIBLE]\n\n`;
         });
         
-        console.log('Conteúdo formatado:', formattedContent);
-        return formattedContent || template.code;
+        return formattedContent;
       }
     } catch (error) {
       console.error('Erro ao processar estrutura do template:', error);
-      console.error('Template structure que causou erro:', template.structure);
     }
     
     return template.code; // Fallback para o código original
