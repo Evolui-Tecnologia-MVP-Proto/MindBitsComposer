@@ -683,56 +683,8 @@ export default function BasicTextEditor() {
     <div className="w-full h-full border rounded-lg overflow-hidden flex flex-col">
       {/* Toolbar */}
       <div className="flex items-center justify-between gap-2 p-2 border-b bg-gray-50 shrink-0">
-        {/* Lado esquerdo - Ferramentas de formatação */}
+        {/* Lado esquerdo - Plugins e ferramentas */}
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center gap-1"
-            onClick={() => {
-              const textarea = document.getElementById('editor-textarea') as HTMLTextAreaElement;
-              if (textarea) {
-                const start = textarea.selectionStart;
-                const end = textarea.selectionEnd;
-                const text = textarea.value;
-                const before = text.substring(0, start);
-                const selected = text.substring(start, end);
-                const after = text.substring(end);
-                
-                if (selected) {
-                  setContent(before + "**" + selected + "**" + after);
-                }
-              }
-            }}
-          >
-            <Bold className="h-4 w-4" />
-          </Button>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center gap-1"
-            onClick={() => {
-              const textarea = document.getElementById('editor-textarea') as HTMLTextAreaElement;
-              if (textarea) {
-                const start = textarea.selectionStart;
-                const end = textarea.selectionEnd;
-                const text = textarea.value;
-                const before = text.substring(0, start);
-                const selected = text.substring(start, end);
-                const after = text.substring(end);
-                
-                if (selected) {
-                  setContent(before + "*" + selected + "*" + after);
-                }
-              }
-            }}
-          >
-            <Italic className="h-4 w-4" />
-          </Button>
-
-          <Separator orientation="vertical" className="h-6" />
-
           {/* Botões dinâmicos para plugins ativos */}
           {activePlugins.map((plugin) => {
             // Função para renderizar o ícone correto do plugin
@@ -808,7 +760,7 @@ export default function BasicTextEditor() {
             );
           })}
 
-          <Separator orientation="vertical" className="h-6" />
+          {activePlugins.length > 0 && <Separator orientation="vertical" className="h-6" />}
 
           <Button
             variant="ghost"
