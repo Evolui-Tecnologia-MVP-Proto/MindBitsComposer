@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool } from "lucide-react";
+import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool, Eye, Edit } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
@@ -43,6 +43,7 @@ export default function LexicalPage() {
   const [showDocumentList, setShowDocumentList] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
+  const [viewMode, setViewMode] = useState<'editor' | 'preview'>('editor');
   const { toast } = useToast();
 
   // Função para extrair seções do template
@@ -223,6 +224,19 @@ export default function LexicalPage() {
                 </Badge>
               )}
               <Button
+                onClick={() => setViewMode(viewMode === 'editor' ? 'preview' : 'editor')}
+                variant="outline"
+                size="sm"
+                title={viewMode === 'editor' ? 'Visualizar Markdown' : 'Modo Editor'}
+              >
+                {viewMode === 'editor' ? (
+                  <Eye className="w-4 h-4 mr-2" />
+                ) : (
+                  <Edit className="w-4 h-4 mr-2" />
+                )}
+                {viewMode === 'editor' ? 'Markdown' : 'Editor'}
+              </Button>
+              <Button
                 onClick={() => setShowDocumentList(!showDocumentList)}
                 variant={showDocumentList ? "default" : "outline"}
                 size="sm"
@@ -386,6 +400,7 @@ export default function LexicalPage() {
                   onChange={setContent}
                   className="h-full"
                   templateSections={selectedTemplate ? extractTemplateSections(selectedTemplate) : undefined}
+                  viewMode={viewMode}
                 />
               </CardContent>
             </Card>
