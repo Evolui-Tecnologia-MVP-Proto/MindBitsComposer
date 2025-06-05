@@ -56,14 +56,12 @@ export default function LexicalPage() {
       }
       
       if (structure && structure.sections) {
+        // Criar conteúdo formatado com marcações especiais
+        const sectionNames = Object.keys(structure.sections);
         let formattedContent = '';
         
-        // sections é um objeto, não array - usar Object.keys
-        const sectionNames = Object.keys(structure.sections);
-        
-        // Para cada section, criar um container colapsível
         sectionNames.forEach((sectionName: string) => {
-          formattedContent += `[COLLAPSIBLE:${sectionName}]\n\n[/COLLAPSIBLE]\n\n`;
+          formattedContent += `## ${sectionName}\n\n\n\n`;
         });
         
         return formattedContent;
