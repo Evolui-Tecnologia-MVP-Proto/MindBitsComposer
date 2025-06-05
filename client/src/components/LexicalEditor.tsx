@@ -557,24 +557,22 @@ export default function LexicalEditor({ content = '', onChange, className = '', 
   return (
     <div className={`lexical-editor-container w-full h-full flex flex-col ${className}`}>
       <LexicalComposer initialConfig={initialConfig}>
-        <div className="w-full h-full flex flex-col">
+        <div className="w-full h-full flex flex-col min-h-0">
           <ToolbarPlugin 
             viewMode={viewMode}
             setViewMode={setViewMode}
             setMarkdownContent={setMarkdownContent}
           />
-          <div className="flex-1 relative" style={{ height: 'calc(100vh - 200px)', overflow: 'hidden' }}>
+          <div className="flex-1 min-h-0 overflow-hidden">
             {viewMode === 'editor' ? (
               <RichTextPlugin
                 contentEditable={
                   <ContentEditable 
-                    className="w-full h-full p-4 outline-none resize-none text-gray-900"
+                    className="w-full h-full p-4 outline-none resize-none text-gray-900 overflow-y-auto overflow-x-hidden"
                     style={{ 
                       fontFamily: 'system-ui, -apple-system, sans-serif',
                       lineHeight: '1.6',
-                      overflowY: 'auto',
-                      overflowX: 'hidden',
-                      height: '100%'
+                      maxHeight: '100%'
                     }}
                   />
                 }
