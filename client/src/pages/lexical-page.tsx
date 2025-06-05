@@ -231,7 +231,7 @@ export default function LexicalPage() {
             <div className="space-y-6">
               <h3 className="text-lg font-semibold">Biblioteca</h3>
               
-              <Accordion type="multiple" defaultValue={["templates", "documents"]} className="w-full">
+              <Accordion type="multiple" defaultValue={[]} className="w-full">
                 {/* Grupo 1: Templates Estruturais */}
                 <AccordionItem value="templates">
                   <AccordionTrigger className="text-md font-medium text-gray-700 hover:no-underline">
