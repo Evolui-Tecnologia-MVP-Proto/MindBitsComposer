@@ -222,7 +222,7 @@ export default function LexicalPage() {
         </div>
       </div>
       {/* Área do editor - ocupa todo o espaço restante */}
-      <div className="flex-1 px-6 pb-6 min-h-0">
+      <div className="flex-1 px-6 min-h-0">
         <div className="flex h-full">
           {/* Sidebar de documentos (condicional) */}
         {showDocumentList && (
