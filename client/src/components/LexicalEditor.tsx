@@ -171,27 +171,10 @@ function ToolbarPlugin({
   };
 
   const insertTable = () => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if (!$isRangeSelection(selection)) return;
-
-      // Create table manually to ensure proper structure
-      const tableNode = $createTableNode();
-      
-      // Create 2 rows with 3 columns each
-      for (let i = 0; i < 2; i++) {
-        const rowNode = $createTableRowNode();
-        
-        for (let j = 0; j < 3; j++) {
-          const cellNode = $createTableCellNode(0); // 0 = header type for consistent styling
-          cellNode.append($createParagraphNode());
-          rowNode.append(cellNode);
-        }
-        
-        tableNode.append(rowNode);
-      }
-      
-      $insertNodes([tableNode]);
+    editor.dispatchCommand(INSERT_TABLE_COMMAND, {
+      columns: String(3),
+      rows: String(2),
+      includeHeaders: false,
     });
   };
 
