@@ -56,6 +56,16 @@ export class CollapsibleTitleNode extends TextNode {
     return true;
   }
 
+  // Prevenir seleção e edição
+  isSelectable(): boolean {
+    return false;
+  }
+
+  // Preservar o texto durante transformações
+  getTextContent(): string {
+    return this.__text;
+  }
+
   createDOM(config: EditorConfig): HTMLElement {
     const dom = document.createElement('summary');
     dom.classList.add(
@@ -68,6 +78,10 @@ export class CollapsibleTitleNode extends TextNode {
       'items-center',
       'p-2'
     );
+    
+    // Tornar não editável
+    dom.contentEditable = 'false';
+    dom.setAttribute('data-lexical-editor', 'false');
     
     // Adicionar ícone de expansão/contração
     const icon = document.createElement('span');
