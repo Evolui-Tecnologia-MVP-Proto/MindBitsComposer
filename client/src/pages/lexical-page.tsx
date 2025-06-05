@@ -204,7 +204,7 @@ export default function LexicalPage() {
         {showDocumentList && (
           <div className="w-80 border-r bg-white p-4 overflow-y-auto">
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold mb-4">Meus Documentos</h3>
+              <h3 className="text-lg font-semibold mb-4">Biblioteca</h3>
               {isLoadingDocuments ? (
                 <div className="text-center py-4">Carregando...</div>
               ) : (
