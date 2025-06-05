@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { $getRoot, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, type TextFormatType, $createParagraphNode, $createTextNode } from 'lexical';
+import { $getRoot, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, type TextFormatType, $createParagraphNode, $createTextNode, $insertNodes } from 'lexical';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
@@ -180,6 +180,9 @@ function ToolbarPlugin({
 
         for (let j = 0; j < 3; j++) {
           const cellNode = $createTableCellNode(0);
+          // Adicionar um parágrafo vazio em cada célula para torná-la editável
+          const paragraphNode = $createParagraphNode();
+          cellNode.append(paragraphNode);
           rowNode.append(cellNode);
         }
 
