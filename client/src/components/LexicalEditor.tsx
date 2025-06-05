@@ -17,10 +17,10 @@ import { TableNode, TableRowNode, TableCellNode, $createTableNodeWithDimensions,
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 
 
-// Import dos nós e plugin de container colapsável
-import { CollapsibleContainerNode } from './lexical/CollapsibleNode';
-import { CollapsibleTitleNode } from './lexical/CollapsibleTitleNode';
-import { CollapsibleContentNode } from './lexical/CollapsibleContentNode';
+// Import dos nós e plugin de container colapsível
+import { CollapsibleContainerNode, $createCollapsibleContainerNode } from './lexical/CollapsibleNode';
+import { CollapsibleTitleNode, $createCollapsibleTitleNode } from './lexical/CollapsibleTitleNode';
+import { CollapsibleContentNode, $createCollapsibleContentNode } from './lexical/CollapsibleContentNode';
 import CollapsiblePlugin, { INSERT_COLLAPSIBLE_COMMAND } from './lexical/CollapsiblePlugin';
 
 // Import dos nós e plugin de imagem
@@ -399,6 +399,7 @@ interface LexicalEditorProps {
   content?: string;
   onChange?: (content: string) => void;
   className?: string;
+  templateSections?: string[];
 }
 
 // Função para converter conteúdo Lexical para markdown
@@ -452,8 +453,43 @@ function convertToMarkdown(editorState: any): string {
   return markdown.trim();
 }
 
+// Plugin para inserir seções de template automaticamente
+function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Element | null {
+  const [editor] = useLexicalComposerContext();
+
+  React.useEffect(() => {
+    if (sections && sections.length > 0) {
+      editor.update(() => {
+        const root = $getRoot();
+        root.clear();
+        
+        sections.forEach((sectionName, index) => {
+          // Criar container colapsível
+          const title = $createCollapsibleTitleNode(sectionName);
+          const content = $createCollapsibleContentNode();
+          const paragraph = $createParagraphNode();
+          content.append(paragraph);
+
+          const container = $createCollapsibleContainerNode(true);
+          container.append(title, content);
+          
+          root.append(container);
+          
+          // Adicionar espaço entre containers
+          if (index < sections.length - 1) {
+            const spacer = $createParagraphNode();
+            root.append(spacer);
+          }
+        });
+      });
+    }
+  }, [editor, sections]);
+
+  return null;
+}
+
 // Componente principal do editor Lexical completo
-export default function LexicalEditor({ content = '', onChange, className = '' }: LexicalEditorProps): JSX.Element {
+export default function LexicalEditor({ content = '', onChange, className = '', templateSections }: LexicalEditorProps): JSX.Element {
   const [viewMode, setViewMode] = useState<'editor' | 'preview'>('editor');
   const [markdownContent, setMarkdownContent] = useState('');
   const initialConfig = {
@@ -539,6 +575,7 @@ export default function LexicalEditor({ content = '', onChange, className = '' }
           <TablePlugin />
           <CollapsiblePlugin />
           <ImagePlugin />
+          <TemplateSectionsPlugin sections={templateSections} />
           <AutoFocusPlugin />
         </div>
       </LexicalComposer>
