@@ -13,6 +13,8 @@ import { ListItemNode, ListNode, INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_L
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { CodeNode, $createCodeNode } from '@lexical/code';
 import { LinkNode } from '@lexical/link';
+import { TableNode, TableRowNode, TableCellNode, $createTableNodeWithDimensions, INSERT_TABLE_COMMAND } from '@lexical/table';
+import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { $insertNodes, $getNodeByKey } from 'lexical';
 
 import { Button } from "@/components/ui/button";
@@ -29,7 +31,8 @@ import {
   Heading3,
   Quote,
   List,
-  ListOrdered
+  ListOrdered,
+  Table
 } from "lucide-react";
 
 // Tema simplificado para o Lexical
@@ -136,6 +139,10 @@ function ToolbarPlugin(): JSX.Element {
 
   const insertOrderedList = () => {
     editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
+  };
+
+  const insertTable = () => {
+    editor.dispatchCommand(INSERT_TABLE_COMMAND, { columns: '3', rows: '3' });
   };
 
   return (
@@ -259,6 +266,15 @@ function ToolbarPlugin(): JSX.Element {
         >
           <ListOrdered className="w-4 h-4" />
         </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 px-2 text-xs hover:bg-gray-100"
+          title="Inserir Tabela"
+          onClick={insertTable}
+        >
+          <Table className="w-4 h-4" />
+        </Button>
       </div>
     </div>
   );
@@ -293,6 +309,9 @@ export default function LexicalEditor({ content = '', onChange, className = '' }
       ListItemNode,
       CodeNode,
       LinkNode,
+      TableNode,
+      TableRowNode,
+      TableCellNode,
     ],
   };
 
@@ -330,6 +349,7 @@ export default function LexicalEditor({ content = '', onChange, className = '' }
           <OnChangePlugin onChange={handleChange} />
           <HistoryPlugin />
           <ListPlugin />
+          <TablePlugin />
           <AutoFocusPlugin />
         </div>
       </LexicalComposer>
