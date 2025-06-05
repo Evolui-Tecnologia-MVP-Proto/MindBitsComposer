@@ -13,7 +13,7 @@ import { ListItemNode, ListNode, INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_L
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { CodeNode, $createCodeNode } from '@lexical/code';
 import { LinkNode } from '@lexical/link';
-import { TableNode, TableRowNode, TableCellNode, $createTableNodeWithDimensions, INSERT_TABLE_COMMAND } from '@lexical/table';
+import { TableNode, TableRowNode, TableCellNode, $createTableNodeWithDimensions, INSERT_TABLE_COMMAND, $createTableNode, $createTableRowNode, $createTableCellNode } from '@lexical/table';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { $insertNodes, $getNodeByKey } from 'lexical';
 
@@ -175,7 +175,22 @@ function ToolbarPlugin({
       const selection = $getSelection();
       if (!$isRangeSelection(selection)) return;
 
-      const tableNode = $createTableNodeWithDimensions(2, 3); // 2 rows, 3 columns
+      // Create table manually to ensure proper structure
+      const tableNode = $createTableNode();
+      
+      // Create 2 rows with 3 columns each
+      for (let i = 0; i < 2; i++) {
+        const rowNode = $createTableRowNode();
+        
+        for (let j = 0; j < 3; j++) {
+          const cellNode = $createTableCellNode(0); // 0 = header type for consistent styling
+          cellNode.append($createParagraphNode());
+          rowNode.append(cellNode);
+        }
+        
+        tableNode.append(rowNode);
+      }
+      
       $insertNodes([tableNode]);
     });
   };
