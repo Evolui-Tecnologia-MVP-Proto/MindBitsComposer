@@ -78,6 +78,9 @@ const theme = {
     code: 'editor-text-code',
   },
   code: 'editor-code',
+  table: 'editor-table',
+  tableCell: 'editor-table-cell',
+  tableCellHeader: 'editor-table-cell-header',
 };
 
 // Função para lidar com erros
@@ -165,7 +168,7 @@ function ToolbarPlugin({
   };
 
   const insertTable = () => {
-    editor.dispatchCommand(INSERT_TABLE_COMMAND, { columns: '3', rows: '3' });
+    editor.dispatchCommand(INSERT_TABLE_COMMAND, { columns: '3', rows: '2' });
   };
 
   const insertCollapsible = () => {
@@ -493,11 +496,17 @@ export default function LexicalEditor({ content = '', onChange, className = '' }
                 ErrorBoundary={LexicalErrorBoundary}
               />
             ) : (
-              <div className="w-full h-full p-4 overflow-auto bg-gray-50">
-                <div className="max-w-none prose prose-gray">
-                  <pre className="whitespace-pre-wrap font-mono text-sm bg-white p-4 rounded border">
-                    {markdownContent || 'Nenhum conteúdo para visualizar'}
-                  </pre>
+              <div className="w-full h-full p-6 overflow-auto bg-slate-100">
+                <div className="max-w-4xl mx-auto">
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div className="mb-4 pb-3 border-b border-gray-200">
+                      <h3 className="text-lg font-semibold text-gray-800">Visualização Markdown</h3>
+                      <p className="text-sm text-gray-600 mt-1">Representação em markdown do conteúdo do editor</p>
+                    </div>
+                    <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed text-gray-900 bg-gray-50 p-4 rounded-md border border-gray-300 overflow-x-auto">
+                      {markdownContent || '// Nenhum conteúdo para visualizar\n// Adicione texto no editor para ver a conversão markdown'}
+                    </pre>
+                  </div>
                 </div>
               </div>
             )}
