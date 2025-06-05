@@ -362,14 +362,6 @@ export default function LexicalPage() {
                                       <p className="text-xs text-gray-600">
                                         <span className="font-medium">Objeto:</span> {edition.objeto || 'N/A'}
                                       </p>
-                                      <div className="flex items-center gap-2 mt-2">
-                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                          Em Progresso
-                                        </span>
-                                        <span className="text-xs text-gray-400">
-                                          {new Date(edition.updatedAt).toLocaleDateString()}
-                                        </span>
-                                      </div>
                                     </div>
                                   </div>
                                 </div>
