@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { $getRoot, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, type TextFormatType, $createParagraphNode, $createTextNode, $insertNodes } from 'lexical';
+import { $getRoot, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, type TextFormatType, $createParagraphNode, $createTextNode, $insertNodes, $isParagraphNode } from 'lexical';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
@@ -193,22 +193,8 @@ function ToolbarPlugin({
         tableNode.append(rowNode);
       }
 
-      // Inserir na posição do cursor
-      const focusNode = selection.focus.getNode();
-      const anchorNode = selection.anchor.getNode();
-
-      // Se estiver dentro de um parágrafo, inserir após ele
-      if ($isParagraphNode(focusNode)) {
-        focusNode.insertAfter(tableNode);
-      } else {
-        // Caso contrário, inserir no nó pai
-        const parent = focusNode.getParent();
-        if (parent) {
-          parent.insertAfter(tableNode);
-        } else {
-          $getRoot().append(tableNode);
-        }
-      }
+      // Inserir tabela na posição do cursor usando insertNodes
+      $insertNodes([tableNode]);
     });
   };
 
