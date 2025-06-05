@@ -445,12 +445,40 @@ function convertToMarkdown(editorState: any): string {
             const titleText = child.getTextContent();
             markdown += `# ${titleText}\n\n`;
           } else if (child.getType() === 'collapsible-content') {
-            // Processar conteúdo do container
+            // Processar conteúdo do container recursivamente
             const contentChildren = child.getChildren();
             contentChildren.forEach((contentChild: any) => {
-              const contentText = contentChild.getTextContent();
-              if (contentText.trim()) {
-                markdown += contentText + '\n\n';
+              if (contentChild.getType() === 'table') {
+                // Processar tabela dentro do container
+                const rows = contentChild.getChildren();
+                if (rows.length > 0) {
+                  rows.forEach((row: any, rowIndex: number) => {
+                    const cells = row.getChildren();
+                    let rowContent = '|';
+                    
+                    cells.forEach((cell: any) => {
+                      const cellText = cell.getTextContent() || ' ';
+                      rowContent += ` ${cellText} |`;
+                    });
+                    
+                    markdown += rowContent + '\n';
+                    
+                    // Adicionar linha separadora após o cabeçalho (primeira linha)
+                    if (rowIndex === 0) {
+                      let separator = '|';
+                      cells.forEach(() => {
+                        separator += ' --- |';
+                      });
+                      markdown += separator + '\n';
+                    }
+                  });
+                  markdown += '\n';
+                }
+              } else {
+                const contentText = contentChild.getTextContent();
+                if (contentText.trim()) {
+                  markdown += contentText + '\n\n';
+                }
               }
             });
           }
