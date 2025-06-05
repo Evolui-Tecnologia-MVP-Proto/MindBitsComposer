@@ -197,25 +197,22 @@ export default function LexicalEditor({ content = '', onChange, className = '' }
   return (
     <div className={`lexical-editor-container w-full h-full ${className}`}>
       <LexicalComposer initialConfig={initialConfig}>
-        <div className="w-full h-full flex flex-col">
-          <SimpleToolbar />
-          <div className="flex-1 relative">
-            <RichTextPlugin
-              contentEditable={
-                <ContentEditable 
-                  className="w-full h-full p-4 outline-none resize-none text-gray-900 overflow-y-auto border-none"
-                  style={{ 
-                    fontFamily: 'system-ui, -apple-system, sans-serif',
-                    minHeight: '400px'
-                  }}
-                />
-              }
-              placeholder={<Placeholder />}
-              ErrorBoundary={LexicalErrorBoundary}
-            />
-            <HistoryPlugin />
-            <AutoFocusPlugin />
-          </div>
+        <div className="w-full h-full relative">
+          <RichTextPlugin
+            contentEditable={
+              <ContentEditable 
+                className="w-full h-full p-0 outline-none resize-none text-gray-900 border-none"
+                style={{ 
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  minHeight: '100%'
+                }}
+              />
+            }
+            placeholder={<Placeholder />}
+            ErrorBoundary={LexicalErrorBoundary}
+          />
+          <HistoryPlugin />
+          <AutoFocusPlugin />
         </div>
       </LexicalComposer>
     </div>

@@ -1305,6 +1305,25 @@ export default function BasicTextEditor() {
         {/* Lexical Tab Content */}
         <TabsContent value="lexical" className="m-0 p-0 flex-1 flex flex-col">
           <div className="w-full h-full flex flex-col">
+            {/* Toolbar do Lexical - integrada */}
+            <div className="flex items-center justify-between gap-2 p-2 border-b bg-gray-50 shrink-0">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-gray-700">Editor Lexical</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 px-3 text-xs"
+                  onClick={() => setContent('')}
+                  title="Limpar conteúdo"
+                >
+                  Limpar
+                </Button>
+              </div>
+            </div>
+
+            {/* Editor Area */}
             <div className="flex-1 p-4 max-h-full overflow-y-auto">
               <LexicalEditor
                 content={content}
