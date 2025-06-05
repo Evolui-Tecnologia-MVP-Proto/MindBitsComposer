@@ -420,6 +420,42 @@
     margin: 16px 0;
   }
   
+  /* Estilos globais para tabelas do Lexical */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+  }
+  
+  table td,
+  table th {
+    border: 1px solid #000;
+    padding: 8px 12px;
+    min-width: 100px;
+    min-height: 40px;
+    vertical-align: top;
+    background-color: #fff;
+  }
+  
+  table td:focus,
+  table th:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: -2px;
+  }
+  
+  /* Estilos específicos do editor */
+  .editor-container table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  .editor-container td {
+    border: 1px solid #000;
+    padding: 8px;
+    min-width: 80px;
+    min-height: 32px;
+  }
+  
   .table-node {
     border-collapse: collapse;
     width: 100%;
