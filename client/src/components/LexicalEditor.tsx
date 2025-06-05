@@ -92,15 +92,7 @@ function onError(error: Error): void {
 }
 
 // Barra de ferramentas interativa
-function ToolbarPlugin({ 
-  viewMode, 
-  setViewMode, 
-  setMarkdownContent 
-}: { 
-  viewMode: 'editor' | 'preview';
-  setViewMode: (mode: 'editor' | 'preview') => void;
-  setMarkdownContent: (content: string) => void;
-}): JSX.Element {
+function ToolbarPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
@@ -357,34 +349,7 @@ function ToolbarPlugin({
           onChange={handleFileChange}
           style={{ display: 'none' }}
         />
-        <Separator orientation="vertical" className="h-6" />
-        <Button
-          variant={viewMode === 'editor' ? 'default' : 'ghost'}
-          size="sm"
-          className="h-8 px-2 text-xs"
-          title="Modo Editor"
-          onClick={() => setViewMode('editor')}
-        >
-          <Edit className="w-4 h-4" />
-        </Button>
-        <Button
-          variant={viewMode === 'preview' ? 'default' : 'ghost'}
-          size="sm"
-          className="h-8 px-2 text-xs"
-          title="Visualizar Markdown"
-          onClick={() => {
-            if (viewMode === 'editor') {
-              // Capturar o estado atual do editor e converter para markdown
-              editor.getEditorState().read(() => {
-                const markdown = convertToMarkdown(editor.getEditorState());
-                setMarkdownContent(markdown);
-              });
-            }
-            setViewMode('preview');
-          }}
-        >
-          <Eye className="w-4 h-4" />
-        </Button>
+
       </div>
     </div>
   );
@@ -570,9 +535,20 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
 }
 
 // Componente principal do editor Lexical completo
-export default function LexicalEditor({ content = '', onChange, className = '', templateSections, viewMode: externalViewMode = 'editor' }: LexicalEditorProps): JSX.Element {
-  const [viewMode, setViewMode] = useState<'editor' | 'preview'>('editor');
+export default function LexicalEditor({ content = '', onChange, className = '', templateSections, viewMode = 'editor' }: LexicalEditorProps): JSX.Element {
   const [markdownContent, setMarkdownContent] = useState('');
+  const [editorInstance, setEditorInstance] = useState<any>(null);
+  
+  // Hook para capturar markdown quando mudar para preview
+  React.useEffect(() => {
+    if (viewMode === 'preview' && editorInstance) {
+      editorInstance.getEditorState().read(() => {
+        const markdown = convertToMarkdown(editorInstance.getEditorState());
+        setMarkdownContent(markdown);
+      });
+    }
+  }, [viewMode, editorInstance]);
+
   const initialConfig = {
     namespace: 'LexicalEditor',
     theme,
@@ -613,11 +589,7 @@ export default function LexicalEditor({ content = '', onChange, className = '', 
     <div className={`lexical-editor-container w-full h-full flex flex-col ${className}`}>
       <LexicalComposer initialConfig={initialConfig}>
         <div className="w-full h-full flex flex-col min-h-0">
-          <ToolbarPlugin 
-            viewMode={viewMode}
-            setViewMode={setViewMode}
-            setMarkdownContent={setMarkdownContent}
-          />
+          <ToolbarPlugin />
           <div className="p-4 overflow-y-auto" style={{ height: 'calc(100vh - 350px)', maxHeight: 'calc(100vh - 350px)' }}>
             {viewMode === 'editor' ? (
               <RichTextPlugin
