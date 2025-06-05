@@ -325,7 +325,7 @@ export default function LexicalPage() {
         {/* Editor principal */}
         <div className="flex-1 flex flex-col">
           {/* Barra de ferramentas do editor integrada */}
-          <div className="flex-1 pl-0 pr-4 py-4">
+          <div className="flex-1 pl-0 pr-4 pt-4 pb-0">
             <Card className="h-full">
               <CardContent className="p-0 h-full">
                 <LexicalEditor
