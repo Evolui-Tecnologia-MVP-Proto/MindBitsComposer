@@ -1303,16 +1303,12 @@ export default function BasicTextEditor() {
         </TabsContent>
         
         {/* Lexical Tab Content */}
-        <TabsContent value="lexical" className="m-0 p-0 flex-1 flex flex-col">
-          <div className="w-full h-full flex flex-col">
-            <div className="flex-1 max-h-full overflow-hidden">
-              <LexicalEditor
-                content={content}
-                onChange={setContent}
-                className="h-full"
-              />
-            </div>
-          </div>
+        <TabsContent value="lexical" className="m-0 p-0 flex-1 flex flex-col min-h-0">
+          <LexicalEditor
+            content={content}
+            onChange={setContent}
+            className="flex-1"
+          />
         </TabsContent>
       </Tabs>
 
