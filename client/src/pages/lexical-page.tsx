@@ -40,7 +40,7 @@ export default function LexicalPage() {
   const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(null);
   const [title, setTitle] = useState("Novo Documento");
   const [showDocumentList, setShowDocumentList] = useState(false);
-  const [showAttachments, setShowAttachments] = useState(true);
+  const [showAttachments, setShowAttachments] = useState(false);
   const { toast } = useToast();
 
   // Query para buscar documentos do usuário
