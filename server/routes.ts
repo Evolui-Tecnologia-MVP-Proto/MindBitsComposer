@@ -4470,9 +4470,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         status: documentEditions.status,
         createdAt: documentEditions.createdAt,
         updatedAt: documentEditions.updatedAt,
+        lexFile: documentEditions.lexFile,
         origem: documentos.origem,
         objeto: documentos.objeto,
-        templateCode: templates.code
+        templateCode: templates.code,
+        templateStructure: templates.structure
       })
       .from(documentEditions)
       .innerJoin(documentos, eq(documentEditions.documentId, documentos.id))

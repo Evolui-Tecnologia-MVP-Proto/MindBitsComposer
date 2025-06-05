@@ -44,6 +44,7 @@ export default function LexicalPage() {
   const [showAttachments, setShowAttachments] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [viewMode, setViewMode] = useState<'editor' | 'preview'>('editor');
+  const [selectedEdition, setSelectedEdition] = useState<any>(null);
   const { toast } = useToast();
 
   // Função para extrair seções do template
@@ -153,6 +154,45 @@ export default function LexicalPage() {
     setShowDocumentList(false);
   };
 
+  const handleSelectEdition = (edition: any) => {
+    setSelectedEdition(edition);
+    setSelectedTemplate(null);
+    setCurrentDocumentId(null);
+    
+    // Se lex_file estiver vazio ou null, carregar o template
+    if (!edition.lexFile) {
+      const template = {
+        id: edition.templateId,
+        code: edition.templateCode,
+        structure: edition.templateStructure
+      };
+      
+      // Converter estrutura do template para conteúdo do editor
+      const templateContent = convertTemplateToContent(template.structure);
+      setContent(templateContent);
+      setTitle(`${edition.templateCode} - ${edition.origem} - ${edition.objeto}`);
+    } else {
+      // Carregar conteúdo do lex_file
+      setContent(edition.lexFile);
+      setTitle(`${edition.templateCode} - ${edition.origem} - ${edition.objeto}`);
+    }
+    setShowDocumentList(false);
+  };
+
+  const convertTemplateToContent = (structure: any): string => {
+    if (!structure || !structure.containers) return "";
+    
+    // Criar conteúdo do editor com containers colapsíveis
+    const containers = structure.containers.map((container: any) => {
+      return `<div class="collapsible-container collapsed">
+        <div class="collapsible-title">${container.title || 'Container'}</div>
+        <div class="collapsible-content"></div>
+      </div>`;
+    }).join('\n\n');
+    
+    return containers;
+  };
+
   const handleDeleteDocument = (id: string) => {
     if (confirm("Tem certeza que deseja excluir este documento?")) {
       deleteMutation.mutate(id);
@@ -224,6 +264,11 @@ export default function LexicalPage() {
           
           <div className="flex items-center space-x-2">
             <div className="flex items-center space-x-2">
+              {selectedEdition && (
+                <Badge variant="default" className="text-xs bg-green-100 text-green-800">
+                  {selectedEdition.origem} - {selectedEdition.objeto}
+                </Badge>
+              )}
               {selectedTemplate && (
                 <Badge variant="secondary" className="text-xs">
                   Template: {selectedTemplate.code}
@@ -348,7 +393,10 @@ export default function LexicalPage() {
                             Array.isArray(documentEditions) && documentEditions.map((edition: any) => (
                               <div
                                 key={edition.id}
-                                className="p-3 border rounded-lg hover:bg-gray-50"
+                                className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 ${
+                                  selectedEdition?.id === edition.id ? 'border-blue-500 bg-blue-50' : ''
+                                }`}
+                                onClick={() => handleSelectEdition(edition)}
                               >
                                 <div className="flex justify-between items-start">
                                   <div className="flex-1">
