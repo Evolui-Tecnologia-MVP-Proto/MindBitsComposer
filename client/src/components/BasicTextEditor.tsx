@@ -163,6 +163,50 @@ export default function BasicTextEditor() {
   };
 
   // Funções de formatação para a barra de ferramentas
+  // Função para salvar o documento
+  const saveDocument = async () => {
+    if (!selectedDocumentEdition) {
+      console.log("Nenhum documento selecionado para salvar");
+      return;
+    }
+
+    try {
+      // Gerar o conteúdo markdown atual
+      const markdownContent = generateMarkdown();
+      
+      // Preparar dados para salvar
+      const saveData = {
+        mdFile: markdownContent,
+        jsonFile: {
+          headerFields: headerFields,
+          templateSections: templateSections,
+          content: content
+        },
+        status: "draft"
+      };
+
+      const response = await fetch(`/api/document-editions/${selectedDocumentEdition}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(saveData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao salvar documento');
+      }
+
+      console.log("✅ Documento salvo com sucesso");
+      
+      // Aqui você pode adicionar uma notificação de sucesso se tiver um sistema de toast
+      
+    } catch (error) {
+      console.error("❌ Erro ao salvar documento:", error);
+      // Aqui você pode adicionar uma notificação de erro se tiver um sistema de toast
+    }
+  };
+
   const insertFormatting = (format: string, content: string = '', sectionIndex?: number) => {
     const targetTextarea = sectionIndex !== undefined 
       ? document.querySelector(`textarea[data-section-index="${sectionIndex}"]`) as HTMLTextAreaElement
@@ -938,7 +982,10 @@ export default function BasicTextEditor() {
           <Button
             variant="ghost"
             size="sm"
+            onClick={saveDocument}
             className="flex items-center gap-1"
+            disabled={!selectedDocumentEdition}
+            title={selectedDocumentEdition ? "Salvar documento" : "Selecione um documento para salvar"}
           >
             <Save className="h-4 w-4" />
             Salvar
