@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { $getRoot, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, type TextFormatType } from 'lexical';
+import { $getRoot, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, type TextFormatType, $createParagraphNode, $createTextNode } from 'lexical';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
@@ -13,7 +13,7 @@ import { ListItemNode, ListNode, INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_L
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { CodeNode, $createCodeNode } from '@lexical/code';
 import { LinkNode } from '@lexical/link';
-import { TableNode, TableRowNode, TableCellNode, $createTableNodeWithDimensions, INSERT_TABLE_COMMAND } from '@lexical/table';
+import { TableNode, TableRowNode, TableCellNode, $createTableNodeWithDimensions, INSERT_TABLE_COMMAND, $createTableNode, $createTableRowNode, $createTableCellNode } from '@lexical/table';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { $insertNodes, $getNodeByKey } from 'lexical';
 
@@ -168,10 +168,38 @@ function ToolbarPlugin({
   };
 
   const insertTable = () => {
-    editor.dispatchCommand(INSERT_TABLE_COMMAND, {
-      columns: '3',
-      rows: '2',
-      includeHeaders: false,
+    editor.update(() => {
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        // Criar tabela manualmente com 2 linhas e 3 colunas
+        const tableNode = $createTableNode();
+        
+        // Primeira linha
+        const row1 = $createTableRowNode();
+        for (let col = 0; col < 3; col++) {
+          const cell = $createTableCellNode('normal');
+          const paragraph = $createParagraphNode();
+          const text = $createTextNode('');
+          paragraph.append(text);
+          cell.append(paragraph);
+          row1.append(cell);
+        }
+        tableNode.append(row1);
+        
+        // Segunda linha
+        const row2 = $createTableRowNode();
+        for (let col = 0; col < 3; col++) {
+          const cell = $createTableCellNode('normal');
+          const paragraph = $createParagraphNode();
+          const text = $createTextNode('');
+          paragraph.append(text);
+          cell.append(paragraph);
+          row2.append(cell);
+        }
+        tableNode.append(row2);
+        
+        $insertNodes([tableNode]);
+      }
     });
   };
 
