@@ -487,7 +487,7 @@ export default function BasicTextEditor() {
     setContent(edition.content || '');
     
     // Se a edição tem um template associado, carregar sua estrutura
-    if (edition.templateId) {
+    if (edition.templateId && Array.isArray(templates)) {
       const template = templates.find((t: Template) => t.id === edition.templateId);
       if (template) {
         setSelectedTemplate(template);
@@ -607,14 +607,16 @@ export default function BasicTextEditor() {
           <div className="flex items-center gap-2">
             <LayoutTemplate className="w-4 h-4 text-gray-500" />
             <Select value={selectedTemplate?.id || ""} onValueChange={(value) => {
-              const template = templates.find((t: Template) => t.id === value);
-              if (template) loadTemplate(template);
+              if (Array.isArray(templates)) {
+                const template = templates.find((t: Template) => t.id === value);
+                if (template) loadTemplate(template);
+              }
             }}>
               <SelectTrigger className="w-[250px]">
                 <SelectValue placeholder="Selecionar template" />
               </SelectTrigger>
               <SelectContent>
-                {templates.map((template: Template) => (
+                {Array.isArray(templates) && templates.map((template: Template) => (
                   <SelectItem key={template.id} value={template.id}>
                     {template.name}
                   </SelectItem>
@@ -627,14 +629,16 @@ export default function BasicTextEditor() {
           <div className="flex items-center gap-2">
             <FileText className="w-4 h-4 text-gray-500" />
             <Select value={selectedDocumentEdition?.id || ""} onValueChange={(value) => {
-              const edition = documentEditions.find((e: DocumentEdition) => e.id === value);
-              if (edition) loadDocumentEdition(edition);
+              if (Array.isArray(documentEditions)) {
+                const edition = documentEditions.find((e: DocumentEdition) => e.id === value);
+                if (edition) loadDocumentEdition(edition);
+              }
             }}>
               <SelectTrigger className="w-[250px]">
                 <SelectValue placeholder="Carregar documento" />
               </SelectTrigger>
               <SelectContent>
-                {documentEditions.map((edition: DocumentEdition) => (
+                {Array.isArray(documentEditions) && documentEditions.map((edition: DocumentEdition) => (
                   <SelectItem key={edition.id} value={edition.id}>
                     {edition.name}
                   </SelectItem>
