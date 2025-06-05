@@ -977,19 +977,7 @@ export default function BasicTextEditor() {
             </Button>
           </div>
 
-          <Separator orientation="vertical" className="h-6" />
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={saveDocument}
-            className="flex items-center gap-1"
-            disabled={!selectedDocumentEdition}
-            title={selectedDocumentEdition ? "Salvar documento" : "Selecione um documento para salvar"}
-          >
-            <Save className="h-4 w-4" />
-            Salvar
-          </Button>
         </div>
 
         {/* Lado direito - Controles */}
