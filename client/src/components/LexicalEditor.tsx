@@ -197,16 +197,16 @@ export default function LexicalEditor({ content = '', onChange, className = '' }
   return (
     <div className={`lexical-editor-container w-full h-full ${className}`}>
       <LexicalComposer initialConfig={initialConfig}>
-        <div className="editor-container w-full h-full flex flex-col">
+        <div className="w-full h-full flex flex-col">
           <SimpleToolbar />
-          <div className="editor-inner relative flex-1 min-h-0">
+          <div className="flex-1 relative">
             <RichTextPlugin
               contentEditable={
                 <ContentEditable 
-                  className="editor-input w-full h-full p-4 outline-none resize-none text-gray-900 overflow-y-auto"
+                  className="w-full h-full p-4 outline-none resize-none text-gray-900 overflow-y-auto border-none"
                   style={{ 
                     fontFamily: 'system-ui, -apple-system, sans-serif',
-                    minHeight: '100%'
+                    minHeight: '400px'
                   }}
                 />
               }
