@@ -373,7 +373,7 @@ export default function LexicalPage() {
           {/* Barra de ferramentas do editor integrada */}
           <div className="flex-1 pl-0 pr-4 pt-4 pb-0">
             <Card className="h-full">
-              <CardContent className="p-0 h-full relative">
+              <CardContent className="p-0 h-full relative overflow-hidden">
                 {/* Placeholder quando não há conteúdo */}
                 {(!content || content.trim() === '') && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 pointer-events-none">
