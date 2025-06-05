@@ -618,7 +618,7 @@ export default function LexicalEditor({ content = '', onChange, className = '', 
       <LexicalComposer initialConfig={initialConfig}>
         <div className="w-full h-full flex flex-col min-h-0">
           <ToolbarPlugin />
-          <div className="p-4 overflow-y-auto" style={{ height: 'calc(100vh - 350px)', maxHeight: 'calc(100vh - 350px)' }}>
+          <div className="p-4" style={{ height: 'calc(100vh - 350px)', maxHeight: 'calc(100vh - 350px)', overflowY: 'auto' }}>
             {viewMode === 'editor' ? (
               <RichTextPlugin
                 contentEditable={
