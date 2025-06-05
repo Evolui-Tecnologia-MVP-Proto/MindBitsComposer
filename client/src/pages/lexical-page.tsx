@@ -155,23 +155,34 @@ export default function LexicalPage() {
   };
 
   const handleSelectEdition = (edition: any) => {
+    console.log('Selecionando edition:', edition);
     setSelectedEdition(edition);
-    setSelectedTemplate(null);
     setCurrentDocumentId(null);
+    
+    // Criar objeto template para exibir o badge
+    const template = {
+      id: edition.templateId,
+      code: edition.templateCode,
+      structure: edition.templateStructure
+    };
+    setSelectedTemplate(template);
     
     // Se lex_file estiver vazio ou null, carregar o template
     if (!edition.lexFile) {
-      const template = {
-        id: edition.templateId,
-        code: edition.templateCode,
-        structure: edition.templateStructure
-      };
+      console.log('Carregando template, lex_file está vazio');
+      console.log('Template structure:', edition.templateStructure);
       
-      // Converter estrutura do template para conteúdo do editor
-      const templateContent = convertTemplateToContent(template.structure);
-      setContent(templateContent);
+      // Usar a função existente para carregar template
+      if (edition.templateStructure) {
+        const templateSections = extractTemplateSections(template);
+        const templateContent = templateSections.join('\n\n');
+        setContent(templateContent);
+      } else {
+        setContent('');
+      }
       setTitle(`${edition.templateCode} - ${edition.origem} - ${edition.objeto}`);
     } else {
+      console.log('Carregando lex_file existente');
       // Carregar conteúdo do lex_file
       setContent(edition.lexFile);
       setTitle(`${edition.templateCode} - ${edition.origem} - ${edition.objeto}`);
