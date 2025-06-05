@@ -187,7 +187,7 @@ export default function LexicalPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">Editor Lexical</h1>
+              <h1 className="text-3xl font-bold tracking-tight">Composer Editor</h1>
               <p className="text-muted-foreground">Editor avançado com formatação rica</p>
             </div>
           </div>

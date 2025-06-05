@@ -98,7 +98,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
               onClick={() => handleNavigation("/lexical")}
             >
               <PenTool className="mr-3 h-6 w-6" />
-              Lexical
+              Composer
             </div>
           </div>
           
