@@ -199,11 +199,12 @@ export default function LexicalPage() {
             />
             <Button
               onClick={() => setShowDocumentList(!showDocumentList)}
-              variant="outline"
+              variant={showDocumentList ? "default" : "outline"}
               size="sm"
+              className={showDocumentList ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
             >
-              <FolderOpen className="w-4 h-4 mr-2" />
-              Documentos
+              <FolderOpen className={`w-4 h-4 mr-2 ${showDocumentList ? "text-white" : ""}`} />
+              Biblioteca
             </Button>
             <Button
               onClick={handleSave}
