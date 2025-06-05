@@ -45,8 +45,8 @@ export default function LexicalPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const { toast } = useToast();
 
-  // Função para formatar template e criar elementos no editor
-  const templateFormatter = (template: Template) => {
+  // Função para extrair seções do template
+  const extractTemplateSections = (template: Template): string[] => {
     try {
       let structure = template.structure;
       
@@ -56,21 +56,13 @@ export default function LexicalPage() {
       }
       
       if (structure && structure.sections) {
-        // Criar conteúdo formatado com marcações especiais
-        const sectionNames = Object.keys(structure.sections);
-        let formattedContent = '';
-        
-        sectionNames.forEach((sectionName: string) => {
-          formattedContent += `## ${sectionName}\n\n\n\n`;
-        });
-        
-        return formattedContent;
+        return Object.keys(structure.sections);
       }
     } catch (error) {
       console.error('Erro ao processar estrutura do template:', error);
     }
     
-    return template.code; // Fallback para o código original
+    return [];
   };
 
   // Query para buscar documentos do usuário
@@ -80,7 +72,7 @@ export default function LexicalPage() {
   });
 
   // Query para buscar templates do tipo 'struct'
-  const { data: structTemplates, isLoading: isLoadingTemplates } = useQuery({
+  const { data: structTemplates = [], isLoading: isLoadingTemplates } = useQuery({
     queryKey: ['/api/templates/struct'],
     enabled: showDocumentList
   });
@@ -281,7 +273,7 @@ export default function LexicalPage() {
                         <div className="text-center py-2 text-sm">Carregando templates...</div>
                       ) : (
                         <>
-                          {!structTemplates || structTemplates.length === 0 ? (
+                          {!structTemplates || (Array.isArray(structTemplates) && structTemplates.length === 0) ? (
                             <div className="text-center py-4 text-gray-500">
                               <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
                               <p className="text-xs">Nenhum template encontrado</p>
@@ -293,7 +285,7 @@ export default function LexicalPage() {
                                 className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 border-green-200 hover:border-green-300"
                                 onClick={() => {
                                   setTitle(template.name);
-                                  setContent(templateFormatter(template));
+                                  setContent(''); // Limpar conteúdo para o plugin processar
                                   setCurrentDocumentId(null);
                                   setSelectedTemplate(template);
                                 }}
@@ -393,6 +385,7 @@ export default function LexicalPage() {
                   content={content}
                   onChange={setContent}
                   className="h-full"
+                  templateSections={selectedTemplate ? extractTemplateSections(selectedTemplate) : undefined}
                 />
               </CardContent>
             </Card>
