@@ -367,6 +367,7 @@ function Placeholder(): JSX.Element {
 interface LexicalEditorProps {
   content?: string;
   onChange?: (content: string) => void;
+  onEditorStateChange?: (serializedState: string) => void;
   className?: string;
   templateSections?: string[];
   viewMode?: 'editor' | 'preview';
@@ -563,7 +564,7 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
 }
 
 // Componente principal do editor Lexical completo
-export default function LexicalEditor({ content = '', onChange, className = '', templateSections, viewMode = 'editor' }: LexicalEditorProps): JSX.Element {
+export default function LexicalEditor({ content = '', onChange, onEditorStateChange, className = '', templateSections, viewMode = 'editor' }: LexicalEditorProps): JSX.Element {
   const [markdownContent, setMarkdownContent] = useState('');
   const [editorInstance, setEditorInstance] = useState<any>(null);
   
@@ -609,6 +610,12 @@ export default function LexicalEditor({ content = '', onChange, className = '', 
       
       if (onChange) {
         onChange(textContent);
+      }
+      
+      // Salvar estado serializado do editor para onEditorStateChange
+      if (onEditorStateChange) {
+        const serializedState = JSON.stringify(editorState.toJSON());
+        onEditorStateChange(serializedState);
       }
     });
   };

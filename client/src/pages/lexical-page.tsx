@@ -45,6 +45,7 @@ export default function LexicalPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [viewMode, setViewMode] = useState<'editor' | 'preview'>('editor');
   const [selectedEdition, setSelectedEdition] = useState<any>(null);
+  const [editorState, setEditorState] = useState<string>('');
   const { toast } = useToast();
 
   // Função para extrair seções do template
@@ -91,7 +92,7 @@ export default function LexicalPage() {
       // Se há um document edition selecionado, salvar no lex_file
       if (selectedEdition) {
         return apiRequest("PUT", `/api/document-editions/${selectedEdition.id}/lex-file`, {
-          lexFile: data.content
+          lexFile: editorState || data.content
         });
       }
       // Caso contrário, salvar como documento lexical normal
@@ -476,6 +477,7 @@ export default function LexicalPage() {
                 <LexicalEditor
                   content={content}
                   onChange={setContent}
+                  onEditorStateChange={setEditorState}
                   className="h-full"
                   templateSections={selectedTemplate ? extractTemplateSections(selectedTemplate) : undefined}
                   viewMode={viewMode}
