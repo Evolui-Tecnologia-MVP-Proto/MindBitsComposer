@@ -762,6 +762,179 @@ export default function BasicTextEditor() {
 
           {activePlugins.length > 0 && <Separator orientation="vertical" className="h-6" />}
 
+          {/* Barra de ferramentas de formatação */}
+          <div className="flex items-center gap-1">
+            {/* Títulos */}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('h1', 'Título 1')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Título 1"
+            >
+              <Heading1 className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('h2', 'Título 2')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Título 2"
+            >
+              <Heading2 className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('h3', 'Título 3')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Título 3"
+            >
+              <Heading3 className="w-4 h-4" />
+            </Button>
+
+            <Separator orientation="vertical" className="h-6 mx-1" />
+
+            {/* Formatação de texto */}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('bold')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Negrito"
+            >
+              <Bold className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('italic')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Itálico"
+            >
+              <Italic className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('underline')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Sublinhado"
+            >
+              <Underline className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('strikethrough')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Riscado"
+            >
+              <Strikethrough className="w-4 h-4" />
+            </Button>
+
+            <Separator orientation="vertical" className="h-6 mx-1" />
+
+            {/* Código e citações */}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('code')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Código inline"
+            >
+              <Code className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('codeblock')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Bloco de código"
+            >
+              <Code2 className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('quote')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Citação"
+            >
+              <Quote className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('comment')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Comentário"
+            >
+              <MessageSquare className="w-4 h-4" />
+            </Button>
+
+            <Separator orientation="vertical" className="h-6 mx-1" />
+
+            {/* Listas */}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('ul')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Lista com marcadores"
+            >
+              <List className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('ol')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Lista numerada"
+            >
+              <ListOrdered className="w-4 h-4" />
+            </Button>
+
+            <Separator orientation="vertical" className="h-6 mx-1" />
+
+            {/* Tabela e link */}
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('table')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Inserir tabela"
+            >
+              <Table className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting('link')}
+              className="h-8 px-2 text-xs hover:bg-gray-100"
+              title="Inserir link"
+            >
+              <Link className="w-4 h-4" />
+            </Button>
+          </div>
+
+          <Separator orientation="vertical" className="h-6" />
+
           <Button
             variant="ghost"
             size="sm"
@@ -828,188 +1001,7 @@ export default function BasicTextEditor() {
         </div>
       </div>
 
-      {/* Barra de ferramentas de formatação */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="flex flex-wrap items-center gap-1 p-3">
-          {/* Títulos */}
-          <div className="flex items-center gap-1 mr-3">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => insertFormatting('h1', 'Título 1')}
-              className="h-8 px-2 text-xs hover:bg-gray-100"
-              title="Título 1"
-            >
-              <Heading1 className="w-4 h-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => insertFormatting('h2', 'Título 2')}
-              className="h-8 px-2 text-xs hover:bg-gray-100"
-              title="Título 2"
-            >
-              <Heading2 className="w-4 h-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => insertFormatting('h3', 'Título 3')}
-              className="h-8 px-2 text-xs hover:bg-gray-100"
-              title="Título 3"
-            >
-              <Heading3 className="w-4 h-4" />
-            </Button>
-          </div>
 
-          <Separator orientation="vertical" className="h-6 mx-1" />
-
-          {/* Formatação de texto */}
-          <div className="flex items-center gap-1 mr-3">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => insertFormatting('bold')}
-              className="h-8 px-2 text-xs hover:bg-gray-100"
-              title="Negrito"
-            >
-              <Bold className="w-4 h-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => insertFormatting('italic')}
-              className="h-8 px-2 text-xs hover:bg-gray-100"
-              title="Itálico"
-            >
-              <Italic className="w-4 h-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => insertFormatting('underline')}
-              className="h-8 px-2 text-xs hover:bg-gray-100"
-              title="Sublinhado"
-            >
-              <Underline className="w-4 h-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => insertFormatting('strikethrough')}
-              className="h-8 px-2 text-xs hover:bg-gray-100"
-              title="Riscado"
-            >
-              <Strikethrough className="w-4 h-4" />
-            </Button>
-          </div>
-
-          <Separator orientation="vertical" className="h-6 mx-1" />
-
-          {/* Código e citações */}
-          <div className="flex items-center gap-1 mr-3">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => insertFormatting('code')}
-              className="h-8 px-2 text-xs hover:bg-gray-100"
-              title="Código inline"
-            >
-              <Code className="w-4 h-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => insertFormatting('codeblock')}
-              className="h-8 px-2 text-xs hover:bg-gray-100"
-              title="Bloco de código"
-            >
-              <Code2 className="w-4 h-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => insertFormatting('quote')}
-              className="h-8 px-2 text-xs hover:bg-gray-100"
-              title="Citação"
-            >
-              <Quote className="w-4 h-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => insertFormatting('comment')}
-              className="h-8 px-2 text-xs hover:bg-gray-100"
-              title="Comentário"
-            >
-              <MessageSquare className="w-4 h-4" />
-            </Button>
-          </div>
-
-          <Separator orientation="vertical" className="h-6 mx-1" />
-
-          {/* Listas */}
-          <div className="flex items-center gap-1 mr-3">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => insertFormatting('ul')}
-              className="h-8 px-2 text-xs hover:bg-gray-100"
-              title="Lista com marcadores"
-            >
-              <List className="w-4 h-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => insertFormatting('ol')}
-              className="h-8 px-2 text-xs hover:bg-gray-100"
-              title="Lista numerada"
-            >
-              <ListOrdered className="w-4 h-4" />
-            </Button>
-          </div>
-
-          <Separator orientation="vertical" className="h-6 mx-1" />
-
-          {/* Tabela e link */}
-          <div className="flex items-center gap-1">
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => insertFormatting('table')}
-              className="h-8 px-2 text-xs hover:bg-gray-100"
-              title="Inserir tabela"
-            >
-              <Table className="w-4 h-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => insertFormatting('link')}
-              className="h-8 px-2 text-xs hover:bg-gray-100"
-              title="Inserir link"
-            >
-              <Link className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
 
       {/* Editor Area */}
       <div className="flex-1 p-4 max-h-full overflow-y-auto">
