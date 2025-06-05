@@ -11,6 +11,7 @@ import PreferencesPage from "@/pages/preferences-page";
 import ConfiguracoesPage from "@/pages/configuracoes-page";
 import TemplatesPage from "@/pages/templates-page";
 import EditorPage from "@/pages/editor-page";
+import LexicalPage from "@/pages/lexical-page";
 import FluxosPage from "@/pages/fluxos-page";
 import DocumentosPage from "@/pages/documentos-page";
 import PluginsPage from "@/pages/plugins-page";
@@ -27,6 +28,7 @@ function Router() {
       <ProtectedRoute path="/preferences" component={PreferencesPage} />
       <ProtectedRoute path="/templates" component={TemplatesPage} />
       <ProtectedRoute path="/editor" component={EditorPage} />
+      <ProtectedRoute path="/lexical" component={LexicalPage} />
       <ProtectedRoute path="/fluxos" component={FluxosPage} />
       <ProtectedRoute path="/documentos" component={DocumentosPage} />
       <ProtectedRoute path="/plugins" component={PluginsPage} />

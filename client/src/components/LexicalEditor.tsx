@@ -1,15 +1,20 @@
-import React from 'react';
-import { $getRoot } from 'lexical';
+import React, { useCallback, useEffect, useState } from 'react';
+import { $getRoot, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND } from 'lexical';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
-import { HeadingNode, QuoteNode } from '@lexical/rich-text';
-import { ListItemNode, ListNode } from '@lexical/list';
-import { CodeNode } from '@lexical/code';
+import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { HeadingNode, QuoteNode, $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
+import { ListItemNode, ListNode, INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND } from '@lexical/list';
+import { ListPlugin } from '@lexical/react/LexicalListPlugin';
+import { CodeNode, $createCodeNode } from '@lexical/code';
 import { LinkNode } from '@lexical/link';
+import { MarkNode } from '@lexical/mark';
+import { $insertNodes, $getNodeByKey } from 'lexical';
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";

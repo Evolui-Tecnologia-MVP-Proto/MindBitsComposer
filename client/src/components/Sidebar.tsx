@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Settings, FileText, Edit, GitBranch, File, Cog, Puzzle, Home } from "lucide-react";
+import { Settings, FileText, Edit, GitBranch, File, Cog, Puzzle, Home, PenTool } from "lucide-react";
 import { useNavigationGuard } from "@/hooks/use-navigation-guard";
 
 type SidebarProps = {
@@ -22,6 +22,8 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
       setActiveItem("templates");
     } else if (location.startsWith("/editor")) {
       setActiveItem("editor");
+    } else if (location.startsWith("/lexical")) {
+      setActiveItem("lexical");
     } else if (location.startsWith("/fluxos")) {
       setActiveItem("fluxos");
     } else if (location.startsWith("/documentos")) {
@@ -87,6 +89,16 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
             >
               <Edit className="mr-3 h-6 w-6" />
               Editor
+            </div>
+          </div>
+          
+          <div className="sidebar-item-container">
+            <div 
+              className={`sidebar-item ${activeItem === "lexical" ? "sidebar-active" : ""}`}
+              onClick={() => handleNavigation("/lexical")}
+            >
+              <PenTool className="mr-3 h-6 w-6" />
+              Lexical
             </div>
           </div>
           
