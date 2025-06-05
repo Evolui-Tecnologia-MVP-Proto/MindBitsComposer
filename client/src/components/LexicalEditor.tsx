@@ -23,6 +23,10 @@ import { CollapsibleTitleNode } from './lexical/CollapsibleTitleNode';
 import { CollapsibleContentNode } from './lexical/CollapsibleContentNode';
 import CollapsiblePlugin, { INSERT_COLLAPSIBLE_COMMAND } from './lexical/CollapsiblePlugin';
 
+// Import dos nós e plugin de imagem
+import { ImageNode } from './lexical/ImageNode';
+import ImagePlugin, { useImageUpload } from './lexical/ImagePlugin';
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -39,7 +43,8 @@ import {
   List,
   ListOrdered,
   Table,
-  ChevronDown
+  ChevronDown,
+  Image
 } from "lucide-react";
 
 // Tema simplificado para o Lexical
@@ -86,6 +91,7 @@ function ToolbarPlugin(): JSX.Element {
   const [isUnderline, setIsUnderline] = useState(false);
   const [isStrikethrough, setIsStrikethrough] = useState(false);
   const [isCode, setIsCode] = useState(false);
+  const { fileInputRef, openFileDialog, handleFileChange } = useImageUpload();
 
   const updateToolbar = useCallback(() => {
     const selection = $getSelection();
@@ -295,6 +301,22 @@ function ToolbarPlugin(): JSX.Element {
         >
           <ChevronDown className="w-4 h-4" />
         </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 px-2 text-xs hover:bg-gray-100"
+          title="Inserir Imagem"
+          onClick={openFileDialog}
+        >
+          <Image className="w-4 h-4" />
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+        />
       </div>
     </div>
   );
@@ -335,6 +357,7 @@ export default function LexicalEditor({ content = '', onChange, className = '' }
       CollapsibleContainerNode,
       CollapsibleTitleNode,
       CollapsibleContentNode,
+      ImageNode,
     ],
   };
 
