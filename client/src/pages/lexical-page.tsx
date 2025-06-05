@@ -47,6 +47,7 @@ export default function LexicalPage() {
   const [selectedEdition, setSelectedEdition] = useState<any>(null);
   const [editorState, setEditorState] = useState<string>('');
   const [initialEditorState, setInitialEditorState] = useState<string | undefined>(undefined);
+  const [editorKey, setEditorKey] = useState<number>(0); // Chave para forçar re-render do editor
   const { toast } = useToast();
 
   // Função para extrair seções do template
@@ -197,6 +198,9 @@ export default function LexicalPage() {
       console.log('Carregando template, lex_file está vazio');
       console.log('Template structure:', edition.templateStructure);
       
+      // Limpar estado inicial do editor para usar template
+      setInitialEditorState(undefined);
+      
       // Usar a função existente para carregar template
       if (edition.templateStructure) {
         const templateSections = extractTemplateSections(template);
@@ -213,6 +217,9 @@ export default function LexicalPage() {
       setContent(''); // Limpar conteúdo pois usaremos o estado serializado
       setTitle(`${edition.templateCode} - ${edition.origem} - ${edition.objeto}`);
     }
+    
+    // Forçar re-render do editor para aplicar novo estado
+    setEditorKey(prev => prev + 1);
     setShowDocumentList(false);
   };
 
@@ -484,6 +491,7 @@ export default function LexicalPage() {
                   </div>
                 )}
                 <LexicalEditor
+                  key={editorKey}
                   content={content}
                   onChange={setContent}
                   onEditorStateChange={setEditorState}
