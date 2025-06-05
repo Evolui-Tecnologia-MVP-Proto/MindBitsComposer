@@ -168,12 +168,10 @@ function ToolbarPlugin({
   };
 
   const insertTable = () => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if ($isRangeSelection(selection)) {
-        const tableNode = $createTableNodeWithDimensions(2, 3, false);
-        $insertNodes([tableNode]);
-      }
+    editor.dispatchCommand(INSERT_TABLE_COMMAND, {
+      columns: '3',
+      rows: '2',
+      includeHeaders: false,
     });
   };
 
