@@ -27,6 +27,9 @@ import CollapsiblePlugin, { INSERT_COLLAPSIBLE_COMMAND } from './lexical/Collaps
 import { ImageNode } from './lexical/ImageNode';
 import ImagePlugin, { useImageUpload } from './lexical/ImagePlugin';
 
+// Import do plugin customizado de tabela
+import CustomTablePlugin, { INSERT_CUSTOM_TABLE_COMMAND } from './lexical/TablePlugin';
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -168,38 +171,9 @@ function ToolbarPlugin({
   };
 
   const insertTable = () => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if ($isRangeSelection(selection)) {
-        // Criar tabela manualmente com 2 linhas e 3 colunas
-        const tableNode = $createTableNode();
-        
-        // Primeira linha
-        const row1 = $createTableRowNode();
-        for (let col = 0; col < 3; col++) {
-          const cell = $createTableCellNode('normal');
-          const paragraph = $createParagraphNode();
-          const text = $createTextNode('');
-          paragraph.append(text);
-          cell.append(paragraph);
-          row1.append(cell);
-        }
-        tableNode.append(row1);
-        
-        // Segunda linha
-        const row2 = $createTableRowNode();
-        for (let col = 0; col < 3; col++) {
-          const cell = $createTableCellNode('normal');
-          const paragraph = $createParagraphNode();
-          const text = $createTextNode('');
-          paragraph.append(text);
-          cell.append(paragraph);
-          row2.append(cell);
-        }
-        tableNode.append(row2);
-        
-        $insertNodes([tableNode]);
-      }
+    editor.dispatchCommand(INSERT_CUSTOM_TABLE_COMMAND as any, {
+      rows: 2,
+      columns: 3,
     });
   };
 
@@ -547,6 +521,7 @@ export default function LexicalEditor({ content = '', onChange, className = '' }
           <HistoryPlugin />
           <ListPlugin />
           <TablePlugin />
+          <CustomTablePlugin />
           <CollapsiblePlugin />
           <ImagePlugin />
           <AutoFocusPlugin />
