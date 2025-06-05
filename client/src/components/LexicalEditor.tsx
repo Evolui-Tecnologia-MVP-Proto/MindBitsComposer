@@ -373,6 +373,7 @@ export default function LexicalEditor({ content = '', onChange, className = '' }
           <HistoryPlugin />
           <ListPlugin />
           <TablePlugin />
+          <CollapsiblePlugin />
           <AutoFocusPlugin />
         </div>
       </LexicalComposer>
