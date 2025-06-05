@@ -484,8 +484,8 @@ export default function LexicalPage() {
           <div className="flex-1 pl-0 pr-4 pt-4 pb-0">
             <Card className="h-full">
               <CardContent className="p-0 h-full relative overflow-hidden">
-                {/* Placeholder quando não há conteúdo */}
-                {(!content || content.trim() === '') && (
+                {/* Placeholder quando não há conteúdo nem template selecionado */}
+                {(!content || content.trim() === '') && !selectedTemplate && !selectedEdition && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 pointer-events-none">
                     <PenTool className="w-[100px] h-[100px] mb-4 opacity-20" />
                     <p className="text-lg font-medium text-center">Selecione um documento ou template para iniciar...</p>
