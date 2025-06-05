@@ -172,6 +172,9 @@ function ToolbarPlugin({
 
   const insertTable = () => {
     editor.update(() => {
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection)) return;
+
       const tableNode = $createTableNode();
 
       // Criar 2 linhas com 3 colunas cada
@@ -190,7 +193,22 @@ function ToolbarPlugin({
         tableNode.append(rowNode);
       }
 
-      $getRoot().append(tableNode);
+      // Inserir na posição do cursor
+      const focusNode = selection.focus.getNode();
+      const anchorNode = selection.anchor.getNode();
+
+      // Se estiver dentro de um parágrafo, inserir após ele
+      if ($isParagraphNode(focusNode)) {
+        focusNode.insertAfter(tableNode);
+      } else {
+        // Caso contrário, inserir no nó pai
+        const parent = focusNode.getParent();
+        if (parent) {
+          parent.insertAfter(tableNode);
+        } else {
+          $getRoot().append(tableNode);
+        }
+      }
     });
   };
 
