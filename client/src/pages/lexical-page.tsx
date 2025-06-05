@@ -66,6 +66,39 @@ export default function LexicalPage() {
   const [editorKey, setEditorKey] = useState<number>(0); // Chave para forçar re-render do editor
   const { toast } = useToast();
 
+  // Função para obter ícone baseado no tipo de arquivo
+  const getFileIcon = (mimeType: string, isImage: string | undefined) => {
+    if (isImage === "true" || mimeType.startsWith("image/")) {
+      return <Image className="w-4 h-4" />;
+    }
+    if (mimeType.startsWith("video/")) {
+      return <Video className="w-4 h-4" />;
+    }
+    if (mimeType.startsWith("audio/")) {
+      return <FileAudio className="w-4 h-4" />;
+    }
+    return <File className="w-4 h-4" />;
+  };
+
+  // Função para renderizar miniatura de imagem
+  const renderThumbnail = (artifact: DocumentArtifact) => {
+    if (artifact.isImage === "true" && artifact.fileData) {
+      const imageSrc = `data:${artifact.mimeType};base64,${artifact.fileData}`;
+      return (
+        <img 
+          src={imageSrc} 
+          alt={artifact.name}
+          className="w-12 h-12 object-cover rounded border"
+        />
+      );
+    }
+    return (
+      <div className="w-12 h-12 bg-gray-100 rounded border flex items-center justify-center">
+        {getFileIcon(artifact.mimeType, artifact.isImage)}
+      </div>
+    );
+  };
+
   // Função para extrair seções do template
   const extractTemplateSections = (template: Template): string[] => {
     try {
@@ -528,74 +561,119 @@ export default function LexicalPage() {
           </div>
         </div>
 
-        {/* Sidebar de controles (condicional) */}
+        {/* Painel de Anexos */}
         {showAttachments && (
-          <div className="w-80 border-l bg-gray-50 p-4 space-y-4">
-            {/* Controles de documento */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Controles</CardTitle>
-                <CardDescription className="text-xs">
-                  Gerencie seu documento
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button 
-                  onClick={handleExport}
-                  className="w-full"
-                  variant="outline"
-                  size="sm"
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Exportar
-                </Button>
-                
-                <Button 
-                  onClick={handleImport}
-                  className="w-full"
-                  variant="outline"
-                  size="sm"
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  Importar
-                </Button>
-                
-                <Button 
-                  onClick={handleClear}
-                  className="w-full"
-                  variant="destructive"
-                  size="sm"
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Limpar
-                </Button>
-              </CardContent>
-            </Card>
+          <div className="w-80 border-l bg-gray-50 p-4">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <Paperclip className="w-5 h-5" />
+                <h3 className="font-semibold">Anexos</h3>
+              </div>
 
-            {/* Estatísticas do Documento */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Estatísticas</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Caracteres:</span>
-                  <span className="font-medium">{content.length}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Palavras:</span>
-                  <span className="font-medium">
-                    {content.trim() ? content.trim().split(/\s+/).length : 0}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Linhas:</span>
-                  <span className="font-medium">
-                    {content.split('\n').length}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+              <Accordion type="multiple" className="w-full space-y-2">
+                {/* My Assets */}
+                <AccordionItem value="my-assets" className="border rounded-lg bg-white">
+                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                    <div className="flex items-center gap-2">
+                      <Upload className="w-4 h-4" />
+                      <span className="font-medium">My Assets</span>
+                      <Badge variant="secondary" className="ml-auto">
+                        0
+                      </Badge>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4">
+                    <div className="space-y-2">
+                      <p className="text-sm text-gray-500 mb-3">
+                        Seus arquivos pessoais e uploads
+                      </p>
+                      <Button 
+                        className="w-full"
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Adicionar Arquivo
+                      </Button>
+                      <div className="text-center py-4">
+                        <p className="text-sm text-gray-400">
+                          Nenhum arquivo carregado
+                        </p>
+                      </div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Origin Assets */}
+                <AccordionItem value="origin-assets" className="border rounded-lg bg-white">
+                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                    <div className="flex items-center gap-2">
+                      <Download className="w-4 h-4" />
+                      <span className="font-medium">Origin Assets</span>
+                      <Badge variant="secondary" className="ml-auto">
+                        {documentArtifacts.length}
+                      </Badge>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4">
+                    <div className="space-y-2">
+                      <p className="text-sm text-gray-500 mb-3">
+                        Arquivos vinculados ao documento
+                      </p>
+                      
+                      {isLoadingArtifacts ? (
+                        <div className="text-center py-4">
+                          <p className="text-sm text-gray-400">Carregando...</p>
+                        </div>
+                      ) : documentArtifacts.length === 0 ? (
+                        <div className="text-center py-4">
+                          <p className="text-sm text-gray-400">
+                            Nenhum arquivo vinculado
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {documentArtifacts.map((artifact: DocumentArtifact) => (
+                            <div 
+                              key={artifact.id}
+                              className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border"
+                            >
+                              {/* Miniatura ou ícone */}
+                              {renderThumbnail(artifact)}
+                              
+                              {/* Informações do arquivo */}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium truncate">
+                                  {artifact.name}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate">
+                                  {artifact.fileName}
+                                </p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge variant="outline" className="text-xs">
+                                    {artifact.type}
+                                  </Badge>
+                                  {artifact.fileSize && (
+                                    <span className="text-xs text-gray-400">
+                                      {Math.round(parseInt(artifact.fileSize) / 1024)} KB
+                                    </span>
+                                  )}
+                                </div>
+                                {artifact.mondayColumn && (
+                                  <p className="text-xs text-blue-600 mt-1">
+                                    Monday: {artifact.mondayColumn}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
           </div>
         )}
         </div>
