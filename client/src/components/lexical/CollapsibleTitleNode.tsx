@@ -39,6 +39,23 @@ export class CollapsibleTitleNode extends TextNode {
     super(text, key);
   }
 
+  // Tornar o nó somente leitura
+  isToken(): boolean {
+    return true;
+  }
+
+  canInsertTextBefore(): boolean {
+    return false;
+  }
+
+  canInsertTextAfter(): boolean {
+    return false;
+  }
+
+  isTextEntity(): boolean {
+    return true;
+  }
+
   createDOM(config: EditorConfig): HTMLElement {
     const dom = document.createElement('summary');
     dom.classList.add(
