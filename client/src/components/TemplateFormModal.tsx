@@ -144,6 +144,28 @@ export default function TemplateFormModal({
     }));
   };
 
+  // Função para obter o nome real da seção a partir da estrutura
+  const getSectionRealName = (sectionKey: string) => {
+    try {
+      if (!formData.structure) return sectionKey;
+      
+      const parsed = typeof formData.structure === 'string' 
+        ? JSON.parse(formData.structure) 
+        : formData.structure;
+      
+      if (parsed.sections && typeof parsed.sections === 'object' && !Array.isArray(parsed.sections)) {
+        const section = parsed.sections[sectionKey];
+        if (section && section.title) {
+          return `${sectionKey}. ${section.title}`;
+        }
+      }
+      
+      return sectionKey;
+    } catch (error) {
+      return sectionKey;
+    }
+  };
+
   // Função para agrupar campos de mapeamento
   const groupFieldMappings = () => {
     const groups: Record<string, { 
@@ -151,10 +173,10 @@ export default function TemplateFormModal({
       fields: Array<{ field: string; value: string }>;
     } | {
       type: 'nested';
-      subgroups: Record<string, Array<{ field: string; value: string }>>;
+      subgroups: Record<string, { fields: Array<{ field: string; value: string }>; displayName: string }>;
     }> = {};
     
-    const sectionsGroups: Record<string, Array<{ field: string; value: string }>> = {};
+    const sectionsGroups: Record<string, { fields: Array<{ field: string; value: string }>; displayName: string }> = {};
     
     Object.entries(fieldMappings).forEach(([field, value]) => {
       if (field.startsWith('[SEÇÃO]')) {
@@ -172,11 +194,14 @@ export default function TemplateFormModal({
       } else if (field.startsWith('sections.')) {
         const parts = field.split('.');
         if (parts.length >= 2) {
-          const sectionName = parts[1];
-          if (!sectionsGroups[sectionName]) {
-            sectionsGroups[sectionName] = [];
+          const sectionKey = parts[1];
+          if (!sectionsGroups[sectionKey]) {
+            sectionsGroups[sectionKey] = {
+              fields: [],
+              displayName: getSectionRealName(sectionKey)
+            };
           }
-          sectionsGroups[sectionName].push({ field, value });
+          sectionsGroups[sectionKey].fields.push({ field, value });
         }
       } else if (field === 'sections') {
         if (!groups['Outros']) {
@@ -440,7 +465,7 @@ export default function TemplateFormModal({
                       {Object.entries(groupFieldMappings()).map(([groupKey, groupData]) => {
                         const isNested = groupData.type === 'nested';
                         const fields = groupData.type === 'simple' ? groupData.fields : [];
-                        const subGroups = groupData.type === 'nested' ? groupData.subgroups : {} as Record<string, Array<{ field: string; value: string }>>;
+                        const subGroups = groupData.type === 'nested' ? groupData.subgroups : {} as Record<string, { fields: Array<{ field: string; value: string }>; displayName: string }>;
                         
                         return (
                           <Collapsible
@@ -469,22 +494,22 @@ export default function TemplateFormModal({
                                 {isNested ? (
                                   // Renderizar seções aninhadas
                                   <div className="space-y-3">
-                                    {Object.entries(subGroups).map(([sectionName, sectionFields]) => (
+                                    {Object.entries(subGroups).map(([sectionKey, sectionData]) => (
                                       <Collapsible
-                                        key={`${groupKey}-${sectionName}`}
-                                        open={openAccordions[`${groupKey}-${sectionName}`] ?? false}
-                                        onOpenChange={() => toggleAccordion(`${groupKey}-${sectionName}`)}
+                                        key={`${groupKey}-${sectionKey}`}
+                                        open={openAccordions[`${groupKey}-${sectionKey}`] ?? false}
+                                        onOpenChange={() => toggleAccordion(`${groupKey}-${sectionKey}`)}
                                       >
                                         <CollapsibleTrigger className="flex items-center justify-between w-full p-2 text-left bg-blue-50 hover:bg-blue-100 rounded border transition-colors">
                                           <div className="flex items-center gap-2">
-                                            {openAccordions[`${groupKey}-${sectionName}`] ?? false ? (
+                                            {openAccordions[`${groupKey}-${sectionKey}`] ?? false ? (
                                               <ChevronDown className="h-3 w-3 text-blue-500" />
                                             ) : (
                                               <ChevronRight className="h-3 w-3 text-blue-500" />
                                             )}
-                                            <span className="font-medium text-blue-700 text-sm">{sectionName}</span>
+                                            <span className="font-medium text-blue-700 text-sm">{sectionData.displayName}</span>
                                             <span className="text-xs text-blue-500 bg-blue-200 px-2 py-1 rounded-full">
-                                              {sectionFields.length} campos
+                                              {sectionData.fields.length} campos
                                             </span>
                                           </div>
                                         </CollapsibleTrigger>
@@ -497,7 +522,7 @@ export default function TemplateFormModal({
                                               </TableRow>
                                             </TableHeader>
                                             <TableBody>
-                                              {sectionFields.map(({ field, value }) => (
+                                              {sectionData.fields.map(({ field, value }) => (
                                                 <TableRow key={field}>
                                                   <TableCell className="py-2">
                                                     <span className="font-mono text-xs text-gray-700">
