@@ -627,7 +627,8 @@ export default function LexicalEditor({ content = '', onChange, className = '', 
                     style={{ 
                       fontFamily: 'system-ui, -apple-system, sans-serif',
                       lineHeight: '1.6',
-                      minHeight: '100%'
+                      minHeight: '400px',
+                      height: 'auto'
                     }}
                   />
                 }
