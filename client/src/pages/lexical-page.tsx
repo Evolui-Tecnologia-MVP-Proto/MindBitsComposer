@@ -180,14 +180,14 @@ export default function LexicalPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex flex-col h-full overflow-hidden">
       {/* Header com navegação */}
-      <div className="border-b bg-white px-6 py-4">
-        <div className="flex items-center justify-between max-w-screen-2xl mx-auto">
+      <div className="flex-shrink-0 p-6 pb-4">
+        <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Editor Lexical</h1>
-              <p className="text-sm text-gray-600">Editor avançado com formatação rica</p>
+              <h1 className="text-3xl font-bold tracking-tight">Editor Lexical</h1>
+              <p className="text-muted-foreground">Editor avançado com formatação rica</p>
             </div>
           </div>
           
@@ -221,8 +221,10 @@ export default function LexicalPage() {
           </div>
         </div>
       </div>
-      <div className="flex h-[calc(100vh-73px)]">
-        {/* Sidebar de documentos (condicional) */}
+      {/* Área do editor - ocupa todo o espaço restante */}
+      <div className="flex-1 px-6 pb-6 min-h-0">
+        <div className="flex h-full">
+          {/* Sidebar de documentos (condicional) */}
         {showDocumentList && (
           <div className="w-80 border-r bg-white p-4 overflow-y-auto">
             <div className="space-y-6">
@@ -323,7 +325,7 @@ export default function LexicalPage() {
         {/* Editor principal */}
         <div className="flex-1 flex flex-col mb-2.5">
           {/* Barra de ferramentas do editor integrada */}
-          <div className="flex-1 p-6 mt-[20px] mb-[20px]">
+          <div className="flex-1 p-6">
             <Card className="h-full">
               <CardContent className="p-0 h-full">
                 <LexicalEditor
@@ -406,6 +408,7 @@ export default function LexicalPage() {
             </Card>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
