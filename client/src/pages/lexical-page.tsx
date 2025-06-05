@@ -1,42 +1,117 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Layout from "@/components/Layout";
 import LexicalEditor from "@/components/LexicalEditor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Save, Download, Upload, FileText, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+
+interface LexicalDocument {
+  id: string;
+  title: string;
+  content: string;
+  plainText: string;
+  userId: number;
+  isPublic: boolean;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function LexicalPage() {
   const [content, setContent] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(null);
+  const [title, setTitle] = useState("Novo Documento");
+  const [showDocumentList, setShowDocumentList] = useState(false);
   const { toast } = useToast();
 
-  const handleSave = async () => {
-    setIsLoading(true);
-    try {
-      // Simular salvamento
-      await new Promise(resolve => setTimeout(resolve, 1000));
+  // Query para buscar documentos do usuário
+  const { data: documents, isLoading: isLoadingDocuments } = useQuery({
+    queryKey: ['/api/lexical-documents'],
+    enabled: showDocumentList
+  });
+
+  // Mutation para salvar documento
+  const saveMutation = useMutation({
+    mutationFn: async (data: { title: string; content: string; plainText: string }) => {
+      if (currentDocumentId) {
+        return apiRequest(`/api/lexical-documents/${currentDocumentId}`, "PUT", data);
+      } else {
+        return apiRequest('/api/lexical-documents', "POST", data);
+      }
+    },
+    onSuccess: (data) => {
+      setCurrentDocumentId(data.id);
+      queryClient.invalidateQueries({ queryKey: ['/api/lexical-documents'] });
       toast({
         title: "Documento salvo",
-        description: "Seu documento foi salvo com sucesso.",
+        description: `"${title}" foi salvo com sucesso.`,
       });
-    } catch (error) {
+    },
+    onError: (error: any) => {
       toast({
         title: "Erro ao salvar",
-        description: "Ocorreu um erro ao salvar o documento.",
+        description: error.message || "Ocorreu um erro ao salvar o documento.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
+  });
+
+  // Mutation para excluir documento
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => apiRequest(`/api/lexical-documents/${id}`, {
+      method: 'DELETE'
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/lexical-documents'] });
+      toast({
+        title: "Documento excluído",
+        description: "O documento foi excluído com sucesso.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao excluir",
+        description: error.message || "Ocorreu um erro ao excluir o documento.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleSave = () => {
+    const plainText = content.replace(/<[^>]*>/g, '').trim(); // Remove HTML tags para texto plano
+    saveMutation.mutate({
+      title,
+      content,
+      plainText
+    });
   };
 
-  const handleClear = () => {
+  const handleNewDocument = () => {
+    setCurrentDocumentId(null);
+    setTitle("Novo Documento");
     setContent("");
-    toast({
-      title: "Conteúdo limpo",
-      description: "O editor foi limpo com sucesso.",
-    });
+    setShowDocumentList(false);
+  };
+
+  const handleLoadDocument = (document: LexicalDocument) => {
+    setCurrentDocumentId(document.id);
+    setTitle(document.title);
+    setContent(document.content);
+    setShowDocumentList(false);
+  };
+
+  const handleDeleteDocument = (id: string) => {
+    if (confirm("Tem certeza que deseja excluir este documento?")) {
+      deleteMutation.mutate(id);
+      if (currentDocumentId === id) {
+        handleNewDocument();
+      }
+    }
   };
 
   const handleExport = () => {
@@ -44,7 +119,7 @@ export default function LexicalPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'documento-lexical.txt';
+    a.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -67,6 +142,7 @@ export default function LexicalPage() {
         reader.onload = (e) => {
           const text = e.target?.result as string;
           setContent(text);
+          setTitle(file.name.replace(/\.[^/.]+$/, "")); // Remove extensão do arquivo
           toast({
             title: "Documento importado",
             description: "O documento foi importado com sucesso.",
