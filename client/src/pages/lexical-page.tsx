@@ -280,7 +280,7 @@ export default function LexicalPage() {
                 {/* Grupo 2: Documentos Lexical */}
                 <AccordionItem value="documents">
                   <AccordionTrigger className="text-md font-medium text-gray-700 hover:no-underline">
-                    Documentos Lexical
+                    Documentos Composer
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="space-y-2 pt-2">
