@@ -15,7 +15,7 @@ import { CodeNode, $createCodeNode } from '@lexical/code';
 import { LinkNode } from '@lexical/link';
 import { TableNode, TableRowNode, TableCellNode, $createTableNodeWithDimensions, INSERT_TABLE_COMMAND, $createTableNode, $createTableRowNode, $createTableCellNode } from '@lexical/table';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
-import { $insertNodes, $getNodeByKey } from 'lexical';
+
 
 // Import dos nós e plugin de container colapsável
 import { CollapsibleContainerNode } from './lexical/CollapsibleNode';
@@ -171,10 +171,22 @@ function ToolbarPlugin({
   };
 
   const insertTable = () => {
-    editor.dispatchCommand(INSERT_TABLE_COMMAND, {
-      columns: String(3),
-      rows: String(2),
-      includeHeaders: false,
+    editor.update(() => {
+      const tableNode = $createTableNode();
+
+      // Criar 2 linhas com 3 colunas cada
+      for (let i = 0; i < 2; i++) {
+        const rowNode = $createTableRowNode();
+
+        for (let j = 0; j < 3; j++) {
+          const cellNode = $createTableCellNode(0);
+          rowNode.append(cellNode);
+        }
+
+        tableNode.append(rowNode);
+      }
+
+      $getRoot().append(tableNode);
     });
   };
 
