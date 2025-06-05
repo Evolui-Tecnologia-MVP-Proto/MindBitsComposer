@@ -568,10 +568,10 @@ export default function LexicalEditor({ content = '', onChange, className = '', 
               <RichTextPlugin
                 contentEditable={
                   <ContentEditable 
-                    className="w-full h-full p-4 outline-none resize-none text-gray-900 overflow-auto"
+                    className="w-full h-full p-4 outline-none resize-none text-gray-900 overflow-y-auto overflow-x-hidden"
                     style={{ 
                       fontFamily: 'system-ui, -apple-system, sans-serif',
-                      minHeight: '100%',
+                      maxHeight: '100%',
                       lineHeight: '1.6'
                     }}
                   />
