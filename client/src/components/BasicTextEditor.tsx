@@ -329,6 +329,7 @@ export default function BasicTextEditor() {
                   if (typeof fieldValue === 'object' && fieldValue !== null && 
                       fieldValue.columns && Array.isArray(fieldValue.columns) &&
                       fieldValue.lines && Array.isArray(fieldValue.lines)) {
+                    console.log('🔍 Tabela detectada:', fieldKey, fieldValue);
                     sectionTables.push({
                       key: fieldKey,
                       columns: fieldValue.columns,
@@ -344,13 +345,21 @@ export default function BasicTextEditor() {
                 });
               }
               
-              return {
+              const result = {
                 name: sectionName,
                 content: '',
                 isOpen: false, // Começar todas recolhidas
                 fields: sectionFields.length > 0 ? sectionFields : undefined,
                 tables: sectionTables.length > 0 ? sectionTables : undefined
               };
+              
+              console.log('🔍 Seção processada:', sectionName, {
+                fieldsCount: sectionFields.length,
+                tablesCount: sectionTables.length,
+                result
+              });
+              
+              return result;
             });
           }
           
