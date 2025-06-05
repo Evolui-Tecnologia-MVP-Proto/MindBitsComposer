@@ -45,6 +45,32 @@ export default function LexicalPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const { toast } = useToast();
 
+  // Função para formatar template e criar elementos no editor
+  const templateFormatter = (template: Template) => {
+    try {
+      const structure = typeof template.structure === 'string' 
+        ? JSON.parse(template.structure) 
+        : template.structure;
+      
+      if (structure && structure.sections) {
+        let formattedContent = '';
+        
+        // Para cada section, criar um container colapsível
+        structure.sections.forEach((section: any) => {
+          if (section.name) {
+            formattedContent += `[COLLAPSIBLE:${section.name}]\n\n[/COLLAPSIBLE]\n\n`;
+          }
+        });
+        
+        return formattedContent;
+      }
+    } catch (error) {
+      console.error('Erro ao processar estrutura do template:', error);
+    }
+    
+    return template.code; // Fallback para o código original
+  };
+
   // Query para buscar documentos do usuário
   const { data: documents, isLoading: isLoadingDocuments } = useQuery({
     queryKey: ['/api/lexical-documents'],
@@ -265,7 +291,7 @@ export default function LexicalPage() {
                                 className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 border-green-200 hover:border-green-300"
                                 onClick={() => {
                                   setTitle(template.name);
-                                  setContent(template.code);
+                                  setContent(templateFormatter(template));
                                   setCurrentDocumentId(null);
                                   setSelectedTemplate(template);
                                 }}
