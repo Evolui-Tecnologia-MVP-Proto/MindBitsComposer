@@ -44,7 +44,7 @@ export default function LexicalPage() {
         return apiRequest('/api/lexical-documents', "POST", data);
       }
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       setCurrentDocumentId(data.id);
       queryClient.invalidateQueries({ queryKey: ['/api/lexical-documents'] });
       toast({
@@ -63,9 +63,7 @@ export default function LexicalPage() {
 
   // Mutation para excluir documento
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiRequest(`/api/lexical-documents/${id}`, {
-      method: 'DELETE'
-    }),
+    mutationFn: (id: string) => apiRequest(`/api/lexical-documents/${id}`, "DELETE"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/lexical-documents'] });
       toast({
@@ -96,6 +94,14 @@ export default function LexicalPage() {
     setTitle("Novo Documento");
     setContent("");
     setShowDocumentList(false);
+  };
+
+  const handleClear = () => {
+    setContent("");
+    toast({
+      title: "Conteúdo limpo",
+      description: "O editor foi limpo com sucesso.",
+    });
   };
 
   const handleLoadDocument = (document: LexicalDocument) => {
@@ -180,12 +186,12 @@ export default function LexicalPage() {
               <CardContent className="space-y-3">
                 <Button 
                   onClick={handleSave} 
-                  disabled={isLoading}
+                  disabled={saveMutation.isPending}
                   className="w-full"
                   variant="default"
                 >
                   <Save className="w-4 h-4 mr-2" />
-                  {isLoading ? "Salvando..." : "Salvar"}
+                  {saveMutation.isPending ? "Salvando..." : "Salvar"}
                 </Button>
                 
                 <Button 
