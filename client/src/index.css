@@ -4,7 +4,8 @@
 
 /* Lexical Editor Styles */
 .editor-input {
-  min-height: 400px;
+  min-height: 100%;
+  height: 100%;
   resize: none;
   font-size: 15px;
   color: #000;
@@ -260,12 +261,24 @@
 
 .lexical-editor-container {
   font-family: system-ui, -apple-system, sans-serif;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .editor-container {
   background: #fff;
   position: relative;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+}
+
+.editor-inner {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
 }
 
 /* Custom table cell height */
