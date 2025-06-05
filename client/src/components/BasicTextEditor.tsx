@@ -727,23 +727,22 @@ export default function BasicTextEditor() {
   };
 
   return (
-    <div className="w-full h-full border rounded-lg overflow-hidden flex flex-col">
-      {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
-        <TabsList className="grid w-full grid-cols-2 bg-gray-50 h-auto p-0 rounded-none border-b">
-          <TabsTrigger 
-            value="richtext" 
-            className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none border-b-2 border-transparent"
-          >
-            Rich Text
-          </TabsTrigger>
-          <TabsTrigger 
-            value="lexical" 
-            className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none border-b-2 border-transparent"
-          >
-            Lexical
-          </TabsTrigger>
-        </TabsList>
+    <div className="w-full h-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col border rounded-lg overflow-hidden">
+      <TabsList className="grid w-full grid-cols-2 bg-gray-50 h-auto p-0 rounded-none border-b shrink-0">
+        <TabsTrigger 
+          value="richtext" 
+          className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none border-b-2 border-transparent"
+        >
+          Rich Text
+        </TabsTrigger>
+        <TabsTrigger 
+          value="lexical" 
+          className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none border-b-2 border-transparent"
+        >
+          Lexical
+        </TabsTrigger>
+      </TabsList>
         
         {/* Rich Text Tab Content */}
         <TabsContent value="richtext" className="m-0 p-0 flex-1 flex flex-col">
