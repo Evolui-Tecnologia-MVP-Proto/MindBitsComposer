@@ -459,29 +459,44 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
 
   React.useEffect(() => {
     if (sections && sections.length > 0) {
-      editor.update(() => {
-        const root = $getRoot();
-        root.clear();
-        
-        sections.forEach((sectionName, index) => {
-          // Criar container colapsível
-          const title = $createCollapsibleTitleNode(sectionName);
-          const content = $createCollapsibleContentNode();
-          const paragraph = $createParagraphNode();
-          content.append(paragraph);
+      // Usar setTimeout para evitar conflitos com outros plugins
+      setTimeout(() => {
+        editor.update(() => {
+          const root = $getRoot();
+          root.clear();
+          
+          sections.forEach((sectionName, index) => {
+            // Criar container colapsível
+            const title = $createCollapsibleTitleNode(sectionName);
+            const content = $createCollapsibleContentNode();
+            
+            // Adicionar parágrafo editável dentro do conteúdo
+            const paragraph = $createParagraphNode();
+            const textNode = $createTextNode('');
+            paragraph.append(textNode);
+            content.append(paragraph);
 
-          const container = $createCollapsibleContainerNode(true);
-          container.append(title, content);
+            const container = $createCollapsibleContainerNode(true);
+            container.append(title, content);
+            
+            root.append(container);
+            
+            // Adicionar parágrafo entre containers para navegação
+            if (index < sections.length - 1) {
+              const spacer = $createParagraphNode();
+              const spacerText = $createTextNode('');
+              spacer.append(spacerText);
+              root.append(spacer);
+            }
+          });
           
-          root.append(container);
-          
-          // Adicionar espaço entre containers
-          if (index < sections.length - 1) {
-            const spacer = $createParagraphNode();
-            root.append(spacer);
-          }
+          // Adicionar parágrafo final para permitir edição após os containers
+          const finalParagraph = $createParagraphNode();
+          const finalText = $createTextNode('');
+          finalParagraph.append(finalText);
+          root.append(finalParagraph);
         });
-      });
+      }, 100);
     }
   }, [editor, sections]);
 
