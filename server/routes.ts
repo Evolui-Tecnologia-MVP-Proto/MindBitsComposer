@@ -4458,6 +4458,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Document Editions in Progress route
+  app.get("/api/document-editions-in-progress", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const editionsInProgress = await db.select({
+        id: documentEditions.id,
+        documentId: documentEditions.documentId,
+        templateId: documentEditions.templateId,
+        status: documentEditions.status,
+        createdAt: documentEditions.createdAt,
+        updatedAt: documentEditions.updatedAt,
+        origem: documentos.origem,
+        objeto: documentos.objeto,
+        templateCode: templates.code
+      })
+      .from(documentEditions)
+      .innerJoin(documentos, eq(documentEditions.documentId, documentos.id))
+      .innerJoin(templates, eq(documentEditions.templateId, templates.id))
+      .where(eq(documentEditions.status, 'in_progress'))
+      .orderBy(desc(documentEditions.updatedAt));
+      
+      res.json(editionsInProgress);
+    } catch (error) {
+      console.error("Erro ao buscar document_editions em progresso:", error);
+      res.status(500).send("Erro ao buscar document_editions em progresso");
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 

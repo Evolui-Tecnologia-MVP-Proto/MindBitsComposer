@@ -78,6 +78,12 @@ export default function LexicalPage() {
     enabled: showDocumentList
   });
 
+  // Query para buscar document_editions em progresso
+  const { data: documentEditions = [], isLoading: isLoadingEditions } = useQuery({
+    queryKey: ['/api/document-editions-in-progress'],
+    enabled: showDocumentList
+  });
+
   // Mutation para salvar documento
   const saveMutation = useMutation({
     mutationFn: async (data: { title: string; content: string; plainText: string }) => {
@@ -322,52 +328,50 @@ export default function LexicalPage() {
                   </AccordionContent>
                 </AccordionItem>
 
-                {/* Grupo 2: Documentos Lexical */}
+                {/* Grupo 2: Documentos Composer */}
                 <AccordionItem value="documents">
                   <AccordionTrigger className="text-md font-medium text-gray-700 hover:no-underline">
                     Documentos Composer
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="space-y-2 pt-2">
-                      {isLoadingDocuments ? (
-                        <div className="text-center py-2 text-sm">Carregando documentos...</div>
+                      {isLoadingEditions ? (
+                        <div className="text-center py-2 text-sm">Carregando documentos em progresso...</div>
                       ) : (
                         <>
-                          {!documents || (Array.isArray(documents) && documents.length === 0) ? (
+                          {!documentEditions || (Array.isArray(documentEditions) && documentEditions.length === 0) ? (
                             <div className="text-center py-4 text-gray-500">
                               <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                              <p className="text-xs">Nenhum documento encontrado</p>
+                              <p className="text-xs">Nenhum documento em progresso encontrado</p>
                             </div>
                           ) : (
-                            Array.isArray(documents) && documents.map((doc: LexicalDocument) => (
+                            Array.isArray(documentEditions) && documentEditions.map((edition: any) => (
                               <div
-                                key={doc.id}
-                                className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 ${
-                                  currentDocumentId === doc.id ? 'border-blue-500 bg-blue-50' : ''
-                                }`}
-                                onClick={() => handleLoadDocument(doc)}
+                                key={edition.id}
+                                className="p-3 border rounded-lg hover:bg-gray-50"
                               >
                                 <div className="flex justify-between items-start">
                                   <div className="flex-1">
-                                    <h5 className="font-medium text-sm">{doc.title}</h5>
-                                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                                      {doc.plainText || "Documento vazio"}
-                                    </p>
-                                    <p className="text-xs text-gray-400 mt-2">
-                                      {new Date(doc.updatedAt).toLocaleDateString()}
-                                    </p>
+                                    <h5 className="font-medium text-sm text-blue-600">
+                                      {edition.templateCode}
+                                    </h5>
+                                    <div className="mt-1 space-y-1">
+                                      <p className="text-xs text-gray-600">
+                                        <span className="font-medium">Origem:</span> {edition.origem || 'N/A'}
+                                      </p>
+                                      <p className="text-xs text-gray-600">
+                                        <span className="font-medium">Objeto:</span> {edition.objeto || 'N/A'}
+                                      </p>
+                                      <div className="flex items-center gap-2 mt-2">
+                                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                          Em Progresso
+                                        </span>
+                                        <span className="text-xs text-gray-400">
+                                          {new Date(edition.updatedAt).toLocaleDateString()}
+                                        </span>
+                                      </div>
+                                    </div>
                                   </div>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-6 w-6 p-0 hover:bg-red-100"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleDeleteDocument(doc.id);
-                                    }}
-                                  >
-                                    <Trash2 className="w-3 h-3 text-red-600" />
-                                  </Button>
                                 </div>
                               </div>
                             ))
