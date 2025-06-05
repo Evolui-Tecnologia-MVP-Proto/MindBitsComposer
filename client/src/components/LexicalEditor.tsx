@@ -13,7 +13,7 @@ import { ListItemNode, ListNode, INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_L
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { CodeNode, $createCodeNode } from '@lexical/code';
 import { LinkNode } from '@lexical/link';
-import { TableNode, TableRowNode, TableCellNode, $createTableNodeWithDimensions, INSERT_TABLE_COMMAND, $createTableNode, $createTableRowNode, $createTableCellNode } from '@lexical/table';
+import { TableNode, TableRowNode, TableCellNode, $createTableNodeWithDimensions, INSERT_TABLE_COMMAND } from '@lexical/table';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { $insertNodes, $getNodeByKey } from 'lexical';
 
@@ -171,9 +171,12 @@ function ToolbarPlugin({
   };
 
   const insertTable = () => {
-    editor.dispatchCommand(INSERT_CUSTOM_TABLE_COMMAND as any, {
-      rows: 2,
-      columns: 3,
+    editor.update(() => {
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection)) return;
+
+      const tableNode = $createTableNodeWithDimensions(2, 3); // 2 rows, 3 columns
+      $insertNodes([tableNode]);
     });
   };
 
@@ -521,7 +524,6 @@ export default function LexicalEditor({ content = '', onChange, className = '' }
           <HistoryPlugin />
           <ListPlugin />
           <TablePlugin />
-          <CustomTablePlugin />
           <CollapsiblePlugin />
           <ImagePlugin />
           <AutoFocusPlugin />
