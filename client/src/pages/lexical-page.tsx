@@ -88,19 +88,36 @@ export default function LexicalPage() {
   // Mutation para salvar documento
   const saveMutation = useMutation({
     mutationFn: async (data: { title: string; content: string; plainText: string }) => {
-      if (currentDocumentId) {
+      // Se há um document edition selecionado, salvar no lex_file
+      if (selectedEdition) {
+        return apiRequest(`/api/document-editions/${selectedEdition.id}/lex-file`, "PUT", {
+          lexFile: data.content
+        });
+      }
+      // Caso contrário, salvar como documento lexical normal
+      else if (currentDocumentId) {
         return apiRequest(`/api/lexical-documents/${currentDocumentId}`, "PUT", data);
       } else {
         return apiRequest('/api/lexical-documents', "POST", data);
       }
     },
     onSuccess: (data: any) => {
-      setCurrentDocumentId(data.id);
-      queryClient.invalidateQueries({ queryKey: ['/api/lexical-documents'] });
-      toast({
-        title: "Documento salvo",
-        description: `"${title}" foi salvo com sucesso.`,
-      });
+      if (selectedEdition) {
+        // Atualizar o selectedEdition com o novo lex_file
+        setSelectedEdition({ ...selectedEdition, lexFile: content });
+        queryClient.invalidateQueries({ queryKey: ['/api/document-editions-in-progress'] });
+        toast({
+          title: "Documento salvo",
+          description: `Conteúdo salvo no documento "${selectedEdition.origem} - ${selectedEdition.objeto}".`,
+        });
+      } else {
+        setCurrentDocumentId(data.id);
+        queryClient.invalidateQueries({ queryKey: ['/api/lexical-documents'] });
+        toast({
+          title: "Documento salvo",
+          description: `"${title}" foi salvo com sucesso.`,
+        });
+      }
     },
     onError: (error: any) => {
       toast({
@@ -162,8 +179,14 @@ export default function LexicalPage() {
     // Criar objeto template para exibir o badge
     const template = {
       id: edition.templateId,
+      name: edition.templateCode,
       code: edition.templateCode,
-      structure: edition.templateStructure
+      description: '',
+      type: 'struct' as const,
+      structure: edition.templateStructure,
+      mappings: {},
+      createdAt: '',
+      updatedAt: ''
     };
     setSelectedTemplate(template);
     

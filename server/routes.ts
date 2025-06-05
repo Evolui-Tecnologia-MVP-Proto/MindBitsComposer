@@ -4489,6 +4489,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update document edition lex_file
+  app.put("/api/document-editions/:id/lex-file", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { lexFile } = req.body;
+      const editionId = req.params.id;
+      
+      const [updatedEdition] = await db.update(documentEditions)
+        .set({ 
+          lexFile: lexFile,
+          updatedAt: new Date()
+        })
+        .where(eq(documentEditions.id, editionId))
+        .returning();
+      
+      if (!updatedEdition) {
+        return res.status(404).send("Document edition não encontrada");
+      }
+      
+      res.json(updatedEdition);
+    } catch (error) {
+      console.error("Erro ao atualizar lex_file:", error);
+      res.status(500).send("Erro ao atualizar lex_file");
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 
