@@ -271,7 +271,7 @@ export default function LexicalPage() {
                                 }}
                               >
                                 <div className="flex-1">
-                                  <h5 className="font-medium text-sm text-green-700">{template.name}</h5>
+                                  <h5 className="font-medium text-sm text-green-700">{template.code} - {template.name}</h5>
                                   <p className="text-xs text-gray-500 mt-1 line-clamp-2">
                                     {template.description}
                                   </p>
