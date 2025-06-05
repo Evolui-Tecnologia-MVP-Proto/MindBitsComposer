@@ -153,24 +153,25 @@ export default function TemplateFormModal({
         ? JSON.parse(formData.structure) 
         : formData.structure;
       
-      console.log('🔍 Estrutura parsed:', parsed);
-      console.log('🔍 SectionKey:', sectionKey);
-      console.log('🔍 Sections:', parsed.sections);
-      
       if (parsed.sections && typeof parsed.sections === 'object' && !Array.isArray(parsed.sections)) {
-        const section = parsed.sections[sectionKey];
-        console.log('🔍 Section encontrada:', section);
+        // Procurar pela chave que inicia com o número da seção
+        const fullSectionKey = Object.keys(parsed.sections).find(key => 
+          key.startsWith(`${sectionKey}.`)
+        );
         
+        if (fullSectionKey) {
+          return fullSectionKey;
+        }
+        
+        // Fallback: se não encontrar, tentar busca direta
+        const section = parsed.sections[sectionKey];
         if (section && section.title) {
-          const displayName = `${sectionKey}. ${section.title}`;
-          console.log('🔍 Nome final:', displayName);
-          return displayName;
+          return `${sectionKey}. ${section.title}`;
         }
       }
       
       return sectionKey;
     } catch (error) {
-      console.error('🔍 Erro ao extrair nome da seção:', error);
       return sectionKey;
     }
   };
