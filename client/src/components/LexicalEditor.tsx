@@ -38,7 +38,8 @@ import {
   Quote,
   List,
   ListOrdered,
-  Table
+  Table,
+  ChevronDown
 } from "lucide-react";
 
 // Tema simplificado para o Lexical
@@ -149,6 +150,10 @@ function ToolbarPlugin(): JSX.Element {
 
   const insertTable = () => {
     editor.dispatchCommand(INSERT_TABLE_COMMAND, { columns: '3', rows: '3' });
+  };
+
+  const insertCollapsible = () => {
+    editor.dispatchCommand(INSERT_COLLAPSIBLE_COMMAND, true);
   };
 
   return (
@@ -281,6 +286,15 @@ function ToolbarPlugin(): JSX.Element {
         >
           <Table className="w-4 h-4" />
         </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 px-2 text-xs hover:bg-gray-100"
+          title="Container Colapsável"
+          onClick={insertCollapsible}
+        >
+          <ChevronDown className="w-4 h-4" />
+        </Button>
       </div>
     </div>
   );
@@ -318,6 +332,9 @@ export default function LexicalEditor({ content = '', onChange, className = '' }
       TableNode,
       TableRowNode,
       TableCellNode,
+      CollapsibleContainerNode,
+      CollapsibleTitleNode,
+      CollapsibleContentNode,
     ],
   };
 
