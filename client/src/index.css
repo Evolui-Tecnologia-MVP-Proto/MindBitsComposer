@@ -233,7 +233,8 @@
   border-bottom: 1px solid rgba(88, 144, 255, 0.3);
 }
 
-.editor-table {
+/* Estilos específicos para tabelas dentro do editor Lexical */
+.lexical-editor-container .editor-table {
   border-collapse: collapse;
   border-spacing: 0;
   overflow-y: scroll;
@@ -244,8 +245,8 @@
   border: 2px solid #000;
 }
 
-.editor-tableCell,
-.editor-tableCellHeader {
+.lexical-editor-container .editor-tableCell,
+.lexical-editor-container .editor-tableCellHeader {
   border: 1px solid #000;
   width: 75px;
   min-width: 75px;
@@ -256,8 +257,18 @@
   outline: none;
 }
 
-.editor-tableCellHeader {
+.lexical-editor-container .editor-tableCellHeader {
   background-color: #f2f3f5;
+}
+
+/* Remover bordas das tabelas fora do editor Lexical */
+table:not(.lexical-editor-container table) {
+  border: none;
+}
+
+table:not(.lexical-editor-container table) td,
+table:not(.lexical-editor-container table) th {
+  border: none;
 }
 
 .lexical-editor-container {
