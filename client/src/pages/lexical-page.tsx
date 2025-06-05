@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool, Eye, Edit } from "lucide-react";
+import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool, Eye, Edit, File, Image, Video, FileAudio } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
@@ -32,6 +32,22 @@ interface Template {
   type: string;
   structure: any;
   mappings: Record<string, string>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface DocumentArtifact {
+  id: string;
+  documentoId: string;
+  name: string;
+  fileData: string;
+  fileName: string;
+  fileSize: string;
+  mimeType: string;
+  type: string;
+  originAssetId?: string;
+  isImage?: string;
+  mondayColumn?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -86,6 +102,12 @@ export default function LexicalPage() {
   const { data: documentEditions = [], isLoading: isLoadingEditions } = useQuery({
     queryKey: ['/api/document-editions-in-progress'],
     enabled: showDocumentList
+  });
+
+  // Query para buscar artifacts do documento selecionado
+  const { data: documentArtifacts = [], isLoading: isLoadingArtifacts } = useQuery({
+    queryKey: ['/api/document-editions', selectedEdition?.id, 'artifacts'],
+    enabled: !!selectedEdition?.id
   });
 
   // Mutation para salvar documento

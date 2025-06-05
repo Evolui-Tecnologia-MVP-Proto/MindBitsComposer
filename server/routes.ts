@@ -4516,6 +4516,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota para buscar artifacts de um documento específico baseado no document_editions
+  app.get("/api/document-editions/:editionId/artifacts", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const edition = await storage.getDocumentEdition(req.params.editionId);
+      if (!edition) {
+        return res.status(404).send("Edição de documento não encontrada");
+      }
+      
+      const artifacts = await storage.getDocumentArtifactsByDocumento(edition.documentId);
+      res.json(artifacts);
+    } catch (error: any) {
+      console.error("Erro ao buscar artefatos da edição:", error);
+      res.status(500).send("Erro ao buscar artefatos");
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 
