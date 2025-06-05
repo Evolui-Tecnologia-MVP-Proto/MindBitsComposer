@@ -60,6 +60,11 @@ interface TemplateSection {
   content: string;
   isOpen: boolean;
   fields?: Array<{ key: string; value: string }>;
+  tables?: Array<{
+    key: string;
+    columns: string[];
+    lines: Array<Record<string, any>>;
+  }>;
 }
 
 interface HeaderField {
@@ -313,20 +318,38 @@ export default function BasicTextEditor() {
             newSections = Object.keys(structure.sections).map((sectionName: string) => {
               const sectionData = structure.sections[sectionName];
               let sectionFields: Array<{ key: string; value: string }> = [];
+              let sectionTables: Array<{ key: string; columns: string[]; lines: Array<Record<string, any>> }> = [];
               
-              // Se a seção contém campos (objeto), extrair os campos
+              // Se a seção contém campos (objeto), extrair os campos e tabelas
               if (typeof sectionData === 'object' && sectionData !== null && !Array.isArray(sectionData)) {
-                sectionFields = Object.keys(sectionData).map(fieldKey => ({
-                  key: fieldKey,
-                  value: sectionData[fieldKey] || ''
-                }));
+                Object.keys(sectionData).forEach(fieldKey => {
+                  const fieldValue = sectionData[fieldKey];
+                  
+                  // Verificar se é uma definição de tabela
+                  if (typeof fieldValue === 'object' && fieldValue !== null && 
+                      fieldValue.columns && Array.isArray(fieldValue.columns) &&
+                      fieldValue.lines && Array.isArray(fieldValue.lines)) {
+                    sectionTables.push({
+                      key: fieldKey,
+                      columns: fieldValue.columns,
+                      lines: fieldValue.lines
+                    });
+                  } else {
+                    // Campo normal
+                    sectionFields.push({
+                      key: fieldKey,
+                      value: fieldValue || ''
+                    });
+                  }
+                });
               }
               
               return {
                 name: sectionName,
                 content: '',
                 isOpen: false, // Começar todas recolhidas
-                fields: sectionFields.length > 0 ? sectionFields : undefined
+                fields: sectionFields.length > 0 ? sectionFields : undefined,
+                tables: sectionTables.length > 0 ? sectionTables : undefined
               };
             });
           }
@@ -401,6 +424,67 @@ export default function BasicTextEditor() {
     );
   };
 
+  const updateTableCell = (sectionIndex: number, tableIndex: number, rowIndex: number, column: string, value: any) => {
+    setTemplateSections(prev => 
+      prev.map((section, i) => {
+        if (i === sectionIndex && section.tables) {
+          const updatedTables = [...section.tables];
+          const updatedLines = [...updatedTables[tableIndex].lines];
+          updatedLines[rowIndex] = { ...updatedLines[rowIndex], [column]: value };
+          updatedTables[tableIndex] = { ...updatedTables[tableIndex], lines: updatedLines };
+          return { ...section, tables: updatedTables };
+        }
+        return section;
+      })
+    );
+  };
+
+  const addTableRow = (sectionIndex: number, tableIndex: number) => {
+    setTemplateSections(prev => 
+      prev.map((section, i) => {
+        if (i === sectionIndex && section.tables) {
+          const updatedTables = [...section.tables];
+          const table = updatedTables[tableIndex];
+          const newRow: Record<string, any> = {};
+          
+          // Inicializar nova linha com valores vazios baseados no tipo da primeira linha
+          table.columns.forEach(column => {
+            const firstRowValue = table.lines[0]?.[column];
+            if (typeof firstRowValue === 'number') {
+              newRow[column] = 0;
+            } else {
+              newRow[column] = '';
+            }
+          });
+          
+          updatedTables[tableIndex] = { 
+            ...table, 
+            lines: [...table.lines, newRow] 
+          };
+          return { ...section, tables: updatedTables };
+        }
+        return section;
+      })
+    );
+  };
+
+  const removeTableRow = (sectionIndex: number, tableIndex: number, rowIndex: number) => {
+    setTemplateSections(prev => 
+      prev.map((section, i) => {
+        if (i === sectionIndex && section.tables && section.tables[tableIndex].lines.length > 1) {
+          const updatedTables = [...section.tables];
+          const table = updatedTables[tableIndex];
+          updatedTables[tableIndex] = { 
+            ...table, 
+            lines: table.lines.filter((_, idx) => idx !== rowIndex)
+          };
+          return { ...section, tables: updatedTables };
+        }
+        return section;
+      })
+    );
+  };
+
   // Função para gerar markdown do documento
   const generateMarkdown = () => {
     let markdown = '';
@@ -427,6 +511,30 @@ export default function BasicTextEditor() {
           markdown += `| ${field.key} | ${field.value || ''} |\n`;
         });
         markdown += `\n`;
+      }
+      
+      // Se a seção tem tabelas, adicionar cada tabela
+      if (section.tables && section.tables.length > 0) {
+        section.tables.forEach(table => {
+          markdown += `### ${table.key}\n\n`;
+          
+          // Cabeçalho da tabela
+          markdown += `| ${table.columns.join(' | ')} |\n`;
+          markdown += `|${table.columns.map(() => '-------').join('|')}|\n`;
+          
+          // Linhas da tabela
+          table.lines.forEach(line => {
+            const values = table.columns.map(column => {
+              const value = line[column];
+              if (typeof value === 'number') {
+                return value.toFixed(2);
+              }
+              return value || '';
+            });
+            markdown += `| ${values.join(' | ')} |\n`;
+          });
+          markdown += `\n`;
+        });
       }
       
       // Adicionar conteúdo de texto livre da seção (se houver)
@@ -749,6 +857,79 @@ export default function BasicTextEditor() {
                           </tbody>
                         </table>
                       </div>
+                      
+                      {/* Tabelas da seção */}
+                      {section.tables && section.tables.map((table, tableIndex) => (
+                        <div key={`table-${tableIndex}`} className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-sm font-medium text-gray-700">{table.key}</h4>
+                            <div className="flex items-center gap-2">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => addTableRow(index, tableIndex)}
+                                className="h-7 px-2 text-xs"
+                              >
+                                <Plus className="w-3 h-3 mr-1" />
+                                Linha
+                              </Button>
+                            </div>
+                          </div>
+                          <div className="border rounded-lg overflow-x-auto">
+                            <table className="w-full text-sm">
+                              <thead className="bg-gray-50">
+                                <tr>
+                                  {table.columns.map((column) => (
+                                    <th key={column} className="px-3 py-2 text-left font-medium text-gray-900 border-b">
+                                      {column}
+                                    </th>
+                                  ))}
+                                  <th className="px-3 py-2 text-center font-medium text-gray-900 border-b w-16">
+                                    Ações
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {table.lines.map((line, rowIndex) => (
+                                  <tr key={rowIndex} className="border-b hover:bg-gray-50">
+                                    {table.columns.map((column) => (
+                                      <td key={column} className="px-3 py-2">
+                                        <input
+                                          type={typeof line[column] === 'number' ? 'number' : 'text'}
+                                          step={typeof line[column] === 'number' ? '0.01' : undefined}
+                                          value={line[column] || ''}
+                                          onChange={(e) => {
+                                            const value = typeof line[column] === 'number' 
+                                              ? parseFloat(e.target.value) || 0 
+                                              : e.target.value;
+                                            updateTableCell(index, tableIndex, rowIndex, column, value);
+                                          }}
+                                          className="w-full px-2 py-1 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                          placeholder={`${column}...`}
+                                        />
+                                      </td>
+                                    ))}
+                                    <td className="px-3 py-2 text-center">
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => removeTableRow(index, tableIndex, rowIndex)}
+                                        className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                        disabled={table.lines.length <= 1}
+                                      >
+                                        <Trash className="w-3 h-3" />
+                                      </Button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      ))}
+                      
                       {/* Editor de texto livre da seção */}
                       <div>
                         <h4 className="text-sm font-medium text-gray-700 mb-2">Conteúdo Adicional</h4>
