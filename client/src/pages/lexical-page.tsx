@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -41,6 +42,7 @@ export default function LexicalPage() {
   const [title, setTitle] = useState("Novo Documento");
   const [showDocumentList, setShowDocumentList] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const { toast } = useToast();
 
   // Query para buscar documentos do usuário
@@ -120,6 +122,7 @@ export default function LexicalPage() {
     setCurrentDocumentId(document.id);
     setTitle(document.title);
     setContent(document.content);
+    setSelectedTemplate(null); // Limpar template ao carregar documento
     setShowDocumentList(false);
   };
 
@@ -193,15 +196,22 @@ export default function LexicalPage() {
           </div>
           
           <div className="flex items-center space-x-2">
-            <Button
-              onClick={() => setShowDocumentList(!showDocumentList)}
-              variant={showDocumentList ? "default" : "outline"}
-              size="sm"
-              className={showDocumentList ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
-            >
-              <FolderOpen className={`w-4 h-4 mr-2 ${showDocumentList ? "text-white" : ""}`} />
-              Biblioteca
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Button
+                onClick={() => setShowDocumentList(!showDocumentList)}
+                variant={showDocumentList ? "default" : "outline"}
+                size="sm"
+                className={showDocumentList ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
+              >
+                <FolderOpen className={`w-4 h-4 mr-2 ${showDocumentList ? "text-white" : ""}`} />
+                Biblioteca
+              </Button>
+              {selectedTemplate && (
+                <Badge variant="secondary" className="text-xs">
+                  Template: {selectedTemplate.code}
+                </Badge>
+              )}
+            </div>
             <Button
               onClick={() => setShowAttachments(!showAttachments)}
               variant={showAttachments ? "default" : "outline"}
@@ -257,6 +267,7 @@ export default function LexicalPage() {
                                   setTitle(template.name);
                                   setContent(template.code);
                                   setCurrentDocumentId(null);
+                                  setSelectedTemplate(template);
                                 }}
                               >
                                 <div className="flex-1">
