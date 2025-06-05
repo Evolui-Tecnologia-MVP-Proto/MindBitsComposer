@@ -17,6 +17,12 @@ import { TableNode, TableRowNode, TableCellNode, $createTableNodeWithDimensions,
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { $insertNodes, $getNodeByKey } from 'lexical';
 
+// Import dos nós e plugin de container colapsável
+import { CollapsibleContainerNode } from './lexical/CollapsibleNode';
+import { CollapsibleTitleNode } from './lexical/CollapsibleTitleNode';
+import { CollapsibleContentNode } from './lexical/CollapsibleContentNode';
+import CollapsiblePlugin, { INSERT_COLLAPSIBLE_COMMAND } from './lexical/CollapsiblePlugin';
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
