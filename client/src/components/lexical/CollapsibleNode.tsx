@@ -62,10 +62,6 @@ export class CollapsibleContainerNode extends ElementNode {
       'bg-gray-50'
     );
     dom.open = this.__open;
-    dom.addEventListener('toggle', () => {
-      const open = dom.open;
-      this.getWritable().__open = open;
-    });
 
     return dom;
   }

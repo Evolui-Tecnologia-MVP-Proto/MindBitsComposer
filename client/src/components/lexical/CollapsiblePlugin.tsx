@@ -36,12 +36,6 @@ export const TOGGLE_COLLAPSIBLE_COMMAND: LexicalCommand<NodeKey> = createCommand
 );
 
 export function $insertCollapsibleContainer(isOpen = true): void {
-  const selection = $getSelection();
-
-  if (!$isRangeSelection(selection)) {
-    return;
-  }
-
   const title = $createCollapsibleTitleNode('Container Colapsável');
   const content = $createCollapsibleContentNode();
   const paragraph = $createParagraphNode();
