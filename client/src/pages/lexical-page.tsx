@@ -221,7 +221,6 @@ export default function LexicalPage() {
           </div>
         </div>
       </div>
-
       <div className="flex h-[calc(100vh-73px)]">
         {/* Sidebar de documentos (condicional) */}
         {showDocumentList && (
@@ -324,7 +323,7 @@ export default function LexicalPage() {
         {/* Editor principal */}
         <div className="flex-1 flex flex-col mb-2.5">
           {/* Barra de ferramentas do editor integrada */}
-          <div className="flex-1 p-6">
+          <div className="flex-1 p-6 mt-[20px] mb-[20px]">
             <Card className="h-full">
               <CardContent className="p-0 h-full">
                 <LexicalEditor
