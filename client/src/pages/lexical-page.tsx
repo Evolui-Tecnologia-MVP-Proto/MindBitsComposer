@@ -192,12 +192,6 @@ export default function LexicalPage() {
           </div>
           
           <div className="flex items-center space-x-2">
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-64"
-              placeholder="Nome do documento"
-            />
             <Button
               onClick={() => setShowDocumentList(!showDocumentList)}
               variant={showDocumentList ? "default" : "outline"}
