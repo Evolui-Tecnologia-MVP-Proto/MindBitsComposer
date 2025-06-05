@@ -479,6 +479,18 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
           if (!hasTemplateContent) {
             root.clear();
             
+            // Criar container de cabeçalho padrão
+            const headerTitle = $createCollapsibleTitleNode();
+            headerTitle.setTextContent('Conteúdo de cabeçalho');
+            
+            const headerContent = $createCollapsibleContentNode();
+            const headerParagraph = $createParagraphNode();
+            headerContent.append(headerParagraph);
+            
+            const headerContainer = $createCollapsibleContainerNode(false);
+            headerContainer.append(headerTitle, headerContent);
+            root.append(headerContainer);
+            
             sections.forEach((sectionName, index) => {
               // Criar container colapsível
               const title = $createCollapsibleTitleNode(sectionName);
