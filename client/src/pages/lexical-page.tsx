@@ -166,12 +166,6 @@ export default function LexicalPage() {
       <div className="border-b bg-white px-6 py-4">
         <div className="flex items-center justify-between max-w-screen-2xl mx-auto">
           <div className="flex items-center space-x-4">
-            <Link href="/">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Voltar
-              </Button>
-            </Link>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Editor Lexical</h1>
               <p className="text-sm text-gray-600">Editor avançado com formatação rica</p>
@@ -192,14 +186,6 @@ export default function LexicalPage() {
             >
               <FolderOpen className="w-4 h-4 mr-2" />
               Documentos
-            </Button>
-            <Button
-              onClick={handleNewDocument}
-              variant="outline"
-              size="sm"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Novo
             </Button>
             <Button
               onClick={handleSave}
