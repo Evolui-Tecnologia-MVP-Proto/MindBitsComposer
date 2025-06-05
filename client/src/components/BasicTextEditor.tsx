@@ -1308,7 +1308,85 @@ export default function BasicTextEditor() {
             {/* Toolbar do Lexical - integrada */}
             <div className="flex items-center justify-between gap-2 p-2 border-b bg-gray-50 shrink-0">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-700">Editor Lexical</span>
+                {/* Formatação de texto */}
+                <div className="flex items-center gap-1 mr-3">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2 text-xs hover:bg-gray-100"
+                    title="Negrito"
+                  >
+                    <Bold className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2 text-xs hover:bg-gray-100"
+                    title="Itálico"
+                  >
+                    <Italic className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2 text-xs hover:bg-gray-100"
+                    title="Sublinhado"
+                  >
+                    <Underline className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                <Separator orientation="vertical" className="h-6 mx-1" />
+
+                {/* Títulos */}
+                <div className="flex items-center gap-1 mr-3">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2 text-xs hover:bg-gray-100"
+                    title="Título 1"
+                  >
+                    <Heading1 className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2 text-xs hover:bg-gray-100"
+                    title="Título 2"
+                  >
+                    <Heading2 className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2 text-xs hover:bg-gray-100"
+                    title="Título 3"
+                  >
+                    <Heading3 className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                <Separator orientation="vertical" className="h-6 mx-1" />
+
+                {/* Elementos */}
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2 text-xs hover:bg-gray-100"
+                    title="Citação"
+                  >
+                    <Quote className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2 text-xs hover:bg-gray-100"
+                    title="Lista"
+                  >
+                    <List className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 <Button
