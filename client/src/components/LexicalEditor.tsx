@@ -456,47 +456,58 @@ function convertToMarkdown(editorState: any): string {
 // Plugin para inserir seções de template automaticamente
 function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
+  const sectionsRef = React.useRef<string[] | null>(null);
 
   React.useEffect(() => {
-    if (sections && sections.length > 0) {
+    // Evitar re-aplicar as mesmas seções
+    if (sections && sections.length > 0 && 
+        JSON.stringify(sections) !== JSON.stringify(sectionsRef.current)) {
+      
+      sectionsRef.current = sections;
+      
       // Usar setTimeout para evitar conflitos com outros plugins
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         editor.update(() => {
           const root = $getRoot();
-          root.clear();
           
-          sections.forEach((sectionName, index) => {
-            // Criar container colapsível
-            const title = $createCollapsibleTitleNode(sectionName);
-            const content = $createCollapsibleContentNode();
+          // Verificar se o root já tem conteúdo dos templates
+          const children = root.getChildren();
+          const hasTemplateContent = children.some(child => 
+            child.getType() === 'collapsible-container'
+          );
+          
+          if (!hasTemplateContent) {
+            root.clear();
             
-            // Adicionar parágrafo editável dentro do conteúdo
-            const paragraph = $createParagraphNode();
-            const textNode = $createTextNode('');
-            paragraph.append(textNode);
-            content.append(paragraph);
+            sections.forEach((sectionName, index) => {
+              // Criar container colapsível
+              const title = $createCollapsibleTitleNode(sectionName);
+              const content = $createCollapsibleContentNode();
+              
+              // Adicionar parágrafo editável dentro do conteúdo
+              const paragraph = $createParagraphNode();
+              content.append(paragraph);
 
-            const container = $createCollapsibleContainerNode(true);
-            container.append(title, content);
+              const container = $createCollapsibleContainerNode(true);
+              container.append(title, content);
+              
+              root.append(container);
+              
+              // Adicionar parágrafo entre containers para navegação
+              if (index < sections.length - 1) {
+                const spacer = $createParagraphNode();
+                root.append(spacer);
+              }
+            });
             
-            root.append(container);
-            
-            // Adicionar parágrafo entre containers para navegação
-            if (index < sections.length - 1) {
-              const spacer = $createParagraphNode();
-              const spacerText = $createTextNode('');
-              spacer.append(spacerText);
-              root.append(spacer);
-            }
-          });
-          
-          // Adicionar parágrafo final para permitir edição após os containers
-          const finalParagraph = $createParagraphNode();
-          const finalText = $createTextNode('');
-          finalParagraph.append(finalText);
-          root.append(finalParagraph);
-        });
-      }, 100);
+            // Adicionar parágrafo final para permitir edição após os containers
+            const finalParagraph = $createParagraphNode();
+            root.append(finalParagraph);
+          }
+        }, { discrete: true });
+      }, 50);
+      
+      return () => clearTimeout(timeoutId);
     }
   }, [editor, sections]);
 
