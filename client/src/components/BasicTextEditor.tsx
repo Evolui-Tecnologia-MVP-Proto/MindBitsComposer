@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Bold, 
   Italic, 
@@ -97,6 +98,7 @@ export default function BasicTextEditor() {
   const [templateSections, setTemplateSections] = useState<TemplateSection[]>([]);
   const [headerFields, setHeaderFields] = useState<HeaderField[]>([]);
   const [isMarkdownView, setIsMarkdownView] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<string>("richtext");
   const [lastCursorInfo, setLastCursorInfo] = useState<{
     elementId: string;
     position: number;
@@ -725,8 +727,28 @@ export default function BasicTextEditor() {
 
   return (
     <div className="w-full h-full border rounded-lg overflow-hidden flex flex-col">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between gap-2 p-2 border-b bg-gray-50 shrink-0">
+      {/* Tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full h-full flex flex-col">
+        <TabsList className="grid w-full grid-cols-2 bg-gray-50 h-auto p-0 rounded-none border-b">
+          <TabsTrigger 
+            value="richtext" 
+            className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none border-b-2 border-transparent"
+          >
+            Rich Text
+          </TabsTrigger>
+          <TabsTrigger 
+            value="lexical" 
+            className="data-[state=active]:bg-white data-[state=active]:border-b-2 data-[state=active]:border-blue-500 rounded-none border-b-2 border-transparent"
+          >
+            Lexical
+          </TabsTrigger>
+        </TabsList>
+        
+        {/* Rich Text Tab Content */}
+        <TabsContent value="richtext" className="m-0 p-0 flex-1 flex flex-col">
+          <div className="w-full h-full flex flex-col">
+            {/* Toolbar */}
+            <div className="flex items-center justify-between gap-2 p-2 border-b bg-gray-50 shrink-0">
         {/* Lado esquerdo - Plugins e ferramentas */}
         <div className="flex items-center gap-2">
           {/* Botões dinâmicos para plugins ativos */}
@@ -1275,7 +1297,27 @@ export default function BasicTextEditor() {
             style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}
           />
         )}
-      </div>
+            </div>
+          </div>
+        </TabsContent>
+        
+        {/* Lexical Tab Content */}
+        <TabsContent value="lexical" className="m-0 p-0 flex-1 flex flex-col">
+          <div className="w-full h-full flex flex-col">
+            <div className="flex-1 p-4 max-h-full overflow-y-auto">
+              <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-gray-400">
+                <FileCode2 className="w-24 h-24 mb-4 text-gray-300" />
+                <p className="text-lg font-medium text-gray-500">
+                  Editor Lexical em desenvolvimento...
+                </p>
+                <p className="text-sm text-gray-400 mt-2">
+                  Em breve você poderá usar o editor Lexical avançado aqui.
+                </p>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
 
       <PluginModal
         plugin={selectedPlugin}
