@@ -445,6 +445,32 @@ function convertToMarkdown(editorState: any): string {
         const src = node.getSrc();
         const alt = node.getAltText();
         markdown += `![${alt}](${src})\n\n`;
+      } else if (node.getType() === 'table') {
+        // Processar tabela para markdown
+        const rows = node.getChildren();
+        if (rows.length > 0) {
+          rows.forEach((row: any, rowIndex: number) => {
+            const cells = row.getChildren();
+            let rowContent = '|';
+            
+            cells.forEach((cell: any) => {
+              const cellText = cell.getTextContent() || ' ';
+              rowContent += ` ${cellText} |`;
+            });
+            
+            markdown += rowContent + '\n';
+            
+            // Adicionar linha separadora após o cabeçalho (primeira linha)
+            if (rowIndex === 0) {
+              let separator = '|';
+              cells.forEach(() => {
+                separator += ' --- |';
+              });
+              markdown += separator + '\n';
+            }
+          });
+          markdown += '\n';
+        }
       } else if (node.getType() === 'collapsible-container') {
         // Processar container colapsível
         const containerChildren = node.getChildren();
