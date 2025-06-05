@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip } from "lucide-react";
+import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -342,7 +342,14 @@ export default function LexicalPage() {
           {/* Barra de ferramentas do editor integrada */}
           <div className="flex-1 pl-0 pr-4 pt-4 pb-0">
             <Card className="h-full">
-              <CardContent className="p-0 h-full">
+              <CardContent className="p-0 h-full relative">
+                {/* Placeholder quando não há conteúdo */}
+                {(!content || content.trim() === '') && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 pointer-events-none">
+                    <PenTool className="w-[100px] h-[100px] mb-4 opacity-20" />
+                    <p className="text-lg font-medium text-center">Selecione um documento ou template para iniciar...</p>
+                  </div>
+                )}
                 <LexicalEditor
                   content={content}
                   onChange={setContent}
