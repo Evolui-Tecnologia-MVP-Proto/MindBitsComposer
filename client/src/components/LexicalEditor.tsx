@@ -179,12 +179,12 @@ function ToolbarPlugin({
         const rowNode = $createTableRowNode();
 
         for (let j = 0; j < 3; j++) {
-          const cellNode = $createTableCellNode(0);
-          // Adicionar um parágrafo com texto de teste em cada célula
-          const paragraphNode = $createParagraphNode();
-          paragraphNode.append($createTextNode(`Linha ${i + 1}, Coluna ${j + 1}`));
+          const cellNode = $createTableCellNode(0); // nova célula
+          const paragraphNode = $createParagraphNode(); // novo parágrafo
+          const textNode = $createTextNode(`Linha ${i + 1}, Coluna ${j + 1}`);
+          paragraphNode.append(textNode);
           cellNode.append(paragraphNode);
-          rowNode.append(cellNode);
+          rowNode.append(cellNode); // célula adicionada à linha
         }
 
         tableNode.append(rowNode);
