@@ -241,11 +241,12 @@
   table-layout: fixed;
   width: max-content;
   margin: 30px 0;
+  border: 2px solid #000;
 }
 
 .editor-tableCell,
 .editor-tableCellHeader {
-  border: 1px solid #bbb;
+  border: 1px solid #000;
   width: 75px;
   min-width: 75px;
   vertical-align: top;
