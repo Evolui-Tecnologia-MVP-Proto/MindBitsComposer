@@ -3604,7 +3604,44 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         selectedDocument={selectedDocument}
       />
       {renderCreateModal()}
-      {renderEditModal()}
+      <EditDocumentModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        editingDocument={editingDocument}
+        currentCreatedDocumentId={currentCreatedDocumentId}
+        formData={formData}
+        setFormData={setFormData}
+        onOpenAddArtifactModal={() => {
+          setArtifactFormData({
+            documentoId: editingDocument?.id || "",
+            name: "",
+            fileData: "",
+            fileName: "",
+            fileSize: "",
+            mimeType: "",
+            type: "",
+          });
+          setIsAddArtifactModalOpen(true);
+        }}
+        onOpenEditArtifactModal={(artifact) => {
+          setEditingArtifact(artifact);
+          setArtifactFormData({
+            documentoId: artifact.documentoId,
+            name: artifact.name,
+            fileData: artifact.fileData || "",
+            fileName: artifact.fileName || "",
+            fileSize: artifact.fileSize || "",
+            mimeType: artifact.mimeType || "",
+            type: artifact.type || "",
+            originAssetId: artifact.originAssetId,
+            isImage: artifact.isImage,
+          });
+          setIsEditArtifactModalOpen(true);
+        }}
+        onDeleteArtifact={handleDeleteArtifact}
+        onUpdateDocument={handleUpdateDocument}
+        updateDocumentoMutation={updateDocumentoMutation}
+      />
       {renderAddArtifactModal()}
       {renderEditArtifactModal()}
       {renderDocumentationModal()}
@@ -6735,7 +6772,44 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   return (
     <div className="container mx-auto py-6">
-      {renderEditModal()}
+      <EditDocumentModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        editingDocument={editingDocument}
+        currentCreatedDocumentId={currentCreatedDocumentId}
+        formData={formData}
+        setFormData={setFormData}
+        onOpenAddArtifactModal={() => {
+          setArtifactFormData({
+            documentoId: editingDocument?.id || "",
+            name: "",
+            fileData: "",
+            fileName: "",
+            fileSize: "",
+            mimeType: "",
+            type: "",
+          });
+          setIsAddArtifactModalOpen(true);
+        }}
+        onOpenEditArtifactModal={(artifact) => {
+          setEditingArtifact(artifact);
+          setArtifactFormData({
+            documentoId: artifact.documentoId,
+            name: artifact.name,
+            fileData: artifact.fileData || "",
+            fileName: artifact.fileName || "",
+            fileSize: artifact.fileSize || "",
+            mimeType: artifact.mimeType || "",
+            type: artifact.type || "",
+            originAssetId: artifact.originAssetId,
+            isImage: artifact.isImage,
+          });
+          setIsEditArtifactModalOpen(true);
+        }}
+        onDeleteArtifact={handleDeleteArtifact}
+        onUpdateDocument={handleUpdateDocument}
+        updateDocumentoMutation={updateDocumentoMutation}
+      />
       {renderAddArtifactModal()}
       {renderDocumentationModal()}
       {renderEditArtifactModal()}
