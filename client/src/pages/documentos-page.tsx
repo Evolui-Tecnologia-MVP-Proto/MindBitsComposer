@@ -2455,7 +2455,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     <Badge 
                       variant="secondary" 
                       className="ml-1 text-xs bg-purple-100 text-purple-700 hover:bg-purple-200"
-                      title={`${flowExecutionCounts[documento.id]} execução${flowExecutionCounts[documento.id] > 1 ? 'ões' : ''} de fluxo`}
+                      title="Número de fluxos executados"
                     >
                       {flowExecutionCounts[documento.id]}
                     </Badge>
