@@ -7216,12 +7216,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   };
 
   function renderFlowDiagramModal() {
-    console.log("🔴 RENDERIZANDO MODAL:", flowDiagramModal);
     if (!flowDiagramModal.isOpen || !flowDiagramModal.flowData) {
-      console.log("🔴 Modal fechada ou sem dados, não renderizando");
       return null;
     }
-    console.log("🔴 Modal ABERTA, renderizando...");
 
     // Node types definition moved inside render function
     const nodeTypes = {
