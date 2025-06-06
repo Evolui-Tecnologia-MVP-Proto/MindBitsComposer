@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Settings, FileText, Edit, GitBranch, File, Cog, Puzzle, Home, PenTool } from "lucide-react";
+import { Settings, FileText, Edit, GitBranch, File, Cog, Puzzle, Home, PenTool, Workflow } from "lucide-react";
 import { useNavigationGuard } from "@/hooks/use-navigation-guard";
 
 type SidebarProps = {
@@ -20,8 +20,6 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
       setActiveItem("admin");
     } else if (location.startsWith("/templates")) {
       setActiveItem("templates");
-    } else if (location.startsWith("/editor")) {
-      setActiveItem("editor");
     } else if (location.startsWith("/lexical")) {
       setActiveItem("lexical");
     } else if (location.startsWith("/fluxos")) {
@@ -82,15 +80,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
             </div>
           </div>
           
-          <div className="sidebar-item-container">
-            <div 
-              className={`sidebar-item ${activeItem === "editor" ? "sidebar-active" : ""}`}
-              onClick={() => handleNavigation("/editor")}
-            >
-              <Edit className="mr-3 h-6 w-6" />
-              Editor
-            </div>
-          </div>
+
           
           <div className="sidebar-item-container">
             <div 
