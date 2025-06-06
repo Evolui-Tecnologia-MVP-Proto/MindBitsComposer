@@ -2412,8 +2412,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     </div>
   );
 
-  // Componente FlowWithAutoFitView extraído para arquivo separado
-
   return (
     <div className="container mx-auto py-6">
       <DocumentosTable
@@ -2534,5 +2532,3 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     </div>
   );
 }
-
-// End of file - all components and logic have been properly extracted
