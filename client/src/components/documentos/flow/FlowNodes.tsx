@@ -600,3 +600,42 @@ export const SwitchNodeComponent = (props: any) => {
     </div>
   );
 };
+
+// Main FlowNodes component that was missing from extraction
+
+import ReactFlow, { Node, Edge, Controls, Background } from 'reactflow';
+
+interface FlowNodesProps {
+  nodes: Node[];
+  edges: Edge[];
+  onNodeClick?: (event: React.MouseEvent, node: Node) => void;
+  isReadOnly?: boolean;
+}
+
+export const FlowNodes = ({ nodes, edges, onNodeClick, isReadOnly = false }: FlowNodesProps) => {
+  const nodeTypes = {
+    startNode: StartNodeComponent,
+    endNode: EndNodeComponent,
+    actionNode: ActionNodeComponent,
+    documentNode: DocumentNodeComponent,
+    integrationNode: IntegrationNodeComponent,
+    switchNode: SwitchNodeComponent,
+  };
+
+  return (
+    <ReactFlow
+      nodes={nodes}
+      edges={edges}
+      nodeTypes={nodeTypes}
+      onNodeClick={onNodeClick}
+      fitView
+      fitViewOptions={{ padding: 0.1 }}
+      nodesDraggable={!isReadOnly}
+      nodesConnectable={!isReadOnly}
+      elementsSelectable={true}
+    >
+      <Controls />
+      <Background />
+    </ReactFlow>
+  );
+};

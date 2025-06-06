@@ -201,6 +201,11 @@ export default function DocumentosPage() {
   const [showFlowInspector, setShowFlowInspector] = useState(false);
   const [selectedFlowNode, setSelectedFlowNode] = useState<any>(null);
   const [isFlowInspectorPinned, setIsFlowInspectorPinned] = useState(false);
+  
+  // Missing state variables that were corrupted during extraction
+  const [editingArtifact, setEditingArtifact] = useState<any>(null);
+  const [filteredDocuments, setFilteredDocuments] = useState<any[]>([]);
+  const [flowData, setFlowData] = useState<any>(null);
   // Função para resetar o formulário
   const resetFormData = () => {
     console.log("🧹 LIMPANDO CAMPOS DO FORMULÁRIO");
