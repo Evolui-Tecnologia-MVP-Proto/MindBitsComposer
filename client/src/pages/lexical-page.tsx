@@ -671,11 +671,7 @@ export default function LexicalPage() {
                                         {Math.round(parseInt(artifact.fileSize) / 1024)} KB
                                       </span>
                                     )}
-                                    {artifact.mimeType && (
-                                      <span className="text-xs text-gray-400 truncate">
-                                        {artifact.mimeType}
-                                      </span>
-                                    )}
+
                                   </div>
                                   {artifact.mondayColumn && (
                                     <p className="text-xs text-blue-600 mt-1">
