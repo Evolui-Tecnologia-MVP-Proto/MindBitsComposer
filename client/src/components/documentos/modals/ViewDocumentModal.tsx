@@ -84,8 +84,13 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
         title: "Sucesso",
         description: "Anexos integrados com sucesso!",
       });
+      // Invalidar artifacts do documento específico
       queryClient.invalidateQueries({
         queryKey: ['/api/documentos', selectedDocument?.id, 'artifacts']
+      });
+      // Invalidar lista principal de documentos para atualizar badge de sync
+      queryClient.invalidateQueries({
+        queryKey: ['/api/documentos']
       });
     },
     onError: (error: any) => {
