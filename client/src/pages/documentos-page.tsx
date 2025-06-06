@@ -7466,6 +7466,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   }
 
+  console.log("🟡 RENDERIZANDO COMPONENTE PRINCIPAL - flowExecutionsModal:", flowExecutionsModal);
+  
   return (
     <div className="container mx-auto py-6">
       {renderEditModal()}
