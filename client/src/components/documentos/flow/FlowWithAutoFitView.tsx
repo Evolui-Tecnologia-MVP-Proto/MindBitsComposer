@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useReactFlow, Node, Edge } from 'reactflow';
+import ReactFlow, { useReactFlow, Node, Edge, Controls, Background } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { Controls, Background } from 'reactflow';
 import { Pin, BookOpen, Zap, CircleCheck, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -44,6 +43,15 @@ export function FlowWithAutoFitView({
   const { fitView, getNodes, setNodes } = useReactFlow();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Extract nodes and edges from flowData
+  const flowNodes = flowData?.flowTasks?.nodes || [];
+  const flowEdges = flowData?.flowTasks?.edges || [];
+  
+  // Mock missing variables for now
+  const isFlowInspectorPinned = isPinned;
+  const setIsFlowInspectorPinned = () => {};
+  const getTemplateInfo = () => ({ name: 'Template', version: '1.0' });
 
   // Estado para controlar os valores dos campos do formulário
   const [formValues, setFormValues] = useState<Record<string, string>>({});
@@ -777,8 +785,8 @@ export function FlowWithAutoFitView({
   }, [showFlowInspector, fitView]);
 
   // Implementar lógica de "pendente em processo"
-  const nodes = flowData.flowTasks.nodes || [];
-  const edges = flowData.flowTasks.edges || [];
+  const processNodes = flowData.flowTasks?.nodes || [];
+  const processEdges = flowData.flowTasks?.edges || [];
 
   // Encontrar nós executados
   const executedNodes = new Set(
@@ -920,12 +928,17 @@ export function FlowWithAutoFitView({
   });
 
   const nodeTypes = useMemo(() => ({
-    startNode: StartNodeComponent,
-    endNode: EndNodeComponent,
-    actionNode: ActionNodeComponent,
-    documentNode: DocumentNodeComponent,
-    integrationNode: IntegrationNodeComponent,
-    switchNode: SwitchNodeComponent
+    startNode: StartNode,
+    endNode: EndNode,
+    actionNode: TaskNode,
+    documentNode: TaskNode,
+    integrationNode: TaskNode,
+    switchNode: DecisionNode,
+    taskNode: TaskNode,
+    decisionNode: DecisionNode,
+    approveNode: ApproveNode,
+    elaboreNode: ElaboreNode,
+    reviseNode: ReviseNode
   }), []);
 
   const onNodeClick = (event: any, node: any) => {
