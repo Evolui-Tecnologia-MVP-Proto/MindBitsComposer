@@ -104,6 +104,8 @@ import { CreateDocumentModal } from "@/components/documentos/modals/CreateDocume
 import { AddArtifactModal } from "@/components/documentos/modals/AddArtifactModal";
 import { EditArtifactModal } from "@/components/documentos/modals/EditArtifactModal";
 import { DocumentationModal } from "@/components/documentos/modals/DocumentationModal";
+import { DeleteConfirmDialog } from "@/components/documentos/modals/DeleteConfirmDialog";
+import { DeleteArtifactConfirmDialog } from "@/components/documentos/modals/DeleteArtifactConfirmDialog";
 
 export default function DocumentosPage() {
   const [activeTab, setActiveTab] = useState("incluidos");
@@ -1435,41 +1437,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   };
 
   const handleDeleteDocument = (documento: Documento) => {
-    toast({
-      title: "⚠️ Confirmar Exclusão",
-      description: `Tem certeza que deseja excluir "${documento.objeto}"? Esta ação não pode ser desfeita.`,
-      action: (
-        <div className="flex gap-2">
-          <button
-            onClick={() => deleteDocumentoMutation.mutate(documento.id)}
-            disabled={deleteDocumentoMutation.isPending}
-            className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm flex items-center gap-1"
-          >
-            {deleteDocumentoMutation.isPending ? (
-              <>
-                <Loader2 className="h-3 w-3 animate-spin" />
-                Excluindo...
-              </>
-            ) : (
-              <>
-                <Trash2 className="h-3 w-3" />
-                Excluir
-              </>
-            )}
-          </button>
-        </div>
-      ),
-      duration: 8000,
-    });
+    setDocumentToDelete(documento);
+    setIsDeleteConfirmOpen(true);
   };
 
-  const confirmDelete = () => {
-    if (documentToDelete) {
-      deleteDocumentoMutation.mutate(documentToDelete.id);
-    }
+  const confirmDeleteDocument = (documento: Documento) => {
+    deleteDocumentoMutation.mutate(documento.id);
   };
 
-  const cancelDelete = () => {
+  const closeDeleteConfirm = () => {
     setIsDeleteConfirmOpen(false);
     setDocumentToDelete(null);
   };
@@ -4976,6 +4952,27 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         setShowApprovalAlert={setShowApprovalAlert}
         isFlowInspectorPinned={isFlowInspectorPinned}
         FlowWithAutoFitView={FlowWithAutoFitView}
+      />
+      <DeleteConfirmDialog
+        isOpen={isDeleteConfirmOpen}
+        onClose={closeDeleteConfirm}
+        documentToDelete={documentToDelete}
+        onConfirmDelete={confirmDeleteDocument}
+        isDeleting={deleteDocumentoMutation.isPending}
+      />
+      <DeleteArtifactConfirmDialog
+        isOpen={isDeleteArtifactConfirmOpen}
+        onClose={() => {
+          setIsDeleteArtifactConfirmOpen(false);
+          setArtifactToDelete(null);
+        }}
+        artifactToDelete={artifactToDelete}
+        onConfirmDelete={() => {
+          if (artifactToDelete) {
+            deleteArtifactMutation.mutate(artifactToDelete);
+          }
+        }}
+        isDeleting={deleteArtifactMutation.isPending}
       />
     </div>
   );
