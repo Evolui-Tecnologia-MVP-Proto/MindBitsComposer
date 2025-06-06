@@ -2483,11 +2483,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         e.preventDefault();
                         e.stopPropagation();
                         console.log("✅ BADGE CLICADA! Abrindo modal...", documento.id);
-                        setFlowExecutionsModal({
+                        const newState = {
                           isOpen: true,
                           documentId: documento.id,
                           documentTitle: documento.objeto
-                        });
+                        };
+                        console.log("🟢 NOVO ESTADO:", newState);
+                        setFlowExecutionsModal(newState);
                       }}
                     >
                       {flowExecutionCounts[documento.id]}
@@ -7342,9 +7344,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   }
 
   function renderFlowExecutionsModal() {
+    console.log("🔍 RENDER FLOW EXECUTIONS - Estado atual:", flowExecutionsModal);
     if (!flowExecutionsModal.isOpen) {
+      console.log("❌ Modal fechada, retornando null");
       return null;
     }
+    console.log("✅ Modal aberta, renderizando...");
 
     return (
       <Dialog open={flowExecutionsModal.isOpen} onOpenChange={(open) => {
