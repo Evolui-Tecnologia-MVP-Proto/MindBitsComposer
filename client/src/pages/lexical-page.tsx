@@ -679,7 +679,7 @@ export default function LexicalPage() {
                                   </div>
                                   {artifact.mondayColumn && (
                                     <p className="text-xs text-blue-600 mt-1">
-                                      Monday: {artifact.mondayColumn}
+                                      Monday: {(artifact as any).mondayColumnTitle || artifact.mondayColumn}
                                     </p>
                                   )}
                                 </div>

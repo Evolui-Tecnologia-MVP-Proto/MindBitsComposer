@@ -4526,10 +4526,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).send("Edição de documento não encontrada");
       }
       
-      console.log("🔍 Buscando artifacts para documentId:", edition.documentId);
       const artifacts = await storage.getDocumentArtifactsByDocumento(edition.documentId);
-      console.log("📄 Artifacts encontrados:", artifacts.length, artifacts);
-      res.json(artifacts);
+      
+      // Buscar títulos das colunas Monday para cada artifact
+      const artifactsWithColumnTitles = await Promise.all(
+        artifacts.map(async (artifact) => {
+          let mondayColumnTitle = artifact.mondayColumn || '';
+          
+          // Se o artifact tem uma coluna Monday, buscar o título
+          if (artifact.mondayColumn) {
+            try {
+              // Usar storage para buscar todas as colunas Monday e encontrar a correspondente
+              const allMappings = await storage.getMondayMappings();
+              
+              for (const mapping of allMappings) {
+                const mondayColumns = await storage.getMondayColumns(mapping.id);
+                const foundColumn = mondayColumns.find(col => col.columnId === artifact.mondayColumn);
+                
+                if (foundColumn) {
+                  mondayColumnTitle = foundColumn.title;
+                  break;
+                }
+              }
+            } catch (columnError) {
+              console.warn(`Erro ao buscar título da coluna ${artifact.mondayColumn}:`, columnError);
+            }
+          }
+          
+          return {
+            ...artifact,
+            mondayColumnTitle
+          };
+        })
+      );
+      
+      res.json(artifactsWithColumnTitles);
     } catch (error: any) {
       console.error("Erro ao buscar artefatos da edição:", error);
       res.status(500).send("Erro ao buscar artefatos");
