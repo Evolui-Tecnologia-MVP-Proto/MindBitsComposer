@@ -5,6 +5,8 @@ import {
   COMMAND_PRIORITY_EDITOR,
   createCommand,
   LexicalCommand,
+  $createParagraphNode,
+  $createTextNode,
 } from 'lexical';
 import { $insertNodeToNearestRoot } from '@lexical/utils';
 import { useEffect, useRef } from 'react';
@@ -26,6 +28,17 @@ export const UPLOAD_IMAGE_COMMAND: LexicalCommand<File> = createCommand(
 export function $insertImageNode(payload: ImagePayload): void {
   const imageNode = $createImageNode(payload);
   $insertNodeToNearestRoot(imageNode);
+  
+  // Gerar ID único para a imagem
+  const imageId = Math.floor(Math.random() * 10000000000).toString();
+  
+  // Criar parágrafo com informações da imagem
+  const infoParagraph = $createParagraphNode();
+  const infoText = $createTextNode(`[image_id: ${imageId}] - [${payload.src}]`);
+  infoParagraph.append(infoText);
+  
+  // Inserir o parágrafo após a imagem
+  $insertNodeToNearestRoot(infoParagraph);
 }
 
 async function uploadImageFile(file: File): Promise<string> {
