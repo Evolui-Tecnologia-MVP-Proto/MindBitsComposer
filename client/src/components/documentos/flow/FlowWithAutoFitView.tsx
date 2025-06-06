@@ -274,7 +274,7 @@ export function FlowWithAutoFitView({
       }
 
       // Marcar o nó como executado
-      const updatedNodes = [...nodes];
+      const updatedNodes = [...flowNodes];
       const nodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
       if (nodeIndex !== -1) {
         updatedNodes[nodeIndex] = {
@@ -303,7 +303,7 @@ export function FlowWithAutoFitView({
       // Preparar dados atualizados do fluxo
       const updatedFlowTasks = {
         nodes: updatedNodes,
-        edges: edges,
+        edges: flowEdges,
         viewport: flowData.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
       };
 
@@ -368,7 +368,7 @@ export function FlowWithAutoFitView({
 
     try {
       // Marcar o nó como executado
-      const updatedNodes = [...nodes];
+      const updatedNodes = [...flowNodes];
       const nodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
       if (nodeIndex !== -1) {
         updatedNodes[nodeIndex] = {
@@ -478,7 +478,7 @@ export function FlowWithAutoFitView({
       });
 
       // Marcar o nó como executado
-      const updatedNodes = [...nodes];
+      const updatedNodes = [...flowNodes];
       const nodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
       if (nodeIndex !== -1) {
         updatedNodes[nodeIndex] = {
@@ -560,7 +560,7 @@ export function FlowWithAutoFitView({
 
     try {
       // 1. Marcar o actionNode atual como executado, preservar o isAproved e salvar formValues
-      const updatedNodes = [...nodes];
+      const updatedNodes = [...flowNodes];
       const actionNodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
       if (actionNodeIndex !== -1) {
         updatedNodes[actionNodeIndex] = {
