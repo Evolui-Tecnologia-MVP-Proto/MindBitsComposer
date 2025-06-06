@@ -147,10 +147,6 @@ export function FlowDiagramModal({
               showApprovalAlert={showApprovalAlert}
               setShowApprovalAlert={setShowApprovalAlert}
               isPinned={isFlowInspectorPinned}
-              flowDiagramModal={flowDiagramModal}
-              setFlowDiagramModal={setFlowDiagramModal}
-              nodes={nodes}
-              edges={edges}
             />
           </ReactFlowProvider>
         </div>
