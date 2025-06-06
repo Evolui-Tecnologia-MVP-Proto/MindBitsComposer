@@ -102,11 +102,22 @@ function ImageEventListenerPlugin(): JSX.Element | null {
       editor.update(() => {
         const selection = $getSelection();
         if ($isRangeSelection(selection)) {
+          // Gerar ID único para a imagem
+          const imageId = Math.floor(Math.random() * 10000000000).toString();
+          
+          // Criar nó de imagem
           const imageNode = $createImageNode({
             src,
             altText,
           });
-          $insertNodes([imageNode]);
+          
+          // Criar parágrafo com informações da imagem
+          const infoParagraph = $createParagraphNode();
+          const infoText = $createTextNode(`[image_id: ${imageId}] - [${src}]`);
+          infoParagraph.append(infoText);
+          
+          // Inserir a imagem e o texto informativo
+          $insertNodes([imageNode, infoParagraph]);
         }
       });
     };
