@@ -154,8 +154,11 @@ export function FlowWithAutoFitView({
         requestData.additionalData = additionalData;
       }
       
-      const response = await apiRequest('/api/monday/mappings/execute-headless', {
+      const response = await fetch('/api/monday/mappings/execute-headless', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(requestData)
       });
       
