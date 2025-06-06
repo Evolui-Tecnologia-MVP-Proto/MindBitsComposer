@@ -431,6 +431,30 @@ export default function LexicalPage() {
     input.click();
   };
 
+  // Função para descartar e limpar o editor
+  const handleDiscard = () => {
+    if (confirm("Tem certeza que deseja descartar todas as alterações? Esta ação não pode ser desfeita.")) {
+      // Limpar todo o estado do editor
+      setContent('');
+      setTitle('Documento sem título');
+      setEditorState('');
+      setInitialEditorState(undefined);
+      
+      // Desassociar template e documento
+      setSelectedTemplate(null);
+      setSelectedEdition(null);
+      setCurrentDocumentId(null);
+      
+      // Forçar re-render do editor
+      setEditorKey(prev => prev + 1);
+      
+      toast({
+        title: "Editor limpo",
+        description: "O editor foi limpo e está pronto para uma nova edição.",
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header com navegação */}
@@ -486,6 +510,15 @@ export default function LexicalPage() {
             >
               <Paperclip className={`w-4 h-4 mr-2 ${showAttachments ? "text-white" : ""}`} />
               Anexos
+            </Button>
+            <Button
+              onClick={handleDiscard}
+              variant="outline"
+              size="sm"
+              className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Descartar
             </Button>
             <Button
               onClick={handleSave}
