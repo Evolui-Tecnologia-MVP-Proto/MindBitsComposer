@@ -52,6 +52,14 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
     enabled: !!selectedDocument?.id,
   });
 
+  // Debug log para verificar artifacts
+  console.log('🔍 Debug artifacts:', {
+    documentId: selectedDocument?.id,
+    artifacts,
+    artifactsLength: artifacts?.length,
+    hasArtifacts: artifacts && artifacts.length > 0
+  });
+
   // Mutation para integrar anexos
   const integrateAttachmentsMutation = useMutation({
     mutationFn: async (documentId: string) => {
