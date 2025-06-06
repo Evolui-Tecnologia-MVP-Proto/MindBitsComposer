@@ -44,20 +44,6 @@ export function FlowWithAutoFitView({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Extract nodes and edges from flowData
-  const flowNodes = flowData?.flowTasks?.nodes || [];
-  const flowEdges = flowData?.flowTasks?.edges || [];
-  
-  // Early return if no flow data
-  if (!flowData?.flowTasks) {
-    return null;
-  }
-  
-  // Mock missing variables for now
-  const isFlowInspectorPinned = isPinned;
-  const setIsFlowInspectorPinned = () => {};
-  const getTemplateInfo = () => ({ name: 'Template', version: '1.0' });
-
   // Estado para controlar os valores dos campos do formulário
   const [formValues, setFormValues] = useState<Record<string, string>>({});
 
@@ -66,6 +52,15 @@ export function FlowWithAutoFitView({
     status: 'success' | 'error' | null;
     message: string;
   }>({ status: null, message: '' });
+
+  // Extract nodes and edges from flowData
+  const flowNodes = flowData?.flowTasks?.nodes || [];
+  const flowEdges = flowData?.flowTasks?.edges || [];
+  
+  // Mock missing variables for now
+  const isFlowInspectorPinned = isPinned;
+  const setIsFlowInspectorPinned = () => {};
+  const getTemplateInfo = () => ({ name: 'Template', version: '1.0' });
 
   // Carregar dados salvos quando um nó é selecionado
   useEffect(() => {
@@ -80,6 +75,25 @@ export function FlowWithAutoFitView({
     // Limpar resultado da integração ao mudar de nó
     setIntegrationResult({ status: null, message: '' });
   }, [selectedFlowNode?.id, selectedFlowNode?.data.formData]);
+
+  // Effect para executar fit view quando o painel inspector é aberto/fechado
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      fitView({
+        padding: 0.2,
+        minZoom: 0.1,
+        maxZoom: 2,
+        duration: 300
+      });
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
+  }, [showFlowInspector, fitView]);
+
+  // Early return if no flow data - moved after all hooks
+  if (!flowData?.flowTasks) {
+    return null;
+  }
 
   // Função helper para extrair dados do formulário
   const getFormFields = () => {
@@ -774,20 +788,6 @@ export function FlowWithAutoFitView({
       // Aqui poderia mostrar um toast de erro
     }
   };
-
-  // Effect para executar fit view quando o painel inspector é aberto/fechado
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      fitView({
-        padding: 0.2,
-        minZoom: 0.1,
-        maxZoom: 2,
-        duration: 300
-      });
-    }, 100);
-
-    return () => clearTimeout(timeoutId);
-  }, [showFlowInspector, fitView]);
 
   // Implementar lógica de "pendente em processo"
   const processNodes = flowData.flowTasks?.nodes || [];
