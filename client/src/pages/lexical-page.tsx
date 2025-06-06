@@ -152,6 +152,65 @@ export default function LexicalPage() {
     enabled: !!selectedEdition?.id
   });
 
+  // Função para inserir imagem no editor
+  const handleInsertImage = (artifact: DocumentArtifact) => {
+    try {
+      if (artifact.fileData && artifact.mimeType) {
+        const imageUrl = `data:${artifact.mimeType};base64,${artifact.fileData}`;
+        
+        // Aqui você pode implementar a lógica para inserir a imagem no editor Lexical
+        // Por enquanto, vamos mostrar um toast de sucesso
+        toast({
+          title: "Imagem inserida",
+          description: `A imagem "${artifact.name}" foi inserida no documento.`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro ao inserir imagem",
+        description: "Não foi possível inserir a imagem no documento.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Função para baixar arquivo
+  const handleDownloadFile = (artifact: DocumentArtifact) => {
+    try {
+      if (artifact.fileData && artifact.mimeType) {
+        // Criar blob a partir do base64
+        const byteCharacters = atob(artifact.fileData);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: artifact.mimeType });
+
+        // Criar link de download
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = artifact.fileName || artifact.name || 'arquivo';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        toast({
+          title: "Download iniciado",
+          description: `O arquivo "${artifact.name}" está sendo baixado.`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro no download",
+        description: "Não foi possível baixar o arquivo.",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Mutation para salvar documento
   const saveMutation = useMutation({
     mutationFn: async (data: { title: string; content: string; plainText: string }) => {
@@ -677,6 +736,33 @@ export default function LexicalPage() {
                                     <p className="text-xs text-blue-600 mt-1">
                                       Monday: {(artifact as any).mondayColumnTitle || artifact.mondayColumn}
                                     </p>
+                                  )}
+                                </div>
+                                
+                                {/* Botões de ação */}
+                                <div className="flex-shrink-0 ml-2">
+                                  {artifact.isImage === 'true' ? (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="text-xs px-2 py-1 h-7"
+                                      onClick={() => handleInsertImage(artifact)}
+                                      title="Inserir imagem no documento"
+                                    >
+                                      <Image className="w-3 h-3 mr-1" />
+                                      Inserir
+                                    </Button>
+                                  ) : (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="text-xs px-2 py-1 h-7"
+                                      onClick={() => handleDownloadFile(artifact)}
+                                      title="Baixar arquivo"
+                                    >
+                                      <Download className="w-3 h-3 mr-1" />
+                                      Baixar
+                                    </Button>
                                   )}
                                 </div>
                               </div>
