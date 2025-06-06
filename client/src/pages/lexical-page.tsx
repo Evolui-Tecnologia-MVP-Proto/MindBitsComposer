@@ -635,13 +635,7 @@ export default function LexicalPage() {
                         <div className="space-y-3">
                           {documentArtifacts.map((artifact: DocumentArtifact) => {
                             // Log para debug dos campos
-                            console.log('Artifact data:', {
-                              id: artifact.id,
-                              name: artifact.name,
-                              fileName: artifact.fileName,
-                              type: artifact.type,
-                              mimeType: artifact.mimeType
-                            });
+                            console.log('Artifact data completo:', artifact);
                             
                             return (
                               <div 
