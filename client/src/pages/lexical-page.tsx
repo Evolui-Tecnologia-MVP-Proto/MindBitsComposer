@@ -479,6 +479,10 @@ export default function LexicalPage() {
                   Template: {selectedTemplate.code}
                 </Badge>
               )}
+            </div>
+            
+            <div className="flex flex-col items-center space-y-1">
+              <span className="text-xs text-gray-500 font-medium">Visualização</span>
               <Button
                 onClick={() => setViewMode(viewMode === 'editor' ? 'preview' : 'editor')}
                 variant="outline"
@@ -517,23 +521,29 @@ export default function LexicalPage() {
                 </Button>
               </div>
             </div>
-            <Button
-              onClick={handleDiscard}
-              variant="outline"
-              size="sm"
-              className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Descartar
-            </Button>
-            <Button
-              onClick={handleSave}
-              disabled={saveMutation.isPending}
-              size="sm"
-            >
-              <Save className="w-4 h-4 mr-2" />
-              {saveMutation.isPending ? "Salvando..." : "Salvar"}
-            </Button>
+            
+            <div className="flex flex-col items-center space-y-1">
+              <span className="text-xs text-gray-500 font-medium">Ações</span>
+              <div className="flex items-center space-x-2">
+                <Button
+                  onClick={handleDiscard}
+                  variant="outline"
+                  size="sm"
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Descartar
+                </Button>
+                <Button
+                  onClick={handleSave}
+                  disabled={saveMutation.isPending}
+                  size="sm"
+                >
+                  <Save className="w-4 h-4 mr-2" />
+                  {saveMutation.isPending ? "Salvando..." : "Salvar"}
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
