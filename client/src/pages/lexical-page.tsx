@@ -506,18 +506,18 @@ export default function LexicalPage() {
                   variant={showDocumentList ? "default" : "outline"}
                   size="sm"
                   className={showDocumentList ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
+                  title="Biblioteca"
                 >
-                  <FolderOpen className={`w-4 h-4 mr-2 ${showDocumentList ? "text-white" : ""}`} />
-                  Biblioteca
+                  <FolderOpen className={`w-4 h-4 ${showDocumentList ? "text-white" : ""}`} />
                 </Button>
                 <Button
                   onClick={() => setShowAttachments(!showAttachments)}
                   variant={showAttachments ? "default" : "outline"}
                   size="sm"
                   className={showAttachments ? "bg-green-600 text-white hover:bg-green-700" : ""}
+                  title="Anexos"
                 >
-                  <Paperclip className={`w-4 h-4 mr-2 ${showAttachments ? "text-white" : ""}`} />
-                  Anexos
+                  <Paperclip className={`w-4 h-4 ${showAttachments ? "text-white" : ""}`} />
                 </Button>
               </div>
             </div>
