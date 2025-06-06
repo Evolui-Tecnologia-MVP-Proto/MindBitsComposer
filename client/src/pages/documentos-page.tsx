@@ -771,6 +771,17 @@ export default function DocumentosPage() {
   const [showFlowInspector, setShowFlowInspector] = useState(false);
   const [selectedFlowNode, setSelectedFlowNode] = useState<any>(null);
   const [isFlowInspectorPinned, setIsFlowInspectorPinned] = useState(false);
+
+  // Estado para modal de detalhes das execuções de fluxo
+  const [flowExecutionsModal, setFlowExecutionsModal] = useState<{
+    isOpen: boolean;
+    documentId: string;
+    documentTitle: string;
+  }>({
+    isOpen: false,
+    documentId: "",
+    documentTitle: "",
+  });
   // Função para resetar o formulário
   const resetFormData = () => {
     console.log("🧹 LIMPANDO CAMPOS DO FORMULÁRIO");
@@ -1383,6 +1394,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       return response.json();
     },
     enabled: !!currentCreatedDocumentId,
+  });
+
+  // Buscar detalhes das execuções de fluxo de um documento específico
+  const { data: documentFlowExecutions = [] } = useQuery({
+    queryKey: ["/api/document-flow-executions", flowExecutionsModal.documentId],
+    queryFn: async () => {
+      if (!flowExecutionsModal.documentId) return [];
+      const response = await fetch(`/api/document-flow-executions?documentId=${flowExecutionsModal.documentId}`);
+      if (!response.ok) throw new Error("Erro ao buscar execuções de fluxo");
+      return response.json();
+    },
+    enabled: !!flowExecutionsModal.documentId && flowExecutionsModal.isOpen,
   });
 
   // Mutation para criar documento
@@ -2454,8 +2477,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   {(activeTab === "em-processo" || activeTab === "concluidos") && flowExecutionCounts[documento.id] && (
                     <Badge 
                       variant="secondary" 
-                      className="ml-1 text-xs bg-purple-100 text-purple-700 hover:bg-purple-200"
-                      title={`${flowExecutionCounts[documento.id]} execução${flowExecutionCounts[documento.id] > 1 ? 'ões' : ''} de fluxo`}
+                      className="ml-1 text-xs bg-purple-100 text-purple-700 hover:bg-purple-200 cursor-pointer"
+                      title="Número de fluxos - Clique para ver detalhes"
+                      onClick={() => {
+                        setFlowExecutionsModal({
+                          isOpen: true,
+                          documentId: documento.id,
+                          documentTitle: documento.objeto
+                        });
+                      }}
                     >
                       {flowExecutionCounts[documento.id]}
                     </Badge>
@@ -7308,6 +7338,125 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   }
 
+  function renderFlowExecutionsModal() {
+    if (!flowExecutionsModal.isOpen) {
+      return null;
+    }
+
+    return (
+      <Dialog open={flowExecutionsModal.isOpen} onOpenChange={(open) => {
+        if (!open) {
+          setFlowExecutionsModal({
+            isOpen: false,
+            documentId: "",
+            documentTitle: ""
+          });
+        }
+      }}>
+        <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Detalhes das Execuções de Fluxo</DialogTitle>
+            <DialogDescription>
+              Histórico de execuções de fluxo para o documento: {flowExecutionsModal.documentTitle}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex-1 overflow-auto">
+            {documentFlowExecutions.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                Nenhuma execução de fluxo encontrada para este documento.
+              </div>
+            ) : (
+              <div className="border rounded-lg overflow-hidden">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Fluxo
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Criado em
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Atualizado em
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Duração
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {documentFlowExecutions.map((execution: any, index: number) => {
+                      const createdAt = new Date(execution.createdAt);
+                      const updatedAt = new Date(execution.updatedAt);
+                      const duration = execution.status === 'completed' 
+                        ? Math.round((updatedAt.getTime() - createdAt.getTime()) / (1000 * 60)) // em minutos
+                        : null;
+
+                      return (
+                        <tr key={execution.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <div className="flex flex-col">
+                              <div className="text-sm font-medium text-gray-900">
+                                {execution.flowName || 'Fluxo sem nome'}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {execution.flowCode || execution.flowId}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            <Badge variant={
+                              execution.status === 'completed' ? 'default' :
+                              execution.status === 'initiated' ? 'secondary' :
+                              execution.status === 'failed' ? 'destructive' : 'outline'
+                            }>
+                              {execution.status === 'completed' ? 'Concluído' :
+                               execution.status === 'initiated' ? 'Iniciado' :
+                               execution.status === 'failed' ? 'Falhou' : execution.status}
+                            </Badge>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {createdAt.toLocaleDateString('pt-BR')} {createdAt.toLocaleTimeString('pt-BR')}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {updatedAt.toLocaleDateString('pt-BR')} {updatedAt.toLocaleTimeString('pt-BR')}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {duration !== null ? `${duration} min` : '-'}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+          
+          <div className="flex-shrink-0 border-t bg-white p-4 mt-4">
+            <div className="flex justify-end">
+              <Button 
+                onClick={() => {
+                  setFlowExecutionsModal({
+                    isOpen: false,
+                    documentId: "",
+                    documentTitle: ""
+                  });
+                }}
+              >
+                Fechar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <div className="container mx-auto py-6">
       {renderEditModal()}
@@ -7315,6 +7464,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {renderDocumentationModal()}
       {renderEditArtifactModal()}
       {renderFlowDiagramModal()}
+      {renderFlowExecutionsModal()}
     </div>
   );
 }
