@@ -2408,212 +2408,42 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   );
 
   // Componente FlowWithAutoFitView extraído para arquivo separado
-    
-    // Carregar dados salvos quando um nó é selecionado
-    useEffect(() => {
-      if (selectedFlowNode && selectedFlowNode.data.formData) {
-        console.log('🔄 Carregando dados salvos do formulário:', selectedFlowNode.data.formData);
-        setFormValues(selectedFlowNode.data.formData);
-      } else {
-        // Limpar formulário se não há dados salvos
-        setFormValues({});
-      }
-      
-      // Limpar resultado da integração ao mudar de nó
-      setIntegrationResult({ status: null, message: '' });
-    }, [selectedFlowNode?.id, selectedFlowNode?.data.formData]);
-    
-    // Função helper para extrair dados do formulário
-    const getFormFields = () => {
-      try {
-        if (!selectedFlowNode) {
-          console.log('🔍 getFormFields: Nenhum nó selecionado');
-          return {};
-        }
-        
-        const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
-        console.log('🔍 getFormFields: dados brutos', {
-          nodeId: selectedFlowNode.id,
-          attachedFormData,
-          hasForm: !!attachedFormData
-        });
-        
-        if (!attachedFormData) return {};
-        
-        // Corrigir o formato JSON malformado específico
-        let correctedData = attachedFormData;
-        
-        // Verificar se precisa de correção de formato
-        if (attachedFormData.includes('["') && attachedFormData.includes('": [')) {
-          // Primeiro, substituir a estrutura Fields
-          correctedData = attachedFormData.replace(
-            /"Fields":\s*\[/g, 
-            '"Fields":{'
-          );
-          
-          // Corrigir os campos individuais
-          correctedData = correctedData
-            .replace(/\"([^"]+)\"\:\s*\[/g, '"$1":[')
-            .replace(/\]\s*,\s*\"([^"]+)\"\:\s*\[/g, '],"$1":[')
-            .replace(/\]\s*\]/g, ']}');
-          
-          console.log('🔍 getFormFields: dados corrigidos', correctedData);
-        }
-        
-        const parsedData = JSON.parse(correctedData);
-        const fields = parsedData.Fields || {};
-        console.log('🔍 getFormFields: campos extraídos', fields);
-        return fields;
-      } catch (e) {
-        console.log('🔍 getFormFields: erro', e);
-        return {};
-      }
-    };
 
-    // Função para verificar se todos os campos obrigatórios estão preenchidos
-    const areAllFieldsFilled = () => {
-      // Só valida se há um nó selecionado e é um actionNode
-      if (!selectedFlowNode || selectedFlowNode.type !== 'actionNode') {
-        return true;
-      }
-
-      // Só valida se o nó está pendente de execução
-      if (!selectedFlowNode.data.isPendingConnected) {
-        return true;
-      }
-
-      // Verifica se existe formulário anexado
-      const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
-      if (!attachedFormData) {
-        return true; // Sem formulário, pode salvar
-      }
-
-      try {
-        // Parse do formulário anexado
-        let formData;
-        if (typeof attachedFormData === 'string' && attachedFormData.includes('"Motivo de Recusa":') && attachedFormData.includes('"Detalhamento":')) {
-          // Converte o formato específico manualmente
-          formData = {
-            "Show_Condition": "FALSE",
-            "Fields": {
-              "Motivo de Recusa": ["Incompatível com processo", "Forma de operação", "Configuração de Sistema"],
-              "Detalhamento": ["default:", "type:longText"]
-            }
-          };
-        } else {
-          formData = JSON.parse(attachedFormData);
-        }
-
-        // Verifica se é um formulário com condição
-        if (formData.Show_Condition !== undefined && formData.Fields) {
-          const showCondition = formData.Show_Condition;
-          const isApprovalNode = selectedFlowNode.data.actionType === 'Intern_Aprove';
-          const approvalStatus = selectedFlowNode.data.isAproved;
-          
-          // Determina se deve mostrar o formulário baseado na condição
-          let shouldShowForm = false;
-          if (isApprovalNode && approvalStatus !== 'UNDEF') {
-            if (showCondition === 'TRUE' && approvalStatus === 'TRUE') {
-              shouldShowForm = true;
-            } else if (showCondition === 'FALSE' && approvalStatus === 'FALSE') {
-              shouldShowForm = true;
-            } else if (showCondition === 'BOTH' && (approvalStatus === 'TRUE' || approvalStatus === 'FALSE')) {
-              shouldShowForm = true;
-            }
-          }
-          
-          // Se o formulário não deve ser exibido devido à condição, permite salvar
-          if (!shouldShowForm) {
-            console.log('🔍 Formulário oculto por condição de aprovação, permitindo salvar');
-            return true;
-          }
-        }
-
-        // Se chegou até aqui, o formulário deve ser exibido, então valida os campos
-        const fieldsData = getFormFields();
-        const fieldNames = Object.keys(fieldsData);
-        
-        console.log('🔍 Validação de campos:', {
-          nodeId: selectedFlowNode.id,
-          nodeType: selectedFlowNode.type,
-          isPending: selectedFlowNode.data.isPendingConnected,
-          fieldsData,
-          fieldNames,
-          formValues,
-          hasFields: fieldNames.length > 0
-        });
-        
-        // Se não há campos, permite salvar
-        if (fieldNames.length === 0) return true;
-        
-        // Verifica se todos os campos têm valores preenchidos
-        const allFilled = fieldNames.every(fieldName => {
-          const value = formValues[fieldName];
-          // Para campos select, verificar se não está vazio ou "Selecione uma opção"
-          const isFilled = value && value.trim() !== '' && value !== 'Selecione uma opção';
-          console.log(`Campo ${fieldName}: valor="${value}", preenchido=${isFilled}`);
-          return isFilled;
-        });
-        
-        console.log('🔍 Resultado da validação:', allFilled);
-        return allFilled;
-      } catch (e) {
-        console.log('🔍 Erro na validação do formulário:', e);
-        return true; // Em caso de erro, permite salvar
-      }
-    };
-
-    // Função para alterar o status de aprovação (altera estado imediatamente e mostra alerta)
-    const updateApprovalStatus = (nodeId: string, newStatus: string) => {
-      const currentNodes = getNodes();
-      const updatedNodes = currentNodes.map(node => {
-        if (node.id === nodeId) {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              isAproved: newStatus
-            }
-          };
-        }
-        return node;
-      });
-      setNodes(updatedNodes);
-      
-      // Atualizar também o nó selecionado para refletir a mudança no painel
-      if (selectedFlowNode && selectedFlowNode.id === nodeId) {
-        setSelectedFlowNode({
-          ...selectedFlowNode,
-          data: {
-            ...selectedFlowNode.data,
-            isAproved: newStatus
-          }
-        });
-      }
-
-      // Mostrar alerta para persistir alterações
-      console.log('🔴 Definindo showApprovalAlert para true');
-      setShowApprovalAlert(true);
-    };
-
-    // Função para executar transferência de fluxo
-    const executeFlowTransfer = async () => {
-      if (!selectedFlowNode || selectedFlowNode.type !== 'endNode' || selectedFlowNode.data.FromType !== 'flow_init') {
-        console.log('Nenhum endNode de transferência selecionado');
-        return;
-      }
-
-      console.log('Executando transferência de fluxo...');
-      
-      try {
-        // Verificar se existe fluxo destino
-        if (!selectedFlowNode.data.To_Flow_id) {
-          setIntegrationResult({
-            status: 'error',
-            message: 'Fluxo de destino não definido para transferência.'
+  return (
+    <div className="container mx-auto py-6">
+      <DocumentosTable
+        filteredDocuments={filteredDocuments}
+        openEditModal={openEditModal}
+        openViewModal={openViewModal}
+        handleDeleteDocument={handleDeleteDocument}
+        onOpenFlowDiagram={(doc: Documento) => {
+          setSelectedDocument(doc);
+          setIsFlowDiagramModalOpen(true);
+        }}
+        onOpenAddArtifact={(doc: Documento) => {
+          setSelectedDocument(doc);
+          setArtifactFormData({
+            name: '',
+            documentoId: doc.id,
+            fileData: null,
+            fileName: null,
+            fileSize: null,
+            mimeType: null,
+            type: null,
+            originAssetId: null,
+            isImage: null
           });
-          return;
-        }
+          setIsAddArtifactModalOpen(true);
+        }}
+        onOpenDocumentation={(doc: Documento) => {
+          setSelectedDocument(doc);
+          setIsDocumentationModalOpen(true);
+        }}
+        documentsFlows={documentsFlows}
+        flowExecutions={flowExecutions}
+      />
+
+      <EditDocumentModal
 
         // Marcar o nó como executado
         const updatedNodes = [...nodes];
