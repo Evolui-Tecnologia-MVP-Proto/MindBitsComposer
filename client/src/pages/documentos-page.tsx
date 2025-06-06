@@ -7345,9 +7345,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   }
 
   function renderFlowExecutionsModal() {
+    console.log("🟡 RENDERIZANDO FLOW EXECUTIONS MODAL:", flowExecutionsModal);
     if (!flowExecutionsModal.isOpen) {
+      console.log("🟡 Modal fechada, não renderizando");
       return null;
     }
+    console.log("🟡 Modal ABERTA, renderizando...");
 
     return (
       <Dialog open={flowExecutionsModal.isOpen} onOpenChange={(open) => {
