@@ -82,6 +82,7 @@ import {
   type DocumentArtifact,
   type InsertDocumentArtifact,
 } from "@shared/schema";
+import { FlowWithAutoFitView } from "@/components/documentos/flow/FlowWithAutoFitView";
 
 export default function DocumentosPage() {
   const [activeTab, setActiveTab] = useState("incluidos");
@@ -4331,74 +4332,53 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   // Modal do diagrama de fluxo
   function renderFlowDiagramModal() {
-    if (!flowDiagramModal.isOpen || !flowDiagramModal.flowData) return null;
-
-    const nodeTypes = {
-      start: StartNode,
-      end: EndNode,
-    };
-
-    const convertFlowDataToReactFlow = (flowData: any) => {
-      if (!flowData?.nodes || !flowData?.edges) {
-        return { nodes: [], edges: [] };
-      }
-
-      const nodes = flowData.nodes.map((node: any) => ({
-        ...node,
-        data: {
-          ...node.data,
-          isReadonly: true,
-        },
-      }));
-
-      return {
-        nodes,
-        edges: flowData.edges || [],
-      };
-    };
-
-    const { nodes, edges } = convertFlowDataToReactFlow(flowDiagramModal.flowData);
+    console.log("🔴 RENDERIZANDO MODAL:", flowDiagramModal);
+    if (!flowDiagramModal.isOpen || !flowDiagramModal.flowData) {
+      console.log("🔴 Modal fechada ou sem dados, não renderizando");
+      return null;
+    }
+    console.log("🔴 Modal ABERTA, renderizando...");
 
     return (
-      <Dialog open={flowDiagramModal.isOpen} onOpenChange={(open) => {
-        if (!open) {
-          setFlowDiagramModal({
-            isOpen: false,
-            flowData: null,
-            documentTitle: "",
-          });
-        }
-      }}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <GitBranch className="h-5 w-5" />
-              Diagrama do Fluxo - {flowDiagramModal.documentTitle}
+      <Dialog 
+        open={flowDiagramModal.isOpen} 
+        onOpenChange={(open) => {
+          if (!open) {
+            setFlowDiagramModal({ isOpen: false, flowData: null, documentTitle: "" });
+            setSelectedFlowNode(null);
+            setShowFlowInspector(false);
+          }
+        }}
+      >
+        <DialogContent className="max-w-7xl h-[90vh] p-0">
+          <DialogHeader className="p-6 pb-0">
+            <DialogTitle className="text-xl font-semibold">
+              Diagrama de Fluxo - {flowDiagramModal.documentTitle}
             </DialogTitle>
-            <DialogDescription>
-              Visualização do diagrama de fluxo de trabalho aplicado ao documento
-            </DialogDescription>
           </DialogHeader>
-          <div className="h-[500px] w-full border rounded-lg">
+          
+          <div className="flex-1 h-full relative">
             <ReactFlowProvider>
-              <ReactFlow
-                nodes={nodes}
-                edges={edges}
-                nodeTypes={nodeTypes}
-                fitView
-                attributionPosition="bottom-left"
-                nodesDraggable={false}
-                nodesConnectable={false}
-                elementsSelectable={false}
-                panOnDrag={true}
-                zoomOnScroll={true}
-                zoomOnPinch={true}
-                zoomOnDoubleClick={false}
-              >
-                <Controls showInteractive={false} />
-                <Background />
-              </ReactFlow>
+              <FlowWithAutoFitView 
+                flowData={flowDiagramModal.flowData}
+                showFlowInspector={showFlowInspector}
+                setShowFlowInspector={setShowFlowInspector}
+                setSelectedFlowNode={setSelectedFlowNode}
+                selectedFlowNode={selectedFlowNode}
+                showApprovalAlert={showApprovalAlert}
+                setShowApprovalAlert={setShowApprovalAlert}
+                isPinned={isFlowInspectorPinned}
+              />
             </ReactFlowProvider>
+          </div>
+          
+          <div className="p-4 border-t bg-gray-50">
+            <Button 
+              onClick={() => setFlowDiagramModal({ isOpen: false, flowData: null, documentTitle: "" })}
+              variant="outline"
+            >
+              Fechar
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
