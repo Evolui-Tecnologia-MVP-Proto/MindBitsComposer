@@ -91,6 +91,37 @@ function onError(error: Error): void {
   console.error('Erro no editor Lexical:', error);
 }
 
+// Plugin para escutar eventos de inserção de imagem
+function ImageEventListenerPlugin(): JSX.Element | null {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    const handleInsertImage = (event: CustomEvent) => {
+      const { src, altText } = event.detail;
+      
+      editor.update(() => {
+        const selection = $getSelection();
+        if ($isRangeSelection(selection)) {
+          const imageNode = $createImageNode({
+            src,
+            altText,
+          });
+          $insertNodes([imageNode]);
+        }
+      });
+    };
+
+    // Escutar evento customizado de inserção de imagem
+    window.addEventListener('insertImage', handleInsertImage as EventListener);
+
+    return () => {
+      window.removeEventListener('insertImage', handleInsertImage as EventListener);
+    };
+  }, [editor]);
+
+  return null;
+}
+
 // Barra de ferramentas interativa
 function ToolbarPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
@@ -666,6 +697,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <TablePlugin />
           <CollapsiblePlugin />
           <ImagePlugin />
+          <ImageEventListenerPlugin />
           <TemplateSectionsPlugin sections={templateSections} />
           <AutoFocusPlugin />
         </div>

@@ -11,6 +11,9 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Link } from "wouter";
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { INSERT_IMAGE_COMMAND } from '@/components/lexical/ImagePlugin';
+import type { ImagePayload } from '@/components/lexical/ImageNode';
 
 interface LexicalDocument {
   id: string;
@@ -64,6 +67,7 @@ export default function LexicalPage() {
   const [editorState, setEditorState] = useState<string>('');
   const [initialEditorState, setInitialEditorState] = useState<string | undefined>(undefined);
   const [editorKey, setEditorKey] = useState<number>(0); // Chave para forçar re-render do editor
+  const [editorInstance, setEditorInstance] = useState<any>(null);
   const { toast } = useToast();
 
   // Função para obter ícone baseado no tipo de arquivo
@@ -158,8 +162,17 @@ export default function LexicalPage() {
       if (artifact.fileData && artifact.mimeType) {
         const imageUrl = `data:${artifact.mimeType};base64,${artifact.fileData}`;
         
-        // Aqui você pode implementar a lógica para inserir a imagem no editor Lexical
-        // Por enquanto, vamos mostrar um toast de sucesso
+        // Criar evento customizado para inserir imagem
+        const insertImageEvent = new CustomEvent('insertImage', {
+          detail: {
+            src: imageUrl,
+            altText: artifact.name || 'Imagem',
+          }
+        });
+        
+        // Disparar evento para o editor
+        window.dispatchEvent(insertImageEvent);
+        
         toast({
           title: "Imagem inserida",
           description: `A imagem "${artifact.name}" foi inserida no documento.`,
