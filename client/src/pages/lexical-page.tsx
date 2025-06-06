@@ -140,6 +140,15 @@ export default function LexicalPage() {
   // Query para buscar artifacts do documento selecionado
   const { data: documentArtifacts = [], isLoading: isLoadingArtifacts } = useQuery<DocumentArtifact[]>({
     queryKey: ['/api/document-editions', selectedEdition?.id, 'artifacts'],
+    queryFn: async () => {
+      if (!selectedEdition?.id) return [];
+      console.log('🔥 Buscando artifacts para editionId:', selectedEdition.id);
+      const response = await fetch(`/api/document-editions/${selectedEdition.id}/artifacts`);
+      if (!response.ok) throw new Error('Erro ao buscar artifacts');
+      const data = await response.json();
+      console.log('🔥 Artifacts recebidos:', data);
+      return data;
+    },
     enabled: !!selectedEdition?.id
   });
 
