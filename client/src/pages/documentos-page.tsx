@@ -616,7 +616,7 @@ export default function DocumentosPage() {
         `https://api.github.com/repos/${owner}/${repo}/contents`,
         {
           headers: {
-            Authorization: `Bearer ${githubConnection.token}`,
+            Authorization: `token ${githubConnection.token}`,
             Accept: "application/vnd.github.v3+json",
             "User-Agent": "EVO-MindBits-Composer",
           },
