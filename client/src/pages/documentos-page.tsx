@@ -97,6 +97,7 @@ import {
   IntegrationNodeComponent,
   SwitchNodeComponent
 } from "@/components/documentos/flow/FlowNodes";
+import { ViewDocumentModal } from "@/components/documentos/modals/ViewDocumentModal";
 
 export default function DocumentosPage() {
   const [activeTab, setActiveTab] = useState("incluidos");
@@ -3596,7 +3597,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         </Tabs>
       </div>
 
-      {renderViewModal()}
+      <ViewDocumentModal 
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        selectedDocument={selectedDocument}
+      />
       {renderCreateModal()}
       {renderEditModal()}
       {renderAddArtifactModal()}
