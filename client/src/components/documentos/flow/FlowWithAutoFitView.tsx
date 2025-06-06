@@ -269,7 +269,7 @@ export function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowIn
       }
 
       // Marcar o nó como executado
-      const updatedNodes = [...nodes];
+      const updatedNodes = [...flowTaskNodes];
       const nodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
       if (nodeIndex !== -1) {
         updatedNodes[nodeIndex] = {
@@ -363,7 +363,7 @@ export function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowIn
     
     try {
       // Marcar o nó como executado
-      const updatedNodes = [...nodes];
+      const updatedNodes = [...flowTaskNodes];
       const nodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
       if (nodeIndex !== -1) {
         updatedNodes[nodeIndex] = {
@@ -473,7 +473,7 @@ export function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowIn
       });
       
       // Marcar o nó como executado
-      const updatedNodes = [...nodes];
+      const updatedNodes = [...flowTaskNodes];
       const nodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
       if (nodeIndex !== -1) {
         updatedNodes[nodeIndex] = {
