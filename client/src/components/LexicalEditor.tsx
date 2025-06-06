@@ -408,6 +408,7 @@ interface LexicalEditorProps {
 // Função para converter conteúdo Lexical para markdown
 function convertToMarkdown(editorState: any): string {
   let markdown = '';
+  let imageCounter = 1;
   
   editorState.read(() => {
     const root = $getRoot();
@@ -443,7 +444,9 @@ function convertToMarkdown(editorState: any): string {
       } else if (node.getType() === 'image') {
         const src = node.getSrc();
         const alt = node.getAltText();
-        markdown += `![${alt}](${src})\n\n`;
+        const imageId = `img_${imageCounter}`;
+        markdown += `![${imageId}](${src})\n\n`;
+        imageCounter++;
       } else if (node.getType() === 'table') {
         // Processar tabela para markdown
         const rows = node.getChildren();
@@ -507,6 +510,12 @@ function convertToMarkdown(editorState: any): string {
                   });
                   markdown += '\n';
                 }
+              } else if (contentChild.getType() === 'image') {
+                const src = contentChild.getSrc();
+                const alt = contentChild.getAltText();
+                const imageId = `img_${imageCounter}`;
+                markdown += `![${imageId}](${src})\n\n`;
+                imageCounter++;
               } else {
                 const contentText = contentChild.getTextContent();
                 if (contentText.trim()) {
