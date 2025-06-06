@@ -90,6 +90,21 @@ export function FlowWithAutoFitView({
     return () => clearTimeout(timeoutId);
   }, [showFlowInspector, fitView]);
 
+  // Node types definition - moved before conditional return
+  const nodeTypes = useMemo(() => ({
+    startNode: StartNode,
+    endNode: EndNode,
+    actionNode: TaskNode,
+    documentNode: TaskNode,
+    integrationNode: TaskNode,
+    switchNode: DecisionNode,
+    taskNode: TaskNode,
+    decisionNode: DecisionNode,
+    approveNode: ApproveNode,
+    elaboreNode: ElaboreNode,
+    reviseNode: ReviseNode
+  }), []);
+
   // Early return if no flow data - moved after all hooks
   if (!flowData?.flowTasks) {
     return null;
@@ -931,20 +946,6 @@ export function FlowWithAutoFitView({
       },
     };
   });
-
-  const nodeTypes = useMemo(() => ({
-    startNode: StartNode,
-    endNode: EndNode,
-    actionNode: TaskNode,
-    documentNode: TaskNode,
-    integrationNode: TaskNode,
-    switchNode: DecisionNode,
-    taskNode: TaskNode,
-    decisionNode: DecisionNode,
-    approveNode: ApproveNode,
-    elaboreNode: ElaboreNode,
-    reviseNode: ReviseNode
-  }), []);
 
   const onNodeClick = (event: any, node: any) => {
     setSelectedFlowNode(node);
