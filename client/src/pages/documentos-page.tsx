@@ -99,6 +99,7 @@ import {
 } from "@/components/documentos/flow/FlowNodes";
 import { ViewDocumentModal } from "@/components/documentos/modals/ViewDocumentModal";
 import { EditDocumentModal } from "@/components/documentos/modals/EditDocumentModal";
+import { FlowDiagramModal } from "@/components/documentos/modals/FlowDiagramModal";
 
 export default function DocumentosPage() {
   const [activeTab, setActiveTab] = useState("incluidos");
@@ -3645,7 +3646,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {renderAddArtifactModal()}
       {renderEditArtifactModal()}
       {renderDocumentationModal()}
-      {renderFlowDiagramModal()}
+      <FlowDiagramModal
+        flowDiagramModal={flowDiagramModal}
+        setFlowDiagramModal={setFlowDiagramModal}
+        showFlowInspector={showFlowInspector}
+        setShowFlowInspector={setShowFlowInspector}
+        selectedFlowNode={selectedFlowNode}
+        setSelectedFlowNode={setSelectedFlowNode}
+        showApprovalAlert={showApprovalAlert}
+        setShowApprovalAlert={setShowApprovalAlert}
+        isFlowInspectorPinned={isFlowInspectorPinned}
+        FlowWithAutoFitView={FlowWithAutoFitView}
+      />
     </div>
   );
 
@@ -6813,7 +6825,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       {renderAddArtifactModal()}
       {renderDocumentationModal()}
       {renderEditArtifactModal()}
-      {renderFlowDiagramModal()}
+      <FlowDiagramModal
+        flowDiagramModal={flowDiagramModal}
+        setFlowDiagramModal={setFlowDiagramModal}
+        showFlowInspector={showFlowInspector}
+        setShowFlowInspector={setShowFlowInspector}
+        selectedFlowNode={selectedFlowNode}
+        setSelectedFlowNode={setSelectedFlowNode}
+        showApprovalAlert={showApprovalAlert}
+        setShowApprovalAlert={setShowApprovalAlert}
+        isFlowInspectorPinned={isFlowInspectorPinned}
+        FlowWithAutoFitView={FlowWithAutoFitView}
+      />
     </div>
   );
 }
