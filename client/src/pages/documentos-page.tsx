@@ -897,6 +897,11 @@ export default function DocumentosPage() {
     enabled: documentos.length > 0,
   });
 
+  // Buscar contagem de execuções de fluxo para todos os documentos
+  const { data: flowExecutionCounts = {} } = useQuery<Record<string, number>>({
+    queryKey: ["/api/document-flow-executions/count"],
+  });
+
   // Buscar conexões de serviço para obter o repositório GitHub
   const { data: serviceConnections = [] } = useQuery({
     queryKey: ["/api/service-connections"],
@@ -2445,6 +2450,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     >
                       <Network className="h-4 w-4 text-purple-500" />
                     </Button>
+                  )}
+                  {(activeTab === "em-processo" || activeTab === "concluidos") && flowExecutionCounts[documento.id] && (
+                    <Badge 
+                      variant="secondary" 
+                      className="ml-1 text-xs bg-purple-100 text-purple-700 hover:bg-purple-200"
+                      title={`${flowExecutionCounts[documento.id]} execução${flowExecutionCounts[documento.id] > 1 ? 'ões' : ''} de fluxo`}
+                    >
+                      {flowExecutionCounts[documento.id]}
+                    </Badge>
                   )}
                   {activeTab !== "integrados" && activeTab !== "em-processo" && activeTab !== "concluidos" && (
                     <>
@@ -7250,7 +7264,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         <DialogContent className="max-w-[90vw] max-h-[90vh] w-[90vw] h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="flex items-center gap-2">
-              <GitBranch className="h-5 w-5" />
+              <Network className="h-5 w-5" />
               Diagrama do Fluxo - {flowDiagramModal.documentTitle}
             </DialogTitle>
             <DialogDescription>

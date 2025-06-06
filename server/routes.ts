@@ -4031,6 +4031,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get flow executions count by document
+  app.get("/api/document-flow-executions/count", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const countResults = await db
+        .select({
+          documentId: documentFlowExecutions.documentId,
+          count: sql<number>`count(*)::int`
+        })
+        .from(documentFlowExecutions)
+        .groupBy(documentFlowExecutions.documentId);
+      
+      // Converter array para objeto com documentId como chave
+      const countsMap = countResults.reduce((acc, row) => {
+        acc[row.documentId] = row.count;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      res.json(countsMap);
+    } catch (error) {
+      console.error("Erro ao buscar contagem de execuções:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   // Update flow execution tasks
   app.put("/api/document-flow-executions/:documentId", async (req: Request, res: Response) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
