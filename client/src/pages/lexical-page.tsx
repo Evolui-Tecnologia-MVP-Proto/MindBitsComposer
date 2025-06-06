@@ -67,14 +67,14 @@ export default function LexicalPage() {
   const { toast } = useToast();
 
   // Função para obter ícone baseado no tipo de arquivo
-  const getFileIcon = (mimeType: string, isImage: string | undefined) => {
-    if (isImage === "true" || mimeType.startsWith("image/")) {
+  const getFileIcon = (mimeType: string | undefined, isImage: string | undefined) => {
+    if (isImage === "true" || (mimeType && mimeType.startsWith("image/"))) {
       return <Image className="w-4 h-4" />;
     }
-    if (mimeType.startsWith("video/")) {
+    if (mimeType && mimeType.startsWith("video/")) {
       return <Video className="w-4 h-4" />;
     }
-    if (mimeType.startsWith("audio/")) {
+    if (mimeType && mimeType.startsWith("audio/")) {
       return <FileAudio className="w-4 h-4" />;
     }
     return <File className="w-4 h-4" />;
@@ -138,7 +138,7 @@ export default function LexicalPage() {
   });
 
   // Query para buscar artifacts do documento selecionado
-  const { data: documentArtifacts = [], isLoading: isLoadingArtifacts } = useQuery({
+  const { data: documentArtifacts = [], isLoading: isLoadingArtifacts } = useQuery<DocumentArtifact[]>({
     queryKey: ['/api/document-editions', selectedEdition?.id, 'artifacts'],
     enabled: !!selectedEdition?.id
   });
