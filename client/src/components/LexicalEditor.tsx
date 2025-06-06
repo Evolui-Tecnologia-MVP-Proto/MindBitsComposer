@@ -414,8 +414,10 @@ function convertToMarkdown(editorState: any): string {
     const root = $getRoot();
     const children = root.getChildren();
     
+    console.log('📄 Total de nós filhos encontrados:', children.length);
+    
     children.forEach((node: any) => {
-      console.log('🔍 Processando nó tipo:', node.getType());
+      console.log('🔍 Processando nó tipo:', node.getType(), 'Nó:', node);
       if (node.getType() === 'heading') {
         const level = node.getTag().replace('h', '');
         const text = node.getTextContent();
