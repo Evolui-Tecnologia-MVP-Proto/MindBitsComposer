@@ -5576,69 +5576,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     </div>
   );
 }
-      const tasksData = flowData?.flowTasks || flowData;
-      
-      if (!tasksData?.nodes) {
-        console.log("🔴 Nenhum node encontrado nos dados:", tasksData);
-        return { nodes: [], edges: [] };
-      }
-
-      const nodes = tasksData.nodes.map((node: any) => ({
-        ...node,
-        data: {
-          ...node.data,
-          isReadonly: true,
-        },
-      }));
-
-      console.log("🔴 Nodes convertidos:", nodes);
-      console.log("🔴 Edges encontradas:", tasksData.edges || []);
-
-      return {
-        nodes,
-        edges: tasksData.edges || [],
-      };
-    };
-
-    const { nodes, edges } = convertFlowDataToReactFlow(flowDiagramModal.flowData);
-    
-    // Usar as edges originais diretamente - a animação será aplicada no FlowWithAutoFitView
-
-    // Handler para clique em nós
-    const onNodeClick = (event: React.MouseEvent, node: any) => {
-      setSelectedFlowNode(node);
-      setShowFlowInspector(true);
-    };
-
-    // Handler para clique no painel (fechar inspector apenas se não estiver pinado)
-    const onPaneClick = () => {
-      if (!isFlowInspectorPinned) {
-        setShowFlowInspector(false);
-        setSelectedFlowNode(null);
-      }
-    };
-
-    // Remover lógica duplicada - a animação será aplicada no FlowWithAutoFitView
-
-
-
-    return (
-      <Dialog 
-        open={flowDiagramModal.isOpen} 
-        onOpenChange={(open) => {
-          console.log("🔴 onOpenChange chamado:", open);
-          if (!open) {
-            setFlowDiagramModal({
-              isOpen: false,
-              flowData: null,
-              documentTitle: "",
-            });
-          }
-        }}
-      >
-        <DialogContent className="max-w-[90vw] max-h-[90vh] w-[90vw] h-[90vh] overflow-hidden flex flex-col">
-          <DialogHeader className="flex-shrink-0">
-            <DialogTitle className="flex items-center gap-2">
               <Network className="h-5 w-5" />
               Diagrama do Fluxo - {flowDiagramModal.documentTitle}
             </DialogTitle>
