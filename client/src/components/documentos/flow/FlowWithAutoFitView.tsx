@@ -38,7 +38,7 @@ export function FlowWithAutoFitView({
   
   // Carregar dados salvos quando um nó é selecionado
   useEffect(() => {
-    if (selectedFlowNode && selectedFlowNode.data.formData) {
+    if (selectedFlowNode && selectedFlowNode.data && selectedFlowNode.data.formData) {
       console.log('🔄 Carregando dados salvos do formulário:', selectedFlowNode.data.formData);
       setFormValues(selectedFlowNode.data.formData);
     } else {
@@ -48,7 +48,7 @@ export function FlowWithAutoFitView({
     
     // Limpar resultado da integração ao mudar de nó
     setIntegrationResult({ status: null, message: '' });
-  }, [selectedFlowNode?.id, selectedFlowNode?.data.formData]);
+  }, [selectedFlowNode?.id, selectedFlowNode?.data?.formData]);
   
   // Função helper para extrair dados do formulário
   const getFormFields = () => {
@@ -58,7 +58,7 @@ export function FlowWithAutoFitView({
         return {};
       }
       
-      const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+      const attachedFormData = selectedFlowNode.data?.attached_Form || selectedFlowNode.data?.attached_form;
       console.log('🔍 getFormFields: dados brutos', {
         nodeId: selectedFlowNode.id,
         attachedFormData,
