@@ -97,7 +97,6 @@ import {
   IntegrationNodeComponent,
   SwitchNodeComponent
 } from "@/components/documentos/flow/FlowNodes";
-import { FlowInspector } from "@/components/documentos/flow/FlowInspector";
 
 export default function DocumentosPage() {
   const [activeTab, setActiveTab] = useState("incluidos");
@@ -5427,19 +5426,1178 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           </ReactFlow>
         </div>
         {showFlowInspector && selectedFlowNode && (
-          <FlowInspector 
-            selectedFlowNode={selectedFlowNode} 
-            onClose={() => {
-              setShowFlowInspector(false);
-              setSelectedFlowNode(null);
-              setIsFlowInspectorPinned(false);
-            }} 
-          />
+          <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto relative">
+            <div className="space-y-4">
+              <div className="border-b pb-2 relative">
+                <h3 className="text-lg font-semibold">Execution Form</h3>
+                <p className="text-sm text-gray-600 font-mono">
+                  {(() => {
+                    const typeMap: { [key: string]: string } = {
+                      'startNode': 'Início',
+                      'endNode': 'Fim',
+                      'actionNode': 'Ação',
+                      'documentNode': 'Documento',
+                      'integrationNode': 'Integração',
+                      'switchNode': 'Condição'
+                    };
+                    return typeMap[selectedFlowNode.type] || selectedFlowNode.type;
+                  })()} - {selectedFlowNode.id}
+                </p>
+                <button
+                  onClick={() => setIsFlowInspectorPinned(!isFlowInspectorPinned)}
+                  className={`absolute top-0 right-0 p-1 rounded transition-colors ${
+                    isFlowInspectorPinned 
+                      ? 'text-blue-600 bg-blue-100 hover:bg-blue-200' 
+                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                  }`}
+                  title={isFlowInspectorPinned ? "Desafixar painel" : "Fixar painel"}
+                >
+                  <Pin 
+                    className={`w-4 h-4 transition-transform ${isFlowInspectorPinned ? 'rotate-45' : 'rotate-0'}`}
+                  />
+                </button>
+              </div>
+              
+              <div className="space-y-3">
+                {/* Status Exec./Tipo apenas para ActionNode */}
+                {selectedFlowNode.type === 'actionNode' && (
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div>
+                      <p className="text-xs font-medium text-gray-700 mb-1">Status Exec.</p>
+                      <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                        selectedFlowNode.data.isExecuted === 'TRUE' 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : selectedFlowNode.data.isPendingConnected
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {selectedFlowNode.data.isExecuted === 'TRUE' 
+                          ? 'Executado' 
+                          : selectedFlowNode.data.isPendingConnected
+                          ? 'Pendente'
+                          : 'N.Exec.'}
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-gray-700 mb-1">Tipo Ação</p>
+                      {selectedFlowNode.data.actionType && (
+                        <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                          {selectedFlowNode.data.actionType}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-xs font-medium text-gray-700 mb-1">Aprovação</p>
+                      {selectedFlowNode.data.isAproved && (
+                        <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                          selectedFlowNode.data.isAproved === 'TRUE' 
+                            ? 'bg-green-100 text-green-800'
+                            : selectedFlowNode.data.isAproved === 'FALSE'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {selectedFlowNode.data.isAproved === 'TRUE' 
+                            ? 'SIM' 
+                            : selectedFlowNode.data.isAproved === 'FALSE'
+                            ? 'NÃO'
+                            : 'UNDEF'}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {selectedFlowNode.data.description && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700">Descrição</p>
+                    <p className="text-xs text-gray-900 bg-gray-50 p-2 rounded border font-mono">
+                      {selectedFlowNode.data.description}
+                    </p>
+                  </div>
+                )}
+
+                {/* Formulário dinâmico baseado no attached_Form */}
+                {selectedFlowNode.type === 'actionNode' && (selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form) && (
+                  <div>
+                    {(() => {
+                      try {
+                        // Verifica tanto attached_Form (maiúsculo) quanto attached_form (minúsculo)
+                        let attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+                        console.log('🔍 Dados brutos do formulário:', attachedFormData);
+                        
+                        // Corrige formato malformado do JSON se necessário
+                        if (typeof attachedFormData === 'string' && attachedFormData.includes('"Motivo de Recusa":') && attachedFormData.includes('"Detalhamento":')) {
+                          // Converte o formato específico manualmente
+                          const fixedJson = {
+                            "Show_Condition": "FALSE",
+                            "Fields": {
+                              "Motivo de Recusa": ["Incompatível com processo", "Forma de operação", "Configuração de Sistema"],
+                              "Detalhamento": ["default:", "type:longText"]
+                            }
+                          };
+                          attachedFormData = JSON.stringify(fixedJson);
+                        }
+                        
+                        console.log('🔍 Dados corrigidos:', attachedFormData);
+                        const formData = JSON.parse(attachedFormData);
+                        console.log('🔍 Dados parseados:', formData);
+                        
+                        // Verifica se é um formulário com condição
+                        if (formData.Show_Condition !== undefined && formData.Fields) {
+                          const showCondition = formData.Show_Condition;
+                          const isApprovalNode = selectedFlowNode.data.actionType === 'Intern_Aprove';
+                          const approvalStatus = selectedFlowNode.data.isAproved;
+                          
+                          // Determina se deve mostrar o formulário baseado na condição
+                          let shouldShowForm = false;
+                          if (isApprovalNode && approvalStatus !== 'UNDEF') {
+                            if (showCondition === 'TRUE' && approvalStatus === 'TRUE') {
+                              shouldShowForm = true;
+                            } else if (showCondition === 'FALSE' && approvalStatus === 'FALSE') {
+                              shouldShowForm = true;
+                            } else if (showCondition === 'BOTH' && (approvalStatus === 'TRUE' || approvalStatus === 'FALSE')) {
+                              shouldShowForm = true;
+                            }
+                          }
+                          
+                          if (!shouldShowForm) {
+                            return null;
+                          }
+                          
+                          // Converte Fields para objeto se for array - só processa se vai mostrar
+                          let fieldsData = formData.Fields;
+                          if (Array.isArray(formData.Fields)) {
+                            fieldsData = {};
+                            // Trata diferentes formatos de array
+                            formData.Fields.forEach((item, index) => {
+                              if (typeof item === 'string') {
+                                // Formato: [fieldName1, fieldValue1, fieldName2, fieldValue2, ...]
+                                const nextItem = formData.Fields[index + 1];
+                                if (nextItem !== undefined && index % 2 === 0) {
+                                  fieldsData[item] = nextItem;
+                                }
+                              } else if (typeof item === 'object' && item !== null) {
+                                // Formato: [{fieldName: fieldValue}, ...]
+                                Object.assign(fieldsData, item);
+                              }
+                            });
+                          }
+                          
+                          console.log('🟡 Dados do formulário processados:', fieldsData);
+                          
+                          return (
+                            <div className="bg-gray-50 p-4 rounded border space-y-4">
+                              {Object.entries(fieldsData).map(([fieldName, fieldValue]) => {
+                              // Verifica se é um array de configuração com default e type
+                              if (Array.isArray(fieldValue) && fieldValue.length === 2 && 
+                                  typeof fieldValue[0] === 'string' && fieldValue[0].startsWith('default:') &&
+                                  typeof fieldValue[1] === 'string' && fieldValue[1].startsWith('type:')) {
+                                
+                                const defaultValue = fieldValue[0].replace('default:', '');
+                                const fieldType = fieldValue[1].replace('type:', '');
+                                const isReadonly = !selectedFlowNode.data.isPendingConnected;
+                                const baseClasses = "w-full px-3 py-2 border rounded-md text-xs font-mono";
+                                const readonlyClasses = isReadonly 
+                                  ? "bg-gray-50 border-gray-200 text-gray-600 cursor-not-allowed" 
+                                  : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+                                
+                                return (
+                                  <div key={fieldName} className="space-y-2">
+                                    <label className="text-sm font-medium text-gray-700">{fieldName}</label>
+                                    {fieldType === 'longText' ? (
+                                      <textarea
+                                        rows={4}
+                                        placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
+                                        readOnly={isReadonly}
+                                        value={formValues[fieldName] || ''}
+                                        onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
+                                        className={`${baseClasses} ${readonlyClasses} resize-vertical`}
+                                      />
+                                    ) : fieldType.startsWith('char(') ? (
+                                      <input
+                                        type="text"
+                                        maxLength={parseInt(fieldType.match(/\d+/)?.[0] || '255')}
+                                        placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
+                                        readOnly={isReadonly}
+                                        value={formValues[fieldName] || ''}
+                                        onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
+                                        className={`${baseClasses} ${readonlyClasses}`}
+                                      />
+                                    ) : fieldType === 'int' ? (
+                                      <input
+                                        type="number"
+                                        step="1"
+                                        placeholder={defaultValue || `Digite um número inteiro`}
+                                        readOnly={isReadonly}
+                                        value={formValues[fieldName] || ''}
+                                        onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
+                                        className={`${baseClasses} ${readonlyClasses}`}
+                                      />
+                                    ) : fieldType.startsWith('number(') ? (
+                                      <input
+                                        type="number"
+                                        step={Math.pow(10, -parseInt(fieldType.match(/\d+/)?.[0] || '2'))}
+                                        placeholder={defaultValue || `Digite um número`}
+                                        readOnly={isReadonly}
+                                        value={formValues[fieldName] || ''}
+                                        onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
+                                        className={`${baseClasses} ${readonlyClasses}`}
+                                      />
+                                    ) : (
+                                      <input
+                                        type="text"
+                                        placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
+                                        readOnly={isReadonly}
+                                        value={formValues[fieldName] || ''}
+                                        onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
+                                        className={`${baseClasses} ${readonlyClasses}`}
+                                      />
+                                    )}
+                                  </div>
+                                );
+                              }
+                              
+                              // Comportamento original para arrays simples ou strings
+                              const isReadonly = !selectedFlowNode.data.isPendingConnected;
+                              const baseClasses = "w-full px-3 py-2 border rounded-md text-xs font-mono";
+                              const readonlyClasses = isReadonly 
+                                ? "bg-gray-50 border-gray-200 text-gray-600 cursor-not-allowed" 
+                                : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+                              
+                              return (
+                                <div key={fieldName} className="space-y-2">
+                                  <label className="text-sm font-medium text-gray-700">{fieldName}</label>
+                                  {Array.isArray(fieldValue) ? (
+                                    <select 
+                                      disabled={isReadonly}
+                                      value={formValues[fieldName] || ''}
+                                      onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
+                                      className={`${baseClasses} ${readonlyClasses}`}
+                                    >
+                                      <option value="">Selecione uma opção</option>
+                                      {fieldValue.map((option, index) => (
+                                        <option key={index} value={option}>{option}</option>
+                                      ))}
+                                    </select>
+                                  ) : (
+                                    <input
+                                      type="text"
+                                      placeholder={fieldValue || `Digite ${fieldName.toLowerCase()}`}
+                                      readOnly={isReadonly}
+                                      value={formValues[fieldName] || ''}
+                                      onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
+                                      className={`${baseClasses} ${readonlyClasses}`}
+                                    />
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        );
+                        }
+                        
+                        // Comportamento legado para formulários sem condição
+                        return (
+                          <div className="bg-gray-50 p-4 rounded border space-y-4">
+                            {Object.entries(formData).map(([fieldName, fieldValue]) => {
+                              const isReadonly = !selectedFlowNode.data.isPendingConnected;
+                              const baseClasses = "w-full px-3 py-2 border rounded-md text-xs font-mono";
+                              const readonlyClasses = isReadonly 
+                                ? "bg-gray-50 border-gray-200 text-gray-600 cursor-not-allowed" 
+                                : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+                              
+                              return (
+                                <div key={fieldName} className="space-y-2">
+                                  <label className="text-sm font-medium text-gray-700">{fieldName}</label>
+                                  {Array.isArray(fieldValue) ? (
+                                    <select 
+                                      disabled={isReadonly}
+                                      value={formValues[fieldName] || ''}
+                                      onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
+                                      className={`${baseClasses} ${readonlyClasses}`}
+                                    >
+                                      <option value="">Selecione uma opção</option>
+                                      {fieldValue.map((option, index) => (
+                                        <option key={index} value={option}>{option}</option>
+                                      ))}
+                                    </select>
+                                  ) : (
+                                    <input
+                                      type="text"
+                                      placeholder={fieldValue || `Digite ${fieldName.toLowerCase()}`}
+                                      readOnly={isReadonly}
+                                      value={formValues[fieldName] || ''}
+                                      onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
+                                      className={`${baseClasses} ${readonlyClasses}`}
+                                    />
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        );
+                      } catch (e) {
+                        const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+                        return (
+                          <div className="text-sm text-red-600">
+                            Erro ao processar formulário: {attachedFormData}
+                          </div>
+                        );
+                      }
+                    })()}
+                  </div>
+                )}
+
+                {/* Layout tabular para DocumentNode - 2 colunas */}
+                {selectedFlowNode.type === 'documentNode' && (
+                  <div className="space-y-4">
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Status Exec.</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 text-xs">ID Template</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="bg-white">
+                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                              <div className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                                selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'bg-blue-100 text-blue-800' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'Executado' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'Pendente'
+                                  : 'N.Exec.'}
+                              </div>
+                            </td>
+                            <td className="px-2 py-1.5 text-center">
+                              {selectedFlowNode.data.docType ? (
+                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 font-mono">
+                                  {selectedFlowNode.data.docType}
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-xs font-mono">-</span>
+                              )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Mensagem e botão para iniciar edição quando isExecuted = FALSE e isInProcess = FALSE */}
+                    {selectedFlowNode.data.isExecuted === 'FALSE' && selectedFlowNode.data.isInProcess === 'FALSE' && (
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex items-start space-x-3">
+                          <BookOpen className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <h4 className="text-sm font-medium text-blue-800 mb-2">
+                              Iniciar Documentação
+                            </h4>
+                            <p className="text-xs text-blue-700 mb-3 leading-relaxed">
+                              Selecione o botão de iniciar edição para enviar este documento para início de documentação no editor. 
+                              Ao selecionar este elemento do fluxo indicará modo "In Progress", acesse o editor e selecione o documento 
+                              para dar prosseguimento ao processo de edição da documentação. O documento a ser editado será o{' '}
+                              <span className="font-mono font-medium text-xs">
+                                {(() => {
+                                  if (selectedFlowNode.data.docType) {
+                                    const templateInfo = getTemplateInfo(selectedFlowNode.data.docType);
+                                    if (templateInfo) {
+                                      return `${templateInfo.code} - ${templateInfo.name}`;
+                                    }
+                                    // Fallback: tentar extrair do formato já processado
+                                    const parts = selectedFlowNode.data.docType.split('-');
+                                    return parts.length >= 2 ? `${parts[0]} - ${parts[1]}` : selectedFlowNode.data.docType;
+                                  }
+                                  return 'Documento não definido';
+                                })()}
+                              </span>
+                            </p>
+                            <Button
+                              onClick={async () => {
+                                try {
+                                  // Atualizar o nó para marcar como em processo
+                                  const currentNodes = getNodes();
+                                  const updatedNodes = currentNodes.map(node => {
+                                    if (node.id === selectedFlowNode.id) {
+                                      return {
+                                        ...node,
+                                        data: {
+                                          ...node.data,
+                                          isInProcess: 'TRUE'
+                                        }
+                                      };
+                                    }
+                                    return node;
+                                  });
+                                  setNodes(updatedNodes);
+                                  
+                                  // Atualizar também o nó selecionado para refletir a mudança no painel
+                                  setSelectedFlowNode({
+                                    ...selectedFlowNode,
+                                    data: {
+                                      ...selectedFlowNode.data,
+                                      isInProcess: 'TRUE'
+                                    }
+                                  });
+
+                                  // Salvar alterações no banco de dados imediatamente
+                                  const updatedFlowTasks = {
+                                    nodes: updatedNodes,
+                                    edges: flowDiagramModal.flowData?.flowTasks?.edges || [],
+                                    viewport: flowDiagramModal.flowData?.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
+                                  };
+
+                                  const response = await fetch(`/api/document-flow-executions/${flowDiagramModal.flowData?.documentId}`, {
+                                    method: 'PUT',
+                                    headers: {
+                                      'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                      flowTasks: updatedFlowTasks
+                                    }),
+                                  });
+
+                                  if (!response.ok) {
+                                    throw new Error('Erro ao salvar alterações');
+                                  }
+
+                                  // Atualizar estado local
+                                  setFlowDiagramModal(prev => ({
+                                    ...prev,
+                                    flowData: {
+                                      ...prev.flowData,
+                                      flowTasks: updatedFlowTasks
+                                    }
+                                  }));
+
+                                  // Criar registro em document_editions e atualizar task_state
+                                  try {
+                                    const templateId = selectedFlowNode.data.docType; // Este é o ID do template
+                                    const documentId = flowDiagramModal.flowData?.documentId;
+                                    
+                                    if (templateId && documentId) {
+                                      const editionResponse = await fetch('/api/document-editions', {
+                                        method: 'POST',
+                                        headers: {
+                                          'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({
+                                          documentId: documentId,
+                                          templateId: templateId,
+                                          status: 'in_progress',
+                                          init: new Date().toISOString()
+                                        }),
+                                      });
+                                      
+                                      if (editionResponse.ok) {
+                                        const editionData = await editionResponse.json();
+                                        console.log('✅ Registro criado em document_editions:', editionData);
+                                        console.log('✅ Task state atualizado para "in_doc" automaticamente');
+                                      } else {
+                                        console.error('❌ Erro ao criar registro em document_editions:', await editionResponse.text());
+                                      }
+                                    }
+                                  } catch (editionError) {
+                                    console.error('❌ Erro ao criar edição de documento:', editionError);
+                                  }
+
+                                  // Recarregar dados
+                                  queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
+
+                                  toast({
+                                    title: "Documentação iniciada",
+                                    description: "O documento foi marcado como 'In Progress' e registro de edição criado no banco de dados.",
+                                  });
+                                } catch (error) {
+                                  console.error('Erro ao salvar alterações:', error);
+                                  toast({
+                                    title: "Erro",
+                                    description: "Falha ao salvar as alterações no banco de dados.",
+                                    variant: "destructive"
+                                  });
+                                }
+                              }}
+                              size="sm"
+                              className="bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                              <BookOpen className="mr-1.5 h-3 w-3" />
+                              Iniciar Edição
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Mensagem informativa quando está em processo */}
+                    {selectedFlowNode.data.isInProcess === 'TRUE' && selectedFlowNode.data.isExecuted === 'FALSE' && (
+                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <div className="flex items-start space-x-3">
+                          <Zap className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <h4 className="text-sm font-medium text-purple-800 mb-2">
+                              Documentação em Progresso
+                            </h4>
+                            <p className="text-xs text-purple-700">
+                              Este documento está sendo editado no editor. Acesse a página de fluxos para continuar o processo de documentação do{' '}
+                              <span className="font-mono font-medium text-xs">
+                                {(() => {
+                                  if (selectedFlowNode.data.docType) {
+                                    const templateInfo = getTemplateInfo(selectedFlowNode.data.docType);
+                                    if (templateInfo) {
+                                      return `${templateInfo.code} - ${templateInfo.name}`;
+                                    }
+                                    // Fallback: tentar extrair do formato já processado
+                                    const parts = selectedFlowNode.data.docType.split('-');
+                                    return parts.length >= 2 ? `${parts[0]} - ${parts[1]}` : selectedFlowNode.data.docType;
+                                  }
+                                  return 'Documento não definido';
+                                })()}
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {(selectedFlowNode.data.integrType || selectedFlowNode.type === 'integrationNode') && (
+                  <div>
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Status Exec.</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Dir.Integr.</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 text-xs">Tipo Integr.</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="bg-white">
+                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                              <div className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                                selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'bg-blue-100 text-blue-800' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'Executado' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'Pendente'
+                                  : 'N.Exec.'}
+                              </div>
+                            </td>
+                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                              {selectedFlowNode.data.integrType ? (
+                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                  {selectedFlowNode.data.integrType}
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-xs">-</span>
+                              )}
+                            </td>
+                            <td className="px-2 py-1.5 text-center">
+                              {selectedFlowNode.data.callType ? (
+                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                  {selectedFlowNode.data.callType}
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-xs">-</span>
+                              )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {selectedFlowNode.data.service && (
+                  <div>
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium text-gray-700">Serviço:</span> {selectedFlowNode.data.service}
+                    </p>
+                  </div>
+                )}
+
+                {(selectedFlowNode.data.callType?.toLowerCase() === 'automatico' || selectedFlowNode.data.callType?.toLowerCase() === 'automático') && (
+                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-xs text-blue-800">
+                      Esta integração é feita automaticamente por um processo agendado, o ID deste processo é:
+                    </p>
+                    <p className="text-xs text-blue-800 font-mono mt-1">
+                      {selectedFlowNode.data.jobId || 'N/A'}
+                    </p>
+                  </div>
+                )}
+
+                {selectedFlowNode.data.callType?.toLowerCase() === 'manual' && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
+                  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="mb-3">
+                      <p className="text-xs text-yellow-800 mb-2">
+                        {(() => {
+                          // Extrair informações do jobId
+                          let functionCaption = selectedFlowNode.data.callType || 'callJob';
+                          let functionName = '';
+                          
+                          if (selectedFlowNode.data.jobId) {
+                            try {
+                              const jobData = JSON.parse(selectedFlowNode.data.jobId);
+                              const firstKey = Object.keys(jobData)[0];
+                              if (firstKey) {
+                                functionCaption = firstKey;
+                                functionName = jobData[firstKey];
+                              }
+                            } catch (e) {
+                              console.log('Erro ao fazer parse do jobId:', e);
+                            }
+                          }
+                          
+                          const displayName = functionName ? `${functionCaption} [${functionName}]` : functionCaption;
+                          
+                          return (
+                            <>
+                              Ao clicar no botão você executará a função{' '}
+                              <span className="font-mono font-semibold bg-yellow-100 px-1 py-0.5 rounded text-yellow-900">
+                                {displayName}
+                              </span>
+                              {' '}que {selectedFlowNode.data.integrType || 'Atualiza Dados'} com o serviço {selectedFlowNode.data.service || 'externo'}. Pressione para continuar.
+                            </>
+                          );
+                        })()}
+                      </p>
+                    </div>
+
+                    {integrationResult.status && (
+                      <div className={`mb-3 p-3 rounded-md ${
+                        integrationResult.status === 'success' 
+                          ? 'bg-green-50 border border-green-200' 
+                          : 'bg-red-50 border border-red-200'
+                      }`}>
+                        <p className={`text-sm ${
+                          integrationResult.status === 'success' 
+                            ? 'text-green-800' 
+                            : 'text-red-800'
+                        }`}>
+                          {integrationResult.message}
+                        </p>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={executeManualIntegration}
+                      disabled={selectedFlowNode.data.isExecuted === 'TRUE'}
+                      className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                        selectedFlowNode.data.isExecuted === 'TRUE'
+                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          : 'bg-yellow-600 text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2'
+                      }`}
+                    >
+                      {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Já Executado' : 'Executar'}
+                    </button>
+                  </div>
+                )}
+
+                {/* Layout tabular para StartNode - 2 colunas */}
+                {selectedFlowNode.type === 'startNode' && (
+                  <div>
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Status Exec.</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 text-xs">Tipo</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="bg-white">
+                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                              <div className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                                selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'bg-blue-100 text-blue-800' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'Executado' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'Pendente'
+                                  : 'N.Exec.'}
+                              </div>
+                            </td>
+                            <td className="px-2 py-1.5 text-center">
+                              <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Início Direto
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* Layout tabular para EndNode - 2 colunas */}
+                {selectedFlowNode.type === 'endNode' && (
+                  <div>
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Status Exec.</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 text-xs">Tipo</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="bg-white">
+                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                              <div className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                                selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'bg-blue-100 text-blue-800' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'Executado' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'Pendente'
+                                  : 'N.Exec.'}
+                              </div>
+                            </td>
+                            <td className="px-2 py-1.5 text-center">
+                              {selectedFlowNode.data.To_Type ? (
+                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                  {selectedFlowNode.data.To_Type === 'Direct_finish' ? 'Encerramento Direto' : 
+                                   selectedFlowNode.data.To_Type === 'flow_Finish' ? 'Transferência para Fluxo' : selectedFlowNode.data.To_Type}
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-xs">-</span>
+                              )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Exibição do fluxo destino para EndNode de Transferência */}
+                    {selectedFlowNode.data.FromType === 'flow_init' && selectedFlowNode.data.To_Flow_id && (
+                      <div className="mt-4">
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <div className="mb-2">
+                            <p className="text-xs font-medium text-blue-800 mb-1">Fluxo Destino:</p>
+                            <p className="text-xs text-blue-700 font-mono bg-white px-2 py-1 rounded border">
+                              {selectedFlowNode.data.To_Flow_id}
+                            </p>
+                          </div>
+                          {(selectedFlowNode.data.To_Flow_code || selectedFlowNode.data.To_Flow_name) && (
+                            <div>
+                              <p className="text-xs font-medium text-blue-800 mb-1">Detalhes:</p>
+                              <p className="text-xs text-blue-700 font-mono bg-white px-2 py-1 rounded border">
+                                [{selectedFlowNode.data.To_Flow_code}] - {selectedFlowNode.data.To_Flow_name}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Manual execution form para EndNode de Transferência para Fluxo */}
+                    {selectedFlowNode.data.FromType === 'flow_init' && selectedFlowNode.data.To_Flow_id && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
+                      <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="mb-3">
+                          <p className="text-xs text-blue-800 mb-2">
+                            Ao pressionar o botão você confirma o encerramento deste fluxo e a abertura do novo fluxo vinculado. Ao confirmar, o sistema: 1- Encerra o fluxo corrente, 2- Cria uma nova instância com o fluxo indicado vinculado ao presente documento, 3- Inicia o fluxo no novo documento. Confirma estas ações?
+                          </p>
+                        </div>
+
+                        {integrationResult.status && (
+                          <div className={`mb-3 p-3 rounded-md ${
+                            integrationResult.status === 'success' 
+                              ? 'bg-green-50 border border-green-200' 
+                              : 'bg-red-50 border border-red-200'
+                          }`}>
+                            <p className={`text-sm ${
+                              integrationResult.status === 'success' 
+                                ? 'text-green-800' 
+                                : 'text-red-800'
+                            }`}>
+                              {integrationResult.message}
+                            </p>
+                          </div>
+                        )}
+
+                        <button
+                          onClick={executeFlowTransfer}
+                          disabled={selectedFlowNode.data.isExecuted === 'TRUE'}
+                          className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                            selectedFlowNode.data.isExecuted === 'TRUE'
+                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                              : 'bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+                          }`}
+                        >
+                          {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Transferência Concluída' : 'Transferir Fluxo'}
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Manual execution form para EndNode de Encerramento Direto */}
+                    {selectedFlowNode.data.FromType === 'Init' && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
+                      <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <div className="mb-3">
+                          <p className="text-xs text-red-800 mb-2">
+                            Ao pressionar o botão você encerrará este fluxo vinculado ao documento, bem como marcará o documento como encerrado e o enviará para a tab [Concluídos] da página [Documentos]. Pressione para continuar.
+                          </p>
+                        </div>
+
+                        {integrationResult.status && (
+                          <div className={`mb-3 p-3 rounded-md ${
+                            integrationResult.status === 'success' 
+                              ? 'bg-green-50 border border-green-200' 
+                              : 'bg-red-50 border border-red-200'
+                          }`}>
+                            <p className={`text-sm ${
+                              integrationResult.status === 'success' 
+                                ? 'text-green-800' 
+                                : 'text-red-800'
+                            }`}>
+                              {integrationResult.message}
+                            </p>
+                          </div>
+                        )}
+
+                        <button
+                          onClick={executeDirectFlowConclusion}
+                          disabled={selectedFlowNode.data.isExecuted === 'TRUE'}
+                          className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                            selectedFlowNode.data.isExecuted === 'TRUE'
+                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                              : 'bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
+                          }`}
+                        >
+                          {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Já Concluído' : 'Concluir Fluxo'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Layout tabular 3x2 para SwitchNode */}
+                {selectedFlowNode.type === 'switchNode' && (
+                  <div>
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="bg-gray-50">
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Status Exec.</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Campo Switch</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 text-xs">Input Switch</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr className="bg-white">
+                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                              <div className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                                selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'bg-blue-100 text-blue-800' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {selectedFlowNode.data.isExecuted === 'TRUE' 
+                                  ? 'Executado' 
+                                  : selectedFlowNode.data.isPendingConnected
+                                  ? 'Pendente'
+                                  : 'N.Exec.'}
+                              </div>
+                            </td>
+                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                              {selectedFlowNode.data.switchField ? (
+                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                  {selectedFlowNode.data.switchField}
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-xs">-</span>
+                              )}
+                            </td>
+                            <td className="px-2 py-1.5 text-center">
+                              {selectedFlowNode.data.inputSwitch ? (
+                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800">
+                                  {selectedFlowNode.data.inputSwitch}
+                                </div>
+                              ) : (
+                                <span className="text-gray-400 text-xs">-</span>
+                              )}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+
+
+                {selectedFlowNode.type === 'actionNode' && selectedFlowNode.data.actionType === 'Intern_Aprove' && selectedFlowNode.data.isAproved !== undefined && (
+                  <div>
+                    <p className="text-sm font-medium text-gray-700 mb-2">Status de Aprovação</p>
+                    <div className="flex space-x-2 mb-2">
+                      <button
+                        onClick={() => {
+                          if (selectedFlowNode.data.isPendingConnected) {
+                            updateApprovalStatus(selectedFlowNode.id, 'TRUE');
+                          }
+                        }}
+                        disabled={!selectedFlowNode.data.isPendingConnected}
+                        className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all flex-1 justify-center ${
+                          selectedFlowNode.data.isAproved === 'TRUE'
+                            ? 'bg-green-100 border-green-300 text-green-800'
+                            : selectedFlowNode.data.isPendingConnected
+                            ? 'bg-white border-gray-300 text-gray-600 hover:bg-green-50 hover:border-green-300 cursor-pointer'
+                            : 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
+                        }`}
+                      >
+                        <CircleCheck className="w-4 h-4" />
+                        <span className="text-sm font-medium">SIM</span>
+                      </button>
+                      
+                      <button
+                        onClick={() => {
+                          if (selectedFlowNode.data.isPendingConnected) {
+                            updateApprovalStatus(selectedFlowNode.id, 'FALSE');
+                          }
+                        }}
+                        disabled={!selectedFlowNode.data.isPendingConnected}
+                        className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all flex-1 justify-center ${
+                          selectedFlowNode.data.isAproved === 'FALSE'
+                            ? 'bg-red-100 border-red-300 text-red-800'
+                            : selectedFlowNode.data.isPendingConnected
+                            ? 'bg-white border-gray-300 text-gray-600 hover:bg-red-50 hover:border-red-300 cursor-pointer'
+                            : 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
+                        }`}
+                      >
+                        <X className="w-4 h-4" />
+                        <span className="text-sm font-medium">NÃO</span>
+                      </button>
+                    </div>
+                    
+                    {/* Caixa de alerta para confirmação */}
+                    {showApprovalAlert && selectedFlowNode.data.isAproved !== 'UNDEF' && (
+                      <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                        <div className="flex items-start space-x-2">
+                          <div className="flex-shrink-0">
+                            <svg className="w-5 h-5 text-orange-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-sm font-medium text-orange-800 mb-1">ATENÇÃO</h4>
+                            <p className="text-xs text-orange-700 mb-3">
+                              Ao executar esta ação o fluxo passará automaticamente para o próximo estágio definido conforme o diagrama, esta ação pode ser irreversível caso ações posteriores no workflow sejam executadas.
+                            </p>
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={saveChangesToDatabase}
+                                disabled={!areAllFieldsFilled()}
+                                className={`px-3 py-1.5 text-white text-xs font-medium rounded transition-colors ${
+                                  areAllFieldsFilled()
+                                    ? 'bg-orange-600 hover:bg-orange-700'
+                                    : 'bg-gray-400 cursor-not-allowed'
+                                }`}
+                              >
+                                Salvar Alterações
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="text-xs text-gray-500">
+                      Status atual: {selectedFlowNode.data.isAproved || 'UNDEF'}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         )}
       </div>
     );
   };
 
+  // Função para renderizar o inspector de propriedades do fluxo
+  const renderFlowInspector = () => {
+    if (!selectedFlowNode) return null;
+    
+    const getNodeTypeLabel = (nodeType: string) => {
+      const typeMap: { [key: string]: string } = {
+        'startNode': 'Início',
+        'endNode': 'Fim',
+        'actionNode': 'Ação',
+        'documentNode': 'Documento',
+        'integrationNode': 'Integração',
+        'switchNode': 'Condição'
+      };
+      return typeMap[nodeType] || nodeType;
+    };
+
+    return (
+      <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto">
+        <div className="space-y-4">
+          <div className="border-b pb-2">
+            <h3 className="text-lg font-semibold">Inspetor de Propriedades</h3>
+            <p className="text-sm text-gray-600 font-mono">
+              {getNodeTypeLabel(selectedFlowNode.type)} - {selectedFlowNode.id}
+            </p>
+          </div>
+          
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm font-medium text-gray-700">Status de Execução</p>
+              <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                selectedFlowNode.data.isExecuted === 'TRUE' 
+                  ? 'bg-blue-100 text-blue-800' 
+                  : selectedFlowNode.data.isPendingConnected
+                  ? 'bg-yellow-100 text-yellow-800'
+                  : 'bg-gray-100 text-gray-800'
+              }`}>
+                {selectedFlowNode.data.isExecuted === 'TRUE' 
+                  ? 'Executado' 
+                  : selectedFlowNode.data.isPendingConnected
+                  ? 'Pendente'
+                  : 'N.Exec.'}
+              </div>
+            </div>
+
+            {selectedFlowNode.data.actionType && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Tipo de Ação</p>
+                <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.actionType}</p>
+              </div>
+            )}
+
+            {selectedFlowNode.data.description && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Descrição</p>
+                <p className="text-sm text-gray-900 bg-gray-50 p-2 rounded border">
+                  {selectedFlowNode.data.description}
+                </p>
+              </div>
+            )}
+
+            {selectedFlowNode.data.docType && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Tipo de Documento</p>
+                <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.docType}</p>
+              </div>
+            )}
+
+            {selectedFlowNode.data.integrType && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Tipo de Integração</p>
+                <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.integrType}</p>
+              </div>
+            )}
+
+            {selectedFlowNode.data.service && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Serviço</p>
+                <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.service}</p>
+              </div>
+            )}
+
+            {selectedFlowNode.data.FromType && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Tipo de Origem</p>
+                <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.FromType}</p>
+              </div>
+            )}
+
+
+
+            {selectedFlowNode.type === 'switchNode' && selectedFlowNode.data.switchField && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Campo de Condição</p>
+                <p className="text-sm text-gray-900 font-mono">{selectedFlowNode.data.switchField}</p>
+              </div>
+            )}
+
+            {selectedFlowNode.type === 'switchNode' && (selectedFlowNode.data.leftSwitch || selectedFlowNode.data.rightSwitch) && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Valores de Switch</p>
+                <div className="space-y-2">
+                  {selectedFlowNode.data.leftSwitch && (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <span className="text-sm text-gray-900 font-mono">
+                        {Array.isArray(selectedFlowNode.data.leftSwitch) 
+                          ? selectedFlowNode.data.leftSwitch.join(', ') 
+                          : selectedFlowNode.data.leftSwitch}
+                      </span>
+                    </div>
+                  )}
+                  {selectedFlowNode.data.rightSwitch && (
+                    <div className="flex items-center space-x-2">
+                      <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                      <span className="text-sm text-gray-900 font-mono">
+                        {Array.isArray(selectedFlowNode.data.rightSwitch) 
+                          ? selectedFlowNode.data.rightSwitch.join(', ') 
+                          : selectedFlowNode.data.rightSwitch}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {selectedFlowNode.data.isAproved && (
+              <div>
+                <p className="text-sm font-medium text-gray-700">Status de Aprovação</p>
+                <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                  selectedFlowNode.data.isAproved === 'TRUE' 
+                    ? 'bg-green-100 text-green-800' 
+                    : selectedFlowNode.data.isAproved === 'FALSE'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {selectedFlowNode.data.isAproved === 'TRUE' 
+                    ? 'Aprovado' 
+                    : selectedFlowNode.data.isAproved === 'FALSE'
+                    ? 'Rejeitado'
+                    : 'Indefinido'}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="pt-4 border-t">
+            <Button 
+              onClick={() => {
+                setShowFlowInspector(false);
+                setSelectedFlowNode(null);
+                setIsFlowInspectorPinned(false);
+              }}
+              variant="outline"
+              size="sm"
+              className="w-full"
+            >
+              Fechar Inspetor
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   function renderFlowDiagramModal() {
     console.log("🔴 RENDERIZANDO MODAL:", flowDiagramModal);
@@ -5451,131 +6609,80 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
     // Node types definition moved inside render function
     const nodeTypes = {
-      startNode: FlowNodes.StartNode,
-      endNode: FlowNodes.EndNode,
-      actionNode: FlowNodes.ActionNode,
-      documentNode: FlowNodes.DocumentNode,
-      integrationNode: FlowNodes.IntegrationNode,
-      switchNode: FlowNodes.SwitchNode,
+      startNode: StartNodeComponent,
+      endNode: EndNodeComponent,
+      actionNode: ActionNodeComponent,
+      documentNode: DocumentNodeComponent,
+      integrationNode: IntegrationNodeComponent,
+      switchNode: SwitchNodeComponent,
     };
 
+    // Convert flow data function moved inside render function
+    const convertFlowDataToReactFlow = (flowData: any) => {
+      // Try to access flow_tasks first, then fall back to direct flowData
+      const tasksData = flowData?.flowTasks || flowData;
+      
+      if (!tasksData?.nodes) {
+        console.log("🔴 Nenhum node encontrado nos dados:", tasksData);
+        return { nodes: [], edges: [] };
+      }
+
+      const nodes = tasksData.nodes.map((node: any) => ({
+        ...node,
+        data: {
+          ...node.data,
+          isReadonly: true,
+        },
+      }));
+
+      console.log("🔴 Nodes convertidos:", nodes);
+      console.log("🔴 Edges encontradas:", tasksData.edges || []);
+
+      return {
+        nodes,
+        edges: tasksData.edges || [],
+      };
+    };
+
+    const { nodes, edges } = convertFlowDataToReactFlow(flowDiagramModal.flowData);
+    
+    // Usar as edges originais diretamente - a animação será aplicada no FlowWithAutoFitView
+
+    // Handler para clique em nós
+    const onNodeClick = (event: React.MouseEvent, node: any) => {
+      setSelectedFlowNode(node);
+      setShowFlowInspector(true);
+    };
+
+    // Handler para clique no painel (fechar inspector apenas se não estiver pinado)
+    const onPaneClick = () => {
+      if (!isFlowInspectorPinned) {
+        setShowFlowInspector(false);
+        setSelectedFlowNode(null);
+      }
+    };
+
+    // Remover lógica duplicada - a animação será aplicada no FlowWithAutoFitView
+
+
+
     return (
-      <Dialog open={flowDiagramModal.isOpen} onOpenChange={(open) => {
-        if (!open) {
-          setFlowDiagramModal({ isOpen: false, flowData: null, documentTitle: '' });
-          
-          if (!isFlowInspectorPinned) {
-            setShowFlowInspector(false);
-            setSelectedFlowNode(null);
+      <Dialog 
+        open={flowDiagramModal.isOpen} 
+        onOpenChange={(open) => {
+          console.log("🔴 onOpenChange chamado:", open);
+          if (!open) {
+            setFlowDiagramModal({
+              isOpen: false,
+              flowData: null,
+              documentTitle: "",
+            });
           }
-        }
-      }}>
-        <DialogContent className="max-w-7xl h-[90vh] p-0">
-          <DialogHeader className="p-6 pb-0">
-            <DialogTitle>
-              Diagrama de Fluxo: {flowDiagramModal.documentTitle}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex-1 flex p-6 pt-0">
-            <FlowWithAutoFitView 
-              flowData={flowDiagramModal.flowData} 
-              showFlowInspector={showFlowInspector} 
-              setShowFlowInspector={setShowFlowInspector} 
-              setSelectedFlowNode={setSelectedFlowNode} 
-              selectedFlowNode={selectedFlowNode} 
-              showApprovalAlert={showApprovalAlert} 
-              setShowApprovalAlert={setShowApprovalAlert} 
-              isPinned={isFlowInspectorPinned} 
-            />
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
-  return (
-    <div className="space-y-6 p-6">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Documentos</h1>
-        <p className="text-muted-foreground">
-          Gerencie seus documentos e fluxos de trabalho
-        </p>
-      </div>
-
-      {/* Botões de ação */}
-      <div className="flex gap-4 mb-6">
-        <Button onClick={() => setShowCreateModal(true)}>
-          <PlusCircle className="w-4 h-4 mr-2" />
-          Novo Documento
-        </Button>
-        <Button onClick={() => setShowImportModal(true)} variant="outline">
-          <Upload className="w-4 h-4 mr-2" />
-          Importar
-        </Button>
-        <Button onClick={() => setShowFilterModal(true)} variant="outline">
-          <Filter className="w-4 h-4 mr-2" />
-          Filtros
-        </Button>
-      </div>
-
-      {renderEditModal()}
-      {renderAddArtifactModal()}
-      {renderDocumentationModal()}
-      {renderEditArtifactModal()}
-      {renderFlowDiagramModal()}
-
-      {/* Lista de documentos */}
-      <div className="grid gap-4">
-        {documentos?.map((documento: Documento) => (
-          <Card key={documento.id} className="p-4">
-            <div className="flex justify-between items-start">
-              <div className="flex-1">
-                <h3 className="font-semibold">{documento.objeto}</h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  {documento.descricao}
-                </p>
-                <div className="flex gap-2 mt-2">
-                  <Badge variant="secondary">{documento.sistema}</Badge>
-                  <Badge variant="outline">{documento.status}</Badge>
-                  {hasMondayItemValues(documento) && (
-                    <div className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">
-                      <Calendar className="w-3 h-3" />
-                      {getExecutionCount(documento.id)}
-                      <span className="text-xs" title="Número de fluxos executados">execuções</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => openViewModal(documento)}
-                >
-                  <Eye className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => openEditModal(documento)}
-                >
-                  <Edit className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleDeleteDocument(documento)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-}
+        }}
+      >
+        <DialogContent className="max-w-[90vw] max-h-[90vh] w-[90vw] h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader className="flex-shrink-0">
+            <DialogTitle className="flex items-center gap-2">
               <Network className="h-5 w-5" />
               Diagrama do Fluxo - {flowDiagramModal.documentTitle}
             </DialogTitle>
