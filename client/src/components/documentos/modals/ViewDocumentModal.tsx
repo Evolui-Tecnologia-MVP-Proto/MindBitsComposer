@@ -49,7 +49,15 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
   // Query para buscar artifacts do documento
   const { data: artifacts } = useQuery({
     queryKey: ['/api/documentos', selectedDocument?.id, 'artifacts'],
+    queryFn: async () => {
+      if (!selectedDocument?.id) return [];
+      const response = await fetch(`/api/documentos/${selectedDocument.id}/artifacts`);
+      if (!response.ok) throw new Error('Erro ao buscar artifacts');
+      return response.json();
+    },
     enabled: !!selectedDocument?.id,
+    staleTime: 0, // Força refetch sempre
+    gcTime: 0, // Não faz cache
   });
 
   // Debug log para verificar artifacts
