@@ -101,6 +101,7 @@ import { ViewDocumentModal } from "@/components/documentos/modals/ViewDocumentMo
 import { EditDocumentModal } from "@/components/documentos/modals/EditDocumentModal";
 import { FlowDiagramModal } from "@/components/documentos/modals/FlowDiagramModal";
 import { CreateDocumentModal } from "@/components/documentos/modals/CreateDocumentModal";
+import { AddArtifactModal } from "@/components/documentos/modals/AddArtifactModal";
 
 export default function DocumentosPage() {
   const [activeTab, setActiveTab] = useState("incluidos");
@@ -3282,7 +3283,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         onUpdateDocument={handleUpdateDocument}
         updateDocumentoMutation={updateDocumentoMutation}
       />
-      {renderAddArtifactModal()}
+      <AddArtifactModal
+        isOpen={isAddArtifactModalOpen}
+        onClose={() => setIsAddArtifactModalOpen(false)}
+        artifactFormData={artifactFormData}
+        setArtifactFormData={setArtifactFormData}
+        onCreateArtifact={handleCreateArtifact}
+        createArtifactMutation={createArtifactMutation}
+        onFileUpload={handleFileUpload}
+      />
       {renderEditArtifactModal()}
       {renderDocumentationModal()}
       <FlowDiagramModal
@@ -6333,7 +6342,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         onUpdateDocument={handleUpdateDocument}
         updateDocumentoMutation={updateDocumentoMutation}
       />
-      {renderAddArtifactModal()}
+      <AddArtifactModal
+        isOpen={isAddArtifactModalOpen}
+        onClose={() => setIsAddArtifactModalOpen(false)}
+        artifactFormData={artifactFormData}
+        setArtifactFormData={setArtifactFormData}
+        onCreateArtifact={handleCreateArtifact}
+        createArtifactMutation={createArtifactMutation}
+        onFileUpload={handleFileUpload}
+      />
       {renderDocumentationModal()}
       {renderEditArtifactModal()}
       <FlowDiagramModal
