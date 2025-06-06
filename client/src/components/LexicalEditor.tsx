@@ -113,8 +113,26 @@ function ImageEventListenerPlugin(): JSX.Element | null {
           
           // Criar parágrafo com informações da imagem
           const infoParagraph = $createParagraphNode();
-          // Criar URL mais limpa para display
-          const displayUrl = src.startsWith('data:') ? `image_${imageId}.${src.includes('png') ? 'png' : 'jpg'}` : src;
+          
+          // Criar URL blob acessível para navegadores externos
+          let displayUrl = src;
+          if (src.startsWith('data:')) {
+            try {
+              // Converter data URL para blob
+              const byteString = atob(src.split(',')[1]);
+              const mimeString = src.split(',')[0].split(':')[1].split(';')[0];
+              const ab = new ArrayBuffer(byteString.length);
+              const ia = new Uint8Array(ab);
+              for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+              }
+              const blob = new Blob([ab], { type: mimeString });
+              displayUrl = URL.createObjectURL(blob);
+            } catch (error) {
+              displayUrl = `blob:${window.location.origin}/${imageId}`;
+            }
+          }
+          
           const infoText = $createTextNode(`[image_id: ${imageId}] - [${displayUrl}]`);
           infoParagraph.append(infoText);
           

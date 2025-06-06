@@ -37,8 +37,26 @@ export function $insertImageNode(payload: ImagePayload): void {
     
     // Criar parágrafo com informações da imagem
     const infoParagraph = $createParagraphNode();
-    // Criar URL mais limpa para display
-    const displayUrl = payload.src.startsWith('data:') ? `image_${imageId}.${payload.src.includes('png') ? 'png' : 'jpg'}` : payload.src;
+    
+    // Criar URL blob acessível para navegadores externos
+    let displayUrl = payload.src;
+    if (payload.src.startsWith('data:')) {
+      try {
+        // Converter data URL para blob
+        const byteString = atob(payload.src.split(',')[1]);
+        const mimeString = payload.src.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+        const blob = new Blob([ab], { type: mimeString });
+        displayUrl = URL.createObjectURL(blob);
+      } catch (error) {
+        displayUrl = `blob:${window.location.origin}/${imageId}`;
+      }
+    }
+    
     const infoText = $createTextNode(`[image_id: ${imageId}] - [${displayUrl}]`);
     infoParagraph.append(infoText);
     
@@ -54,8 +72,26 @@ export function $insertImageNode(payload: ImagePayload): void {
     
     const imageId = Math.floor(Math.random() * 10000000000).toString();
     const infoParagraph = $createParagraphNode();
-    // Criar URL mais limpa para display
-    const displayUrl = payload.src.startsWith('data:') ? `image_${imageId}.${payload.src.includes('png') ? 'png' : 'jpg'}` : payload.src;
+    
+    // Criar URL blob acessível para navegadores externos
+    let displayUrl = payload.src;
+    if (payload.src.startsWith('data:')) {
+      try {
+        // Converter data URL para blob
+        const byteString = atob(payload.src.split(',')[1]);
+        const mimeString = payload.src.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+        const blob = new Blob([ab], { type: mimeString });
+        displayUrl = URL.createObjectURL(blob);
+      } catch (error) {
+        displayUrl = `blob:${window.location.origin}/${imageId}`;
+      }
+    }
+    
     const infoText = $createTextNode(`[image_id: ${imageId}] - [${displayUrl}]`);
     infoParagraph.append(infoText);
     $insertNodeToNearestRoot(infoParagraph);
