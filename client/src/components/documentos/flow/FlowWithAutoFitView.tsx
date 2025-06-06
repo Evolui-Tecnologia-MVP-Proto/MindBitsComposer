@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useReactFlow } from 'reactflow';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FlowNodes } from "../FlowNodes";
+import { FlowNodes } from "../../FlowNodes";
 
 interface FlowWithAutoFitViewProps {
   flowData: any;
