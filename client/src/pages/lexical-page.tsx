@@ -664,7 +664,7 @@ export default function LexicalPage() {
                                   </p>
                                   <div className="flex items-center gap-2 mt-2">
                                     <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-                                      {artifact.type || 'unknown'}
+                                      {artifact.type === 'vnd.openxmlformats-officedocument.wordprocessingml.document' ? 'word.docx' : (artifact.type || 'unknown')}
                                     </Badge>
                                     {artifact.fileSize && (
                                       <span className="text-xs text-gray-500">
