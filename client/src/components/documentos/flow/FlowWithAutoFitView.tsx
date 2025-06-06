@@ -4,16 +4,17 @@ import 'reactflow/dist/style.css';
 import { Controls, Background } from 'reactflow';
 import { Pin, BookOpen, Zap, CircleCheck, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 
 // Importar componentes de nós
-import { StartNodeComponent } from '../nodes/StartNode';
-import { EndNodeComponent } from '../nodes/EndNode';
-import { ActionNodeComponent } from '../nodes/ActionNode';
-import { DocumentNodeComponent } from '../nodes/DocumentNode';
-import { IntegrationNodeComponent } from '../nodes/IntegrationNode';
-import { SwitchNodeComponent } from '../nodes/SwitchNode';
+import StartNode from '@/components/flow/StartNode';
+import EndNode from '@/components/flow/EndNode';
+import TaskNode from '@/components/flow/TaskNode';
+import DecisionNode from '@/components/flow/DecisionNode';
+import ApproveNode from '@/components/flow/ApproveNode';
+import ElaboreNode from '@/components/flow/ElaboreNode';
+import ReviseNode from '@/components/flow/ReviseNode';
 
 interface FlowWithAutoFitViewProps {
   flowData: any;
