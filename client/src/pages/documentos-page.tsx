@@ -75,7 +75,7 @@ import {
   Image,
   BookOpen,
   Zap,
-  GitBranch,
+  Network,
   FileText,
   Link,
   Check,
@@ -584,7 +584,7 @@ const SwitchNodeComponent = (props: any) => {
   
   return (
     <div className="relative transition-transform duration-200" style={{ width: `${dynamicWidth}px`, height: `${dynamicHeight}px`, transform: containerTransform }}>
-      <GitBranch className="absolute top-1 left-1 h-6 w-6 text-blue-600 z-20" />
+      <Network className="absolute top-1 left-1 h-6 w-6 text-blue-600 z-20" />
       <Handle 
         type="target" 
         position={Position.Top} 
@@ -2443,7 +2443,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       }}
                       title="Mostrar diagrama do fluxo"
                     >
-                      <GitBranch className="h-4 w-4 text-purple-500" />
+                      <Network className="h-4 w-4 text-purple-500" />
                     </Button>
                   )}
                   {activeTab !== "integrados" && activeTab !== "em-processo" && activeTab !== "concluidos" && (

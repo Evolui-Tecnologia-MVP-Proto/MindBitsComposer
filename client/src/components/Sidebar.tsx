@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Settings, FileText, Edit, GitBranch, File, Cog, Puzzle, Home, PenTool, Workflow } from "lucide-react";
+import { Settings, FileText, Edit, GitBranch, File, Cog, Puzzle, Home, PenTool, Network } from "lucide-react";
 import { useNavigationGuard } from "@/hooks/use-navigation-guard";
 
 type SidebarProps = {
@@ -97,7 +97,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
               className={`sidebar-item ${activeItem === "fluxos" ? "sidebar-active" : ""}`}
               onClick={() => handleNavigation("/fluxos")}
             >
-              <Workflow className="mr-3 h-6 w-6" />
+              <Network className="mr-3 h-6 w-6" />
               Fluxos
             </div>
           </div>
