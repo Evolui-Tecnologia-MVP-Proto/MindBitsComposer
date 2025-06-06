@@ -773,20 +773,18 @@ export default function DocumentosPage() {
   const [isFlowInspectorPinned, setIsFlowInspectorPinned] = useState(false);
 
   // Estado para modal de detalhes das execuções de fluxo
-  const [flowExecutionsModal, setFlowExecutionsModal] = useState<{
-    isOpen: boolean;
-    documentId: string;
-    documentTitle: string;
-  }>({
-    isOpen: false,
-    documentId: "",
-    documentTitle: "",
-  });
+  const [isFlowExecutionsModalOpen, setIsFlowExecutionsModalOpen] = useState(false);
+  const [flowExecutionsDocumentId, setFlowExecutionsDocumentId] = useState("");
+  const [flowExecutionsDocumentTitle, setFlowExecutionsDocumentTitle] = useState("");
 
   // Debug effect para monitorar mudanças no estado da modal
   useEffect(() => {
-    console.log("🟡 ESTADO FLOW EXECUTIONS MODAL MUDOU:", flowExecutionsModal);
-  }, [flowExecutionsModal]);
+    console.log("🟡 ESTADO FLOW EXECUTIONS MODAL MUDOU:", {
+      isOpen: isFlowExecutionsModalOpen,
+      documentId: flowExecutionsDocumentId,
+      documentTitle: flowExecutionsDocumentTitle
+    });
+  }, [isFlowExecutionsModalOpen, flowExecutionsDocumentId, flowExecutionsDocumentTitle]);
   // Função para resetar o formulário
   const resetFormData = () => {
     console.log("🧹 LIMPANDO CAMPOS DO FORMULÁRIO");
@@ -1403,14 +1401,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   // Buscar detalhes das execuções de fluxo de um documento específico
   const { data: documentFlowExecutions = [] } = useQuery({
-    queryKey: ["/api/document-flow-executions", flowExecutionsModal.documentId],
+    queryKey: ["/api/document-flow-executions", flowExecutionsDocumentId],
     queryFn: async () => {
-      if (!flowExecutionsModal.documentId) return [];
-      const response = await fetch(`/api/document-flow-executions?documentId=${flowExecutionsModal.documentId}`);
+      if (!flowExecutionsDocumentId) return [];
+      const response = await fetch(`/api/document-flow-executions?documentId=${flowExecutionsDocumentId}`);
       if (!response.ok) throw new Error("Erro ao buscar execuções de fluxo");
       return response.json();
     },
-    enabled: !!flowExecutionsModal.documentId && flowExecutionsModal.isOpen,
+    enabled: !!flowExecutionsDocumentId && isFlowExecutionsModalOpen,
   });
 
   // Mutation para criar documento
@@ -2486,11 +2484,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       title="Número de fluxos - Clique para ver detalhes"
                       onClick={() => {
                         console.log("🟡 BADGE CLICADA! Documento:", documento.id, documento.objeto);
-                        setFlowExecutionsModal({
-                          isOpen: true,
-                          documentId: documento.id,
-                          documentTitle: documento.objeto
-                        });
+                        setIsFlowExecutionsModalOpen(true);
+                        setFlowExecutionsDocumentId(documento.id);
+                        setFlowExecutionsDocumentTitle(documento.objeto);
                         console.log("🟡 Estado da modal atualizado:", {
                           isOpen: true,
                           documentId: documento.id,
@@ -7350,28 +7346,30 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   }
 
   function renderFlowExecutionsModal() {
-    console.log("🟡 RENDERIZANDO FLOW EXECUTIONS MODAL:", flowExecutionsModal);
-    if (!flowExecutionsModal.isOpen) {
+    console.log("🟡 RENDERIZANDO FLOW EXECUTIONS MODAL:", { 
+      isOpen: isFlowExecutionsModalOpen, 
+      documentId: flowExecutionsDocumentId, 
+      documentTitle: flowExecutionsDocumentTitle 
+    });
+    if (!isFlowExecutionsModalOpen) {
       console.log("🟡 Modal fechada, não renderizando");
       return null;
     }
     console.log("🟡 Modal ABERTA, renderizando...");
 
     return (
-      <Dialog open={flowExecutionsModal.isOpen} onOpenChange={(open) => {
+      <Dialog open={isFlowExecutionsModalOpen} onOpenChange={(open) => {
         if (!open) {
-          setFlowExecutionsModal({
-            isOpen: false,
-            documentId: "",
-            documentTitle: ""
-          });
+          setIsFlowExecutionsModalOpen(false);
+          setFlowExecutionsDocumentId("");
+          setFlowExecutionsDocumentTitle("");
         }
       }}>
         <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Detalhes das Execuções de Fluxo</DialogTitle>
             <DialogDescription>
-              Histórico de execuções de fluxo para o documento: {flowExecutionsModal.documentTitle}
+              Histórico de execuções de fluxo para o documento: {flowExecutionsDocumentTitle}
             </DialogDescription>
           </DialogHeader>
           
