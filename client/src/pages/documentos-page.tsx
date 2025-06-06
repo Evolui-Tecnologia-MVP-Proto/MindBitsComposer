@@ -773,18 +773,15 @@ export default function DocumentosPage() {
   const [isFlowInspectorPinned, setIsFlowInspectorPinned] = useState(false);
 
   // Estado para modal de detalhes das execuções de fluxo
-  const [isFlowExecutionsModalOpen, setIsFlowExecutionsModalOpen] = useState(false);
-  const [flowExecutionsDocumentId, setFlowExecutionsDocumentId] = useState("");
-  const [flowExecutionsDocumentTitle, setFlowExecutionsDocumentTitle] = useState("");
-
-  // Debug effect para monitorar mudanças no estado da modal
-  useEffect(() => {
-    console.log("🟡 ESTADO FLOW EXECUTIONS MODAL MUDOU:", {
-      isOpen: isFlowExecutionsModalOpen,
-      documentId: flowExecutionsDocumentId,
-      documentTitle: flowExecutionsDocumentTitle
-    });
-  }, [isFlowExecutionsModalOpen, flowExecutionsDocumentId, flowExecutionsDocumentTitle]);
+  const [flowExecutionsModal, setFlowExecutionsModal] = useState<{
+    isOpen: boolean;
+    documentId: string;
+    documentTitle: string;
+  }>({
+    isOpen: false,
+    documentId: "",
+    documentTitle: "",
+  });
   // Função para resetar o formulário
   const resetFormData = () => {
     console.log("🧹 LIMPANDO CAMPOS DO FORMULÁRIO");
@@ -1401,14 +1398,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
   // Buscar detalhes das execuções de fluxo de um documento específico
   const { data: documentFlowExecutions = [] } = useQuery({
-    queryKey: ["/api/document-flow-executions", flowExecutionsDocumentId],
+    queryKey: ["/api/document-flow-executions", flowExecutionsModal.documentId],
     queryFn: async () => {
-      if (!flowExecutionsDocumentId) return [];
-      const response = await fetch(`/api/document-flow-executions?documentId=${flowExecutionsDocumentId}`);
+      if (!flowExecutionsModal.documentId) return [];
+      const response = await fetch(`/api/document-flow-executions?documentId=${flowExecutionsModal.documentId}`);
       if (!response.ok) throw new Error("Erro ao buscar execuções de fluxo");
       return response.json();
     },
-    enabled: !!flowExecutionsDocumentId && isFlowExecutionsModalOpen,
+    enabled: !!flowExecutionsModal.documentId && flowExecutionsModal.isOpen,
   });
 
   // Mutation para criar documento
@@ -2483,11 +2480,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       className="ml-1 text-xs bg-purple-100 text-purple-700 hover:bg-purple-200 cursor-pointer"
                       title="Número de fluxos - Clique para ver detalhes"
                       onClick={() => {
-                        console.log("🟡 BADGE CLICADA! Documento:", documento.id, documento.objeto);
-                        setIsFlowExecutionsModalOpen(true);
-                        setFlowExecutionsDocumentId(documento.id);
-                        setFlowExecutionsDocumentTitle(documento.objeto);
-                        console.log("🟡 Estado da modal atualizado:", {
+                        setFlowExecutionsModal({
                           isOpen: true,
                           documentId: documento.id,
                           documentTitle: documento.objeto
@@ -7346,30 +7339,25 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   }
 
   function renderFlowExecutionsModal() {
-    console.log("🟡 RENDERIZANDO FLOW EXECUTIONS MODAL:", { 
-      isOpen: isFlowExecutionsModalOpen, 
-      documentId: flowExecutionsDocumentId, 
-      documentTitle: flowExecutionsDocumentTitle 
-    });
-    if (!isFlowExecutionsModalOpen) {
-      console.log("🟡 Modal fechada, não renderizando");
+    if (!flowExecutionsModal.isOpen) {
       return null;
     }
-    console.log("🟡 Modal ABERTA, renderizando...");
 
     return (
-      <Dialog open={isFlowExecutionsModalOpen} onOpenChange={(open) => {
+      <Dialog open={flowExecutionsModal.isOpen} onOpenChange={(open) => {
         if (!open) {
-          setIsFlowExecutionsModalOpen(false);
-          setFlowExecutionsDocumentId("");
-          setFlowExecutionsDocumentTitle("");
+          setFlowExecutionsModal({
+            isOpen: false,
+            documentId: "",
+            documentTitle: ""
+          });
         }
       }}>
         <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Detalhes das Execuções de Fluxo</DialogTitle>
             <DialogDescription>
-              Histórico de execuções de fluxo para o documento: {flowExecutionsDocumentTitle}
+              Histórico de execuções de fluxo para o documento: {flowExecutionsModal.documentTitle}
             </DialogDescription>
           </DialogHeader>
           
@@ -7469,8 +7457,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   }
 
-  console.log("🟡 RENDERIZANDO COMPONENTE PRINCIPAL - flowExecutionsModal:", flowExecutionsModal);
-  
   return (
     <div className="container mx-auto py-6">
       {renderEditModal()}
