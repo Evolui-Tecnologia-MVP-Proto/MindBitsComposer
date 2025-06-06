@@ -60,20 +60,24 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
     gcTime: 0, // Não faz cache
   });
 
-  // Debug log para verificar artifacts
-  console.log('🔍 Debug artifacts:', {
-    documentId: selectedDocument?.id,
-    artifacts,
-    artifactsLength: artifacts?.length,
-    hasArtifacts: artifacts && artifacts.length > 0
-  });
+
 
   // Mutation para integrar anexos
   const integrateAttachmentsMutation = useMutation({
     mutationFn: async (documentId: string) => {
-      return apiRequest(`/api/documentos/${documentId}/integrate-attachments`, {
+      const response = await fetch(`/api/documentos/${documentId}/integrate-attachments`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Erro ao integrar anexos');
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       toast({
