@@ -97,7 +97,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
               className={`sidebar-item ${activeItem === "fluxos" ? "sidebar-active" : ""}`}
               onClick={() => handleNavigation("/fluxos")}
             >
-              <GitBranch className="mr-3 h-6 w-6" />
+              <Workflow className="mr-3 h-6 w-6" />
               Fluxos
             </div>
           </div>
