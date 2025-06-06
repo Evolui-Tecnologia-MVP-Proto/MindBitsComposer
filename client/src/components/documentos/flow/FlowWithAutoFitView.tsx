@@ -286,7 +286,7 @@ export function FlowWithAutoFitView({
             isReadonly: true
           }
         };
-        setNodes(updatedNodes);
+        setFlowNodes(updatedNodes);
 
         // Atualizar nó selecionado
         setSelectedFlowNode({
@@ -578,7 +578,7 @@ export function FlowWithAutoFitView({
       }
 
       // 2. Encontrar nós conectados APENAS pelas conexões de SAÍDA do actionNode
-      const outgoingConnections = edges.filter(edge => edge.source === selectedFlowNode.id);
+      const outgoingConnections = flowEdges.filter(edge => edge.source === selectedFlowNode.id);
       console.log('Conexões de saída do actionNode encontradas:', outgoingConnections);
 
       // 3. Processar apenas os nós que recebem conexões diretas do actionNode
@@ -619,7 +619,7 @@ export function FlowWithAutoFitView({
 
         if (connectedNode?.type === 'switchNode') {
           // Para switchNodes, encontrar as próximas conexões baseadas no inputSwitch
-          const switchOutgoingEdges = edges.filter(e => e.source === connectedNode.id);
+          const switchOutgoingEdges = flowEdges.filter(e => e.source === connectedNode.id);
 
           switchOutgoingEdges.forEach(switchEdge => {
             const { inputSwitch, leftSwitch, rightSwitch } = connectedNode.data;
@@ -642,7 +642,7 @@ export function FlowWithAutoFitView({
           });
         } else {
           // Para outros tipos de nós, verificar suas conexões de saída
-          const nodeOutgoingEdges = edges.filter(e => e.source === connectedNode.id);
+          const nodeOutgoingEdges = flowEdges.filter(e => e.source === connectedNode.id);
           nodeOutgoingEdges.forEach(nodeEdge => {
             const finalTargetNode = updatedNodes.find(n => n.id === nodeEdge.target);
             if (finalTargetNode && finalTargetNode.data?.isExecuted !== 'TRUE') {
