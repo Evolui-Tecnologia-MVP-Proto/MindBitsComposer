@@ -108,6 +108,10 @@ import { DeleteConfirmDialog } from "@/components/documentos/modals/DeleteConfir
 import { DeleteArtifactConfirmDialog } from "@/components/documentos/modals/DeleteArtifactConfirmDialog";
 import { DocumentosTable } from "@/components/documentos/tables/DocumentosTable";
 import { FlowWithAutoFitView } from "@/components/documentos/flow/FlowWithAutoFitView";
+import { DocumentFilters } from "@/components/documentos/components/DocumentFilters";
+import { StatusBadge } from "@/components/documentos/components/StatusBadge";
+import { DocumentActions } from "@/components/documentos/components/DocumentActions";
+import { DocumentStats } from "@/components/documentos/components/DocumentStats";
 
 export default function DocumentosPage() {
   const [activeTab, setActiveTab] = useState("incluidos");
@@ -1701,33 +1705,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-3xl font-bold tracking-tight">Documentos</h2>
-          <div className="flex items-center gap-3">
-            <Button
-              onClick={() => {
-                queryClient.invalidateQueries({ queryKey: ['/api/documentos'] });
-                queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
-                toast({
-                  title: "Dados atualizados",
-                  description: "As informações das abas foram recarregadas com sucesso.",
-                });
-              }}
-              variant="outline"
-              className="border-gray-300 hover:bg-gray-50"
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Atualizar
-            </Button>
-            <Button
-              onClick={() => {
-                resetFormData();
-                setIsCreateModalOpen(true);
-              }}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Incluir Documento
-            </Button>
-          </div>
+          <DocumentActions 
+            onCreateDocument={() => {
+              resetFormData();
+              setIsCreateModalOpen(true);
+            }}
+          />
         </div>
 
         <Tabs
@@ -1855,172 +1838,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           </TabsContent>
 
           <TabsContent value="integrados" className="slide-in">
-            {/* Filtros */}
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
-              <div className="flex items-center justify-end mb-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    setFiltros({
-                      responsavel: "",
-                      modulo: "",
-                      cliente: "",
-                      statusOrigem: "",
-                      arquivos: "",
-                      nome: "",
-                    })
-                  }
-                  className="text-xs"
-                >
-                  Limpar filtros
-                </Button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-                {/* Filtro por Nome */}
-                <div>
-                  <Label htmlFor="filtro-nome" className="text-xs">
-                    Nome
-                  </Label>
-                  <Input
-                    id="filtro-nome"
-                    placeholder="Filtrar por nome..."
-                    value={filtros.nome}
-                    onChange={(e) =>
-                      setFiltros((prev) => ({ ...prev, nome: e.target.value }))
-                    }
-                    className="h-8 text-sm"
-                  />
-                </div>
-
-                {/* Filtro por Responsável */}
-                <div>
-                  <Label htmlFor="filtro-responsavel" className="text-xs">
-                    Responsável
-                  </Label>
-                  <Select
-                    value={filtros.responsavel}
-                    onValueChange={(value) =>
-                      setFiltros((prev) => ({ ...prev, responsavel: value }))
-                    }
-                  >
-                    <SelectTrigger className="h-8 text-sm">
-                      <SelectValue placeholder="Todos" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__todos__">Todos</SelectItem>
-                      {responsaveisUnicos.map((responsavel) => (
-                        <SelectItem key={responsavel} value={responsavel}>
-                          {responsavel}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Filtro por Módulo */}
-                <div>
-                  <Label htmlFor="filtro-modulo" className="text-xs">
-                    Módulo
-                  </Label>
-                  <Select
-                    value={filtros.modulo}
-                    onValueChange={(value) =>
-                      setFiltros((prev) => ({ ...prev, modulo: value }))
-                    }
-                  >
-                    <SelectTrigger className="h-8 text-sm">
-                      <SelectValue placeholder="Todos" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__todos__">Todos</SelectItem>
-                      {modulosUnicos.map((modulo) => (
-                        <SelectItem key={modulo} value={modulo}>
-                          {modulo}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Filtro por Cliente */}
-                <div>
-                  <Label htmlFor="filtro-cliente" className="text-xs">
-                    Cliente
-                  </Label>
-                  <Select
-                    value={filtros.cliente}
-                    onValueChange={(value) =>
-                      setFiltros((prev) => ({ ...prev, cliente: value }))
-                    }
-                  >
-                    <SelectTrigger className="h-8 text-sm">
-                      <SelectValue placeholder="Todos" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__todos__">Todos</SelectItem>
-                      {clientesUnicos.map((cliente) => (
-                        <SelectItem key={cliente} value={cliente}>
-                          {cliente}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Filtro por Status Origem */}
-                <div>
-                  <Label htmlFor="filtro-status-origem" className="text-xs">
-                    Status Origem
-                  </Label>
-                  <Select
-                    value={filtros.statusOrigem}
-                    onValueChange={(value) =>
-                      setFiltros((prev) => ({ ...prev, statusOrigem: value }))
-                    }
-                  >
-                    <SelectTrigger className="h-8 text-sm">
-                      <SelectValue placeholder="Todos" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__todos__">Todos</SelectItem>
-                      {statusOrigensUnicos.map((status) => (
-                        <SelectItem key={status} value={status}>
-                          {status}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Filtro por Arquivos */}
-                <div>
-                  <Label htmlFor="filtro-arquivos" className="text-xs">
-                    Arquivos
-                  </Label>
-                  <Select
-                    value={filtros.arquivos}
-                    onValueChange={(value) =>
-                      setFiltros((prev) => ({ ...prev, arquivos: value }))
-                    }
-                  >
-                    <SelectTrigger className="h-8 text-sm">
-                      <SelectValue placeholder="Todos" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="__todos__">Todos</SelectItem>
-                      <SelectItem value="sem-arquivos">Sem arquivos</SelectItem>
-                      <SelectItem value="a-sincronizar">
-                        A sincronizar
-                      </SelectItem>
-                      <SelectItem value="sincronizados">
-                        Sincronizados
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </div>
+            <DocumentFilters
+              filtros={filtros}
+              setFiltros={setFiltros}
+              responsaveisUnicos={responsaveisUnicos}
+              modulosUnicos={modulosUnicos}
+              clientesUnicos={clientesUnicos}
+              statusOrigensUnicos={statusOrigensUnicos}
+            />
 
             {isLoading ? (
               <div className="text-center py-6">Carregando documentos...</div>
