@@ -37,7 +37,9 @@ export function $insertImageNode(payload: ImagePayload): void {
     
     // Criar parágrafo com informações da imagem
     const infoParagraph = $createParagraphNode();
-    const infoText = $createTextNode(`[image_id: ${imageId}] - [${payload.src}]`);
+    // Criar URL mais limpa para display
+    const displayUrl = payload.src.startsWith('data:') ? `image_${imageId}.${payload.src.includes('png') ? 'png' : 'jpg'}` : payload.src;
+    const infoText = $createTextNode(`[image_id: ${imageId}] - [${displayUrl}]`);
     infoParagraph.append(infoText);
     
     // Inserir a imagem
@@ -52,7 +54,9 @@ export function $insertImageNode(payload: ImagePayload): void {
     
     const imageId = Math.floor(Math.random() * 10000000000).toString();
     const infoParagraph = $createParagraphNode();
-    const infoText = $createTextNode(`[image_id: ${imageId}] - [${payload.src}]`);
+    // Criar URL mais limpa para display
+    const displayUrl = payload.src.startsWith('data:') ? `image_${imageId}.${payload.src.includes('png') ? 'png' : 'jpg'}` : payload.src;
+    const infoText = $createTextNode(`[image_id: ${imageId}] - [${displayUrl}]`);
     infoParagraph.append(infoText);
     $insertNodeToNearestRoot(infoParagraph);
   }

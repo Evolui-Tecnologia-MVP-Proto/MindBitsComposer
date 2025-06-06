@@ -113,7 +113,9 @@ function ImageEventListenerPlugin(): JSX.Element | null {
           
           // Criar parágrafo com informações da imagem
           const infoParagraph = $createParagraphNode();
-          const infoText = $createTextNode(`[image_id: ${imageId}] - [${src}]`);
+          // Criar URL mais limpa para display
+          const displayUrl = src.startsWith('data:') ? `image_${imageId}.${src.includes('png') ? 'png' : 'jpg'}` : src;
+          const infoText = $createTextNode(`[image_id: ${imageId}] - [${displayUrl}]`);
           infoParagraph.append(infoText);
           
           // Inserir a imagem e o texto informativo
