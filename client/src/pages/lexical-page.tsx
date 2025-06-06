@@ -483,19 +483,26 @@ export default function LexicalPage() {
             
             <div className="flex flex-col items-center space-y-1">
               <span className="text-xs text-gray-500 font-medium">Visualização</span>
-              <Button
-                onClick={() => setViewMode(viewMode === 'editor' ? 'preview' : 'editor')}
-                variant="outline"
-                size="sm"
-                title={viewMode === 'editor' ? 'Visualizar Markdown' : 'Modo Editor'}
-              >
-                {viewMode === 'editor' ? (
-                  <Eye className="w-4 h-4 mr-2" />
-                ) : (
-                  <Edit className="w-4 h-4 mr-2" />
-                )}
-                {viewMode === 'editor' ? 'Markdown' : 'Editor'}
-              </Button>
+              <div className="flex items-center space-x-1">
+                <Button
+                  onClick={() => setViewMode('editor')}
+                  variant={viewMode === 'editor' ? "default" : "outline"}
+                  size="sm"
+                  className={viewMode === 'editor' ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
+                  title="Modo Editor"
+                >
+                  <Edit className={`w-4 h-4 ${viewMode === 'editor' ? "text-white" : ""}`} />
+                </Button>
+                <Button
+                  onClick={() => setViewMode('preview')}
+                  variant={viewMode === 'preview' ? "default" : "outline"}
+                  size="sm"
+                  className={viewMode === 'preview' ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
+                  title="Visualizar Markdown"
+                >
+                  <Eye className={`w-4 h-4 ${viewMode === 'preview' ? "text-white" : ""}`} />
+                </Button>
+              </div>
             </div>
             
             <div className="flex flex-col items-center space-y-1">
