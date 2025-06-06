@@ -111,6 +111,7 @@ import { FlowInspector } from "@/components/documentos/flow/FlowInspector";
 import { GitHubTab } from "@/components/documentos/tabs/GitHubTab";
 import { IncluirDocumentosTab } from "@/components/documentos/tabs/IncluirDocumentosTab";
 import { IntegradosTab } from "@/components/documentos/tabs/IntegradosTab";
+import { ConcluidosTab } from "@/components/documentos/tabs/ConcluidosTab";
 
 export default function DocumentosPage() {
   const [activeTab, setActiveTab] = useState("incluidos");
@@ -1771,13 +1772,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             )}
           </TabsContent>
 
-          <TabsContent value="concluidos" className="slide-in">
-            {isLoading ? (
-              <div className="text-center py-6">Carregando documentos...</div>
-            ) : (
-              renderDocumentosTable(documentosConcluidos)
-            )}
-          </TabsContent>
+          <ConcluidosTab
+            isLoading={isLoading}
+            renderDocumentosTable={renderDocumentosTable}
+            documentosConcluidos={documentosConcluidos}
+          />
 
           <TabsContent value="repositorio" className="slide-in">
             <GitHubTab
