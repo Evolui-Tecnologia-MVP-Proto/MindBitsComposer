@@ -41,11 +41,11 @@ export function DocumentFilters({
           size="sm"
           onClick={() =>
             setFiltros({
-              responsavel: "__todos__",
-              modulo: "__todos__",
-              cliente: "__todos__",
-              statusOrigem: "__todos__",
-              arquivos: "__todos__",
+              responsavel: "",
+              modulo: "",
+              cliente: "",
+              statusOrigem: "",
+              arquivos: "",
               nome: "",
             })
           }

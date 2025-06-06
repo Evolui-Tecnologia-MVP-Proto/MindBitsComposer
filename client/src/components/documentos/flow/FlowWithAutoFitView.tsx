@@ -48,7 +48,7 @@ export function FlowWithAutoFitView({
     
     // Limpar resultado da integração ao mudar de nó
     setIntegrationResult({ status: null, message: '' });
-  }, [selectedFlowNode?.id, selectedFlowNode?.data.formData]);
+  }, [selectedFlowNode?.id, selectedFlowNode?.data?.formData]);
   
   // Função helper para extrair dados do formulário
   const getFormFields = () => {
