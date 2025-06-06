@@ -2480,7 +2480,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       className="ml-1 text-xs bg-purple-100 text-purple-700 hover:bg-purple-200 cursor-pointer"
                       title="Número de fluxos - Clique para ver detalhes"
                       onClick={() => {
+                        console.log("🟡 BADGE CLICADA! Documento:", documento.id, documento.objeto);
                         setFlowExecutionsModal({
+                          isOpen: true,
+                          documentId: documento.id,
+                          documentTitle: documento.objeto
+                        });
+                        console.log("🟡 Estado da modal atualizado:", {
                           isOpen: true,
                           documentId: documento.id,
                           documentTitle: documento.objeto
