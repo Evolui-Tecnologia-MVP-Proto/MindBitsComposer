@@ -2404,18 +2404,20 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         setShowApprovalAlert={setShowApprovalAlert}
         isFlowInspectorPinned={isFlowInspectorPinned}
       />
-      <FlowWithAutoFitView
-        flowData={flowDiagramModal.flowData}
-        showFlowInspector={showFlowInspector}
-        setShowFlowInspector={setShowFlowInspector}
-        selectedFlowNode={selectedFlowNode}
-        setSelectedFlowNode={setSelectedFlowNode}
-        showApprovalAlert={showApprovalAlert}
-        setShowApprovalAlert={setShowApprovalAlert}
-        isPinned={isFlowInspectorPinned}
-        setFlowDiagramModal={setFlowDiagramModal}
-        flowDiagramModal={flowDiagramModal}
-      />
+      <ReactFlowProvider>
+        <FlowWithAutoFitView
+          flowData={flowDiagramModal.flowData}
+          showFlowInspector={showFlowInspector}
+          setShowFlowInspector={setShowFlowInspector}
+          selectedFlowNode={selectedFlowNode}
+          setSelectedFlowNode={setSelectedFlowNode}
+          showApprovalAlert={showApprovalAlert}
+          setShowApprovalAlert={setShowApprovalAlert}
+          isPinned={isFlowInspectorPinned}
+          setFlowDiagramModal={setFlowDiagramModal}
+          flowDiagramModal={flowDiagramModal}
+        />
+      </ReactFlowProvider>
     </div>
   );
 

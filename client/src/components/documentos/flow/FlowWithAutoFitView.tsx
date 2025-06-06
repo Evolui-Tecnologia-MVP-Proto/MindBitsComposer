@@ -48,6 +48,11 @@ export function FlowWithAutoFitView({
   const flowNodes = flowData?.flowTasks?.nodes || [];
   const flowEdges = flowData?.flowTasks?.edges || [];
   
+  // Early return if no flow data
+  if (!flowData?.flowTasks) {
+    return null;
+  }
+  
   // Mock missing variables for now
   const isFlowInspectorPinned = isPinned;
   const setIsFlowInspectorPinned = () => {};
@@ -790,17 +795,17 @@ export function FlowWithAutoFitView({
 
   // Encontrar nós executados
   const executedNodes = new Set(
-    nodes.filter((node: any) => node.data?.isExecuted === 'TRUE').map((node: any) => node.id)
+    processNodes.filter((node: any) => node.data?.isExecuted === 'TRUE').map((node: any) => node.id)
   );
 
   // Encontrar nós pendentes conectados aos executados
   const pendingConnectedNodes = new Set<string>();
 
-  for (const edge of edges) {
+  for (const edge of processEdges) {
     // Se o nó de origem está executado e o nó de destino não está executado
     if (executedNodes.has(edge.source)) {
-      const sourceNode = nodes.find((n: any) => n.id === edge.source);
-      const targetNode = nodes.find((n: any) => n.id === edge.target);
+      const sourceNode = processNodes.find((n: any) => n.id === edge.source);
+      const targetNode = processNodes.find((n: any) => n.id === edge.target);
 
       if (targetNode && targetNode.data?.isExecuted !== 'TRUE') {
         // Verificar se o nó de origem é um switchNode
@@ -829,7 +834,7 @@ export function FlowWithAutoFitView({
 
     // Se o nó de destino está executado e o nó de origem não está executado
     if (executedNodes.has(edge.target)) {
-      const sourceNode = nodes.find((n: any) => n.id === edge.source);
+      const sourceNode = processNodes.find((n: any) => n.id === edge.source);
       if (sourceNode && sourceNode.data?.isExecuted !== 'TRUE') {
         pendingConnectedNodes.add(edge.source);
       }
@@ -837,7 +842,7 @@ export function FlowWithAutoFitView({
   }
 
   // Processar nós para adicionar destaque amarelo aos pendentes conectados
-  const processedNodes = nodes.map((node: any) => {
+  const processedNodes = processNodes.map((node: any) => {
     const isSelected = selectedFlowNode?.id === node.id;
 
     if (pendingConnectedNodes.has(node.id)) {
@@ -859,9 +864,9 @@ export function FlowWithAutoFitView({
   });
 
   // Processar edges para colorir conexões e adicionar animação
-  const processedEdges = edges.map((edge: any) => {
-    const sourceNode = nodes.find((n: any) => n.id === edge.source);
-    const targetNode = nodes.find((n: any) => n.id === edge.target);
+  const processedEdges = processEdges.map((edge: any) => {
+    const sourceNode = processNodes.find((n: any) => n.id === edge.source);
+    const targetNode = processNodes.find((n: any) => n.id === edge.target);
 
     const sourceExecuted = sourceNode?.data?.isExecuted === 'TRUE';
     const targetExecuted = targetNode?.data?.isExecuted === 'TRUE';
