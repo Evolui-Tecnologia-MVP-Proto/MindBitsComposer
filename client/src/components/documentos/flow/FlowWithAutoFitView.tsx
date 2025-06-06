@@ -390,19 +390,35 @@ export function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowIn
 
   console.log("🟢 FlowWithAutoFitView - Edges com animação:", processedEdges.filter((edge: any) => edge.animated));
 
+  // Definir os tipos de nós
+  const nodeTypes = {
+    startNode: StartNodeComponent,
+    endNode: EndNodeComponent,
+    actionNode: ActionNodeComponent,
+    documentNode: DocumentNodeComponent,
+    integrationNode: IntegrationNodeComponent,
+    switchNode: SwitchNodeComponent,
+  };
+
   return (
     <div className="w-full h-full">
-      <FlowNodes
+      <ReactFlow
         nodes={processedNodes}
         edges={processedEdges}
-        onNodeClick={(node: any) => {
+        nodeTypes={nodeTypes}
+        onNodeClick={(event, node) => {
           console.log('🎯 Nó clicado:', node);
           setSelectedFlowNode(node);
           if (!isPinned) {
             setShowFlowInspector(true);
           }
         }}
-      />
+        fitView
+        fitViewOptions={{ padding: 0.1 }}
+      >
+        <Controls />
+        <Background />
+      </ReactFlow>
       
       {/* Painel lateral para mostrar formulários quando um nó está selecionado */}
       {selectedFlowNode && selectedFlowNode.data.isPendingConnected && (
