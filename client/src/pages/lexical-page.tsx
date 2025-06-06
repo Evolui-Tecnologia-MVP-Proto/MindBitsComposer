@@ -633,40 +633,56 @@ export default function LexicalPage() {
                         </div>
                       ) : (
                         <div className="space-y-3">
-                          {documentArtifacts.map((artifact: DocumentArtifact) => (
-                            <div 
-                              key={artifact.id}
-                              className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border"
-                            >
-                              {/* Miniatura ou ícone */}
-                              {renderThumbnail(artifact)}
-                              
-                              {/* Informações do arquivo */}
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium truncate">
-                                  {artifact.name}
-                                </p>
-                                <p className="text-xs text-gray-500 truncate">
-                                  {artifact.fileName || `${artifact.name}.${artifact.type}`}
-                                </p>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Badge variant="outline" className="text-xs">
-                                    .{artifact.type || 'unknown'}
-                                  </Badge>
-                                  {artifact.fileSize && (
-                                    <span className="text-xs text-gray-400">
-                                      {Math.round(parseInt(artifact.fileSize) / 1024)} KB
-                                    </span>
+                          {documentArtifacts.map((artifact: DocumentArtifact) => {
+                            // Log para debug dos campos
+                            console.log('Artifact data:', {
+                              id: artifact.id,
+                              name: artifact.name,
+                              fileName: artifact.fileName,
+                              type: artifact.type,
+                              mimeType: artifact.mimeType
+                            });
+                            
+                            return (
+                              <div 
+                                key={artifact.id}
+                                className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border"
+                              >
+                                {/* Miniatura ou ícone */}
+                                {renderThumbnail(artifact)}
+                                
+                                {/* Informações do arquivo */}
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium truncate" title={artifact.name}>
+                                    {artifact.name}
+                                  </p>
+                                  <p className="text-xs text-gray-600 truncate font-mono" title={artifact.fileName}>
+                                    {artifact.fileName || 'Nome do arquivo não disponível'}
+                                  </p>
+                                  <div className="flex items-center gap-2 mt-2">
+                                    <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                                      {artifact.type || 'unknown'}
+                                    </Badge>
+                                    {artifact.fileSize && (
+                                      <span className="text-xs text-gray-500">
+                                        {Math.round(parseInt(artifact.fileSize) / 1024)} KB
+                                      </span>
+                                    )}
+                                    {artifact.mimeType && (
+                                      <span className="text-xs text-gray-400 truncate">
+                                        {artifact.mimeType}
+                                      </span>
+                                    )}
+                                  </div>
+                                  {artifact.mondayColumn && (
+                                    <p className="text-xs text-blue-600 mt-1">
+                                      Monday: {artifact.mondayColumn}
+                                    </p>
                                   )}
                                 </div>
-                                {artifact.mondayColumn && (
-                                  <p className="text-xs text-blue-600 mt-1">
-                                    Monday: {artifact.mondayColumn}
-                                  </p>
-                                )}
                               </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
                     </div>
