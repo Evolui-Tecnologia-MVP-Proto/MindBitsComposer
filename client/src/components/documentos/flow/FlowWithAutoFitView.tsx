@@ -13,7 +13,14 @@ import { CheckCircle, XCircle, Play, Save, Trash2, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import ReactFlow, { Background, Controls, MiniMap } from "reactflow";
-import { FlowNodes } from "./FlowNodes";
+import { 
+  StartNodeComponent,
+  EndNodeComponent,
+  ActionNodeComponent,
+  DocumentNodeComponent,
+  IntegrationNodeComponent,
+  SwitchNodeComponent
+} from "./FlowNodes";
 import { DeleteArtifactConfirmDialog } from "../modals/DeleteArtifactConfirmDialog";
 
 interface FlowWithAutoFitViewProps {
@@ -25,10 +32,26 @@ interface FlowWithAutoFitViewProps {
   showApprovalAlert: boolean;
   setShowApprovalAlert: (show: boolean) => void;
   isPinned: boolean;
+  flowDiagramModal: any;
+  setFlowDiagramModal: (setter: any) => void;
+  nodes: any[];
+  edges: any[];
 }
 
-export function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode, showApprovalAlert, setShowApprovalAlert, isPinned }: FlowWithAutoFitViewProps) {
+export function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode, showApprovalAlert, setShowApprovalAlert, isPinned, flowDiagramModal, setFlowDiagramModal, nodes: flowNodes, edges: flowEdges }: FlowWithAutoFitViewProps) {
   const { fitView, getNodes, setNodes } = useReactFlow();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  
+  // Create nodeTypes object
+  const nodeTypes = {
+    startNode: StartNodeComponent,
+    endNode: EndNodeComponent,
+    actionNode: ActionNodeComponent,
+    documentNode: DocumentNodeComponent,
+    integrationNode: IntegrationNodeComponent,
+    switchNode: SwitchNodeComponent
+  };
   
   // Estado para controlar os valores dos campos do formulário
   const [formValues, setFormValues] = useState<Record<string, string>>({});
@@ -498,7 +521,7 @@ export function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowIn
   }
 
   // Processar dados do fluxo
-  const { nodes, edges } = flowData.flowTasks;
+  const { nodes: flowTaskNodes, edges: flowTaskEdges } = flowData.flowTasks;
 
   if (!nodes || !Array.isArray(nodes)) {
     return (
@@ -1048,7 +1071,7 @@ export function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowIn
         <ReactFlow
           nodes={processedNodes}
           edges={processedEdges}
-          nodeTypes={FlowNodes}
+          nodeTypes={nodeTypes}
           onNodeClick={(event, node) => {
             console.log('🎯 Nó clicado:', node);
             setSelectedFlowNode(node);
