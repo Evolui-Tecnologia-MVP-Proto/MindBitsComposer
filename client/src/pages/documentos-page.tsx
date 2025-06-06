@@ -592,41 +592,11 @@ export default function DocumentosPage() {
 
   // Função para carregar visualização da estrutura do repositório
   const fetchGithubRepoStructure = async () => {
-    const githubConnection = serviceConnections.find(
-      (conn: any) => conn.serviceName === "github",
-    );
-
-    console.log("🔍 Verificando conexão GitHub:", githubConnection);
-
-    if (!githubConnection || !githubConnection.token) {
-      console.error("❌ Conexão GitHub não encontrada ou token ausente");
-      setIsLoadingRepo(false);
-      return [];
-    }
-
-    const repoParam = githubConnection.parameters?.[0];
-    if (!repoParam) {
-      console.error("❌ Repositório não configurado");
-      setIsLoadingRepo(false);
-      return [];
-    }
-
-    const [owner, repo] = repoParam.split("/");
-    console.log("🚀 Carregando repositório:", repoParam);
-    console.log("🔑 Token presente:", !!githubConnection.token);
+    console.log("🚀 Carregando estrutura do repositório GitHub via backend");
 
     setIsLoadingRepo(true);
     try {
-      const url = `https://api.github.com/repos/${owner}/${repo}/contents`;
-      console.log("📡 Fazendo requisição para:", url);
-      
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `token ${githubConnection.token}`,
-          Accept: "application/vnd.github.v3+json",
-          "User-Agent": "EVO-MindBits-Composer",
-        },
-      });
+      const response = await fetch("/api/github/repo/contents");
 
       console.log("📊 Status da resposta:", response.status, response.statusText);
 
@@ -637,11 +607,11 @@ export default function DocumentosPage() {
         setGithubRepoFiles(fileStructure);
         return fileStructure;
       } else {
-        const errorText = await response.text();
+        const errorData = await response.json();
         console.error("❌ Erro na resposta:", {
           status: response.status,
           statusText: response.statusText,
-          body: errorText
+          error: errorData.error
         });
         return [];
       }

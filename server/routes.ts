@@ -4001,6 +4001,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get GitHub repository contents
+  app.get("/api/github/repo/contents", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const githubConnection = await storage.getServiceConnection("github");
+      if (!githubConnection) {
+        return res.status(400).json({ error: "Conexão GitHub não encontrada" });
+      }
+
+      const [owner, repo] = githubConnection.parameters[0].split('/');
+      
+      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents`, {
+        headers: {
+          Authorization: `token ${githubConnection.token}`,
+          Accept: "application/vnd.github.v3+json",
+          "User-Agent": "EVO-MindBits-Composer",
+        },
+      });
+
+      if (response.ok) {
+        const contents = await response.json();
+        res.json(contents);
+      } else {
+        const errorText = await response.text();
+        console.error("Erro na API do GitHub:", response.status, errorText);
+        res.status(response.status).json({ error: "Erro ao acessar repositório GitHub" });
+      }
+    } catch (error) {
+      console.error("Erro ao buscar conteúdo do GitHub:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   // Get flow executions for documents (both active and concluded)
   app.get("/api/document-flow-executions", async (req: Request, res: Response) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
