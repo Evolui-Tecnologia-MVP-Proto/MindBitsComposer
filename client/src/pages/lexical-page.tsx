@@ -647,11 +647,11 @@ export default function LexicalPage() {
                                   {artifact.name}
                                 </p>
                                 <p className="text-xs text-gray-500 truncate">
-                                  {artifact.fileName}
+                                  {artifact.fileName || `${artifact.name}.${artifact.type}`}
                                 </p>
                                 <div className="flex items-center gap-2 mt-1">
                                   <Badge variant="outline" className="text-xs">
-                                    {artifact.type}
+                                    .{artifact.type || 'unknown'}
                                   </Badge>
                                   {artifact.fileSize && (
                                     <span className="text-xs text-gray-400">
