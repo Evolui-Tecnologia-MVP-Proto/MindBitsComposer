@@ -492,25 +492,31 @@ export default function LexicalPage() {
                 )}
                 {viewMode === 'editor' ? 'Markdown' : 'Editor'}
               </Button>
-              <Button
-                onClick={() => setShowDocumentList(!showDocumentList)}
-                variant={showDocumentList ? "default" : "outline"}
-                size="sm"
-                className={showDocumentList ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
-              >
-                <FolderOpen className={`w-4 h-4 mr-2 ${showDocumentList ? "text-white" : ""}`} />
-                Biblioteca
-              </Button>
             </div>
-            <Button
-              onClick={() => setShowAttachments(!showAttachments)}
-              variant={showAttachments ? "default" : "outline"}
-              size="sm"
-              className={showAttachments ? "bg-green-600 text-white hover:bg-green-700" : ""}
-            >
-              <Paperclip className={`w-4 h-4 mr-2 ${showAttachments ? "text-white" : ""}`} />
-              Anexos
-            </Button>
+            
+            <div className="flex flex-col items-center space-y-1">
+              <span className="text-xs text-gray-500 font-medium">Side Panels</span>
+              <div className="flex items-center space-x-2">
+                <Button
+                  onClick={() => setShowDocumentList(!showDocumentList)}
+                  variant={showDocumentList ? "default" : "outline"}
+                  size="sm"
+                  className={showDocumentList ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
+                >
+                  <FolderOpen className={`w-4 h-4 mr-2 ${showDocumentList ? "text-white" : ""}`} />
+                  Biblioteca
+                </Button>
+                <Button
+                  onClick={() => setShowAttachments(!showAttachments)}
+                  variant={showAttachments ? "default" : "outline"}
+                  size="sm"
+                  className={showAttachments ? "bg-green-600 text-white hover:bg-green-700" : ""}
+                >
+                  <Paperclip className={`w-4 h-4 mr-2 ${showAttachments ? "text-white" : ""}`} />
+                  Anexos
+                </Button>
+              </div>
+            </div>
             <Button
               onClick={handleDiscard}
               variant="outline"
