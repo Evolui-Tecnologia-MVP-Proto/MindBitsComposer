@@ -782,6 +782,11 @@ export default function DocumentosPage() {
     documentId: "",
     documentTitle: "",
   });
+
+  // useEffect para debug quando o estado da modal muda
+  useEffect(() => {
+    console.log("🔄 FLOW EXECUTIONS MODAL STATE CHANGED:", flowExecutionsModal);
+  }, [flowExecutionsModal]);
   // Função para resetar o formulário
   const resetFormData = () => {
     console.log("🧹 LIMPANDO CAMPOS DO FORMULÁRIO");
