@@ -96,106 +96,6 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
     }
   };
 
-  // Função para verificar se há arquivos não integrados do Monday.com
-  const hasUnintegratedFiles = (): boolean => {
-    if (!selectedDocument?.mondayItemValues) return false;
-
-    try {
-      let mondayData = null;
-      if (typeof selectedDocument.mondayItemValues === "string") {
-        mondayData = JSON.parse(selectedDocument.mondayItemValues);
-      } else {
-        mondayData = selectedDocument.mondayItemValues;
-      }
-
-      if (!Array.isArray(mondayData) || mondayData.length === 0) {
-        return false;
-      }
-
-      // Coletar todos os assetIds dos arquivos do Monday.com
-      const mondayAssetIds = new Set<string>();
-      mondayData.forEach((column: any) => {
-        try {
-          const value = column.value ? JSON.parse(column.value) : {};
-          const files = value.files || [];
-          if (Array.isArray(files)) {
-            files.forEach((file: any) => {
-              if (file.assetId) {
-                mondayAssetIds.add(file.assetId.toString());
-              }
-            });
-          }
-        } catch {
-          // Ignorar erros de parsing
-        }
-      });
-
-      if (mondayAssetIds.size === 0) {
-        return false;
-      }
-
-      // Verificar se há assetIds do Monday.com que não estão nos artifacts
-      const integratedAssetIds = new Set(
-        artifacts?.map((artifact: DocumentArtifact) => artifact.originAssetId).filter(Boolean) || []
-      );
-
-      // Se há arquivos do Monday.com que não foram integrados
-      return Array.from(mondayAssetIds).some(assetId => !integratedAssetIds.has(assetId));
-    } catch {
-      return false;
-    }
-  };
-
-  // Verificar se todos os arquivos do Monday.com já foram integrados
-  const allFilesIntegrated = (): boolean => {
-    if (!selectedDocument?.mondayItemValues) return false;
-
-    try {
-      let mondayData = null;
-      if (typeof selectedDocument.mondayItemValues === "string") {
-        mondayData = JSON.parse(selectedDocument.mondayItemValues);
-      } else {
-        mondayData = selectedDocument.mondayItemValues;
-      }
-
-      if (!Array.isArray(mondayData) || mondayData.length === 0) {
-        return false;
-      }
-
-      // Coletar todos os assetIds dos arquivos do Monday.com
-      const mondayAssetIds = new Set<string>();
-      mondayData.forEach((column: any) => {
-        try {
-          const value = column.value ? JSON.parse(column.value) : {};
-          const files = value.files || [];
-          if (Array.isArray(files)) {
-            files.forEach((file: any) => {
-              if (file.assetId) {
-                mondayAssetIds.add(file.assetId.toString());
-              }
-            });
-          }
-        } catch {
-          // Ignorar erros de parsing
-        }
-      });
-
-      if (mondayAssetIds.size === 0) {
-        return false;
-      }
-
-      // Verificar se todos os assetIds do Monday.com estão nos artifacts
-      const integratedAssetIds = new Set(
-        artifacts?.map((artifact: DocumentArtifact) => artifact.originAssetId).filter(Boolean) || []
-      );
-
-      // Todos os arquivos foram integrados se cada assetId do Monday.com tem um artifact correspondente
-      return Array.from(mondayAssetIds).every(assetId => integratedAssetIds.has(assetId));
-    } catch {
-      return false;
-    }
-  };
-
   // Funções de formatação
   const formatDate = (date: Date | string | null): string => {
     if (!date) return "N/A";
@@ -448,10 +348,10 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                     }}
                     disabled={
                       integrateAttachmentsMutation.isPending ||
-                      !hasUnintegratedFiles()
+                      (artifacts && artifacts.length > 0)
                     }
                     className={
-                      allFilesIntegrated()
+                      artifacts && artifacts.length > 0
                         ? "bg-gray-400 cursor-not-allowed"
                         : "bg-green-600 hover:bg-green-700"
                     }
@@ -462,7 +362,7 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Integrando...
                       </>
-                    ) : allFilesIntegrated() ? (
+                    ) : artifacts && artifacts.length > 0 ? (
                       <>
                         <Check className="mr-2 h-4 w-4" />
                         Já Integrado
