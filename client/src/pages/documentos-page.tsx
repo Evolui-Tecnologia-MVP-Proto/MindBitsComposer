@@ -5436,287 +5436,146 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             }} 
           />
         )}
-                  <div className="grid grid-cols-3 gap-2 text-center">
-                    <div>
-                      <p className="text-xs font-medium text-gray-700 mb-1">Status Exec.</p>
-                      <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                        selectedFlowNode.data.isExecuted === 'TRUE' 
-                          ? 'bg-blue-100 text-blue-800' 
-                          : selectedFlowNode.data.isPendingConnected
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {selectedFlowNode.data.isExecuted === 'TRUE' 
-                          ? 'Executado' 
-                          : selectedFlowNode.data.isPendingConnected
-                          ? 'Pendente'
-                          : 'N.Exec.'}
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-gray-700 mb-1">Tipo Ação</p>
-                      {selectedFlowNode.data.actionType && (
-                        <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                          {selectedFlowNode.data.actionType}
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <p className="text-xs font-medium text-gray-700 mb-1">Aprovação</p>
-                      {selectedFlowNode.data.isAproved && (
-                        <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                          selectedFlowNode.data.isAproved === 'TRUE' 
-                            ? 'bg-green-100 text-green-800'
-                            : selectedFlowNode.data.isAproved === 'FALSE'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {selectedFlowNode.data.isAproved === 'TRUE' 
-                            ? 'SIM' 
-                            : selectedFlowNode.data.isAproved === 'FALSE'
-                            ? 'NÃO'
-                            : 'UNDEF'}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
+      </div>
+    );
+  };
 
-                {selectedFlowNode.data.description && (
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">Descrição</p>
-                    <p className="text-xs text-gray-900 bg-gray-50 p-2 rounded border font-mono">
-                      {selectedFlowNode.data.description}
-                    </p>
-                  </div>
-                )}
 
-                {/* Formulário dinâmico baseado no attached_Form */}
-                {selectedFlowNode.type === 'actionNode' && (selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form) && (
-                  <div>
-                    {(() => {
-                      try {
-                        // Verifica tanto attached_Form (maiúsculo) quanto attached_form (minúsculo)
-                        let attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
-                        console.log('🔍 Dados brutos do formulário:', attachedFormData);
-                        
-                        // Corrige formato malformado do JSON se necessário
-                        if (typeof attachedFormData === 'string' && attachedFormData.includes('"Motivo de Recusa":') && attachedFormData.includes('"Detalhamento":')) {
-                          // Converte o formato específico manualmente
-                          const fixedJson = {
-                            "Show_Condition": "FALSE",
-                            "Fields": {
-                              "Motivo de Recusa": ["Incompatível com processo", "Forma de operação", "Configuração de Sistema"],
-                              "Detalhamento": ["default:", "type:longText"]
-                            }
-                          };
-                          attachedFormData = JSON.stringify(fixedJson);
-                        }
-                        
-                        console.log('🔍 Dados corrigidos:', attachedFormData);
-                        const formData = JSON.parse(attachedFormData);
-                        console.log('🔍 Dados parseados:', formData);
-                        
-                        // Verifica se é um formulário com condição
-                        if (formData.Show_Condition !== undefined && formData.Fields) {
-                          const showCondition = formData.Show_Condition;
-                          const isApprovalNode = selectedFlowNode.data.actionType === 'Intern_Aprove';
-                          const approvalStatus = selectedFlowNode.data.isAproved;
-                          
-                          // Determina se deve mostrar o formulário baseado na condição
-                          let shouldShowForm = false;
-                          if (isApprovalNode && approvalStatus !== 'UNDEF') {
-                            if (showCondition === 'TRUE' && approvalStatus === 'TRUE') {
-                              shouldShowForm = true;
-                            } else if (showCondition === 'FALSE' && approvalStatus === 'FALSE') {
-                              shouldShowForm = true;
-                            } else if (showCondition === 'BOTH' && (approvalStatus === 'TRUE' || approvalStatus === 'FALSE')) {
-                              shouldShowForm = true;
-                            }
-                          }
-                          
-                          if (!shouldShowForm) {
-                            return null;
-                          }
-                          
-                          // Converte Fields para objeto se for array - só processa se vai mostrar
-                          let fieldsData = formData.Fields;
-                          if (Array.isArray(formData.Fields)) {
-                            fieldsData = {};
-                            // Trata diferentes formatos de array
-                            formData.Fields.forEach((item, index) => {
-                              if (typeof item === 'string') {
-                                // Formato: [fieldName1, fieldValue1, fieldName2, fieldValue2, ...]
-                                const nextItem = formData.Fields[index + 1];
-                                if (nextItem !== undefined && index % 2 === 0) {
-                                  fieldsData[item] = nextItem;
-                                }
-                              } else if (typeof item === 'object' && item !== null) {
-                                // Formato: [{fieldName: fieldValue}, ...]
-                                Object.assign(fieldsData, item);
-                              }
-                            });
-                          }
-                          
-                          console.log('🟡 Dados do formulário processados:', fieldsData);
-                          
-                          return (
-                            <div className="bg-gray-50 p-4 rounded border space-y-4">
-                              {Object.entries(fieldsData).map(([fieldName, fieldValue]) => {
-                              // Verifica se é um array de configuração com default e type
-                              if (Array.isArray(fieldValue) && fieldValue.length === 2 && 
-                                  typeof fieldValue[0] === 'string' && fieldValue[0].startsWith('default:') &&
-                                  typeof fieldValue[1] === 'string' && fieldValue[1].startsWith('type:')) {
-                                
-                                const defaultValue = fieldValue[0].replace('default:', '');
-                                const fieldType = fieldValue[1].replace('type:', '');
-                                const isReadonly = !selectedFlowNode.data.isPendingConnected;
-                                const baseClasses = "w-full px-3 py-2 border rounded-md text-xs font-mono";
-                                const readonlyClasses = isReadonly 
-                                  ? "bg-gray-50 border-gray-200 text-gray-600 cursor-not-allowed" 
-                                  : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
-                                
-                                return (
-                                  <div key={fieldName} className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700">{fieldName}</label>
-                                    {fieldType === 'longText' ? (
-                                      <textarea
-                                        rows={4}
-                                        placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
-                                        readOnly={isReadonly}
-                                        value={formValues[fieldName] || ''}
-                                        onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
-                                        className={`${baseClasses} ${readonlyClasses} resize-vertical`}
-                                      />
-                                    ) : fieldType.startsWith('char(') ? (
-                                      <input
-                                        type="text"
-                                        maxLength={parseInt(fieldType.match(/\d+/)?.[0] || '255')}
-                                        placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
-                                        readOnly={isReadonly}
-                                        value={formValues[fieldName] || ''}
-                                        onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
-                                        className={`${baseClasses} ${readonlyClasses}`}
-                                      />
-                                    ) : fieldType === 'int' ? (
-                                      <input
-                                        type="number"
-                                        step="1"
-                                        placeholder={defaultValue || `Digite um número inteiro`}
-                                        readOnly={isReadonly}
-                                        value={formValues[fieldName] || ''}
-                                        onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
-                                        className={`${baseClasses} ${readonlyClasses}`}
-                                      />
-                                    ) : fieldType.startsWith('number(') ? (
-                                      <input
-                                        type="number"
-                                        step={Math.pow(10, -parseInt(fieldType.match(/\d+/)?.[0] || '2'))}
-                                        placeholder={defaultValue || `Digite um número`}
-                                        readOnly={isReadonly}
-                                        value={formValues[fieldName] || ''}
-                                        onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
-                                        className={`${baseClasses} ${readonlyClasses}`}
-                                      />
-                                    ) : (
-                                      <input
-                                        type="text"
-                                        placeholder={defaultValue || `Digite ${fieldName.toLowerCase()}`}
-                                        readOnly={isReadonly}
-                                        value={formValues[fieldName] || ''}
-                                        onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
-                                        className={`${baseClasses} ${readonlyClasses}`}
-                                      />
-                                    )}
-                                  </div>
-                                );
-                              }
-                              
-                              // Comportamento original para arrays simples ou strings
-                              const isReadonly = !selectedFlowNode.data.isPendingConnected;
-                              const baseClasses = "w-full px-3 py-2 border rounded-md text-xs font-mono";
-                              const readonlyClasses = isReadonly 
-                                ? "bg-gray-50 border-gray-200 text-gray-600 cursor-not-allowed" 
-                                : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
-                              
-                              return (
-                                <div key={fieldName} className="space-y-2">
-                                  <label className="text-sm font-medium text-gray-700">{fieldName}</label>
-                                  {Array.isArray(fieldValue) ? (
-                                    <select 
-                                      disabled={isReadonly}
-                                      value={formValues[fieldName] || ''}
-                                      onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
-                                      className={`${baseClasses} ${readonlyClasses}`}
-                                    >
-                                      <option value="">Selecione uma opção</option>
-                                      {fieldValue.map((option, index) => (
-                                        <option key={index} value={option}>{option}</option>
-                                      ))}
-                                    </select>
-                                  ) : (
-                                    <input
-                                      type="text"
-                                      placeholder={fieldValue || `Digite ${fieldName.toLowerCase()}`}
-                                      readOnly={isReadonly}
-                                      value={formValues[fieldName] || ''}
-                                      onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
-                                      className={`${baseClasses} ${readonlyClasses}`}
-                                    />
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        );
-                        }
-                        
-                        // Comportamento legado para formulários sem condição
-                        return (
-                          <div className="bg-gray-50 p-4 rounded border space-y-4">
-                            {Object.entries(formData).map(([fieldName, fieldValue]) => {
-                              const isReadonly = !selectedFlowNode.data.isPendingConnected;
-                              const baseClasses = "w-full px-3 py-2 border rounded-md text-xs font-mono";
-                              const readonlyClasses = isReadonly 
-                                ? "bg-gray-50 border-gray-200 text-gray-600 cursor-not-allowed" 
-                                : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
-                              
-                              return (
-                                <div key={fieldName} className="space-y-2">
-                                  <label className="text-sm font-medium text-gray-700">{fieldName}</label>
-                                  {Array.isArray(fieldValue) ? (
-                                    <select 
-                                      disabled={isReadonly}
-                                      value={formValues[fieldName] || ''}
-                                      onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
-                                      className={`${baseClasses} ${readonlyClasses}`}
-                                    >
-                                      <option value="">Selecione uma opção</option>
-                                      {fieldValue.map((option, index) => (
-                                        <option key={index} value={option}>{option}</option>
-                                      ))}
-                                    </select>
-                                  ) : (
-                                    <input
-                                      type="text"
-                                      placeholder={fieldValue || `Digite ${fieldName.toLowerCase()}`}
-                                      readOnly={isReadonly}
-                                      value={formValues[fieldName] || ''}
-                                      onChange={(e) => setFormValues(prev => ({ ...prev, [fieldName]: e.target.value }))}
-                                      className={`${baseClasses} ${readonlyClasses}`}
-                                    />
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        );
-                      } catch (e) {
-                        const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
-                        return (
-                          <div className="text-sm text-red-600">
-                            Erro ao processar formulário: {attachedFormData}
-                          </div>
+  function renderFlowDiagramModal() {
+    console.log("🔴 RENDERIZANDO MODAL:", flowDiagramModal);
+    if (!flowDiagramModal.isOpen || !flowDiagramModal.flowData) {
+      console.log("🔴 Modal fechada ou sem dados, não renderizando");
+      return null;
+    }
+    console.log("🔴 Modal ABERTA, renderizando...");
+
+    // Node types definition moved inside render function
+    const nodeTypes = {
+      startNode: FlowNodes.StartNode,
+      endNode: FlowNodes.EndNode,
+      actionNode: FlowNodes.ActionNode,
+      documentNode: FlowNodes.DocumentNode,
+      integrationNode: FlowNodes.IntegrationNode,
+      switchNode: FlowNodes.SwitchNode,
+    };
+
+    return (
+      <Dialog open={flowDiagramModal.isOpen} onOpenChange={(open) => {
+        if (!open) {
+          setFlowDiagramModal({ isOpen: false, flowData: null, documentTitle: '' });
+          
+          if (!isFlowInspectorPinned) {
+            setShowFlowInspector(false);
+            setSelectedFlowNode(null);
+          }
+        }
+      }}>
+        <DialogContent className="max-w-7xl h-[90vh] p-0">
+          <DialogHeader className="p-6 pb-0">
+            <DialogTitle>
+              Diagrama de Fluxo: {flowDiagramModal.documentTitle}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 flex p-6 pt-0">
+            <FlowWithAutoFitView 
+              flowData={flowDiagramModal.flowData} 
+              showFlowInspector={showFlowInspector} 
+              setShowFlowInspector={setShowFlowInspector} 
+              setSelectedFlowNode={setSelectedFlowNode} 
+              selectedFlowNode={selectedFlowNode} 
+              showApprovalAlert={showApprovalAlert} 
+              setShowApprovalAlert={setShowApprovalAlert} 
+              isPinned={isFlowInspectorPinned} 
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <div className="space-y-6 p-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold">Documentos</h1>
+        <p className="text-muted-foreground">
+          Gerencie seus documentos e fluxos de trabalho
+        </p>
+      </div>
+
+      {/* Botões de ação */}
+      <div className="flex gap-4 mb-6">
+        <Button onClick={() => setShowCreateModal(true)}>
+          <PlusCircle className="w-4 h-4 mr-2" />
+          Novo Documento
+        </Button>
+        <Button onClick={() => setShowImportModal(true)} variant="outline">
+          <Upload className="w-4 h-4 mr-2" />
+          Importar
+        </Button>
+        <Button onClick={() => setShowFilterModal(true)} variant="outline">
+          <Filter className="w-4 h-4 mr-2" />
+          Filtros
+        </Button>
+      </div>
+
+      {renderEditModal()}
+      {renderAddArtifactModal()}
+      {renderDocumentationModal()}
+      {renderEditArtifactModal()}
+      {renderFlowDiagramModal()}
+
+      {/* Lista de documentos */}
+      <div className="grid gap-4">
+        {documentos?.map((documento: Documento) => (
+          <Card key={documento.id} className="p-4">
+            <div className="flex justify-between items-start">
+              <div className="flex-1">
+                <h3 className="font-semibold">{documento.objeto}</h3>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {documento.descricao}
+                </p>
+                <div className="flex gap-2 mt-2">
+                  <Badge variant="secondary">{documento.sistema}</Badge>
+                  <Badge variant="outline">{documento.status}</Badge>
+                  {hasMondayItemValues(documento) && (
+                    <div className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs">
+                      <Calendar className="w-3 h-3" />
+                      {getExecutionCount(documento.id)}
+                      <span className="text-xs" title="Número de fluxos executados">execuções</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => openViewModal(documento)}
+                >
+                  <Eye className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => openEditModal(documento)}
+                >
+                  <Edit className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDeleteDocument(documento)}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
                         );
                       }
                     })()}
