@@ -4537,7 +4537,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (artifact.mondayColumn) {
             try {
               // Usar storage para buscar todas as colunas Monday e encontrar a correspondente
-              const allMappings = await storage.getMondayMappings();
+              const allMappings = await storage.getAllMondayMappings();
               
               for (const mapping of allMappings) {
                 const mondayColumns = await storage.getMondayColumns(mapping.id);
