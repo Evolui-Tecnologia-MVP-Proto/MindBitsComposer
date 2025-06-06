@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/dialog";
 import { ReactFlowProvider } from "reactflow";
 import { Network } from "lucide-react";
-import { FlowWithAutoFitView } from "@/components/documentos/flow/FlowWithAutoFitView";
 import {
   StartNodeComponent,
   EndNodeComponent,
@@ -35,6 +34,7 @@ interface FlowDiagramModalProps {
   showApprovalAlert: boolean;
   setShowApprovalAlert: (show: boolean) => void;
   isFlowInspectorPinned: boolean;
+  FlowWithAutoFitView: any;
 }
 
 export function FlowDiagramModal({
@@ -47,6 +47,7 @@ export function FlowDiagramModal({
   showApprovalAlert,
   setShowApprovalAlert,
   isFlowInspectorPinned,
+  FlowWithAutoFitView,
 }: FlowDiagramModalProps) {
   console.log("🔴 RENDERIZANDO MODAL:", flowDiagramModal);
   
@@ -146,8 +147,6 @@ export function FlowDiagramModal({
               showApprovalAlert={showApprovalAlert}
               setShowApprovalAlert={setShowApprovalAlert}
               isPinned={isFlowInspectorPinned}
-              setFlowDiagramModal={setFlowDiagramModal}
-              flowDiagramModal={flowDiagramModal}
             />
           </ReactFlowProvider>
         </div>
