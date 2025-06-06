@@ -17,6 +17,7 @@ import {
   IntegrationNodeComponent,
   SwitchNodeComponent
 } from "@/components/documentos/flow/FlowNodes";
+import { FlowInspector } from "@/components/documentos/flow/FlowInspector";
 
 interface FlowDiagramModalData {
   isOpen: boolean;
@@ -136,19 +137,30 @@ export function FlowDiagramModal({
           </DialogDescription>
         </DialogHeader>
         
-        <div className="flex-1 w-full border rounded-lg overflow-hidden">
-          <ReactFlowProvider>
-            <FlowWithAutoFitView 
-              flowData={flowDiagramModal.flowData}
-              showFlowInspector={showFlowInspector}
-              setShowFlowInspector={setShowFlowInspector}
-              setSelectedFlowNode={setSelectedFlowNode}
+        <div className="flex-1 w-full border rounded-lg overflow-hidden flex">
+          <div className="flex-1">
+            <ReactFlowProvider>
+              <FlowWithAutoFitView 
+                flowData={flowDiagramModal.flowData}
+                showFlowInspector={showFlowInspector}
+                setShowFlowInspector={setShowFlowInspector}
+                setSelectedFlowNode={setSelectedFlowNode}
+                selectedFlowNode={selectedFlowNode}
+                showApprovalAlert={showApprovalAlert}
+                setShowApprovalAlert={setShowApprovalAlert}
+                isPinned={isFlowInspectorPinned}
+              />
+            </ReactFlowProvider>
+          </div>
+          {showFlowInspector && (
+            <FlowInspector
               selectedFlowNode={selectedFlowNode}
-              showApprovalAlert={showApprovalAlert}
-              setShowApprovalAlert={setShowApprovalAlert}
-              isPinned={isFlowInspectorPinned}
+              onClose={() => {
+                setShowFlowInspector(false);
+                setSelectedFlowNode(null);
+              }}
             />
-          </ReactFlowProvider>
+          )}
         </div>
         
         <div className="flex-shrink-0 border-t bg-white p-4 mt-4">
