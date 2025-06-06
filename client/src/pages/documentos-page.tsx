@@ -98,6 +98,7 @@ import {
   SwitchNodeComponent
 } from "@/components/documentos/flow/FlowNodes";
 import { ViewDocumentModal } from "@/components/documentos/modals/ViewDocumentModal";
+import { EditDocumentModal } from "@/components/documentos/modals/EditDocumentModal";
 
 export default function DocumentosPage() {
   const [activeTab, setActiveTab] = useState("incluidos");
