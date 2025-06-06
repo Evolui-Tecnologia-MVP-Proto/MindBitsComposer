@@ -286,7 +286,7 @@ export function FlowWithAutoFitView({
             isReadonly: true
           }
         };
-        setFlowNodes(updatedNodes);
+        setNodes(updatedNodes);
 
         // Atualizar nó selecionado
         setSelectedFlowNode({
