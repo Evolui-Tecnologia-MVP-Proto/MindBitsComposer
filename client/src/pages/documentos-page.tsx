@@ -596,44 +596,61 @@ export default function DocumentosPage() {
       (conn: any) => conn.serviceName === "github",
     );
 
+    console.log("🔍 Verificando conexão GitHub:", githubConnection);
+
     if (!githubConnection || !githubConnection.token) {
-      console.log("Conexão GitHub não encontrada");
+      console.error("❌ Conexão GitHub não encontrada ou token ausente");
+      setIsLoadingRepo(false);
       return [];
     }
 
     const repoParam = githubConnection.parameters?.[0];
     if (!repoParam) {
-      console.log("Repositório não configurado");
+      console.error("❌ Repositório não configurado");
+      setIsLoadingRepo(false);
       return [];
     }
 
     const [owner, repo] = repoParam.split("/");
-    console.log("Carregando visualização do repositório:", repoParam);
+    console.log("🚀 Carregando repositório:", repoParam);
+    console.log("🔑 Token presente:", !!githubConnection.token);
 
     setIsLoadingRepo(true);
     try {
-      const response = await fetch(
-        `https://api.github.com/repos/${owner}/${repo}/contents`,
-        {
-          headers: {
-            Authorization: `token ${githubConnection.token}`,
-            Accept: "application/vnd.github.v3+json",
-            "User-Agent": "EVO-MindBits-Composer",
-          },
+      const url = `https://api.github.com/repos/${owner}/${repo}/contents`;
+      console.log("📡 Fazendo requisição para:", url);
+      
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `token ${githubConnection.token}`,
+          Accept: "application/vnd.github.v3+json",
+          "User-Agent": "EVO-MindBits-Composer",
         },
-      );
+      });
+
+      console.log("📊 Status da resposta:", response.status, response.statusText);
 
       if (response.ok) {
         const contents = await response.json();
+        console.log("✅ Conteúdo recebido:", contents.length, "itens");
         const fileStructure = await buildSimpleFileTree(contents);
         setGithubRepoFiles(fileStructure);
         return fileStructure;
       } else {
-        console.error("Erro ao carregar repositório:", response.status);
+        const errorText = await response.text();
+        console.error("❌ Erro na resposta:", {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorText
+        });
         return [];
       }
     } catch (error) {
-      console.error("Erro na requisição:", error);
+      console.error("❌ Erro na requisição completa:", {
+        message: error.message,
+        name: error.name,
+        stack: error.stack
+      });
       return [];
     } finally {
       setIsLoadingRepo(false);
