@@ -2412,7 +2412,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
 
 
-  // Componente interno que usa useReactFlow para fit view automático
+  // Componente interno que usa useReactFlow para fit view automático - OLD VERSION
   function FlowWithAutoFitView_OLD({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode, showApprovalAlert, setShowApprovalAlert, isPinned }: any) {
     const { fitView, getNodes, setNodes } = useReactFlow();
     

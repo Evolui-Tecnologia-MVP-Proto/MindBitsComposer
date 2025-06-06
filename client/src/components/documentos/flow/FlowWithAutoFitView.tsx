@@ -1,15 +1,23 @@
 import { useState, useEffect } from "react";
-import { useReactFlow, ReactFlow, Controls, Background } from "reactflow";
+import ReactFlow, { useReactFlow, Controls, Background } from "reactflow";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, XCircle, Clock, AlertCircle, Play, Save, Trash2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { AlertTriangle, CheckCircle, XCircle, Clock, Play, Save, FileText, Settings } from "lucide-react";
+import { 
+  StartNodeComponent, 
+  EndNodeComponent, 
+  ActionNodeComponent, 
+  DocumentNodeComponent, 
+  IntegrationNodeComponent, 
+  SwitchNodeComponent 
+} from "./FlowNodes";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { StartNodeComponent, EndNodeComponent, ActionNodeComponent, DocumentNodeComponent, IntegrationNodeComponent, SwitchNodeComponent } from "./FlowNodes";
 
 interface FlowWithAutoFitViewProps {
   flowData: any;
@@ -22,7 +30,16 @@ interface FlowWithAutoFitViewProps {
   isPinned: boolean;
 }
 
-export function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode, showApprovalAlert, setShowApprovalAlert, isPinned }: FlowWithAutoFitViewProps) {
+export function FlowWithAutoFitView({ 
+  flowData, 
+  showFlowInspector, 
+  setShowFlowInspector, 
+  setSelectedFlowNode, 
+  selectedFlowNode, 
+  showApprovalAlert, 
+  setShowApprovalAlert, 
+  isPinned 
+}: FlowWithAutoFitViewProps) {
   const { fitView, getNodes, setNodes } = useReactFlow();
   const { toast } = useToast();
   
@@ -60,174 +77,114 @@ export function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowIn
       const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
       console.log('🔍 getFormFields: dados brutos', {
         nodeId: selectedFlowNode.id,
-        attachedFormData,
-        hasForm: !!attachedFormData
+        actionType: selectedFlowNode.data.actionType,
+        attached_Form: selectedFlowNode.data.attached_Form,
+        attached_form: selectedFlowNode.data.attached_form,
+        formData: attachedFormData
       });
       
-      if (!attachedFormData) return {};
-      
-      // Corrigir o formato JSON malformado específico
-      let correctedData = attachedFormData;
-      
-      // Verificar se precisa de correção de formato
-      if (attachedFormData.includes('["') && attachedFormData.includes('": [')) {
-        // Primeiro, substituir a estrutura Fields
-        correctedData = attachedFormData.replace(
-          /"Fields":\s*\[/g, 
-          '"Fields":{'
-        );
-        
-        // Corrigir os campos individuais
-        correctedData = correctedData
-          .replace(/\"([^"]+)\"\:\s*\[/g, '"$1":[')
-          .replace(/\]\s*,\s*\"([^"]+)\"\:\s*\[/g, '],"$1":[')
-          .replace(/\]\s*\]/g, ']}');
-        
-        console.log('🔍 getFormFields: dados corrigidos', correctedData);
+      if (!attachedFormData) {
+        console.log('⚠️ getFormFields: Nenhum formulário anexado');
+        return {};
       }
       
-      const parsedData = JSON.parse(correctedData);
-      const fields = parsedData.Fields || {};
-      console.log('🔍 getFormFields: campos extraídos', fields);
-      return fields;
-    } catch (e) {
-      console.log('🔍 getFormFields: erro', e);
+      // Primeiro, tentar parsear se for string
+      let parsedData;
+      if (typeof attachedFormData === 'string') {
+        // Assumindo formulário visível por segurança
+        console.log('🔍 getFormFields: dados brutos', Object(attachedFormData));
+        
+        // Corrigir formato JSON malformado se necessário
+        let correctedData = attachedFormData;
+        
+        // Corrigir problemas comuns de JSON malformado
+        correctedData = correctedData.replace(/\["/g, '{"').replace(/": \[/g, '": [');
+        correctedData = correctedData.replace(/"\]/g, '"}');
+        
+        console.log('🔍 Dados corrigidos:', correctedData);
+        
+        try {
+          parsedData = JSON.parse(correctedData);
+          console.log('🔍 Dados parseados:', parsedData);
+        } catch (e) {
+          console.error('❌ Erro ao parsear JSON corrigido:', e);
+          // Tentar uma abordagem mais robusta
+          try {
+            // Substituir formatação malformada mais agressivamente
+            correctedData = attachedFormData
+              .replace(/\["/g, '{"')
+              .replace(/": \[/g, '": [')
+              .replace(/"\]/g, '"}')
+              .replace(/(\w+):/g, '"$1":')  // Adicionar aspas em chaves sem aspas
+              .replace(/,\s*}/g, '}')       // Remover vírgulas extras
+              .replace(/,\s*]/g, ']');      // Remover vírgulas extras em arrays
+            
+            parsedData = JSON.parse(correctedData);
+          } catch (e2) {
+            console.error('❌ Erro final ao parsear JSON:', e2);
+            return {};
+          }
+        }
+      } else {
+        parsedData = attachedFormData;
+      }
+      
+      return parsedData?.Fields || {};
+    } catch (error) {
+      console.error('❌ Erro em getFormFields:', error);
       return {};
     }
   };
-
-  // Função para verificar se todos os campos obrigatórios estão preenchidos
-  const areAllFieldsFilled = () => {
-    // Só valida se há um nó selecionado e é um actionNode
-    if (!selectedFlowNode || selectedFlowNode.type !== 'actionNode') {
-      return true;
-    }
-
-    // Só valida se o nó está pendente de execução
-    if (!selectedFlowNode.data.isPendingConnected) {
-      return true;
-    }
-
-    // Verifica se existe formulário anexado
-    const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
-    if (!attachedFormData) {
-      return true; // Sem formulário, pode salvar
-    }
-
+  
+  // Função compartilhada para executar mapeamento Monday
+  async function executeMondayMapping(mappingId: string, documentId?: string, isHeadless?: boolean, additionalData?: any) {
     try {
-      // Parse do formulário anexado
-      let formData;
-      if (typeof attachedFormData === 'string' && attachedFormData.includes('"Motivo de Recusa":') && attachedFormData.includes('"Detalhamento":')) {
-        // Converte o formato específico manualmente
-        formData = {
-          "Show_Condition": "FALSE",
-          "Fields": {
-            "Motivo de Recusa": ["Incompatível com processo", "Forma de operação", "Configuração de Sistema"],
-            "Detalhamento": ["default:", "type:longText"]
-          }
-        };
-      } else {
-        formData = JSON.parse(attachedFormData);
-      }
-
-      // Verifica se é um formulário com condição
-      if (formData.Show_Condition !== undefined && formData.Fields) {
-        const showCondition = formData.Show_Condition;
-        const isApprovalNode = selectedFlowNode.data.actionType === 'Intern_Aprove';
-        const approvalStatus = selectedFlowNode.data.isAproved;
-        
-        // Determina se deve mostrar o formulário baseado na condição
-        let shouldShowForm = false;
-        if (isApprovalNode && approvalStatus !== 'UNDEF') {
-          if (showCondition === 'TRUE' && approvalStatus === 'TRUE') {
-            shouldShowForm = true;
-          } else if (showCondition === 'FALSE' && approvalStatus === 'FALSE') {
-            shouldShowForm = true;
-          } else if (showCondition === 'BOTH' && (approvalStatus === 'TRUE' || approvalStatus === 'FALSE')) {
-            shouldShowForm = true;
-          }
-        }
-        
-        // Se o formulário não deve ser exibido devido à condição, permite salvar
-        if (!shouldShowForm) {
-          console.log('🔍 Formulário oculto por condição de aprovação, permitindo salvar');
-          return true;
-        }
-      }
-
-      // Se chegou até aqui, o formulário deve ser exibido, então valida os campos
-      const fieldsData = getFormFields();
-      const fieldNames = Object.keys(fieldsData);
+      console.log('🔄 Executando mapeamento Monday:', { mappingId, documentId, isHeadless, additionalData });
       
-      console.log('🔍 Validação de campos:', {
-        nodeId: selectedFlowNode.id,
-        nodeType: selectedFlowNode.type,
-        isPending: selectedFlowNode.data.isPendingConnected,
-        fieldsData,
-        fieldNames,
-        formValues,
-        hasFields: fieldNames.length > 0
+      const requestData: any = {
+        mappingId,
+        isHeadless: isHeadless || false
+      };
+      
+      if (documentId) {
+        requestData.documentId = documentId;
+      }
+      
+      if (additionalData) {
+        requestData.additionalData = additionalData;
+      }
+      
+      const response = await fetch('/api/monday/mappings/execute-headless', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData)
       });
       
-      // Se não há campos, permite salvar
-      if (fieldNames.length === 0) return true;
-      
-      // Verifica se todos os campos têm valores preenchidos
-      const allFilled = fieldNames.every(fieldName => {
-        const value = formValues[fieldName];
-        // Para campos select, verificar se não está vazio ou "Selecione uma opção"
-        const isFilled = value && value.trim() !== '' && value !== 'Selecione uma opção';
-        console.log(`Campo ${fieldName}: valor="${value}", preenchido=${isFilled}`);
-        return isFilled;
-      });
-      
-      console.log('🔍 Resultado da validação:', allFilled);
-      return allFilled;
-    } catch (e) {
-      console.log('🔍 Erro na validação do formulário:', e);
-      return true; // Em caso de erro, permite salvar
+      console.log('✅ Resposta do mapeamento Monday:', response);
+      return response;
+    } catch (error: any) {
+      console.error('❌ Erro na execução do mapeamento Monday:', error);
+      throw error;
+    }
+  }
+  
+  // Função para lidar com clique em nós
+  const onNodeClick = (event: any, node: any) => {
+    console.log('🔴 Node clicado:', node);
+    setSelectedFlowNode(node);
+    
+    if (!isPinned) {
+      setShowFlowInspector(true);
     }
   };
-
-  // Função para alterar o status de aprovação (altera estado imediatamente e mostra alerta)
-  const updateApprovalStatus = (nodeId: string, newStatus: string) => {
-    const currentNodes = getNodes();
-    const updatedNodes = currentNodes.map(node => {
-      if (node.id === nodeId) {
-        return {
-          ...node,
-          data: {
-            ...node.data,
-            isAproved: newStatus
-          }
-        };
-      }
-      return node;
-    });
-    setNodes(updatedNodes);
-    
-    // Atualizar também o nó selecionado para refletir a mudança no painel
-    if (selectedFlowNode && selectedFlowNode.id === nodeId) {
-      setSelectedFlowNode({
-        ...selectedFlowNode,
-        data: {
-          ...selectedFlowNode.data,
-          isAproved: newStatus
-        }
-      });
-    }
-    
-    setShowApprovalAlert(true);
-  };
-
-  // Função para salvar dados do formulário
+  
+  // Função para salvar dados do formulário no nó
   const saveFormData = () => {
     if (!selectedFlowNode) return;
     
-    console.log('💾 Salvando dados do formulário:', {
-      nodeId: selectedFlowNode.id,
-      formValues
-    });
+    console.log('💾 Salvando dados do formulário:', formValues);
     
     const currentNodes = getNodes();
     const updatedNodes = currentNodes.map(node => {
@@ -242,9 +199,10 @@ export function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowIn
       }
       return node;
     });
+    
     setNodes(updatedNodes);
     
-    // Atualizar também o nó selecionado
+    // Atualizar selectedFlowNode também
     setSelectedFlowNode({
       ...selectedFlowNode,
       data: {
@@ -255,142 +213,128 @@ export function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowIn
     
     toast({
       title: "Dados salvos",
-      description: "Os dados do formulário foram salvos com sucesso.",
+      description: "Os dados do formulário foram salvos no nó.",
     });
   };
-
-  // Função para executar integração
+  
+  // Função para executar integração manual
   const executeIntegration = async () => {
-    if (!selectedFlowNode) return;
-    
-    console.log('⚡ Executando integração:', {
-      nodeId: selectedFlowNode.id,
-      integrType: selectedFlowNode.data.integrType,
-      service: selectedFlowNode.data.service
-    });
+    if (!selectedFlowNode || selectedFlowNode.type !== 'integrationNode') return;
     
     try {
-      setIntegrationResult({ status: null, message: 'Executando...' });
+      setIntegrationResult({ status: null, message: 'Executando integração...' });
       
-      // Simular execução da integração
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const integrationType = selectedFlowNode.data.integrType;
+      const service = selectedFlowNode.data.service;
       
-      // Simular resultado (pode ser success ou error)
-      const isSuccess = Math.random() > 0.3; // 70% de chance de sucesso
+      console.log('🔄 Executando integração:', { integrationType, service });
       
-      if (isSuccess) {
-        setIntegrationResult({
-          status: 'success',
-          message: 'Integração executada com sucesso!'
-        });
-        
-        // Marcar o nó como executado
-        const currentNodes = getNodes();
-        const updatedNodes = currentNodes.map(node => {
-          if (node.id === selectedFlowNode.id) {
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                isExecuted: 'TRUE',
-                isPendingConnected: false
-              }
-            };
-          }
-          return node;
-        });
-        setNodes(updatedNodes);
-        
-        setSelectedFlowNode({
-          ...selectedFlowNode,
-          data: {
-            ...selectedFlowNode.data,
-            isExecuted: 'TRUE',
-            isPendingConnected: false
-          }
-        });
-        
-        toast({
-          title: "Integração executada",
-          description: "A integração foi executada com sucesso.",
+      if (integrationType === 'Monday' && service) {
+        // Executar mapeamento Monday
+        const result = await executeMondayMapping(service, undefined, true, formValues);
+        setIntegrationResult({ 
+          status: 'success', 
+          message: `Integração Monday executada com sucesso: ${JSON.stringify(result)}` 
         });
       } else {
-        setIntegrationResult({
-          status: 'error',
-          message: 'Erro na execução da integração. Tente novamente.'
-        });
-        
-        toast({
-          title: "Erro na integração",
-          description: "Ocorreu um erro durante a execução da integração.",
-          variant: "destructive",
+        setIntegrationResult({ 
+          status: 'error', 
+          message: 'Tipo de integração não suportado ou serviço não configurado' 
         });
       }
-    } catch (error) {
-      setIntegrationResult({
-        status: 'error',
-        message: 'Erro inesperado na integração.'
-      });
-      
-      toast({
-        title: "Erro inesperado",
-        description: "Ocorreu um erro inesperado durante a integração.",
-        variant: "destructive",
+    } catch (error: any) {
+      console.error('❌ Erro na execução da integração:', error);
+      setIntegrationResult({ 
+        status: 'error', 
+        message: `Erro na integração: ${error.message || 'Erro desconhecido'}` 
       });
     }
   };
-
+  
+  // Função para aprovar/rejeitar nó de ação
+  const handleApproval = async (approved: boolean) => {
+    if (!selectedFlowNode || selectedFlowNode.type !== 'actionNode') return;
+    
+    const currentNodes = getNodes();
+    const updatedNodes = currentNodes.map(node => {
+      if (node.id === selectedFlowNode.id) {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            isAproved: approved ? 'TRUE' : 'FALSE'
+          }
+        };
+      }
+      return node;
+    });
+    
+    setNodes(updatedNodes);
+    setSelectedFlowNode({
+      ...selectedFlowNode,
+      data: {
+        ...selectedFlowNode.data,
+        isAproved: approved ? 'TRUE' : 'FALSE'
+      }
+    });
+    
+    toast({
+      title: approved ? "Ação aprovada" : "Ação rejeitada",
+      description: `A ação foi ${approved ? 'aprovada' : 'rejeitada'} com sucesso.`,
+    });
+  };
+  
   useEffect(() => {
     if (flowData?.nodes) {
-      setTimeout(() => {
-        fitView({ duration: 800, padding: 0.1 });
+      const timer = setTimeout(() => {
+        fitView({ padding: 0.1, duration: 800 });
       }, 100);
+      return () => clearTimeout(timer);
     }
   }, [flowData, fitView]);
-
-  if (!flowData?.nodes || !flowData?.edges) {
+  
+  if (!flowData?.nodes) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Carregando diagrama...</div>
+      <div className="flex items-center justify-center h-full">
+        <div className="text-gray-500">Nenhum fluxo carregado</div>
       </div>
     );
   }
-
-  // Converter nós para incluir animação baseada em isExecuted
-  const processedNodes = flowData.nodes.map((node: any) => ({
-    ...node,
-    data: {
-      ...node.data,
-      isReadonly: true // Marcar todos os nós como readonly no modo de visualização
+  
+  // Processar edges para adicionar animação aos executados
+  const processedEdges = flowData.edges?.map((edge: any) => {
+    // Verificar se ambos os nós da edge foram executados
+    const sourceNode = flowData.nodes.find((node: any) => node.id === edge.source);
+    const targetNode = flowData.nodes.find((node: any) => node.id === edge.target);
+    
+    const sourceExecuted = sourceNode?.data?.isExecuted === 'TRUE';
+    const targetExecuted = targetNode?.data?.isExecuted === 'TRUE';
+    
+    if (sourceExecuted && targetExecuted) {
+      return {
+        ...edge,
+        animated: true,
+        style: {
+          ...edge.style,
+          stroke: '#21639a',
+          strokeWidth: 3
+        },
+        markerEnd: {
+          ...edge.markerEnd,
+          color: '#21639a'
+        }
+      };
     }
-  }));
-
-  // Converter edges para incluir animação baseada na execução dos nós
-  const processedEdges = flowData.edges.map((edge: any) => {
-    // Encontrar o nó de origem
-    const sourceNode = processedNodes.find((node: any) => node.id === edge.source);
     
-    // Se o nó de origem foi executado, animar a aresta
-    const isSourceExecuted = sourceNode?.data?.isExecuted === 'TRUE';
-    
-    return {
-      ...edge,
-      animated: isSourceExecuted,
-      style: {
-        ...edge.style,
-        stroke: isSourceExecuted ? '#21639a' : '#6b7280',
-        strokeWidth: 3
-      },
-      markerEnd: {
-        type: 'arrowclosed',
-        color: isSourceExecuted ? '#21639a' : '#6b7280'
-      }
-    };
-  });
-
+    return edge;
+  }) || [];
+  
   console.log("🟢 FlowWithAutoFitView - Edges com animação:", processedEdges.filter((edge: any) => edge.animated));
-
-  // Definir os tipos de nós
+  
+  const formFields = getFormFields();
+  const hasFormFields = Object.keys(formFields).length > 0;
+  
+  // Definir tipos de nós
   const nodeTypes = {
     startNode: StartNodeComponent,
     endNode: EndNodeComponent,
@@ -399,256 +343,231 @@ export function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowIn
     integrationNode: IntegrationNodeComponent,
     switchNode: SwitchNodeComponent,
   };
-
+  
   return (
-    <div className="w-full h-full">
+    <div className="h-full w-full relative">
       <ReactFlow
-        nodes={processedNodes}
+        nodes={flowData.nodes}
         edges={processedEdges}
         nodeTypes={nodeTypes}
-        onNodeClick={(event, node) => {
-          console.log('🎯 Nó clicado:', node);
-          setSelectedFlowNode(node);
-          if (!isPinned) {
-            setShowFlowInspector(true);
-          }
-        }}
+        onNodeClick={onNodeClick}
         fitView
-        fitViewOptions={{ padding: 0.1 }}
+        attributionPosition="bottom-left"
       >
         <Controls />
         <Background />
       </ReactFlow>
       
-      {/* Painel lateral para mostrar formulários quando um nó está selecionado */}
-      {selectedFlowNode && selectedFlowNode.data.isPendingConnected && (
-        <div className="absolute top-4 right-4 w-80 bg-white border border-gray-200 rounded-lg shadow-lg p-4 max-h-[80vh] overflow-y-auto">
-          <div className="space-y-4">
-            <div className="border-b pb-2">
-              <h3 className="text-lg font-semibold">Ações Pendentes</h3>
-              <p className="text-sm text-gray-600">
-                {selectedFlowNode.data.label || selectedFlowNode.id}
-              </p>
-            </div>
-            
-            {/* Mostrar botões de aprovação para nós de ação */}
-            {selectedFlowNode.type === 'actionNode' && selectedFlowNode.data.actionType === 'Intern_Aprove' && (
-              <div className="space-y-3">
-                <Label className="text-sm font-medium">Status de Aprovação</Label>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => updateApprovalStatus(selectedFlowNode.id, 'TRUE')}
-                    variant={selectedFlowNode.data.isAproved === 'TRUE' ? 'default' : 'outline'}
-                    size="sm"
-                    className="flex-1"
-                  >
-                    <CheckCircle className="w-4 h-4 mr-1" />
-                    Aprovar
-                  </Button>
-                  <Button
-                    onClick={() => updateApprovalStatus(selectedFlowNode.id, 'FALSE')}
-                    variant={selectedFlowNode.data.isAproved === 'FALSE' ? 'destructive' : 'outline'}
-                    size="sm"
-                    className="flex-1"
-                  >
-                    <XCircle className="w-4 h-4 mr-1" />
-                    Rejeitar
-                  </Button>
+      {showApprovalAlert && selectedFlowNode && selectedFlowNode.type === 'actionNode' && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
+          <Card className="w-96 shadow-lg border-amber-200 bg-amber-50">
+            <CardContent className="p-4">
+              <div className="flex items-start space-x-3">
+                <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="font-medium text-amber-900">Aprovação Necessária</h3>
+                  <p className="text-sm text-amber-800 mt-1">
+                    Este nó de ação requer aprovação para prosseguir no fluxo.
+                  </p>
+                  <div className="flex space-x-2 mt-3">
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        handleApproval(true);
+                        setShowApprovalAlert(false);
+                      }}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      <CheckCircle className="w-4 h-4 mr-1" />
+                      Aprovar
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        handleApproval(false);
+                        setShowApprovalAlert(false);
+                      }}
+                      className="border-red-300 text-red-700 hover:bg-red-50"
+                    >
+                      <XCircle className="w-4 h-4 mr-1" />
+                      Rejeitar
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setShowApprovalAlert(false)}
+                    >
+                      Fechar
+                    </Button>
+                  </div>
                 </div>
               </div>
-            )}
-            
-            {/* Mostrar formulário dinâmico baseado nos dados anexados */}
-            {selectedFlowNode.type === 'actionNode' && (() => {
-              const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      
+      {/* Painel de formulário para nós selecionados */}
+      {selectedFlowNode && (selectedFlowNode.type === 'actionNode' || selectedFlowNode.type === 'integrationNode') && (
+        <div className="absolute bottom-4 right-4 z-40">
+          <Card className="w-80 max-h-96 overflow-y-auto shadow-lg">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  {selectedFlowNode.type === 'actionNode' ? (
+                    <Settings className="w-4 h-4 text-blue-600" />
+                  ) : (
+                    <FileText className="w-4 h-4 text-purple-600" />
+                  )}
+                  <h3 className="font-medium text-sm">
+                    {selectedFlowNode.type === 'actionNode' ? 'Formulário de Ação' : 'Execução de Integração'}
+                  </h3>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedFlowNode(null)}
+                  className="h-6 w-6 p-0"
+                >
+                  ×
+                </Button>
+              </div>
               
-              if (!attachedFormData) return null;
-              
-              try {
-                console.log('🔍 Dados brutos do formulário:', attachedFormData);
-                
-                // Corrigir o formato JSON malformado específico
-                let correctedData = attachedFormData;
-                
-                // Verificar se precisa de correção de formato
-                if (attachedFormData.includes('["') && attachedFormData.includes('": [')) {
-                  // Primeiro, substituir a estrutura Fields
-                  correctedData = attachedFormData.replace(
-                    /"Fields":\s*\[/g, 
-                    '"Fields":{'
-                  );
+              {selectedFlowNode.type === 'actionNode' && hasFormFields && (
+                <div className="space-y-3">
+                  {Object.entries(formFields).map(([fieldName, fieldConfig]) => {
+                    const configArray = Array.isArray(fieldConfig) ? fieldConfig : [];
+                    const isLongText = configArray.some((item: any) => 
+                      typeof item === 'string' && item.includes('type:longText')
+                    );
+                    const isSelect = Array.isArray(configArray) && configArray.length > 0 && 
+                      !configArray.some((item: any) => typeof item === 'string' && item.includes('type:'));
+                    
+                    return (
+                      <div key={fieldName}>
+                        <Label className="text-xs font-medium">{fieldName}</Label>
+                        {isLongText ? (
+                          <Textarea
+                            value={formValues[fieldName] || ''}
+                            onChange={(e) => setFormValues(prev => ({
+                              ...prev,
+                              [fieldName]: e.target.value
+                            }))}
+                            className="mt-1 text-sm"
+                            rows={3}
+                          />
+                        ) : isSelect ? (
+                          <Select
+                            value={formValues[fieldName] || ''}
+                            onValueChange={(value) => setFormValues(prev => ({
+                              ...prev,
+                              [fieldName]: value
+                            }))}
+                          >
+                            <SelectTrigger className="mt-1 text-sm">
+                              <SelectValue placeholder={`Selecione ${fieldName}`} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {configArray.map((option: any, index: number) => (
+                                <SelectItem key={index} value={option.toString()}>
+                                  {option.toString()}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        ) : (
+                          <Input
+                            value={formValues[fieldName] || ''}
+                            onChange={(e) => setFormValues(prev => ({
+                              ...prev,
+                              [fieldName]: e.target.value
+                            }))}
+                            className="mt-1 text-sm"
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
                   
-                  // Corrigir os campos individuais
-                  correctedData = correctedData
-                    .replace(/\"([^"]+)\"\:\s*\[/g, '"$1":[')
-                    .replace(/\]\s*,\s*\"([^"]+)\"\:\s*\[/g, '],"$1":[')
-                    .replace(/\]\s*\]/g, ']}');
+                  <div className="flex space-x-2 pt-2">
+                    <Button onClick={saveFormData} size="sm" className="flex-1">
+                      <Save className="w-3 h-3 mr-1" />
+                      Salvar
+                    </Button>
+                  </div>
                   
-                  console.log('🔍 Dados corrigidos:', correctedData);
-                }
-                
-                const parsedData = JSON.parse(correctedData);
-                console.log('🔍 Dados parseados:', parsedData);
-                
-                // Verificar se deve mostrar o formulário baseado na condição
-                if (parsedData.Show_Condition !== undefined && parsedData.Fields) {
-                  const showCondition = parsedData.Show_Condition;
-                  const isApprovalNode = selectedFlowNode.data.actionType === 'Intern_Aprove';
-                  const approvalStatus = selectedFlowNode.data.isAproved;
-                  
-                  // Determina se deve mostrar o formulário baseado na condição
-                  let shouldShowForm = false;
-                  if (isApprovalNode && approvalStatus !== 'UNDEF') {
-                    if (showCondition === 'TRUE' && approvalStatus === 'TRUE') {
-                      shouldShowForm = true;
-                    } else if (showCondition === 'FALSE' && approvalStatus === 'FALSE') {
-                      shouldShowForm = true;
-                    } else if (showCondition === 'BOTH' && (approvalStatus === 'TRUE' || approvalStatus === 'FALSE')) {
-                      shouldShowForm = true;
-                    }
-                  }
-                  
-                  // Se não deve mostrar o formulário, não renderizar
-                  if (!shouldShowForm) {
-                    console.log('🔍 Formulário oculto por condição:', { showCondition, approvalStatus });
-                    return null;
-                  }
-                }
-                
-                const fields = parsedData.Fields || {};
-                const fieldNames = Object.keys(fields);
-                
-                if (fieldNames.length === 0) return null;
-                
-                return (
-                  <div className="space-y-3 mt-4 border-t pt-4">
-                    <Label className="text-sm font-medium">Formulário de Dados</Label>
-                    {fieldNames.map((fieldName, index) => {
-                      const fieldOptions = fields[fieldName];
-                      const isLongText = Array.isArray(fieldOptions) && fieldOptions.some((opt: string) => opt.includes('type:longText'));
-                      const isSelect = Array.isArray(fieldOptions) && fieldOptions.length > 0 && !fieldOptions.some((opt: string) => opt.includes('type:'));
+                  {selectedFlowNode.data.actionType === 'Intern_Aprove' && (
+                    <div className="pt-2 border-t">
+                      <div className="flex space-x-2">
+                        <Button
+                          onClick={() => handleApproval(true)}
+                          size="sm"
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                        >
+                          <CheckCircle className="w-3 h-3 mr-1" />
+                          Aprovar
+                        </Button>
+                        <Button
+                          onClick={() => handleApproval(false)}
+                          size="sm"
+                          variant="outline"
+                          className="flex-1 border-red-300 text-red-700 hover:bg-red-50"
+                        >
+                          <XCircle className="w-3 h-3 mr-1" />
+                          Rejeitar
+                        </Button>
+                      </div>
                       
-                      if (isLongText) {
-                        return (
-                          <div key={index} className="space-y-1">
-                            <Label className="text-xs">{fieldName}</Label>
-                            <Textarea
-                              placeholder={`Digite ${fieldName.toLowerCase()}`}
-                              value={formValues[fieldName] || ''}
-                              onChange={(e) => setFormValues(prev => ({
-                                ...prev,
-                                [fieldName]: e.target.value
-                              }))}
-                              className="text-sm"
-                              rows={3}
-                            />
-                          </div>
-                        );
-                      } else if (isSelect) {
-                        const selectOptions = fieldOptions.filter((opt: string) => !opt.includes('default:') && !opt.includes('type:'));
-                        return (
-                          <div key={index} className="space-y-1">
-                            <Label className="text-xs">{fieldName}</Label>
-                            <Select
-                              value={formValues[fieldName] || ''}
-                              onValueChange={(value) => setFormValues(prev => ({
-                                ...prev,
-                                [fieldName]: value
-                              }))}
-                            >
-                              <SelectTrigger className="text-sm">
-                                <SelectValue placeholder="Selecione uma opção" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {selectOptions.map((option: string, optIndex: number) => (
-                                  <SelectItem key={optIndex} value={option}>
-                                    {option}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                        );
-                      } else {
-                        return (
-                          <div key={index} className="space-y-1">
-                            <Label className="text-xs">{fieldName}</Label>
-                            <Input
-                              placeholder={`Digite ${fieldName.toLowerCase()}`}
-                              value={formValues[fieldName] || ''}
-                              onChange={(e) => setFormValues(prev => ({
-                                ...prev,
-                                [fieldName]: e.target.value
-                              }))}
-                              className="text-sm"
-                            />
-                          </div>
-                        );
-                      }
-                    })}
-                  </div>
-                );
-              } catch (e) {
-                console.log('🔍 Erro ao processar formulário:', e);
-                return null;
-              }
-            })()}
-            
-            {/* Mostrar botão de execução para nós de integração */}
-            {selectedFlowNode.type === 'integrationNode' && (
-              <div className="space-y-3 mt-4 border-t pt-4">
-                <Label className="text-sm font-medium">Execução Manual</Label>
-                <div className="space-y-2">
-                  <div className="text-xs text-gray-600">
-                    Tipo: {selectedFlowNode.data.integrType}<br/>
-                    Serviço: {selectedFlowNode.data.service}
+                      <div className="text-xs text-gray-500 mt-2">
+                        Status atual: {selectedFlowNode.data.isAproved || 'UNDEF'}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {selectedFlowNode.type === 'integrationNode' && (
+                <div className="space-y-3">
+                  <div className="text-sm text-gray-600">
+                    <div><strong>Tipo:</strong> {selectedFlowNode.data.integrType || 'N/A'}</div>
+                    <div><strong>Serviço:</strong> {selectedFlowNode.data.service || 'N/A'}</div>
                   </div>
                   
-                  {integrationResult.status && (
-                    <div className={`p-2 rounded text-xs ${
+                  <Button 
+                    onClick={executeIntegration} 
+                    size="sm" 
+                    className="w-full"
+                    disabled={integrationResult.status === null && integrationResult.message !== ''}
+                  >
+                    <Play className="w-3 h-3 mr-1" />
+                    Executar Integração
+                  </Button>
+                  
+                  {integrationResult.message && (
+                    <div className={`text-xs p-2 rounded border ${
                       integrationResult.status === 'success' 
-                        ? 'bg-green-100 text-green-800' 
+                        ? 'bg-green-50 text-green-700 border-green-200'
                         : integrationResult.status === 'error'
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-blue-100 text-blue-800'
+                        ? 'bg-red-50 text-red-700 border-red-200'
+                        : 'bg-blue-50 text-blue-700 border-blue-200'
                     }`}>
+                      {integrationResult.status === 'success' && <CheckCircle className="w-3 h-3 inline mr-1" />}
+                      {integrationResult.status === 'error' && <XCircle className="w-3 h-3 inline mr-1" />}
+                      {integrationResult.status === null && <Clock className="w-3 h-3 inline mr-1" />}
                       {integrationResult.message}
                     </div>
                   )}
-                  
-                  <Button
-                    onClick={executeIntegration}
-                    size="sm"
-                    className="w-full"
-                    disabled={integrationResult.status === null && integrationResult.message === 'Executando...'}
-                  >
-                    <Play className="w-4 h-4 mr-1" />
-                    Executar Integração
-                  </Button>
-                </div>
-              </div>
-            )}
-            
-            {/* Botões de ação */}
-            <div className="flex gap-2 pt-4 border-t">
-              <Button
-                onClick={saveFormData}
-                size="sm"
-                variant="outline"
-                className="flex-1"
-                disabled={!areAllFieldsFilled()}
-              >
-                <Save className="w-4 h-4 mr-1" />
-                Salvar
-              </Button>
-              
-              {selectedFlowNode.type === 'actionNode' && selectedFlowNode.data.actionType === 'Intern_Aprove' && (
-                <div className="text-xs text-gray-500">
-                  Status atual: {selectedFlowNode.data.isAproved || 'UNDEF'}
                 </div>
               )}
-            </div>
-          </div>
+              
+              {selectedFlowNode.type === 'actionNode' && !hasFormFields && (
+                <div className="text-sm text-gray-500 text-center py-4">
+                  Nenhum formulário configurado para este nó.
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       )}
     </div>
