@@ -298,7 +298,7 @@ export function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowIn
       // Preparar dados atualizados do fluxo
       const updatedFlowTasks = {
         nodes: updatedNodes,
-        edges: edges,
+        edges: flowTaskEdges,
         viewport: flowData.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
       };
 
@@ -523,7 +523,7 @@ export function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowIn
   // Processar dados do fluxo
   const { nodes: flowTaskNodes, edges: flowTaskEdges } = flowData.flowTasks;
 
-  if (!nodes || !Array.isArray(nodes)) {
+  if (!flowTaskNodes || !Array.isArray(flowTaskNodes)) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-red-500">Erro: Dados de fluxo inválidos</div>
@@ -532,7 +532,7 @@ export function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowIn
   }
 
   // Marcar nós executados como readonly
-  const processedNodes = nodes.map(node => ({
+  const processedNodes = flowTaskNodes.map(node => ({
     ...node,
     data: {
       ...node.data,
@@ -541,7 +541,7 @@ export function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowIn
   }));
 
   // Aplicar animação nas arestas dos caminhos executados
-  const processedEdges = edges?.map((edge: any) => {
+  const processedEdges = flowTaskEdges?.map((edge: any) => {
     // Verificar se tanto source quanto target estão executados
     const sourceNode = processedNodes.find(n => n.id === edge.source);
     const targetNode = processedNodes.find(n => n.id === edge.target);
