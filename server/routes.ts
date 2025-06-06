@@ -4526,7 +4526,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).send("Edição de documento não encontrada");
       }
       
+      console.log("🔍 Buscando artifacts para documentId:", edition.documentId);
       const artifacts = await storage.getDocumentArtifactsByDocumento(edition.documentId);
+      console.log("📄 Artifacts encontrados:", artifacts.length, artifacts);
       res.json(artifacts);
     } catch (error: any) {
       console.error("Erro ao buscar artefatos da edição:", error);
