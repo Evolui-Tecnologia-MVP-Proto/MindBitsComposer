@@ -415,6 +415,7 @@ function convertToMarkdown(editorState: any): string {
     const children = root.getChildren();
     
     children.forEach((node: any) => {
+      console.log('🔍 Processando nó tipo:', node.getType());
       if (node.getType() === 'heading') {
         const level = node.getTag().replace('h', '');
         const text = node.getTextContent();
@@ -442,9 +443,11 @@ function convertToMarkdown(editorState: any): string {
           markdown += text + '\n\n';
         }
       } else if (node.getType() === 'image') {
+        console.log('🖼️ Processando imagem no markdown:', node);
         const src = node.getSrc();
         const alt = node.getAltText();
         const imageId = `img_${imageCounter}`;
+        console.log('🖼️ Dados da imagem:', { src: src?.substring(0, 50) + '...', alt, imageId });
         markdown += `![${imageId}](${src})\n\n`;
         imageCounter++;
       } else if (node.getType() === 'table') {
