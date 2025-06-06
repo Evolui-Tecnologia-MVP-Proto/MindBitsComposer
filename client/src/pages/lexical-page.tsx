@@ -708,39 +708,10 @@ export default function LexicalPage() {
                             return (
                               <div 
                                 key={artifact.id}
-                                className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border"
+                                className="p-3 bg-gray-50 rounded-lg border"
                               >
-                                {/* Miniatura ou ícone */}
-                                {renderThumbnail(artifact)}
-                                
-                                {/* Informações do arquivo */}
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium truncate" title={artifact.name}>
-                                    {artifact.name}
-                                  </p>
-                                  <p className="text-xs text-gray-600 truncate font-mono" title={artifact.fileName}>
-                                    {artifact.fileName || 'Nome do arquivo não disponível'}
-                                  </p>
-                                  <div className="flex items-center gap-2 mt-2">
-                                    <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
-                                      {artifact.type === 'vnd.openxmlformats-officedocument.wordprocessingml.document' ? 'word.docx' : (artifact.type || 'unknown')}
-                                    </Badge>
-                                    {artifact.fileSize && (
-                                      <span className="text-xs text-gray-500">
-                                        {Math.round(parseInt(artifact.fileSize) / 1024)} KB
-                                      </span>
-                                    )}
-
-                                  </div>
-                                  {artifact.mondayColumn && (
-                                    <p className="text-xs text-blue-600 mt-1">
-                                      Monday: {(artifact as any).mondayColumnTitle || artifact.mondayColumn}
-                                    </p>
-                                  )}
-                                </div>
-                                
-                                {/* Botões de ação */}
-                                <div className="flex-shrink-0 ml-2">
+                                {/* Botões de ação no topo */}
+                                <div className="flex justify-end mb-3">
                                   {artifact.isImage === 'true' ? (
                                     <Button
                                       size="sm"
@@ -764,6 +735,38 @@ export default function LexicalPage() {
                                       Baixar
                                     </Button>
                                   )}
+                                </div>
+                                
+                                {/* Conteúdo do card */}
+                                <div className="flex items-center gap-3">
+                                  {/* Miniatura ou ícone */}
+                                  {renderThumbnail(artifact)}
+                                  
+                                  {/* Informações do arquivo */}
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium truncate" title={artifact.name}>
+                                      {artifact.name}
+                                    </p>
+                                    <p className="text-xs text-gray-600 truncate font-mono" title={artifact.fileName}>
+                                      {artifact.fileName || 'Nome do arquivo não disponível'}
+                                    </p>
+                                    <div className="flex items-center gap-2 mt-2">
+                                      <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                                        {artifact.type === 'vnd.openxmlformats-officedocument.wordprocessingml.document' ? 'word.docx' : (artifact.type || 'unknown')}
+                                      </Badge>
+                                      {artifact.fileSize && (
+                                        <span className="text-xs text-gray-500">
+                                          {Math.round(parseInt(artifact.fileSize) / 1024)} KB
+                                        </span>
+                                      )}
+
+                                    </div>
+                                    {artifact.mondayColumn && (
+                                      <p className="text-xs text-blue-600 mt-1">
+                                        Monday: {(artifact as any).mondayColumnTitle || artifact.mondayColumn}
+                                      </p>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             );
