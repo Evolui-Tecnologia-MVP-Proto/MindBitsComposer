@@ -108,7 +108,6 @@ import { DeleteConfirmDialog } from "@/components/documentos/modals/DeleteConfir
 import { DeleteArtifactConfirmDialog } from "@/components/documentos/modals/DeleteArtifactConfirmDialog";
 import { DocumentosTable } from "@/components/documentos/tables/DocumentosTable";
 import { FlowInspector } from "@/components/documentos/flow/FlowInspector";
-import { FlowWithAutoFitView } from "@/components/documentos/flow/FlowWithAutoFitView";
 
 export default function DocumentosPage() {
   const [activeTab, setActiveTab] = useState("incluidos");
@@ -2412,8 +2411,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
 
 
-  // Componente interno que usa useReactFlow para fit view automático - OLD VERSION
-  function FlowWithAutoFitView_OLD({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode, showApprovalAlert, setShowApprovalAlert, isPinned }: any) {
+  // Componente interno que usa useReactFlow para fit view automático
+  function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode, showApprovalAlert, setShowApprovalAlert, isPinned }: any) {
     const { fitView, getNodes, setNodes } = useReactFlow();
     
     // Estado para controlar os valores dos campos do formulário
