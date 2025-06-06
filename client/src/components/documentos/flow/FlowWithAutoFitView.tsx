@@ -452,7 +452,11 @@ export function FlowWithAutoFitView({
       <FlowNodes 
         nodes={flowData.flowTasks.nodes || []} 
         edges={flowData.flowTasks.edges || []} 
-        onNodeClick={setSelectedFlowNode}
+        onNodeClick={(event, node) => {
+          console.log('🔴 Nó clicado:', node);
+          setSelectedFlowNode(node);
+          setShowFlowInspector(true);
+        }}
         isReadOnly={true}
       />
       
