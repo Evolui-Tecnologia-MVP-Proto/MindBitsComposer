@@ -126,15 +126,15 @@ export function DocumentosTable({
         setDropdown({
           isOpen: true,
           documentId: documento.id,
-          position: { x: evento.clientX - 310, y: evento.clientY },
+          position: { x: evento.clientX - 340, y: evento.clientY },
           flows: documentFlows,
         });
       } else {
-        console.log("🔴 DROPDOWN: Nenhum fluxo encontrado - tentando método alternativo");
+
         // Fallback para o método original
         const flowToShow = getConcludedFlow(documento.id);
         if (flowToShow) {
-          console.log("🔴 DROPDOWN: Fluxo encontrado via getConcludedFlow");
+
           openFlowDiagramModal({
             flowTasks: flowToShow,
             document: { objeto: documento.objeto }
