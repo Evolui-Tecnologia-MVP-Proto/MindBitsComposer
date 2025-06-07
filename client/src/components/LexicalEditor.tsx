@@ -806,12 +806,12 @@ function convertToMarkdown(editorState: any): string {
               let cellContent = '';
               const cellChildren = cell.getChildren();
               
-              // Check for images inside table cells
-              cellChildren.forEach((cellChild: any) => {
-                if (cellChild.getType() === 'image-with-metadata' && !processedImageNodes.has(cellChild.getKey())) {
-                  processedImageNodes.add(cellChild.getKey());
-                  const metadataText = cellChild.getMetadataText();
-                  const imageId = cellChild.getImageId();
+              // Check for images inside table cells (recursively)
+              function processCellNode(node: any): void {
+                if (node.getType() === 'image-with-metadata' && !processedImageNodes.has(node.getKey())) {
+                  processedImageNodes.add(node.getKey());
+                  const metadataText = node.getMetadataText();
+                  const imageId = node.getImageId();
                   
                   // Extract HTTPS URL from metadata text (for global assets)
                   const httpsUrlMatch = metadataText.match(/\[(https?:\/\/.*?)\]/);
@@ -827,24 +827,37 @@ function convertToMarkdown(editorState: any): string {
                     cellContent += `![${imageId}](blob:${blobUrl})`;
                   } else {
                     // Fallback to original src if no URL found in metadata
-                    const src = cellChild.getSrc();
+                    const src = node.getSrc();
                     cellContent += `![${imageId}](${src})`;
                   }
                   
                   imageCounter++;
-                } else if (cellChild.getType() === 'image' && !processedImageNodes.has(cellChild.getKey())) {
-                  processedImageNodes.add(cellChild.getKey());
-                  const src = cellChild.getSrc();
+                } else if (node.getType() === 'image' && !processedImageNodes.has(node.getKey())) {
+                  processedImageNodes.add(node.getKey());
+                  const src = node.getSrc();
                   const imageId = `img_${imageCounter}`;
                   cellContent += `![${imageId}](${src})`;
                   imageCounter++;
+                } else if (node.getType() === 'paragraph') {
+                  // Check inside paragraphs within cells
+                  const paragraphChildren = node.getChildren();
+                  paragraphChildren.forEach((pChild: any) => processCellNode(pChild));
                 } else {
-                  const childText = cellChild.getTextContent();
-                  if (childText.trim()) {
-                    cellContent += childText;
+                  // For other nodes, check their children recursively
+                  if (node.getChildren) {
+                    const nodeChildren = node.getChildren();
+                    nodeChildren.forEach((nChild: any) => processCellNode(nChild));
+                  }
+                  
+                  // Also add text content if it's a text node
+                  const nodeText = node.getTextContent();
+                  if (nodeText.trim()) {
+                    cellContent += nodeText;
                   }
                 }
-              });
+              }
+              
+              cellChildren.forEach((cellChild: any) => processCellNode(cellChild));
               
               // If no content found in children, use cell text content
               if (!cellContent.trim()) {
