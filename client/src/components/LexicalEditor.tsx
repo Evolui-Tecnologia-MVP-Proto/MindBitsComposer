@@ -782,6 +782,41 @@ function convertToMarkdown(editorState: any): string {
                 markdown += `![${imageId}](${src})\n\n`;
                 markdown += `${metadataText}\n\n`;
                 imageCounter++;
+              } else if (contentChild.getType() === 'paragraph') {
+                // Check if paragraph has ImageWithMetadataNode children
+                const paragraphChildren = contentChild.getChildren();
+                let paragraphHasContent = false;
+                
+                paragraphChildren.forEach((pChild: any) => {
+                  console.log('Processing paragraph child:', pChild.getType(), pChild);
+                  if (pChild.getType() === 'image-with-metadata') {
+                    const src = pChild.getSrc();
+                    const alt = pChild.getAltText();
+                    const metadataText = pChild.getMetadataText();
+                    const imageId = pChild.getImageId();
+                    markdown += `![${imageId}](${src})\n\n`;
+                    markdown += `${metadataText}\n\n`;
+                    imageCounter++;
+                    paragraphHasContent = true;
+                  } else if (pChild.getType() === 'image') {
+                    const src = pChild.getSrc();
+                    const alt = pChild.getAltText();
+                    const imageId = `img_${imageCounter}`;
+                    markdown += `![${imageId}](${src})\n\n`;
+                    imageCounter++;
+                    paragraphHasContent = true;
+                  } else {
+                    const childText = pChild.getTextContent();
+                    if (childText.trim()) {
+                      markdown += childText;
+                      paragraphHasContent = true;
+                    }
+                  }
+                });
+                
+                if (paragraphHasContent) {
+                  markdown += '\n\n';
+                }
               } else {
                 const contentText = contentChild.getTextContent();
                 if (contentText.trim()) {
