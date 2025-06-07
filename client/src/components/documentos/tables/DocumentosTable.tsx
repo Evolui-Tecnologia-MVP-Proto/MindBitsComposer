@@ -92,10 +92,25 @@ export function DocumentosTable({
 
   // Função para obter todos os fluxos de um documento
   const getDocumentFlows = (documentId: string) => {
-    const flows = flowExecutions.filter(execution => 
-      execution.documentId === documentId && 
-      (execution.status === "concluded" || execution.status === "initiated" || execution.status === "completed" || execution.status === "transfered")
-    );
+    console.log("🔴 DEBUG: Procurando fluxos para documentId:", documentId);
+    console.log("🔴 DEBUG: flowExecutions disponíveis:", flowExecutions?.length || 0);
+    
+    if (!flowExecutions || flowExecutions.length === 0) {
+      console.log("🔴 DEBUG: Nenhum flowExecutions disponível");
+      return [];
+    }
+
+    const flows = flowExecutions.filter(execution => {
+      console.log("🔴 DEBUG: Verificando execução:", {
+        documentId: execution.documentId,
+        status: execution.status,
+        match: execution.documentId === documentId
+      });
+      
+      return execution.documentId === documentId && 
+        (execution.status === "concluded" || execution.status === "initiated" || execution.status === "completed" || execution.status === "transfered");
+    });
+    
     console.log("🔴 DROPDOWN: getDocumentFlows para", documentId, "encontrou:", flows);
     return flows;
   };
