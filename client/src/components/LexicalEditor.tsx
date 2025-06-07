@@ -662,6 +662,7 @@ function convertToMarkdown(editorState: any): string {
     const children = root.getChildren();
     
     children.forEach((node: any) => {
+      console.log('Processing node type:', node.getType(), node);
       if (node.getType() === 'heading') {
         const level = node.getTag().replace('h', '');
         const text = node.getTextContent();
@@ -695,6 +696,7 @@ function convertToMarkdown(editorState: any): string {
         markdown += `![${imageId}](${src})\n\n`;
         imageCounter++;
       } else if (node.getType() === 'image-with-metadata') {
+        console.log('Found ImageWithMetadataNode at root level:', node);
         const src = node.getSrc();
         const alt = node.getAltText();
         const metadataText = node.getMetadataText();
@@ -739,6 +741,7 @@ function convertToMarkdown(editorState: any): string {
             // Processar conteúdo do container recursivamente
             const contentChildren = child.getChildren();
             contentChildren.forEach((contentChild: any) => {
+              console.log('Processing collapsible content child:', contentChild.getType(), contentChild);
               if (contentChild.getType() === 'table') {
                 // Processar tabela dentro do container
                 const rows = contentChild.getChildren();
