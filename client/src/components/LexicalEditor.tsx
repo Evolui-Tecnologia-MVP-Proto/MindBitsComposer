@@ -692,6 +692,34 @@ function convertToMarkdown(editorState: any): string {
     
     children.forEach((child: any) => collectNodes(child));
     
+    // Process all collected image-with-metadata nodes first
+    allNodes.forEach((node: any) => {
+      if (node.getType() === 'image-with-metadata') {
+        const metadataText = node.getMetadataText();
+        const imageId = node.getImageId();
+        
+        // Extract HTTPS URL from metadata text (for global assets)
+        const httpsUrlMatch = metadataText.match(/\[(https?:\/\/.*?)\]/);
+        const httpsUrl = httpsUrlMatch ? httpsUrlMatch[1] : '';
+        
+        // Extract blob URL from metadata text (for local uploads)
+        const blobUrlMatch = metadataText.match(/\[blob:(.*?)\]/);
+        const blobUrl = blobUrlMatch ? blobUrlMatch[1] : '';
+        
+        if (httpsUrl) {
+          markdown += `![${imageId}](${httpsUrl})\n\n`;
+        } else if (blobUrl) {
+          markdown += `![${imageId}](blob:${blobUrl})\n\n`;
+        } else {
+          // Fallback to original src if no URL found in metadata
+          const src = node.getSrc();
+          markdown += `![${imageId}](${src})\n\n`;
+        }
+        
+        imageCounter++;
+      }
+    });
+    
     children.forEach((node: any) => {
       if (node.getType() === 'heading') {
         const level = node.getTag().replace('h', '');
