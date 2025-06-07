@@ -3163,12 +3163,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       console.log('✅ GitHub API resposta válida recebida');
       const githubFolders = githubContent.filter((item: any) => item.type === 'dir');
-      console.log(`📁 Pastas encontradas no GitHub: ${githubFolders.map((f: any) => f.name).join(', ')}`);
+      console.log(`📁 Pastas raiz encontradas no GitHub: ${githubFolders.map((f: any) => f.name).join(', ')}`);
+
+      // Buscar todas as pastas recursivamente no GitHub
+      const getAllGitHubFolders = async (path = '', level = 0): Promise<string[]> => {
+        if (level > 3) {
+          console.log(`⚠️ Limite de profundidade atingido para: ${path}`);
+          return [];
+        }
+        
+        const url = path ? `${githubUrl}/${path}` : githubUrl;
+        console.log(`🔍 Buscando pastas no caminho: "${path || 'raiz'}" (nível ${level})`);
+        
+        try {
+          const response = await fetch(url, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/vnd.github.v3+json',
+              'User-Agent': 'EVO-MindBits-Composer',
+            },
+          });
+          
+          if (!response.ok) {
+            console.log(`❌ Falha na busca de ${path}: ${response.status}`);
+            return [];
+          }
+          
+          const content: any = await response.json();
+          const folders = content.filter((item: any) => item.type === 'dir');
+          console.log(`📂 Encontradas ${folders.length} pastas em "${path || 'raiz'}"`);
+          
+          let allFolders: string[] = [];
+          
+          // Adicionar pastas do nível atual
+          for (const folder of folders) {
+            const folderName = folder.name;
+            allFolders.push(folderName);
+            console.log(`📁 Pasta encontrada: ${folderName} (caminho completo: ${path ? path + '/' + folderName : folderName})`);
+            
+            // Buscar subpastas recursivamente
+            console.log(`🔄 Iniciando busca recursiva em: ${folderName}`);
+            const subFolders = await getAllGitHubFolders(path ? `${path}/${folderName}` : folderName, level + 1);
+            allFolders = allFolders.concat(subFolders);
+            console.log(`✅ Busca recursiva completa para ${folderName}, encontradas ${subFolders.length} subpastas`);
+          }
+          
+          console.log(`📊 Total de pastas em "${path || 'raiz'}": ${allFolders.length}`);
+          return allFolders;
+        } catch (error) {
+          console.error(`❌ Erro ao buscar pastas em ${path}:`, error);
+          return [];
+        }
+      };
+      
+      console.log(`🚀 Iniciando busca recursiva de todas as pastas do GitHub...`);
+      // Buscar todas as pastas do GitHub (incluindo subpastas)
+      const githubFolderNames = await getAllGitHubFolders();
+      console.log(`📁 TODAS as pastas encontradas no GitHub: ${githubFolderNames.join(', ')}`);
 
       // Buscar estruturas existentes no banco
       const existingStructures = await storage.getAllRepoStructures();
       const existingFolderNames = existingStructures.map((s: any) => s.folderName);
-      const githubFolderNames = githubFolders.map((f: any) => f.name);
       
       console.log(`💾 Pastas existentes no banco: ${existingFolderNames.join(', ')}`);
       console.log(`🔄 Iniciando sincronização entre GitHub e banco local`);
@@ -3177,15 +3232,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let updatedCount = 0;
 
       // Importar pastas que existem no GitHub mas não no banco
-      for (const folder of githubFolders) {
-        if (!existingFolderNames.includes(folder.name)) {
+      for (const folderName of githubFolderNames) {
+        if (!existingFolderNames.includes(folderName)) {
           await storage.createRepoStructure({
-            folderName: folder.name,
+            folderName: folderName,
             linkedTo: null, // Pastas raiz por padrão
             isSync: true, // Já existem no GitHub, então estão sincronizadas
-          });
+          } as any);
           importedCount++;
-          console.log(`Pasta importada do GitHub: ${folder.name}`);
+          console.log(`Pasta importada do GitHub: ${folderName}`);
         }
       }
 
