@@ -108,20 +108,10 @@ export function DocumentosTable({
 
 
     
-    // Documentos que sabemos que têm fluxos pelos logs:
-    const knownFlowDocuments = ["c382deea-21da-493d-8d6d-892ad0e45a31", "2f0078c9-71b4-4485-ba24-fd7bce9ae19f", "9ef9937a-5e02-45af-9d71-e5fb26b71a5e"];
-    if (knownFlowDocuments.includes(documento.id)) {
-      console.log("🔴 DROPDOWN: ATENÇÃO - Este documento deveria ter fluxos!", documento.id);
-    }
-
     if (activeTab === "concluidos" || activeTab === "em-processo") {
       const documentFlows = getDocumentFlows(documento.id);
-      console.log("🔴 DROPDOWN: Fluxos encontrados para", documento.id, ":", documentFlows);
-      
-
       
       if (documentFlows.length > 1) {
-        console.log("🔴 DROPDOWN: Múltiplos fluxos encontrados - abrindo dropdown");
         // Mostrar dropdown apenas quando há múltiplos fluxos
         setDropdown({
           isOpen: true,
@@ -130,23 +120,18 @@ export function DocumentosTable({
           flows: documentFlows,
         });
       } else if (documentFlows.length === 1) {
-        console.log("🔴 DROPDOWN: Um fluxo encontrado - abrindo diretamente");
         // Abrir diretamente quando há apenas um fluxo
         openFlowDiagramModal(documentFlows[0]);
       } else {
-
         // Fallback para o método original
         const flowToShow = activeTab === "concluidos" 
           ? getConcludedFlow(documento.id)
           : getActiveFlow(documento.id);
         if (flowToShow) {
-
           openFlowDiagramModal({
             flowTasks: flowToShow,
             document: { objeto: documento.objeto }
           });
-        } else {
-          console.log("🔴 DROPDOWN: Nenhum fluxo encontrado para:", documento.id);
         }
       }
     } else {
@@ -528,12 +513,7 @@ export function DocumentosTable({
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="p-3 border-b border-gray-100">
-            <h3 className="font-medium text-sm text-gray-900">Fluxos Associados</h3>
-            <p className="text-xs text-gray-500 mt-1">
-              Selecione um fluxo para visualizar o diagrama
-            </p>
-          </div>
+
           <div className="max-h-64 overflow-y-auto">
             {dropdown.flows.map((flow, index) => {
               // Parse execution_data if it's a string
