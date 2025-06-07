@@ -4055,7 +4055,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .innerJoin(documentsFlows, eq(documentFlowExecutions.flowId, documentsFlows.id))
         .where(or(
           eq(documentFlowExecutions.status, "initiated"),
-          eq(documentFlowExecutions.status, "completed")
+          eq(documentFlowExecutions.status, "completed"),
+          eq(documentFlowExecutions.status, "concluded"),
+          eq(documentFlowExecutions.status, "transfered")
         ));
       
       res.json(executions);
