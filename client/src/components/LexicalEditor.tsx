@@ -253,6 +253,17 @@ function TableSelectionPlugin({
   return null;
 }
 
+// Plugin para capturar instância do editor
+function EditorInstancePlugin({ setEditorInstance }: { setEditorInstance: (editor: any) => void }): JSX.Element | null {
+  const [editor] = useLexicalComposerContext();
+  
+  useEffect(() => {
+    setEditorInstance(editor);
+  }, [editor, setEditorInstance]);
+
+  return null;
+}
+
 // Barra de ferramentas interativa
 function ToolbarPlugin({ 
   tableRows, 
@@ -538,7 +549,7 @@ function ToolbarPlugin({
               const newRows = Math.max(1, parseInt(e.target.value) || 1);
               setTableRows(newRows);
               if (selectedTableKey) {
-                resizeSelectedTable(newRows, tableColumns);
+                setTimeout(() => resizeSelectedTable(newRows, tableColumns), 0);
               }
             }}
             className="w-8 h-6 px-1 border border-gray-300 rounded text-center text-xs"
@@ -554,7 +565,7 @@ function ToolbarPlugin({
               const newColumns = Math.max(1, parseInt(e.target.value) || 1);
               setTableColumns(newColumns);
               if (selectedTableKey) {
-                resizeSelectedTable(tableRows, newColumns);
+                setTimeout(() => resizeSelectedTable(tableRows, newColumns), 0);
               }
             }}
             className="w-8 h-6 px-1 border border-gray-300 rounded text-center text-xs"
@@ -806,22 +817,41 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
 
   // Função para redimensionar tabela existente
   const resizeSelectedTable = useCallback((newRows: number, newColumns: number) => {
-    if (!selectedTableKey || !editorInstance) return;
+    console.log('resizeSelectedTable chamada:', { newRows, newColumns, selectedTableKey, hasEditor: !!editorInstance });
+    
+    if (!selectedTableKey) {
+      console.log('Nenhuma tabela selecionada');
+      return;
+    }
+
+    if (!editorInstance) {
+      console.log('Editor não disponível');
+      return;
+    }
 
     editorInstance.update(() => {
       const tableNode = $getNodeByKey(selectedTableKey);
-      if (!$isTableNode(tableNode)) return;
+      console.log('Nó da tabela encontrado:', !!tableNode, tableNode?.getType());
+      
+      if (!$isTableNode(tableNode)) {
+        console.log('Nó não é uma tabela válida');
+        return;
+      }
 
       const currentRows = tableNode.getChildren();
       const currentRowCount = currentRows.length;
       const currentColumnCount = currentRows.length > 0 ? (currentRows[0] as TableRowNode).getChildren().length : 0;
+      
+      console.log('Dimensões atuais:', { currentRowCount, currentColumnCount });
+      console.log('Novas dimensões:', { newRows, newColumns });
 
       // Ajustar número de linhas
       if (newRows > currentRowCount) {
+        console.log('Adicionando linhas:', newRows - currentRowCount);
         // Adicionar linhas
         for (let i = currentRowCount; i < newRows; i++) {
           const newRow = $createTableRowNode();
-          for (let j = 0; j < Math.max(newColumns, currentColumnCount); j++) {
+          for (let j = 0; j < newColumns; j++) {
             const newCell = $createTableCellNode(0);
             const newParagraph = $createParagraphNode();
             newCell.append(newParagraph);
@@ -830,6 +860,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           tableNode.append(newRow);
         }
       } else if (newRows < currentRowCount) {
+        console.log('Removendo linhas:', currentRowCount - newRows);
         // Remover linhas
         for (let i = currentRowCount - 1; i >= newRows; i--) {
           const rowToRemove = currentRows[i];
@@ -839,12 +870,13 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
 
       // Ajustar número de colunas
       const updatedRows = tableNode.getChildren();
-      updatedRows.forEach((row) => {
+      updatedRows.forEach((row, rowIndex) => {
         const rowNode = row as TableRowNode;
         const cells = rowNode.getChildren();
         const currentCellCount = cells.length;
 
         if (newColumns > currentCellCount) {
+          console.log(`Linha ${rowIndex}: Adicionando células:`, newColumns - currentCellCount);
           // Adicionar células
           for (let j = currentCellCount; j < newColumns; j++) {
             const newCell = $createTableCellNode(0);
@@ -853,12 +885,15 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
             rowNode.append(newCell);
           }
         } else if (newColumns < currentCellCount) {
+          console.log(`Linha ${rowIndex}: Removendo células:`, currentCellCount - newColumns);
           // Remover células
           for (let j = currentCellCount - 1; j >= newColumns; j--) {
             cells[j].remove();
           }
         }
       });
+      
+      console.log('Redimensionamento concluído');
     });
   }, [selectedTableKey, editorInstance]);
   
@@ -894,7 +929,12 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
     ],
   };
 
-  const handleChange = (editorState: any) => {
+  const handleChange = (editorState: any, editor: any) => {
+    // Capturar instância do editor se ainda não temos
+    if (!editorInstance) {
+      setEditorInstance(editor);
+    }
+    
     editorState.read(() => {
       const root = $getRoot();
       const textContent = root.getTextContent();
@@ -976,6 +1016,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <ImagePlugin />
           <ImageEventListenerPlugin />
           <TemplateSectionsPlugin sections={templateSections} />
+          <EditorInstancePlugin setEditorInstance={setEditorInstance} />
           <AutoFocusPlugin />
         </div>
       </LexicalComposer>
