@@ -105,28 +105,23 @@ export function DocumentosTable({
     evento.stopPropagation();
 
     console.log("🔴 DROPDOWN: Botão clicado para documento:", documento.objeto);
+    console.log("🔴 DROPDOWN: Document ID:", documento.id);
     console.log("🔴 DROPDOWN: activeTab:", activeTab);
     console.log("🔴 DROPDOWN: flowExecutions total:", flowExecutions.length);
+    console.log("🔴 DROPDOWN: Todos os flowExecutions:", flowExecutions.map(f => ({ documentId: f.documentId, status: f.status, flowName: f.flowName })));
 
     if (activeTab === "concluidos") {
       const documentFlows = getDocumentFlows(documento.id);
       console.log("🔴 DROPDOWN: Fluxos encontrados para", documento.id, ":", documentFlows);
       
-      if (documentFlows.length > 1) {
-        console.log("🔴 DROPDOWN: Múltiplos fluxos - abrindo dropdown");
-        // Múltiplos fluxos - mostrar dropdown
+      if (documentFlows.length >= 1) {
+        console.log("🔴 DROPDOWN: Fluxos encontrados - abrindo dropdown");
+        // Mostrar dropdown sempre que há fluxos (mesmo que seja apenas 1)
         setDropdown({
           isOpen: true,
           documentId: documento.id,
           position: { x: evento.clientX, y: evento.clientY },
           flows: documentFlows,
-        });
-      } else if (documentFlows.length === 1) {
-        console.log("🔴 DROPDOWN: Um fluxo - abrindo diretamente");
-        // Um único fluxo - abrir diretamente
-        openFlowDiagramModal({
-          flowTasks: documentFlows[0],
-          document: { objeto: documento.objeto }
         });
       } else {
         console.log("🔴 DROPDOWN: Nenhum fluxo encontrado - tentando método alternativo");
