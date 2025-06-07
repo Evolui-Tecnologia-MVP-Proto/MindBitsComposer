@@ -914,6 +914,50 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
   return null;
 }
 
+// Plugin para garantir foco adequado quando carregando conteúdo existente
+function FocusPlugin({ initialEditorState }: { initialEditorState?: string }) {
+  const [editor] = useLexicalComposerContext();
+  
+  useEffect(() => {
+    if (initialEditorState) {
+      // Aguardar um pouco para garantir que o conteúdo foi carregado
+      const timeoutId = setTimeout(() => {
+        editor.update(() => {
+          // Mover cursor para o final do documento
+          const root = $getRoot();
+          const lastChild = root.getLastChild();
+          
+          if (lastChild) {
+            // Se o último nó é um parágrafo, colocar cursor no final dele
+            if ($isParagraphNode(lastChild)) {
+              lastChild.selectEnd();
+            } else {
+              // Caso contrário, criar um novo parágrafo e focar nele
+              const newParagraph = $createParagraphNode();
+              root.append(newParagraph);
+              newParagraph.select();
+            }
+          } else {
+            // Se não há conteúdo, criar parágrafo inicial
+            const newParagraph = $createParagraphNode();
+            root.append(newParagraph);
+            newParagraph.select();
+          }
+        });
+        
+        // Focar o editor após a atualização
+        setTimeout(() => {
+          editor.focus();
+        }, 50);
+      }, 100);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [editor, initialEditorState]);
+
+  return null;
+}
+
 // Componente principal do editor Lexical completo
 export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, className = '', templateSections, viewMode = 'editor', initialEditorState }: LexicalEditorProps): JSX.Element {
   const [markdownContent, setMarkdownContent] = useState('');
@@ -1141,6 +1185,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <TemplateSectionsPlugin sections={templateSections} />
           <EditorInstancePlugin setEditorInstance={setEditorInstance} />
           <AutoFocusPlugin />
+          <FocusPlugin initialEditorState={initialEditorState} />
         </div>
       </LexicalComposer>
     </div>
