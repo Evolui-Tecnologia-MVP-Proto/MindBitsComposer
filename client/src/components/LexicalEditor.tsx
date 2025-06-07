@@ -567,39 +567,43 @@ function ToolbarPlugin({
         >
           <Table className="w-4 h-4" />
         </Button>
-        <div className="flex items-center gap-1 ml-2 text-xs text-gray-600">
-          <input
-            type="number"
-            min="1"
-            max="20"
-            value={tableRows}
-            onChange={(e) => {
-              const newRows = Math.max(1, parseInt(e.target.value) || 1);
-              setTableRows(newRows);
-              if (selectedTableKey) {
-                setTimeout(() => resizeSelectedTable(newRows, tableColumns), 0);
-              }
-            }}
-            className="w-8 h-6 px-1 border border-gray-300 rounded text-center text-xs"
-            title="Linhas"
-          />
-          <span className="text-gray-400">×</span>
-          <input
-            type="number"
-            min="1"
-            max="20"
-            value={tableColumns}
-            onChange={(e) => {
-              const newColumns = Math.max(1, parseInt(e.target.value) || 1);
-              setTableColumns(newColumns);
-              if (selectedTableKey) {
-                setTimeout(() => resizeSelectedTable(tableRows, newColumns), 0);
-              }
-            }}
-            className="w-8 h-6 px-1 border border-gray-300 rounded text-center text-xs"
-            title="Colunas"
-          />
-        </div>
+        
+        {/* Controles de dimensionamento da tabela - apenas quando uma tabela está selecionada */}
+        {selectedTableKey && (
+          <div className="flex items-center gap-1 ml-2 text-xs text-gray-600">
+            <input
+              type="number"
+              min="1"
+              max="20"
+              value={tableRows}
+              onChange={(e) => {
+                const newRows = Math.max(1, parseInt(e.target.value) || 1);
+                setTableRows(newRows);
+                if (selectedTableKey) {
+                  setTimeout(() => resizeSelectedTable(newRows, tableColumns), 0);
+                }
+              }}
+              className="w-8 h-6 px-1 border border-gray-300 rounded text-center text-xs"
+              title="Linhas"
+            />
+            <span className="text-gray-400">×</span>
+            <input
+              type="number"
+              min="1"
+              max="20"
+              value={tableColumns}
+              onChange={(e) => {
+                const newColumns = Math.max(1, parseInt(e.target.value) || 1);
+                setTableColumns(newColumns);
+                if (selectedTableKey) {
+                  setTimeout(() => resizeSelectedTable(tableRows, newColumns), 0);
+                }
+              }}
+              className="w-8 h-6 px-1 border border-gray-300 rounded text-center text-xs"
+              title="Colunas"
+            />
+          </div>
+        )}
         
         {/* Botão para excluir tabela selecionada */}
         {selectedTableKey && (
