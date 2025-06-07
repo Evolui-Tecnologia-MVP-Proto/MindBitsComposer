@@ -581,7 +581,7 @@ export default function LexicalPage() {
           </div>
           
           <div className="flex items-center space-x-2">
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col space-y-1">
               {selectedEdition && (
                 <Badge variant="default" className="text-xs bg-green-100 text-green-800">
                   {selectedEdition.origem} - {selectedEdition.objeto}
@@ -835,9 +835,6 @@ export default function LexicalPage() {
                   </AccordionTrigger>
                   <AccordionContent className="px-4 pb-4">
                     <div className="space-y-2">
-                      <p className="text-sm text-gray-500 mb-3">
-                        Seus arquivos pessoais e uploads
-                      </p>
                       <Button 
                         className="w-full"
                         variant="outline"
@@ -904,9 +901,6 @@ export default function LexicalPage() {
                                     <p className="text-sm font-medium truncate" title={artifact.name}>
                                       {artifact.name}
                                     </p>
-                                    <p className="text-xs text-gray-600 truncate font-mono" title={artifact.fileName}>
-                                      {artifact.fileName || 'Nome do arquivo não disponível'}
-                                    </p>
                                     <div className="flex items-center gap-2 mt-2">
                                       <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
                                         Uploaded
@@ -941,10 +935,6 @@ export default function LexicalPage() {
                   </AccordionTrigger>
                   <AccordionContent className="px-4 pb-4">
                     <div className="space-y-2">
-                      <p className="text-sm text-gray-500 mb-3">
-                        Arquivos vinculados ao documento
-                      </p>
-                      
                       {isLoadingArtifacts ? (
                         <div className="text-center py-4">
                           <p className="text-sm text-gray-400">Carregando...</p>
@@ -1004,9 +994,6 @@ export default function LexicalPage() {
                                   <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium truncate" title={artifact.name}>
                                       {artifact.name}
-                                    </p>
-                                    <p className="text-xs text-gray-600 truncate font-mono" title={artifact.fileName}>
-                                      {artifact.fileName || 'Nome do arquivo não disponível'}
                                     </p>
                                     <div className="flex items-center gap-2 mt-2">
                                       <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
