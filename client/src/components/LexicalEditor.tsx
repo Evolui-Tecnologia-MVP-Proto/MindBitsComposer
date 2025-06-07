@@ -254,17 +254,29 @@ function TableSelectionPlugin({
 }
 
 // Barra de ferramentas interativa
-function ToolbarPlugin(): JSX.Element {
+function ToolbarPlugin({ 
+  tableRows, 
+  setTableRows, 
+  tableColumns, 
+  setTableColumns, 
+  selectedTableKey,
+  resizeSelectedTable,
+  onTableSelect
+}: {
+  tableRows: number;
+  setTableRows: (rows: number) => void;
+  tableColumns: number;
+  setTableColumns: (columns: number) => void;
+  selectedTableKey: string | null;
+  resizeSelectedTable: (rows: number, columns: number) => void;
+  onTableSelect: (tableKey: string | null) => void;
+}): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
   const [isStrikethrough, setIsStrikethrough] = useState(false);
   const [isCode, setIsCode] = useState(false);
-  const [tableRows, setTableRows] = useState(2);
-  const [tableColumns, setTableColumns] = useState(3);
-  const [selectedTableKey, setSelectedTableKey] = useState<string | null>(null);
-  const [currentTableDimensions, setCurrentTableDimensions] = useState<{rows: number, columns: number} | null>(null);
   const { fileInputRef, openFileDialog, handleFileChange } = useImageUpload();
 
   const updateToolbar = useCallback(() => {
@@ -379,63 +391,7 @@ function ToolbarPlugin(): JSX.Element {
     });
   };
 
-  // Função para redimensionar tabela existente
-  const resizeSelectedTable = (newRows: number, newColumns: number) => {
-    if (!selectedTableKey) return;
 
-    editor.update(() => {
-      const tableNode = $getNodeByKey(selectedTableKey);
-      if (!$isTableNode(tableNode)) return;
-
-      const currentRows = tableNode.getChildren();
-      const currentRowCount = currentRows.length;
-      const currentColumnCount = currentRows.length > 0 ? (currentRows[0] as TableRowNode).getChildren().length : 0;
-
-      // Ajustar número de linhas
-      if (newRows > currentRowCount) {
-        // Adicionar linhas
-        for (let i = currentRowCount; i < newRows; i++) {
-          const newRow = $createTableRowNode();
-          for (let j = 0; j < Math.max(newColumns, currentColumnCount); j++) {
-            const newCell = $createTableCellNode(0);
-            const newParagraph = $createParagraphNode();
-            newCell.append(newParagraph);
-            newRow.append(newCell);
-          }
-          tableNode.append(newRow);
-        }
-      } else if (newRows < currentRowCount) {
-        // Remover linhas
-        for (let i = currentRowCount - 1; i >= newRows; i--) {
-          const rowToRemove = currentRows[i];
-          rowToRemove.remove();
-        }
-      }
-
-      // Ajustar número de colunas
-      const updatedRows = tableNode.getChildren();
-      updatedRows.forEach((row) => {
-        const rowNode = row as TableRowNode;
-        const cells = rowNode.getChildren();
-        const currentCellCount = cells.length;
-
-        if (newColumns > currentCellCount) {
-          // Adicionar células
-          for (let j = currentCellCount; j < newColumns; j++) {
-            const newCell = $createTableCellNode(0);
-            const newParagraph = $createParagraphNode();
-            newCell.append(newParagraph);
-            rowNode.append(newCell);
-          }
-        } else if (newColumns < currentCellCount) {
-          // Remover células
-          for (let j = currentCellCount - 1; j >= newColumns; j--) {
-            cells[j].remove();
-          }
-        }
-      });
-    });
-  };
 
   const insertCollapsible = () => {
     editor.dispatchCommand(INSERT_COLLAPSIBLE_COMMAND, true);
@@ -847,6 +803,64 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
   const [tableRows, setTableRows] = useState(2);
   const [tableColumns, setTableColumns] = useState(3);
   const [selectedTableKey, setSelectedTableKey] = useState<string | null>(null);
+
+  // Função para redimensionar tabela existente
+  const resizeSelectedTable = useCallback((newRows: number, newColumns: number) => {
+    if (!selectedTableKey || !editorInstance) return;
+
+    editorInstance.update(() => {
+      const tableNode = $getNodeByKey(selectedTableKey);
+      if (!$isTableNode(tableNode)) return;
+
+      const currentRows = tableNode.getChildren();
+      const currentRowCount = currentRows.length;
+      const currentColumnCount = currentRows.length > 0 ? (currentRows[0] as TableRowNode).getChildren().length : 0;
+
+      // Ajustar número de linhas
+      if (newRows > currentRowCount) {
+        // Adicionar linhas
+        for (let i = currentRowCount; i < newRows; i++) {
+          const newRow = $createTableRowNode();
+          for (let j = 0; j < Math.max(newColumns, currentColumnCount); j++) {
+            const newCell = $createTableCellNode(0);
+            const newParagraph = $createParagraphNode();
+            newCell.append(newParagraph);
+            newRow.append(newCell);
+          }
+          tableNode.append(newRow);
+        }
+      } else if (newRows < currentRowCount) {
+        // Remover linhas
+        for (let i = currentRowCount - 1; i >= newRows; i--) {
+          const rowToRemove = currentRows[i];
+          rowToRemove.remove();
+        }
+      }
+
+      // Ajustar número de colunas
+      const updatedRows = tableNode.getChildren();
+      updatedRows.forEach((row) => {
+        const rowNode = row as TableRowNode;
+        const cells = rowNode.getChildren();
+        const currentCellCount = cells.length;
+
+        if (newColumns > currentCellCount) {
+          // Adicionar células
+          for (let j = currentCellCount; j < newColumns; j++) {
+            const newCell = $createTableCellNode(0);
+            const newParagraph = $createParagraphNode();
+            newCell.append(newParagraph);
+            rowNode.append(newCell);
+          }
+        } else if (newColumns < currentCellCount) {
+          // Remover células
+          for (let j = currentCellCount - 1; j >= newColumns; j--) {
+            cells[j].remove();
+          }
+        }
+      });
+    });
+  }, [selectedTableKey, editorInstance]);
   
   // Hook para capturar markdown quando mudar para preview
   React.useEffect(() => {
@@ -905,7 +919,15 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
     <div className={`lexical-editor-container w-full h-full flex flex-col ${className}`}>
       <LexicalComposer initialConfig={initialConfig}>
         <div className="w-full h-full flex flex-col min-h-0">
-          <ToolbarPlugin />
+          <ToolbarPlugin 
+            tableRows={tableRows}
+            setTableRows={setTableRows}
+            tableColumns={tableColumns}
+            setTableColumns={setTableColumns}
+            selectedTableKey={selectedTableKey}
+            resizeSelectedTable={resizeSelectedTable}
+            onTableSelect={setSelectedTableKey}
+          />
           <div className="p-4" style={{ height: 'calc(100vh - 350px)', maxHeight: 'calc(100vh - 350px)', overflowY: 'auto' }}>
             {viewMode === 'editor' ? (
               <RichTextPlugin
