@@ -92,43 +92,21 @@ export function DocumentosTable({
 
   // Função para obter todos os fluxos de um documento
   const getDocumentFlows = (documentId: string) => {
-    console.log("🔴 DEBUG: Procurando fluxos para documentId:", documentId);
-    console.log("🔴 DEBUG: flowExecutions disponíveis:", flowExecutions?.length || 0);
-    
     if (!flowExecutions || flowExecutions.length === 0) {
-      console.log("🔴 DEBUG: Nenhum flowExecutions disponível");
       return [];
     }
 
-    const flows = flowExecutions.filter(execution => {
-      console.log("🔴 DEBUG: Verificando execução:", {
-        documentId: execution.documentId,
-        status: execution.status,
-        match: execution.documentId === documentId
-      });
-      
-      return execution.documentId === documentId && 
-        (execution.status === "concluded" || execution.status === "initiated" || execution.status === "completed" || execution.status === "transfered");
-    });
-    
-    console.log("🔴 DROPDOWN: getDocumentFlows para", documentId, "encontrou:", flows);
-    return flows;
+    return flowExecutions.filter(execution => 
+      execution.documentId === documentId && 
+      (execution.status === "concluded" || execution.status === "initiated" || execution.status === "completed" || execution.status === "transfered")
+    );
   };
 
   const handleFlowButtonClick = (evento: React.MouseEvent, documento: Documento) => {
     evento.preventDefault();
     evento.stopPropagation();
 
-    console.log("🔴 DROPDOWN: Botão clicado para documento:", documento.objeto);
-    console.log("🔴 DROPDOWN: Document ID:", documento.id);
-    console.log("🔴 DROPDOWN: activeTab:", activeTab);
-    console.log("🔴 DROPDOWN: flowExecutions total:", flowExecutions.length);
-    
-    // Log específico para os documentos que sabemos que têm fluxos concluded
-    if (documento.id === "e8e56112-4547-499c-8e25-28aba64746ce" || documento.id === "d713b91f-7973-4be0-bd4c-dfca4e275717") {
-      console.log("🔴 DROPDOWN: DOCUMENTO COM FLUXOS CONCLUDED DETECTADO!", documento.id);
-      console.log("🔴 DROPDOWN: Todos os flowExecutions:", flowExecutions);
-    }
+
     
     // Documentos que sabemos que têm fluxos pelos logs:
     const knownFlowDocuments = ["c382deea-21da-493d-8d6d-892ad0e45a31", "2f0078c9-71b4-4485-ba24-fd7bce9ae19f", "9ef9937a-5e02-45af-9d71-e5fb26b71a5e"];
@@ -148,7 +126,7 @@ export function DocumentosTable({
         setDropdown({
           isOpen: true,
           documentId: documento.id,
-          position: { x: evento.clientX, y: evento.clientY },
+          position: { x: evento.clientX - 30, y: evento.clientY },
           flows: documentFlows,
         });
       } else {
