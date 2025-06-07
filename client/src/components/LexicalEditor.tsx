@@ -9,7 +9,7 @@ import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { HeadingNode, QuoteNode, $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
-import { ListItemNode, ListNode, INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND } from '@lexical/list';
+import { ListItemNode, ListNode, INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_LIST_COMMAND, $createListNode, $createListItemNode } from '@lexical/list';
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { CodeNode, $createCodeNode } from '@lexical/code';
 import { LinkNode } from '@lexical/link';
@@ -361,7 +361,20 @@ function ToolbarPlugin({
   };
 
   const insertOrderedList = () => {
-    editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
+    console.log('Inserting ordered list...');
+    editor.update(() => {
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) {
+        const listNode = $createListNode('number');
+        const listItemNode = $createListItemNode();
+        const paragraphNode = $createParagraphNode();
+        
+        listItemNode.append(paragraphNode);
+        listNode.append(listItemNode);
+        
+        $insertNodes([listNode]);
+      }
+    });
   };
 
   const insertTable = () => {
