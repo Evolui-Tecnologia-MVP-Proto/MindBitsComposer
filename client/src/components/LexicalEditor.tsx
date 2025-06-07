@@ -237,8 +237,6 @@ function ToolbarPlugin(): JSX.Element {
         for (let j = 0; j < 3; j++) {
           const cellNode = $createTableCellNode(0); // nova célula
           const paragraphNode = $createParagraphNode(); // novo parágrafo
-          const textNode = $createTextNode(`Linha ${i + 1}, Coluna ${j + 1}`);
-          paragraphNode.append(textNode);
           cellNode.append(paragraphNode);
           rowNode.append(cellNode); // célula adicionada à linha
         }
