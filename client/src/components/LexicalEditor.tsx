@@ -771,6 +771,14 @@ function convertToMarkdown(editorState: any): string {
                 const imageId = `img_${imageCounter}`;
                 markdown += `![${imageId}](${src})\n\n`;
                 imageCounter++;
+              } else if (contentChild.getType() === 'image-with-metadata') {
+                const src = contentChild.getSrc();
+                const alt = contentChild.getAltText();
+                const metadataText = contentChild.getMetadataText();
+                const imageId = contentChild.getImageId();
+                markdown += `![${imageId}](${src})\n\n`;
+                markdown += `${metadataText}\n\n`;
+                imageCounter++;
               } else {
                 const contentText = contentChild.getTextContent();
                 if (contentText.trim()) {
