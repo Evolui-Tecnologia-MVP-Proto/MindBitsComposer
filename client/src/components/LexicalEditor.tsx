@@ -26,6 +26,7 @@ import CollapsiblePlugin, { INSERT_COLLAPSIBLE_COMMAND } from './lexical/Collaps
 
 // Import dos nós e plugin de imagem
 import { ImageNode, $createImageNode } from './lexical/ImageNode';
+import { ImageWithMetadataNode } from './lexical/ImageWithMetadataNode';
 import ImagePlugin, { useImageUpload } from './lexical/ImagePlugin';
 
 // Import do plugin customizado de tabela

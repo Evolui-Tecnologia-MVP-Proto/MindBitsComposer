@@ -16,6 +16,11 @@ import {
   ImageNode,
   type ImagePayload,
 } from './ImageNode';
+import {
+  $createImageWithMetadataNode,
+  ImageWithMetadataNode,
+  type ImageWithMetadataPayload,
+} from './ImageWithMetadataNode';
 
 export const INSERT_IMAGE_COMMAND: LexicalCommand<ImagePayload> = createCommand(
   'INSERT_IMAGE_COMMAND',
@@ -29,72 +34,59 @@ export function $insertImageNode(payload: ImagePayload): void {
   const selection = $getSelection();
   
   if ($isRangeSelection(selection)) {
-    // Gerar ID único para a imagem
-    const imageId = Math.floor(Math.random() * 10000000000).toString();
-    
-    // Criar nó de imagem
+    // Criar nó de imagem tradicional (para compatibilidade)
     const imageNode = $createImageNode(payload);
-    
-    // Criar parágrafo com informações da imagem
-    const infoParagraph = $createParagraphNode();
-    
-    // Criar URL blob acessível para navegadores externos
-    let displayUrl = payload.src;
-    if (payload.src.startsWith('data:')) {
-      try {
-        // Converter data URL para blob
-        const byteString = atob(payload.src.split(',')[1]);
-        const mimeString = payload.src.split(',')[0].split(':')[1].split(';')[0];
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-          ia[i] = byteString.charCodeAt(i);
-        }
-        const blob = new Blob([ab], { type: mimeString });
-        displayUrl = URL.createObjectURL(blob);
-      } catch (error) {
-        displayUrl = `blob:${window.location.origin}/${imageId}`;
-      }
-    }
-    
-    const infoText = $createTextNode(`[image_id: ${imageId}] - [${displayUrl}]`);
-    infoParagraph.append(infoText);
-    
-    // Inserir a imagem
     selection.insertNodes([imageNode]);
-    
-    // Inserir o parágrafo de informações após a imagem
-    selection.insertNodes([infoParagraph]);
   } else {
     // Fallback para inserção sem seleção
     const imageNode = $createImageNode(payload);
     $insertNodeToNearestRoot(imageNode);
-    
-    const imageId = Math.floor(Math.random() * 10000000000).toString();
-    const infoParagraph = $createParagraphNode();
-    
-    // Criar URL blob acessível para navegadores externos
-    let displayUrl = payload.src;
-    if (payload.src.startsWith('data:')) {
-      try {
-        // Converter data URL para blob
-        const byteString = atob(payload.src.split(',')[1]);
-        const mimeString = payload.src.split(',')[0].split(':')[1].split(';')[0];
-        const ab = new ArrayBuffer(byteString.length);
-        const ia = new Uint8Array(ab);
-        for (let i = 0; i < byteString.length; i++) {
-          ia[i] = byteString.charCodeAt(i);
-        }
-        const blob = new Blob([ab], { type: mimeString });
-        displayUrl = URL.createObjectURL(blob);
-      } catch (error) {
-        displayUrl = `blob:${window.location.origin}/${imageId}`;
+  }
+}
+
+export function $insertImageWithMetadataNode(payload: ImagePayload): void {
+  const selection = $getSelection();
+  
+  // Gerar ID único para a imagem
+  const imageId = Math.floor(Math.random() * 10000000000).toString();
+  
+  // Criar URL blob acessível para navegadores externos
+  let displayUrl = payload.src;
+  if (payload.src.startsWith('data:')) {
+    try {
+      // Converter data URL para blob
+      const byteString = atob(payload.src.split(',')[1]);
+      const mimeString = payload.src.split(',')[0].split(':')[1].split(';')[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
       }
+      const blob = new Blob([ab], { type: mimeString });
+      displayUrl = URL.createObjectURL(blob);
+    } catch (error) {
+      displayUrl = `blob:${window.location.origin}/${imageId}`;
     }
-    
-    const infoText = $createTextNode(`[image_id: ${imageId}] - [${displayUrl}]`);
-    infoParagraph.append(infoText);
-    $insertNodeToNearestRoot(infoParagraph);
+  }
+  
+  const metadataText = `[image_id: ${imageId}] - [${displayUrl}]`;
+  
+  // Criar nó de imagem com metadata
+  const imageWithMetadataPayload: ImageWithMetadataPayload = {
+    src: payload.src,
+    altText: payload.altText,
+    imageId: imageId,
+    metadataText: metadataText,
+    width: payload.width,
+    height: payload.height,
+  };
+  
+  const imageWithMetadataNode = $createImageWithMetadataNode(imageWithMetadataPayload);
+  
+  if ($isRangeSelection(selection)) {
+    selection.insertNodes([imageWithMetadataNode]);
+  } else {
+    $insertNodeToNearestRoot(imageWithMetadataNode);
   }
 }
 
@@ -133,7 +125,7 @@ export function useImageUpload() {
           src: url,
           altText: file.name,
         };
-        $insertImageNode(payload);
+        $insertImageWithMetadataNode(payload);
       });
     } catch (error) {
       console.error('Failed to upload image:', error);
@@ -178,7 +170,7 @@ export default function ImagePlugin(): JSX.Element | null {
       INSERT_IMAGE_COMMAND,
       (payload: ImagePayload) => {
         editor.update(() => {
-          $insertImageNode(payload);
+          $insertImageWithMetadataNode(payload);
         });
         return true;
       },
@@ -195,7 +187,7 @@ export default function ImagePlugin(): JSX.Element | null {
                 src: url,
                 altText: file.name,
               };
-              $insertImageNode(payload);
+              $insertImageWithMetadataNode(payload);
             });
           })
           .catch((error) => {
