@@ -56,7 +56,7 @@ export function GitHubTab({
               ) : (
                 <Download className="h-4 w-4 mr-2" />
               )}
-              Sincronizar
+              Trazer do GitHub
             </Button>
             <Button
               className="bg-green-600 hover:bg-green-700"
