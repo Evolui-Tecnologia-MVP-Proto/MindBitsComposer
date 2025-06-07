@@ -5,6 +5,7 @@ import {
   $isRangeSelection,
   $setSelection,
   $createNodeSelection,
+  $isNodeSelection,
   type DOMConversionMap,
   type DOMConversionOutput,
   type DOMExportOutput,
@@ -167,34 +168,51 @@ function ImageComponent({ node }: { node: ImageNode }) {
 
   const handleClick = useCallback((event: React.MouseEvent) => {
     event.preventDefault();
+    event.stopPropagation();
+    
+    console.log('Image clicked, node key:', node.getKey());
     
     editor.update(() => {
       // Criar seleção de nó para esta imagem
       const nodeSelection = $createNodeSelection();
       nodeSelection.add(node.getKey());
       $setSelection(nodeSelection);
+      console.log('Node selection created and set');
     });
+    
+    // Forçar estado selecionado imediatamente para feedback visual rápido
+    setIsSelected(true);
   }, [editor, node]);
 
   // Monitorar mudanças de seleção para atualizar o estado visual
   useEffect(() => {
-    return editor.registerUpdateListener(({ editorState }) => {
+    const unregister = editor.registerUpdateListener(({ editorState }) => {
       editorState.read(() => {
         const selection = $getSelection();
-        if (selection && selection.getNodes().some(n => n.getKey() === node.getKey())) {
-          setIsSelected(true);
+        console.log('Selection update:', selection);
+        
+        if ($isNodeSelection(selection)) {
+          const selectedNodeKeys = selection.getNodes().map(n => n.getKey());
+          const isNodeSelected = selectedNodeKeys.includes(node.getKey());
+          console.log('Node selection detected, selected keys:', selectedNodeKeys, 'current node:', node.getKey(), 'is selected:', isNodeSelected);
+          setIsSelected(isNodeSelected);
         } else {
+          console.log('No node selection, clearing selection state');
           setIsSelected(false);
         }
       });
     });
+    
+    return unregister;
   }, [editor, node]);
 
   // Adicionar listener para tecla DEL
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Delete' && isSelected) {
+      console.log('Key pressed:', event.key, 'Image selected:', isSelected);
+      if ((event.key === 'Delete' || event.key === 'Backspace') && isSelected) {
         event.preventDefault();
+        console.log('Deleting image node');
         editor.update(() => {
           node.remove();
         });
