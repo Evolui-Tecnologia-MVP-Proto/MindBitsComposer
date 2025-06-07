@@ -1136,10 +1136,15 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       // Verificar se há conteúdo real (não apenas parágrafos vazios)
       const hasRealContent = children.some(child => {
         if (child.getType() === 'paragraph') {
-          return child.getTextContent().trim().length > 0;
+          // Verificar se o parágrafo tem texto ou contém imagens
+          const hasText = child.getTextContent().trim().length > 0;
+          const hasImages = child.getChildren().some(innerChild => 
+            innerChild.getType() === 'image' || innerChild.getType() === 'image-with-metadata'
+          );
+          return hasText || hasImages;
         }
-        // Outros tipos de nós (tabelas, imagens, etc.) sempre contam como conteúdo
-        return child.getType() !== 'paragraph';
+        // Outros tipos de nós (tabelas, imagens, collapsibles, etc.) sempre contam como conteúdo
+        return true;
       });
       
       // Notificar mudança de status de conteúdo
