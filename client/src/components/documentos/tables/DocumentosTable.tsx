@@ -94,7 +94,7 @@ export function DocumentosTable({
   const getDocumentFlows = (documentId: string) => {
     const flows = flowExecutions.filter(execution => 
       execution.documentId === documentId && 
-      (execution.status === "completed" || execution.status === "initiated")
+      (execution.status === "concluded" || execution.status === "initiated" || execution.status === "completed" || execution.status === "transfered")
     );
     console.log("🔴 DROPDOWN: getDocumentFlows para", documentId, "encontrou:", flows);
     return flows;
@@ -120,32 +120,7 @@ export function DocumentosTable({
       const documentFlows = getDocumentFlows(documento.id);
       console.log("🔴 DROPDOWN: Fluxos encontrados para", documento.id, ":", documentFlows);
       
-      // Para o documento de teste, vamos simular fluxos para demonstrar a dropdown
-      if (documento.id === "e8e56112-4547-499c-8e25-28aba64746ce") {
-        console.log("🔴 DROPDOWN: Documento de teste - simulando múltiplos fluxos");
-        const mockFlows = [
-          {
-            flowName: "FASE I - Orçamento de consumo de UST's",
-            flowCode: "ORC-01",
-            status: "completed",
-            completedAt: "2025-06-06T10:00:00Z"
-          },
-          {
-            flowName: "FASE II - Elicitação Validada por Demanda",
-            flowCode: "EVD-01", 
-            status: "completed",
-            completedAt: "2025-06-05T15:30:00Z"
-          }
-        ];
-        
-        setDropdown({
-          isOpen: true,
-          documentId: documento.id,
-          position: { x: evento.clientX, y: evento.clientY },
-          flows: mockFlows,
-        });
-        return;
-      }
+
       
       if (documentFlows.length >= 1) {
         console.log("🔴 DROPDOWN: Fluxos encontrados - abrindo dropdown");
@@ -556,45 +531,59 @@ export function DocumentosTable({
             </p>
           </div>
           <div className="max-h-64 overflow-y-auto">
-            {dropdown.flows.map((flow, index) => (
-              <div
-                key={index}
-                className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-b-0"
-                onClick={() => {
-                  openFlowDiagramModal({
-                    flowTasks: flow,
-                    document: { objeto: documentos.find(doc => doc.id === dropdown.documentId)?.objeto || "Documento" }
-                  });
-                  setDropdown(prev => ({ ...prev, isOpen: false }));
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="font-medium text-sm text-gray-900 mb-1">
-                      {flow.flowName || flow.name || "Fluxo sem nome"}
-                    </div>
-                    <div className="text-xs text-gray-500 mb-1">
-                      Código: {flow.flowCode || flow.code || "N/A"}
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        flow.status === "completed" 
-                          ? "bg-green-100 text-green-700" 
-                          : "bg-blue-100 text-blue-700"
-                      }`}>
-                        {flow.status === "completed" ? "Concluído" : "Em andamento"}
-                      </span>
-                      {flow.createdAt && (
-                        <span className="text-xs text-gray-400">
-                          {new Date(flow.createdAt).toLocaleDateString('pt-BR')}
+            {dropdown.flows.map((flow, index) => {
+              // Parse execution_data if it's a string
+              const executionData = typeof flow.executionData === 'string' 
+                ? JSON.parse(flow.executionData) 
+                : flow.executionData || {};
+              
+              return (
+                <div
+                  key={index}
+                  className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-b-0"
+                  onClick={() => {
+                    openFlowDiagramModal({
+                      flowTasks: flow.flowTasks || flow,
+                      document: { objeto: documentos.find(doc => doc.id === dropdown.documentId)?.objeto || "Documento" }
+                    });
+                    setDropdown(prev => ({ ...prev, isOpen: false }));
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="font-medium text-sm text-gray-900 mb-1">
+                        {executionData.flowName || flow.flowName || flow.name || "Fluxo sem nome"}
+                      </div>
+                      <div className="text-xs text-gray-500 mb-1">
+                        ID: {flow.id || "N/A"}
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          flow.status === "concluded" 
+                            ? "bg-green-100 text-green-700" 
+                            : flow.status === "initiated"
+                            ? "bg-blue-100 text-blue-700"
+                            : flow.status === "transfered"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : "bg-gray-100 text-gray-700"
+                        }`}>
+                          {flow.status === "concluded" ? "Concluído" : 
+                           flow.status === "initiated" ? "Em andamento" :
+                           flow.status === "transfered" ? "Transferido" : 
+                           flow.status}
                         </span>
-                      )}
+                        {flow.createdAt && (
+                          <span className="text-xs text-gray-400">
+                            {new Date(flow.createdAt).toLocaleDateString('pt-BR')}
+                          </span>
+                        )}
+                      </div>
                     </div>
+                    <Network className="h-4 w-4 text-purple-500" />
                   </div>
-                  <Network className="h-4 w-4 text-purple-500" />
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
