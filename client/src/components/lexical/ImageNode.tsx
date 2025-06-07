@@ -225,25 +225,119 @@ function ImageComponent({ node }: { node: ImageNode }) {
     };
   }, [editor, node, isSelected]);
 
+  const handleResize = useCallback((scale: number) => {
+    editor.update(() => {
+      // Se as dimensões são 'inherit', vamos obter as dimensões naturais da imagem
+      if (node.__width === 'inherit' || node.__height === 'inherit') {
+        // Para imagens com inherit, usar proporções padrão 4:3
+        const baseWidth = 300;
+        const baseHeight = 225; // 300 * 3/4 para manter proporção 4:3
+        
+        const newWidth = Math.max(50, Math.min(800, baseWidth * scale));
+        const newHeight = Math.max(38, Math.min(600, baseHeight * scale)); // 38 = 50 * 3/4
+        
+        node.setWidthAndHeight(newWidth, newHeight);
+      } else {
+        // Para imagens com dimensões definidas, manter a proporção atual
+        const currentWidth = node.__width as number;
+        const currentHeight = node.__height as number;
+        const aspectRatio = currentWidth / currentHeight;
+        
+        const newWidth = Math.max(50, Math.min(800, currentWidth * scale));
+        const newHeight = Math.max(50, Math.min(600, newWidth / aspectRatio));
+        
+        node.setWidthAndHeight(newWidth, newHeight);
+      }
+    });
+  }, [editor, node]);
+
   return (
-    <img
-      src={node.getSrc()}
-      alt={node.getAltText()}
-      onClick={handleClick}
-      style={{
-        height: node.__height === 'inherit' ? 'inherit' : node.__height,
-        width: node.__width === 'inherit' ? 'inherit' : node.__width,
-        maxWidth: '100%',
-        borderRadius: '8px',
-        margin: '8px 0',
-        cursor: 'pointer',
-        border: isSelected ? '3px solid #3b82f6' : '3px solid transparent',
-        boxSizing: 'border-box',
-        transition: 'border-color 0.2s ease',
-      }}
-      className="lexical-image"
-      draggable="false"
-    />
+    <div style={{ position: 'relative', display: 'inline-block' }}>
+      <img
+        src={node.getSrc()}
+        alt={node.getAltText()}
+        onClick={handleClick}
+        style={{
+          height: node.__height === 'inherit' ? 'inherit' : node.__height,
+          width: node.__width === 'inherit' ? 'inherit' : node.__width,
+          maxWidth: '100%',
+          borderRadius: '8px',
+          margin: '8px 0',
+          cursor: 'pointer',
+          border: isSelected ? '3px solid #3b82f6' : '3px solid transparent',
+          boxSizing: 'border-box',
+          transition: 'border-color 0.2s ease',
+          display: 'block',
+        }}
+        className="lexical-image"
+        draggable="false"
+      />
+      
+      {isSelected && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '12px',
+            right: '12px',
+            display: 'flex',
+            gap: '4px',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            borderRadius: '6px',
+            padding: '4px',
+          }}
+        >
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleResize(0.8);
+            }}
+            style={{
+              background: '#ef4444',
+              border: 'none',
+              borderRadius: '4px',
+              color: 'white',
+              width: '24px',
+              height: '24px',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            title="Diminuir imagem"
+          >
+            −
+          </button>
+          
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleResize(1.25);
+            }}
+            style={{
+              background: '#22c55e',
+              border: 'none',
+              borderRadius: '4px',
+              color: 'white',
+              width: '24px',
+              height: '24px',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+            title="Aumentar imagem"
+          >
+            +
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
