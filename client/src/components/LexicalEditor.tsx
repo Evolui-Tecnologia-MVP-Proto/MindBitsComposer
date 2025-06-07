@@ -716,14 +716,20 @@ function convertToMarkdown(editorState: any): string {
         const metadataText = node.getMetadataText();
         const imageId = node.getImageId();
         
-        // Extract blob URL from metadata text
+        // Extract HTTPS URL from metadata text (for global assets)
+        const httpsUrlMatch = metadataText.match(/\[(https?:\/\/.*?)\]/);
+        const httpsUrl = httpsUrlMatch ? httpsUrlMatch[1] : '';
+        
+        // Extract blob URL from metadata text (for local uploads)
         const blobUrlMatch = metadataText.match(/\[blob:(.*?)\]/);
         const blobUrl = blobUrlMatch ? blobUrlMatch[1] : '';
         
-        if (blobUrl) {
+        if (httpsUrl) {
+          markdown += `![${imageId}](${httpsUrl})\n\n`;
+        } else if (blobUrl) {
           markdown += `![${imageId}](blob:${blobUrl})\n\n`;
         } else {
-          // Fallback to original src if no blob URL found
+          // Fallback to original src if no URL found in metadata
           const src = node.getSrc();
           markdown += `![${imageId}](${src})\n\n`;
         }
@@ -801,14 +807,20 @@ function convertToMarkdown(editorState: any): string {
                 const metadataText = contentChild.getMetadataText();
                 const imageId = contentChild.getImageId();
                 
-                // Extract blob URL from metadata text
+                // Extract HTTPS URL from metadata text (for global assets)
+                const httpsUrlMatch = metadataText.match(/\[(https?:\/\/.*?)\]/);
+                const httpsUrl = httpsUrlMatch ? httpsUrlMatch[1] : '';
+                
+                // Extract blob URL from metadata text (for local uploads)
                 const blobUrlMatch = metadataText.match(/\[blob:(.*?)\]/);
                 const blobUrl = blobUrlMatch ? blobUrlMatch[1] : '';
                 
-                if (blobUrl) {
+                if (httpsUrl) {
+                  markdown += `![${imageId}](${httpsUrl})\n\n`;
+                } else if (blobUrl) {
                   markdown += `![${imageId}](blob:${blobUrl})\n\n`;
                 } else {
-                  // Fallback to original src if no blob URL found
+                  // Fallback to original src if no URL found in metadata
                   const src = contentChild.getSrc();
                   markdown += `![${imageId}](${src})\n\n`;
                 }
