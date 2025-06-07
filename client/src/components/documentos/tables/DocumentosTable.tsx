@@ -540,10 +540,7 @@ export function DocumentosTable({
                   key={index}
                   className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-b-0"
                   onClick={() => {
-                    openFlowDiagramModal({
-                      flowTasks: flow.flowTasks || flow,
-                      document: { objeto: documentos.find(doc => doc.id === dropdown.documentId)?.objeto || "Documento" }
-                    });
+                    openFlowDiagramModal(flow);
                     setDropdown(prev => ({ ...prev, isOpen: false }));
                   }}
                 >
