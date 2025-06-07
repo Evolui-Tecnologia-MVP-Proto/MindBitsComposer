@@ -833,6 +833,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <HistoryPlugin />
           <ListPlugin />
           <TablePlugin />
+          <TableSelectionPlugin />
           <CollapsiblePlugin />
           <ImagePlugin />
           <ImageEventListenerPlugin />
