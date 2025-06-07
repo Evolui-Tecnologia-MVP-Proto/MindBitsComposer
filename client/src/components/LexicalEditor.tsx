@@ -1195,7 +1195,26 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       // Gerar markdown em tempo real
       const markdown = convertToMarkdown(editorState);
       console.log('Markdown gerado:', markdown);
-      console.log('Children no root:', children.map(child => ({ type: child.getType(), text: child.getTextContent() })));
+      console.log('Children no root:', children.map(child => ({ 
+        type: child.getType(), 
+        text: child.getTextContent(),
+        hasChildren: (child as any).getChildren ? (child as any).getChildren().length : 0,
+        childrenTypes: (child as any).getChildren ? (child as any).getChildren().map((c: any) => c.getType()) : []
+      })));
+      
+      // Debug específico para parágrafos
+      children.forEach((child: any) => {
+        if (child.getType() === 'paragraph') {
+          const paragraphChildren = child.getChildren();
+          console.log('Paragraph children:', paragraphChildren.map((pc: any) => ({
+            type: pc.getType(),
+            text: pc.getTextContent(),
+            metadataText: pc.getMetadataText ? pc.getMetadataText() : 'N/A',
+            imageId: pc.getImageId ? pc.getImageId() : 'N/A',
+            src: pc.getSrc ? pc.getSrc() : 'N/A'
+          })));
+        }
+      });
       setMarkdownContent(markdown);
       
       if (onChange) {
