@@ -540,11 +540,14 @@ export function DocumentosTable({
       {/* Dropdown de fluxos na posição do mouse */}
       {dropdown.isOpen && (
         <div
-          className="fixed z-50 bg-white border border-gray-200 rounded-lg shadow-lg min-w-[250px] max-w-[400px]"
+          className="fixed bg-white border border-gray-200 rounded-lg shadow-xl min-w-[250px] max-w-[400px]"
           style={{
-            left: dropdown.position.x,
-            top: dropdown.position.y,
+            left: Math.max(10, dropdown.position.x - 125),
+            top: dropdown.position.y + 10,
+            zIndex: 99999,
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
           }}
+          onClick={(e) => e.stopPropagation()}
         >
           <div className="p-3 border-b border-gray-100">
             <h3 className="font-medium text-sm text-gray-900">Fluxos Associados</h3>
