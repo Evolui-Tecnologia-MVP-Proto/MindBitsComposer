@@ -8,6 +8,7 @@ import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, 
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
+import { useConfirmationToast } from "@/hooks/use-confirmation-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Link } from "wouter";
@@ -69,6 +70,7 @@ export default function LexicalPage() {
   const [editorKey, setEditorKey] = useState<number>(0); // Chave para forçar re-render do editor
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const { toast } = useToast();
+  const { showConfirmation } = useConfirmationToast();
 
   // Função para obter ícone baseado no tipo de arquivo
   const getFileIcon = (mimeType: string | undefined, isImage: string | undefined) => {
@@ -375,12 +377,19 @@ export default function LexicalPage() {
   };
 
   const handleDeleteDocument = (id: string) => {
-    if (confirm("Tem certeza que deseja excluir este documento?")) {
-      deleteMutation.mutate(id);
-      if (currentDocumentId === id) {
-        handleNewDocument();
-      }
-    }
+    showConfirmation({
+      title: "Excluir Documento",
+      description: "Tem certeza que deseja excluir este documento? Esta ação não pode ser desfeita.",
+      onConfirm: () => {
+        deleteMutation.mutate(id);
+        if (currentDocumentId === id) {
+          handleNewDocument();
+        }
+      },
+      confirmText: "Excluir",
+      cancelText: "Cancelar",
+      variant: "destructive"
+    });
   };
 
   const handleClear = () => {
@@ -433,26 +442,33 @@ export default function LexicalPage() {
 
   // Função para descartar e limpar o editor
   const handleDiscard = () => {
-    if (confirm("Tem certeza que deseja descartar todas as alterações? Esta ação não pode ser desfeita.")) {
-      // Limpar todo o estado do editor
-      setContent('');
-      setTitle('Documento sem título');
-      setEditorState('');
-      setInitialEditorState(undefined);
-      
-      // Desassociar template e documento
-      setSelectedTemplate(null);
-      setSelectedEdition(null);
-      setCurrentDocumentId(null);
-      
-      // Forçar re-render do editor
-      setEditorKey(prev => prev + 1);
-      
-      toast({
-        title: "Editor limpo",
-        description: "O editor foi limpo e está pronto para uma nova edição.",
-      });
-    }
+    showConfirmation({
+      title: "Descartar Alterações",
+      description: "Tem certeza que deseja descartar todas as alterações? Esta ação não pode ser desfeita.",
+      onConfirm: () => {
+        // Limpar todo o estado do editor
+        setContent('');
+        setTitle('Documento sem título');
+        setEditorState('');
+        setInitialEditorState(undefined);
+        
+        // Desassociar template e documento
+        setSelectedTemplate(null);
+        setSelectedEdition(null);
+        setCurrentDocumentId(null);
+        
+        // Forçar re-render do editor
+        setEditorKey(prev => prev + 1);
+        
+        toast({
+          title: "Editor limpo",
+          description: "O editor foi limpo e está pronto para uma nova edição.",
+        });
+      },
+      confirmText: "Descartar",
+      cancelText: "Cancelar",
+      variant: "destructive"
+    });
   };
 
   return (
