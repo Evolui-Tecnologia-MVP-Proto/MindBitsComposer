@@ -470,26 +470,25 @@ export default function LexicalPage() {
   // Função para inserir imagem global no editor
   const handleInsertGlobalImage = (asset: GlobalAsset) => {
     try {
-      if (asset.fileData && asset.mimeType) {
-        const imageUrl = `data:${asset.mimeType};base64,${asset.fileData}`;
-        
-        // Criar evento customizado para inserir imagem
-        const insertImageEvent = new CustomEvent('insertImage', {
-          detail: {
-            src: imageUrl,
-            altText: asset.name || 'Imagem',
-            artifactId: asset.id, // Usar o ID do global asset
-          }
-        });
-        
-        // Disparar evento para o editor
-        window.dispatchEvent(insertImageEvent);
-        
-        toast({
-          title: "Imagem inserida",
-          description: `A imagem "${asset.name}" foi inserida no documento.`,
-        });
-      }
+      // Use the public URL instead of base64 data URL
+      const imageUrl = `/api/public/images/${asset.id}`;
+      
+      // Criar evento customizado para inserir imagem
+      const insertImageEvent = new CustomEvent('insertImage', {
+        detail: {
+          src: imageUrl,
+          altText: asset.name || 'Imagem',
+          artifactId: asset.id, // Usar o ID do global asset
+        }
+      });
+      
+      // Disparar evento para o editor
+      window.dispatchEvent(insertImageEvent);
+      
+      toast({
+        title: "Imagem inserida",
+        description: `A imagem "${asset.name}" foi inserida no documento.`,
+      });
     } catch (error) {
       toast({
         title: "Erro ao inserir imagem",
