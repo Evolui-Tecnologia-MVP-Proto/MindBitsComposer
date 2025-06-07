@@ -368,6 +368,42 @@ export default function LexicalPage() {
     }
   });
 
+  // Mutation para upload de global asset
+  const uploadGlobalAssetMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('name', file.name);
+      formData.append('description', '');
+      formData.append('tags', '');
+
+      const response = await fetch('/api/global-assets', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao fazer upload do asset global');
+      }
+
+      return response.json();
+    },
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ['/api/global-assets'] });
+      toast({
+        title: "Asset global carregado",
+        description: `"${data.name}" foi adicionado aos assets globais.`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao carregar asset global",
+        description: error.message || "Ocorreu um erro ao fazer upload do asset global.",
+        variant: "destructive",
+      });
+    }
+  });
+
   // Função para abrir o seletor de arquivos
   const handleFileUpload = () => {
     if (!selectedEdition) {
@@ -404,6 +440,99 @@ export default function LexicalPage() {
     // Limpar input para permitir selecionar o mesmo arquivo novamente
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  // Função para abrir o seletor de arquivos globais
+  const handleGlobalFileUpload = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '*/*';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        // Verificar tamanho do arquivo (limite de 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+          toast({
+            title: "Arquivo muito grande",
+            description: "O arquivo deve ter no máximo 10MB.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        uploadGlobalAssetMutation.mutate(file);
+      }
+    };
+    input.click();
+  };
+
+  // Função para inserir imagem global no editor
+  const handleInsertGlobalImage = (asset: GlobalAsset) => {
+    try {
+      if (asset.fileData && asset.mimeType) {
+        const imageUrl = `data:${asset.mimeType};base64,${asset.fileData}`;
+        
+        // Criar evento customizado para inserir imagem
+        const insertImageEvent = new CustomEvent('insertImage', {
+          detail: {
+            src: imageUrl,
+            altText: asset.name || 'Imagem',
+            artifactId: asset.id, // Usar o ID do global asset
+          }
+        });
+        
+        // Disparar evento para o editor
+        window.dispatchEvent(insertImageEvent);
+        
+        toast({
+          title: "Imagem inserida",
+          description: `A imagem "${asset.name}" foi inserida no documento.`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro ao inserir imagem",
+        description: "Não foi possível inserir a imagem no documento.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Função para baixar arquivo global
+  const handleDownloadGlobalFile = (asset: GlobalAsset) => {
+    try {
+      if (asset.fileData && asset.mimeType) {
+        // Criar blob a partir do base64
+        const byteCharacters = atob(asset.fileData);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: asset.mimeType });
+
+        // Criar link de download
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = asset.fileName || asset.name || 'arquivo';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+
+        toast({
+          title: "Download iniciado",
+          description: `Download de "${asset.name}" foi iniciado.`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro no download",
+        description: "Não foi possível baixar o arquivo.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -1038,6 +1167,118 @@ export default function LexicalPage() {
                               </div>
                             );
                           })}
+                        </div>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
+                {/* Global Assets */}
+                <AccordionItem value="global-assets" className="border rounded-lg bg-white">
+                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      <span className="font-medium">Global</span>
+                      <Badge variant="secondary" className="ml-auto">
+                        {globalAssets.length}
+                      </Badge>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4">
+                    <div className="space-y-2">
+                      <Button 
+                        className="w-full"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleGlobalFileUpload}
+                        disabled={uploadGlobalAssetMutation.isPending}
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        {uploadGlobalAssetMutation.isPending ? "Carregando..." : "Adicionar Asset Global"}
+                      </Button>
+                      {isLoadingGlobalAssets ? (
+                        <div className="text-center py-4">
+                          <p className="text-sm text-gray-400">Carregando...</p>
+                        </div>
+                      ) : globalAssets.length === 0 ? (
+                        <div className="text-center py-4">
+                          <p className="text-sm text-gray-400">
+                            Nenhum asset global encontrado
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {globalAssets.map((asset: GlobalAsset) => (
+                            <div 
+                              key={asset.id}
+                              className="p-3 bg-gray-50 rounded-lg border"
+                            >
+                              {/* Botões de ação no topo */}
+                              <div className="flex justify-end mb-3">
+                                {asset.isImage === 'true' ? (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs px-2 py-1 h-7"
+                                    onClick={() => handleInsertGlobalImage(asset)}
+                                    title="Inserir imagem no documento"
+                                  >
+                                    <Image className="w-3 h-3 mr-1" />
+                                    Inserir
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs px-2 py-1 h-7"
+                                    onClick={() => handleDownloadGlobalFile(asset)}
+                                    title="Baixar arquivo"
+                                  >
+                                    <Download className="w-3 h-3 mr-1" />
+                                    Baixar
+                                  </Button>
+                                )}
+                              </div>
+                              
+                              {/* Conteúdo do card */}
+                              <div className="flex items-center gap-3">
+                                {/* Miniatura ou ícone */}
+                                {asset.isImage === "true" && asset.fileData ? (
+                                  <img 
+                                    src={`data:${asset.mimeType};base64,${asset.fileData}`} 
+                                    alt={asset.name}
+                                    className="w-12 h-12 object-cover rounded border"
+                                  />
+                                ) : (
+                                  <div className="w-12 h-12 bg-gray-100 rounded border flex items-center justify-center">
+                                    {getFileIcon(asset.mimeType, asset.isImage)}
+                                  </div>
+                                )}
+                                
+                                {/* Informações do arquivo */}
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium truncate" title={asset.name}>
+                                    {asset.name}
+                                  </p>
+                                  <div className="flex items-center gap-2 mt-2">
+                                    <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                                      Global
+                                    </Badge>
+                                    {asset.fileSize && (
+                                      <span className="text-xs text-gray-500">
+                                        {Math.round(parseInt(asset.fileSize) / 1024)} KB
+                                      </span>
+                                    )}
+                                  </div>
+                                  {asset.description && (
+                                    <p className="text-xs text-gray-600 mt-1 truncate">
+                                      {asset.description}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       )}
                     </div>
