@@ -4637,9 +4637,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Route to serve global asset images (for display in editor)
   app.get("/api/public/images/:id", async (req: Request, res: Response) => {
     try {
+      console.log(`Buscando imagem com ID: ${req.params.id}`);
+      
       // First try to get as global asset
       const globalAsset = await storage.getGlobalAsset(req.params.id);
+      console.log(`Global asset encontrado:`, globalAsset ? 'SIM' : 'NÃO');
+      
       if (globalAsset && globalAsset.isImage === 'true') {
+        console.log(`Servindo global asset: ${globalAsset.name}`);
         const fileBuffer = Buffer.from(globalAsset.fileData, 'base64');
         res.setHeader('Content-Type', globalAsset.mimeType);
         res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
@@ -4647,14 +4652,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // If not found as global asset, try as document artifact
+      console.log(`Tentando buscar como artifact de documento...`);
       const artifact = await storage.getDocumentArtifact(req.params.id);
+      console.log(`Artifact encontrado:`, artifact ? 'SIM' : 'NÃO');
+      
       if (artifact && artifact.isImage === 'true') {
+        console.log(`Servindo artifact: ${artifact.name}`);
         const fileBuffer = Buffer.from(artifact.fileData, 'base64');
         res.setHeader('Content-Type', artifact.mimeType);
         res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
         return res.send(fileBuffer);
       }
 
+      console.log(`Imagem não encontrada para ID: ${req.params.id}`);
       res.status(404).send("Imagem não encontrada");
     } catch (error) {
       console.error("Erro ao servir imagem:", error);
