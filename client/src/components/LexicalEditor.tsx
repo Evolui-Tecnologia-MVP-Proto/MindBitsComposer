@@ -644,6 +644,7 @@ interface LexicalEditorProps {
   content?: string;
   onChange?: (content: string) => void;
   onEditorStateChange?: (serializedState: string) => void;
+  onContentStatusChange?: (hasContent: boolean) => void;
   className?: string;
   templateSections?: string[];
   viewMode?: 'editor' | 'preview';
@@ -850,7 +851,7 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
 }
 
 // Componente principal do editor Lexical completo
-export default function LexicalEditor({ content = '', onChange, onEditorStateChange, className = '', templateSections, viewMode = 'editor', initialEditorState }: LexicalEditorProps): JSX.Element {
+export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, className = '', templateSections, viewMode = 'editor', initialEditorState }: LexicalEditorProps): JSX.Element {
   const [markdownContent, setMarkdownContent] = useState('');
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [tableRows, setTableRows] = useState(2);
@@ -979,6 +980,21 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
     editorState.read(() => {
       const root = $getRoot();
       const textContent = root.getTextContent();
+      const children = root.getChildren();
+      
+      // Verificar se há conteúdo real (não apenas parágrafos vazios)
+      const hasRealContent = children.some(child => {
+        if (child.getType() === 'paragraph') {
+          return child.getTextContent().trim().length > 0;
+        }
+        // Outros tipos de nós (tabelas, imagens, etc.) sempre contam como conteúdo
+        return child.getType() !== 'paragraph';
+      });
+      
+      // Notificar mudança de status de conteúdo
+      if (onContentStatusChange) {
+        onContentStatusChange(hasRealContent);
+      }
       
       // Gerar markdown em tempo real
       const markdown = convertToMarkdown(editorState);

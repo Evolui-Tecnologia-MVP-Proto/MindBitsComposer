@@ -69,6 +69,7 @@ export default function LexicalPage() {
   const [initialEditorState, setInitialEditorState] = useState<string | undefined>(undefined);
   const [editorKey, setEditorKey] = useState<number>(0); // Chave para forçar re-render do editor
   const [editorInstance, setEditorInstance] = useState<any>(null);
+  const [hasEditorContent, setHasEditorContent] = useState(false); // Estado para controlar se há conteúdo no editor
   const { toast } = useToast();
   const { showConfirmation } = useConfirmationToast();
 
@@ -693,7 +694,7 @@ export default function LexicalPage() {
             <Card className="h-full">
               <CardContent className="p-0 h-full relative overflow-hidden">
                 {/* Placeholder quando não há conteúdo nem template selecionado */}
-                {(!content || content.trim() === '') && !selectedTemplate && !selectedEdition && viewMode === 'editor' && (
+                {!hasEditorContent && (!content || content.trim() === '') && !selectedTemplate && !selectedEdition && viewMode === 'editor' && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 pointer-events-none">
                     <PenTool className="w-[100px] h-[100px] mb-4 opacity-20" />
                     <p className="text-lg font-medium text-center">Selecione um documento ou template para iniciar...</p>
@@ -704,6 +705,7 @@ export default function LexicalPage() {
                   content={content}
                   onChange={setContent}
                   onEditorStateChange={setEditorState}
+                  onContentStatusChange={setHasEditorContent}
                   className="h-full"
                   templateSections={selectedTemplate ? extractTemplateSections(selectedTemplate) : undefined}
                   viewMode={viewMode}
