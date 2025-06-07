@@ -606,8 +606,36 @@ function ToolbarPlugin({
 
 // Componente placeholder
 function Placeholder(): JSX.Element {
+  const [editor] = useLexicalComposerContext();
+  const [hasContent, setHasContent] = useState(false);
+
+  useEffect(() => {
+    return editor.registerUpdateListener(({ editorState }) => {
+      editorState.read(() => {
+        const root = $getRoot();
+        const children = root.getChildren();
+        
+        // Verifica se há conteúdo real (não apenas parágrafos vazios)
+        const hasRealContent = children.some(child => {
+          if (child.getType() === 'paragraph') {
+            return child.getTextContent().trim().length > 0;
+          }
+          // Outros tipos de nós (tabelas, imagens, etc.) sempre contam como conteúdo
+          return child.getType() !== 'paragraph';
+        });
+        
+        setHasContent(hasRealContent);
+      });
+    });
+  }, [editor]);
+
+  if (hasContent) {
+    return null;
+  }
+
   return (
     <div className="editor-placeholder absolute top-4 left-4 text-gray-400 pointer-events-none">
+      Comece a escrever ou insira uma tabela...
     </div>
   );
 }
