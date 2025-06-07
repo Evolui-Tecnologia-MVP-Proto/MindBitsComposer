@@ -228,6 +228,9 @@ function ToolbarPlugin(): JSX.Element {
       const selection = $getSelection();
       if (!$isRangeSelection(selection)) return;
 
+      // Criar parágrafo vazio antes da tabela
+      const paragraphBefore = $createParagraphNode();
+      
       const tableNode = $createTableNode();
 
       // Criar 2 linhas com 3 colunas cada
@@ -244,8 +247,11 @@ function ToolbarPlugin(): JSX.Element {
         tableNode.append(rowNode);
       }
 
-      // Inserir tabela na posição do cursor usando insertNodes
-      $insertNodes([tableNode]);
+      // Criar parágrafo vazio depois da tabela
+      const paragraphAfter = $createParagraphNode();
+
+      // Inserir parágrafo, tabela e parágrafo na posição do cursor
+      $insertNodes([paragraphBefore, tableNode, paragraphAfter]);
     });
   };
 
