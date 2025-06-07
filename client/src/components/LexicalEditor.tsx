@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { $getRoot, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, type TextFormatType, $createParagraphNode, $createTextNode, $insertNodes, $isParagraphNode } from 'lexical';
+import { $getRoot, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, type TextFormatType, $createParagraphNode, $createTextNode, $insertNodes, $isParagraphNode, UNDO_COMMAND, REDO_COMMAND } from 'lexical';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
@@ -51,7 +51,9 @@ import {
   ChevronDown,
   Trash2,
   Eye,
-  Edit
+  Edit,
+  Undo,
+  Redo
 } from "lucide-react";
 
 // Tema simplificado para o Lexical
@@ -402,6 +404,31 @@ function ToolbarPlugin({
 
   return (
     <div className="flex items-center gap-1 p-3 border-b bg-gray-50">
+      {/* Undo/Redo buttons */}
+      <div className="flex items-center gap-1 mr-3">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 px-2 text-xs hover:bg-gray-100"
+          title="Desfazer (Ctrl+Z)"
+          onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
+        >
+          <Undo className="w-4 h-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 px-2 text-xs hover:bg-gray-100"
+          title="Refazer (Ctrl+Y)"
+          onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
+        >
+          <Redo className="w-4 h-4" />
+        </Button>
+      </div>
+      
+      <Separator orientation="vertical" className="h-6 mx-1" />
+      
+      {/* Text formatting buttons */}
       <div className="flex items-center gap-1 mr-3">
         <Button
           variant={isBold ? "default" : "ghost"}
