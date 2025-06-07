@@ -92,10 +92,12 @@ export function DocumentosTable({
 
   // Função para obter todos os fluxos de um documento
   const getDocumentFlows = (documentId: string) => {
-    return flowExecutions.filter(execution => 
+    const flows = flowExecutions.filter(execution => 
       execution.documentId === documentId && 
       (execution.status === "completed" || execution.status === "initiated")
     );
+    console.log("🔴 DROPDOWN: getDocumentFlows para", documentId, "encontrou:", flows);
+    return flows;
   };
 
   const handleFlowButtonClick = (evento: React.MouseEvent, documento: Documento) => {
