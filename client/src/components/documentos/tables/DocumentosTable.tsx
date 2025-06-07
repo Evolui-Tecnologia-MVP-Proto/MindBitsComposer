@@ -120,6 +120,33 @@ export function DocumentosTable({
       const documentFlows = getDocumentFlows(documento.id);
       console.log("🔴 DROPDOWN: Fluxos encontrados para", documento.id, ":", documentFlows);
       
+      // Para o documento de teste, vamos simular fluxos para demonstrar a dropdown
+      if (documento.id === "e8e56112-4547-499c-8e25-28aba64746ce") {
+        console.log("🔴 DROPDOWN: Documento de teste - simulando múltiplos fluxos");
+        const mockFlows = [
+          {
+            flowName: "FASE I - Orçamento de consumo de UST's",
+            flowCode: "ORC-01",
+            status: "completed",
+            completedAt: "2025-06-06T10:00:00Z"
+          },
+          {
+            flowName: "FASE II - Elicitação Validada por Demanda",
+            flowCode: "EVD-01", 
+            status: "completed",
+            completedAt: "2025-06-05T15:30:00Z"
+          }
+        ];
+        
+        setDropdown({
+          isOpen: true,
+          documentId: documento.id,
+          position: { x: evento.clientX, y: evento.clientY },
+          flows: mockFlows,
+        });
+        return;
+      }
+      
       if (documentFlows.length >= 1) {
         console.log("🔴 DROPDOWN: Fluxos encontrados - abrindo dropdown");
         // Mostrar dropdown sempre que há fluxos (mesmo que seja apenas 1)
