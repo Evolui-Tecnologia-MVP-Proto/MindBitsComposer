@@ -102,10 +102,16 @@ export function DocumentosTable({
     evento.preventDefault();
     evento.stopPropagation();
 
+    console.log("🔴 DROPDOWN: Botão clicado para documento:", documento.objeto);
+    console.log("🔴 DROPDOWN: activeTab:", activeTab);
+    console.log("🔴 DROPDOWN: flowExecutions total:", flowExecutions.length);
+
     if (activeTab === "concluidos") {
       const documentFlows = getDocumentFlows(documento.id);
+      console.log("🔴 DROPDOWN: Fluxos encontrados para", documento.id, ":", documentFlows);
       
       if (documentFlows.length > 1) {
+        console.log("🔴 DROPDOWN: Múltiplos fluxos - abrindo dropdown");
         // Múltiplos fluxos - mostrar dropdown
         setDropdown({
           isOpen: true,
@@ -114,13 +120,25 @@ export function DocumentosTable({
           flows: documentFlows,
         });
       } else if (documentFlows.length === 1) {
+        console.log("🔴 DROPDOWN: Um fluxo - abrindo diretamente");
         // Um único fluxo - abrir diretamente
         openFlowDiagramModal({
           flowTasks: documentFlows[0],
           document: { objeto: documento.objeto }
         });
       } else {
-        console.log("Nenhum fluxo encontrado para:", documento.id);
+        console.log("🔴 DROPDOWN: Nenhum fluxo encontrado - tentando método alternativo");
+        // Fallback para o método original
+        const flowToShow = getConcludedFlow(documento.id);
+        if (flowToShow) {
+          console.log("🔴 DROPDOWN: Fluxo encontrado via getConcludedFlow");
+          openFlowDiagramModal({
+            flowTasks: flowToShow,
+            document: { objeto: documento.objeto }
+          });
+        } else {
+          console.log("🔴 DROPDOWN: Nenhum fluxo encontrado para:", documento.id);
+        }
       }
     } else {
       // Comportamento original para outras abas
