@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool, Eye, Edit, File, Image, Video, FileAudio } from "lucide-react";
+import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool, Eye, Edit, File, Image, Video, FileAudio, FileCode2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
@@ -500,7 +500,7 @@ export default function LexicalPage() {
                   className={viewMode === 'preview' ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
                   title="Visualizar Markdown"
                 >
-                  <Eye className={`w-4 h-4 ${viewMode === 'preview' ? "text-white" : ""}`} />
+                  <FileCode2 className={`w-4 h-4 ${viewMode === 'preview' ? "text-white" : ""}`} />
                 </Button>
               </div>
             </div>
