@@ -99,7 +99,7 @@ function ImageEventListenerPlugin(): JSX.Element | null {
 
   useEffect(() => {
     const handleInsertImage = (event: CustomEvent) => {
-      const { src, altText } = event.detail;
+      const { src, altText, artifactId } = event.detail;
       
       editor.update(() => {
         const selection = $getSelection();
@@ -107,26 +107,14 @@ function ImageEventListenerPlugin(): JSX.Element | null {
           // Gerar ID único para a imagem
           const imageId = Math.floor(Math.random() * 10000000000).toString();
           
-          // Criar URL blob acessível para navegadores externos
-          let displayUrl = src;
-          if (src.startsWith('data:')) {
-            try {
-              // Converter data URL para blob
-              const byteString = atob(src.split(',')[1]);
-              const mimeString = src.split(',')[0].split(':')[1].split(';')[0];
-              const ab = new ArrayBuffer(byteString.length);
-              const ia = new Uint8Array(ab);
-              for (let i = 0; i < byteString.length; i++) {
-                ia[i] = byteString.charCodeAt(i);
-              }
-              const blob = new Blob([ab], { type: mimeString });
-              displayUrl = URL.createObjectURL(blob);
-            } catch (error) {
-              displayUrl = `blob:${window.location.origin}/${imageId}`;
-            }
+          // Criar URL HTTPS pública usando o artifact ID
+          let httpsUrl = src;
+          if (artifactId) {
+            // Gerar URL pública que funciona externamente
+            httpsUrl = `${window.location.origin}/api/public/images/${artifactId}`;
           }
           
-          const metadataText = `[image_id: ${imageId}] - [${displayUrl}]`;
+          const metadataText = `[image_id: ${imageId}] - [${httpsUrl}]`;
           
           // Criar nó de imagem com metadata (oculto no editor)
           const imageWithMetadataPayload: ImageWithMetadataPayload = {
@@ -805,14 +793,14 @@ function convertToMarkdown(editorState: any): string {
                     const metadataText = pChild.getMetadataText();
                     const imageId = pChild.getImageId();
                     
-                    // Extract blob URL from metadata text
-                    const blobUrlMatch = metadataText.match(/\[blob:(.*?)\]/);
-                    const blobUrl = blobUrlMatch ? blobUrlMatch[1] : '';
+                    // Extract HTTPS URL from metadata text
+                    const httpsUrlMatch = metadataText.match(/\[(https?:\/\/.*?)\]/);
+                    const httpsUrl = httpsUrlMatch ? httpsUrlMatch[1] : '';
                     
-                    if (blobUrl) {
-                      markdown += `![${imageId}](blob:${blobUrl})\n\n`;
+                    if (httpsUrl) {
+                      markdown += `![${imageId}](${httpsUrl})\n\n`;
                     } else {
-                      // Fallback to original src if no blob URL found
+                      // Fallback to original src if no HTTPS URL found
                       const src = pChild.getSrc();
                       markdown += `![${imageId}](${src})\n\n`;
                     }

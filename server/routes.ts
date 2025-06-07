@@ -3686,6 +3686,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota pública para servir imagens dos artifacts (sem autenticação)
+  app.get("/api/public/images/:artifactId", async (req: Request, res: Response) => {
+    try {
+      const { artifactId } = req.params;
+      
+      // Buscar o artifact no banco
+      const artifact = await storage.getDocumentArtifact(artifactId);
+      
+      if (!artifact) {
+        return res.status(404).json({ error: "Imagem não encontrada" });
+      }
+
+      if (!artifact.fileData) {
+        return res.status(404).json({ error: "Dados da imagem não encontrados" });
+      }
+
+      // Verificar se é realmente uma imagem
+      const mimeType = artifact.mimeType || '';
+      if (!mimeType.startsWith('image/')) {
+        return res.status(400).json({ error: "Arquivo não é uma imagem" });
+      }
+
+      // Decodificar base64
+      const fileBuffer = Buffer.from(artifact.fileData, 'base64');
+      
+      // Definir headers apropriados para imagens públicas
+      res.set({
+        'Content-Type': mimeType,
+        'Content-Length': fileBuffer.length.toString(),
+        'Cache-Control': 'public, max-age=31536000', // Cache por 1 ano
+        'Access-Control-Allow-Origin': '*', // Permitir CORS para uso externo
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      });
+
+      res.send(fileBuffer);
+    } catch (error) {
+      console.error("Erro ao servir imagem pública:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   // Endpoint para buscar colunas da tabela documentos dinamicamente
   app.get("/api/documentos-columns", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
