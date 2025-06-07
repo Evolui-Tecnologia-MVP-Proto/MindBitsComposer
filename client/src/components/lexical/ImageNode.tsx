@@ -165,6 +165,7 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
 function ImageComponent({ node }: { node: ImageNode }) {
   const [editor] = useLexicalComposerContext();
   const [isSelected, setIsSelected] = useState(false);
+  const [naturalDimensions, setNaturalDimensions] = useState<{ width: number; height: number } | null>(null);
 
   const handleClick = useCallback((event: React.MouseEvent) => {
     event.preventDefault();
@@ -227,29 +228,36 @@ function ImageComponent({ node }: { node: ImageNode }) {
 
   const handleResize = useCallback((scale: number) => {
     editor.update(() => {
-      // Se as dimensões são 'inherit', vamos obter as dimensões naturais da imagem
-      if (node.__width === 'inherit' || node.__height === 'inherit') {
-        // Para imagens com inherit, usar proporções padrão 4:3
-        const baseWidth = 300;
-        const baseHeight = 225; // 300 * 3/4 para manter proporção 4:3
-        
-        const newWidth = Math.max(50, Math.min(800, baseWidth * scale));
-        const newHeight = Math.max(38, Math.min(600, baseHeight * scale)); // 38 = 50 * 3/4
-        
-        node.setWidthAndHeight(newWidth, newHeight);
-      } else {
-        // Para imagens com dimensões definidas, manter a proporção atual
-        const currentWidth = node.__width as number;
-        const currentHeight = node.__height as number;
-        const aspectRatio = currentWidth / currentHeight;
-        
-        const newWidth = Math.max(50, Math.min(800, currentWidth * scale));
-        const newHeight = Math.max(50, Math.min(600, newWidth / aspectRatio));
-        
-        node.setWidthAndHeight(newWidth, newHeight);
+      let aspectRatio = 1; // Default fallback
+
+      // Usar dimensões naturais se disponíveis
+      if (naturalDimensions) {
+        aspectRatio = naturalDimensions.width / naturalDimensions.height;
+      } else if (node.__width !== 'inherit' && node.__height !== 'inherit') {
+        // Usar dimensões atuais se definidas
+        aspectRatio = (node.__width as number) / (node.__height as number);
       }
+
+      // Calcular novas dimensões baseadas na escala e proporção
+      const currentWidth = node.__width === 'inherit' ? 
+        (naturalDimensions?.width || 300) : 
+        (node.__width as number);
+      
+      const newWidth = Math.max(50, Math.min(800, currentWidth * scale));
+      const newHeight = Math.max(50, Math.min(600, newWidth / aspectRatio));
+      
+      console.log('Resizing image:', {
+        currentWidth,
+        newWidth,
+        newHeight,
+        aspectRatio,
+        naturalDimensions,
+        scale
+      });
+      
+      node.setWidthAndHeight(newWidth, newHeight);
     });
-  }, [editor, node]);
+  }, [editor, node, naturalDimensions]);
 
   return (
     <div style={{ position: 'relative', display: 'inline-block' }}>
@@ -257,6 +265,17 @@ function ImageComponent({ node }: { node: ImageNode }) {
         src={node.getSrc()}
         alt={node.getAltText()}
         onClick={handleClick}
+        onLoad={(e) => {
+          const img = e.target as HTMLImageElement;
+          setNaturalDimensions({
+            width: img.naturalWidth,
+            height: img.naturalHeight
+          });
+          console.log('Image loaded, natural dimensions:', {
+            width: img.naturalWidth,
+            height: img.naturalHeight
+          });
+        }}
         style={{
           height: node.__height === 'inherit' ? 'inherit' : node.__height,
           width: node.__width === 'inherit' ? 'inherit' : node.__width,
