@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import LexicalEditor from "@/components/LexicalEditor";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -72,6 +72,7 @@ export default function LexicalPage() {
   const [hasEditorContent, setHasEditorContent] = useState(false); // Estado para controlar se há conteúdo no editor
   const { toast } = useToast();
   const { showConfirmation } = useConfirmationToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Função para obter ícone baseado no tipo de arquivo
   const getFileIcon = (mimeType: string | undefined, isImage: string | undefined) => {
@@ -289,6 +290,100 @@ export default function LexicalPage() {
       });
     }
   });
+
+  // Mutation para upload de arquivo
+  const uploadFileMutation = useMutation({
+    mutationFn: async (file: File) => {
+      if (!selectedEdition) {
+        throw new Error("Nenhum documento selecionado");
+      }
+
+      // Converter arquivo para base64
+      const base64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          // Remover o prefixo data:type;base64,
+          const base64Data = result.split(',')[1];
+          resolve(base64Data);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      // Criar artifact com arquivo uploadado
+      const artifactData = {
+        documentoId: selectedEdition.documentId,
+        name: file.name,
+        fileName: file.name,
+        fileData: base64,
+        fileSize: file.size.toString(),
+        mimeType: file.type,
+        type: file.type,
+        originAssetId: "Uploaded", // Marcar como arquivo uploadado
+        isImage: file.type.startsWith('image/') ? 'true' : 'false'
+      };
+
+      return apiRequest("POST", "/api/document-artifacts", artifactData);
+    },
+    onSuccess: (data: any) => {
+      // Invalidar cache dos artifacts para recarregar a lista
+      queryClient.invalidateQueries({ 
+        queryKey: ['/api/document-editions', selectedEdition?.id, 'artifacts'] 
+      });
+      
+      toast({
+        title: "Arquivo carregado",
+        description: `"${data.name}" foi adicionado aos seus assets.`,
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao carregar arquivo",
+        description: error.message || "Ocorreu um erro ao fazer upload do arquivo.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Função para abrir o seletor de arquivos
+  const handleFileUpload = () => {
+    if (!selectedEdition) {
+      toast({
+        title: "Nenhum documento selecionado",
+        description: "Selecione um documento em edição para fazer upload de arquivos.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  // Função para processar arquivo selecionado
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Verificar tamanho do arquivo (limite de 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast({
+          title: "Arquivo muito grande",
+          description: "O arquivo deve ter no máximo 10MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      uploadFileMutation.mutate(file);
+    }
+    
+    // Limpar input para permitir selecionar o mesmo arquivo novamente
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleSave = () => {
     const plainText = content.replace(/<[^>]*>/g, '').trim(); // Remove HTML tags para texto plano
@@ -747,9 +842,11 @@ export default function LexicalPage() {
                         className="w-full"
                         variant="outline"
                         size="sm"
+                        onClick={handleFileUpload}
+                        disabled={uploadFileMutation.isPending || !selectedEdition}
                       >
                         <Plus className="w-4 h-4 mr-2" />
-                        Adicionar Arquivo
+                        {uploadFileMutation.isPending ? "Carregando..." : "Adicionar Arquivo"}
                       </Button>
                       <div className="text-center py-4">
                         <p className="text-sm text-gray-400">
@@ -870,6 +967,15 @@ export default function LexicalPage() {
         )}
         </div>
       </div>
+      
+      {/* Hidden file input for upload */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        style={{ display: 'none' }}
+        accept="*/*"
+      />
     </div>
   );
 }
