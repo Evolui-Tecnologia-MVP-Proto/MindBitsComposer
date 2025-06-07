@@ -13,7 +13,7 @@ import { ListItemNode, ListNode, INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_L
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { CodeNode, $createCodeNode } from '@lexical/code';
 import { LinkNode } from '@lexical/link';
-import { TableNode, TableRowNode, TableCellNode, $createTableNodeWithDimensions, INSERT_TABLE_COMMAND, $createTableNode, $createTableRowNode, $createTableCellNode, $isTableNode, $getTableRowIndexFromTableCellNode, $getTableColumnIndexFromTableCellNode } from '@lexical/table';
+import { TableNode, TableRowNode, TableCellNode, $createTableNodeWithDimensions, INSERT_TABLE_COMMAND, $createTableNode, $createTableRowNode, $createTableCellNode, $isTableNode, $getTableRowIndexFromTableCellNode, $getTableColumnIndexFromTableCellNode, $insertTableRow__EXPERIMENTAL, $insertTableColumn__EXPERIMENTAL, $deleteTableRow__EXPERIMENTAL, $deleteTableColumn__EXPERIMENTAL } from '@lexical/table';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 import { $getNodeByKey, $getSelection as $getLexicalSelection, $setSelection, NodeSelection, $createNodeSelection } from 'lexical';
 
@@ -153,8 +153,20 @@ function ImageEventListenerPlugin(): JSX.Element | null {
   return null;
 }
 
-// Plugin para seleção de tabelas
-function TableSelectionPlugin(): JSX.Element | null {
+// Plugin para seleção de tabelas com sincronização dos controles
+function TableSelectionPlugin({ 
+  onTableSelect, 
+  tableRows, 
+  tableColumns, 
+  setTableRows, 
+  setTableColumns 
+}: { 
+  onTableSelect?: (tableKey: string | null) => void;
+  tableRows: number;
+  tableColumns: number;
+  setTableRows: (rows: number) => void;
+  setTableColumns: (columns: number) => void;
+}): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
@@ -179,11 +191,35 @@ function TableSelectionPlugin(): JSX.Element | null {
               if (tableElement) {
                 tableElement.classList.add('lexical-table-selected');
               }
+
+              // Calcular dimensões da tabela selecionada
+              const rows = currentNode.getChildren();
+              const rowCount = rows.length;
+              let columnCount = 0;
+              
+              if (rows.length > 0) {
+                const firstRow = rows[0] as TableRowNode;
+                columnCount = firstRow.getChildren().length;
+              }
+
+              // Sincronizar com os controles da toolbar
+              setTableRows(rowCount);
+              setTableColumns(columnCount);
+              
+              if (onTableSelect) {
+                onTableSelect(currentNode.getKey());
+              }
+              
               break;
             }
             const parentNode = currentNode.getParent();
             if (!parentNode) break;
             currentNode = parentNode;
+          }
+        } else {
+          // Nenhuma tabela selecionada
+          if (onTableSelect) {
+            onTableSelect(null);
           }
         }
       });
@@ -212,7 +248,7 @@ function TableSelectionPlugin(): JSX.Element | null {
         editorElement.removeEventListener('click', handleClick);
       }
     };
-  }, [editor]);
+  }, [editor, onTableSelect, setTableRows, setTableColumns]);
 
   return null;
 }
@@ -228,6 +264,7 @@ function ToolbarPlugin(): JSX.Element {
   const [tableRows, setTableRows] = useState(2);
   const [tableColumns, setTableColumns] = useState(3);
   const [selectedTableKey, setSelectedTableKey] = useState<string | null>(null);
+  const [currentTableDimensions, setCurrentTableDimensions] = useState<{rows: number, columns: number} | null>(null);
   const { fileInputRef, openFileDialog, handleFileChange } = useImageUpload();
 
   const updateToolbar = useCallback(() => {
@@ -339,6 +376,64 @@ function ToolbarPlugin(): JSX.Element {
 
       // Inserir parágrafo, tabela e parágrafo na posição do cursor
       $insertNodes([paragraphBefore, tableNode, paragraphAfter]);
+    });
+  };
+
+  // Função para redimensionar tabela existente
+  const resizeSelectedTable = (newRows: number, newColumns: number) => {
+    if (!selectedTableKey) return;
+
+    editor.update(() => {
+      const tableNode = $getNodeByKey(selectedTableKey);
+      if (!$isTableNode(tableNode)) return;
+
+      const currentRows = tableNode.getChildren();
+      const currentRowCount = currentRows.length;
+      const currentColumnCount = currentRows.length > 0 ? (currentRows[0] as TableRowNode).getChildren().length : 0;
+
+      // Ajustar número de linhas
+      if (newRows > currentRowCount) {
+        // Adicionar linhas
+        for (let i = currentRowCount; i < newRows; i++) {
+          const newRow = $createTableRowNode();
+          for (let j = 0; j < Math.max(newColumns, currentColumnCount); j++) {
+            const newCell = $createTableCellNode(0);
+            const newParagraph = $createParagraphNode();
+            newCell.append(newParagraph);
+            newRow.append(newCell);
+          }
+          tableNode.append(newRow);
+        }
+      } else if (newRows < currentRowCount) {
+        // Remover linhas
+        for (let i = currentRowCount - 1; i >= newRows; i--) {
+          const rowToRemove = currentRows[i];
+          rowToRemove.remove();
+        }
+      }
+
+      // Ajustar número de colunas
+      const updatedRows = tableNode.getChildren();
+      updatedRows.forEach((row) => {
+        const rowNode = row as TableRowNode;
+        const cells = rowNode.getChildren();
+        const currentCellCount = cells.length;
+
+        if (newColumns > currentCellCount) {
+          // Adicionar células
+          for (let j = currentCellCount; j < newColumns; j++) {
+            const newCell = $createTableCellNode(0);
+            const newParagraph = $createParagraphNode();
+            newCell.append(newParagraph);
+            rowNode.append(newCell);
+          }
+        } else if (newColumns < currentCellCount) {
+          // Remover células
+          for (let j = currentCellCount - 1; j >= newColumns; j--) {
+            cells[j].remove();
+          }
+        }
+      });
     });
   };
 
@@ -483,7 +578,13 @@ function ToolbarPlugin(): JSX.Element {
             min="1"
             max="20"
             value={tableRows}
-            onChange={(e) => setTableRows(Math.max(1, parseInt(e.target.value) || 1))}
+            onChange={(e) => {
+              const newRows = Math.max(1, parseInt(e.target.value) || 1);
+              setTableRows(newRows);
+              if (selectedTableKey) {
+                resizeSelectedTable(newRows, tableColumns);
+              }
+            }}
             className="w-8 h-6 px-1 border border-gray-300 rounded text-center text-xs"
             title="Linhas"
           />
@@ -493,7 +594,13 @@ function ToolbarPlugin(): JSX.Element {
             min="1"
             max="20"
             value={tableColumns}
-            onChange={(e) => setTableColumns(Math.max(1, parseInt(e.target.value) || 1))}
+            onChange={(e) => {
+              const newColumns = Math.max(1, parseInt(e.target.value) || 1);
+              setTableColumns(newColumns);
+              if (selectedTableKey) {
+                resizeSelectedTable(tableRows, newColumns);
+              }
+            }}
             className="w-8 h-6 px-1 border border-gray-300 rounded text-center text-xs"
             title="Colunas"
           />
@@ -737,6 +844,9 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
 export default function LexicalEditor({ content = '', onChange, onEditorStateChange, className = '', templateSections, viewMode = 'editor', initialEditorState }: LexicalEditorProps): JSX.Element {
   const [markdownContent, setMarkdownContent] = useState('');
   const [editorInstance, setEditorInstance] = useState<any>(null);
+  const [tableRows, setTableRows] = useState(2);
+  const [tableColumns, setTableColumns] = useState(3);
+  const [selectedTableKey, setSelectedTableKey] = useState<string | null>(null);
   
   // Hook para capturar markdown quando mudar para preview
   React.useEffect(() => {
@@ -833,7 +943,13 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <HistoryPlugin />
           <ListPlugin />
           <TablePlugin />
-          <TableSelectionPlugin />
+          <TableSelectionPlugin 
+            onTableSelect={setSelectedTableKey}
+            tableRows={tableRows}
+            tableColumns={tableColumns}
+            setTableRows={setTableRows}
+            setTableColumns={setTableColumns}
+          />
           <CollapsiblePlugin />
           <ImagePlugin />
           <ImageEventListenerPlugin />
