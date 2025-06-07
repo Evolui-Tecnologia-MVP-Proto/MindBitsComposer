@@ -1138,7 +1138,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
         if (child.getType() === 'paragraph') {
           // Verificar se o parágrafo tem texto ou contém imagens
           const hasText = child.getTextContent().trim().length > 0;
-          const hasImages = child.getChildren().some(innerChild => 
+          const hasImages = (child as any).getChildren().some((innerChild: any) => 
             innerChild.getType() === 'image' || innerChild.getType() === 'image-with-metadata'
           );
           return hasText || hasImages;
@@ -1154,6 +1154,8 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       
       // Gerar markdown em tempo real
       const markdown = convertToMarkdown(editorState);
+      console.log('Markdown gerado:', markdown);
+      console.log('Children no root:', children.map(child => ({ type: child.getType(), text: child.getTextContent() })));
       setMarkdownContent(markdown);
       
       if (onChange) {
