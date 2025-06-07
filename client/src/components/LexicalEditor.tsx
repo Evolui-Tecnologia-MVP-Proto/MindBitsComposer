@@ -48,6 +48,7 @@ import {
   ListOrdered,
   Table,
   ChevronDown,
+  Trash2,
   Eye,
   Edit
 } from "lucide-react";
@@ -572,17 +573,29 @@ function ToolbarPlugin({
             title="Colunas"
           />
         </div>
+        
+        {/* Botão para excluir tabela selecionada */}
+        {selectedTableKey && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 px-2 text-xs hover:bg-red-100 text-red-600 hover:text-red-700"
+            title="Excluir Tabela"
+            onClick={deleteSelectedTable}
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        )}
+        
         <Button
           variant="ghost"
           size="sm"
           className="h-8 px-2 text-xs hover:bg-gray-100"
-          title="Container Colapsável"
+          title="Container Colapsível"
           onClick={insertCollapsible}
         >
           <ChevronDown className="w-4 h-4" />
         </Button>
-        
-        
 
       </div>
     </div>
@@ -879,6 +892,19 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
         if (tableElement) {
           tableElement.classList.add('lexical-table-selected');
         }
+      }
+    });
+  }, [selectedTableKey, editorInstance]);
+
+  // Função para excluir tabela selecionada
+  const deleteSelectedTable = useCallback(() => {
+    if (!selectedTableKey || !editorInstance) return;
+
+    editorInstance.update(() => {
+      const tableNode = $getNodeByKey(selectedTableKey);
+      if ($isTableNode(tableNode)) {
+        tableNode.remove();
+        setSelectedTableKey(null); // Limpar seleção
       }
     });
   }, [selectedTableKey, editorInstance]);
