@@ -542,7 +542,7 @@ export function DocumentosTable({
         <div
           className="fixed bg-white border border-gray-200 rounded-lg shadow-xl min-w-[250px] max-w-[400px]"
           style={{
-            left: Math.max(10, dropdown.position.x - 50),
+            left: Math.max(10, dropdown.position.x - 200),
             top: dropdown.position.y + 10,
             zIndex: 99999,
             boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
