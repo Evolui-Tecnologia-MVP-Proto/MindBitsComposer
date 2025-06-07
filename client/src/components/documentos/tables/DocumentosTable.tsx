@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -19,6 +20,7 @@ import {
   Loader2,
   BookOpen,
   Network,
+  ChevronDown,
 } from "lucide-react";
 import { type Documento } from "@shared/schema";
 import { useQueryClient } from "@tanstack/react-query";
@@ -41,6 +43,7 @@ interface DocumentosTableProps {
   getActiveFlow: (documentId: string) => any;
   getConcludedFlow: (documentId: string) => any;
   openFlowDiagramModal: (execution: any) => void;
+  flowExecutions?: any[];
 }
 
 export function DocumentosTable({
@@ -61,11 +64,83 @@ export function DocumentosTable({
   getActiveFlow,
   getConcludedFlow,
   openFlowDiagramModal,
+  flowExecutions = [],
 }: DocumentosTableProps) {
+  const [dropdown, setDropdown] = useState<{
+    isOpen: boolean;
+    documentId: string;
+    position: { x: number; y: number };
+    flows: any[];
+  }>({
+    isOpen: false,
+    documentId: "",
+    position: { x: 0, y: 0 },
+    flows: [],
+  });
+
+  // Fechar dropdown ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdown.isOpen) {
+        setDropdown(prev => ({ ...prev, isOpen: false }));
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [dropdown.isOpen]);
+
+  // Função para obter todos os fluxos de um documento
+  const getDocumentFlows = (documentId: string) => {
+    return flowExecutions.filter(execution => 
+      execution.documentId === documentId && 
+      (execution.status === "completed" || execution.status === "initiated")
+    );
+  };
+
+  const handleFlowButtonClick = (evento: React.MouseEvent, documento: Documento) => {
+    evento.preventDefault();
+    evento.stopPropagation();
+
+    if (activeTab === "concluidos") {
+      const documentFlows = getDocumentFlows(documento.id);
+      
+      if (documentFlows.length > 1) {
+        // Múltiplos fluxos - mostrar dropdown
+        setDropdown({
+          isOpen: true,
+          documentId: documento.id,
+          position: { x: evento.clientX, y: evento.clientY },
+          flows: documentFlows,
+        });
+      } else if (documentFlows.length === 1) {
+        // Um único fluxo - abrir diretamente
+        openFlowDiagramModal({
+          flowTasks: documentFlows[0],
+          document: { objeto: documento.objeto }
+        });
+      } else {
+        console.log("Nenhum fluxo encontrado para:", documento.id);
+      }
+    } else {
+      // Comportamento original para outras abas
+      const flowToShow = activeTab === "concluidos" 
+        ? getConcludedFlow(documento.id)
+        : getActiveFlow(documento.id);
+        
+      if (flowToShow) {
+        openFlowDiagramModal({
+          flowTasks: flowToShow,
+          document: { objeto: documento.objeto }
+        });
+      }
+    }
+  };
   const queryClient = useQueryClient();
 
   if (activeTab === "integrados") {
     return (
+      <>
       <div className="border rounded-lg">
         <div className="max-h-[calc(100vh-450px)] overflow-y-auto">
           <Table>
@@ -358,34 +433,13 @@ export function DocumentosTable({
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => {
-                      console.log("🔴 BOTÃO CLICADO! Documento:", documento.objeto);
-                      
-                      let flowToShow = null;
-                      
-                      if (activeTab === "concluidos") {
-                        // Para documentos concluídos, busca o último fluxo concluído
-                        flowToShow = getConcludedFlow(documento.id);
-                        console.log("🔴 Fluxo concluído encontrado:", flowToShow);
-                      } else {
-                        // Para documentos em processo, busca o fluxo ativo
-                        flowToShow = getActiveFlow(documento.id);
-                        console.log("🔴 Fluxo ativo encontrado:", flowToShow);
-                      }
-                      
-                      if (flowToShow) {
-                        console.log("🔴 Abrindo modal com fluxo");
-                        openFlowDiagramModal({
-                          flowTasks: flowToShow,
-                          document: { objeto: documento.objeto }
-                        });
-                      } else {
-                        console.log(`🔴 Nenhum fluxo ${activeTab === "concluidos" ? "concluído" : "ativo"} encontrado para:`, documento.id);
-                      }
-                    }}
+                    onClick={(e) => handleFlowButtonClick(e, documento)}
                     title="Mostrar diagrama do fluxo"
                   >
                     <Network className="h-4 w-4 text-purple-500" />
+                    {activeTab === "concluidos" && getDocumentFlows(documento.id).length > 1 && (
+                      <ChevronDown className="h-3 w-3 ml-1 text-purple-500" />
+                    )}
                   </Button>
                 )}
                 {(activeTab === "em-processo" || activeTab === "concluidos") && flowExecutionCounts[documento.id] && (
@@ -434,5 +488,65 @@ export function DocumentosTable({
         )}
       </TableBody>
     </Table>
+
+    {/* Dropdown de fluxos na posição do mouse */}
+    {dropdown.isOpen && (
+      <div
+        className="fixed z-50 bg-white border border-gray-200 rounded-lg shadow-lg min-w-[250px] max-w-[400px]"
+        style={{
+          left: dropdown.position.x,
+          top: dropdown.position.y,
+        }}
+      >
+        <div className="p-3 border-b border-gray-100">
+          <h3 className="font-medium text-sm text-gray-900">Fluxos Associados</h3>
+          <p className="text-xs text-gray-500 mt-1">
+            Selecione um fluxo para visualizar o diagrama
+          </p>
+        </div>
+        <div className="max-h-64 overflow-y-auto">
+          {dropdown.flows.map((flow, index) => (
+            <div
+              key={index}
+              className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-b-0"
+              onClick={() => {
+                openFlowDiagramModal({
+                  flowTasks: flow,
+                  document: { objeto: documentos.find(doc => doc.id === dropdown.documentId)?.objeto || "Documento" }
+                });
+                setDropdown(prev => ({ ...prev, isOpen: false }));
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="font-medium text-sm text-gray-900 mb-1">
+                    {flow.flowName || flow.name || "Fluxo sem nome"}
+                  </div>
+                  <div className="text-xs text-gray-500 mb-1">
+                    Código: {flow.flowCode || flow.code || "N/A"}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      flow.status === "completed" 
+                        ? "bg-green-100 text-green-700" 
+                        : "bg-blue-100 text-blue-700"
+                    }`}>
+                      {flow.status === "completed" ? "Concluído" : "Em andamento"}
+                    </span>
+                    {flow.createdAt && (
+                      <span className="text-xs text-gray-400">
+                        {new Date(flow.createdAt).toLocaleDateString('pt-BR')}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <Network className="h-4 w-4 text-purple-500" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+    </>
   );
 }

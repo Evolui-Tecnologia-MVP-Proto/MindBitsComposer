@@ -3,84 +3,28 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import ReactFlow, { 
-  Node, 
-  Edge, 
-  ReactFlowProvider, 
   useReactFlow, 
   Controls, 
-  Background,
-  Handle,
-  Position 
+  Background
 } from 'reactflow';
+
 // Importing icons for custom nodes
-import { Play, Square, Cloud, Pin, X } from 'lucide-react';
+import { Pin, X } from 'lucide-react';
 import 'reactflow/dist/style.css';
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import FileExplorer from "@/components/FileExplorer";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import {
-  Eye,
-  Pencil,
-  Trash2,
   Plus,
   File,
-  Clock,
   CircleCheck,
-  CircleX,
   AlertCircle,
   Loader2,
-  Paperclip,
-  Upload,
-  Download,
-  ChevronUp,
-  ChevronDown,
-  Database,
-  Image,
   BookOpen,
   Zap,
-  Network,
-  FileText,
-  Link,
-  Check,
-  RefreshCw,
+  RefreshCw
 } from "lucide-react";
+
 import {
   type Documento,
   type InsertDocumento,
@@ -97,6 +41,7 @@ import {
   IntegrationNodeComponent,
   SwitchNodeComponent
 } from "@/components/documentos/flow/FlowNodes";
+
 import { ViewDocumentModal } from "@/components/documentos/modals/ViewDocumentModal";
 import { EditDocumentModal } from "@/components/documentos/modals/EditDocumentModal";
 import { FlowDiagramModal } from "@/components/documentos/modals/FlowDiagramModal";
@@ -107,7 +52,6 @@ import { DocumentationModal } from "@/components/documentos/modals/Documentation
 import { DeleteConfirmDialog } from "@/components/documentos/modals/DeleteConfirmDialog";
 import { DeleteArtifactConfirmDialog } from "@/components/documentos/modals/DeleteArtifactConfirmDialog";
 import { DocumentosTable } from "@/components/documentos/tables/DocumentosTable";
-import { FlowInspector } from "@/components/documentos/flow/FlowInspector";
 import { GitHubTab } from "@/components/documentos/tabs/GitHubTab";
 import { IncluirDocumentosTab } from "@/components/documentos/tabs/IncluirDocumentosTab";
 import { IntegradosTab } from "@/components/documentos/tabs/IntegradosTab";
@@ -153,11 +97,13 @@ export default function DocumentosPage() {
   const [isPessoasExpanded, setIsPessoasExpanded] = useState(false);
   const [createModalActiveTab, setCreateModalActiveTab] =
     useState("dados-gerais");
+  
   const [isLoadingMondayAttachments, setIsLoadingMondayAttachments] =
     useState(false);
   const [mondayAttachmentsPreview, setMondayAttachmentsPreview] = useState<
     any[]
   >([]);
+  
   const [artifactFormData, setArtifactFormData] =
     useState<InsertDocumentArtifact>({
       documentoId: "",
@@ -207,8 +153,6 @@ export default function DocumentosPage() {
   const [isFlowInspectorPinned, setIsFlowInspectorPinned] = useState(false);
   // Função para resetar o formulário
   const resetFormData = () => {
-    console.log("🧹 LIMPANDO CAMPOS DO FORMULÁRIO");
-    console.log("📋 Dados antes da limpeza:", formData);
     setFormData({
       origem: "CPx", // Sempre CPx para novos documentos
       objeto: "",
@@ -228,7 +172,6 @@ export default function DocumentosPage() {
     setCreateModalActiveTab("dados-gerais"); // Resetar aba para dados-gerais
     setIsEscopoExpanded(false); // Frames sempre recolhidos
     setIsPessoasExpanded(false); // Frames sempre recolhidos
-    console.log("✅ Campos limpos!");
   };
 
   // Função para verificar se o MIME type é suportado pelo browser para visualização
@@ -443,7 +386,6 @@ export default function DocumentosPage() {
   // Mutation para sincronizar todas as pastas não sincronizadas com GitHub
   const syncAllToGitHubMutation = useMutation({
     mutationFn: async () => {
-      console.log("🔄 INICIANDO SINCRONIZAÇÃO - Botão clicado!");
       const unsyncedFolders = repoStructures.filter(
         (folder: any) =>
           !folder.isSync &&
@@ -452,12 +394,8 @@ export default function DocumentosPage() {
               (parent: any) => parent.uid === folder.linkedTo,
             )),
       );
-      console.log(
-        "📁 Pastas para sincronizar:",
-        unsyncedFolders.map((f) => f.folderName),
-      );
+      
       const results = [];
-
       for (const folder of unsyncedFolders) {
         console.log(
           `🚀 Sincronizando pasta: ${folder.folderName} (${folder.uid})`,
@@ -468,14 +406,12 @@ export default function DocumentosPage() {
             `/api/repo-structure/${folder.uid}/sync-github`,
           );
           const result = await res.json();
-          console.log(`✅ Sucesso para ${folder.folderName}:`, result);
           results.push({
             folder: folder.folderName,
             success: true,
             message: result.message,
           });
         } catch (error: any) {
-          console.log(`❌ Erro para ${folder.folderName}:`, error);
           results.push({
             folder: folder.folderName,
             success: false,
@@ -483,8 +419,6 @@ export default function DocumentosPage() {
           });
         }
       }
-
-      console.log("🏁 SINCRONIZAÇÃO FINALIZADA - Resultados:", results);
       return results;
     },
     onSuccess: (results) => {
@@ -576,14 +510,11 @@ export default function DocumentosPage() {
         setSelectedFolderFiles(fileList);
       } else if (response.status === 404) {
         // Pasta vazia ou não existe - mostrar mensagem apropriada
-        console.log("Pasta vazia ou não encontrada:", folderPath);
         setSelectedFolderFiles([]);
       } else {
-        console.error("Erro ao buscar arquivos da pasta:", response.status);
         setSelectedFolderFiles([]);
       }
     } catch (error) {
-      console.error("Erro ao buscar arquivos da pasta:", error);
       setSelectedFolderFiles([]);
     } finally {
       setIsLoadingFolderFiles(false);
@@ -592,8 +523,6 @@ export default function DocumentosPage() {
 
   // Função para carregar visualização da estrutura do repositório
   const fetchGithubRepoStructure = async () => {
-    console.log("🚀 Carregando estrutura do repositório GitHub via backend");
-
     setIsLoadingRepo(true);
     try {
       const response = await fetch("/api/github/repo/contents");
@@ -644,7 +573,6 @@ export default function DocumentosPage() {
     token: string,
     owner: string,
     repo: string,
-    path: string = "",
   ) => {
     const tree: any[] = [];
 
@@ -1289,17 +1217,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   };
 
   const confirmDeleteArtifact = () => {
-    console.log("🗑️ CONFIRMANDO EXCLUSÃO DE ANEXO:", artifactToDelete);
     if (artifactToDelete) {
-      console.log("✅ Executando exclusão via mutation...");
       deleteArtifactMutation.mutate(artifactToDelete);
-    } else {
-      console.log("❌ Nenhum anexo selecionado para exclusão");
     }
   };
 
   const cancelDeleteArtifact = () => {
-    console.log("❌ CANCELANDO EXCLUSÃO DE ANEXO");
     setIsDeleteArtifactConfirmOpen(false);
     setArtifactToDelete(null);
   };
@@ -1405,7 +1328,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       return execution.documentId === documentId && execution.status === "completed";
     });
     
-    console.log("🔴 DEBUG: Execuções concluídas encontradas:", concludedExecutions);
     
     // Retorna a execução mais recente (ordenado por updatedAt)
     return concludedExecutions.sort((a: any, b: any) => 
