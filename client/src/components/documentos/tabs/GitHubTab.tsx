@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Upload, Loader2 } from "lucide-react";
+import { Download, Upload, Loader2, FolderSync } from "lucide-react";
 import FileExplorer from "@/components/FileExplorer";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -48,7 +48,7 @@ export function GitHubTab({
           </div>
           <div className="flex items-center space-x-3">
             <Button
-              variant="outline"
+              className="bg-blue-600 hover:bg-blue-700 text-white"
               size="sm"
               onClick={() => {
                 // Update all repo structures to is_sync: true
@@ -69,8 +69,7 @@ export function GitHubTab({
                 });
               }}
             >
-              <Download className="h-4 w-4 mr-2" />
-              Sync Ref
+              <FolderSync className="h-4 w-4" />
             </Button>
             <Button
               variant="outline"

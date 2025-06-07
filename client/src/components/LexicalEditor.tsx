@@ -47,7 +47,6 @@ import {
   ListOrdered,
   Table,
   ChevronDown,
-  Image,
   Eye,
   Edit
 } from "lucide-react";
@@ -377,6 +376,7 @@ function ToolbarPlugin(): JSX.Element {
         >
           <ListOrdered className="w-4 h-4" />
         </Button>
+        <div className="h-6 w-px bg-gray-300 mx-2"></div>
         <Button
           variant="ghost"
           size="sm"
@@ -395,22 +395,8 @@ function ToolbarPlugin(): JSX.Element {
         >
           <ChevronDown className="w-4 h-4" />
         </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100"
-          title="Inserir Imagem"
-          onClick={openFileDialog}
-        >
-          <Image className="w-4 h-4" />
-        </Button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          style={{ display: 'none' }}
-        />
+        
+        
 
       </div>
     </div>
