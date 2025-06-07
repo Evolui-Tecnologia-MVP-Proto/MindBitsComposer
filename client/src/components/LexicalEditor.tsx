@@ -160,6 +160,8 @@ function ToolbarPlugin(): JSX.Element {
   const [isUnderline, setIsUnderline] = useState(false);
   const [isStrikethrough, setIsStrikethrough] = useState(false);
   const [isCode, setIsCode] = useState(false);
+  const [tableRows, setTableRows] = useState(2);
+  const [tableColumns, setTableColumns] = useState(3);
   const { fileInputRef, openFileDialog, handleFileChange } = useImageUpload();
 
   const updateToolbar = useCallback(() => {
@@ -233,11 +235,11 @@ function ToolbarPlugin(): JSX.Element {
       
       const tableNode = $createTableNode();
 
-      // Criar 2 linhas com 3 colunas cada
-      for (let i = 0; i < 2; i++) {
+      // Criar linhas e colunas conforme definido nos controles
+      for (let i = 0; i < tableRows; i++) {
         const rowNode = $createTableRowNode();
 
-        for (let j = 0; j < 3; j++) {
+        for (let j = 0; j < tableColumns; j++) {
           const cellNode = $createTableCellNode(0); // nova célula
           const paragraphNode = $createParagraphNode(); // novo parágrafo
           cellNode.append(paragraphNode);
@@ -390,6 +392,27 @@ function ToolbarPlugin(): JSX.Element {
         >
           <Table className="w-4 h-4" />
         </Button>
+        <div className="flex items-center gap-1 ml-2 text-xs text-gray-600">
+          <input
+            type="number"
+            min="1"
+            max="20"
+            value={tableRows}
+            onChange={(e) => setTableRows(Math.max(1, parseInt(e.target.value) || 1))}
+            className="w-8 h-6 px-1 border border-gray-300 rounded text-center text-xs"
+            title="Linhas"
+          />
+          <span className="text-gray-400">×</span>
+          <input
+            type="number"
+            min="1"
+            max="20"
+            value={tableColumns}
+            onChange={(e) => setTableColumns(Math.max(1, parseInt(e.target.value) || 1))}
+            className="w-8 h-6 px-1 border border-gray-300 rounded text-center text-xs"
+            title="Colunas"
+          />
+        </div>
         <Button
           variant="ghost"
           size="sm"
