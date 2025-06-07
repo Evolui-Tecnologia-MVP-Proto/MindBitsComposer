@@ -679,6 +679,19 @@ function convertToMarkdown(editorState: any): string {
     const root = $getRoot();
     const children = root.getChildren();
     
+    // First pass: collect all nodes including DecoratorNodes
+    const allNodes: any[] = [];
+    
+    function collectNodes(node: any) {
+      allNodes.push(node);
+      if (node.getChildren) {
+        const children = node.getChildren();
+        children.forEach((child: any) => collectNodes(child));
+      }
+    }
+    
+    children.forEach((child: any) => collectNodes(child));
+    
     children.forEach((node: any) => {
       if (node.getType() === 'heading') {
         const level = node.getTag().replace('h', '');
