@@ -26,7 +26,7 @@ import CollapsiblePlugin, { INSERT_COLLAPSIBLE_COMMAND } from './lexical/Collaps
 
 // Import dos nós e plugin de imagem
 import { ImageNode, $createImageNode } from './lexical/ImageNode';
-import { ImageWithMetadataNode } from './lexical/ImageWithMetadataNode';
+import { ImageWithMetadataNode, $createImageWithMetadataNode, type ImageWithMetadataPayload } from './lexical/ImageWithMetadataNode';
 import ImagePlugin, { useImageUpload } from './lexical/ImagePlugin';
 
 // Import do plugin customizado de tabela
@@ -107,15 +107,6 @@ function ImageEventListenerPlugin(): JSX.Element | null {
           // Gerar ID único para a imagem
           const imageId = Math.floor(Math.random() * 10000000000).toString();
           
-          // Criar nó de imagem
-          const imageNode = $createImageNode({
-            src,
-            altText,
-          });
-          
-          // Criar parágrafo com informações da imagem
-          const infoParagraph = $createParagraphNode();
-          
           // Criar URL blob acessível para navegadores externos
           let displayUrl = src;
           if (src.startsWith('data:')) {
@@ -135,11 +126,20 @@ function ImageEventListenerPlugin(): JSX.Element | null {
             }
           }
           
-          const infoText = $createTextNode(`[image_id: ${imageId}] - [${displayUrl}]`);
-          infoParagraph.append(infoText);
+          const metadataText = `[image_id: ${imageId}] - [${displayUrl}]`;
           
-          // Inserir a imagem e o texto informativo
-          $insertNodes([imageNode, infoParagraph]);
+          // Criar nó de imagem com metadata (oculto no editor)
+          const imageWithMetadataPayload: ImageWithMetadataPayload = {
+            src,
+            altText,
+            imageId,
+            metadataText,
+          };
+          
+          const imageWithMetadataNode = $createImageWithMetadataNode(imageWithMetadataPayload);
+          
+          // Inserir apenas o nó composto (sem texto separado visível)
+          $insertNodes([imageWithMetadataNode]);
         }
       });
     };
