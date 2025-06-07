@@ -583,7 +583,7 @@ export default function LexicalPage() {
           <div className="flex items-center space-x-2">
             <div className="flex flex-col space-y-1">
               {selectedEdition && (
-                <Badge variant="default" className="text-xs bg-green-100 text-green-800">
+                <Badge variant="default" className="text-xs bg-blue-100 text-blue-800">
                   {selectedEdition.origem} - {selectedEdition.objeto}
                 </Badge>
               )}
