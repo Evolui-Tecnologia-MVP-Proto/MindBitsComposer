@@ -126,7 +126,7 @@ export function DocumentosTable({
         setDropdown({
           isOpen: true,
           documentId: documento.id,
-          position: { x: evento.clientX - 60, y: evento.clientY },
+          position: { x: evento.clientX - 310, y: evento.clientY },
           flows: documentFlows,
         });
       } else {
