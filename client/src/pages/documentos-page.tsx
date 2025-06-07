@@ -1464,6 +1464,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         getActiveFlow={getActiveFlow}
         getConcludedFlow={getConcludedFlow}
         openFlowDiagramModal={openFlowDiagramModal}
+        flowExecutions={flowExecutions}
       />
     );
   };

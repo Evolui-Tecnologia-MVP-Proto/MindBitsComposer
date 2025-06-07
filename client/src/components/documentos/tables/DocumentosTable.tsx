@@ -140,7 +140,6 @@ export function DocumentosTable({
 
   if (activeTab === "integrados") {
     return (
-      <>
       <div className="border rounded-lg">
         <div className="max-h-[calc(100vh-450px)] overflow-y-auto">
           <Table>
@@ -317,22 +316,23 @@ export function DocumentosTable({
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Origem</TableHead>
-          <TableHead>Nome</TableHead>
-          <TableHead>Incluído</TableHead>
-          <TableHead>Iniciado</TableHead>
-          {activeTab === "em-processo" && <TableHead>Fluxo Atual</TableHead>}
-          <TableHead>Status</TableHead>
-          {activeTab === "em-processo" && <TableHead className="w-[120px]">Tsk.Status</TableHead>}
-          <TableHead className="text-right">Ações</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {documentos.map((documento) => (
-          <TableRow key={documento.id}>
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Origem</TableHead>
+            <TableHead>Nome</TableHead>
+            <TableHead>Incluído</TableHead>
+            <TableHead>Iniciado</TableHead>
+            {activeTab === "em-processo" && <TableHead>Fluxo Atual</TableHead>}
+            <TableHead>Status</TableHead>
+            {activeTab === "em-processo" && <TableHead className="w-[120px]">Tsk.Status</TableHead>}
+            <TableHead className="text-right">Ações</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {documentos.map((documento) => (
+            <TableRow key={documento.id}>
             <TableCell>
               <div className="flex items-center">
                 {documento.origem === "Monday" ? (
@@ -486,67 +486,67 @@ export function DocumentosTable({
             </TableCell>
           </TableRow>
         )}
-      </TableBody>
-    </Table>
+        </TableBody>
+      </Table>
 
-    {/* Dropdown de fluxos na posição do mouse */}
-    {dropdown.isOpen && (
-      <div
-        className="fixed z-50 bg-white border border-gray-200 rounded-lg shadow-lg min-w-[250px] max-w-[400px]"
-        style={{
-          left: dropdown.position.x,
-          top: dropdown.position.y,
-        }}
-      >
-        <div className="p-3 border-b border-gray-100">
-          <h3 className="font-medium text-sm text-gray-900">Fluxos Associados</h3>
-          <p className="text-xs text-gray-500 mt-1">
-            Selecione um fluxo para visualizar o diagrama
-          </p>
-        </div>
-        <div className="max-h-64 overflow-y-auto">
-          {dropdown.flows.map((flow, index) => (
-            <div
-              key={index}
-              className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-b-0"
-              onClick={() => {
-                openFlowDiagramModal({
-                  flowTasks: flow,
-                  document: { objeto: documentos.find(doc => doc.id === dropdown.documentId)?.objeto || "Documento" }
-                });
-                setDropdown(prev => ({ ...prev, isOpen: false }));
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="font-medium text-sm text-gray-900 mb-1">
-                    {flow.flowName || flow.name || "Fluxo sem nome"}
-                  </div>
-                  <div className="text-xs text-gray-500 mb-1">
-                    Código: {flow.flowCode || flow.code || "N/A"}
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      flow.status === "completed" 
-                        ? "bg-green-100 text-green-700" 
-                        : "bg-blue-100 text-blue-700"
-                    }`}>
-                      {flow.status === "completed" ? "Concluído" : "Em andamento"}
-                    </span>
-                    {flow.createdAt && (
-                      <span className="text-xs text-gray-400">
-                        {new Date(flow.createdAt).toLocaleDateString('pt-BR')}
+      {/* Dropdown de fluxos na posição do mouse */}
+      {dropdown.isOpen && (
+        <div
+          className="fixed z-50 bg-white border border-gray-200 rounded-lg shadow-lg min-w-[250px] max-w-[400px]"
+          style={{
+            left: dropdown.position.x,
+            top: dropdown.position.y,
+          }}
+        >
+          <div className="p-3 border-b border-gray-100">
+            <h3 className="font-medium text-sm text-gray-900">Fluxos Associados</h3>
+            <p className="text-xs text-gray-500 mt-1">
+              Selecione um fluxo para visualizar o diagrama
+            </p>
+          </div>
+          <div className="max-h-64 overflow-y-auto">
+            {dropdown.flows.map((flow, index) => (
+              <div
+                key={index}
+                className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-b-0"
+                onClick={() => {
+                  openFlowDiagramModal({
+                    flowTasks: flow,
+                    document: { objeto: documentos.find(doc => doc.id === dropdown.documentId)?.objeto || "Documento" }
+                  });
+                  setDropdown(prev => ({ ...prev, isOpen: false }));
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="font-medium text-sm text-gray-900 mb-1">
+                      {flow.flowName || flow.name || "Fluxo sem nome"}
+                    </div>
+                    <div className="text-xs text-gray-500 mb-1">
+                      Código: {flow.flowCode || flow.code || "N/A"}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        flow.status === "completed" 
+                          ? "bg-green-100 text-green-700" 
+                          : "bg-blue-100 text-blue-700"
+                      }`}>
+                        {flow.status === "completed" ? "Concluído" : "Em andamento"}
                       </span>
-                    )}
+                      {flow.createdAt && (
+                        <span className="text-xs text-gray-400">
+                          {new Date(flow.createdAt).toLocaleDateString('pt-BR')}
+                        </span>
+                      )}
+                    </div>
                   </div>
+                  <Network className="h-4 w-4 text-purple-500" />
                 </div>
-                <Network className="h-4 w-4 text-purple-500" />
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
-    )}
+      )}
     </>
   );
 }
