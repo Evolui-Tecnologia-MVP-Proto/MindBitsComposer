@@ -306,8 +306,8 @@ function ToolbarPlugin({
       }
     }
     
-    setSelectedTableKey(currentTableKey);
-  }, []);
+    onTableSelect(currentTableKey);
+  }, [onTableSelect]);
 
   useEffect(() => {
     return editor.registerUpdateListener(({ editorState }) => {
