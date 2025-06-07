@@ -109,6 +109,12 @@ export function DocumentosTable({
     console.log("🔴 DROPDOWN: activeTab:", activeTab);
     console.log("🔴 DROPDOWN: flowExecutions total:", flowExecutions.length);
     console.log("🔴 DROPDOWN: Todos os flowExecutions:", flowExecutions.map(f => ({ documentId: f.documentId, status: f.status, flowName: f.flowName })));
+    
+    // Documentos que sabemos que têm fluxos pelos logs:
+    const knownFlowDocuments = ["c382deea-21da-493d-8d6d-892ad0e45a31", "2f0078c9-71b4-4485-ba24-fd7bce9ae19f", "9ef9937a-5e02-45af-9d71-e5fb26b71a5e"];
+    if (knownFlowDocuments.includes(documento.id)) {
+      console.log("🔴 DROPDOWN: ATENÇÃO - Este documento deveria ter fluxos!", documento.id);
+    }
 
     if (activeTab === "concluidos") {
       const documentFlows = getDocumentFlows(documento.id);
