@@ -1,9 +1,10 @@
-import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos, documentsArtifacts, repoStructure, systemLogs, documentEditions,
+import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos, documentsArtifacts, globalAssets, repoStructure, systemLogs, documentEditions,
   type User, type InsertUser, type Template, type InsertTemplate, 
   type MondayMapping, type InsertMondayMapping, type MondayColumn, type InsertMondayColumn, 
   type MappingColumn, type InsertMappingColumn, type ServiceConnection, type InsertServiceConnection,
   type Plugin, type InsertPlugin, type Documento, type InsertDocumento,
-  type DocumentArtifact, type InsertDocumentArtifact, type RepoStructure, type InsertRepoStructure,
+  type DocumentArtifact, type InsertDocumentArtifact, type GlobalAsset, type InsertGlobalAsset,
+  type RepoStructure, type InsertRepoStructure,
   type SystemLog, type InsertSystemLog, type DocumentEdition, type InsertDocumentEdition,
   UserStatus, UserRole, TemplateType, PluginStatus, PluginType } from "@shared/schema";
 import { db } from "./db";
@@ -103,6 +104,13 @@ export interface IStorage {
   createDocumentArtifact(artifact: InsertDocumentArtifact): Promise<DocumentArtifact>;
   updateDocumentArtifact(id: string, data: Partial<DocumentArtifact>): Promise<DocumentArtifact>;
   deleteDocumentArtifact(id: string): Promise<void>;
+
+  // Global Asset operations
+  getGlobalAsset(id: string): Promise<GlobalAsset | undefined>;
+  getAllGlobalAssets(): Promise<GlobalAsset[]>;
+  createGlobalAsset(asset: InsertGlobalAsset): Promise<GlobalAsset>;
+  updateGlobalAsset(id: string, data: Partial<GlobalAsset>): Promise<GlobalAsset>;
+  deleteGlobalAsset(id: string): Promise<void>;
   
   // Repo Structure operations
   getRepoStructure(uid: string): Promise<RepoStructure | undefined>;
@@ -752,6 +760,47 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(documentsArtifacts)
       .where(eq(documentsArtifacts.id, id));
+  }
+
+  // Global Asset operations
+  async getGlobalAsset(id: string): Promise<GlobalAsset | undefined> {
+    const [asset] = await db.select().from(globalAssets).where(eq(globalAssets.id, id));
+    return asset || undefined;
+  }
+
+  async getAllGlobalAssets(): Promise<GlobalAsset[]> {
+    return await db.select().from(globalAssets).orderBy(globalAssets.createdAt);
+  }
+
+  async createGlobalAsset(assetData: InsertGlobalAsset): Promise<GlobalAsset> {
+    const [asset] = await db
+      .insert(globalAssets)
+      .values(assetData)
+      .returning();
+    return asset;
+  }
+
+  async updateGlobalAsset(id: string, data: Partial<GlobalAsset>): Promise<GlobalAsset> {
+    const [updatedAsset] = await db
+      .update(globalAssets)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(globalAssets.id, id))
+      .returning();
+    
+    if (!updatedAsset) {
+      throw new Error("Asset global não encontrado");
+    }
+    
+    return updatedAsset;
+  }
+
+  async deleteGlobalAsset(id: string): Promise<void> {
+    await db
+      .delete(globalAssets)
+      .where(eq(globalAssets.id, id));
   }
 
   // Repo Structure operations

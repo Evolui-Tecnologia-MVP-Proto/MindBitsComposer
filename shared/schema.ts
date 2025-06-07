@@ -242,6 +242,23 @@ export const documentsArtifacts = pgTable("documents_artifacts", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Global Assets table - Assets accessible system-wide, not tied to specific documents
+export const globalAssets = pgTable("global_assets", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull(),
+  fileData: text("file_data").default(""), // Stores file as Base64
+  fileName: text("file_name").default(""), // Original file name
+  fileSize: text("file_size"), // File size in bytes
+  mimeType: text("mime_type").default("application/octet-stream"), // MIME type
+  type: text("type").default("unknown"), // doc, pdf, txt, json, image, etc.
+  isImage: text("is_image").default("false"), // Whether it's an image ("true"/"false")
+  uploadedBy: integer("uploaded_by").references(() => users.id), // User who uploaded
+  description: text("description").default(""), // Optional description
+  tags: text("tags").default(""), // Comma-separated tags for organization
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // System Logs table
 export const systemLogs = pgTable("app_logs", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -268,6 +285,16 @@ export const insertSystemLogSchema = createInsertSchema(systemLogs).omit({
 
 export type InsertDocumentArtifact = z.infer<typeof insertDocumentArtifactSchema>;
 export type DocumentArtifact = typeof documentsArtifacts.$inferSelect;
+
+// Global Assets schema
+export const insertGlobalAssetSchema = createInsertSchema(globalAssets).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertGlobalAsset = z.infer<typeof insertGlobalAssetSchema>;
+export type GlobalAsset = typeof globalAssets.$inferSelect;
 
 export type InsertSystemLog = z.infer<typeof insertSystemLogSchema>;
 export type SystemLog = typeof systemLogs.$inferSelect;
