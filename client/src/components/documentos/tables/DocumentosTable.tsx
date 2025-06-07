@@ -120,15 +120,19 @@ export function DocumentosTable({
       
 
       
-      if (documentFlows.length >= 1) {
-        console.log("🔴 DROPDOWN: Fluxos encontrados - abrindo dropdown");
-        // Mostrar dropdown sempre que há fluxos (mesmo que seja apenas 1)
+      if (documentFlows.length > 1) {
+        console.log("🔴 DROPDOWN: Múltiplos fluxos encontrados - abrindo dropdown");
+        // Mostrar dropdown apenas quando há múltiplos fluxos
         setDropdown({
           isOpen: true,
           documentId: documento.id,
           position: { x: evento.clientX - 340, y: evento.clientY },
           flows: documentFlows,
         });
+      } else if (documentFlows.length === 1) {
+        console.log("🔴 DROPDOWN: Um fluxo encontrado - abrindo diretamente");
+        // Abrir diretamente quando há apenas um fluxo
+        openFlowDiagramModal(documentFlows[0]);
       } else {
 
         // Fallback para o método original
