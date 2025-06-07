@@ -535,9 +535,7 @@ export function DocumentosTable({
                       <div className="font-medium text-sm text-gray-900 mb-1">
                         {executionData.flowName || flow.flowName || flow.name || "Fluxo sem nome"}
                       </div>
-                      <div className="text-xs text-gray-500 mb-1">
-                        ID: {flow.id || "N/A"}
-                      </div>
+
                       <div className="flex items-center space-x-2">
                         <span className={`text-xs px-2 py-1 rounded-full ${
                           flow.status === "concluded" 
