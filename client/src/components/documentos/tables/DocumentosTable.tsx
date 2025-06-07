@@ -114,7 +114,7 @@ export function DocumentosTable({
       console.log("🔴 DROPDOWN: ATENÇÃO - Este documento deveria ter fluxos!", documento.id);
     }
 
-    if (activeTab === "concluidos") {
+    if (activeTab === "concluidos" || activeTab === "em-processo") {
       const documentFlows = getDocumentFlows(documento.id);
       console.log("🔴 DROPDOWN: Fluxos encontrados para", documento.id, ":", documentFlows);
       
@@ -132,7 +132,9 @@ export function DocumentosTable({
       } else {
 
         // Fallback para o método original
-        const flowToShow = getConcludedFlow(documento.id);
+        const flowToShow = activeTab === "concluidos" 
+          ? getConcludedFlow(documento.id)
+          : getActiveFlow(documento.id);
         if (flowToShow) {
 
           openFlowDiagramModal({
@@ -458,7 +460,7 @@ export function DocumentosTable({
                     title="Mostrar diagrama do fluxo"
                   >
                     <Network className="h-4 w-4 text-purple-500" />
-                    {activeTab === "concluidos" && getDocumentFlows(documento.id).length > 1 && (
+                    {(activeTab === "concluidos" || activeTab === "em-processo") && getDocumentFlows(documento.id).length > 1 && (
                       <ChevronDown className="h-3 w-3 ml-1 text-purple-500" />
                     )}
                   </Button>
