@@ -3139,10 +3139,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const contentType = githubResponse.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         const responseText = await githubResponse.text();
-        console.error('Resposta não é JSON:', responseText.substring(0, 200));
-        return res.status(500).json({ 
-          error: "GitHub retornou HTML em vez de JSON",
-          details: "Possível problema de autenticação ou rate limit"
+        console.error('GitHub retornou resposta não-JSON:', responseText.substring(0, 200));
+        console.error('Content-Type recebido:', contentType);
+        return res.status(400).json({ 
+          error: "GitHub retornou resposta inválida",
+          details: "Verifique as credenciais do GitHub e se o repositório existe",
+          contentType: contentType,
+          responsePreview: responseText.substring(0, 100)
         });
       }
 
@@ -3152,31 +3155,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } catch (parseError) {
         console.error('Erro ao fazer parse da resposta do GitHub:', parseError);
         
-        // Se falhar, apenas sincronizar com base no que temos no banco
-        const existingStructures = await storage.getAllRepoStructures();
-        let updatedCount = 0;
-        
-        // Marcar todas as pastas como não sincronizadas por precaução
-        for (const structure of existingStructures) {
-          if (structure.isSync) {
-            await storage.updateRepoStructureSync(structure.uid, false);
-            updatedCount++;
-          }
-        }
-        
-        return res.json({ 
-          message: `Token GitHub pode estar inválido. ${updatedCount} pasta(s) marcadas como não sincronizadas.`,
-          importedCount: 0,
-          updatedCount,
-          warning: "Verifique o token do GitHub"
+        return res.status(500).json({ 
+          error: "Erro ao processar resposta do GitHub",
+          details: "Verifique se o token GitHub está válido e se o repositório está acessível",
+          parseError: parseError.message
         });
       }
+      console.log('✅ GitHub API resposta válida recebida');
       const githubFolders = githubContent.filter((item: any) => item.type === 'dir');
+      console.log(`📁 Pastas encontradas no GitHub: ${githubFolders.map((f: any) => f.name).join(', ')}`);
 
       // Buscar estruturas existentes no banco
       const existingStructures = await storage.getAllRepoStructures();
       const existingFolderNames = existingStructures.map((s: any) => s.folderName);
       const githubFolderNames = githubFolders.map((f: any) => f.name);
+      
+      console.log(`💾 Pastas existentes no banco: ${existingFolderNames.join(', ')}`);
+      console.log(`🔄 Iniciando sincronização entre GitHub e banco local`);
 
       let importedCount = 0;
       let updatedCount = 0;
@@ -3196,17 +3191,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Atualizar status de pastas que existem no banco mas foram deletadas do GitHub
       for (const structure of existingStructures) {
+        console.log(`🔍 Verificando pasta: ${structure.folderName} (isSync: ${structure.isSync})`);
+        
         if (!githubFolderNames.includes(structure.folderName)) {
           // Pasta existe no banco mas não no GitHub (foi deletada)
+          console.log(`❌ Pasta ${structure.folderName} não encontrada no GitHub - marcando como não sincronizada`);
           await storage.updateRepoStructureSync(structure.uid, false);
           updatedCount++;
-          console.log(`Status atualizado - pasta deletada do GitHub: ${structure.folderName}`);
+          console.log(`✅ Status atualizado - pasta deletada do GitHub: ${structure.folderName}`);
         } else {
           // Pasta existe em ambos - garantir que está marcada como sincronizada
+          console.log(`✅ Pasta ${structure.folderName} encontrada em ambos (GitHub + banco)`);
           if (!structure.isSync) {
+            console.log(`🔄 Marcando ${structure.folderName} como sincronizada (estava FALSE)`);
             await storage.updateRepoStructureSync(structure.uid, true);
             updatedCount++;
-            console.log(`Status atualizado - pasta re-sincronizada: ${structure.folderName}`);
+            console.log(`✅ Status atualizado - pasta re-sincronizada: ${structure.folderName}`);
+          } else {
+            console.log(`ℹ️ Pasta ${structure.folderName} já estava marcada como sincronizada`);
           }
         }
       }
