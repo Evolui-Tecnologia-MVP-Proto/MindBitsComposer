@@ -703,7 +703,47 @@ function convertToMarkdown(editorState: any): string {
         markdown += '```\n' + text + '\n```\n\n';
       } else if (node.getType() === 'paragraph') {
         const text = node.getTextContent();
-        if (text.trim()) {
+        const paragraphChildren = (node as any).getChildren();
+        let paragraphHasContent = false;
+        
+        // Check for image nodes inside the paragraph
+        paragraphChildren.forEach((pChild: any) => {
+          if (pChild.getType() === 'image-with-metadata') {
+            const metadataText = pChild.getMetadataText();
+            const imageId = pChild.getImageId();
+            
+            // Extract HTTPS URL from metadata text (for global assets)
+            const httpsUrlMatch = metadataText.match(/\[(https?:\/\/.*?)\]/);
+            const httpsUrl = httpsUrlMatch ? httpsUrlMatch[1] : '';
+            
+            // Extract blob URL from metadata text (for local uploads)
+            const blobUrlMatch = metadataText.match(/\[blob:(.*?)\]/);
+            const blobUrl = blobUrlMatch ? blobUrlMatch[1] : '';
+            
+            if (httpsUrl) {
+              markdown += `![${imageId}](${httpsUrl})\n\n`;
+            } else if (blobUrl) {
+              markdown += `![${imageId}](blob:${blobUrl})\n\n`;
+            } else {
+              // Fallback to original src if no URL found in metadata
+              const src = pChild.getSrc();
+              markdown += `![${imageId}](${src})\n\n`;
+            }
+            
+            imageCounter++;
+            paragraphHasContent = true;
+          } else if (pChild.getType() === 'image') {
+            const src = pChild.getSrc();
+            const alt = pChild.getAltText();
+            const imageId = `img_${imageCounter}`;
+            markdown += `![${imageId}](${src})\n\n`;
+            imageCounter++;
+            paragraphHasContent = true;
+          }
+        });
+        
+        // If paragraph has text content and no images were processed
+        if (text.trim() && !paragraphHasContent) {
           markdown += text + '\n\n';
         }
       } else if (node.getType() === 'image') {
