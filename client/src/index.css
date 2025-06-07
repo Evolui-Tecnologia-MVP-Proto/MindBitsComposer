@@ -158,6 +158,7 @@
   padding: 0;
   margin: 0;
   margin-left: 16px;
+  list-style-type: decimal;
 }
 
 .editor-list-ul {
@@ -174,14 +175,14 @@
   list-style-type: none;
 }
 
-.editor-listitem:before {
+.editor-list-ul .editor-listitem:before {
   content: '';
-  width: 10px;
-  height: 10px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  border: 1px solid rgb(61, 135, 245);
+  border: 1px solid #000;
   display: inline-block;
-  background-color: #3d87f5;
+  background-color: #000;
   margin-right: 8px;
   cursor: pointer;
 }

@@ -361,20 +361,7 @@ function ToolbarPlugin({
   };
 
   const insertOrderedList = () => {
-    console.log('Inserting ordered list...');
-    editor.update(() => {
-      const selection = $getSelection();
-      if ($isRangeSelection(selection)) {
-        const listNode = $createListNode('number');
-        const listItemNode = $createListItemNode();
-        const paragraphNode = $createParagraphNode();
-        
-        listItemNode.append(paragraphNode);
-        listNode.append(listItemNode);
-        
-        $insertNodes([listNode]);
-      }
-    });
+    editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined);
   };
 
   const insertTable = () => {
