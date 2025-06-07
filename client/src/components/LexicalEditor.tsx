@@ -706,7 +706,7 @@ function convertToMarkdown(editorState: any): string {
         const paragraphChildren = (node as any).getChildren();
         let paragraphHasContent = false;
         
-        // Check for image nodes inside the paragraph
+        // Check for image nodes inside the paragraph (including DecoratorNodes)
         paragraphChildren.forEach((pChild: any) => {
           if (pChild.getType() === 'image-with-metadata') {
             const metadataText = pChild.getMetadataText();
