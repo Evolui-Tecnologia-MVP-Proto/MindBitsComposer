@@ -4517,6 +4517,123 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Global Assets routes
+  app.get("/api/global-assets", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const assets = await storage.getAllGlobalAssets();
+      res.json(assets);
+    } catch (error) {
+      console.error("Erro ao buscar assets globais:", error);
+      res.status(500).send("Erro ao buscar assets globais");
+    }
+  });
+
+  app.get("/api/global-assets/:id", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const asset = await storage.getGlobalAsset(req.params.id);
+      if (!asset) {
+        return res.status(404).send("Asset global não encontrado");
+      }
+      res.json(asset);
+    } catch (error) {
+      console.error("Erro ao buscar asset global:", error);
+      res.status(500).send("Erro ao buscar asset global");
+    }
+  });
+
+  app.post("/api/global-assets", upload.single('file'), async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const file = req.file;
+      const { name, description = "", tags = "" } = req.body;
+      
+      if (!file) {
+        return res.status(400).send("Arquivo é obrigatório");
+      }
+
+      // Convert file to base64
+      const fileData = file.buffer.toString('base64');
+      
+      // Determine if it's an image
+      const isImage = file.mimetype.startsWith('image/') ? "true" : "false";
+      
+      // Get file type from mimetype
+      const type = file.mimetype.split('/')[1] || 'unknown';
+
+      const assetData = {
+        name: name || file.originalname,
+        fileData,
+        fileName: file.originalname,
+        fileSize: file.size.toString(),
+        mimeType: file.mimetype,
+        type,
+        isImage,
+        uploadedBy: req.user.id,
+        description,
+        tags
+      };
+
+      const asset = await storage.createGlobalAsset(assetData);
+      res.status(201).json(asset);
+    } catch (error) {
+      console.error("Erro ao criar asset global:", error);
+      res.status(500).send("Erro ao criar asset global");
+    }
+  });
+
+  app.put("/api/global-assets/:id", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const asset = await storage.updateGlobalAsset(req.params.id, req.body);
+      res.json(asset);
+    } catch (error) {
+      console.error("Erro ao atualizar asset global:", error);
+      res.status(500).send("Erro ao atualizar asset global");
+    }
+  });
+
+  app.delete("/api/global-assets/:id", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      await storage.deleteGlobalAsset(req.params.id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Erro ao deletar asset global:", error);
+      res.status(500).send("Erro ao deletar asset global");
+    }
+  });
+
+  app.get("/api/global-assets/:id/file", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const asset = await storage.getGlobalAsset(req.params.id);
+      if (!asset) {
+        return res.status(404).send("Asset global não encontrado");
+      }
+
+      // Convert base64 back to buffer
+      const fileBuffer = Buffer.from(asset.fileData, 'base64');
+      
+      // Set appropriate headers
+      res.setHeader('Content-Type', asset.mimeType);
+      res.setHeader('Content-Disposition', `attachment; filename="${asset.fileName}"`);
+      res.setHeader('Content-Length', fileBuffer.length);
+      
+      res.send(fileBuffer);
+    } catch (error) {
+      console.error("Erro ao baixar arquivo do asset global:", error);
+      res.status(500).send("Erro ao baixar arquivo");
+    }
+  });
+
   app.delete("/api/document-editions/:id", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     

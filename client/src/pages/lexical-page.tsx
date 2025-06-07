@@ -56,6 +56,22 @@ interface DocumentArtifact {
   updatedAt: string;
 }
 
+interface GlobalAsset {
+  id: string;
+  name: string;
+  fileData: string;
+  fileName: string;
+  fileSize: string;
+  mimeType: string;
+  type: string;
+  isImage: string;
+  uploadedBy: string;
+  description?: string;
+  tags?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function LexicalPage() {
   const [content, setContent] = useState("");
   const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(null);
@@ -158,6 +174,12 @@ export default function LexicalPage() {
       return data;
     },
     enabled: !!selectedEdition?.id
+  });
+
+  // Query para buscar global assets
+  const { data: globalAssets = [], isLoading: isLoadingGlobalAssets } = useQuery<GlobalAsset[]>({
+    queryKey: ['/api/global-assets'],
+    enabled: showAttachments,
   });
 
   // Função para inserir imagem no editor
