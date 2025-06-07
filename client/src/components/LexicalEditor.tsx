@@ -694,6 +694,14 @@ function convertToMarkdown(editorState: any): string {
         const imageId = `img_${imageCounter}`;
         markdown += `![${imageId}](${src})\n\n`;
         imageCounter++;
+      } else if (node.getType() === 'image-with-metadata') {
+        const src = node.getSrc();
+        const alt = node.getAltText();
+        const metadataText = node.getMetadataText();
+        const imageId = node.getImageId();
+        markdown += `![${imageId}](${src})\n\n`;
+        markdown += `${metadataText}\n\n`;
+        imageCounter++;
       } else if (node.getType() === 'table') {
         // Processar tabela para markdown
         const rows = node.getChildren();
@@ -969,6 +977,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       CollapsibleTitleNode,
       CollapsibleContentNode,
       ImageNode,
+      ImageWithMetadataNode,
     ],
   };
 

@@ -162,8 +162,8 @@ export default function ImagePlugin(): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
-    if (!editor.hasNodes([ImageNode])) {
-      throw new Error('ImagePlugin: ImageNode not registered on editor');
+    if (!editor.hasNodes([ImageNode, ImageWithMetadataNode])) {
+      throw new Error('ImagePlugin: ImageNode and ImageWithMetadataNode not registered on editor');
     }
 
     const removeInsertImageCommand = editor.registerCommand(
