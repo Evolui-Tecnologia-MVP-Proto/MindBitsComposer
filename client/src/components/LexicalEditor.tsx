@@ -662,7 +662,6 @@ function convertToMarkdown(editorState: any): string {
     const children = root.getChildren();
     
     children.forEach((node: any) => {
-      console.log('Processing node type:', node.getType(), node);
       if (node.getType() === 'heading') {
         const level = node.getTag().replace('h', '');
         const text = node.getTextContent();
@@ -696,13 +695,20 @@ function convertToMarkdown(editorState: any): string {
         markdown += `![${imageId}](${src})\n\n`;
         imageCounter++;
       } else if (node.getType() === 'image-with-metadata') {
-        console.log('Found ImageWithMetadataNode at root level:', node);
-        const src = node.getSrc();
-        const alt = node.getAltText();
         const metadataText = node.getMetadataText();
         const imageId = node.getImageId();
-        markdown += `![${imageId}](${src})\n\n`;
-        markdown += `${metadataText}\n\n`;
+        
+        // Extract blob URL from metadata text
+        const blobUrlMatch = metadataText.match(/\[blob:(.*?)\]/);
+        const blobUrl = blobUrlMatch ? blobUrlMatch[1] : '';
+        
+        if (blobUrl) {
+          markdown += `![${imageId}](blob:${blobUrl})\n\n`;
+        } else {
+          // Fallback to original src if no blob URL found
+          const src = node.getSrc();
+          markdown += `![${imageId}](${src})\n\n`;
+        }
         imageCounter++;
       } else if (node.getType() === 'table') {
         // Processar tabela para markdown
@@ -741,7 +747,6 @@ function convertToMarkdown(editorState: any): string {
             // Processar conteúdo do container recursivamente
             const contentChildren = child.getChildren();
             contentChildren.forEach((contentChild: any) => {
-              console.log('Processing collapsible content child:', contentChild.getType(), contentChild);
               if (contentChild.getType() === 'table') {
                 // Processar tabela dentro do container
                 const rows = contentChild.getChildren();
@@ -775,12 +780,20 @@ function convertToMarkdown(editorState: any): string {
                 markdown += `![${imageId}](${src})\n\n`;
                 imageCounter++;
               } else if (contentChild.getType() === 'image-with-metadata') {
-                const src = contentChild.getSrc();
-                const alt = contentChild.getAltText();
                 const metadataText = contentChild.getMetadataText();
                 const imageId = contentChild.getImageId();
-                markdown += `![${imageId}](${src})\n\n`;
-                markdown += `${metadataText}\n\n`;
+                
+                // Extract blob URL from metadata text
+                const blobUrlMatch = metadataText.match(/\[blob:(.*?)\]/);
+                const blobUrl = blobUrlMatch ? blobUrlMatch[1] : '';
+                
+                if (blobUrl) {
+                  markdown += `![${imageId}](blob:${blobUrl})\n\n`;
+                } else {
+                  // Fallback to original src if no blob URL found
+                  const src = contentChild.getSrc();
+                  markdown += `![${imageId}](${src})\n\n`;
+                }
                 imageCounter++;
               } else if (contentChild.getType() === 'paragraph') {
                 // Check if paragraph has ImageWithMetadataNode children
@@ -788,14 +801,22 @@ function convertToMarkdown(editorState: any): string {
                 let paragraphHasContent = false;
                 
                 paragraphChildren.forEach((pChild: any) => {
-                  console.log('Processing paragraph child:', pChild.getType(), pChild);
                   if (pChild.getType() === 'image-with-metadata') {
-                    const src = pChild.getSrc();
-                    const alt = pChild.getAltText();
                     const metadataText = pChild.getMetadataText();
                     const imageId = pChild.getImageId();
-                    markdown += `![${imageId}](${src})\n\n`;
-                    markdown += `${metadataText}\n\n`;
+                    
+                    // Extract blob URL from metadata text
+                    const blobUrlMatch = metadataText.match(/\[blob:(.*?)\]/);
+                    const blobUrl = blobUrlMatch ? blobUrlMatch[1] : '';
+                    
+                    if (blobUrl) {
+                      markdown += `![${imageId}](blob:${blobUrl})\n\n`;
+                    } else {
+                      // Fallback to original src if no blob URL found
+                      const src = pChild.getSrc();
+                      markdown += `![${imageId}](${src})\n\n`;
+                    }
+                    
                     imageCounter++;
                     paragraphHasContent = true;
                   } else if (pChild.getType() === 'image') {
