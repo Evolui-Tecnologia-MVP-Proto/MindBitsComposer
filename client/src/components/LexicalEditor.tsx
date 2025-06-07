@@ -15,7 +15,7 @@ import { CodeNode, $createCodeNode } from '@lexical/code';
 import { LinkNode } from '@lexical/link';
 import { TableNode, TableRowNode, TableCellNode, $createTableNodeWithDimensions, INSERT_TABLE_COMMAND, $createTableNode, $createTableRowNode, $createTableCellNode, $isTableNode, $getTableRowIndexFromTableCellNode, $getTableColumnIndexFromTableCellNode, $insertTableRow__EXPERIMENTAL, $insertTableColumn__EXPERIMENTAL, $deleteTableRow__EXPERIMENTAL, $deleteTableColumn__EXPERIMENTAL } from '@lexical/table';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
-import { $getNodeByKey, $getSelection as $getLexicalSelection, $setSelection, NodeSelection, $createNodeSelection } from 'lexical';
+import { $getNodeByKey, $getSelection as $getLexicalSelection, $setSelection, $createRangeSelection, NodeSelection, $createNodeSelection } from 'lexical';
 
 
 // Import dos nós e plugin de container colapsível
@@ -817,37 +817,18 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
 
   // Função para redimensionar tabela existente
   const resizeSelectedTable = useCallback((newRows: number, newColumns: number) => {
-    console.log('resizeSelectedTable chamada:', { newRows, newColumns, selectedTableKey, hasEditor: !!editorInstance });
-    
-    if (!selectedTableKey) {
-      console.log('Nenhuma tabela selecionada');
-      return;
-    }
-
-    if (!editorInstance) {
-      console.log('Editor não disponível');
-      return;
-    }
+    if (!selectedTableKey || !editorInstance) return;
 
     editorInstance.update(() => {
       const tableNode = $getNodeByKey(selectedTableKey);
-      console.log('Nó da tabela encontrado:', !!tableNode, tableNode?.getType());
-      
-      if (!$isTableNode(tableNode)) {
-        console.log('Nó não é uma tabela válida');
-        return;
-      }
+      if (!$isTableNode(tableNode)) return;
 
       const currentRows = tableNode.getChildren();
       const currentRowCount = currentRows.length;
       const currentColumnCount = currentRows.length > 0 ? (currentRows[0] as TableRowNode).getChildren().length : 0;
-      
-      console.log('Dimensões atuais:', { currentRowCount, currentColumnCount });
-      console.log('Novas dimensões:', { newRows, newColumns });
 
       // Ajustar número de linhas
       if (newRows > currentRowCount) {
-        console.log('Adicionando linhas:', newRows - currentRowCount);
         // Adicionar linhas
         for (let i = currentRowCount; i < newRows; i++) {
           const newRow = $createTableRowNode();
@@ -860,7 +841,6 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           tableNode.append(newRow);
         }
       } else if (newRows < currentRowCount) {
-        console.log('Removendo linhas:', currentRowCount - newRows);
         // Remover linhas
         for (let i = currentRowCount - 1; i >= newRows; i--) {
           const rowToRemove = currentRows[i];
@@ -870,13 +850,12 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
 
       // Ajustar número de colunas
       const updatedRows = tableNode.getChildren();
-      updatedRows.forEach((row, rowIndex) => {
+      updatedRows.forEach((row) => {
         const rowNode = row as TableRowNode;
         const cells = rowNode.getChildren();
         const currentCellCount = cells.length;
 
         if (newColumns > currentCellCount) {
-          console.log(`Linha ${rowIndex}: Adicionando células:`, newColumns - currentCellCount);
           // Adicionar células
           for (let j = currentCellCount; j < newColumns; j++) {
             const newCell = $createTableCellNode(0);
@@ -885,16 +864,23 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
             rowNode.append(newCell);
           }
         } else if (newColumns < currentCellCount) {
-          console.log(`Linha ${rowIndex}: Removendo células:`, currentCellCount - newColumns);
           // Remover células
           for (let j = currentCellCount - 1; j >= newColumns; j--) {
             cells[j].remove();
           }
         }
       });
-      
-      console.log('Redimensionamento concluído');
     });
+    
+    // Manter tabela visualmente selecionada após redimensionamento
+    setTimeout(() => {
+      if (editorInstance && selectedTableKey) {
+        const tableElement = editorInstance.getElementByKey(selectedTableKey);
+        if (tableElement) {
+          tableElement.classList.add('lexical-table-selected');
+        }
+      }
+    }, 100);
   }, [selectedTableKey, editorInstance]);
   
   // Hook para capturar markdown quando mudar para preview
