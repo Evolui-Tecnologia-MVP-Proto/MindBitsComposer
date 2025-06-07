@@ -273,7 +273,8 @@ function ToolbarPlugin({
   setTableColumns, 
   selectedTableKey,
   resizeSelectedTable,
-  onTableSelect
+  onTableSelect,
+  deleteSelectedTable
 }: {
   tableRows: number;
   setTableRows: (rows: number) => void;
@@ -282,6 +283,7 @@ function ToolbarPlugin({
   selectedTableKey: string | null;
   resizeSelectedTable: (rows: number, columns: number) => void;
   onTableSelect: (tableKey: string | null) => void;
+  deleteSelectedTable: () => void;
 }): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const [isBold, setIsBold] = useState(false);
@@ -828,6 +830,19 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
   const [tableColumns, setTableColumns] = useState(3);
   const [selectedTableKey, setSelectedTableKey] = useState<string | null>(null);
 
+  // Função para excluir tabela selecionada
+  const deleteSelectedTable = useCallback(() => {
+    if (!selectedTableKey || !editorInstance) return;
+
+    editorInstance.update(() => {
+      const tableNode = $getNodeByKey(selectedTableKey);
+      if ($isTableNode(tableNode)) {
+        tableNode.remove();
+        setSelectedTableKey(null); // Limpar seleção
+      }
+    });
+  }, [selectedTableKey, editorInstance]);
+
   // Função para redimensionar tabela existente
   const resizeSelectedTable = useCallback((newRows: number, newColumns: number) => {
     if (!selectedTableKey || !editorInstance) return;
@@ -892,19 +907,6 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
         if (tableElement) {
           tableElement.classList.add('lexical-table-selected');
         }
-      }
-    });
-  }, [selectedTableKey, editorInstance]);
-
-  // Função para excluir tabela selecionada
-  const deleteSelectedTable = useCallback(() => {
-    if (!selectedTableKey || !editorInstance) return;
-
-    editorInstance.update(() => {
-      const tableNode = $getNodeByKey(selectedTableKey);
-      if ($isTableNode(tableNode)) {
-        tableNode.remove();
-        setSelectedTableKey(null); // Limpar seleção
       }
     });
   }, [selectedTableKey, editorInstance]);
@@ -979,6 +981,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
             selectedTableKey={selectedTableKey}
             resizeSelectedTable={resizeSelectedTable}
             onTableSelect={setSelectedTableKey}
+            deleteSelectedTable={deleteSelectedTable}
           />
           <div className="p-4" style={{ height: 'calc(100vh - 350px)', maxHeight: 'calc(100vh - 350px)', overflowY: 'auto' }}>
             {viewMode === 'editor' ? (
