@@ -4634,6 +4634,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Route to serve global asset images (for display in editor)
+  app.get("/api/public/images/:id", async (req: Request, res: Response) => {
+    try {
+      // First try to get as global asset
+      const globalAsset = await storage.getGlobalAsset(req.params.id);
+      if (globalAsset && globalAsset.isImage === 'true') {
+        const fileBuffer = Buffer.from(globalAsset.fileData, 'base64');
+        res.setHeader('Content-Type', globalAsset.mimeType);
+        res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+        return res.send(fileBuffer);
+      }
+
+      // If not found as global asset, try as document artifact
+      const artifact = await storage.getDocumentArtifact(req.params.id);
+      if (artifact && artifact.isImage === 'true') {
+        const fileBuffer = Buffer.from(artifact.fileData, 'base64');
+        res.setHeader('Content-Type', artifact.mimeType);
+        res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+        return res.send(fileBuffer);
+      }
+
+      res.status(404).send("Imagem não encontrada");
+    } catch (error) {
+      console.error("Erro ao servir imagem:", error);
+      res.status(500).send("Erro ao servir imagem");
+    }
+  });
+
   app.delete("/api/document-editions/:id", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
