@@ -13,8 +13,9 @@ import { ListItemNode, ListNode, INSERT_UNORDERED_LIST_COMMAND, INSERT_ORDERED_L
 import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { CodeNode, $createCodeNode } from '@lexical/code';
 import { LinkNode } from '@lexical/link';
-import { TableNode, TableRowNode, TableCellNode, $createTableNodeWithDimensions, INSERT_TABLE_COMMAND, $createTableNode, $createTableRowNode, $createTableCellNode } from '@lexical/table';
+import { TableNode, TableRowNode, TableCellNode, $createTableNodeWithDimensions, INSERT_TABLE_COMMAND, $createTableNode, $createTableRowNode, $createTableCellNode, $isTableNode, $getTableRowIndexFromTableCellNode, $getTableColumnIndexFromTableCellNode } from '@lexical/table';
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
+import { $getNodeByKey, $getSelection as $getLexicalSelection, $setSelection, NodeSelection, $createNodeSelection } from 'lexical';
 
 
 // Import dos nós e plugin de container colapsível
@@ -152,6 +153,70 @@ function ImageEventListenerPlugin(): JSX.Element | null {
   return null;
 }
 
+// Plugin para seleção de tabelas
+function TableSelectionPlugin(): JSX.Element | null {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    const updateTableSelection = () => {
+      editor.getEditorState().read(() => {
+        const selection = $getSelection();
+        
+        // Remove seleção anterior
+        const previousSelected = document.querySelector('.lexical-table-selected');
+        if (previousSelected) {
+          previousSelected.classList.remove('lexical-table-selected');
+        }
+
+        if ($isRangeSelection(selection)) {
+          const anchorNode = selection.anchor.getNode();
+          let currentNode = anchorNode;
+          
+          // Encontrar a tabela pai
+          while (currentNode) {
+            if ($isTableNode(currentNode)) {
+              const tableElement = editor.getElementByKey(currentNode.getKey());
+              if (tableElement) {
+                tableElement.classList.add('lexical-table-selected');
+              }
+              break;
+            }
+            const parentNode = currentNode.getParent();
+            if (!parentNode) break;
+            currentNode = parentNode;
+          }
+        }
+      });
+    };
+
+    // Registrar listener para mudanças de seleção
+    const unregister = editor.registerUpdateListener(({ editorState }) => {
+      editorState.read(() => {
+        updateTableSelection();
+      });
+    });
+
+    // Registrar listener para cliques
+    const handleClick = () => {
+      setTimeout(updateTableSelection, 0);
+    };
+
+    const editorElement = editor.getRootElement();
+    if (editorElement) {
+      editorElement.addEventListener('click', handleClick);
+    }
+
+    return () => {
+      unregister();
+      if (editorElement) {
+        editorElement.removeEventListener('click', handleClick);
+      }
+    };
+  }, [editor]);
+
+  return null;
+}
+
 // Barra de ferramentas interativa
 function ToolbarPlugin(): JSX.Element {
   const [editor] = useLexicalComposerContext();
@@ -162,6 +227,7 @@ function ToolbarPlugin(): JSX.Element {
   const [isCode, setIsCode] = useState(false);
   const [tableRows, setTableRows] = useState(2);
   const [tableColumns, setTableColumns] = useState(3);
+  const [selectedTableKey, setSelectedTableKey] = useState<string | null>(null);
   const { fileInputRef, openFileDialog, handleFileChange } = useImageUpload();
 
   const updateToolbar = useCallback(() => {
@@ -173,6 +239,25 @@ function ToolbarPlugin(): JSX.Element {
       setIsStrikethrough(selection.hasFormat('strikethrough'));
       setIsCode(selection.hasFormat('code'));
     }
+    
+    // Check for table selection
+    let currentTableKey = null;
+    
+    if ($isRangeSelection(selection)) {
+      const anchorNode = selection.anchor.getNode();
+      let node = anchorNode;
+      while (node) {
+        if ($isTableNode(node)) {
+          currentTableKey = node.getKey();
+          break;
+        }
+        const parentNode = node.getParent();
+        if (!parentNode) break;
+        node = parentNode;
+      }
+    }
+    
+    setSelectedTableKey(currentTableKey);
   }, []);
 
   useEffect(() => {
