@@ -803,8 +803,55 @@ function convertToMarkdown(editorState: any): string {
             let rowContent = '|';
             
             cells.forEach((cell: any) => {
-              const cellText = cell.getTextContent() || ' ';
-              rowContent += ` ${cellText} |`;
+              let cellContent = '';
+              const cellChildren = cell.getChildren();
+              
+              // Check for images inside table cells
+              cellChildren.forEach((cellChild: any) => {
+                if (cellChild.getType() === 'image-with-metadata' && !processedImageNodes.has(cellChild.getKey())) {
+                  processedImageNodes.add(cellChild.getKey());
+                  const metadataText = cellChild.getMetadataText();
+                  const imageId = cellChild.getImageId();
+                  
+                  // Extract HTTPS URL from metadata text (for global assets)
+                  const httpsUrlMatch = metadataText.match(/\[(https?:\/\/.*?)\]/);
+                  const httpsUrl = httpsUrlMatch ? httpsUrlMatch[1] : '';
+                  
+                  // Extract blob URL from metadata text (for local uploads)
+                  const blobUrlMatch = metadataText.match(/\[blob:(.*?)\]/);
+                  const blobUrl = blobUrlMatch ? blobUrlMatch[1] : '';
+                  
+                  if (httpsUrl) {
+                    cellContent += `![${imageId}](${httpsUrl})`;
+                  } else if (blobUrl) {
+                    cellContent += `![${imageId}](blob:${blobUrl})`;
+                  } else {
+                    // Fallback to original src if no URL found in metadata
+                    const src = cellChild.getSrc();
+                    cellContent += `![${imageId}](${src})`;
+                  }
+                  
+                  imageCounter++;
+                } else if (cellChild.getType() === 'image' && !processedImageNodes.has(cellChild.getKey())) {
+                  processedImageNodes.add(cellChild.getKey());
+                  const src = cellChild.getSrc();
+                  const imageId = `img_${imageCounter}`;
+                  cellContent += `![${imageId}](${src})`;
+                  imageCounter++;
+                } else {
+                  const childText = cellChild.getTextContent();
+                  if (childText.trim()) {
+                    cellContent += childText;
+                  }
+                }
+              });
+              
+              // If no content found in children, use cell text content
+              if (!cellContent.trim()) {
+                cellContent = cell.getTextContent() || ' ';
+              }
+              
+              rowContent += ` ${cellContent} |`;
             });
             
             markdown += rowContent + '\n';
