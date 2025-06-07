@@ -692,33 +692,8 @@ function convertToMarkdown(editorState: any): string {
     
     children.forEach((child: any) => collectNodes(child));
     
-    // Process all collected image-with-metadata nodes first
-    allNodes.forEach((node: any) => {
-      if (node.getType() === 'image-with-metadata') {
-        const metadataText = node.getMetadataText();
-        const imageId = node.getImageId();
-        
-        // Extract HTTPS URL from metadata text (for global assets)
-        const httpsUrlMatch = metadataText.match(/\[(https?:\/\/.*?)\]/);
-        const httpsUrl = httpsUrlMatch ? httpsUrlMatch[1] : '';
-        
-        // Extract blob URL from metadata text (for local uploads)
-        const blobUrlMatch = metadataText.match(/\[blob:(.*?)\]/);
-        const blobUrl = blobUrlMatch ? blobUrlMatch[1] : '';
-        
-        if (httpsUrl) {
-          markdown += `![${imageId}](${httpsUrl})\n\n`;
-        } else if (blobUrl) {
-          markdown += `![${imageId}](blob:${blobUrl})\n\n`;
-        } else {
-          // Fallback to original src if no URL found in metadata
-          const src = node.getSrc();
-          markdown += `![${imageId}](${src})\n\n`;
-        }
-        
-        imageCounter++;
-      }
-    });
+    // Track processed image nodes to avoid duplicates
+    const processedImageNodes = new Set();
     
     children.forEach((node: any) => {
       if (node.getType() === 'heading') {
@@ -749,7 +724,10 @@ function convertToMarkdown(editorState: any): string {
         
         // Check for image nodes inside the paragraph (including DecoratorNodes)
         paragraphChildren.forEach((pChild: any) => {
-          if (pChild.getType() === 'image-with-metadata') {
+          const nodeKey = pChild.getKey();
+          
+          if (pChild.getType() === 'image-with-metadata' && !processedImageNodes.has(nodeKey)) {
+            processedImageNodes.add(nodeKey);
             const metadataText = pChild.getMetadataText();
             const imageId = pChild.getImageId();
             
@@ -773,7 +751,8 @@ function convertToMarkdown(editorState: any): string {
             
             imageCounter++;
             paragraphHasContent = true;
-          } else if (pChild.getType() === 'image') {
+          } else if (pChild.getType() === 'image' && !processedImageNodes.has(nodeKey)) {
+            processedImageNodes.add(nodeKey);
             const src = pChild.getSrc();
             const alt = pChild.getAltText();
             const imageId = `img_${imageCounter}`;
@@ -1235,27 +1214,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       
       // Gerar markdown em tempo real
       const markdown = convertToMarkdown(editorState);
-      console.log('Markdown gerado:', markdown);
-      console.log('Children no root:', children.map(child => ({ 
-        type: child.getType(), 
-        text: child.getTextContent(),
-        hasChildren: (child as any).getChildren ? (child as any).getChildren().length : 0,
-        childrenTypes: (child as any).getChildren ? (child as any).getChildren().map((c: any) => c.getType()) : []
-      })));
-      
-      // Debug específico para parágrafos
-      children.forEach((child: any) => {
-        if (child.getType() === 'paragraph') {
-          const paragraphChildren = child.getChildren();
-          console.log('Paragraph children:', paragraphChildren.map((pc: any) => ({
-            type: pc.getType(),
-            text: pc.getTextContent(),
-            metadataText: pc.getMetadataText ? pc.getMetadataText() : 'N/A',
-            imageId: pc.getImageId ? pc.getImageId() : 'N/A',
-            src: pc.getSrc ? pc.getSrc() : 'N/A'
-          })));
-        }
-      });
+
       setMarkdownContent(markdown);
       
       if (onChange) {
