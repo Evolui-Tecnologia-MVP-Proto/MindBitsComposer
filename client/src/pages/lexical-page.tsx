@@ -170,6 +170,7 @@ export default function LexicalPage() {
           detail: {
             src: imageUrl,
             altText: artifact.name || 'Imagem',
+            artifactId: artifact.id, // Passar o ID do artifact para gerar URL HTTPS
           }
         });
         
