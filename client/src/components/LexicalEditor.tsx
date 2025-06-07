@@ -819,10 +819,6 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
   const resizeSelectedTable = useCallback((newRows: number, newColumns: number) => {
     if (!selectedTableKey || !editorInstance) return;
 
-    // Salvar o foco atual antes de modificar a tabela
-    const activeElement = document.activeElement;
-    const wasFocused = editorInstance.getRootElement()?.contains(activeElement);
-
     editorInstance.update(() => {
       const tableNode = $getNodeByKey(selectedTableKey);
       if (!$isTableNode(tableNode)) return;
@@ -876,24 +872,15 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       });
     });
     
-    // Manter seleção visual e foco após modificações
-    setTimeout(() => {
+    // Manter seleção visual após redimensionamento
+    requestAnimationFrame(() => {
       if (editorInstance && selectedTableKey) {
         const tableElement = editorInstance.getElementByKey(selectedTableKey);
         if (tableElement) {
           tableElement.classList.add('lexical-table-selected');
         }
-        
-        // Restaurar foco se estava focado antes
-        if (wasFocused) {
-          const editorElement = editorInstance.getRootElement();
-          if (editorElement) {
-            editorElement.focus();
-            editorElement.click(); // Força o foco ativo
-          }
-        }
       }
-    }, 10);
+    });
   }, [selectedTableKey, editorInstance]);
   
   // Hook para capturar markdown quando mudar para preview
