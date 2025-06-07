@@ -2570,8 +2570,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     }, [showFlowInspector, fitView]);
 
     // Implementar lógica de "pendente em processo"
-    const nodes = flowData.flowTasks.nodes || [];
-    const edges = flowData.flowTasks.edges || [];
+    // Handle different data structures: flowData might be the flowTasks directly or have a flowTasks property
+    const tasksData = flowData?.flowTasks || flowData;
+    const nodes = tasksData?.nodes || [];
+    const edges = tasksData?.edges || [];
 
     // Encontrar nós executados
     const executedNodes = new Set(
