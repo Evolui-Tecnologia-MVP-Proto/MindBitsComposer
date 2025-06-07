@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Download, Upload, Loader2 } from "lucide-react";
 import FileExplorer from "@/components/FileExplorer";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface GitHubTabProps {
   syncFromGitHubMutation: any;
@@ -31,6 +32,7 @@ export function GitHubTab({
   fetchGithubRepoStructure,
   fetchFolderFiles,
 }: GitHubTabProps) {
+  const queryClient = useQueryClient();
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-lg border p-6">
@@ -45,6 +47,31 @@ export function GitHubTab({
             </p>
           </div>
           <div className="flex items-center space-x-3">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                // Update all repo structures to is_sync: true
+                fetch('/api/repo-structure/sync-all', {
+                  method: 'PATCH',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                })
+                .then(response => response.json())
+                .then(data => {
+                  console.log('Sync Ref completed:', data);
+                  // Refresh the repo structures
+                  queryClient.invalidateQueries({ queryKey: ['/api/repo-structure'] });
+                })
+                .catch(error => {
+                  console.error('Error in Sync Ref:', error);
+                });
+              }}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Sync Ref
+            </Button>
             <Button
               variant="outline"
               size="sm"

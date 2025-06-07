@@ -3040,6 +3040,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // PATCH: Sync all repo structures (set all is_sync to true)
+  app.patch("/api/repo-structure/sync-all", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const allStructures = await storage.getAllRepoStructures();
+      let updatedCount = 0;
+      
+      for (const structure of allStructures) {
+        if (!structure.isSync) {
+          await storage.updateRepoStructureSync(structure.uid, true);
+          updatedCount++;
+        }
+      }
+      
+      res.json({
+        success: true,
+        message: `Sync Ref concluído. ${updatedCount} estrutura(s) marcada(s) como sincronizada(s).`,
+        updatedCount,
+        totalStructures: allStructures.length
+      });
+    } catch (error: any) {
+      console.error("Erro ao sincronizar todas as estruturas:", error);
+      res.status(500).json({
+        success: false,
+        message: "Erro ao sincronizar estruturas",
+        error: error.message
+      });
+    }
+  });
+
   // DELETE: Remover pasta do banco local (não do GitHub)
   app.delete("/api/repo-structure/:uid", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
