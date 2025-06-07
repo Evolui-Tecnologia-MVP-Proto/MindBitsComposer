@@ -3,6 +3,8 @@ import {
   $createTextNode,
   $getSelection,
   $isRangeSelection,
+  $setSelection,
+  $createNodeSelection,
   type DOMConversionMap,
   type DOMConversionOutput,
   type DOMExportOutput,
@@ -13,6 +15,8 @@ import {
   type Spread,
   DecoratorNode,
 } from 'lexical';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { useCallback, useState, useEffect } from 'react';
 
 export interface ImagePayload {
   altText: string;
@@ -152,22 +156,77 @@ export class ImageNode extends DecoratorNode<JSX.Element> {
   }
 
   decorate(): JSX.Element {
-    return (
-      <img
-        src={this.__src}
-        alt={this.__altText}
-        style={{
-          height: this.__height === 'inherit' ? 'inherit' : this.__height,
-          width: this.__width === 'inherit' ? 'inherit' : this.__width,
-          maxWidth: '100%',
-          borderRadius: '8px',
-          margin: '8px 0',
-        }}
-        className="lexical-image"
-        draggable="false"
-      />
-    );
+    return <ImageComponent node={this} />;
   }
+}
+
+// Componente de imagem com funcionalidade de seleção e deleção
+function ImageComponent({ node }: { node: ImageNode }) {
+  const [editor] = useLexicalComposerContext();
+  const [isSelected, setIsSelected] = useState(false);
+
+  const handleClick = useCallback((event: React.MouseEvent) => {
+    event.preventDefault();
+    
+    editor.update(() => {
+      // Criar seleção de nó para esta imagem
+      const nodeSelection = $createNodeSelection();
+      nodeSelection.add(node.getKey());
+      $setSelection(nodeSelection);
+    });
+  }, [editor, node]);
+
+  // Monitorar mudanças de seleção para atualizar o estado visual
+  useEffect(() => {
+    return editor.registerUpdateListener(({ editorState }) => {
+      editorState.read(() => {
+        const selection = $getSelection();
+        if (selection && selection.getNodes().some(n => n.getKey() === node.getKey())) {
+          setIsSelected(true);
+        } else {
+          setIsSelected(false);
+        }
+      });
+    });
+  }, [editor, node]);
+
+  // Adicionar listener para tecla DEL
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Delete' && isSelected) {
+        event.preventDefault();
+        editor.update(() => {
+          node.remove();
+        });
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [editor, node, isSelected]);
+
+  return (
+    <img
+      src={node.getSrc()}
+      alt={node.getAltText()}
+      onClick={handleClick}
+      style={{
+        height: node.__height === 'inherit' ? 'inherit' : node.__height,
+        width: node.__width === 'inherit' ? 'inherit' : node.__width,
+        maxWidth: '100%',
+        borderRadius: '8px',
+        margin: '8px 0',
+        cursor: 'pointer',
+        border: isSelected ? '3px solid #3b82f6' : '3px solid transparent',
+        boxSizing: 'border-box',
+        transition: 'border-color 0.2s ease',
+      }}
+      className="lexical-image"
+      draggable="false"
+    />
+  );
 }
 
 export function $createImageNode({
