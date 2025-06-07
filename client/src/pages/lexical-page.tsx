@@ -829,7 +829,7 @@ export default function LexicalPage() {
                       <Upload className="w-4 h-4" />
                       <span className="font-medium">My Assets</span>
                       <Badge variant="secondary" className="ml-auto">
-                        0
+                        {documentArtifacts.filter(artifact => artifact.originAssetId === "Uploaded").length}
                       </Badge>
                     </div>
                   </AccordionTrigger>
