@@ -1013,7 +1013,7 @@ export default function LexicalPage() {
                               className="p-3 bg-gray-50 rounded-lg border"
                             >
                               {/* Botões de ação no topo */}
-                              <div className="flex justify-end mb-3">
+                              <div className="flex justify-start mb-3">
                                 {asset.isImage === 'true' ? (
                                   <Button
                                     size="sm"
@@ -1128,7 +1128,7 @@ export default function LexicalPage() {
                                   className="p-3 bg-gray-50 rounded-lg border"
                                 >
                                   {/* Botões de ação no topo */}
-                                  <div className="flex justify-end mb-3">
+                                  <div className="flex justify-start mb-3">
                                     {artifact.isImage === 'true' ? (
                                       <Button
                                         size="sm"
@@ -1224,7 +1224,7 @@ export default function LexicalPage() {
                                   className="p-3 bg-gray-50 rounded-lg border"
                                 >
                                 {/* Botões de ação no topo */}
-                                <div className="flex justify-end mb-3">
+                                <div className="flex justify-start mb-3">
                                   {artifact.isImage === 'true' ? (
                                     <Button
                                       size="sm"
