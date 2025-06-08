@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool, Eye, Edit, File, Image, Video, FileAudio, FileCode2 } from "lucide-react";
+import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool, Eye, Edit, File, Image, Video, FileAudio, FileCode2, CircleChevronLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
@@ -1081,7 +1081,7 @@ export default function LexicalPage() {
                                     onClick={() => handleInsertGlobalImage(asset)}
                                     title="Inserir imagem no documento"
                                   >
-                                    <Image className="w-3 h-3 mr-1" />
+                                    <CircleChevronLeft className="w-3 h-3 mr-1" />
                                     Inserir
                                   </Button>
                                 ) : (
@@ -1206,7 +1206,7 @@ export default function LexicalPage() {
                                         onClick={() => handleInsertImage(artifact)}
                                         title="Inserir imagem no documento"
                                       >
-                                        <Image className="w-3 h-3 mr-1" />
+                                        <CircleChevronLeft className="w-3 h-3 mr-1" />
                                         Inserir
                                       </Button>
                                     ) : (
@@ -1312,7 +1312,7 @@ export default function LexicalPage() {
                                       onClick={() => handleInsertImage(artifact)}
                                       title="Inserir imagem no documento"
                                     >
-                                      <Image className="w-3 h-3 mr-1" />
+                                      <CircleChevronLeft className="w-3 h-3 mr-1" />
                                       Inserir
                                     </Button>
                                   ) : (
