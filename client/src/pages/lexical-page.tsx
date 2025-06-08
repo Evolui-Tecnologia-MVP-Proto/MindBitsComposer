@@ -535,6 +535,56 @@ export default function LexicalPage() {
     }
   };
 
+  // Mutation para excluir asset global
+  const deleteGlobalAssetMutation = useMutation({
+    mutationFn: (assetId: string) => apiRequest(`/api/global-assets/${assetId}`, "DELETE"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/global-assets'] });
+      toast({
+        title: "Asset excluído",
+        description: "O asset global foi excluído com sucesso.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao excluir asset",
+        description: error.message || "Ocorreu um erro ao excluir o asset global.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Mutation para excluir artifact do documento
+  const deleteMyAssetMutation = useMutation({
+    mutationFn: (artifactId: string) => apiRequest(`/api/artifacts/${artifactId}`, "DELETE"),
+    onSuccess: () => {
+      if (selectedEdition) {
+        queryClient.invalidateQueries({ queryKey: [`/api/documentos/${selectedEdition.documentId}/artifacts`] });
+      }
+      toast({
+        title: "Arquivo excluído",
+        description: "O arquivo foi excluído com sucesso.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao excluir arquivo",
+        description: error.message || "Ocorreu um erro ao excluir o arquivo.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Função para excluir asset global
+  const handleDeleteGlobalAsset = (assetId: string) => {
+    deleteGlobalAssetMutation.mutate(assetId);
+  };
+
+  // Função para excluir my asset
+  const handleDeleteMyAsset = (artifactId: string) => {
+    deleteMyAssetMutation.mutate(artifactId);
+  };
+
   const handleSave = () => {
     const plainText = content.replace(/<[^>]*>/g, '').trim(); // Remove HTML tags para texto plano
     saveMutation.mutate({
@@ -1013,7 +1063,7 @@ export default function LexicalPage() {
                               className="p-3 bg-gray-50 rounded-lg border"
                             >
                               {/* Botões de ação no topo */}
-                              <div className="flex justify-start mb-3">
+                              <div className="flex justify-start gap-2 mb-3">
                                 {asset.isImage === 'true' ? (
                                   <Button
                                     size="sm"
@@ -1037,6 +1087,16 @@ export default function LexicalPage() {
                                     Baixar
                                   </Button>
                                 )}
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-xs px-2 py-1 h-7 text-red-600 border-red-200 hover:bg-red-50"
+                                  onClick={() => handleDeleteGlobalAsset(asset.id)}
+                                  title="Excluir asset global"
+                                >
+                                  <Trash2 className="w-3 h-3 mr-1" />
+                                  Excluir
+                                </Button>
                               </div>
                               
                               {/* Conteúdo do card */}
@@ -1128,7 +1188,7 @@ export default function LexicalPage() {
                                   className="p-3 bg-gray-50 rounded-lg border"
                                 >
                                   {/* Botões de ação no topo */}
-                                  <div className="flex justify-start mb-3">
+                                  <div className="flex justify-start gap-2 mb-3">
                                     {artifact.isImage === 'true' ? (
                                       <Button
                                         size="sm"
@@ -1152,6 +1212,16 @@ export default function LexicalPage() {
                                         Baixar
                                       </Button>
                                     )}
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="text-xs px-2 py-1 h-7 text-red-600 border-red-200 hover:bg-red-50"
+                                      onClick={() => handleDeleteMyAsset(artifact.id)}
+                                      title="Excluir arquivo"
+                                    >
+                                      <Trash2 className="w-3 h-3 mr-1" />
+                                      Excluir
+                                    </Button>
                                   </div>
                                   
                                   {/* Conteúdo do card */}
