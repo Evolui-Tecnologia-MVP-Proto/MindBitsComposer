@@ -1185,6 +1185,7 @@ export default function LexicalPage() {
                 </AccordionItem>
 
                 {/* Origin Assets */}
+                {documentArtifacts.filter(artifact => artifact.originAssetId !== "Uploaded").length > 0 && (
                 <AccordionItem value="origin-assets" className="border rounded-lg bg-white">
                   <AccordionTrigger className="px-4 py-3 hover:no-underline">
                     <div className="flex items-center gap-2">
