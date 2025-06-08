@@ -972,6 +972,118 @@ export default function LexicalPage() {
               </div>
 
               <Accordion type="multiple" className="w-full space-y-2">
+                {/* Global Assets */}
+                <AccordionItem value="global-assets" className="border rounded-lg bg-white">
+                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      <span className="font-medium">Global</span>
+                      <Badge variant="secondary" className="ml-auto">
+                        {globalAssets.length}
+                      </Badge>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4">
+                    <div className="space-y-2">
+                      <Button 
+                        className="w-full"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleGlobalFileUpload}
+                        disabled={uploadGlobalAssetMutation.isPending}
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        {uploadGlobalAssetMutation.isPending ? "Carregando..." : "Adicionar Asset Global"}
+                      </Button>
+                      {isLoadingGlobalAssets ? (
+                        <div className="text-center py-4">
+                          <p className="text-sm text-gray-400">Carregando...</p>
+                        </div>
+                      ) : globalAssets.length === 0 ? (
+                        <div className="text-center py-4">
+                          <p className="text-sm text-gray-400">
+                            Nenhum asset global encontrado
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {globalAssets.map((asset: GlobalAsset) => (
+                            <div 
+                              key={asset.id}
+                              className="p-3 bg-gray-50 rounded-lg border"
+                            >
+                              {/* Botões de ação no topo */}
+                              <div className="flex justify-end mb-3">
+                                {asset.isImage === 'true' ? (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs px-2 py-1 h-7"
+                                    onClick={() => handleInsertGlobalImage(asset)}
+                                    title="Inserir imagem no documento"
+                                  >
+                                    <Image className="w-3 h-3 mr-1" />
+                                    Inserir
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs px-2 py-1 h-7"
+                                    onClick={() => handleDownloadGlobalFile(asset)}
+                                    title="Baixar arquivo"
+                                  >
+                                    <Download className="w-3 h-3 mr-1" />
+                                    Baixar
+                                  </Button>
+                                )}
+                              </div>
+                              
+                              {/* Conteúdo do card */}
+                              <div className="flex items-center gap-3">
+                                {/* Miniatura ou ícone */}
+                                {asset.isImage === "true" && asset.fileData ? (
+                                  <img 
+                                    src={`data:${asset.mimeType};base64,${asset.fileData}`} 
+                                    alt={asset.name}
+                                    className="w-12 h-12 object-cover rounded border"
+                                  />
+                                ) : (
+                                  <div className="w-12 h-12 bg-gray-100 rounded border flex items-center justify-center">
+                                    {getFileIcon(asset.mimeType, asset.isImage)}
+                                  </div>
+                                )}
+                                
+                                {/* Informações do arquivo */}
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium truncate" title={asset.name}>
+                                    {asset.name}
+                                  </p>
+                                  <div className="flex items-center gap-2 mt-2">
+                                    <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                                      Global
+                                    </Badge>
+                                    {asset.fileSize && (
+                                      <span className="text-xs text-gray-500">
+                                        {Math.round(parseInt(asset.fileSize) / 1024)} KB
+                                      </span>
+                                    )}
+                                  </div>
+                                  {asset.description && (
+                                    <p className="text-xs text-gray-600 mt-1 truncate">
+                                      {asset.description}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
                 {/* My Assets */}
                 <AccordionItem value="my-assets" className="border rounded-lg bg-white">
                   <AccordionTrigger className="px-4 py-3 hover:no-underline">
@@ -1166,118 +1278,6 @@ export default function LexicalPage() {
                               </div>
                             );
                           })}
-                        </div>
-                      )}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-
-                {/* Global Assets */}
-                <AccordionItem value="global-assets" className="border rounded-lg bg-white">
-                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4" />
-                      <span className="font-medium">Global</span>
-                      <Badge variant="secondary" className="ml-auto">
-                        {globalAssets.length}
-                      </Badge>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-4 pb-4">
-                    <div className="space-y-2">
-                      <Button 
-                        className="w-full"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleGlobalFileUpload}
-                        disabled={uploadGlobalAssetMutation.isPending}
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        {uploadGlobalAssetMutation.isPending ? "Carregando..." : "Adicionar Asset Global"}
-                      </Button>
-                      {isLoadingGlobalAssets ? (
-                        <div className="text-center py-4">
-                          <p className="text-sm text-gray-400">Carregando...</p>
-                        </div>
-                      ) : globalAssets.length === 0 ? (
-                        <div className="text-center py-4">
-                          <p className="text-sm text-gray-400">
-                            Nenhum asset global encontrado
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          {globalAssets.map((asset: GlobalAsset) => (
-                            <div 
-                              key={asset.id}
-                              className="p-3 bg-gray-50 rounded-lg border"
-                            >
-                              {/* Botões de ação no topo */}
-                              <div className="flex justify-end mb-3">
-                                {asset.isImage === 'true' ? (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="text-xs px-2 py-1 h-7"
-                                    onClick={() => handleInsertGlobalImage(asset)}
-                                    title="Inserir imagem no documento"
-                                  >
-                                    <Image className="w-3 h-3 mr-1" />
-                                    Inserir
-                                  </Button>
-                                ) : (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="text-xs px-2 py-1 h-7"
-                                    onClick={() => handleDownloadGlobalFile(asset)}
-                                    title="Baixar arquivo"
-                                  >
-                                    <Download className="w-3 h-3 mr-1" />
-                                    Baixar
-                                  </Button>
-                                )}
-                              </div>
-                              
-                              {/* Conteúdo do card */}
-                              <div className="flex items-center gap-3">
-                                {/* Miniatura ou ícone */}
-                                {asset.isImage === "true" && asset.fileData ? (
-                                  <img 
-                                    src={`data:${asset.mimeType};base64,${asset.fileData}`} 
-                                    alt={asset.name}
-                                    className="w-12 h-12 object-cover rounded border"
-                                  />
-                                ) : (
-                                  <div className="w-12 h-12 bg-gray-100 rounded border flex items-center justify-center">
-                                    {getFileIcon(asset.mimeType, asset.isImage)}
-                                  </div>
-                                )}
-                                
-                                {/* Informações do arquivo */}
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium truncate" title={asset.name}>
-                                    {asset.name}
-                                  </p>
-                                  <div className="flex items-center gap-2 mt-2">
-                                    <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
-                                      Global
-                                    </Badge>
-                                    {asset.fileSize && (
-                                      <span className="text-xs text-gray-500">
-                                        {Math.round(parseInt(asset.fileSize) / 1024)} KB
-                                      </span>
-                                    )}
-                                  </div>
-                                  {asset.description && (
-                                    <p className="text-xs text-gray-600 mt-1 truncate">
-                                      {asset.description}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
                         </div>
                       )}
                     </div>
