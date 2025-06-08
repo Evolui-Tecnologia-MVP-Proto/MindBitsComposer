@@ -682,13 +682,13 @@ export default function LexicalPage() {
       if (editorInstance) {
         const editorState = editorInstance.getEditorState();
         const markdown = convertToMarkdown(editorState);
-        return `# ${title}\n\n${markdown}`;
+        return markdown;
       }
 
-      return `# ${title}\n\nEditor não disponível para conversão.`;
+      return "Editor não disponível para conversão.";
     } catch (error) {
       console.error('Erro ao converter para Markdown:', error);
-      return `# ${title}\n\nErro ao converter o conteúdo para Markdown.`;
+      return "Erro ao converter o conteúdo para Markdown.";
     }
   };
 
