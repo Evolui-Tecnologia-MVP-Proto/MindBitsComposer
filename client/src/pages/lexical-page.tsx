@@ -922,6 +922,7 @@ export default function LexicalPage() {
                   size="sm"
                   className={viewMode === 'editor' ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
                   title="Modo Editor"
+                  disabled={!hasEditorContent}
                 >
                   <Edit className={`w-4 h-4 ${viewMode === 'editor' ? "text-white" : ""}`} />
                 </Button>
@@ -931,6 +932,7 @@ export default function LexicalPage() {
                   size="sm"
                   className={viewMode === 'preview' ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
                   title="Visualizar Markdown"
+                  disabled={!hasEditorContent}
                 >
                   <FileCode2 className={`w-4 h-4 ${viewMode === 'preview' ? "text-white" : ""}`} />
                 </Button>
