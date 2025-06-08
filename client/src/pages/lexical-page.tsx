@@ -93,6 +93,7 @@ export default function LexicalPage() {
   const { toast } = useToast();
   const { showConfirmation } = useConfirmationToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const lexicalFileInputRef = useRef<HTMLInputElement>(null);
 
   // Função para obter ícone baseado no tipo de arquivo
   const getFileIcon = (mimeType: string | undefined, isImage: string | undefined) => {
@@ -619,6 +620,79 @@ export default function LexicalPage() {
     setShowSaveModal(true);
   };
 
+  // Função para abrir arquivo .lexical local
+  const handleOpenLexicalFile = () => {
+    lexicalFileInputRef.current?.click();
+  };
+
+  // Função para processar arquivo .lexical selecionado
+  const handleLexicalFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Verificar se é arquivo .lexical
+    if (!file.name.endsWith('.lexical')) {
+      toast({
+        title: "Arquivo inválido",
+        description: "Por favor, selecione um arquivo com extensão .lexical",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const fileContent = event.target?.result as string;
+        const lexicalData = JSON.parse(fileContent);
+        
+        // Verificar se tem a estrutura esperada de um documento lexical
+        if (lexicalData.title && lexicalData.content) {
+          // Limpar seleções atuais
+          setCurrentDocumentId(null);
+          setSelectedTemplate(null);
+          setSelectedEdition(null);
+          
+          // Carregar dados do arquivo
+          setTitle(lexicalData.title);
+          
+          // Se o content é string (estado serializado), usar diretamente
+          // Se é objeto, serializar novamente
+          if (typeof lexicalData.content === 'string') {
+            setContent(lexicalData.content);
+            setInitialEditorState(lexicalData.content);
+          } else {
+            const serializedContent = JSON.stringify(lexicalData.content);
+            setContent(serializedContent);
+            setInitialEditorState(serializedContent);
+          }
+          
+          // Forçar re-render do editor
+          setEditorKey(prev => prev + 1);
+          
+          toast({
+            title: "Arquivo carregado",
+            description: `O documento "${lexicalData.title}" foi carregado com sucesso.`,
+          });
+        } else {
+          throw new Error("Estrutura de arquivo inválida");
+        }
+      } catch (error) {
+        console.error('Erro ao processar arquivo .lexical:', error);
+        toast({
+          title: "Erro ao carregar arquivo",
+          description: "O arquivo selecionado não é um documento Lexical válido.",
+          variant: "destructive",
+        });
+      }
+    };
+    
+    reader.readAsText(file);
+    
+    // Limpar o input para permitir selecionar o mesmo arquivo novamente
+    e.target.value = '';
+  };
+
   const extractImagesFromContent = () => {
     const images: any[] = [];
     
@@ -1024,6 +1098,16 @@ export default function LexicalPage() {
             <div className="flex flex-col items-center space-y-1 border border-gray-300 rounded-lg p-3 pl-[12px] pr-[12px]" style={{ marginRight: '16px' }}>
               <span className="text-xs text-gray-500 font-medium">Ações</span>
               <div className="flex items-center space-x-2">
+                <Button
+                  onClick={handleOpenLexicalFile}
+                  variant="outline"
+                  size="sm"
+                  className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
+                  title="Abrir arquivo .lexical local"
+                >
+                  <FolderOpen className="w-4 h-4 mr-2" />
+                  Abrir
+                </Button>
                 <Button
                   onClick={handleDiscard}
                   variant="outline"
@@ -1567,6 +1651,15 @@ export default function LexicalPage() {
         onChange={handleFileChange}
         style={{ display: 'none' }}
         accept="*/*"
+      />
+      
+      {/* Hidden file input for .lexical files */}
+      <input
+        type="file"
+        ref={lexicalFileInputRef}
+        onChange={handleLexicalFileChange}
+        style={{ display: 'none' }}
+        accept=".lexical"
       />
       
       {/* Save File Modal */}
