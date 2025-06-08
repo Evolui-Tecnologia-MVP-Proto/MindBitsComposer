@@ -792,7 +792,7 @@ export default function LexicalPage() {
               </div>
             </div>
             
-            <div className="flex flex-col items-center space-y-1 border border-gray-300 rounded-lg p-3 mr-4">
+            <div className="flex flex-col items-center space-y-1 border border-gray-300 rounded-lg p-3 mr-4 pl-[20px] pr-[20px]">
               <span className="text-xs text-gray-500 font-medium">Ações</span>
               <div className="flex items-center space-x-2">
                 <Button
@@ -1289,7 +1289,6 @@ export default function LexicalPage() {
         )}
         </div>
       </div>
-      
       {/* Hidden file input for upload */}
       <input
         type="file"
