@@ -617,11 +617,156 @@ export default function LexicalPage() {
       title: "Escolher Formato de Salvamento",
       description: "Em qual formato deseja salvar o documento?",
       onConfirm: () => showLexicalImageOptions(), // Lexical
-      onCancel: () => saveMarkdown(), // Markdown
+      onCancel: () => showFormatChoiceDialog(), // Mostrar opções Markdown/Ambos
       confirmText: "Lexical (.lexical)",
-      cancelText: "Markdown (.md)",
+      cancelText: "Outras opções",
       variant: "default"
     });
+  };
+
+  const showFormatChoiceDialog = () => {
+    // Segunda pergunta: Markdown ou ambos os formatos
+    showConfirmation({
+      title: "Formato de Salvamento",
+      description: "Deseja salvar apenas em Markdown ou em ambos os formatos?",
+      onConfirm: () => saveMarkdown(), // Apenas Markdown
+      onCancel: () => saveBothFormats(), // Ambos os formatos
+      confirmText: "Apenas Markdown (.md)",
+      cancelText: "Ambos os formatos",
+      variant: "default"
+    });
+  };
+
+  const extractImagesFromContent = () => {
+    const images: any[] = [];
+    
+    // Extrair imagens do conteúdo HTML/Lexical
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    const imgElements = tempDiv.querySelectorAll('img');
+    
+    imgElements.forEach((img, index) => {
+      const src = img.getAttribute('src');
+      const alt = img.getAttribute('alt') || `Imagem ${index + 1}`;
+      const artifactId = img.getAttribute('data-artifact-id');
+      
+      if (src) {
+        images.push({
+          index,
+          src,
+          alt,
+          artifactId,
+          isBase64: src.startsWith('data:'),
+          isArtifact: !!artifactId
+        });
+      }
+    });
+    
+    return images;
+  };
+
+  const convertLexicalToMarkdown = (lexicalContent: string): string => {
+    try {
+      const editorState = JSON.parse(lexicalContent);
+      let markdown = `# ${title}\n\n`;
+      
+      const processNode = (node: any): string => {
+        let result = '';
+        
+        switch (node.type) {
+          case 'paragraph':
+            result += processChildren(node.children) + '\n\n';
+            break;
+          case 'heading':
+            const level = '#'.repeat(node.tag ? parseInt(node.tag.replace('h', '')) : 1);
+            result += `${level} ${processChildren(node.children)}\n\n`;
+            break;
+          case 'text':
+            let text = node.text || '';
+            if (node.format & 1) text = `**${text}**`;
+            if (node.format & 2) text = `*${text}*`;
+            if (node.format & 8) text = `\`${text}\``;
+            result += text;
+            break;
+          case 'linebreak':
+            result += '\n';
+            break;
+          case 'image-with-metadata':
+            const imageRef = node.artifactId ? `[Imagem: ${node.artifactId}]` : `[Imagem: ${node.alt || 'External'}]`;
+            result += `${imageRef}\n\n`;
+            break;
+          case 'image':
+            result += `[Imagem: ${node.alt || 'External'}]\n\n`;
+            break;
+          case 'list':
+            result += processListNode(node) + '\n';
+            break;
+          case 'listitem':
+            result += `- ${processChildren(node.children)}\n`;
+            break;
+          case 'table':
+            result += processTableNode(node) + '\n';
+            break;
+          case 'collapsible-container':
+            result += `\n### ${processChildren(node.children)}\n\n`;
+            break;
+          case 'collapsible-content':
+            result += processChildren(node.children) + '\n';
+            break;
+          default:
+            if (node.children) {
+              result += processChildren(node.children);
+            }
+            break;
+        }
+        
+        return result;
+      };
+      
+      const processChildren = (children: any[]): string => {
+        if (!children) return '';
+        return children.map(child => processNode(child)).join('');
+      };
+      
+      const processListNode = (listNode: any): string => {
+        if (!listNode.children) return '';
+        return listNode.children.map((item: any) => processNode(item)).join('');
+      };
+      
+      const processTableNode = (tableNode: any): string => {
+        let tableMarkdown = '';
+        if (!tableNode.children) return tableMarkdown;
+        
+        tableNode.children.forEach((row: any, rowIndex: number) => {
+          if (row.type === 'tablerow' && row.children) {
+            let rowText = '|';
+            row.children.forEach((cell: any) => {
+              if (cell.type === 'tablecell' && cell.children) {
+                const cellContent = processChildren(cell.children).replace(/\n/g, ' ').trim();
+                rowText += ` ${cellContent} |`;
+              }
+            });
+            tableMarkdown += rowText + '\n';
+            
+            if (rowIndex === 0) {
+              const separatorCount = (rowText.match(/\|/g) || []).length - 1;
+              tableMarkdown += '|' + ' --- |'.repeat(separatorCount) + '\n';
+            }
+          }
+        });
+        
+        return tableMarkdown;
+      };
+      
+      if (editorState.root && editorState.root.children) {
+        markdown += processChildren(editorState.root.children);
+      }
+      
+      return markdown;
+    } catch (error) {
+      console.error('Erro ao converter para Markdown:', error);
+      return `# ${title}\n\nErro ao converter o conteúdo para Markdown.`;
+    }
   };
 
   const saveLexical = (includeImages: boolean) => {
@@ -637,13 +782,10 @@ export default function LexicalPage() {
       const images = extractImagesFromContent();
       documentData.images = images;
       
-      // Processar imagens para incluir dados base64 completos
       const processedImages = images.map(img => {
         if (img.isBase64) {
-          // Já está em base64, manter como está
           return img;
         } else if (img.isArtifact) {
-          // Converter referência de artifact para base64 se possível
           return {
             ...img,
             note: "Referência ao banco de dados - dados base64 não incluídos"
@@ -654,7 +796,6 @@ export default function LexicalPage() {
       
       documentData.images = processedImages;
     } else {
-      // Incluir apenas referências das imagens
       const images = extractImagesFromContent();
       documentData.imageReferences = images.map(img => ({
         index: img.index,
@@ -665,10 +806,7 @@ export default function LexicalPage() {
       }));
     }
 
-    // Converter para JSON
     const jsonData = JSON.stringify(documentData, null, 2);
-    
-    // Criar blob e fazer download
     const blob = new Blob([jsonData], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -686,10 +824,7 @@ export default function LexicalPage() {
   };
 
   const saveMarkdown = () => {
-    // Converter conteúdo Lexical para Markdown (sem base64)
-    const markdownContent = convertLexicalToMarkdown(content, false); // false = não incluir base64
-    
-    // Criar blob e fazer download
+    const markdownContent = convertLexicalToMarkdown(content);
     const blob = new Blob([markdownContent], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -707,19 +842,29 @@ export default function LexicalPage() {
   };
 
   const saveBothFormats = () => {
-    // Salvar Lexical sem imagens
     saveLexical(false);
-    
-    // Aguardar um pouco e salvar Markdown
     setTimeout(() => {
       saveMarkdown();
-      
       toast({
         title: "Documentos salvos",
         description: `Salvos "${title}.lexical" e "${title}.md".`,
       });
     }, 500);
   };
+
+  const showLexicalImageOptions = () => {
+    showConfirmation({
+      title: "Incluir Imagens em Base64?",
+      description: "Deseja incluir as imagens convertidas em base64 no arquivo .lexical? Isso aumentará o tamanho do arquivo mas garantirá que as imagens estejam incluídas.",
+      onConfirm: () => saveLexical(true),
+      onCancel: () => saveLexical(false),
+      confirmText: "Incluir imagens",
+      cancelText: "Apenas referências",
+      variant: "default"
+    });
+  };
+
+
 
   const showLexicalImageOptions = () => {
     // Segunda pergunta: Para Lexical, incluir imagens?
@@ -863,42 +1008,6 @@ export default function LexicalPage() {
       console.error('Erro ao converter para Markdown:', error);
       return `# ${title}\n\nErro ao converter o conteúdo para Markdown.`;
     }
-  };
-
-  const saveMarkdown = () => {
-    // Converter conteúdo Lexical para Markdown (sem base64)
-    const markdownContent = convertLexicalToMarkdown(content, false); // false = não incluir base64
-    
-    // Criar blob e fazer download
-    const blob = new Blob([markdownContent], { type: 'text/markdown' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.md`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    toast({
-      title: "Documento salvo em Markdown",
-      description: `O arquivo "${title}.md" foi salvo (imagens como referências).`,
-    });
-  };
-
-  const saveBothFormats = () => {
-    // Salvar Lexical sem imagens
-    saveLexical(false);
-    
-    // Aguardar um pouco e salvar Markdown
-    setTimeout(() => {
-      saveMarkdown();
-      
-      toast({
-        title: "Documentos salvos",
-        description: `Salvos "${title}.lexical" e "${title}.md".`,
-      });
-    }, 500);
   };
 
   const extractImagesFromContent = () => {
