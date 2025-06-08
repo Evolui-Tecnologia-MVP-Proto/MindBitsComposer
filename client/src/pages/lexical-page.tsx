@@ -987,6 +987,7 @@ export default function LexicalPage() {
                   variant="outline"
                   size="sm"
                   className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                  disabled={!selectedEdition}
                 >
                   <Split className="w-4 h-4 mr-2" />
                   Publicar
