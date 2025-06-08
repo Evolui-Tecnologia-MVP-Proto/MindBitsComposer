@@ -862,6 +862,15 @@ export default function LexicalPage() {
                   <Save className="w-4 h-4 mr-2" />
                   {saveMutation.isPending ? "Salvando..." : "Salvar"}
                 </Button>
+                <Button
+                  onClick={() => {}} // Placeholder for future functionality
+                  variant="outline"
+                  size="sm"
+                  className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Publicar
+                </Button>
               </div>
             </div>
           </div>
