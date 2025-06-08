@@ -104,7 +104,7 @@ export default function SaveFileModal({ isOpen, onClose, onSave, defaultFilename
 
           {/* Opções para imagens (Lexical e Ambos os formatos) */}
           {(format === "lexical" || format === "both") && (
-            <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+            <div className="space-y-3 p-4 bg-gray-50 rounded-lg pl-[0px] pr-[0px]">
               <Label>
                 Tratamento de imagens 
                 {format === "both" && <span className="text-sm text-gray-600">(aplicado apenas ao arquivo Lexical)</span>}
