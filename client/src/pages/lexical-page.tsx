@@ -1270,7 +1270,7 @@ export default function LexicalPage() {
                   <AccordionItem value="origin-assets" className="border rounded-lg bg-white">
                     <AccordionTrigger className="px-4 py-3 hover:no-underline">
                       <div className="flex items-center gap-2">
-                        <Download className="w-4 h-4" />
+                        <FileInput className="w-4 h-4" />
                         <span className="font-medium">Origin Assets</span>
                         <Badge variant="secondary" className="ml-auto">
                           {documentArtifacts.filter(artifact => artifact.originAssetId !== "Uploaded").length}
