@@ -969,13 +969,14 @@ export default function LexicalPage() {
                   variant="outline"
                   size="sm"
                   className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                  disabled={!hasEditorContent}
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
                   Descartar
                 </Button>
                 <Button
                   onClick={handleSave}
-                  disabled={saveMutation.isPending}
+                  disabled={saveMutation.isPending || !hasEditorContent}
                   size="sm"
                 >
                   <Save className="w-4 h-4 mr-2" />
