@@ -672,26 +672,26 @@ export default function LexicalPage() {
     }
   };
 
-  const handleSaveFile = (filename: string, format: string, includeImages?: boolean) => {
+  const handleSaveFile = (filename: string, format: string, includeImages?: boolean, directoryHandle?: any) => {
     const cleanFilename = filename.replace(/[^a-z0-9\-_\s]/gi, '').trim();
 
     switch (format) {
       case "lexical":
-        saveLexicalFile(cleanFilename, includeImages || false);
+        saveLexicalFile(cleanFilename, includeImages || false, directoryHandle);
         break;
       case "markdown":
-        saveMarkdownFile(cleanFilename);
+        saveMarkdownFile(cleanFilename, directoryHandle);
         break;
       case "both":
-        saveLexicalFile(cleanFilename, false);
+        saveLexicalFile(cleanFilename, includeImages || false, directoryHandle);
         setTimeout(() => {
-          saveMarkdownFile(cleanFilename);
+          saveMarkdownFile(cleanFilename, directoryHandle);
         }, 500);
         break;
     }
   };
 
-  const saveLexicalFile = (filename: string, includeImages: boolean) => {
+  const saveLexicalFile = async (filename: string, includeImages: boolean, directoryHandle?: any) => {
     let documentData: any = {
       title,
       content,
@@ -729,11 +729,34 @@ export default function LexicalPage() {
     }
 
     const jsonData = JSON.stringify(documentData, null, 2);
+    const fileName = `${filename}.lexical`;
+
+    // Tentar usar File System Access API se disponível
+    if (directoryHandle && 'showSaveFilePicker' in window) {
+      try {
+        // @ts-ignore
+        const fileHandle = await directoryHandle.getFileHandle(fileName, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(jsonData);
+        await writable.close();
+        
+        toast({
+          title: "Documento salvo em Lexical",
+          description: `O arquivo "${fileName}" foi salvo no diretório selecionado${includeImages ? ' com imagens em base64' : ' com referências de imagem'}.`,
+        });
+        return;
+      } catch (error) {
+        console.error('Erro ao salvar com File System Access API:', error);
+        // Fallback para download padrão
+      }
+    }
+
+    // Fallback: download padrão
     const blob = new Blob([jsonData], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${filename}.lexical`;
+    a.download = fileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -741,17 +764,40 @@ export default function LexicalPage() {
 
     toast({
       title: "Documento salvo em Lexical",
-      description: `O arquivo "${filename}.lexical" foi salvo${includeImages ? ' com imagens em base64' : ' com referências de imagem'}.`,
+      description: `O arquivo "${fileName}" foi salvo${includeImages ? ' com imagens em base64' : ' com referências de imagem'}.`,
     });
   };
 
-  const saveMarkdownFile = (filename: string) => {
+  const saveMarkdownFile = async (filename: string, directoryHandle?: any) => {
     const markdownContent = convertLexicalToMarkdown();
+    const fileName = `${filename}.md`;
+
+    // Tentar usar File System Access API se disponível
+    if (directoryHandle && 'showSaveFilePicker' in window) {
+      try {
+        // @ts-ignore
+        const fileHandle = await directoryHandle.getFileHandle(fileName, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(markdownContent);
+        await writable.close();
+        
+        toast({
+          title: "Documento salvo em Markdown",
+          description: `O arquivo "${fileName}" foi salvo no diretório selecionado (imagens como referências).`,
+        });
+        return;
+      } catch (error) {
+        console.error('Erro ao salvar com File System Access API:', error);
+        // Fallback para download padrão
+      }
+    }
+
+    // Fallback: download padrão
     const blob = new Blob([markdownContent], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${filename}.md`;
+    a.download = fileName;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -759,7 +805,7 @@ export default function LexicalPage() {
 
     toast({
       title: "Documento salvo em Markdown",
-      description: `O arquivo "${filename}.md" foi salvo (imagens como referências).`,
+      description: `O arquivo "${fileName}" foi salvo (imagens como referências).`,
     });
   };
 

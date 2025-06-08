@@ -6,11 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Folder, File, FileText, Download } from "lucide-react";
+import FileSystemExplorer from "./FileSystemExplorer";
 
 interface SaveFileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (filename: string, format: string, includeImages?: boolean) => void;
+  onSave: (filename: string, format: string, includeImages?: boolean, directoryHandle?: any) => void;
   defaultFilename?: string;
 }
 
@@ -18,6 +19,8 @@ export default function SaveFileModal({ isOpen, onClose, onSave, defaultFilename
   const [filename, setFilename] = useState(defaultFilename);
   const [format, setFormat] = useState("lexical");
   const [includeImages, setIncludeImages] = useState(false);
+  const [selectedPath, setSelectedPath] = useState("Downloads");
+  const [directoryHandle, setDirectoryHandle] = useState<any>(null);
 
   const handleSave = () => {
     if (!filename.trim()) {
@@ -25,7 +28,7 @@ export default function SaveFileModal({ isOpen, onClose, onSave, defaultFilename
     }
 
     const cleanFilename = filename.replace(/[^a-z0-9\-_\s]/gi, '').trim();
-    onSave(cleanFilename, format, format === "lexical" ? includeImages : undefined);
+    onSave(cleanFilename, format, format === "lexical" ? includeImages : undefined, directoryHandle);
     onClose();
   };
 
@@ -56,6 +59,13 @@ export default function SaveFileModal({ isOpen, onClose, onSave, defaultFilename
         </DialogHeader>
 
         <div className="space-y-6 py-4">
+          {/* Explorador de diretórios */}
+          <FileSystemExplorer
+            onDirectorySelected={setDirectoryHandle}
+            selectedPath={selectedPath}
+            onPathChange={setSelectedPath}
+          />
+
           {/* Nome do arquivo */}
           <div className="space-y-2">
             <Label htmlFor="filename">Nome do arquivo</Label>
