@@ -669,21 +669,34 @@ export default function LexicalPage() {
 
   const convertLexicalToMarkdown = (): string => {
     try {
-      if (!editorInstance) {
-        console.error('Editor instance not available');
-        return `# ${title}\n\nErro: Editor não disponível para conversão.`;
+      // If we have an editor instance, use it directly
+      if (editorInstance) {
+        const converter = createMarkdownConverter();
+        return editorInstance.getEditorState().read(() => {
+          const root = $getRoot();
+          const markdown = converter.convert(root);
+          return `# ${title}\n\n${markdown}`;
+        });
       }
 
-      const converter = createMarkdownConverter();
-      
-      return editorInstance.getEditorState().read(() => {
-        const root = $getRoot();
-        const markdown = converter.convert(root);
-        return `# ${title}\n\n${markdown}`;
-      });
+      // Fallback: Simple text conversion from content
+      if (content && content.trim() !== '') {
+        // Try to extract text from HTML content
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+        const textContent = tempDiv.textContent || tempDiv.innerText || '';
+        
+        if (textContent.trim()) {
+          return `# ${title}\n\n${textContent}`;
+        }
+      }
+
+      return `# ${title}\n\nNenhum conteúdo disponível para conversão.`;
     } catch (error) {
       console.error('Erro ao converter para Markdown:', error);
-      return `# ${title}\n\nErro ao converter o conteúdo para Markdown.`;
+      // Final fallback with basic content
+      const fallbackContent = content ? content.replace(/<[^>]*>/g, '') : 'Erro na conversão';
+      return `# ${title}\n\n${fallbackContent}`;
     }
   };
 
