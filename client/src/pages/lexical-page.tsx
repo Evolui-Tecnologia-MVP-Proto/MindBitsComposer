@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool, Eye, Edit, File, Image, Video, FileAudio, FileCode2, CircleChevronLeft, Globe } from "lucide-react";
+import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool, Eye, Edit, File, Image, Video, FileAudio, FileCode2, CircleChevronLeft, Globe, Split } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { useToast } from "@/hooks/use-toast";
@@ -868,7 +868,7 @@ export default function LexicalPage() {
                   size="sm"
                   className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
                 >
-                  <Globe className="w-4 h-4 mr-2" />
+                  <Split className="w-4 h-4 mr-2" />
                   Publicar
                 </Button>
               </div>
