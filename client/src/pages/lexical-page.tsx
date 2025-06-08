@@ -667,36 +667,28 @@ export default function LexicalPage() {
     return images;
   };
 
+  // Use the same function that works in the preview mode
+  const convertToMarkdown = (editorState: any): string => {
+    const converter = createMarkdownConverter();
+    
+    return editorState.read(() => {
+      const root = $getRoot();
+      return converter.convert(root);
+    });
+  };
+
   const convertLexicalToMarkdown = (): string => {
     try {
-      // If we have an editor instance, use it directly
       if (editorInstance) {
-        const converter = createMarkdownConverter();
-        return editorInstance.getEditorState().read(() => {
-          const root = $getRoot();
-          const markdown = converter.convert(root);
-          return `# ${title}\n\n${markdown}`;
-        });
+        const editorState = editorInstance.getEditorState();
+        const markdown = convertToMarkdown(editorState);
+        return `# ${title}\n\n${markdown}`;
       }
 
-      // Fallback: Simple text conversion from content
-      if (content && content.trim() !== '') {
-        // Try to extract text from HTML content
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = content;
-        const textContent = tempDiv.textContent || tempDiv.innerText || '';
-        
-        if (textContent.trim()) {
-          return `# ${title}\n\n${textContent}`;
-        }
-      }
-
-      return `# ${title}\n\nNenhum conteúdo disponível para conversão.`;
+      return `# ${title}\n\nEditor não disponível para conversão.`;
     } catch (error) {
       console.error('Erro ao converter para Markdown:', error);
-      // Final fallback with basic content
-      const fallbackContent = content ? content.replace(/<[^>]*>/g, '') : 'Erro na conversão';
-      return `# ${title}\n\n${fallbackContent}`;
+      return `# ${title}\n\nErro ao converter o conteúdo para Markdown.`;
     }
   };
 
