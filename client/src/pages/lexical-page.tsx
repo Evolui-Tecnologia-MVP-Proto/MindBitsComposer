@@ -744,7 +744,7 @@ export default function LexicalPage() {
               )}
             </div>
             
-            <div className="flex flex-col items-center space-y-1">
+            <div className="flex flex-col items-center space-y-1 border border-gray-300 rounded-lg p-3">
               <span className="text-xs text-gray-500 font-medium">Visualização</span>
               <div className="flex items-center space-x-1">
                 <Button
@@ -768,7 +768,7 @@ export default function LexicalPage() {
               </div>
             </div>
             
-            <div className="flex flex-col items-center space-y-1">
+            <div className="flex flex-col items-center space-y-1 border border-gray-300 rounded-lg p-3">
               <span className="text-xs text-gray-500 font-medium">Side Panels</span>
               <div className="flex items-center space-x-2">
                 <Button
