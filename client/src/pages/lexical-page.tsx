@@ -1035,7 +1035,7 @@ export default function LexicalPage() {
                 <AccordionItem value="global-assets" className="border rounded-lg bg-white">
                   <AccordionTrigger className="px-4 py-3 hover:no-underline">
                     <div className="flex items-center gap-2">
-                      <FileText className="w-4 h-4" />
+                      <Globe className="w-4 h-4" />
                       <span className="font-medium">Global</span>
                       <Badge variant="secondary" className="ml-auto">
                         {globalAssets.length}
