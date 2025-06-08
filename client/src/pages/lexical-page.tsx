@@ -763,17 +763,7 @@ export default function LexicalPage() {
     });
   };
 
-  const showLexicalImageOptions = () => {
-    showConfirmation({
-      title: "Incluir Imagens em Base64?",
-      description: "Deseja incluir as imagens convertidas em base64 no arquivo .lexical? Isso aumentará o tamanho do arquivo mas garantirá que as imagens estejam incluídas.",
-      onConfirm: () => saveLexical(true),
-      onCancel: () => saveLexical(false),
-      confirmText: "Incluir imagens",
-      cancelText: "Apenas referências",
-      variant: "default"
-    });
-  };
+
 
   const handleNewDocument = () => {
     setCurrentDocumentId(null);
@@ -1571,6 +1561,14 @@ export default function LexicalPage() {
         onChange={handleFileChange}
         style={{ display: 'none' }}
         accept="*/*"
+      />
+      
+      {/* Save File Modal */}
+      <SaveFileModal
+        isOpen={showSaveModal}
+        onClose={() => setShowSaveModal(false)}
+        onSave={handleSaveFile}
+        defaultFilename={title.replace(/[^a-z0-9\-_\s]/gi, '').trim() || "documento"}
       />
     </div>
   );
