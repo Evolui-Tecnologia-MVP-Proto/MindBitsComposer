@@ -1034,10 +1034,12 @@ export default function LexicalPage() {
                 {/* Global Assets */}
                 <AccordionItem value="global-assets" className="border rounded-lg bg-white">
                   <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                    <div className="flex items-center gap-2">
-                      <Globe className="w-4 h-4" />
-                      <span className="font-medium">Global</span>
-                      <Badge variant="secondary" className="ml-auto">
+                    <div className="flex items-center justify-between w-full pr-2">
+                      <div className="flex items-center gap-2">
+                        <Globe className="w-4 h-4" />
+                        <span className="font-medium">Global</span>
+                      </div>
+                      <Badge variant="secondary">
                         {globalAssets.length}
                       </Badge>
                     </div>
@@ -1157,10 +1159,12 @@ export default function LexicalPage() {
                 {selectedEdition && (
                   <AccordionItem value="my-assets" className="border rounded-lg bg-white">
                     <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                      <div className="flex items-center gap-2">
-                        <FileOutput className="w-4 h-4" />
-                        <span className="font-medium">My Assets</span>
-                        <Badge variant="secondary" className="ml-auto">
+                      <div className="flex items-center justify-between w-full pr-2">
+                        <div className="flex items-center gap-2">
+                          <FileOutput className="w-4 h-4" />
+                          <span className="font-medium">My Assets</span>
+                        </div>
+                        <Badge variant="secondary">
                           {documentArtifacts.filter(artifact => artifact.originAssetId === "Uploaded").length}
                         </Badge>
                       </div>
@@ -1269,10 +1273,12 @@ export default function LexicalPage() {
                 {documentArtifacts.filter(artifact => artifact.originAssetId !== "Uploaded").length > 0 && (
                   <AccordionItem value="origin-assets" className="border rounded-lg bg-white">
                     <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                      <div className="flex items-center gap-2">
-                        <FileInput className="w-4 h-4" />
-                        <span className="font-medium">Origin Assets</span>
-                        <Badge variant="secondary" className="ml-auto">
+                      <div className="flex items-center justify-between w-full pr-2">
+                        <div className="flex items-center gap-2">
+                          <FileInput className="w-4 h-4" />
+                          <span className="font-medium">Origin Assets</span>
+                        </div>
+                        <Badge variant="secondary">
                           {documentArtifacts.filter(artifact => artifact.originAssetId !== "Uploaded").length}
                         </Badge>
                       </div>
