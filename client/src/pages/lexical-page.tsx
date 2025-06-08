@@ -586,12 +586,131 @@ export default function LexicalPage() {
   };
 
   const handleSave = () => {
-    const plainText = content.replace(/<[^>]*>/g, '').trim(); // Remove HTML tags para texto plano
-    saveMutation.mutate({
-      title,
-      content,
-      plainText
+    // 1. Documentos Composer selecionado: manter implementação atual
+    if (selectedEdition) {
+      const plainText = content.replace(/<[^>]*>/g, '').trim();
+      saveMutation.mutate({
+        title,
+        content,
+        plainText
+      });
+      return;
+    }
+
+    // 2. Templates Estruturais selecionado: mostrar toast
+    if (selectedTemplate) {
+      toast({
+        title: "Funcionalidade a Implementar",
+        description: "O salvamento de templates estruturais será implementado em breve.",
+        variant: "default",
+      });
+      return;
+    }
+
+    // 3. Editor sem seleção: salvar localmente no formato .lexical
+    handleSaveLocal();
+  };
+
+  const handleSaveLocal = () => {
+    const saveWithImages = (includeImages: boolean) => {
+      let documentData: any = {
+        title,
+        content,
+        editorState: editorState || content,
+        timestamp: new Date().toISOString(),
+        includeImages
+      };
+
+      if (includeImages) {
+        const images = extractImagesFromContent();
+        documentData.images = images;
+        
+        // Processar imagens para incluir dados base64 completos
+        const processedImages = images.map(img => {
+          if (img.isBase64) {
+            // Já está em base64, manter como está
+            return img;
+          } else if (img.isArtifact) {
+            // Converter referência de artifact para base64 se possível
+            return {
+              ...img,
+              note: "Referência ao banco de dados - dados base64 não incluídos"
+            };
+          }
+          return img;
+        });
+        
+        documentData.images = processedImages;
+      } else {
+        // Incluir apenas referências das imagens
+        const images = extractImagesFromContent();
+        documentData.imageReferences = images.map(img => ({
+          index: img.index,
+          alt: img.alt,
+          artifactId: img.artifactId,
+          originalSrc: img.src,
+          type: img.isArtifact ? "database_reference" : "external_url"
+        }));
+      }
+
+      // Converter para JSON
+      const jsonData = JSON.stringify(documentData, null, 2);
+      
+      // Criar blob e fazer download
+      const blob = new Blob([jsonData], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.lexical`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Documento salvo localmente",
+        description: `O arquivo "${title}.lexical" foi salvo${includeImages ? ' com imagens em base64' : ' com referências de imagem'}.`,
+      });
+    };
+
+    // Mostrar primeira confirmação para incluir imagens
+    showConfirmation({
+      title: "Incluir Imagens em Base64?",
+      description: "Deseja incluir as imagens convertidas em base64 no arquivo .lexical? Isso aumentará o tamanho do arquivo mas garantirá que as imagens estejam incluídas.",
+      onConfirm: () => saveWithImages(true),
+      onCancel: () => saveWithImages(false),
+      confirmText: "Incluir imagens",
+      cancelText: "Apenas referências",
+      variant: "default"
     });
+  };
+
+  const extractImagesFromContent = () => {
+    const images: any[] = [];
+    
+    // Extrair imagens do conteúdo HTML/Lexical
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    const imgElements = tempDiv.querySelectorAll('img');
+    
+    imgElements.forEach((img, index) => {
+      const src = img.getAttribute('src');
+      const alt = img.getAttribute('alt') || `Imagem ${index + 1}`;
+      const artifactId = img.getAttribute('data-artifact-id');
+      
+      if (src) {
+        images.push({
+          index,
+          src,
+          alt,
+          artifactId,
+          isBase64: src.startsWith('data:'),
+          isArtifact: !!artifactId
+        });
+      }
+    });
+    
+    return images;
   };
 
   const handleNewDocument = () => {
