@@ -792,7 +792,7 @@ export default function LexicalPage() {
               </div>
             </div>
             
-            <div className="flex flex-col items-center space-y-1 border border-gray-300 rounded-lg p-3 pl-[12px] pr-[12px]" style={{ marginRight: '30px' }}>
+            <div className="flex flex-col items-center space-y-1 border border-gray-300 rounded-lg p-3 pl-[12px] pr-[12px]" style={{ marginRight: '25px' }}>
               <span className="text-xs text-gray-500 font-medium">Ações</span>
               <div className="flex items-center space-x-2">
                 <Button
