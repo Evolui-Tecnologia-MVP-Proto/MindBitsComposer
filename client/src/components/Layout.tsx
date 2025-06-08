@@ -39,18 +39,16 @@ export default function Layout({ children }: LayoutProps) {
           </div>
         </div>
       </header>
-
       <div className="flex flex-1 min-h-0">
         <Sidebar 
           isMobileOpen={isMobileMenuOpen} 
           setIsMobileOpen={setIsMobileMenuOpen} 
         />
         
-        <main className="flex-1 relative z-0 focus:outline-none bg-gray-50 p-5 min-h-0 overflow-hidden">
+        <main className="flex-1 relative z-0 focus:outline-none bg-gray-50 p-5 min-h-0 overflow-hidden pl-[10px] pr-[10px]">
           {children}
         </main>
       </div>
-
       <Footer />
     </div>
   );
