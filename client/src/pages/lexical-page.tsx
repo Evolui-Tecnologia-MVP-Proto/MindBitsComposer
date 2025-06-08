@@ -1063,7 +1063,7 @@ export default function LexicalPage() {
                               className="p-3 bg-gray-50 rounded-lg border"
                             >
                               {/* Botões de ação no topo */}
-                              <div className="flex justify-start gap-2 mb-3">
+                              <div className="flex justify-between mb-3">
                                 {asset.isImage === 'true' ? (
                                   <Button
                                     size="sm"
@@ -1188,7 +1188,7 @@ export default function LexicalPage() {
                                   className="p-3 bg-gray-50 rounded-lg border"
                                 >
                                   {/* Botões de ação no topo */}
-                                  <div className="flex justify-start gap-2 mb-3">
+                                  <div className="flex justify-between mb-3">
                                     {artifact.isImage === 'true' ? (
                                       <Button
                                         size="sm"
