@@ -20,33 +20,49 @@ export default function FileSystemExplorer({
 
   useEffect(() => {
     // Verificar se o navegador suporta File System Access API
-    setIsSupported('showDirectoryPicker' in window);
+    const hasAPI = typeof window !== 'undefined' && 'showDirectoryPicker' in window;
+    setIsSupported(hasAPI);
   }, []);
 
   const handleSelectDirectory = async () => {
-    if (!isSupported) {
-      // Fallback: mostrar input manual do caminho
-      const path = prompt("Digite o caminho do diretório (ex: C:\\Documentos\\):");
-      if (path) {
-        onPathChange(path);
-      }
-      return;
-    }
-
+    console.log('handleSelectDirectory chamado, isSupported:', isSupported);
+    
     try {
-      // @ts-ignore - File System Access API ainda não tem tipos oficiais
-      const dirHandle = await window.showDirectoryPicker({
-        mode: 'readwrite',
-        startIn: 'documents'
-      });
-      
-      setDirectoryHandle(dirHandle);
-      onPathChange(dirHandle.name);
-      onDirectorySelected(dirHandle);
-    } catch (error) {
-      if (error instanceof Error && error.name !== 'AbortError') {
-        console.error('Erro ao selecionar diretório:', error);
+      // Sempre tentar usar a API se ela existir
+      if (typeof window !== 'undefined' && 'showDirectoryPicker' in window) {
+        console.log('Tentando usar showDirectoryPicker...');
+        
+        // @ts-ignore - File System Access API ainda não tem tipos oficiais
+        const dirHandle = await window.showDirectoryPicker({
+          mode: 'readwrite'
+        });
+        
+        console.log('Diretório selecionado:', dirHandle);
+        setDirectoryHandle(dirHandle);
+        onPathChange(dirHandle.name || 'Diretório selecionado');
+        onDirectorySelected(dirHandle);
+        return;
       }
+    } catch (error: any) {
+      console.log('Erro na API, código:', error?.name, error?.message);
+      
+      if (error?.name === 'AbortError') {
+        // Usuário cancelou a seleção
+        console.log('Seleção cancelada pelo usuário');
+        return;
+      }
+      
+      if (error?.name === 'NotAllowedError') {
+        console.log('Permissão negada pelo navegador');
+      }
+    }
+    
+    // Fallback: input manual
+    console.log('Usando fallback para input manual');
+    const path = prompt("Digite o caminho do diretório onde deseja salvar os arquivos:");
+    if (path && path.trim()) {
+      onPathChange(path.trim());
+      console.log('Caminho definido manualmente:', path.trim());
     }
   };
 
