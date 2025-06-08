@@ -1085,104 +1085,106 @@ export default function LexicalPage() {
                 </AccordionItem>
 
                 {/* My Assets */}
-                <AccordionItem value="my-assets" className="border rounded-lg bg-white">
-                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                    <div className="flex items-center gap-2">
-                      <Upload className="w-4 h-4" />
-                      <span className="font-medium">My Assets</span>
-                      <Badge variant="secondary" className="ml-auto">
-                        {documentArtifacts.filter(artifact => artifact.originAssetId === "Uploaded").length}
-                      </Badge>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-4 pb-4">
-                    <div className="space-y-2">
-                      <Button 
-                        className="w-full"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleFileUpload}
-                        disabled={uploadFileMutation.isPending || !selectedEdition}
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        {uploadFileMutation.isPending ? "Carregando..." : "Adicionar Arquivo"}
-                      </Button>
-                      {isLoadingArtifacts ? (
-                        <div className="text-center py-4">
-                          <p className="text-sm text-gray-400">Carregando...</p>
-                        </div>
-                      ) : documentArtifacts.filter(artifact => artifact.originAssetId === "Uploaded").length === 0 ? (
-                        <div className="text-center py-4">
-                          <p className="text-sm text-gray-400">
-                            Nenhum arquivo carregado
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          {documentArtifacts
-                            .filter(artifact => artifact.originAssetId === "Uploaded")
-                            .map((artifact: DocumentArtifact) => (
-                              <div 
-                                key={artifact.id}
-                                className="p-3 bg-gray-50 rounded-lg border"
-                              >
-                                {/* Botões de ação no topo */}
-                                <div className="flex justify-end mb-3">
-                                  {artifact.isImage === 'true' ? (
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="text-xs px-2 py-1 h-7"
-                                      onClick={() => handleInsertImage(artifact)}
-                                      title="Inserir imagem no documento"
-                                    >
-                                      <Image className="w-3 h-3 mr-1" />
-                                      Inserir
-                                    </Button>
-                                  ) : (
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="text-xs px-2 py-1 h-7"
-                                      onClick={() => handleDownloadFile(artifact)}
-                                      title="Baixar arquivo"
-                                    >
-                                      <Download className="w-3 h-3 mr-1" />
-                                      Baixar
-                                    </Button>
-                                  )}
-                                </div>
-                                
-                                {/* Conteúdo do card */}
-                                <div className="flex items-center gap-3">
-                                  {/* Miniatura ou ícone */}
-                                  {renderThumbnail(artifact)}
+                {selectedEdition && (
+                  <AccordionItem value="my-assets" className="border rounded-lg bg-white">
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                      <div className="flex items-center gap-2">
+                        <Upload className="w-4 h-4" />
+                        <span className="font-medium">My Assets</span>
+                        <Badge variant="secondary" className="ml-auto">
+                          {documentArtifacts.filter(artifact => artifact.originAssetId === "Uploaded").length}
+                        </Badge>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="px-4 pb-4">
+                      <div className="space-y-2">
+                        <Button 
+                          className="w-full"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleFileUpload}
+                          disabled={uploadFileMutation.isPending || !selectedEdition}
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          {uploadFileMutation.isPending ? "Carregando..." : "Adicionar Arquivo"}
+                        </Button>
+                        {isLoadingArtifacts ? (
+                          <div className="text-center py-4">
+                            <p className="text-sm text-gray-400">Carregando...</p>
+                          </div>
+                        ) : documentArtifacts.filter(artifact => artifact.originAssetId === "Uploaded").length === 0 ? (
+                          <div className="text-center py-4">
+                            <p className="text-sm text-gray-400">
+                              Nenhum arquivo carregado
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            {documentArtifacts
+                              .filter(artifact => artifact.originAssetId === "Uploaded")
+                              .map((artifact: DocumentArtifact) => (
+                                <div 
+                                  key={artifact.id}
+                                  className="p-3 bg-gray-50 rounded-lg border"
+                                >
+                                  {/* Botões de ação no topo */}
+                                  <div className="flex justify-end mb-3">
+                                    {artifact.isImage === 'true' ? (
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="text-xs px-2 py-1 h-7"
+                                        onClick={() => handleInsertImage(artifact)}
+                                        title="Inserir imagem no documento"
+                                      >
+                                        <Image className="w-3 h-3 mr-1" />
+                                        Inserir
+                                      </Button>
+                                    ) : (
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="text-xs px-2 py-1 h-7"
+                                        onClick={() => handleDownloadFile(artifact)}
+                                        title="Baixar arquivo"
+                                      >
+                                        <Download className="w-3 h-3 mr-1" />
+                                        Baixar
+                                      </Button>
+                                    )}
+                                  </div>
                                   
-                                  {/* Informações do arquivo */}
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium truncate" title={artifact.name}>
-                                      {artifact.name}
-                                    </p>
-                                    <div className="flex items-center gap-2 mt-2">
-                                      <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                                        Uploaded
-                                      </Badge>
-                                      {artifact.fileSize && (
-                                        <span className="text-xs text-gray-500">
-                                          {Math.round(parseInt(artifact.fileSize) / 1024)} KB
-                                        </span>
-                                      )}
+                                  {/* Conteúdo do card */}
+                                  <div className="flex items-center gap-3">
+                                    {/* Miniatura ou ícone */}
+                                    {renderThumbnail(artifact)}
+                                    
+                                    {/* Informações do arquivo */}
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-sm font-medium truncate" title={artifact.name}>
+                                        {artifact.name}
+                                      </p>
+                                      <div className="flex items-center gap-2 mt-2">
+                                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                                          Uploaded
+                                        </Badge>
+                                        {artifact.fileSize && (
+                                          <span className="text-xs text-gray-500">
+                                            {Math.round(parseInt(artifact.fileSize) / 1024)} KB
+                                          </span>
+                                        )}
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                            ))
-                          }
-                        </div>
-                      )}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
+                              ))
+                            }
+                          </div>
+                        )}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                )}
 
                 {/* Origin Assets */}
                 {documentArtifacts.filter(artifact => artifact.originAssetId !== "Uploaded").length > 0 && (
