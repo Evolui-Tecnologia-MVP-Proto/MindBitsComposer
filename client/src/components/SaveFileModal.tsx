@@ -3,15 +3,13 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Folder, File, FileText, Download } from "lucide-react";
-import FileSystemExplorer from "./FileSystemExplorer";
+import { File, FileText, Download } from "lucide-react";
 
 interface SaveFileModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (filename: string, format: string, includeImages?: boolean, directoryHandle?: any) => void;
+  onSave: (filename: string, format: string, includeImages?: boolean) => void;
   defaultFilename?: string;
 }
 
@@ -19,8 +17,6 @@ export default function SaveFileModal({ isOpen, onClose, onSave, defaultFilename
   const [filename, setFilename] = useState(defaultFilename);
   const [format, setFormat] = useState("lexical");
   const [includeImages, setIncludeImages] = useState(false);
-  const [selectedPath, setSelectedPath] = useState("Downloads");
-  const [directoryHandle, setDirectoryHandle] = useState<any>(null);
 
   const handleSave = () => {
     if (!filename.trim()) {
@@ -28,7 +24,7 @@ export default function SaveFileModal({ isOpen, onClose, onSave, defaultFilename
     }
 
     const cleanFilename = filename.replace(/[^a-z0-9\-_\s]/gi, '').trim();
-    onSave(cleanFilename, format, format === "lexical" ? includeImages : undefined, directoryHandle);
+    onSave(cleanFilename, format, format === "lexical" ? includeImages : undefined);
     onClose();
   };
 
@@ -59,12 +55,14 @@ export default function SaveFileModal({ isOpen, onClose, onSave, defaultFilename
         </DialogHeader>
 
         <div className="space-y-6 py-4">
-          {/* Explorador de diretórios */}
-          <FileSystemExplorer
-            onDirectorySelected={setDirectoryHandle}
-            selectedPath={selectedPath}
-            onPathChange={setSelectedPath}
-          />
+          {/* Informações sobre salvamento */}
+          <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <Download className="w-4 h-4 text-blue-600" />
+            <div className="text-sm text-blue-700">
+              <p className="font-medium">Salvamento automático</p>
+              <p>Os arquivos serão salvos no diretório de Downloads do seu navegador.</p>
+            </div>
+          </div>
 
           {/* Nome do arquivo */}
           <div className="space-y-2">
@@ -114,7 +112,7 @@ export default function SaveFileModal({ isOpen, onClose, onSave, defaultFilename
 
           {/* Opções para imagens (Lexical e Ambos os formatos) */}
           {(format === "lexical" || format === "both") && (
-            <div className="space-y-3 p-4 bg-gray-50 rounded-lg pl-[0px] pr-[0px]">
+            <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
               <Label>
                 Tratamento de imagens 
                 {format === "both" && <span className="text-sm text-gray-600">(aplicado apenas ao arquivo Lexical)</span>}
