@@ -102,10 +102,13 @@ export default function SaveFileModal({ isOpen, onClose, onSave, defaultFilename
             </RadioGroup>
           </div>
 
-          {/* Opções para imagens (apenas para formato Lexical) */}
-          {format === "lexical" && (
+          {/* Opções para imagens (Lexical e Ambos os formatos) */}
+          {(format === "lexical" || format === "both") && (
             <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
-              <Label>Tratamento de imagens (apenas Lexical)</Label>
+              <Label>
+                Tratamento de imagens 
+                {format === "both" && <span className="text-sm text-gray-600">(aplicado apenas ao arquivo Lexical)</span>}
+              </Label>
               <RadioGroup 
                 value={includeImages ? "base64" : "references"} 
                 onValueChange={(value) => setIncludeImages(value === "base64")}
@@ -123,6 +126,11 @@ export default function SaveFileModal({ isOpen, onClose, onSave, defaultFilename
                   </Label>
                 </div>
               </RadioGroup>
+              {format === "both" && (
+                <p className="text-xs text-blue-600 mt-2">
+                  <strong>Nota:</strong> O arquivo Markdown sempre manterá imagens como referências, independente desta configuração.
+                </p>
+              )}
             </div>
           )}
 
