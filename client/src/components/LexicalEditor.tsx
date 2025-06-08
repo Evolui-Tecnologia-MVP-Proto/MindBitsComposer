@@ -247,14 +247,14 @@ function TableSelectionPlugin({
 }
 
 // Plugin para capturar instância do editor
-function EditorInstancePlugin({ setEditorInstance }: { setEditorInstance: (editor: any) => void }): JSX.Element | null {
+function EditorInstancePlugin({ setEditorInstance }: { setEditorInstance: (editor: any) => void }): JSX.Element {
   const [editor] = useLexicalComposerContext();
   
   useEffect(() => {
     setEditorInstance(editor);
   }, [editor, setEditorInstance]);
 
-  return null;
+  return <></>;
 }
 
 // Barra de ferramentas interativa
@@ -650,7 +650,7 @@ function Placeholder(): JSX.Element {
   }, [editor]);
 
   if (hasContent) {
-    return null;
+    return <></>;
   }
 
   return (
@@ -665,6 +665,7 @@ interface LexicalEditorProps {
   onChange?: (content: string) => void;
   onEditorStateChange?: (serializedState: string) => void;
   onContentStatusChange?: (hasContent: boolean) => void;
+  onEditorInstanceChange?: (editor: any) => void;
   className?: string;
   templateSections?: string[];
   viewMode?: 'editor' | 'preview';
@@ -793,7 +794,7 @@ function FocusPlugin({ initialEditorState }: { initialEditorState?: string }) {
 }
 
 // Componente principal do editor Lexical completo
-export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, className = '', templateSections, viewMode = 'editor', initialEditorState }: LexicalEditorProps): JSX.Element {
+export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, onEditorInstanceChange, className = '', templateSections, viewMode = 'editor', initialEditorState }: LexicalEditorProps): JSX.Element {
   const [markdownContent, setMarkdownContent] = useState('');
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [tableRows, setTableRows] = useState(2);
@@ -1023,7 +1024,12 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <ImagePlugin />
           <ImageEventListenerPlugin />
           <TemplateSectionsPlugin sections={templateSections} />
-          <EditorInstancePlugin setEditorInstance={setEditorInstance} />
+          <EditorInstancePlugin setEditorInstance={(editor) => {
+            setEditorInstance(editor);
+            if (onEditorInstanceChange) {
+              onEditorInstanceChange(editor);
+            }
+          }} />
           <AutoFocusPlugin />
           <FocusPlugin initialEditorState={initialEditorState} />
         </div>
