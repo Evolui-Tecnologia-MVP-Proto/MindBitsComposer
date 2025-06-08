@@ -1213,14 +1213,14 @@ export default function LexicalPage() {
                             {documentArtifacts
                               .filter(artifact => artifact.originAssetId !== "Uploaded")
                               .map((artifact: DocumentArtifact) => {
-                            // Log para debug dos campos
-                            console.log('Artifact data completo:', artifact);
-                            
-                            return (
-                              <div 
-                                key={artifact.id}
-                                className="p-3 bg-gray-50 rounded-lg border"
-                              >
+                              // Log para debug dos campos
+                              console.log('Artifact data completo:', artifact);
+                              
+                              return (
+                                <div 
+                                  key={artifact.id}
+                                  className="p-3 bg-gray-50 rounded-lg border"
+                                >
                                 {/* Botões de ação no topo */}
                                 <div className="flex justify-end mb-3">
                                   {artifact.isImage === 'true' ? (
