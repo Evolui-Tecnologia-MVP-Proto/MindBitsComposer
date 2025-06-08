@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import LexicalEditor from "@/components/LexicalEditor";
+import SaveFileModal from "@/components/SaveFileModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -88,6 +89,7 @@ export default function LexicalPage() {
   const [editorKey, setEditorKey] = useState<number>(0); // Chave para forçar re-render do editor
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [hasEditorContent, setHasEditorContent] = useState(false); // Estado para controlar se há conteúdo no editor
+  const [showSaveModal, setShowSaveModal] = useState(false);
   const { toast } = useToast();
   const { showConfirmation } = useConfirmationToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -614,29 +616,7 @@ export default function LexicalPage() {
   };
 
   const handleSaveLocal = () => {
-    // Primeira pergunta: Escolher formato
-    showConfirmation({
-      title: "Escolher Formato de Salvamento",
-      description: "Em qual formato deseja salvar o documento?",
-      onConfirm: () => showLexicalImageOptions(), // Lexical
-      onCancel: () => showFormatChoiceDialog(), // Mostrar opções Markdown/Ambos
-      confirmText: "Lexical (.lexical)",
-      cancelText: "Outras opções",
-      variant: "default"
-    });
-  };
-
-  const showFormatChoiceDialog = () => {
-    // Segunda pergunta: Markdown ou ambos os formatos
-    showConfirmation({
-      title: "Formato de Salvamento",
-      description: "Deseja salvar apenas em Markdown ou em ambos os formatos?",
-      onConfirm: () => saveMarkdown(), // Apenas Markdown
-      onCancel: () => saveBothFormats(), // Ambos os formatos
-      confirmText: "Apenas Markdown (.md)",
-      cancelText: "Ambos os formatos",
-      variant: "default"
-    });
+    setShowSaveModal(true);
   };
 
   const extractImagesFromContent = () => {
@@ -692,7 +672,26 @@ export default function LexicalPage() {
     }
   };
 
-  const saveLexical = (includeImages: boolean) => {
+  const handleSaveFile = (filename: string, format: string, includeImages?: boolean) => {
+    const cleanFilename = filename.replace(/[^a-z0-9\-_\s]/gi, '').trim();
+
+    switch (format) {
+      case "lexical":
+        saveLexicalFile(cleanFilename, includeImages || false);
+        break;
+      case "markdown":
+        saveMarkdownFile(cleanFilename);
+        break;
+      case "both":
+        saveLexicalFile(cleanFilename, false);
+        setTimeout(() => {
+          saveMarkdownFile(cleanFilename);
+        }, 500);
+        break;
+    }
+  };
+
+  const saveLexicalFile = (filename: string, includeImages: boolean) => {
     let documentData: any = {
       title,
       content,
@@ -734,7 +733,7 @@ export default function LexicalPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.lexical`;
+    a.download = `${filename}.lexical`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -742,17 +741,17 @@ export default function LexicalPage() {
 
     toast({
       title: "Documento salvo em Lexical",
-      description: `O arquivo "${title}.lexical" foi salvo${includeImages ? ' com imagens em base64' : ' com referências de imagem'}.`,
+      description: `O arquivo "${filename}.lexical" foi salvo${includeImages ? ' com imagens em base64' : ' com referências de imagem'}.`,
     });
   };
 
-  const saveMarkdown = () => {
+  const saveMarkdownFile = (filename: string) => {
     const markdownContent = convertLexicalToMarkdown();
     const blob = new Blob([markdownContent], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.md`;
+    a.download = `${filename}.md`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -760,19 +759,8 @@ export default function LexicalPage() {
 
     toast({
       title: "Documento salvo em Markdown",
-      description: `O arquivo "${title}.md" foi salvo (imagens como referências).`,
+      description: `O arquivo "${filename}.md" foi salvo (imagens como referências).`,
     });
-  };
-
-  const saveBothFormats = () => {
-    saveLexical(false);
-    setTimeout(() => {
-      saveMarkdown();
-      toast({
-        title: "Documentos salvos",
-        description: `Salvos "${title}.lexical" e "${title}.md".`,
-      });
-    }, 500);
   };
 
   const showLexicalImageOptions = () => {
