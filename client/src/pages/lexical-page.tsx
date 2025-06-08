@@ -15,6 +15,8 @@ import { Link } from "wouter";
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { INSERT_IMAGE_COMMAND } from '@/components/lexical/ImagePlugin';
 import type { ImagePayload } from '@/components/lexical/ImageNode';
+import { createMarkdownConverter } from '@/components/markdown-converter';
+import { $getRoot } from 'lexical';
 
 interface LexicalDocument {
   id: string;
@@ -665,104 +667,20 @@ export default function LexicalPage() {
     return images;
   };
 
-  const convertLexicalToMarkdown = (lexicalContent: string): string => {
+  const convertLexicalToMarkdown = (): string => {
     try {
-      const editorState = JSON.parse(lexicalContent);
-      let markdown = `# ${title}\n\n`;
-      
-      const processNode = (node: any): string => {
-        let result = '';
-        
-        switch (node.type) {
-          case 'paragraph':
-            result += processChildren(node.children) + '\n\n';
-            break;
-          case 'heading':
-            const level = '#'.repeat(node.tag ? parseInt(node.tag.replace('h', '')) : 1);
-            result += `${level} ${processChildren(node.children)}\n\n`;
-            break;
-          case 'text':
-            let text = node.text || '';
-            if (node.format & 1) text = `**${text}**`;
-            if (node.format & 2) text = `*${text}*`;
-            if (node.format & 8) text = `\`${text}\``;
-            result += text;
-            break;
-          case 'linebreak':
-            result += '\n';
-            break;
-          case 'image-with-metadata':
-            const imageRef = node.artifactId ? `[Imagem: ${node.artifactId}]` : `[Imagem: ${node.alt || 'External'}]`;
-            result += `${imageRef}\n\n`;
-            break;
-          case 'image':
-            result += `[Imagem: ${node.alt || 'External'}]\n\n`;
-            break;
-          case 'list':
-            result += processListNode(node) + '\n';
-            break;
-          case 'listitem':
-            result += `- ${processChildren(node.children)}\n`;
-            break;
-          case 'table':
-            result += processTableNode(node) + '\n';
-            break;
-          case 'collapsible-container':
-            result += `\n### ${processChildren(node.children)}\n\n`;
-            break;
-          case 'collapsible-content':
-            result += processChildren(node.children) + '\n';
-            break;
-          default:
-            if (node.children) {
-              result += processChildren(node.children);
-            }
-            break;
-        }
-        
-        return result;
-      };
-      
-      const processChildren = (children: any[]): string => {
-        if (!children) return '';
-        return children.map(child => processNode(child)).join('');
-      };
-      
-      const processListNode = (listNode: any): string => {
-        if (!listNode.children) return '';
-        return listNode.children.map((item: any) => processNode(item)).join('');
-      };
-      
-      const processTableNode = (tableNode: any): string => {
-        let tableMarkdown = '';
-        if (!tableNode.children) return tableMarkdown;
-        
-        tableNode.children.forEach((row: any, rowIndex: number) => {
-          if (row.type === 'tablerow' && row.children) {
-            let rowText = '|';
-            row.children.forEach((cell: any) => {
-              if (cell.type === 'tablecell' && cell.children) {
-                const cellContent = processChildren(cell.children).replace(/\n/g, ' ').trim();
-                rowText += ` ${cellContent} |`;
-              }
-            });
-            tableMarkdown += rowText + '\n';
-            
-            if (rowIndex === 0) {
-              const separatorCount = (rowText.match(/\|/g) || []).length - 1;
-              tableMarkdown += '|' + ' --- |'.repeat(separatorCount) + '\n';
-            }
-          }
-        });
-        
-        return tableMarkdown;
-      };
-      
-      if (editorState.root && editorState.root.children) {
-        markdown += processChildren(editorState.root.children);
+      if (!editorInstance) {
+        console.error('Editor instance not available');
+        return `# ${title}\n\nErro: Editor não disponível para conversão.`;
       }
+
+      const converter = createMarkdownConverter();
       
-      return markdown;
+      return editorInstance.getEditorState().read(() => {
+        const root = $getRoot();
+        const markdown = converter.convert(root);
+        return `# ${title}\n\n${markdown}`;
+      });
     } catch (error) {
       console.error('Erro ao converter para Markdown:', error);
       return `# ${title}\n\nErro ao converter o conteúdo para Markdown.`;
@@ -824,7 +742,7 @@ export default function LexicalPage() {
   };
 
   const saveMarkdown = () => {
-    const markdownContent = convertLexicalToMarkdown(content);
+    const markdownContent = convertLexicalToMarkdown();
     const blob = new Blob([markdownContent], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
