@@ -633,7 +633,7 @@ export default function LexicalPage() {
   // Função para abrir arquivo .lexical local
   const handleOpenLexicalFile = () => {
     // Verificar se há conteúdo não salvo no editor
-    if (hasEditorContent && !currentDocumentId && !selectedEdition) {
+    if (hasEditorContent && !currentDocumentId) {
       showConfirmation({
         title: "Conteúdo não salvo",
         description: "Há conteúdo em edição que será perdido se não for salvo. Deseja continuar carregando o novo arquivo?",
@@ -1047,7 +1047,7 @@ export default function LexicalPage() {
 
   const handleLoadDocument = (document: LexicalDocument) => {
     // Verificar se há conteúdo não salvo no editor
-    if (hasEditorContent && !currentDocumentId && !selectedEdition) {
+    if (hasEditorContent && !currentDocumentId) {
       showConfirmation({
         title: "Conteúdo não salvo",
         description: "Há conteúdo em edição que será perdido se não for salvo. Deseja continuar carregando o documento?",
@@ -1057,6 +1057,7 @@ export default function LexicalPage() {
           setContent(document.content);
           setSelectedTemplate(null); // Limpar template ao carregar documento
           setLoadedFileName(null); // Limpar arquivo carregado
+          setSelectedEdition(null); // Limpar edition selecionada
           setShowDocumentList(false);
         },
         confirmText: "Continuar",
@@ -1069,13 +1070,14 @@ export default function LexicalPage() {
       setContent(document.content);
       setSelectedTemplate(null); // Limpar template ao carregar documento
       setLoadedFileName(null); // Limpar arquivo carregado
+      setSelectedEdition(null); // Limpar edition selecionada
       setShowDocumentList(false);
     }
   };
 
   const handleSelectEdition = (edition: any) => {
     // Verificar se há conteúdo não salvo no editor
-    if (hasEditorContent && !currentDocumentId && !selectedEdition) {
+    if (hasEditorContent && !currentDocumentId) {
       showConfirmation({
         title: "Conteúdo não salvo",
         description: "Há conteúdo em edição que será perdido se não for salvo. Deseja continuar carregando este documento composer?",
@@ -1411,7 +1413,7 @@ export default function LexicalPage() {
                                 className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 border-green-200 hover:border-green-300"
                                 onClick={() => {
                                   // Verificar se há conteúdo não salvo no editor
-                                  if (hasEditorContent && !currentDocumentId && !selectedEdition) {
+                                  if (hasEditorContent && !currentDocumentId) {
                                     showConfirmation({
                                       title: "Conteúdo não salvo",
                                       description: "Há conteúdo em edição que será perdido se não for salvo. Deseja continuar carregando este template?",
@@ -1421,6 +1423,7 @@ export default function LexicalPage() {
                                         setCurrentDocumentId(null);
                                         setSelectedTemplate(template);
                                         setLoadedFileName(null); // Limpar arquivo carregado
+                                        setSelectedEdition(null); // Limpar edition selecionada
                                       },
                                       confirmText: "Continuar",
                                       cancelText: "Cancelar",
@@ -1432,6 +1435,7 @@ export default function LexicalPage() {
                                     setCurrentDocumentId(null);
                                     setSelectedTemplate(template);
                                     setLoadedFileName(null); // Limpar arquivo carregado
+                                    setSelectedEdition(null); // Limpar edition selecionada
                                   }
                                 }}
                               >
