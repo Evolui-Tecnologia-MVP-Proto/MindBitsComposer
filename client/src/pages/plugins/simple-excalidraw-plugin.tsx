@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Excalidraw } from "@excalidraw/excalidraw";
 
 interface SimpleExcalidrawPluginProps {
@@ -7,6 +7,7 @@ interface SimpleExcalidrawPluginProps {
 
 const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataReceived }) => {
   const excalidrawRef = useRef<any>(null);
+  const [apiReady, setApiReady] = useState(false);
 
   const handleChange = (elements: any, appState: any) => {
     onDataReceived?.({
@@ -17,7 +18,7 @@ const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataR
   };
 
   useEffect(() => {
-    if (!excalidrawRef.current) return;
+    if (!apiReady || !excalidrawRef.current) return;
 
     const timer = setTimeout(() => {
       excalidrawRef.current?.refresh?.();
@@ -25,7 +26,7 @@ const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataR
     }, 200);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [apiReady]);
 
   return (
     <div
@@ -40,7 +41,10 @@ const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataR
       }}
     >
       <Excalidraw
-        ref={excalidrawRef}
+        excalidrawAPI={(api) => {
+          excalidrawRef.current = api;
+          setApiReady(true);
+        }}
         onChange={handleChange}
         theme="light"
         UIOptions={{
