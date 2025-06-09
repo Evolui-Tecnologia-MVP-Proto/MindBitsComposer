@@ -118,9 +118,16 @@ export default function PluginModal({
         <VisuallyHidden>
           <DialogTitle>Plugin {pluginName}</DialogTitle>
         </VisuallyHidden>
-        <PluginComponent
-          onDataExchange={handleDataExchange}
-        />
+
+        {(actualPluginName !== 'simple-excalidraw-plugin' || isReadyToMountPlugin) ? (
+          <PluginComponent
+            onDataExchange={handleDataExchange}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            Carregando editor...
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

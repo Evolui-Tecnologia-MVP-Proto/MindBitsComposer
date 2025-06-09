@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Excalidraw } from "@excalidraw/excalidraw";
 
 interface SimpleExcalidrawPluginProps {
@@ -6,47 +6,27 @@ interface SimpleExcalidrawPluginProps {
 }
 
 const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataReceived }) => {
-  const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null);
-  const [isReady, setIsReady] = useState(false);
+  const excalidrawRef = useRef<any>(null);
 
   const handleChange = (elements: any, appState: any) => {
     onDataReceived?.({
       elements,
       appState,
-      files: excalidrawAPI?.getFiles?.() || {}
+      files: excalidrawRef.current?.getFiles?.() || {}
     });
   };
 
-  // Aguardar modal estar visível antes de renderizar
+  // Forçar refresh depois que a modal já renderizou por completo
   useEffect(() => {
     const timer = setTimeout(() => {
-      setIsReady(true);
-    }, 100);
+      if (excalidrawRef.current?.refresh) {
+        excalidrawRef.current.refresh();
+      }
+      window.dispatchEvent(new Event("resize"));
+    }, 200);
 
     return () => clearTimeout(timer);
   }, []);
-
-  // Delay para forçar recalcular o layout após API estar disponível
-  useEffect(() => {
-    if (excalidrawAPI && isReady) {
-      const timer = setTimeout(() => {
-        if (excalidrawAPI.refresh) {
-          excalidrawAPI.refresh();
-        }
-        window.dispatchEvent(new Event('resize'));
-      }, 300);
-
-      return () => clearTimeout(timer);
-    }
-  }, [excalidrawAPI, isReady]);
-
-  if (!isReady) {
-    return (
-      <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div>Carregando editor...</div>
-      </div>
-    );
-  }
 
   return (
     <div
@@ -57,19 +37,19 @@ const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataR
         minHeight: "500px",
         minWidth: "700px",
         overflow: "hidden",
-        position: "relative"
+        position: "relative",
       }}
     >
       <Excalidraw
-        excalidrawAPI={(api) => setExcalidrawAPI(api)}
+        excalidrawAPI={(api) => { excalidrawRef.current = api; }}
         onChange={handleChange}
         theme="light"
         UIOptions={{
           canvasActions: {
             loadScene: false,
             export: false,
-            saveAsImage: false
-          }
+            saveAsImage: false,
+          },
         }}
       />
     </div>
