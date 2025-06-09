@@ -38,8 +38,10 @@
     z-index: 1000 !important;
   }
   
-  /* Toolbar principal com botões */
-  .excalidraw .Island {
+  /* Forçar toolbar a manter posição no topo sempre */
+  .excalidraw .Island,
+  .excalidraw [class*="Island"],
+  .excalidraw .App-toolbar {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
@@ -55,11 +57,26 @@
     left: 50% !important;
     transform: translateX(-50%) !important;
     z-index: 1000 !important;
+    max-width: none !important;
+    width: auto !important;
     
     > * {
       display: inline-flex !important;
       margin: 0 !important;
     }
+  }
+  
+  /* Sobrescrever qualquer estilo que possa reposicionar a toolbar */
+  .excalidraw .Island[style],
+  .excalidraw [class*="Island"][style] {
+    position: absolute !important;
+    top: 10px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: auto !important;
+    height: auto !important;
   }
   
   /* Botões da toolbar */
