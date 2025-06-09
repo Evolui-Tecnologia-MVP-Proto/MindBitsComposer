@@ -259,11 +259,11 @@ export default function LexicalPage() {
 
   // Mutation para salvar documento
   const saveMutation = useMutation({
-    mutationFn: async (data: { title: string; content: string; plainText: string }) => {
+    mutationFn: async (data: { title: string; content: string; plainText: string; editorState?: string; editionId?: string }) => {
       // Se há um document edition selecionado, salvar no lex_file
-      if (selectedEdition) {
-        return apiRequest("PUT", `/api/document-editions/${selectedEdition.id}/lex-file`, {
-          lexFile: editorState || data.content
+      if (data.editionId) {
+        return apiRequest("PUT", `/api/document-editions/${data.editionId}/lex-file`, {
+          lexFile: data.editorState || data.content
         });
       }
       // Caso contrário, salvar como documento lexical normal
@@ -273,14 +273,14 @@ export default function LexicalPage() {
         return apiRequest("POST", '/api/lexical-documents', data);
       }
     },
-    onSuccess: (data: any) => {
-      if (selectedEdition) {
+    onSuccess: (data: any, variables) => {
+      if (variables.editionId) {
         // Atualizar o selectedEdition com o novo lex_file
-        setSelectedEdition({ ...selectedEdition, lexFile: content });
+        setSelectedEdition({ ...selectedEdition, lexFile: variables.editorState || variables.content });
         queryClient.invalidateQueries({ queryKey: ['/api/document-editions-in-progress'] });
         toast({
           title: "Documento salvo",
-          description: `Conteúdo salvo no documento "${selectedEdition.origem} - ${selectedEdition.objeto}".`,
+          description: `Conteúdo salvo no documento "${selectedEdition?.origem} - ${selectedEdition?.objeto}".`,
         });
       } else {
         setCurrentDocumentId(data.id);
@@ -592,13 +592,25 @@ export default function LexicalPage() {
   };
 
   const handleSave = () => {
-    // 1. Documentos Composer selecionado: manter implementação atual
+    // 1. Documentos Composer selecionado: salvar com estado do editor
     if (selectedEdition) {
       const plainText = content.replace(/<[^>]*>/g, '').trim();
+      
+      // Capturar o estado atual do editor Lexical
+      let editorStateToSave = editorState;
+      
+      // Se não há estado do editor mas há conteúdo, usar o conteúdo
+      if (!editorStateToSave && content) {
+        editorStateToSave = content;
+      }
+      
+      // Fazer requisição para salvar no documento composer
       saveMutation.mutate({
         title,
         content,
-        plainText
+        plainText,
+        editorState: editorStateToSave, // Adicionar estado do editor
+        editionId: selectedEdition.id // Adicionar ID da edition
       });
       return;
     }
