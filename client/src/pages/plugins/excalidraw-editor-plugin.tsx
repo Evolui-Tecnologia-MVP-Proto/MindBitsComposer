@@ -1,6 +1,6 @@
 import React, { useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Download, Upload, Save } from 'lucide-react';
+import { X, Download, Save } from 'lucide-react';
 import { Excalidraw, exportToCanvas, exportToSvg } from '@excalidraw/excalidraw';
 
 interface ExcalidrawEditorPluginProps {
@@ -9,7 +9,6 @@ interface ExcalidrawEditorPluginProps {
 
 export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEditorPluginProps) {
   const excalidrawRef = useRef<any>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleClose = useCallback(() => {
     if (onDataExchange) {
@@ -86,42 +85,13 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
     }
   }, []);
 
-  const handleLoad = useCallback(() => {
-    fileInputRef.current?.click();
-  }, []);
-
-  const handleFileLoad = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const content = e.target?.result as string;
-        const data = JSON.parse(content);
-        
-        if (data.elements && Array.isArray(data.elements)) {
-          setSceneData({
-            elements: data.elements,
-            appState: data.appState || { theme: 'light', viewBackgroundColor: '#ffffff' }
-          });
-        }
-      } catch (error) {
-        console.error('Erro ao carregar arquivo:', error);
-        alert('Erro ao carregar arquivo. Verifique se é um arquivo Excalidraw válido.');
-      }
-    };
-    reader.readAsText(file);
-    
-    // Limpar o input
-    event.target.value = '';
-  }, []);
-
   const handleClear = useCallback(() => {
-    setSceneData({
-      elements: [],
-      appState: { theme: 'light', viewBackgroundColor: '#ffffff' }
-    });
+    if (excalidrawRef.current) {
+      excalidrawRef.current.updateScene({
+        elements: [],
+        appState: { theme: 'light', viewBackgroundColor: '#ffffff' }
+      });
+    }
   }, []);
 
   return (
@@ -138,16 +108,6 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
         </div>
         
         <div className="flex items-center space-x-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleLoad}
-            className="h-8 px-3 text-xs"
-          >
-            <Upload className="h-3 w-3 mr-1" />
-            Carregar
-          </Button>
-          
           <Button 
             variant="outline" 
             size="sm" 
@@ -188,24 +148,16 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
         </div>
       </div>
       
-      {/* Input file oculto */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".excalidraw,.json"
-        onChange={handleFileLoad}
-        style={{ display: 'none' }}
-      />
-      
       {/* Editor Excalidraw */}
       <div className="flex-1 w-full" style={{ height: 'calc(100% - 73px)' }}>
         <Excalidraw
-          initialData={sceneData}
-          onChange={(elements: any, appState: any, files: any) => {
-            setSceneData({
-              elements: [...elements],
-              appState: appState
-            });
+          excalidrawAPI={(api: any) => (excalidrawRef.current = api)}
+          initialData={{
+            elements: [],
+            appState: {
+              theme: 'light',
+              viewBackgroundColor: '#ffffff',
+            },
           }}
           UIOptions={{
             canvasActions: {
