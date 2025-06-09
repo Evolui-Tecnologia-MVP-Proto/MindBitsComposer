@@ -97,22 +97,22 @@
     }
   }
   
-  /* Texto de ajuda específico */
+  /* Ocultar textos de ajuda da toolbar */
   .excalidraw div[style*="color: var(--color-gray-50)"],
-  .excalidraw div[style*="color: rgb"] {
-    position: absolute !important;
-    top: 70px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    background: rgba(255, 255, 255, 0.9) !important;
-    padding: 4px 8px !important;
-    border-radius: 4px !important;
-    font-size: 11px !important;
-    color: #666 !important;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1) !important;
-    white-space: nowrap !important;
-    z-index: 999 !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  .excalidraw div[style*="color: rgb"],
+  .excalidraw div:contains("To move canvas"),
+  .excalidraw div:contains("hold mouse wheel") {
+    display: none !important;
+    visibility: hidden !important;
+  }
+  
+  /* Ocultar qualquer texto de ajuda que contenha essas palavras */
+  .excalidraw div {
+    &:has-text("To move canvas"),
+    &:has-text("hold mouse wheel"),
+    &:has-text("spacebar while dragging") {
+      display: none !important;
+    }
   }
   
   /* Controlar menu */
