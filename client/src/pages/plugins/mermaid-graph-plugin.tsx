@@ -92,12 +92,12 @@ export default function MermaidGraphPlugin({ onDataExchange }: MermaidGraphPlugi
   };
 
   return (
-    <div className="w-full h-screen flex flex-col bg-white">
+    <div className="w-full h-full flex flex-col bg-white">
       {/* Header */}
-      <div className="p-6 pb-4 border-b flex items-center justify-between">
+      <div className="p-4 pb-3 border-b flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold">Mermaid Graph Plugin</h1>
-          <p className="text-sm text-gray-600 mt-1">
+          <h1 className="text-lg font-semibold">Mermaid Graph Plugin</h1>
+          <p className="text-xs text-gray-600 mt-1">
             Editor e visualizador de diagramas Mermaid em tempo real
           </p>
         </div>
@@ -115,15 +115,15 @@ export default function MermaidGraphPlugin({ onDataExchange }: MermaidGraphPlugi
       <div className="flex flex-1">
         {/* Painel Esquerdo - Editor de Código */}
         <div className="w-1/2 border-r flex flex-col">
-          <div className="p-4 border-b bg-gray-50">
+          <div className="p-3 border-b bg-gray-50">
             <h3 className="font-medium text-sm text-gray-700">Editor Mermaid</h3>
             <p className="text-xs text-gray-500 mt-1">Digite ou cole seu código Mermaid aqui</p>
           </div>
-          <div className="flex-1 p-4">
+          <div className="flex-1 p-3">
             <textarea
               value={mermaidCode}
               onChange={(e) => setMermaidCode(e.target.value)}
-              className="w-full h-full resize-none border rounded-lg p-3 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full h-full resize-none border rounded-lg p-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Digite seu código Mermaid aqui..."
               spellCheck={false}
             />
@@ -132,7 +132,7 @@ export default function MermaidGraphPlugin({ onDataExchange }: MermaidGraphPlugi
         
         {/* Painel Direito - Canvas Renderizador */}
         <div className="w-1/2 flex flex-col">
-          <div className="p-4 border-b bg-gray-50">
+          <div className="p-3 border-b bg-gray-50">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-medium text-sm text-gray-700">Visualização</h3>
@@ -146,7 +146,7 @@ export default function MermaidGraphPlugin({ onDataExchange }: MermaidGraphPlugi
               )}
             </div>
           </div>
-          <div className="flex-1 p-4 overflow-auto bg-white">
+          <div className="flex-1 p-3 overflow-auto bg-white">
             <div 
               ref={canvasRef}
               className="w-full h-full flex items-center justify-center border-2 border-dashed border-gray-200 rounded-lg"

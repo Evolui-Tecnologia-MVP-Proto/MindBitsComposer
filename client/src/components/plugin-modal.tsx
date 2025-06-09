@@ -72,21 +72,21 @@ export default function PluginModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="p-0 gap-0 !max-w-none !max-h-none fixed inset-0 w-full h-full m-0 border-0"
+        className="p-0 gap-0 !max-w-none !max-h-none"
         style={{
-          position: 'fixed',
-          top: '0',
-          left: '0',
-          right: '0',
-          bottom: '0',
-          width: '100vw',
-          height: '100vh',
+          width: actualPluginName === 'mermaid-graph-plugin' ? '60vw' : '100vw',
+          height: actualPluginName === 'mermaid-graph-plugin' ? '60vh' : '100vh',
           maxWidth: 'none',
           maxHeight: 'none',
+          position: 'fixed',
+          top: actualPluginName === 'mermaid-graph-plugin' ? '20vh' : '0',
+          left: actualPluginName === 'mermaid-graph-plugin' ? '20vw' : '0',
+          right: 'auto',
+          bottom: 'auto',
           margin: '0',
           padding: '0',
           transform: 'none',
-          borderRadius: '0',
+          borderRadius: actualPluginName === 'mermaid-graph-plugin' ? '8px' : '0',
           zIndex: 50
         }}
       >
