@@ -97,22 +97,14 @@
     }
   }
   
-  /* Ocultar textos de ajuda da toolbar */
-  .excalidraw div[style*="color: var(--color-gray-50)"],
-  .excalidraw div[style*="color: rgb"],
-  .excalidraw div:contains("To move canvas"),
-  .excalidraw div:contains("hold mouse wheel") {
+  /* Ocultar apenas textos de ajuda específicos, mantendo a toolbar */
+  .excalidraw div[style*="color: var(--color-gray-50)"]:not(.Island):not([class*="Island"]) {
     display: none !important;
-    visibility: hidden !important;
   }
   
-  /* Ocultar qualquer texto de ajuda que contenha essas palavras */
-  .excalidraw div {
-    &:has-text("To move canvas"),
-    &:has-text("hold mouse wheel"),
-    &:has-text("spacebar while dragging") {
-      display: none !important;
-    }
+  /* Remover texto do help hint sem afetar botões */
+  .excalidraw div[style*="position: absolute"][style*="pointer-events: none"] {
+    display: none !important;
   }
   
   /* Controlar menu */
