@@ -647,7 +647,7 @@ export default function LexicalPage() {
         const lexicalData = JSON.parse(fileContent);
         
         // Verificar se tem a estrutura esperada de um documento lexical
-        if (lexicalData.title && lexicalData.content) {
+        if (lexicalData.title && lexicalData.editorState) {
           // Limpar seleções atuais
           setCurrentDocumentId(null);
           setSelectedTemplate(null);
@@ -656,15 +656,22 @@ export default function LexicalPage() {
           // Carregar dados do arquivo
           setTitle(lexicalData.title);
           
-          // Se o content é string (estado serializado), usar diretamente
-          // Se é objeto, serializar novamente
-          if (typeof lexicalData.content === 'string') {
-            setContent(lexicalData.content);
-            setInitialEditorState(lexicalData.content);
-          } else {
-            const serializedContent = JSON.stringify(lexicalData.content);
-            setContent(serializedContent);
-            setInitialEditorState(serializedContent);
+          // Usar o editorState que contém o estado JSON serializado
+          let editorStateToUse = lexicalData.editorState;
+          
+          // Se editorState é uma string, usar diretamente
+          // Se é um objeto, serializar
+          if (typeof editorStateToUse === 'object') {
+            editorStateToUse = JSON.stringify(editorStateToUse);
+          }
+          
+          // Verificar se é JSON válido
+          try {
+            JSON.parse(editorStateToUse);
+            setContent(editorStateToUse);
+            setInitialEditorState(editorStateToUse);
+          } catch (e) {
+            throw new Error("Estado do editor inválido no arquivo");
           }
           
           // Forçar re-render do editor
@@ -675,7 +682,7 @@ export default function LexicalPage() {
             description: `O documento "${lexicalData.title}" foi carregado com sucesso.`,
           });
         } else {
-          throw new Error("Estrutura de arquivo inválida");
+          throw new Error("Estrutura de arquivo inválida - título ou estado do editor ausente");
         }
       } catch (error) {
         console.error('Erro ao processar arquivo .lexical:', error);
