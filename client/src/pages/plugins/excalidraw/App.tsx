@@ -1,5 +1,6 @@
 import React from "react";
 import { Excalidraw } from "@excalidraw/excalidraw";
+import "./App.scss";
 
 export interface AppProps {
   onDataChange?: (data: any) => void;
@@ -7,7 +8,7 @@ export interface AppProps {
 
 export const App = ({ onDataChange }: AppProps) => {
   return (
-    <div style={{ width: '100%', height: '500px' }}>
+    <div className="excalidraw-simple-wrapper" style={{ width: '100%', height: '500px' }}>
       <Excalidraw
         initialData={{
           elements: [],
