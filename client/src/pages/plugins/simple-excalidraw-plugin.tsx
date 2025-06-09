@@ -41,7 +41,7 @@ const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataR
       }}
     >
       <Excalidraw
-        excalidrawAPI={(api) => { excalidrawRef.current = api; }}
+        ref={excalidrawRef}
         onChange={handleChange}
         theme="light"
         UIOptions={{
