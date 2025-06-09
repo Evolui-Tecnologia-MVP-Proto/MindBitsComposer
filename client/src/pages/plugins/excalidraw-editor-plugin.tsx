@@ -159,35 +159,53 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
         <style>
           {`
             .excalidraw-container .Island {
-              transform: scale(0.7);
-              transform-origin: top left;
+              flex-direction: row !important;
+              flex-wrap: wrap !important;
+              max-width: none !important;
+              width: auto !important;
+              padding: 8px !important;
             }
             .excalidraw-container .App-toolbar {
-              transform: scale(0.7);
-              transform-origin: top left;
+              flex-direction: row !important;
+              flex-wrap: wrap !important;
+              transform: none !important;
+              top: 10px !important;
+              left: 10px !important;
+              max-width: none !important;
+              width: auto !important;
             }
-            .excalidraw-container .App-menu {
-              transform: scale(0.8);
-              transform-origin: top right;
+            .excalidraw-container .App-toolbar .Island {
+              flex-direction: row !important;
+              flex-wrap: wrap !important;
+              gap: 6px !important;
+              padding: 8px !important;
             }
             .excalidraw-container .ToolIcon {
-              width: 28px !important;
-              height: 28px !important;
-              min-width: 28px !important;
-              min-height: 28px !important;
+              width: 40px !important;
+              height: 40px !important;
+              min-width: 40px !important;
+              min-height: 40px !important;
+              margin: 2px !important;
             }
             .excalidraw-container .ToolIcon svg {
-              width: 14px !important;
-              height: 14px !important;
+              width: 20px !important;
+              height: 20px !important;
             }
             .excalidraw-container .ToolIcon__icon {
-              font-size: 14px !important;
+              font-size: 16px !important;
             }
             .excalidraw-container button {
-              font-size: 12px !important;
+              font-size: 14px !important;
+              min-width: 40px !important;
+              min-height: 40px !important;
             }
             .excalidraw-container .App-menu__left {
-              gap: 4px !important;
+              gap: 6px !important;
+              flex-direction: row !important;
+              flex-wrap: wrap !important;
+            }
+            .excalidraw-container .App-menu {
+              transform: none !important;
             }
           `}
         </style>
