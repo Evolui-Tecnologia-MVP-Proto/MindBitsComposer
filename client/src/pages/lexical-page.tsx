@@ -20,6 +20,7 @@ import type { ImagePayload } from '@/components/lexical/ImageNode';
 import { createMarkdownConverter } from '@/components/markdown-converter';
 import { $getRoot } from 'lexical';
 import PluginModal from '@/components/plugin-modal';
+import type { Plugin } from '@shared/schema';
 
 interface LexicalDocument {
   id: string;
