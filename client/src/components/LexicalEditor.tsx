@@ -702,47 +702,42 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
         editor.update(() => {
           const root = $getRoot();
           
-          // Verificar se o root já tem conteúdo dos templates
-          const children = root.getChildren();
-          const hasTemplateContent = children.some(child => 
-            child.getType() === 'collapsible-container'
-          );
+          console.log('🔥 TemplateSectionsPlugin - Aplicando template ao editor, limpando conteúdo existente');
           
-          if (!hasTemplateContent) {
-            root.clear();
+          // Limpar sempre o conteúdo para aplicar o template
+          root.clear();
+          
+          // Criar container de cabeçalho padrão
+          const headerTitle = $createCollapsibleTitleNode();
+          headerTitle.setTextContent('Conteúdo de cabeçalho');
+          
+          const headerContent = $createCollapsibleContentNode();
+          const headerParagraph = $createParagraphNode();
+          headerContent.append(headerParagraph);
+          
+          const headerContainer = $createCollapsibleContainerNode(false);
+          headerContainer.append(headerTitle, headerContent);
+          root.append(headerContainer);
+          
+          sections.forEach((sectionName) => {
+            // Criar container colapsível
+            const title = $createCollapsibleTitleNode(sectionName);
+            const content = $createCollapsibleContentNode();
             
-            // Criar container de cabeçalho padrão
-            const headerTitle = $createCollapsibleTitleNode();
-            headerTitle.setTextContent('Conteúdo de cabeçalho');
-            
-            const headerContent = $createCollapsibleContentNode();
-            const headerParagraph = $createParagraphNode();
-            headerContent.append(headerParagraph);
-            
-            const headerContainer = $createCollapsibleContainerNode(false);
-            headerContainer.append(headerTitle, headerContent);
-            root.append(headerContainer);
-            
-            sections.forEach((sectionName, index) => {
-              // Criar container colapsível
-              const title = $createCollapsibleTitleNode(sectionName);
-              const content = $createCollapsibleContentNode();
-              
-              // Adicionar parágrafo editável dentro do conteúdo
-              const paragraph = $createParagraphNode();
-              content.append(paragraph);
+            // Adicionar parágrafo editável dentro do conteúdo
+            const paragraph = $createParagraphNode();
+            content.append(paragraph);
 
-              const container = $createCollapsibleContainerNode(false);
-              container.append(title, content);
-              
-              root.append(container);
-            });
+            const container = $createCollapsibleContainerNode(false);
+            container.append(title, content);
             
-            // Adicionar parágrafo final para permitir edição após os containers
-            const finalParagraph = $createParagraphNode();
-            root.append(finalParagraph);
-          }
-        }, { discrete: true });
+            root.append(container);
+          });
+          
+          // Adicionar parágrafo final para permitir edição após os containers
+          const finalParagraph = $createParagraphNode();
+          root.append(finalParagraph);
+        });
       }, 50);
       
       return () => clearTimeout(timeoutId);
