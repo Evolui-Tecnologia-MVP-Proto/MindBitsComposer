@@ -7,6 +7,7 @@ interface SimpleExcalidrawPluginProps {
 
 const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataReceived }) => {
   const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null);
+  const [isReady, setIsReady] = useState(false);
 
   const handleChange = (elements: any, appState: any) => {
     onDataReceived?.({
@@ -16,24 +17,42 @@ const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataR
     });
   };
 
-  // Forçar refresh após montagem para garantir layout correto
+  // Aguardar modal estar visível antes de renderizar
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (excalidrawAPI && excalidrawAPI.refresh) {
-        excalidrawAPI.refresh();
-      }
-      // Forçar recálculo do viewport
-      window.dispatchEvent(new Event('resize'));
-    }, 200);
+      setIsReady(true);
+    }, 100);
 
     return () => clearTimeout(timer);
-  }, [excalidrawAPI]);
+  }, []);
+
+  // Delay para forçar recalcular o layout após API estar disponível
+  useEffect(() => {
+    if (excalidrawAPI && isReady) {
+      const timer = setTimeout(() => {
+        if (excalidrawAPI.refresh) {
+          excalidrawAPI.refresh();
+        }
+        window.dispatchEvent(new Event('resize'));
+      }, 300);
+
+      return () => clearTimeout(timer);
+    }
+  }, [excalidrawAPI, isReady]);
+
+  if (!isReady) {
+    return (
+      <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div>Carregando editor...</div>
+      </div>
+    );
+  }
 
   return (
-    <div 
+    <div
       className="excalidraw-wrapper"
-      style={{ 
-        width: "100%", 
+      style={{
+        width: "100%",
         height: "100%",
         minHeight: "500px",
         minWidth: "700px",
