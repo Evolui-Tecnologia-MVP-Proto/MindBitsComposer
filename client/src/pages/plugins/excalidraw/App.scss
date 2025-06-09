@@ -25,52 +25,54 @@
     padding: 8px !important;
   }
   
-  /* Controlar especificamente a toolbar */
-  .App-toolbar {
+  /* Forçar layout horizontal para toolbar do Excalidraw */
+  .excalidraw .Island {
     display: flex !important;
     flex-direction: row !important;
-    justify-content: center !important;
-    align-items: center !important;
     flex-wrap: wrap !important;
-    gap: 4px !important;
-    padding: 8px !important;
-    position: absolute !important;
-    top: 10px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    padding: 6px !important;
+    position: fixed !important;
+    top: 20px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    background: rgba(255, 255, 255, 0.9) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
     border-radius: 8px !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1) !important;
     z-index: 1000 !important;
+    max-width: 90% !important;
     
-    button {
-      width: 40px !important;
-      height: 40px !important;
-      margin: 0 !important;
-      flex-shrink: 0 !important;
+    > * {
       display: inline-flex !important;
-      
-      svg {
-        width: 16px !important;
-        height: 16px !important;
-      }
+      margin: 0 !important;
     }
   }
   
-  /* Forçar layout horizontal para grupos de ferramentas */
-  .App-toolbar__left,
-  .App-toolbar__right {
-    display: flex !important;
-    flex-direction: row !important;
-    gap: 4px !important;
+  /* Controlar botões da toolbar */
+  .excalidraw .Island button {
+    width: 36px !important;
+    height: 36px !important;
+    margin: 0 2px !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+    
+    svg {
+      width: 16px !important;
+      height: 16px !important;
+    }
   }
   
-  /* Controlar container de ferramentas */
-  .App-toolbar-content {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 4px !important;
+  /* Separadores na toolbar */
+  .excalidraw .Island .separator {
+    width: 1px !important;
+    height: 24px !important;
+    margin: 0 4px !important;
+    background: #ddd !important;
   }
   
   /* Controlar menu */
