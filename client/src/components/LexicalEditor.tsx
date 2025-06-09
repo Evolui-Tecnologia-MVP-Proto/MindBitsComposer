@@ -699,7 +699,10 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
       
       // Usar setTimeout para evitar conflitos com outros plugins
       const timeoutId = setTimeout(() => {
+        console.log('🔥 TemplateSectionsPlugin - setTimeout executado, iniciando editor.update');
+        
         editor.update(() => {
+          console.log('🔥 TemplateSectionsPlugin - Dentro do editor.update');
           const root = $getRoot();
           
           console.log('🔥 TemplateSectionsPlugin - Aplicando template ao editor, limpando conteúdo existente');
