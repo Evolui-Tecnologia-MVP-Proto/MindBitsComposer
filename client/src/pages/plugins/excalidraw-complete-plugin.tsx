@@ -28,17 +28,18 @@ const ExcalidrawCompletePlugin: React.FC<ExcalidrawCompletePluginProps> = ({ onD
           // Reposicionar texto de ajuda para baixo da toolbar
           const element = div as HTMLElement;
           element.style.position = 'absolute';
-          element.style.top = '80px';
+          element.style.top = '70px';
           element.style.left = '50%';
           element.style.transform = 'translateX(-50%)';
           element.style.background = 'rgba(255, 255, 255, 0.9)';
-          element.style.padding = '6px 12px';
-          element.style.borderRadius = '6px';
-          element.style.fontSize = '12px';
+          element.style.padding = '4px 8px';
+          element.style.borderRadius = '4px';
+          element.style.fontSize = '11px';
           element.style.color = '#666';
-          element.style.boxShadow = '0 1px 6px rgba(0, 0, 0, 0.1)';
+          element.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.1)';
           element.style.whiteSpace = 'nowrap';
           element.style.zIndex = '999';
+          element.style.border = '1px solid rgba(0, 0, 0, 0.1)';
         }
       });
 
@@ -46,10 +47,14 @@ const ExcalidrawCompletePlugin: React.FC<ExcalidrawCompletePluginProps> = ({ onD
       if (toolbarIsland) {
         const element = toolbarIsland as HTMLElement;
         element.style.position = 'absolute';
-        element.style.top = '20px';
+        element.style.top = '10px';
         element.style.left = '50%';
         element.style.transform = 'translateX(-50%)';
         element.style.zIndex = '1000';
+        element.style.display = 'flex';
+        element.style.flexDirection = 'row';
+        element.style.alignItems = 'center';
+        element.style.gap = '4px';
       }
     };
 
