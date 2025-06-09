@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Excalidraw } from "@excalidraw/excalidraw";
 
 interface SimpleExcalidrawPluginProps {
@@ -9,7 +9,6 @@ const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataR
   const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null);
 
   const handleChange = (elements: any, appState: any) => {
-    // Enviar dados para o componente pai quando houver mudanças
     onDataReceived?.({
       elements,
       appState,
@@ -17,8 +16,31 @@ const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataR
     });
   };
 
+  // Forçar refresh após montagem para garantir layout correto
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (excalidrawAPI && excalidrawAPI.refresh) {
+        excalidrawAPI.refresh();
+      }
+      // Forçar recálculo do viewport
+      window.dispatchEvent(new Event('resize'));
+    }, 200);
+
+    return () => clearTimeout(timer);
+  }, [excalidrawAPI]);
+
   return (
-    <div style={{ width: "100%", height: "500px" }}>
+    <div 
+      className="excalidraw-wrapper"
+      style={{ 
+        width: "100%", 
+        height: "100%",
+        minHeight: "500px",
+        minWidth: "700px",
+        overflow: "hidden",
+        position: "relative"
+      }}
+    >
       <Excalidraw
         excalidrawAPI={(api) => setExcalidrawAPI(api)}
         onChange={handleChange}

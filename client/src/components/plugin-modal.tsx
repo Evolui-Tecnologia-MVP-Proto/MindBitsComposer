@@ -80,20 +80,26 @@ export default function PluginModal({
       <DialogContent 
         className="p-0 gap-0 !max-w-none !max-h-none"
         style={{
-          width: actualPluginName === 'mermaid-graph-plugin' ? '60vw' : '100vw',
-          height: actualPluginName === 'mermaid-graph-plugin' ? '60vh' : '100vh',
+          width: actualPluginName === 'mermaid-graph-plugin' ? '60vw' : 
+                 actualPluginName === 'simple-excalidraw-plugin' ? '90vw' : '100vw',
+          height: actualPluginName === 'mermaid-graph-plugin' ? '60vh' : 
+                  actualPluginName === 'simple-excalidraw-plugin' ? '90vh' : '100vh',
           maxWidth: 'none',
           maxHeight: 'none',
           position: 'fixed',
-          top: actualPluginName === 'mermaid-graph-plugin' ? '20vh' : '0',
-          left: actualPluginName === 'mermaid-graph-plugin' ? '20vw' : '0',
+          top: actualPluginName === 'mermaid-graph-plugin' ? '20vh' : 
+               actualPluginName === 'simple-excalidraw-plugin' ? '5vh' : '0',
+          left: actualPluginName === 'mermaid-graph-plugin' ? '20vw' : 
+                actualPluginName === 'simple-excalidraw-plugin' ? '5vw' : '0',
           right: 'auto',
           bottom: 'auto',
           margin: '0',
           padding: '0',
           transform: 'none',
-          borderRadius: actualPluginName === 'mermaid-graph-plugin' ? '8px' : '0',
-          zIndex: 50
+          borderRadius: (actualPluginName === 'mermaid-graph-plugin' || actualPluginName === 'simple-excalidraw-plugin') ? '8px' : '0',
+          zIndex: 50,
+          border: 'none',
+          overflow: 'hidden'
         }}
       >
         <VisuallyHidden>
