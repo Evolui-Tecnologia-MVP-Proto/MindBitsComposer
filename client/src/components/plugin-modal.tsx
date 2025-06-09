@@ -5,6 +5,7 @@ import FreeHandCanvasPlugin from "@/pages/plugins/freehand-canvas-plugin";
 import MermaidGraphPlugin from "@/pages/plugins/mermaid-graph-plugin";
 import ExcalidrawEditorPlugin from "@/pages/plugins/excalidraw-editor-plugin";
 import ExcalidrawCompletePlugin from "@/pages/plugins/excalidraw-complete-plugin";
+import SimpleExcalidrawPlugin from "@/pages/plugins/simple-excalidraw-plugin";
 
 interface PluginModalProps {
   isOpen: boolean;
@@ -20,6 +21,7 @@ const PLUGIN_COMPONENTS: Record<string, React.ComponentType<any>> = {
   'mermaid-graph-plugin': MermaidGraphPlugin,
   'excalidraw-editor-plugin': ExcalidrawEditorPlugin,
   'excalidraw-complete-plugin': ExcalidrawCompletePlugin,
+  'simple-excalidraw-plugin': SimpleExcalidrawPlugin,
 };
 
 export default function PluginModal({ 
