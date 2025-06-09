@@ -1129,24 +1129,24 @@ export default function LexicalPage() {
     setCurrentDocumentId(null);
     setLoadedFileName(null);
     
-    // Criar objeto template para exibir o badge
-    const template = {
-      id: edition.templateId,
-      name: edition.templateCode,
-      code: edition.templateCode,
-      description: '',
-      type: 'struct' as const,
-      structure: edition.templateStructure,
-      mappings: {},
-      createdAt: '',
-      updatedAt: ''
-    };
-    setSelectedTemplate(template);
-    
     // Se lex_file estiver vazio ou null, carregar o template
-    if (!edition.lexFile) {
+    if (!edition.lexFile || edition.lexFile.trim() === '') {
       console.log('Carregando template, lex_file está vazio');
       console.log('Template structure:', edition.templateStructure);
+      
+      // Criar objeto template para aplicar as seções
+      const template = {
+        id: edition.templateId,
+        name: edition.templateCode,
+        code: edition.templateCode,
+        description: '',
+        type: 'struct' as const,
+        structure: edition.templateStructure,
+        mappings: {},
+        createdAt: '',
+        updatedAt: ''
+      };
+      setSelectedTemplate(template);
       
       // Limpar estado inicial do editor para usar template
       setInitialEditorState(undefined);
@@ -1158,11 +1158,18 @@ export default function LexicalPage() {
       // Forçar re-render do editor para aplicar as seções do template
       setEditorKey(prev => prev + 1);
     } else {
-      console.log('Carregando lex_file existente');
+      console.log('Carregando lex_file existente, não aplicar template');
+      
+      // Limpar template para não aplicar seções
+      setSelectedTemplate(null);
+      
       // Carregar estado serializado do Lexical
       setInitialEditorState(edition.lexFile);
       setContent(''); // Limpar conteúdo pois usaremos o estado serializado
       setTitle(`${edition.templateCode} - ${edition.origem} - ${edition.objeto}`);
+      
+      // Forçar re-render do editor
+      setEditorKey(prev => prev + 1);
     }
     
     setShowDocumentList(false);
