@@ -25,86 +25,10 @@
     padding: 8px !important;
   }
   
-  /* Container principal da toolbar */
-  .excalidraw .App-toolbar_container {
-    position: fixed !important;
-    top: 20px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 8px !important;
-    z-index: 1000 !important;
-  }
-  
-  /* Forçar toolbar a manter posição no topo sempre */
-  .excalidraw .Island,
-  .excalidraw [class*="Island"],
-  .excalidraw .App-toolbar {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 4px !important;
-    padding: 8px 12px !important;
-    background: rgba(255, 255, 255, 0.95) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1) !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    position: absolute !important;
-    top: 10px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    z-index: 1000 !important;
-    max-width: none !important;
-    width: auto !important;
-    
-    > * {
-      display: inline-flex !important;
-      margin: 0 !important;
-    }
-  }
-  
-  /* Sobrescrever qualquer estilo que possa reposicionar a toolbar */
-  .excalidraw .Island[style],
-  .excalidraw [class*="Island"][style] {
-    position: absolute !important;
-    top: 10px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    right: auto !important;
-    bottom: auto !important;
-    width: auto !important;
-    height: auto !important;
-  }
-  
-  /* Botões da toolbar */
-  .excalidraw .Island button {
-    width: 40px !important;
-    height: 40px !important;
-    margin: 0 2px !important;
-    padding: 0 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
-    border-radius: 8px !important;
-    
-    svg {
-      width: 18px !important;
-      height: 18px !important;
-    }
-  }
-  
-  /* Ocultar apenas textos de ajuda específicos, mantendo a toolbar */
-  .excalidraw div[style*="color: var(--color-gray-50)"]:not(.Island):not([class*="Island"]) {
-    display: none !important;
-  }
-  
-  /* Remover texto do help hint sem afetar botões */
-  .excalidraw div[style*="position: absolute"][style*="pointer-events: none"] {
-    display: none !important;
+  /* Manter apenas estilos essenciais que não interferem na funcionalidade */
+  .excalidraw-complete-container {
+    position: relative !important;
+    overflow: hidden !important;
   }
   
   /* Controlar menu */
