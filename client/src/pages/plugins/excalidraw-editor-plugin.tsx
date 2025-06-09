@@ -158,34 +158,37 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
       >
         <style>
           {`
+            .excalidraw-container .App-toolbar-content {
+              flex-direction: row !important;
+              flex-wrap: wrap !important;
+              display: flex !important;
+            }
+            .excalidraw-container .App-toolbar {
+              top: 10px !important;
+              left: 10px !important;
+              max-width: calc(100vw - 100px) !important;
+              width: auto !important;
+              height: auto !important;
+            }
+            .excalidraw-container .App-toolbar .Island,
             .excalidraw-container .Island {
               flex-direction: row !important;
               flex-wrap: wrap !important;
+              display: flex !important;
+              align-items: center !important;
+              gap: 4px !important;
+              padding: 8px !important;
               max-width: none !important;
               width: auto !important;
-              padding: 8px !important;
-            }
-            .excalidraw-container .App-toolbar {
-              flex-direction: row !important;
-              flex-wrap: wrap !important;
-              transform: none !important;
-              top: 10px !important;
-              left: 10px !important;
-              max-width: none !important;
-              width: auto !important;
-            }
-            .excalidraw-container .App-toolbar .Island {
-              flex-direction: row !important;
-              flex-wrap: wrap !important;
-              gap: 6px !important;
-              padding: 8px !important;
+              height: auto !important;
             }
             .excalidraw-container .ToolIcon {
               width: 40px !important;
               height: 40px !important;
               min-width: 40px !important;
               min-height: 40px !important;
-              margin: 2px !important;
+              margin: 0 !important;
+              flex-shrink: 0 !important;
             }
             .excalidraw-container .ToolIcon svg {
               width: 20px !important;
@@ -198,14 +201,22 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
               font-size: 14px !important;
               min-width: 40px !important;
               min-height: 40px !important;
+              flex-shrink: 0 !important;
             }
             .excalidraw-container .App-menu__left {
-              gap: 6px !important;
+              gap: 4px !important;
               flex-direction: row !important;
               flex-wrap: wrap !important;
+              display: flex !important;
             }
             .excalidraw-container .App-menu {
               transform: none !important;
+            }
+            .excalidraw-container .Stack {
+              flex-direction: row !important;
+              flex-wrap: wrap !important;
+              display: flex !important;
+              gap: 4px !important;
             }
           `}
         </style>
