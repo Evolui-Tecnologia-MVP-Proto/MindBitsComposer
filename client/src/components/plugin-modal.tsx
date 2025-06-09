@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import FreeHandCanvasPlugin from "@/pages/plugins/freehand-canvas-plugin";
@@ -35,6 +35,19 @@ export default function PluginModal({
   // Determinar o nome do plugin a partir do objeto plugin ou do pluginName
   const actualPluginName = plugin?.pageName || pluginName || "";
   const PluginComponent = actualPluginName ? PLUGIN_COMPONENTS[actualPluginName] : null;
+  const [isReadyToMountPlugin, setIsReadyToMountPlugin] = useState(false);
+
+  // Espera a modal abrir completamente para renderizar plugin pesado como o Excalidraw
+  useEffect(() => {
+    if (isOpen && actualPluginName === 'simple-excalidraw-plugin') {
+      const timeout = setTimeout(() => {
+        setIsReadyToMountPlugin(true);
+      }, 300);
+      return () => clearTimeout(timeout);
+    } else {
+      setIsReadyToMountPlugin(true);
+    }
+  }, [isOpen, actualPluginName]);
 
   // Função para interceptar dados do plugin e verificar se deve fechar modal
   const handleDataExchange = (data: any) => {
