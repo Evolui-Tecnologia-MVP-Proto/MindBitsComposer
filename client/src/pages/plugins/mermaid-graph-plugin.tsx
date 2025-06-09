@@ -18,6 +18,7 @@ export default function MermaidGraphPlugin({ onDataExchange }: MermaidGraphPlugi
   const canvasRef = useRef<HTMLDivElement>(null);
   const [isRendering, setIsRendering] = useState(false);
   const [renderError, setRenderError] = useState<string | null>(null);
+  const [lastSvg, setLastSvg] = useState<string>('');
 
   // Inicializar Mermaid
   useEffect(() => {
@@ -62,6 +63,19 @@ export default function MermaidGraphPlugin({ onDataExchange }: MermaidGraphPlugi
         
         if (canvasRef.current) {
           canvasRef.current.innerHTML = svg;
+          setLastSvg(svg);
+          
+          // Auto-redimensionar o SVG para caber no canvas
+          setTimeout(() => {
+            const svgElement = canvasRef.current?.querySelector('svg');
+            if (svgElement) {
+              svgElement.style.width = '100%';
+              svgElement.style.height = 'auto';
+              svgElement.style.maxWidth = '100%';
+              svgElement.style.maxHeight = '100%';
+              svgElement.style.objectFit = 'contain';
+            }
+          }, 100);
         }
       } catch (error) {
         console.error('Erro ao renderizar Mermaid:', error);
