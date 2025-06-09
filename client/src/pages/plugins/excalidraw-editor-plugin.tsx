@@ -218,6 +218,12 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
               display: flex !important;
               gap: 4px !important;
             }
+            .excalidraw-container .excalidraw {
+              pointer-events: all !important;
+            }
+            .excalidraw-container canvas {
+              pointer-events: all !important;
+            }
           `}
         </style>
         <Excalidraw
@@ -241,6 +247,9 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
             },
           }}
           renderTopRightUI={() => null}
+          viewModeEnabled={false}
+          zenModeEnabled={false}
+          gridModeEnabled={false}
         />
       </div>
     </div>
