@@ -89,16 +89,16 @@ export default function PluginModal({
       <DialogContent 
         className="p-0 gap-0 !max-w-none !max-h-none"
         style={{
-          width: actualPluginName === 'mermaid-graph-plugin' ? '60vw' : 
+          width: actualPluginName === 'mermaid-graph-plugin' ? '80vw' : 
                  actualPluginName === 'simple-excalidraw-plugin' ? '90vw' : '100vw',
-          height: actualPluginName === 'mermaid-graph-plugin' ? '60vh' : 
+          height: actualPluginName === 'mermaid-graph-plugin' ? '80vh' : 
                   actualPluginName === 'simple-excalidraw-plugin' ? '90vh' : '100vh',
           maxWidth: 'none',
           maxHeight: 'none',
           position: 'fixed',
-          top: actualPluginName === 'mermaid-graph-plugin' ? '20vh' : 
+          top: actualPluginName === 'mermaid-graph-plugin' ? '10vh' : 
                actualPluginName === 'simple-excalidraw-plugin' ? '5vh' : '0',
-          left: actualPluginName === 'mermaid-graph-plugin' ? '20vw' : 
+          left: actualPluginName === 'mermaid-graph-plugin' ? '10vw' : 
                 actualPluginName === 'simple-excalidraw-plugin' ? '5vw' : '0',
           right: 'auto',
           bottom: 'auto',
