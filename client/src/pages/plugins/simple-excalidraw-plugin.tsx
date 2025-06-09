@@ -25,7 +25,7 @@ const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataR
     }, 200);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [excalidrawRef.current]);
 
   return (
     <div
@@ -40,7 +40,7 @@ const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataR
       }}
     >
       <Excalidraw
-        ref={excalidrawRef}
+        excalidrawAPI={(api) => { excalidrawRef.current = api; }}
         onChange={handleChange}
         theme="light"
         UIOptions={{
