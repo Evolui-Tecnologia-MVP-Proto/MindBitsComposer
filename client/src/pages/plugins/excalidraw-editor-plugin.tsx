@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { X, Download, Upload, Save } from 'lucide-react';
 import { Excalidraw, exportToCanvas, exportToSvg } from '@excalidraw/excalidraw';
@@ -8,9 +8,7 @@ interface ExcalidrawEditorPluginProps {
 }
 
 export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEditorPluginProps) {
-  const [excalidrawAPI, setExcalidrawAPI] = useState<any>(null);
-  const [elements, setElements] = useState<any[]>([]);
-  const [appState, setAppState] = useState<any>({});
+  const excalidrawRef = useRef<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleClose = useCallback(() => {
@@ -20,7 +18,15 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
   }, [onDataExchange]);
 
   const handleSave = useCallback(async () => {
+    if (!excalidrawRef.current) {
+      alert('Editor não está pronto');
+      return;
+    }
+
     try {
+      const elements = excalidrawRef.current.getSceneElements();
+      const appState = excalidrawRef.current.getAppState();
+      
       // Exportar como PNG
       const canvas = await exportToCanvas({
         elements,
@@ -41,33 +47,22 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
         }
       }, 'image/png');
 
-      // Também salvar os dados do Excalidraw
-      const excalidrawData = {
-        type: 'excalidraw',
-        version: 2,
-        source: 'https://excalidraw.com',
-        elements,
-        appState,
-      };
-
-      const dataStr = JSON.stringify(excalidrawData, null, 2);
-      const dataBlob = new Blob([dataStr], { type: 'application/json' });
-      const dataUrl = URL.createObjectURL(dataBlob);
-      const dataLink = document.createElement('a');
-      dataLink.href = dataUrl;
-      dataLink.download = `excalidraw-data-${Date.now()}.excalidraw`;
-      document.body.appendChild(dataLink);
-      dataLink.click();
-      document.body.removeChild(dataLink);
-      URL.revokeObjectURL(dataUrl);
-
     } catch (error) {
       console.error('Erro ao salvar:', error);
+      alert('Erro ao salvar. Desenhe algo primeiro.');
     }
-  }, [elements, appState]);
+  }, []);
 
   const handleExportSVG = useCallback(async () => {
+    if (!excalidrawRef.current) {
+      alert('Editor não está pronto');
+      return;
+    }
+
     try {
+      const elements = excalidrawRef.current.getSceneElements();
+      const appState = excalidrawRef.current.getAppState();
+      
       const svg = await exportToSvg({
         elements,
         appState,
@@ -87,8 +82,9 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
 
     } catch (error) {
       console.error('Erro ao exportar SVG:', error);
+      alert('Erro ao exportar. Desenhe algo primeiro.');
     }
-  }, [elements, appState]);
+  }, []);
 
   const handleLoad = useCallback(() => {
     fileInputRef.current?.click();
@@ -105,8 +101,10 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
         const data = JSON.parse(content);
         
         if (data.elements && Array.isArray(data.elements)) {
-          setElements(data.elements);
-          setAppState(data.appState || {});
+          setSceneData({
+            elements: data.elements,
+            appState: data.appState || { theme: 'light', viewBackgroundColor: '#ffffff' }
+          });
         }
       } catch (error) {
         console.error('Erro ao carregar arquivo:', error);
@@ -120,8 +118,10 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
   }, []);
 
   const handleClear = useCallback(() => {
-    setElements([]);
-    setAppState({});
+    setSceneData({
+      elements: [],
+      appState: { theme: 'light', viewBackgroundColor: '#ffffff' }
+    });
   }, []);
 
   return (
@@ -200,17 +200,12 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
       {/* Editor Excalidraw */}
       <div className="flex-1 w-full" style={{ height: 'calc(100% - 73px)' }}>
         <Excalidraw
-          initialData={{
-            elements,
-            appState: {
-              ...appState,
-              theme: 'light',
-              viewBackgroundColor: '#ffffff',
-            },
-          }}
+          initialData={sceneData}
           onChange={(elements: any, appState: any, files: any) => {
-            setElements([...elements]);
-            setAppState(appState);
+            setSceneData({
+              elements: [...elements],
+              appState: appState
+            });
           }}
           UIOptions={{
             canvasActions: {
