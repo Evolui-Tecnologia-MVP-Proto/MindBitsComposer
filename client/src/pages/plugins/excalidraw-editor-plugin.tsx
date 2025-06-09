@@ -149,7 +149,48 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
       </div>
       
       {/* Editor Excalidraw */}
-      <div className="flex-1 w-full" style={{ height: 'calc(100% - 73px)' }}>
+      <div 
+        className="flex-1 w-full excalidraw-container" 
+        style={{ 
+          height: 'calc(100% - 73px)',
+          '--ui-font-size': '14px',
+        } as React.CSSProperties}
+      >
+        <style>
+          {`
+            .excalidraw-container .Island {
+              transform: scale(0.7);
+              transform-origin: top left;
+            }
+            .excalidraw-container .App-toolbar {
+              transform: scale(0.7);
+              transform-origin: top left;
+            }
+            .excalidraw-container .App-menu {
+              transform: scale(0.8);
+              transform-origin: top right;
+            }
+            .excalidraw-container .ToolIcon {
+              width: 28px !important;
+              height: 28px !important;
+              min-width: 28px !important;
+              min-height: 28px !important;
+            }
+            .excalidraw-container .ToolIcon svg {
+              width: 14px !important;
+              height: 14px !important;
+            }
+            .excalidraw-container .ToolIcon__icon {
+              font-size: 14px !important;
+            }
+            .excalidraw-container button {
+              font-size: 12px !important;
+            }
+            .excalidraw-container .App-menu__left {
+              gap: 4px !important;
+            }
+          `}
+        </style>
         <Excalidraw
           excalidrawAPI={(api: any) => (excalidrawRef.current = api)}
           initialData={{
@@ -166,7 +207,11 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
               export: false,
               toggleTheme: true,
             },
+            tools: {
+              image: false,
+            },
           }}
+          renderTopRightUI={() => null}
         />
       </div>
     </div>
