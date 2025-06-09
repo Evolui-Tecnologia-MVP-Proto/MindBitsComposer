@@ -703,27 +703,73 @@ export default function LexicalPage() {
   const extractImagesFromContent = () => {
     const images: any[] = [];
     
-    // Extrair imagens do conteúdo HTML/Lexical
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = content;
-    const imgElements = tempDiv.querySelectorAll('img');
-    
-    imgElements.forEach((img, index) => {
-      const src = img.getAttribute('src');
-      const alt = img.getAttribute('alt') || `Imagem ${index + 1}`;
-      const artifactId = img.getAttribute('data-artifact-id');
+    try {
+      // Parse do estado do Lexical para extrair imagens
+      const editorState = JSON.parse(content);
+      console.log('🔍 Estado do editor para extração de imagens:', editorState);
       
-      if (src) {
-        images.push({
-          index,
-          src,
-          alt,
-          artifactId,
-          isBase64: src.startsWith('data:'),
-          isArtifact: !!artifactId
-        });
+      // Função recursiva para percorrer o estado do Lexical
+      const extractImagesFromNode = (node: any, depth = 0) => {
+        const indent = '  '.repeat(depth);
+        console.log(`${indent}🔎 Analisando nó tipo: ${node.type}`);
+        
+        if (node.type === 'image' || node.type === 'imageWithMetadata') {
+          console.log(`${indent}📸 Imagem encontrada:`, node);
+          const src = node.src;
+          const alt = node.altText || node.alt || `Imagem ${images.length + 1}`;
+          const artifactId = node.artifactId;
+          
+          if (src) {
+            const imageData = {
+              index: images.length,
+              src,
+              alt,
+              artifactId,
+              isBase64: src.startsWith('data:'),
+              isArtifact: !!artifactId
+            };
+            console.log(`${indent}✅ Imagem adicionada:`, imageData);
+            images.push(imageData);
+          }
+        }
+        
+        // Recursivamente verificar filhos
+        if (node.children && Array.isArray(node.children)) {
+          node.children.forEach((child: any) => extractImagesFromNode(child, depth + 1));
+        }
+      };
+      
+      // Começar pela raiz
+      if (editorState.root) {
+        extractImagesFromNode(editorState.root);
       }
-    });
+      
+      console.log('🎯 Total de imagens extraídas:', images.length, images);
+    } catch (error) {
+      console.error('Erro ao extrair imagens do estado do Lexical:', error);
+      
+      // Fallback: tentar extrair do HTML se o content não for JSON válido
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = content;
+      const imgElements = tempDiv.querySelectorAll('img');
+      
+      imgElements.forEach((img, index) => {
+        const src = img.getAttribute('src');
+        const alt = img.getAttribute('alt') || `Imagem ${index + 1}`;
+        const artifactId = img.getAttribute('data-artifact-id');
+        
+        if (src) {
+          images.push({
+            index,
+            src,
+            alt,
+            artifactId,
+            isBase64: src.startsWith('data:'),
+            isArtifact: !!artifactId
+          });
+        }
+      });
+    }
     
     return images;
   };
