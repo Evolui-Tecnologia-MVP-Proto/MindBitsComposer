@@ -342,6 +342,9 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
         className="flex-1 w-full excalidraw-container" 
         style={{ 
           height: 'calc(100% - 73px)',
+          width: '100%',
+          overflow: 'hidden',
+          position: 'relative',
           '--ui-font-size': '14px',
         } as React.CSSProperties}
       >
@@ -409,9 +412,41 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
             }
             .excalidraw-container .excalidraw {
               pointer-events: all !important;
+              width: 100% !important;
+              height: 100% !important;
+              max-width: 100% !important;
+              max-height: 100% !important;
+              overflow: hidden !important;
             }
             .excalidraw-container canvas {
               pointer-events: all !important;
+              max-width: 100% !important;
+              max-height: 100% !important;
+            }
+            .excalidraw-container .App {
+              width: 100% !important;
+              height: 100% !important;
+              overflow: hidden !important;
+            }
+            .excalidraw-container .excalidraw__canvas {
+              max-width: 100% !important;
+              max-height: 100% !important;
+            }
+            .excalidraw-container .excalidraw .App-main {
+              width: 100% !important;
+              height: 100% !important;
+              max-width: 100vw !important;
+              max-height: 100vh !important;
+              overflow: hidden !important;
+            }
+            .excalidraw-container .excalidraw .App-canvas {
+              width: 100% !important;
+              height: 100% !important;
+              overflow: hidden !important;
+            }
+            .excalidraw-container .layer-ui__wrapper {
+              max-width: 100% !important;
+              max-height: 100% !important;
             }
           `}
         </style>
@@ -424,7 +459,6 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
             appState: {
               theme,
               viewBackgroundColor: theme === 'light' ? '#ffffff' : '#1e1e1e',
-              gridSize: null,
               zenModeEnabled: false,
               viewModeEnabled: false,
             },
