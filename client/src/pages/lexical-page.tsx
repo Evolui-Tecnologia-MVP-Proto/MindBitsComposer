@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool, Eye, Edit, File, Image, Video, FileAudio, FileCode2, CircleChevronLeft, Globe, Split, FileInput, FileOutput, Puzzle } from "lucide-react";
+import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool, Eye, Edit, File, Image, Video, FileAudio, FileCode2, CircleChevronLeft, Globe, Split, FileInput, FileOutput, Puzzle, Palette, Settings, Database, Brain, BarChart, Zap, Wrench, Code, Cpu, Lock, Mail, Music, Calendar, Clock, Users, Star, Heart, Flag, Target, Bookmark, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -113,6 +113,44 @@ export default function LexicalPage() {
   const { showConfirmation } = useConfirmationToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const lexicalFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Dicionário de ícones disponíveis para plugins
+  const availableIcons = {
+    "Palette": Palette,
+    "Settings": Settings,
+    "Database": Database,
+    "Brain": Brain,
+    "BarChart": BarChart,
+    "FileText": FileText,
+    "Zap": Zap,
+    "Wrench": Wrench,
+    "Puzzle": Puzzle,
+    "Code": Code,
+    "Cpu": Cpu,
+    "Globe": Globe,
+    "Lock": Lock,
+    "Mail": Mail,
+    "Image": Image,
+    "Video": Video,
+    "Music": Music,
+    "Calendar": Calendar,
+    "Clock": Clock,
+    "Users": Users,
+    "Star": Star,
+    "Heart": Heart,
+    "Flag": Flag,
+    "Target": Target,
+    "Bookmark": Bookmark,
+    "Search": Search,
+    "Upload": Upload
+  };
+
+  // Função para renderizar ícone do plugin
+  const getPluginIcon = (iconName: string | null) => {
+    if (!iconName) return <Puzzle className="w-3 h-3" />;
+    const IconComponent = availableIcons[iconName as keyof typeof availableIcons] || Puzzle;
+    return <IconComponent className="w-3 h-3" />;
+  };
 
   // Função para obter ícone baseado no tipo de arquivo
   const getFileIcon = (mimeType: string | undefined, isImage: string | undefined) => {
@@ -1652,7 +1690,7 @@ export default function LexicalPage() {
                         {activePlugins.map((plugin) => (
                           <SelectItem key={plugin.id} value={plugin.id}>
                             <div className="flex items-center gap-2">
-                              <Puzzle className="w-3 h-3" />
+                              {getPluginIcon(plugin.icon)}
                               <span className="text-xs">{plugin.name}</span>
                             </div>
                           </SelectItem>
