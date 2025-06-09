@@ -711,11 +711,14 @@ export default function LexicalPage() {
           
           // Função para percorrer recursivamente todos os nós
           const traverseNodes = (node: any) => {
-            if (node.getType() === 'image' || node.getType() === 'imageWithMetadata') {
+            const nodeType = node.getType();
+            console.log('🔎 Analisando nó do editor, tipo:', nodeType);
+            
+            if (nodeType === 'image' || nodeType === 'image-with-metadata' || nodeType === 'imageWithMetadata') {
               console.log('📸 Nó de imagem encontrado no editor:', node);
               const src = node.getSrc ? node.getSrc() : node.__src;
               const alt = node.getAltText ? node.getAltText() : (node.__altText || node.__alt || `Imagem ${images.length + 1}`);
-              const artifactId = node.getArtifactId ? node.getArtifactId() : node.__artifactId;
+              const artifactId = node.getArtifactId ? node.getArtifactId() : (node.__artifactId || node.__imageId);
               
               if (src) {
                 const imageData = {
@@ -762,11 +765,11 @@ export default function LexicalPage() {
         const indent = '  '.repeat(depth);
         console.log(`${indent}🔎 Analisando nó tipo: ${node.type}`);
         
-        if (node.type === 'image' || node.type === 'imageWithMetadata') {
+        if (node.type === 'image' || node.type === 'image-with-metadata' || node.type === 'imageWithMetadata') {
           console.log(`${indent}📸 Imagem encontrada:`, node);
           const src = node.src;
           const alt = node.altText || node.alt || `Imagem ${images.length + 1}`;
-          const artifactId = node.artifactId;
+          const artifactId = node.artifactId || node.imageId;
           
           if (src) {
             const imageData = {
