@@ -1046,15 +1046,52 @@ export default function LexicalPage() {
   };
 
   const handleLoadDocument = (document: LexicalDocument) => {
-    setCurrentDocumentId(document.id);
-    setTitle(document.title);
-    setContent(document.content);
-    setSelectedTemplate(null); // Limpar template ao carregar documento
-    setLoadedFileName(null); // Limpar arquivo carregado
-    setShowDocumentList(false);
+    // Verificar se há conteúdo não salvo no editor
+    if (hasEditorContent && !currentDocumentId && !selectedEdition) {
+      showConfirmation({
+        title: "Conteúdo não salvo",
+        description: "Há conteúdo em edição que será perdido se não for salvo. Deseja continuar carregando o documento?",
+        onConfirm: () => {
+          setCurrentDocumentId(document.id);
+          setTitle(document.title);
+          setContent(document.content);
+          setSelectedTemplate(null); // Limpar template ao carregar documento
+          setLoadedFileName(null); // Limpar arquivo carregado
+          setShowDocumentList(false);
+        },
+        confirmText: "Continuar",
+        cancelText: "Cancelar",
+        variant: "destructive"
+      });
+    } else {
+      setCurrentDocumentId(document.id);
+      setTitle(document.title);
+      setContent(document.content);
+      setSelectedTemplate(null); // Limpar template ao carregar documento
+      setLoadedFileName(null); // Limpar arquivo carregado
+      setShowDocumentList(false);
+    }
   };
 
   const handleSelectEdition = (edition: any) => {
+    // Verificar se há conteúdo não salvo no editor
+    if (hasEditorContent && !currentDocumentId && !selectedEdition) {
+      showConfirmation({
+        title: "Conteúdo não salvo",
+        description: "Há conteúdo em edição que será perdido se não for salvo. Deseja continuar carregando este documento composer?",
+        onConfirm: () => {
+          executeSelectEdition(edition);
+        },
+        confirmText: "Continuar",
+        cancelText: "Cancelar",
+        variant: "destructive"
+      });
+    } else {
+      executeSelectEdition(edition);
+    }
+  };
+
+  const executeSelectEdition = (edition: any) => {
     console.log('Selecionando edition:', edition);
     setSelectedEdition(edition);
     setCurrentDocumentId(null);
@@ -1373,10 +1410,29 @@ export default function LexicalPage() {
                                 key={template.id}
                                 className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 border-green-200 hover:border-green-300"
                                 onClick={() => {
-                                  setTitle(template.name);
-                                  setContent(''); // Limpar conteúdo para o plugin processar
-                                  setCurrentDocumentId(null);
-                                  setSelectedTemplate(template);
+                                  // Verificar se há conteúdo não salvo no editor
+                                  if (hasEditorContent && !currentDocumentId && !selectedEdition) {
+                                    showConfirmation({
+                                      title: "Conteúdo não salvo",
+                                      description: "Há conteúdo em edição que será perdido se não for salvo. Deseja continuar carregando este template?",
+                                      onConfirm: () => {
+                                        setTitle(template.name);
+                                        setContent(''); // Limpar conteúdo para o plugin processar
+                                        setCurrentDocumentId(null);
+                                        setSelectedTemplate(template);
+                                        setLoadedFileName(null); // Limpar arquivo carregado
+                                      },
+                                      confirmText: "Continuar",
+                                      cancelText: "Cancelar",
+                                      variant: "destructive"
+                                    });
+                                  } else {
+                                    setTitle(template.name);
+                                    setContent(''); // Limpar conteúdo para o plugin processar
+                                    setCurrentDocumentId(null);
+                                    setSelectedTemplate(template);
+                                    setLoadedFileName(null); // Limpar arquivo carregado
+                                  }
                                 }}
                               >
                                 <div className="flex-1">
