@@ -679,7 +679,7 @@ export default function LexicalPage() {
           
           toast({
             title: "Arquivo carregado",
-            description: `O documento "${lexicalData.title}" foi carregado com sucesso.`,
+            description: `O arquivo "${file.name}" foi carregado com sucesso.`,
           });
         } else {
           throw new Error("Estrutura de arquivo inválida - título ou estado do editor ausente");
