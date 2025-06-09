@@ -25,24 +25,31 @@
     padding: 8px !important;
   }
   
-  /* Forçar layout horizontal para toolbar do Excalidraw */
-  .excalidraw .Island {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 2px !important;
-    padding: 6px !important;
+  /* Container principal da toolbar */
+  .excalidraw .App-toolbar_container {
     position: fixed !important;
     top: 20px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    background: rgba(255, 255, 255, 0.95) !important;
-    border-radius: 8px !important;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
     z-index: 1000 !important;
-    max-width: 90% !important;
+  }
+  
+  /* Toolbar principal com botões */
+  .excalidraw .Island {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    padding: 8px 12px !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
     
     > * {
       display: inline-flex !important;
@@ -50,29 +57,63 @@
     }
   }
   
-  /* Controlar botões da toolbar */
+  /* Botões da toolbar */
   .excalidraw .Island button {
-    width: 36px !important;
-    height: 36px !important;
+    width: 40px !important;
+    height: 40px !important;
     margin: 0 2px !important;
     padding: 0 !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     flex-shrink: 0 !important;
+    border-radius: 8px !important;
     
     svg {
-      width: 16px !important;
-      height: 16px !important;
+      width: 18px !important;
+      height: 18px !important;
     }
   }
   
-  /* Separadores na toolbar */
-  .excalidraw .Island .separator {
-    width: 1px !important;
-    height: 24px !important;
-    margin: 0 4px !important;
-    background: #ddd !important;
+  /* Forçar reorganização do layout da toolbar */
+  .excalidraw .App-toolbar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 8px !important;
+    position: fixed !important;
+    top: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 1000 !important;
+  }
+  
+  /* Texto de ajuda - múltiplos seletores para garantir que funcione */
+  .excalidraw .help-hint,
+  .excalidraw [class*="hint"],
+  .excalidraw .App-bottom-bar,
+  .excalidraw div[style*="position: absolute"]:has(+ .Island),
+  .excalidraw div:contains("To move canvas") {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    padding: 6px 12px !important;
+    border-radius: 6px !important;
+    font-size: 12px !important;
+    color: #666 !important;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1) !important;
+    white-space: nowrap !important;
+    margin-top: 8px !important;
+    order: 2 !important;
+  }
+  
+  /* Forçar a toolbar de botões a ser primeiro */
+  .excalidraw .Island {
+    order: 1 !important;
   }
   
   /* Controlar menu */
