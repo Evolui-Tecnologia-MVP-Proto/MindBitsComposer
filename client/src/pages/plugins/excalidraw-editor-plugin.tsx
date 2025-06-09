@@ -1,7 +1,15 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Download, Save, RefreshCw } from 'lucide-react';
-import { Excalidraw, exportToCanvas, exportToSvg } from '@excalidraw/excalidraw';
+import { X, Download, Save, RefreshCw, Upload, Undo, Redo, ZoomIn, ZoomOut } from 'lucide-react';
+import { 
+  Excalidraw, 
+  exportToCanvas, 
+  exportToSvg, 
+  exportToBlob,
+  loadFromBlob,
+  loadLibraryFromBlob,
+  exportToClipboard
+} from '@excalidraw/excalidraw';
 
 interface ExcalidrawEditorPluginProps {
   onDataExchange?: (data: any) => void;
@@ -9,6 +17,12 @@ interface ExcalidrawEditorPluginProps {
 
 export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEditorPluginProps) {
   const excalidrawRef = useRef<any>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isCollaborating, setIsCollaborating] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [canUndo, setCanUndo] = useState(false);
+  const [canRedo, setCanRedo] = useState(false);
+  const [zoom, setZoom] = useState(1);
 
   const handleClose = useCallback(() => {
     if (onDataExchange) {
@@ -100,52 +114,228 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
     });
   }, []);
 
+  const handleLoad = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileLoad = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !excalidrawRef.current) return;
+
+    try {
+      if (file.name.endsWith('.excalidraw')) {
+        const text = await file.text();
+        const data = JSON.parse(text);
+        excalidrawRef.current.updateScene({
+          elements: data.elements || [],
+          appState: { ...data.appState, theme }
+        });
+      } else if (file.type.startsWith('image/')) {
+        // Handle image import
+        const fileData = await loadFromBlob(file, null, null);
+        if (fileData) {
+          excalidrawRef.current.updateScene(fileData);
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao carregar arquivo:', error);
+      alert('Erro ao carregar arquivo. Verifique se é um arquivo válido.');
+    }
+    
+    event.target.value = '';
+  }, [theme]);
+
+  const handleUndo = useCallback(() => {
+    excalidrawRef.current?.history?.undo();
+  }, []);
+
+  const handleRedo = useCallback(() => {
+    excalidrawRef.current?.history?.redo();
+  }, []);
+
+  const handleZoomIn = useCallback(() => {
+    const currentZoom = excalidrawRef.current?.getAppState()?.zoom?.value || 1;
+    excalidrawRef.current?.updateScene({
+      appState: { zoom: { value: Math.min(currentZoom * 1.2, 3) } }
+    });
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    const currentZoom = excalidrawRef.current?.getAppState()?.zoom?.value || 1;
+    excalidrawRef.current?.updateScene({
+      appState: { zoom: { value: Math.max(currentZoom / 1.2, 0.1) } }
+    });
+  }, []);
+
   const resetViewport = useCallback(() => {
     excalidrawRef.current?.updateScene({
       appState: {
-        zoom: 1,
+        zoom: { value: 1 },
         scrollX: 0,
         scrollY: 0,
       }
     });
   }, []);
 
+  const toggleTheme = useCallback(() => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    excalidrawRef.current?.updateScene({
+      appState: { theme: newTheme }
+    });
+  }, [theme]);
+
+  const exportToClipboardHandler = useCallback(async () => {
+    if (!excalidrawRef.current) return;
+
+    try {
+      const elements = excalidrawRef.current.getSceneElements();
+      if (!elements || elements.length === 0) {
+        alert('Desenhe algo primeiro.');
+        return;
+      }
+
+      await exportToClipboard({
+        elements,
+        appState: excalidrawRef.current.getAppState(),
+        files: excalidrawRef.current.getFiles(),
+        type: 'png'
+      });
+      
+      alert('Imagem copiada para a área de transferência!');
+    } catch (error) {
+      console.error('Erro ao copiar:', error);
+      alert('Erro ao copiar para área de transferência.');
+    }
+  }, []);
+
+  const saveAsExcalidraw = useCallback(async () => {
+    if (!excalidrawRef.current) return;
+
+    try {
+      const elements = excalidrawRef.current.getSceneElements();
+      const appState = excalidrawRef.current.getAppState();
+      
+      const data = {
+        type: 'excalidraw',
+        version: 2,
+        source: 'https://excalidraw.com',
+        elements,
+        appState
+      };
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { 
+        type: 'application/json' 
+      });
+      
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `drawing-${Date.now()}.excalidraw`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Erro ao salvar .excalidraw:', error);
+    }
+  }, []);
+
   return (
     <div className="w-full h-full flex flex-col bg-white">
       {/* Header */}
-      <div className="p-4 pb-3 border-b flex items-center justify-between bg-gray-50">
+      <div className="p-3 border-b flex items-center justify-between bg-gray-50">
         <div>
           <h1 className="text-lg font-semibold">Excalidraw Editor</h1>
           <p className="text-xs text-gray-600 mt-1">
-            Editor de diagramas e desenhos vetoriais
+            Editor profissional de diagramas e desenhos vetoriais
           </p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" onClick={handleSave} className="h-8 px-3 text-xs">
-            <Save className="h-3 w-3 mr-1" />
-            Salvar PNG
-          </Button>
+        <div className="flex items-center space-x-1">
+          {/* Grupo Arquivo */}
+          <div className="flex items-center space-x-1 mr-2">
+            <Button variant="outline" size="sm" onClick={handleLoad} className="h-7 px-2 text-xs">
+              <Upload className="h-3 w-3 mr-1" />
+              Abrir
+            </Button>
+            <Button variant="outline" size="sm" onClick={saveAsExcalidraw} className="h-7 px-2 text-xs">
+              <Save className="h-3 w-3 mr-1" />
+              Salvar
+            </Button>
+          </div>
 
-          <Button variant="outline" size="sm" onClick={handleExportSVG} className="h-8 px-3 text-xs">
-            <Download className="h-3 w-3 mr-1" />
-            Exportar SVG
-          </Button>
+          {/* Grupo Exportar */}
+          <div className="flex items-center space-x-1 mr-2">
+            <Button variant="outline" size="sm" onClick={handleSave} className="h-7 px-2 text-xs">
+              PNG
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportSVG} className="h-7 px-2 text-xs">
+              SVG
+            </Button>
+            <Button variant="outline" size="sm" onClick={exportToClipboardHandler} className="h-7 px-2 text-xs">
+              Copiar
+            </Button>
+          </div>
 
-          <Button variant="outline" size="sm" onClick={handleClear} className="h-8 px-3 text-xs">
-            Limpar
-          </Button>
+          {/* Grupo Edição */}
+          <div className="flex items-center space-x-1 mr-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleUndo} 
+              disabled={!canUndo}
+              className="h-7 w-7 p-0"
+            >
+              <Undo className="h-3 w-3" />
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleRedo} 
+              disabled={!canRedo}
+              className="h-7 w-7 p-0"
+            >
+              <Redo className="h-3 w-3" />
+            </Button>
+          </div>
 
-          <Button variant="outline" size="sm" onClick={resetViewport} className="h-8 px-3 text-xs">
-            <RefreshCw className="h-3 w-3 mr-1" />
-            Reset Viewport
-          </Button>
+          {/* Grupo Zoom */}
+          <div className="flex items-center space-x-1 mr-2">
+            <Button variant="outline" size="sm" onClick={handleZoomOut} className="h-7 w-7 p-0">
+              <ZoomOut className="h-3 w-3" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={resetViewport} className="h-7 px-2 text-xs">
+              100%
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleZoomIn} className="h-7 w-7 p-0">
+              <ZoomIn className="h-3 w-3" />
+            </Button>
+          </div>
 
-          <Button variant="ghost" size="sm" onClick={handleClose} className="h-8 w-8 p-0">
-            <X className="h-4 w-4" />
-          </Button>
+          {/* Grupo Ações */}
+          <div className="flex items-center space-x-1">
+            <Button variant="outline" size="sm" onClick={handleClear} className="h-7 px-2 text-xs">
+              Limpar
+            </Button>
+            <Button variant="outline" size="sm" onClick={toggleTheme} className="h-7 px-2 text-xs">
+              {theme === 'light' ? '🌙' : '☀️'}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleClose} className="h-7 w-7 p-0">
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
+
+      {/* Input file oculto */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".excalidraw,.json,image/*"
+        onChange={handleFileLoad}
+        style={{ display: 'none' }}
+      />
       
       {/* Editor Excalidraw */}
       <div 
@@ -226,29 +416,45 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
           `}
         </style>
         <Excalidraw
-          excalidrawAPI={(api: any) => (excalidrawRef.current = api)}
+          excalidrawAPI={(api: any) => {
+            excalidrawRef.current = api;
+          }}
           initialData={{
             elements: [],
             appState: {
-              theme: 'light',
-              viewBackgroundColor: '#ffffff',
+              theme,
+              viewBackgroundColor: theme === 'light' ? '#ffffff' : '#1e1e1e',
+              gridSize: null,
+              zenModeEnabled: false,
+              viewModeEnabled: false,
             },
+          }}
+          onChange={(elements, appState, files) => {
+            // Atualizar estados para controles
+            if (appState) {
+              const historySize = excalidrawRef.current?.history?.getSnapshotsMeta?.();
+              setCanUndo(historySize?.undoSize > 0);
+              setCanRedo(historySize?.redoSize > 0);
+              setZoom(appState.zoom?.value || 1);
+            }
           }}
           UIOptions={{
             canvasActions: {
               loadScene: false,
               saveToActiveFile: false,
               export: false,
-              toggleTheme: true,
+              toggleTheme: false,
+              clearCanvas: false,
             },
             tools: {
-              image: false,
+              image: true,
             },
           }}
           renderTopRightUI={() => null}
           viewModeEnabled={false}
           zenModeEnabled={false}
-          gridModeEnabled={false}
+          gridModeEnabled={true}
+          theme={theme}
         />
       </div>
     </div>
