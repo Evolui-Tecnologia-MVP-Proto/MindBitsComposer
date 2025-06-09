@@ -322,10 +322,11 @@ function ImageWithMetadataComponent({ node }: { node: ImageWithMetadataNode }) {
               e.preventDefault();
               e.stopPropagation();
               const imageId = node.getImageId();
-              navigator.clipboard.writeText(imageId).then(() => {
-                console.log('ID da imagem copiado para área de transferência:', imageId);
+              const formattedText = `[Imagem_ID: ${imageId}]`;
+              navigator.clipboard.writeText(formattedText).then(() => {
+                console.log('Texto formatado copiado para área de transferência:', formattedText);
               }).catch(err => {
-                console.error('Erro ao copiar ID da imagem:', err);
+                console.error('Erro ao copiar texto formatado da imagem:', err);
               });
             }}
             style={{
