@@ -703,10 +703,59 @@ export default function LexicalPage() {
   const extractImagesFromContent = () => {
     const images: any[] = [];
     
+    // Primeiro, tentar extrair diretamente do editor ativo
+    if (editorInstance) {
+      try {
+        editorInstance.read(() => {
+          const root = $getRoot();
+          
+          // Função para percorrer recursivamente todos os nós
+          const traverseNodes = (node: any) => {
+            if (node.getType() === 'image' || node.getType() === 'imageWithMetadata') {
+              console.log('📸 Nó de imagem encontrado no editor:', node);
+              const src = node.getSrc ? node.getSrc() : node.__src;
+              const alt = node.getAltText ? node.getAltText() : (node.__altText || node.__alt || `Imagem ${images.length + 1}`);
+              const artifactId = node.getArtifactId ? node.getArtifactId() : node.__artifactId;
+              
+              if (src) {
+                const imageData = {
+                  index: images.length,
+                  src,
+                  alt,
+                  artifactId,
+                  isBase64: src.startsWith('data:'),
+                  isArtifact: !!artifactId
+                };
+                console.log('✅ Imagem adicionada do editor ativo:', imageData);
+                images.push(imageData);
+              }
+            }
+            
+            // Percorrer filhos
+            const children = node.getChildren ? node.getChildren() : [];
+            children.forEach((child: any) => traverseNodes(child));
+          };
+          
+          traverseNodes(root);
+        });
+        
+        console.log('🎯 Total de imagens extraídas do editor ativo:', images.length, images);
+        return images;
+      } catch (error) {
+        console.error('Erro ao extrair do editor ativo:', error);
+      }
+    }
+    
+    // Fallback: tentar extrair do estado JSON
     try {
-      // Parse do estado do Lexical para extrair imagens
-      const editorState = JSON.parse(content);
-      console.log('🔍 Estado do editor para extração de imagens:', editorState);
+      const stateToUse = editorState || content;
+      if (!stateToUse) {
+        console.log('Nenhum estado disponível para extração');
+        return images;
+      }
+      
+      const parsedState = typeof stateToUse === 'string' ? JSON.parse(stateToUse) : stateToUse;
+      console.log('🔍 Estado do editor para extração de imagens:', parsedState);
       
       // Função recursiva para percorrer o estado do Lexical
       const extractImagesFromNode = (node: any, depth = 0) => {
@@ -740,35 +789,41 @@ export default function LexicalPage() {
       };
       
       // Começar pela raiz
-      if (editorState.root) {
-        extractImagesFromNode(editorState.root);
+      if (parsedState && parsedState.root) {
+        extractImagesFromNode(parsedState.root);
       }
       
-      console.log('🎯 Total de imagens extraídas:', images.length, images);
+      console.log('🎯 Total de imagens extraídas do estado JSON:', images.length, images);
     } catch (error) {
       console.error('Erro ao extrair imagens do estado do Lexical:', error);
       
-      // Fallback: tentar extrair do HTML se o content não for JSON válido
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = content;
-      const imgElements = tempDiv.querySelectorAll('img');
-      
-      imgElements.forEach((img, index) => {
-        const src = img.getAttribute('src');
-        const alt = img.getAttribute('alt') || `Imagem ${index + 1}`;
-        const artifactId = img.getAttribute('data-artifact-id');
+      // Último fallback: tentar extrair do HTML
+      try {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content || '';
+        const imgElements = tempDiv.querySelectorAll('img');
         
-        if (src) {
-          images.push({
-            index,
-            src,
-            alt,
-            artifactId,
-            isBase64: src.startsWith('data:'),
-            isArtifact: !!artifactId
-          });
-        }
-      });
+        imgElements.forEach((img, index) => {
+          const src = img.getAttribute('src');
+          const alt = img.getAttribute('alt') || `Imagem ${index + 1}`;
+          const artifactId = img.getAttribute('data-artifact-id');
+          
+          if (src) {
+            images.push({
+              index,
+              src,
+              alt,
+              artifactId,
+              isBase64: src.startsWith('data:'),
+              isArtifact: !!artifactId
+            });
+          }
+        });
+        
+        console.log('🎯 Total de imagens extraídas do HTML fallback:', images.length, images);
+      } catch (htmlError) {
+        console.error('Erro no fallback HTML:', htmlError);
+      }
     }
     
     return images;
