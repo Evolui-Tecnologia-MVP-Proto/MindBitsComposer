@@ -4,6 +4,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import FreeHandCanvasPlugin from "@/pages/plugins/freehand-canvas-plugin";
 import MermaidGraphPlugin from "@/pages/plugins/mermaid-graph-plugin";
 import SimpleExcalidrawPlugin from "@/pages/plugins/simple-excalidraw-plugin";
+import VectorGraphPlugin from "@/pages/plugins/vector-graph-plugin";
 
 interface PluginModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ const PLUGIN_COMPONENTS: Record<string, React.ComponentType<any>> = {
   'freehand-canvas-plugin': FreeHandCanvasPlugin,
   'mermaid-graph-plugin': MermaidGraphPlugin,
   'simple-excalidraw-plugin': SimpleExcalidrawPlugin,
+  'vector-graph-plugin': VectorGraphPlugin,
 };
 
 export default function PluginModal({ 
@@ -90,22 +92,26 @@ export default function PluginModal({
         className="p-0 gap-0 !max-w-none !max-h-none"
         style={{
           width: actualPluginName === 'mermaid-graph-plugin' ? '80vw' : 
+                 actualPluginName === 'vector-graph-plugin' ? '80vw' :
                  actualPluginName === 'simple-excalidraw-plugin' ? '90vw' : '100vw',
           height: actualPluginName === 'mermaid-graph-plugin' ? '80vh' : 
+                  actualPluginName === 'vector-graph-plugin' ? '80vh' :
                   actualPluginName === 'simple-excalidraw-plugin' ? '90vh' : '100vh',
           maxWidth: 'none',
           maxHeight: 'none',
           position: 'fixed',
           top: actualPluginName === 'mermaid-graph-plugin' ? '10vh' : 
+               actualPluginName === 'vector-graph-plugin' ? '10vh' :
                actualPluginName === 'simple-excalidraw-plugin' ? '5vh' : '0',
           left: actualPluginName === 'mermaid-graph-plugin' ? '10vw' : 
+                actualPluginName === 'vector-graph-plugin' ? '10vw' :
                 actualPluginName === 'simple-excalidraw-plugin' ? '5vw' : '0',
           right: 'auto',
           bottom: 'auto',
           margin: '0',
           padding: '0',
           transform: 'none',
-          borderRadius: (actualPluginName === 'mermaid-graph-plugin' || actualPluginName === 'simple-excalidraw-plugin') ? '8px' : '0',
+          borderRadius: (actualPluginName === 'mermaid-graph-plugin' || actualPluginName === 'vector-graph-plugin' || actualPluginName === 'simple-excalidraw-plugin') ? '8px' : '0',
           zIndex: 50,
           border: 'none',
           overflow: 'hidden'
