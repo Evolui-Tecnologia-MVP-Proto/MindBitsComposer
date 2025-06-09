@@ -1,6 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Virgil:wght@400;700&family=Cascadia+Code:wght@400;700&display=swap");
 
 .excalidraw-simple-wrapper {
+  /* Reset CSS absoluto para o container */
+  font-size: 14px;
+  line-height: 1.4;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   .excalidraw {
     width: 100% !important;
     height: 100% !important;
@@ -123,6 +127,44 @@
         max-width: 16px !important;
         max-height: 16px !important;
       }
+    }
+    
+    /* Reset específico para texto e inputs */
+    input, label, span, div {
+      font-size: 14px !important;
+      line-height: 1.4 !important;
+    }
+    
+    /* Controlar radio buttons */
+    input[type="radio"] {
+      width: 16px !important;
+      height: 16px !important;
+      max-width: 16px !important;
+      max-height: 16px !important;
+      transform: scale(1) !important;
+    }
+    
+    /* Controlar checkboxes */
+    input[type="checkbox"] {
+      width: 16px !important;
+      height: 16px !important;
+      max-width: 16px !important;
+      max-height: 16px !important;
+      transform: scale(1) !important;
+    }
+    
+    /* Reset para todos os elementos de formulário */
+    select, option, textarea {
+      font-size: 14px !important;
+      padding: 4px 8px !important;
+      height: auto !important;
+      max-height: 40px !important;
+    }
+    
+    /* Controlar elementos de texto */
+    .excalidraw * {
+      font-size: inherit !important;
+      line-height: inherit !important;
     }
   }
   
