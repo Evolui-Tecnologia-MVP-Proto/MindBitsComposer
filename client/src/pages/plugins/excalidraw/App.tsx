@@ -75,33 +75,53 @@ export const App = ({ onDataChange }: AppProps) => {
   };
 
   return (
-    <div className="excalidraw-app">
-      <Excalidraw
-        initialData={{
-          elements: [],
-          appState: {
-            theme,
-            viewBackgroundColor: theme === "light" ? "#ffffff" : "#121212",
-          },
+    <div 
+      className="excalidraw-app"
+      style={{
+        width: '100%',
+        height: '100%',
+        maxWidth: '100%',
+        maxHeight: '100%',
+        overflow: 'hidden',
+        position: 'relative'
+      }}
+    >
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          maxWidth: '100%',
+          maxHeight: '100%',
+          overflow: 'hidden'
         }}
-        onChange={(elements, appState, files) => {
-          onDataChange?.({ elements, appState, files });
-        }}
-        UIOptions={{
-          canvasActions: {
-            toggleTheme: false,
-            export: false,
-          },
-        }}
-        renderTopRightUI={renderTopRightUI}
-        viewModeEnabled={viewModeEnabled}
-        zenModeEnabled={zenModeEnabled}
-        theme={theme}
-        name="Excalidraw Editor"
       >
-        {renderMenu()}
-        {renderWelcomeScreen()}
-      </Excalidraw>
+        <Excalidraw
+          initialData={{
+            elements: [],
+            appState: {
+              theme,
+              viewBackgroundColor: theme === "light" ? "#ffffff" : "#121212",
+            },
+          }}
+          onChange={(elements, appState, files) => {
+            onDataChange?.({ elements, appState, files });
+          }}
+          UIOptions={{
+            canvasActions: {
+              toggleTheme: false,
+              export: false,
+            },
+          }}
+          renderTopRightUI={renderTopRightUI}
+          viewModeEnabled={viewModeEnabled}
+          zenModeEnabled={zenModeEnabled}
+          theme={theme}
+          name="Excalidraw Editor"
+        >
+          {renderMenu()}
+          {renderWelcomeScreen()}
+        </Excalidraw>
+      </div>
     </div>
   );
 };
