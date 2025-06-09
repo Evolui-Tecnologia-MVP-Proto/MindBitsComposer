@@ -621,6 +621,15 @@ export default function LexicalPage() {
     setShowSaveModal(true);
   };
 
+  // Função para obter nome padrão do arquivo baseado no contexto
+  const getDefaultFilename = () => {
+    if (loadedFileName) {
+      // Remove a extensão .lexical se existir
+      return loadedFileName.replace(/\.lexical$/, '');
+    }
+    return title.replace(/[^a-z0-9\-_\s]/gi, '').trim() || "documento";
+  };
+
   // Função para abrir arquivo .lexical local
   const handleOpenLexicalFile = () => {
     lexicalFileInputRef.current?.click();
@@ -863,6 +872,11 @@ export default function LexicalPage() {
 
   const handleSaveFile = (filename: string, format: string, includeImages?: boolean) => {
     const cleanFilename = filename.replace(/[^a-z0-9\-_\s]/gi, '').trim();
+    
+    // Se havia um arquivo carregado e o nome foi alterado, atualizar a badge
+    if (loadedFileName && cleanFilename !== loadedFileName.replace(/\.lexical$/, '')) {
+      setLoadedFileName(`${cleanFilename}.lexical`);
+    }
 
     switch (format) {
       case "lexical":
@@ -1839,7 +1853,7 @@ export default function LexicalPage() {
         isOpen={showSaveModal}
         onClose={() => setShowSaveModal(false)}
         onSave={handleSaveFile}
-        defaultFilename={title.replace(/[^a-z0-9\-_\s]/gi, '').trim() || "documento"}
+        defaultFilename={getDefaultFilename()}
       />
     </div>
   );
