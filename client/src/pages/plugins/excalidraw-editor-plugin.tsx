@@ -1,6 +1,6 @@
 import React, { useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Download, Save } from 'lucide-react';
+import { X, Download, Save, RefreshCw } from 'lucide-react';
 import { Excalidraw, exportToCanvas, exportToSvg } from '@excalidraw/excalidraw';
 
 interface ExcalidrawEditorPluginProps {
@@ -25,14 +25,14 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
     try {
       const elements = excalidrawRef.current.getSceneElements();
       const appState = excalidrawRef.current.getAppState();
-      
-      // Exportar como PNG
-      const canvas = await exportToCanvas({
-        elements,
-        appState,
-      });
-      
-      // Converter canvas para blob
+
+      if (!elements || elements.length === 0) {
+        alert('Desenhe algo primeiro.');
+        return;
+      }
+
+      const canvas = await exportToCanvas({ elements, appState });
+
       canvas.toBlob((blob: any) => {
         if (blob) {
           const url = URL.createObjectURL(blob);
@@ -61,16 +61,18 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
     try {
       const elements = excalidrawRef.current.getSceneElements();
       const appState = excalidrawRef.current.getAppState();
-      
-      const svg = await exportToSvg({
-        elements,
-        appState,
-      });
+
+      if (!elements || elements.length === 0) {
+        alert('Desenhe algo primeiro.');
+        return;
+      }
+
+      const svg = await exportToSvg({ elements, appState });
 
       const svgData = new XMLSerializer().serializeToString(svg);
       const svgBlob = new Blob([svgData], { type: 'image/svg+xml' });
       const svgUrl = URL.createObjectURL(svgBlob);
-      
+
       const a = document.createElement('a');
       a.href = svgUrl;
       a.download = `excalidraw-drawing-${Date.now()}.svg`;
@@ -86,63 +88,60 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
   }, []);
 
   const handleClear = useCallback(() => {
-    if (excalidrawRef.current) {
-      excalidrawRef.current.updateScene({
-        elements: [],
-        appState: { theme: 'light', viewBackgroundColor: '#ffffff' }
-      });
-    }
+    excalidrawRef.current?.updateScene({
+      elements: [],
+      appState: {
+        theme: 'light',
+        viewBackgroundColor: '#ffffff',
+        zoom: 1,
+        scrollX: 0,
+        scrollY: 0,
+      }
+    });
+  }, []);
+
+  const resetViewport = useCallback(() => {
+    excalidrawRef.current?.updateScene({
+      appState: {
+        zoom: 1,
+        scrollX: 0,
+        scrollY: 0,
+      }
+    });
   }, []);
 
   return (
     <div className="w-full h-full flex flex-col bg-white">
       {/* Header */}
       <div className="p-4 pb-3 border-b flex items-center justify-between bg-gray-50">
-        <div className="flex items-center space-x-4">
-          <div>
-            <h1 className="text-lg font-semibold">Excalidraw Editor</h1>
-            <p className="text-xs text-gray-600 mt-1">
-              Editor de diagramas e desenhos vetoriais
-            </p>
-          </div>
+        <div>
+          <h1 className="text-lg font-semibold">Excalidraw Editor</h1>
+          <p className="text-xs text-gray-600 mt-1">
+            Editor de diagramas e desenhos vetoriais
+          </p>
         </div>
-        
+
         <div className="flex items-center space-x-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleSave}
-            className="h-8 px-3 text-xs"
-          >
+          <Button variant="outline" size="sm" onClick={handleSave} className="h-8 px-3 text-xs">
             <Save className="h-3 w-3 mr-1" />
             Salvar PNG
           </Button>
-          
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleExportSVG}
-            className="h-8 px-3 text-xs"
-          >
+
+          <Button variant="outline" size="sm" onClick={handleExportSVG} className="h-8 px-3 text-xs">
             <Download className="h-3 w-3 mr-1" />
             Exportar SVG
           </Button>
-          
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleClear}
-            className="h-8 px-3 text-xs"
-          >
+
+          <Button variant="outline" size="sm" onClick={handleClear} className="h-8 px-3 text-xs">
             Limpar
           </Button>
-          
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleClose}
-            className="h-8 w-8 p-0"
-          >
+
+          <Button variant="outline" size="sm" onClick={resetViewport} className="h-8 px-3 text-xs">
+            <RefreshCw className="h-3 w-3 mr-1" />
+            Reset Viewport
+          </Button>
+
+          <Button variant="ghost" size="sm" onClick={handleClose} className="h-8 w-8 p-0">
             <X className="h-4 w-4" />
           </Button>
         </div>
