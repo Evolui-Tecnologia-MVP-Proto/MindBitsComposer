@@ -260,10 +260,28 @@ export default function LexicalPage() {
   // Mutation para salvar documento
   const saveMutation = useMutation({
     mutationFn: async (data: { title: string; content: string; plainText: string; editorState?: string; editionId?: string }) => {
-      // Se há um document edition selecionado, salvar no lex_file
+      // Se há um document edition selecionado, salvar no lex_file, json_file e md_file
       if (data.editionId) {
-        return apiRequest("PUT", `/api/document-editions/${data.editionId}/lex-file`, {
-          lexFile: data.editorState || data.content
+        // Obter o estado JSON não serializado do editor
+        let jsonData = null;
+        let markdownContent = "";
+        
+        try {
+          if (editorInstance) {
+            const currentEditorState = editorInstance.getEditorState();
+            // Converter para JSON não serializado
+            jsonData = currentEditorState.toJSON();
+            // Converter para markdown
+            markdownContent = convertToMarkdown(currentEditorState);
+          }
+        } catch (error) {
+          console.error('Erro ao obter dados do editor:', error);
+        }
+        
+        return apiRequest("PUT", `/api/document-editions/${data.editionId}/content`, {
+          lexFile: data.editorState || data.content,
+          jsonFile: jsonData,
+          mdFile: markdownContent
         });
       }
       // Caso contrário, salvar como documento lexical normal

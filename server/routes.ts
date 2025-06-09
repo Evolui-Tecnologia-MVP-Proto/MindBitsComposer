@@ -4850,6 +4850,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update document edition content (lex_file, json_file, md_file)
+  app.put("/api/document-editions/:id/content", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { lexFile, jsonFile, mdFile } = req.body;
+      const editionId = req.params.id;
+      
+      console.log('📄 Salvando conteúdo do documento:', { 
+        editionId, 
+        hasLexFile: !!lexFile, 
+        hasJsonFile: !!jsonFile, 
+        hasMdFile: !!mdFile 
+      });
+      
+      const [updatedEdition] = await db.update(documentEditions)
+        .set({ 
+          lexFile: lexFile || null,
+          jsonFile: jsonFile || {},
+          mdFile: mdFile || null,
+          updatedAt: new Date()
+        })
+        .where(eq(documentEditions.id, editionId))
+        .returning();
+      
+      if (!updatedEdition) {
+        return res.status(404).send("Document edition não encontrada");
+      }
+      
+      console.log('✅ Conteúdo salvo com sucesso para edition:', editionId);
+      res.json(updatedEdition);
+    } catch (error) {
+      console.error("Erro ao salvar conteúdo do documento:", error);
+      res.status(500).send("Erro ao salvar conteúdo do documento");
+    }
+  });
+
   // Rota para buscar artifacts de um documento específico baseado no document_editions
   app.get("/api/document-editions/:editionId/artifacts", async (req: Request, res: Response) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
