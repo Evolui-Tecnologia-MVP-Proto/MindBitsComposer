@@ -20,17 +20,11 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
   }, [onDataExchange]);
 
   const handleSave = useCallback(async () => {
-    if (!excalidrawAPI) return;
-
     try {
-      const elements = excalidrawAPI.getSceneElements();
-      const appState = excalidrawAPI.getAppState();
-      
       // Exportar como PNG
       const canvas = await exportToCanvas({
         elements,
         appState,
-        files: excalidrawAPI.getFiles(),
       });
       
       // Converter canvas para blob
@@ -54,7 +48,6 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
         source: 'https://excalidraw.com',
         elements,
         appState,
-        files: excalidrawAPI.getFiles(),
       };
 
       const dataStr = JSON.stringify(excalidrawData, null, 2);
@@ -71,19 +64,13 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
     } catch (error) {
       console.error('Erro ao salvar:', error);
     }
-  }, [excalidrawAPI]);
+  }, [elements, appState]);
 
   const handleExportSVG = useCallback(async () => {
-    if (!excalidrawAPI) return;
-
     try {
-      const elements = excalidrawAPI.getSceneElements();
-      const appState = excalidrawAPI.getAppState();
-      
       const svg = await exportToSvg({
         elements,
         appState,
-        files: excalidrawAPI.getFiles(),
       });
 
       const svgData = new XMLSerializer().serializeToString(svg);
@@ -101,7 +88,7 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
     } catch (error) {
       console.error('Erro ao exportar SVG:', error);
     }
-  }, [excalidrawAPI]);
+  }, [elements, appState]);
 
   const handleLoad = useCallback(() => {
     fileInputRef.current?.click();
@@ -109,7 +96,7 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
 
   const handleFileLoad = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || !excalidrawAPI) return;
+    if (!file) return;
 
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -118,10 +105,8 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
         const data = JSON.parse(content);
         
         if (data.elements && Array.isArray(data.elements)) {
-          excalidrawAPI.updateScene({
-            elements: data.elements,
-            appState: data.appState || {},
-          });
+          setElements(data.elements);
+          setAppState(data.appState || {});
         }
       } catch (error) {
         console.error('Erro ao carregar arquivo:', error);
@@ -132,16 +117,12 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
     
     // Limpar o input
     event.target.value = '';
-  }, [excalidrawAPI]);
+  }, []);
 
   const handleClear = useCallback(() => {
-    if (excalidrawAPI) {
-      excalidrawAPI.updateScene({
-        elements: [],
-        appState: {},
-      });
-    }
-  }, [excalidrawAPI]);
+    setElements([]);
+    setAppState({});
+  }, []);
 
   return (
     <div className="w-full h-full flex flex-col bg-white">
@@ -219,7 +200,6 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
       {/* Editor Excalidraw */}
       <div className="flex-1 w-full" style={{ height: 'calc(100% - 73px)' }}>
         <Excalidraw
-          ref={(api) => setExcalidrawAPI(api)}
           initialData={{
             elements,
             appState: {
@@ -228,8 +208,8 @@ export default function ExcalidrawEditorPlugin({ onDataExchange }: ExcalidrawEdi
               viewBackgroundColor: '#ffffff',
             },
           }}
-          onChange={(elements, appState) => {
-            setElements(elements);
+          onChange={(elements: any, appState: any, files: any) => {
+            setElements([...elements]);
             setAppState(appState);
           }}
           UIOptions={{
