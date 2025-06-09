@@ -321,6 +321,39 @@ function ImageWithMetadataComponent({ node }: { node: ImageWithMetadataNode }) {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              const imageId = node.getImageId();
+              navigator.clipboard.writeText(imageId).then(() => {
+                console.log('ID da imagem copiado para área de transferência:', imageId);
+              }).catch(err => {
+                console.error('Erro ao copiar ID da imagem:', err);
+              });
+            }}
+            style={{
+              background: '#6366f1',
+              border: 'none',
+              borderRadius: '4px',
+              color: 'white',
+              fontSize: '10px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '2px 6px',
+              maxWidth: '60px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+            title={`Copiar ID: ${node.getImageId()}`}
+          >
+            {node.getImageId().substring(0, 6)}...
+          </button>
+          
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
               handleResize(0.8);
             }}
             style={{
