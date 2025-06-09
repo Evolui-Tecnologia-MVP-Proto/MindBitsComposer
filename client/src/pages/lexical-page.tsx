@@ -1636,9 +1636,31 @@ export default function LexicalPage() {
         {showAttachments && (
           <div className="w-80 border-l bg-gray-50 p-4">
             <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-4">
-                <Paperclip className="w-5 h-5" />
-                <h3 className="font-semibold">Anexos</h3>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Paperclip className="w-5 h-5" />
+                  <h3 className="font-semibold">Anexos</h3>
+                </div>
+                {/* Combo de Plugins */}
+                {activePlugins.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <Select onValueChange={handleOpenPlugin}>
+                      <SelectTrigger className="w-32 h-8 text-xs">
+                        <SelectValue placeholder="Plugins" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {activePlugins.map((plugin) => (
+                          <SelectItem key={plugin.id} value={plugin.id}>
+                            <div className="flex items-center gap-2">
+                              <Puzzle className="w-3 h-3" />
+                              <span className="text-xs">{plugin.name}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
 
               <Accordion type="multiple" className="w-full space-y-2">
@@ -1760,60 +1782,6 @@ export default function LexicalPage() {
                               </div>
                             </div>
                           ))}
-                        </div>
-                      )}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-
-                {/* Plugins Ativos */}
-                <AccordionItem value="plugins" className="border rounded-lg bg-white">
-                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
-                    <div className="flex items-center justify-between w-full pr-2">
-                      <div className="flex items-center gap-2">
-                        <Puzzle className="w-4 h-4" />
-                        <span className="font-medium">Plugins</span>
-                      </div>
-                      <Badge variant="secondary">
-                        {activePlugins.length}
-                      </Badge>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="px-4 pb-4">
-                    <div className="space-y-2">
-                      {isLoadingPlugins ? (
-                        <div className="text-center py-4">
-                          <p className="text-sm text-gray-400">Carregando plugins...</p>
-                        </div>
-                      ) : activePlugins.length === 0 ? (
-                        <div className="text-center py-4">
-                          <p className="text-sm text-gray-400">
-                            Nenhum plugin ativo encontrado
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="space-y-2">
-                          <Label htmlFor="plugin-select" className="text-sm font-medium">
-                            Selecionar Plugin
-                          </Label>
-                          <Select onValueChange={handleOpenPlugin}>
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Escolha um plugin..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {activePlugins.map((plugin) => (
-                                <SelectItem key={plugin.id} value={plugin.id}>
-                                  <div className="flex items-center gap-2">
-                                    <Puzzle className="w-4 h-4" />
-                                    <span>{plugin.name}</span>
-                                  </div>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <p className="text-xs text-gray-500 mt-2">
-                            Selecione um plugin para abrir em uma nova janela
-                          </p>
                         </div>
                       )}
                     </div>
