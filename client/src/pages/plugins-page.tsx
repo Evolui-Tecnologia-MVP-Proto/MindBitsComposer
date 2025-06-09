@@ -58,6 +58,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import type { Plugin } from "@shared/schema";
 
 // Dicionário de ícones disponíveis
 const availableIcons = {
@@ -106,23 +107,7 @@ const PluginStatus = {
   DEVELOPMENT: "development"
 } as const;
 
-type Plugin = {
-  id: string;
-  name: string;
-  description: string;
-  type: keyof typeof PluginType;
-  status: keyof typeof PluginStatus;
-  version: string;
-  author: string | null;
-  icon: string | null;
-  pageName: string | null;
-  configuration: Record<string, any>;
-  endpoints: Record<string, string>;
-  permissions: string[];
-  dependencies: string[];
-  createdAt: string;
-  updatedAt: string;
-};
+
 
 // Schema para validação
 const pluginFormSchema = z.object({
@@ -544,7 +529,7 @@ export default function PluginsPage() {
                           onClick={() => toggleStatusMutation.mutate(plugin.id)}
                           disabled={toggleStatusMutation.isPending}
                         >
-                          {plugin.status === PluginStatus.ACTIVE ? (
+                          {plugin.status === "active" ? (
                             <PowerOff className="h-4 w-4" />
                           ) : (
                             <Power className="h-4 w-4" />
