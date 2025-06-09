@@ -1014,16 +1014,18 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
     <div className={`lexical-editor-container w-full h-full flex flex-col ${className}`}>
       <LexicalComposer initialConfig={initialConfig}>
         <div className="w-full h-full flex flex-col min-h-0">
-          <ToolbarPlugin 
-            tableRows={tableRows}
-            setTableRows={setTableRows}
-            tableColumns={tableColumns}
-            setTableColumns={setTableColumns}
-            selectedTableKey={selectedTableKey}
-            resizeSelectedTable={resizeSelectedTable}
-            onTableSelect={setSelectedTableKey}
-            deleteSelectedTable={deleteSelectedTable}
-          />
+          {viewMode === 'editor' && (
+            <ToolbarPlugin 
+              tableRows={tableRows}
+              setTableRows={setTableRows}
+              tableColumns={tableColumns}
+              setTableColumns={setTableColumns}
+              selectedTableKey={selectedTableKey}
+              resizeSelectedTable={resizeSelectedTable}
+              onTableSelect={setSelectedTableKey}
+              deleteSelectedTable={deleteSelectedTable}
+            />
+          )}
           <div className="p-4" style={{ height: 'calc(100vh - 350px)', maxHeight: 'calc(100vh - 350px)', overflowY: 'auto' }}>
             {viewMode === 'editor' ? (
               <RichTextPlugin

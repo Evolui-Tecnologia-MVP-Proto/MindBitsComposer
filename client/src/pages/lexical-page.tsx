@@ -1351,6 +1351,7 @@ export default function LexicalPage() {
                   size="sm"
                   className={showDocumentList ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
                   title="Biblioteca"
+                  disabled={viewMode === 'preview'}
                 >
                   <FolderOpen className={`w-4 h-4 ${showDocumentList ? "text-white" : ""}`} />
                 </Button>
@@ -1360,6 +1361,7 @@ export default function LexicalPage() {
                   size="sm"
                   className={showAttachments ? "bg-green-600 text-white hover:bg-green-700" : ""}
                   title="Anexos"
+                  disabled={viewMode === 'preview'}
                 >
                   <Paperclip className={`w-4 h-4 ${showAttachments ? "text-white" : ""}`} />
                 </Button>
@@ -1375,6 +1377,7 @@ export default function LexicalPage() {
                   size="sm"
                   className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
                   title="Abrir arquivo .lexical local"
+                  disabled={viewMode === 'preview'}
                 >
                   <FolderOpen className="w-4 h-4" />
                 </Button>
@@ -1383,14 +1386,14 @@ export default function LexicalPage() {
                   variant="outline"
                   size="sm"
                   className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-                  disabled={!hasEditorContent}
+                  disabled={!hasEditorContent || viewMode === 'preview'}
                   title="Descartar"
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
                 <Button
                   onClick={handleSave}
-                  disabled={saveMutation.isPending || !hasEditorContent}
+                  disabled={saveMutation.isPending || !hasEditorContent || viewMode === 'preview'}
                   size="sm"
                   title={saveMutation.isPending ? "Salvando..." : "Salvar"}
                 >
@@ -1401,7 +1404,7 @@ export default function LexicalPage() {
                   variant="outline"
                   size="sm"
                   className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
-                  disabled={!selectedEdition}
+                  disabled={!selectedEdition || viewMode === 'preview'}
                   title="Publicar"
                 >
                   <Split className="w-4 h-4" />
