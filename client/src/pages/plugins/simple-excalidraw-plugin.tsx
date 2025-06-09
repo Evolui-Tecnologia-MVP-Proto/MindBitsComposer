@@ -7,7 +7,6 @@ interface SimpleExcalidrawPluginProps {
 
 const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataReceived }) => {
   const excalidrawRef = useRef<any>(null);
-  const [apiReady, setApiReady] = useState(false);
 
   const handleChange = (elements: any, appState: any) => {
     onDataReceived?.({
@@ -18,15 +17,15 @@ const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataR
   };
 
   useEffect(() => {
-    if (!apiReady || !excalidrawRef.current) return;
+    if (!excalidrawRef.current) return;
 
     const timer = setTimeout(() => {
-      excalidrawRef.current.refresh?.();
+      excalidrawRef.current?.refresh?.();
       window.dispatchEvent(new Event("resize"));
     }, 200);
 
     return () => clearTimeout(timer);
-  }, [apiReady]);
+  }, []);
 
   return (
     <div
@@ -41,10 +40,7 @@ const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataR
       }}
     >
       <Excalidraw
-        excalidrawAPI={(api) => {
-          excalidrawRef.current = api;
-          setApiReady(true);
-        }}
+        ref={excalidrawRef}
         onChange={handleChange}
         theme="light"
         UIOptions={{
