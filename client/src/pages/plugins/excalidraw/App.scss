@@ -97,45 +97,22 @@
     }
   }
   
-  /* Forçar reorganização do layout da toolbar */
-  .excalidraw .App-toolbar {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    gap: 8px !important;
-    position: fixed !important;
-    top: 20px !important;
+  /* Texto de ajuda específico */
+  .excalidraw div[style*="color: var(--color-gray-50)"],
+  .excalidraw div[style*="color: rgb"] {
+    position: absolute !important;
+    top: 70px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    z-index: 1000 !important;
-  }
-  
-  /* Texto de ajuda - múltiplos seletores para garantir que funcione */
-  .excalidraw .help-hint,
-  .excalidraw [class*="hint"],
-  .excalidraw .App-bottom-bar,
-  .excalidraw div[style*="position: absolute"]:has(+ .Island),
-  .excalidraw div:contains("To move canvas") {
-    position: relative !important;
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
-    bottom: auto !important;
-    transform: none !important;
     background: rgba(255, 255, 255, 0.9) !important;
-    padding: 6px 12px !important;
-    border-radius: 6px !important;
-    font-size: 12px !important;
+    padding: 4px 8px !important;
+    border-radius: 4px !important;
+    font-size: 11px !important;
     color: #666 !important;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1) !important;
     white-space: nowrap !important;
-    margin-top: 8px !important;
-    order: 2 !important;
-  }
-  
-  /* Forçar a toolbar de botões a ser primeiro */
-  .excalidraw .Island {
-    order: 1 !important;
+    z-index: 999 !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
   }
   
   /* Controlar menu */
