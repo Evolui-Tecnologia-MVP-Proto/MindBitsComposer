@@ -19,6 +19,26 @@ export default function MermaidGraphPlugin({ onDataExchange }: MermaidGraphPlugi
   const [isRendering, setIsRendering] = useState(false);
   const [renderError, setRenderError] = useState<string | null>(null);
   const [lastSvg, setLastSvg] = useState<string>('');
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+
+  // Função para redimensionar SVG baseada no canvas real
+  const resizeSvgToCanvas = () => {
+    const svgElement = canvasRef.current?.querySelector('svg');
+    const container = canvasRef.current;
+    
+    if (svgElement && container) {
+      const containerRect = container.getBoundingClientRect();
+      const containerWidth = containerRect.width - 40; // margem para bordas
+      const containerHeight = containerRect.height - 40;
+      
+      svgElement.style.width = `${containerWidth}px`;
+      svgElement.style.height = 'auto';
+      svgElement.style.maxWidth = `${containerWidth}px`;
+      svgElement.style.maxHeight = `${containerHeight}px`;
+      svgElement.style.display = 'block';
+      svgElement.style.margin = '0 auto';
+    }
+  };
 
   // Inicializar Mermaid
   useEffect(() => {
@@ -30,6 +50,25 @@ export default function MermaidGraphPlugin({ onDataExchange }: MermaidGraphPlugi
       fontSize: 14,
     });
   }, []);
+
+  // Observer para redimensionamento do canvas
+  useEffect(() => {
+    if (!canvasRef.current) return;
+
+    resizeObserverRef.current = new ResizeObserver(() => {
+      if (lastSvg) {
+        setTimeout(resizeSvgToCanvas, 50);
+      }
+    });
+
+    resizeObserverRef.current.observe(canvasRef.current);
+
+    return () => {
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect();
+      }
+    };
+  }, [lastSvg]);
 
   // Renderizar o gráfico quando o código mudar
   useEffect(() => {
@@ -66,16 +105,7 @@ export default function MermaidGraphPlugin({ onDataExchange }: MermaidGraphPlugi
           setLastSvg(svg);
           
           // Auto-redimensionar o SVG para caber no canvas
-          setTimeout(() => {
-            const svgElement = canvasRef.current?.querySelector('svg');
-            if (svgElement) {
-              svgElement.style.width = '100%';
-              svgElement.style.height = 'auto';
-              svgElement.style.maxWidth = '100%';
-              svgElement.style.maxHeight = '100%';
-              svgElement.style.objectFit = 'contain';
-            }
-          }, 100);
+          setTimeout(resizeSvgToCanvas, 200);
         }
       } catch (error) {
         console.error('Erro ao renderizar Mermaid:', error);
