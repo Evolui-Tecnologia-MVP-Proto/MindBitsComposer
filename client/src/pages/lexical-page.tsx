@@ -19,6 +19,7 @@ import { INSERT_IMAGE_COMMAND } from '@/components/lexical/ImagePlugin';
 import type { ImagePayload } from '@/components/lexical/ImageNode';
 import { createMarkdownConverter } from '@/components/markdown-converter';
 import { $getRoot } from 'lexical';
+import PluginModal from '@/components/plugin-modal';
 
 interface LexicalDocument {
   id: string;
@@ -203,6 +204,39 @@ export default function LexicalPage() {
     queryKey: ['/api/global-assets'],
     enabled: showAttachments,
   });
+
+  // Query para buscar plugins ativos
+  const { data: activePlugins = [], isLoading: isLoadingPlugins } = useQuery<Plugin[]>({
+    queryKey: ['/api/plugins'],
+    queryFn: async () => {
+      const response = await fetch('/api/plugins');
+      if (!response.ok) throw new Error('Erro ao buscar plugins');
+      const plugins = await response.json();
+      return plugins.filter((plugin: Plugin) => plugin.isActive);
+    },
+    enabled: showAttachments,
+  });
+
+  // Função para abrir plugin selecionado
+  const handleOpenPlugin = (pluginId: string) => {
+    const plugin = activePlugins.find(p => p.id === pluginId);
+    if (plugin) {
+      setSelectedPlugin(plugin);
+      setIsPluginModalOpen(true);
+    }
+  };
+
+  // Função para fechar modal do plugin
+  const handleClosePluginModal = () => {
+    setIsPluginModalOpen(false);
+    setSelectedPlugin(null);
+  };
+
+  // Função para receber dados do plugin
+  const handlePluginDataExchange = (data: any) => {
+    console.log('Dados recebidos do plugin:', data);
+    // Aqui você pode processar os dados do plugin se necessário
+  };
 
   // Função para inserir imagem no editor
   const handleInsertImage = (artifact: DocumentArtifact) => {
@@ -1731,6 +1765,60 @@ export default function LexicalPage() {
                   </AccordionContent>
                 </AccordionItem>
 
+                {/* Plugins Ativos */}
+                <AccordionItem value="plugins" className="border rounded-lg bg-white">
+                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                    <div className="flex items-center justify-between w-full pr-2">
+                      <div className="flex items-center gap-2">
+                        <Puzzle className="w-4 h-4" />
+                        <span className="font-medium">Plugins</span>
+                      </div>
+                      <Badge variant="secondary">
+                        {activePlugins.length}
+                      </Badge>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="px-4 pb-4">
+                    <div className="space-y-2">
+                      {isLoadingPlugins ? (
+                        <div className="text-center py-4">
+                          <p className="text-sm text-gray-400">Carregando plugins...</p>
+                        </div>
+                      ) : activePlugins.length === 0 ? (
+                        <div className="text-center py-4">
+                          <p className="text-sm text-gray-400">
+                            Nenhum plugin ativo encontrado
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <Label htmlFor="plugin-select" className="text-sm font-medium">
+                            Selecionar Plugin
+                          </Label>
+                          <Select onValueChange={handleOpenPlugin}>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Escolha um plugin..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {activePlugins.map((plugin) => (
+                                <SelectItem key={plugin.id} value={plugin.id}>
+                                  <div className="flex items-center gap-2">
+                                    <Puzzle className="w-4 h-4" />
+                                    <span>{plugin.name}</span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <p className="text-xs text-gray-500 mt-2">
+                            Selecione um plugin para abrir em uma nova janela
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+
                 {/* My Assets */}
                 {selectedEdition && (
                   <AccordionItem value="my-assets" className="border rounded-lg bg-white">
@@ -1979,6 +2067,17 @@ export default function LexicalPage() {
         onSave={handleSaveFile}
         defaultFilename={getDefaultFilename()}
       />
+
+      {/* Plugin Modal */}
+      {selectedPlugin && (
+        <PluginModal
+          isOpen={isPluginModalOpen}
+          onClose={handleClosePluginModal}
+          pluginName={selectedPlugin.name}
+          plugin={selectedPlugin}
+          onDataExchange={handlePluginDataExchange}
+        />
+      )}
     </div>
   );
 };
