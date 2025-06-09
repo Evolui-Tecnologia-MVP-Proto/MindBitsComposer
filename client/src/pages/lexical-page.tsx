@@ -632,7 +632,21 @@ export default function LexicalPage() {
 
   // Função para abrir arquivo .lexical local
   const handleOpenLexicalFile = () => {
-    lexicalFileInputRef.current?.click();
+    // Verificar se há conteúdo não salvo no editor
+    if (hasEditorContent && !currentDocumentId && !selectedEdition) {
+      showConfirmation({
+        title: "Conteúdo não salvo",
+        description: "Há conteúdo em edição que será perdido se não for salvo. Deseja continuar carregando o novo arquivo?",
+        onConfirm: () => {
+          lexicalFileInputRef.current?.click();
+        },
+        confirmText: "Continuar",
+        cancelText: "Cancelar",
+        variant: "destructive"
+      });
+    } else {
+      lexicalFileInputRef.current?.click();
+    }
   };
 
   // Função para processar arquivo .lexical selecionado
