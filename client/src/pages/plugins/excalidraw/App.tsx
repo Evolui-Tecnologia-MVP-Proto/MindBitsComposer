@@ -11,16 +11,18 @@ export const App = ({ onDataChange }: AppProps) => {
     <div 
       className="excalidraw-simple-wrapper"
       style={{
-        width: '100%',
+        width: '800px',
         height: '600px',
-        maxWidth: '100%',
+        maxWidth: '800px',
         maxHeight: '600px',
         overflow: 'hidden',
         position: 'relative',
         margin: '0 auto',
         border: '1px solid #ddd',
         borderRadius: '8px',
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        transform: 'scale(1)',
+        transformOrigin: 'top left'
       }}
     >
       <Excalidraw

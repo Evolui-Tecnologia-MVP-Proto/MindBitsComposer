@@ -8,6 +8,122 @@
     max-height: 100% !important;
     overflow: hidden !important;
     position: relative !important;
+    
+    /* Forçar tamanhos normais para todos os elementos */
+    * {
+      box-sizing: border-box !important;
+    }
+    
+    /* Controlar especificamente ícones e SVGs */
+    svg {
+      width: 20px !important;
+      height: 20px !important;
+      max-width: 20px !important;
+      max-height: 20px !important;
+    }
+    
+    /* Controlar botões e ícones de menu */
+    button {
+      width: 36px !important;
+      height: 36px !important;
+      max-width: 36px !important;
+      max-height: 36px !important;
+      padding: 6px !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    
+    /* Controlar menu hamburguer especificamente */
+    .App-menu__left {
+      button {
+        width: 32px !important;
+        height: 32px !important;
+        max-width: 32px !important;
+        max-height: 32px !important;
+        
+        svg {
+          width: 16px !important;
+          height: 16px !important;
+          max-width: 16px !important;
+          max-height: 16px !important;
+        }
+      }
+    }
+    
+    /* Controlar toolbar principal */
+    .App-toolbar {
+      max-height: 60px !important;
+      
+      button {
+        width: 32px !important;
+        height: 32px !important;
+        max-width: 32px !important;
+        max-height: 32px !important;
+        
+        svg {
+          width: 16px !important;
+          height: 16px !important;
+          max-width: 16px !important;
+          max-height: 16px !important;
+        }
+      }
+    }
+    
+    /* Controlar todos os ícones de interface */
+    .App-menu,
+    .App-bottom-bar,
+    .layer-ui__wrapper {
+      svg {
+        width: 16px !important;
+        height: 16px !important;
+        max-width: 16px !important;
+        max-height: 16px !important;
+      }
+      
+      button {
+        width: 32px !important;
+        height: 32px !important;
+        max-width: 32px !important;
+        max-height: 32px !important;
+      }
+    }
+    
+    /* Reset de escala para todo o Excalidraw */
+    .excalidraw {
+      transform: scale(1) !important;
+      zoom: 1 !important;
+    }
+    
+    /* Controlar especificamente elementos que podem estar escalados */
+    .App-canvas,
+    .layer-ui,
+    .App-main,
+    .App {
+      transform: none !important;
+      scale: 1 !important;
+      zoom: 1 !important;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    
+    /* Forçar tamanhos específicos para elementos problemáticos */
+    [data-testid],
+    .App-menu__left button,
+    .ToolIcon,
+    .ToolIcon__icon {
+      width: 32px !important;
+      height: 32px !important;
+      max-width: 32px !important;
+      max-height: 32px !important;
+      
+      svg {
+        width: 16px !important;
+        height: 16px !important;
+        max-width: 16px !important;
+        max-height: 16px !important;
+      }
+    }
   }
   
   .excalidraw .App {
