@@ -27,15 +27,50 @@
   
   /* Controlar especificamente a toolbar */
   .App-toolbar {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    padding: 8px !important;
+    position: absolute !important;
+    top: 10px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    z-index: 1000 !important;
+    
     button {
       width: 40px !important;
       height: 40px !important;
+      margin: 0 !important;
+      flex-shrink: 0 !important;
+      display: inline-flex !important;
       
       svg {
         width: 16px !important;
         height: 16px !important;
       }
     }
+  }
+  
+  /* Forçar layout horizontal para grupos de ferramentas */
+  .App-toolbar__left,
+  .App-toolbar__right {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 4px !important;
+  }
+  
+  /* Controlar container de ferramentas */
+  .App-toolbar-content {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 4px !important;
   }
   
   /* Controlar menu */
