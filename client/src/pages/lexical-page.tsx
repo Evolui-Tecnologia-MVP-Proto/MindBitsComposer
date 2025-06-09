@@ -212,7 +212,7 @@ export default function LexicalPage() {
       const response = await fetch('/api/plugins');
       if (!response.ok) throw new Error('Erro ao buscar plugins');
       const plugins = await response.json();
-      return plugins.filter((plugin: Plugin) => plugin.isActive);
+      return plugins.filter((plugin: Plugin) => plugin.status === 'active');
     },
     enabled: showAttachments,
   });
