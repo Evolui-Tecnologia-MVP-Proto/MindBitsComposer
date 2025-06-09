@@ -109,6 +109,7 @@ export default function LexicalPage() {
   const [loadedFileName, setLoadedFileName] = useState<string | null>(null);
   const [isPluginModalOpen, setIsPluginModalOpen] = useState(false);
   const [selectedPlugin, setSelectedPlugin] = useState<Plugin | null>(null);
+  const [pluginSelectValue, setPluginSelectValue] = useState<string>("");
   const { toast } = useToast();
   const { showConfirmation } = useConfirmationToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -262,6 +263,8 @@ export default function LexicalPage() {
     if (plugin) {
       setSelectedPlugin(plugin);
       setIsPluginModalOpen(true);
+      // Reset the select value to show placeholder again
+      setPluginSelectValue("");
     }
   };
 
@@ -1682,7 +1685,7 @@ export default function LexicalPage() {
                 {/* Combo de Plugins */}
                 {activePlugins.length > 0 && (
                   <div className="flex items-center gap-2">
-                    <Select onValueChange={handleOpenPlugin}>
+                    <Select value={pluginSelectValue} onValueChange={handleOpenPlugin}>
                       <SelectTrigger className="w-32 h-8 text-xs">
                         <SelectValue placeholder="Plugins" />
                       </SelectTrigger>
