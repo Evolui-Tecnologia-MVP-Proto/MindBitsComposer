@@ -90,6 +90,7 @@ export default function LexicalPage() {
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [hasEditorContent, setHasEditorContent] = useState(false); // Estado para controlar se há conteúdo no editor
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [loadedFileName, setLoadedFileName] = useState<string | null>(null);
   const { toast } = useToast();
   const { showConfirmation } = useConfirmationToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -653,6 +654,9 @@ export default function LexicalPage() {
           setSelectedTemplate(null);
           setSelectedEdition(null);
           
+          // Definir arquivo carregado
+          setLoadedFileName(file.name);
+          
           // Carregar dados do arquivo
           setTitle(lexicalData.title);
           
@@ -1025,6 +1029,7 @@ export default function LexicalPage() {
     console.log('Selecionando edition:', edition);
     setSelectedEdition(edition);
     setCurrentDocumentId(null);
+    setLoadedFileName(null);
     
     // Criar objeto template para exibir o badge
     const template = {
@@ -1165,6 +1170,7 @@ export default function LexicalPage() {
         setSelectedTemplate(null);
         setSelectedEdition(null);
         setCurrentDocumentId(null);
+        setLoadedFileName(null);
         
         // Forçar re-render do editor
         setEditorKey(prev => prev + 1);
@@ -1202,6 +1208,11 @@ export default function LexicalPage() {
               {selectedTemplate && (
                 <Badge variant="secondary" className="text-xs">
                   Template: {selectedTemplate.code}
+                </Badge>
+              )}
+              {loadedFileName && (
+                <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                  Arquivo carregado: {loadedFileName}
                 </Badge>
               )}
             </div>
