@@ -3,8 +3,6 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import FreeHandCanvasPlugin from "@/pages/plugins/freehand-canvas-plugin";
 import MermaidGraphPlugin from "@/pages/plugins/mermaid-graph-plugin";
-import ExcalidrawEditorPlugin from "@/pages/plugins/excalidraw-editor-plugin";
-import ExcalidrawCompletePlugin from "@/pages/plugins/excalidraw-complete-plugin";
 import SimpleExcalidrawPlugin from "@/pages/plugins/simple-excalidraw-plugin";
 
 interface PluginModalProps {
@@ -19,8 +17,6 @@ interface PluginModalProps {
 const PLUGIN_COMPONENTS: Record<string, React.ComponentType<any>> = {
   'freehand-canvas-plugin': FreeHandCanvasPlugin,
   'mermaid-graph-plugin': MermaidGraphPlugin,
-  'excalidraw-editor-plugin': ExcalidrawEditorPlugin,
-  'excalidraw-complete-plugin': ExcalidrawCompletePlugin,
   'simple-excalidraw-plugin': SimpleExcalidrawPlugin,
 };
 
