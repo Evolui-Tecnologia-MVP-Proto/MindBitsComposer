@@ -1105,8 +1105,7 @@ export default function LexicalPage() {
                   className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
                   title="Abrir arquivo .lexical local"
                 >
-                  <FolderOpen className="w-4 h-4 mr-2" />
-                  Abrir
+                  <FolderOpen className="w-4 h-4" />
                 </Button>
                 <Button
                   onClick={handleDiscard}
@@ -1114,17 +1113,17 @@ export default function LexicalPage() {
                   size="sm"
                   className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
                   disabled={!hasEditorContent}
+                  title="Descartar"
                 >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Descartar
+                  <Trash2 className="w-4 h-4" />
                 </Button>
                 <Button
                   onClick={handleSave}
                   disabled={saveMutation.isPending || !hasEditorContent}
                   size="sm"
+                  title={saveMutation.isPending ? "Salvando..." : "Salvar"}
                 >
-                  <Save className="w-4 h-4 mr-2" />
-                  {saveMutation.isPending ? "Salvando..." : "Salvar"}
+                  <Save className="w-4 h-4" />
                 </Button>
                 <Button
                   onClick={() => {}} // Placeholder for future functionality
@@ -1132,9 +1131,9 @@ export default function LexicalPage() {
                   size="sm"
                   className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
                   disabled={!selectedEdition}
+                  title="Publicar"
                 >
-                  <Split className="w-4 h-4 mr-2" />
-                  Publicar
+                  <Split className="w-4 h-4" />
                 </Button>
               </div>
             </div>
