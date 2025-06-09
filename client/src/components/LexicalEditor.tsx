@@ -688,10 +688,13 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
   const sectionsRef = React.useRef<string[] | null>(null);
 
   React.useEffect(() => {
+    console.log('🔥 TemplateSectionsPlugin - useEffect executado', { sections, sectionsLength: sections?.length });
+    
     // Evitar re-aplicar as mesmas seções
     if (sections && sections.length > 0 && 
         JSON.stringify(sections) !== JSON.stringify(sectionsRef.current)) {
       
+      console.log('🔥 TemplateSectionsPlugin - Aplicando seções do template:', sections);
       sectionsRef.current = sections;
       
       // Usar setTimeout para evitar conflitos com outros plugins

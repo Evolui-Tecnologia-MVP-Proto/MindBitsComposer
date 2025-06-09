@@ -1133,16 +1133,12 @@ export default function LexicalPage() {
       // Limpar estado inicial do editor para usar template
       setInitialEditorState(undefined);
       
-      // Usar a função existente para carregar template
-      if (edition.templateStructure) {
-        const templateSections = extractTemplateSections(template);
-        console.log('Template sections:', templateSections);
-        // Usar as seções do template como templateSections para o plugin
-        setContent(''); // Deixar vazio para usar o plugin de template
-      } else {
-        setContent('');
-      }
+      // Limpar conteúdo para que o template seja aplicado
+      setContent('');
       setTitle(`${edition.templateCode} - ${edition.origem} - ${edition.objeto}`);
+      
+      // Forçar re-render do editor para aplicar as seções do template
+      setEditorKey(prev => prev + 1);
     } else {
       console.log('Carregando lex_file existente');
       // Carregar estado serializado do Lexical
@@ -1151,8 +1147,6 @@ export default function LexicalPage() {
       setTitle(`${edition.templateCode} - ${edition.origem} - ${edition.objeto}`);
     }
     
-    // Forçar re-render do editor para aplicar novo estado
-    setEditorKey(prev => prev + 1);
     setShowDocumentList(false);
   };
 
