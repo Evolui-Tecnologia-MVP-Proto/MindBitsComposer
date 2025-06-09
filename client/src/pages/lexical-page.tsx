@@ -887,19 +887,57 @@ export default function LexicalPage() {
 
     if (includeImages) {
       const images = extractImagesFromContent();
-      documentData.images = images;
       
-      const processedImages = images.map(img => {
+      if (images.length > 0) {
+        // Mostrar progresso para conversão de imagens
+        toast({
+          title: "Processando imagens",
+          description: `Convertendo ${images.length} imagem(ns) para base64...`,
+        });
+      }
+      
+      // Processar imagens para incluir base64
+      const processedImages = await Promise.all(images.map(async (img, index) => {
         if (img.isBase64) {
           return img;
         } else if (img.isArtifact) {
-          return {
-            ...img,
-            note: "Referência ao banco de dados - dados base64 não incluídos"
-          };
+          try {
+            console.log(`🔄 Baixando imagem ${index + 1}/${images.length}:`, img.src);
+            // Tentar baixar a imagem do banco e converter para base64
+            const response = await fetch(img.src);
+            if (response.ok) {
+              const blob = await response.blob();
+              const base64 = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(blob);
+              });
+              
+              console.log(`✅ Imagem ${index + 1} convertida para base64`);
+              return {
+                ...img,
+                src: base64,
+                originalSrc: img.src,
+                isBase64: true,
+                note: "Convertido para base64 a partir do banco de dados"
+              };
+            } else {
+              console.log(`❌ Erro ao baixar imagem ${index + 1}: ${response.status}`);
+              return {
+                ...img,
+                note: "Erro ao baixar imagem do banco de dados - mantida referência original"
+              };
+            }
+          } catch (error) {
+            console.error(`❌ Erro ao converter imagem ${index + 1} para base64:`, error);
+            return {
+              ...img,
+              note: "Erro ao baixar imagem do banco de dados - mantida referência original"
+            };
+          }
         }
         return img;
-      });
+      }));
       
       documentData.images = processedImages;
     } else {
@@ -927,9 +965,21 @@ export default function LexicalPage() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
+    // Contar imagens convertidas com sucesso
+    const convertedImages = includeImages ? documentData.images.filter((img: any) => img.isBase64).length : 0;
+    const totalImages = includeImages ? documentData.images.length : (documentData.imageReferences ? documentData.imageReferences.length : 0);
+    
+    let description = `O arquivo "${fileName}" foi salvo`;
+    if (includeImages && totalImages > 0) {
+      description += ` com ${convertedImages}/${totalImages} imagem(ns) convertida(s) para base64`;
+    } else if (!includeImages && totalImages > 0) {
+      description += ` com ${totalImages} referência(s) de imagem`;
+    }
+    description += '.';
+    
     toast({
       title: "Documento salvo em Lexical",
-      description: `O arquivo "${fileName}" foi salvo${includeImages ? ' com imagens em base64' : ' com referências de imagem'}.`,
+      description,
     });
   };
 
