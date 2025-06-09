@@ -16,17 +16,17 @@ const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataR
     });
   };
 
-  // Forçar refresh depois que a modal já renderizou por completo
+  // Forçar refresh sempre que a API estiver disponível
   useEffect(() => {
+    if (!excalidrawRef.current) return;
+
     const timer = setTimeout(() => {
-      if (excalidrawRef.current?.refresh) {
-        excalidrawRef.current.refresh();
-      }
+      excalidrawRef.current?.refresh?.();
       window.dispatchEvent(new Event("resize"));
     }, 200);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [excalidrawRef.current]);
 
   return (
     <div
@@ -41,7 +41,7 @@ const SimpleExcalidrawPlugin: React.FC<SimpleExcalidrawPluginProps> = ({ onDataR
       }}
     >
       <Excalidraw
-        ref={excalidrawRef}
+        excalidrawAPI={(api) => { excalidrawRef.current = api; }}
         onChange={handleChange}
         theme="light"
         UIOptions={{
