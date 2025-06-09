@@ -1022,6 +1022,7 @@ export default function LexicalPage() {
     setTitle(document.title);
     setContent(document.content);
     setSelectedTemplate(null); // Limpar template ao carregar documento
+    setLoadedFileName(null); // Limpar arquivo carregado
     setShowDocumentList(false);
   };
 
