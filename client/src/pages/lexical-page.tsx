@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool, Eye, Edit, File, Image, Video, FileAudio, FileCode2, CircleChevronLeft, Globe, Split, FileInput, FileOutput } from "lucide-react";
+import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool, Eye, Edit, File, Image, Video, FileAudio, FileCode2, CircleChevronLeft, Globe, Split, FileInput, FileOutput, Puzzle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useConfirmationToast } from "@/hooks/use-confirmation-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
@@ -75,6 +76,19 @@ interface GlobalAsset {
   updatedAt: string;
 }
 
+interface Plugin {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  version: string;
+  author: string;
+  icon: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export default function LexicalPage() {
   const [content, setContent] = useState("");
   const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(null);
@@ -91,6 +105,8 @@ export default function LexicalPage() {
   const [hasEditorContent, setHasEditorContent] = useState(false); // Estado para controlar se há conteúdo no editor
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [loadedFileName, setLoadedFileName] = useState<string | null>(null);
+  const [isPluginModalOpen, setIsPluginModalOpen] = useState(false);
+  const [selectedPlugin, setSelectedPlugin] = useState<Plugin | null>(null);
   const { toast } = useToast();
   const { showConfirmation } = useConfirmationToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
