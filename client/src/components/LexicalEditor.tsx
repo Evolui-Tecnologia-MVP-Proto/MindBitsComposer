@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { $getRoot, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, type TextFormatType, $createParagraphNode, $createTextNode, $insertNodes, $isParagraphNode, UNDO_COMMAND, REDO_COMMAND } from 'lexical';
+import { $getRoot, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, type TextFormatType, $createParagraphNode, $createTextNode, $insertNodes, $isParagraphNode, UNDO_COMMAND, REDO_COMMAND, COMMAND_PRIORITY_LOW, PASTE_COMMAND, $isTextNode } from 'lexical';
 import { createMarkdownConverter } from './markdown-converter';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
@@ -800,6 +800,47 @@ function FocusPlugin({ initialEditorState }: { initialEditorState?: string }) {
   return null;
 }
 
+// Plugin para detectar e converter automaticamente [Imagem_ID: numeroimagem] para código inline
+function ImageIdAutoConvertPlugin() {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    return editor.registerCommand(
+      PASTE_COMMAND,
+      (event: ClipboardEvent) => {
+        const clipboardData = event.clipboardData;
+        if (!clipboardData) return false;
+
+        const text = clipboardData.getData('text/plain');
+        
+        // Verificar se o texto contém o padrão [Imagem_ID: numero]
+        const imageIdPattern = /\[Imagem_ID:\s*\d+\]/;
+        
+        if (imageIdPattern.test(text)) {
+          event.preventDefault();
+          
+          editor.update(() => {
+            const selection = $getSelection();
+            if (!$isRangeSelection(selection)) return;
+
+            // Criar nó de texto com formatação de código
+            const codeNode = $createTextNode(text);
+            codeNode.setFormat('code');
+            selection.insertNodes([codeNode]);
+          });
+          
+          return true;
+        }
+        
+        return false;
+      },
+      COMMAND_PRIORITY_LOW
+    );
+  }, [editor]);
+
+  return null;
+}
+
 // Componente principal do editor Lexical completo
 export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, onEditorInstanceChange, className = '', templateSections, viewMode = 'editor', initialEditorState }: LexicalEditorProps): JSX.Element {
   const [markdownContent, setMarkdownContent] = useState('');
@@ -1030,6 +1071,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <CollapsiblePlugin />
           <ImagePlugin />
           <ImageEventListenerPlugin />
+          <ImageIdAutoConvertPlugin />
           <TemplateSectionsPlugin sections={templateSections} />
           <EditorInstancePlugin setEditorInstance={(editor) => {
             setEditorInstance(editor);
