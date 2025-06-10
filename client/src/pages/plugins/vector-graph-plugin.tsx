@@ -43,10 +43,57 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         throw new Error('Nenhum conteúdo para exportar. Desenhe algo antes de salvar.');
       }
       
-      const pngBlob = await editorInstance.exportAs(shapeIds, 'png', {
-        scale: 1,
-        background: true
-      });
+      // Try different export methods available in tldraw v3.13.1
+      let pngBlob;
+      try {
+        // Method 1: Try getSvgAsImage
+        if (typeof editorInstance.getSvgAsImage === 'function') {
+          console.log('Using getSvgAsImage method...');
+          pngBlob = await editorInstance.getSvgAsImage(shapeIds, {
+            format: 'png',
+            scale: 1,
+            background: true
+          });
+        } 
+        // Method 2: Try export method
+        else if (typeof editorInstance.export === 'function') {
+          console.log('Using export method...');
+          pngBlob = await editorInstance.export(shapeIds, 'png');
+        }
+        // Method 3: Try getSvg and convert
+        else if (typeof editorInstance.getSvg === 'function') {
+          console.log('Using getSvg method and converting...');
+          const svg = await editorInstance.getSvg(shapeIds, {
+            scale: 1,
+            background: true
+          });
+          
+          if (svg) {
+            // Convert SVG to PNG using canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            await new Promise((resolve, reject) => {
+              img.onload = () => {
+                canvas.width = img.width || 800;
+                canvas.height = img.height || 600;
+                ctx?.drawImage(img, 0, 0);
+                canvas.toBlob(resolve, 'image/png');
+              };
+              img.onerror = reject;
+              img.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(svg));
+            }).then(blob => {
+              pngBlob = blob;
+            });
+          }
+        } else {
+          throw new Error('Nenhum método de exportação disponível no editor');
+        }
+      } catch (exportError) {
+        console.error('Erro no método de exportação:', exportError);
+        throw exportError;
+      }
       console.log('PNG export result:', pngBlob ? 'Success' : 'Failed');
       
       if (!pngBlob) {
