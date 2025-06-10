@@ -1297,7 +1297,8 @@ export default function LexicalPage() {
       setEditorKey(prev => prev + 1);
     }
     
-
+    // Abrir painel esquerdo automaticamente ao carregar composer
+    setShowDocumentList(true);
   };
 
   const convertTemplateToContent = (structure: any): string => {
