@@ -1875,6 +1875,7 @@ export default function LexicalPage() {
                         <Badge variant="secondary">
                           {documentArtifacts.filter(artifact => 
                             artifact.originAssetId === "Uploaded" || 
+                            artifact.originAssetId === "Mermaid" ||
                             !artifact.mondayColumn || 
                             artifact.mondayColumn.trim() === ""
                           ).length}
@@ -1899,6 +1900,7 @@ export default function LexicalPage() {
                           </div>
                         ) : documentArtifacts.filter(artifact => 
                             artifact.originAssetId === "Uploaded" || 
+                            artifact.originAssetId === "Mermaid" ||
                             !artifact.mondayColumn || 
                             artifact.mondayColumn.trim() === ""
                           ).length === 0 ? (
@@ -1912,6 +1914,7 @@ export default function LexicalPage() {
                             {documentArtifacts
                               .filter(artifact => 
                                 artifact.originAssetId === "Uploaded" || 
+                                artifact.originAssetId === "Mermaid" ||
                                 !artifact.mondayColumn || 
                                 artifact.mondayColumn.trim() === ""
                               )
