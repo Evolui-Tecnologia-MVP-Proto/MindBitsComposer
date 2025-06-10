@@ -59,6 +59,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           // Prepare the artifact data  
           const documentId = selectedEdition?.documentId || selectedEdition?.id;
           
+          // Create a completely new artifact object
           const artifactData = {
             documentoId: documentId,
             name: filename,
@@ -71,9 +72,6 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             fileMetadata: JSON.stringify(snapshot),
             isImage: 'true'
           };
-          
-          // Remove any existing id field to ensure new artifact creation
-          delete (artifactData as any).id;
 
           console.log('Artifact data completo:', artifactData);
           console.log('Selected edition:', selectedEdition);
@@ -87,12 +85,21 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
 
           console.log('Making API call to:', `/api/documentos/${documentId}/artifacts`);
           
+          // Check authentication first
+          const authResponse = await fetch('/api/user');
+          console.log('Auth check status:', authResponse.status);
+          
+          if (!authResponse.ok) {
+            throw new Error('Usuário não autenticado. Faça login novamente.');
+          }
+          
           const response = await fetch(`/api/documentos/${documentId}/artifacts`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify(artifactData)
+            body: JSON.stringify(artifactData),
+            credentials: 'include' // Ensure cookies are sent
           });
 
           console.log('Response received, status:', response.status, 'ok:', response.ok);
