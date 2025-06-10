@@ -446,8 +446,8 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               if (snapshotData && snapshotData.store) {
                 console.log('Loading snapshot with store data...');
                 
-                // Use store.loadSnapshot for proper tldraw loading
-                editorInstance.store.loadSnapshot(snapshotData.store);
+                // Use the modern loadSnapshot function from tldraw
+                loadSnapshot(editorInstance.store, snapshotData.store);
                 
                 console.log('Content loaded successfully');
                 
@@ -598,7 +598,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             console.log('Asset IDs to create:', Array.from(assetIds));
             
             // Create placeholder assets
-            assetIds.forEach((assetId: string) => {
+            Array.from(assetIds).forEach((assetId: string) => {
               storeData[assetId] = {
                 id: assetId,
                 type: 'image',
