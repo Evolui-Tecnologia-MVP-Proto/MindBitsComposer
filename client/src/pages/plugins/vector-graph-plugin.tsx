@@ -447,23 +447,36 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                 console.log('Loading snapshot with store data...');
                 console.log('Store size before load:', Object.keys(editorInstance.store.allRecords()).length);
                 
-                // Try different loading approaches
+                // Since loadSnapshot is not working, use manual record insertion
+                const records = Object.values(snapshotData.store);
+                console.log('Manually inserting', records.length, 'records...');
+                
                 try {
-                  console.log('Attempting to load with loadSnapshot function...');
-                  loadSnapshot(editorInstance.store, snapshotData.store);
-                } catch (loadSnapshotError) {
-                  console.warn('loadSnapshot failed, trying store.loadSnapshot:', loadSnapshotError);
-                  try {
-                    editorInstance.store.loadSnapshot(snapshotData.store);
-                  } catch (storeLoadError) {
-                    console.warn('store.loadSnapshot failed, trying manual record insertion:', storeLoadError);
-                    
-                    // Manual approach: put each record individually
-                    const records = Object.values(snapshotData.store);
-                    console.log('Manually inserting', records.length, 'records...');
-                    
-                    editorInstance.store.put(records);
+                  // Clear existing content first
+                  editorInstance.store.clear();
+                  console.log('Store cleared');
+                  
+                  // Insert all records at once
+                  editorInstance.store.put(records);
+                  console.log('Records inserted successfully');
+                  
+                } catch (manualError) {
+                  console.error('Manual insertion failed:', manualError);
+                  
+                  // Last resort: insert records one by one
+                  console.log('Trying individual record insertion...');
+                  let successCount = 0;
+                  
+                  for (const record of records) {
+                    try {
+                      editorInstance.store.put([record]);
+                      successCount++;
+                    } catch (recordError) {
+                      console.warn('Failed to insert record:', record.id, recordError);
+                    }
                   }
+                  
+                  console.log(`Successfully inserted ${successCount} out of ${records.length} records`);
                 }
                 
                 console.log('Content loaded successfully');
