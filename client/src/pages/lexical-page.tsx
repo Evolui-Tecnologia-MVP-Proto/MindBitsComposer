@@ -1707,8 +1707,8 @@ export default function LexicalPage() {
           </div>
         </div>
 
-        {/* Painel de Anexos */}
-        {showAttachments && (
+        {/* Painel de Anexos - desabilitado quando há template struct sem documento composer */}
+        {showAttachments && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) && (
           <div className="w-80 border-l bg-gray-50 flex flex-col">
             {/* Header fixo */}
             <div className="p-4 border-b bg-gray-50">
