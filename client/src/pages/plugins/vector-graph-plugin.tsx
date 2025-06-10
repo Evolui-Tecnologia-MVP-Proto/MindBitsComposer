@@ -497,10 +497,12 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                         
                         // Add required properties based on shape type
                         if (shape.type === 'text') {
-                          // Restore text content for text shapes
-                          if (originalText) {
-                            migratedProps.text = originalText;
-                          }
+                          // In modern tldraw, text content is not in props.text
+                          // Text shapes don't have text property in props anymore
+                          // The text content is managed differently
+                          if (!migratedProps.font) migratedProps.font = 'draw';
+                          if (!migratedProps.size) migratedProps.size = 'm';
+                          if (!migratedProps.color) migratedProps.color = 'black';
                         } else if (shape.type === 'geo') {
                           // Geo shapes need specific properties
                           if (!migratedProps.w) migratedProps.w = 100;
@@ -530,17 +532,35 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                         
                         // Try creating a simplified version of the shape
                         try {
-                          const simplifiedShape = {
-                            id: shape.id + '_simplified',
-                            type: 'geo', // Default to geo shape
-                            x: shape.x || 0,
-                            y: shape.y || 0,
-                            props: {
-                              geo: 'rectangle',
-                              w: 100,
-                              h: 50
-                            }
-                          };
+                          let simplifiedShape;
+                          
+                          if (shape.type === 'text' && originalText) {
+                            // For text shapes, create a note shape instead which supports text
+                            simplifiedShape = {
+                              id: shape.id + '_simplified',
+                              type: 'note',
+                              x: shape.x || 0,
+                              y: shape.y || 0,
+                              props: {
+                                text: originalText,
+                                size: 'm',
+                                color: 'black'
+                              }
+                            };
+                          } else {
+                            // Default fallback to geo shape
+                            simplifiedShape = {
+                              id: shape.id + '_simplified',
+                              type: 'geo',
+                              x: shape.x || 0,
+                              y: shape.y || 0,
+                              props: {
+                                geo: 'rectangle',
+                                w: 100,
+                                h: 50
+                              }
+                            };
+                          }
                           
                           editorInstance.createShape(simplifiedShape);
                           console.log('Created simplified shape for:', shape.id);
