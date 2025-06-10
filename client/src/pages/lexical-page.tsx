@@ -1855,8 +1855,8 @@ export default function LexicalPage() {
                                 
                                 {/* Informações do arquivo */}
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium truncate" title={asset.name}>
-                                    {asset.name}
+                                  <p className="text-sm font-medium truncate" title={asset.description || asset.name}>
+                                    {asset.description || asset.name}
                                   </p>
                                   <div className="flex items-center gap-2 mt-2">
                                     <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
@@ -1869,8 +1869,8 @@ export default function LexicalPage() {
                                     )}
                                   </div>
                                   {asset.description && (
-                                    <p className="text-xs text-gray-600 mt-1 truncate">
-                                      {asset.description}
+                                    <p className="text-xs text-gray-600 mt-1 truncate" title={asset.name}>
+                                      {asset.name}
                                     </p>
                                   )}
                                 </div>
