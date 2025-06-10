@@ -101,26 +101,19 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         const dataUrl = e.target?.result as string;
         
         // Create image asset in tldraw
-        const assetId = editorInstance.createAssetId();
+        const assetId = editorInstance.createId();
         const imageAsset = {
           id: assetId,
           type: 'image',
-          typeName: 'asset',
-          props: {
-            name: file.name,
-            src: dataUrl,
-            w: 0, // Will be set when image loads
-            h: 0,
-            mimeType: file.type,
-            isAnimated: false,
-          },
-          meta: {},
+          typeName: 'image',
+          src: dataUrl,
+          fileName: file.name
         };
 
         editorInstance.createAssets([imageAsset]);
         
         // Create image shape
-        const shapeId = editorInstance.createShapeId();
+        const shapeId = editorInstance.createId();
         editorInstance.createShapes([{
           id: shapeId,
           type: 'image',
