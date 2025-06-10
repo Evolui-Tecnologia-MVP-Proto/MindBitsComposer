@@ -245,7 +245,7 @@ export default function LexicalPage() {
     enabled: showAttachments,
   });
 
-  // Query para buscar plugins ativos
+  // Query para buscar plugins ativos - apenas quando há um documento em edição
   const { data: activePlugins = [], isLoading: isLoadingPlugins } = useQuery<Plugin[]>({
     queryKey: ['/api/plugins', 'active'],
     queryFn: async () => {
@@ -254,7 +254,7 @@ export default function LexicalPage() {
       const plugins = await response.json();
       return plugins.filter((plugin: Plugin) => plugin.status === 'active');
     },
-    enabled: showAttachments,
+    enabled: showAttachments && (currentDocumentId !== null || hasEditorContent),
   });
 
   // Função para abrir plugin selecionado
@@ -1682,8 +1682,8 @@ export default function LexicalPage() {
                   <Paperclip className="w-5 h-5" />
                   <h3 className="font-semibold">Anexos</h3>
                 </div>
-                {/* Combo de Plugins */}
-                {activePlugins.length > 0 && (
+                {/* Combo de Plugins - apenas quando há documento em edição */}
+                {activePlugins.length > 0 && (currentDocumentId !== null || hasEditorContent) && (
                   <div className="flex items-center gap-2">
                     <Select value={pluginSelectValue} onValueChange={handleOpenPlugin}>
                       <SelectTrigger className="w-32 h-8 text-xs">
