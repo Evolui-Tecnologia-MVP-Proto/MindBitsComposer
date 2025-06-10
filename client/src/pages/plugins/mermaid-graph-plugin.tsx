@@ -9,9 +9,10 @@ import mermaid from "mermaid";
 
 interface MermaidGraphPluginProps {
   onDataExchange?: (data: any) => void;
+  selectedEdition?: any;
 }
 
-export default function MermaidGraphPlugin({ onDataExchange }: MermaidGraphPluginProps) {
+export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: MermaidGraphPluginProps) {
   const [mermaidCode, setMermaidCode] = useState(`graph TD
     A[Start] --> B{Is it?}
     B -->|Yes| C[OK]
@@ -31,8 +32,6 @@ export default function MermaidGraphPlugin({ onDataExchange }: MermaidGraphPlugi
   // Mutation para salvar diagram como imagem
   const saveDiagramMutation = useMutation({
     mutationFn: async (data: { name: string; imageData: string }) => {
-      // Get selected edition from parent context (assuming it's available)
-      const selectedEdition = (window as any).selectedEdition;
       if (!selectedEdition) {
         throw new Error('Nenhum documento selecionado');
       }
@@ -53,7 +52,6 @@ export default function MermaidGraphPlugin({ onDataExchange }: MermaidGraphPlugi
     },
     onSuccess: () => {
       // Invalidate artifacts cache to refresh the list
-      const selectedEdition = (window as any).selectedEdition;
       if (selectedEdition) {
         queryClient.invalidateQueries({ queryKey: [`/api/document-editions/${selectedEdition.id}/artifacts`] });
       }

@@ -13,6 +13,7 @@ interface PluginModalProps {
   plugin?: any;
   onDataExchange?: (data: any) => void;
   onImageExport?: (imageUrl: string) => void;
+  selectedEdition?: any;
 }
 
 const PLUGIN_COMPONENTS: Record<string, React.ComponentType<any>> = {
@@ -28,7 +29,8 @@ export default function PluginModal({
   pluginName,
   plugin,
   onDataExchange,
-  onImageExport 
+  onImageExport,
+  selectedEdition
 }: PluginModalProps) {
   // Determinar o nome do plugin a partir do objeto plugin ou do pluginName
   const actualPluginName = plugin?.pageName || pluginName || "";
@@ -124,6 +126,7 @@ export default function PluginModal({
         {(actualPluginName !== 'simple-excalidraw-plugin' || isReadyToMountPlugin) ? (
           <PluginComponent
             onDataExchange={handleDataExchange}
+            selectedEdition={actualPluginName === 'mermaid-graph-plugin' ? selectedEdition : undefined}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
