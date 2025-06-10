@@ -131,6 +131,8 @@ export default function PluginModal({
           <PluginComponent
             onDataExchange={handleDataExchange}
             selectedEdition={actualPluginName === 'mermaid-graph-plugin' ? selectedEdition : undefined}
+            globalAssets={actualPluginName === 'vector-graph-plugin' ? globalAssets : undefined}
+            documentArtifacts={actualPluginName === 'vector-graph-plugin' ? documentArtifacts : undefined}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">

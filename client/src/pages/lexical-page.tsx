@@ -2165,6 +2165,8 @@ export default function LexicalPage() {
           plugin={selectedPlugin}
           onDataExchange={handlePluginDataExchange}
           selectedEdition={selectedEdition}
+          globalAssets={globalAssets}
+          documentArtifacts={documentArtifacts}
         />
       )}
     </div>
