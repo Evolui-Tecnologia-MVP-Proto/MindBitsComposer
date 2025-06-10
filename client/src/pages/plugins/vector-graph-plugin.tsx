@@ -468,6 +468,11 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                         // Remove all deprecated/incompatible properties
                         const deprecatedProps = ['text', 'handles', 'align', 'verticalAlign', 'autoSize'];
                         
+                        // For text shapes, also remove w and h properties that are not supported
+                        if (shape.type === 'text') {
+                          deprecatedProps.push('w', 'h');
+                        }
+                        
                         deprecatedProps.forEach(prop => {
                           if (migratedProps[prop] !== undefined) {
                             console.log(`Removing deprecated property '${prop}' from ${shape.type} shape`);
@@ -477,9 +482,8 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                         
                         // Add required properties based on shape type
                         if (shape.type === 'text') {
-                          // Text shapes need specific properties
-                          if (!migratedProps.w) migratedProps.w = 100;
-                          if (!migratedProps.h) migratedProps.h = 20;
+                          // Text shapes in current tldraw version are simpler
+                          // Just keep basic properties
                         } else if (shape.type === 'geo') {
                           // Geo shapes need specific properties
                           if (!migratedProps.w) migratedProps.w = 100;
