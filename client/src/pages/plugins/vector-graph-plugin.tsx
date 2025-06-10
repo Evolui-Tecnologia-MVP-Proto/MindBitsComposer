@@ -497,38 +497,64 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         // Read .tldr file as text (JSON)
         const reader = new FileReader();
         reader.onload = async (e) => {
+          console.log('🔥 FileReader onload triggered');
           try {
             const fileContent = e.target?.result as string;
             console.log('🔥 RAW FILE CONTENT LENGTH:', fileContent.length);
+            console.log('🔥 FILE CONTENT PREVIEW:', fileContent.substring(0, 200));
             
-            let tldrawData = JSON.parse(fileContent);
-            console.log('🔥 PARSED DATA TOP LEVEL KEYS:', Object.keys(tldrawData));
+            let tldrawData;
+            try {
+              tldrawData = JSON.parse(fileContent);
+              console.log('🔥 JSON PARSE SUCCESS');
+              console.log('🔥 PARSED DATA TOP LEVEL KEYS:', Object.keys(tldrawData));
+            } catch (parseError) {
+              console.error('🔥 JSON PARSE ERROR:', parseError);
+              throw parseError;
+            }
             
             // Immediate sanitization after parsing - remove all deprecated properties
             console.log('🔥 IMMEDIATE SANITIZATION - Starting...');
-            if (tldrawData.store && typeof tldrawData.store === 'object') {
-              console.log('🔥 SANITIZING STORE OBJECT...');
-              Object.keys(tldrawData.store).forEach(key => {
-                const record = tldrawData.store[key];
-                if (record && record.type === 'text' && record.props) {
-                  console.log(`🔥 SANITIZING TEXT SHAPE: ${record.id}`);
-                  const originalProps = Object.keys(record.props);
-                  console.log(`🔥 ORIGINAL PROPS: ${originalProps.join(', ')}`);
+            try {
+              if (tldrawData.store && typeof tldrawData.store === 'object') {
+                console.log('🔥 SANITIZING STORE OBJECT...');
+                const storeKeys = Object.keys(tldrawData.store);
+                console.log('🔥 STORE HAS KEYS:', storeKeys.length);
+                
+                storeKeys.forEach((key, index) => {
+                  const record = tldrawData.store[key];
+                  console.log(`🔥 PROCESSING RECORD ${index + 1}/${storeKeys.length}: ${key}, type: ${record?.type}`);
                   
-                  // Remove all deprecated properties
-                  delete record.props.w;
-                  delete record.props.h;
-                  delete record.props.align;
-                  delete record.props.verticalAlign;
-                  delete record.props.autoSize;
-                  delete record.props.text;
-                  delete record.props.handles;
-                  
-                  const finalProps = Object.keys(record.props);
-                  console.log(`🔥 FINAL PROPS: ${finalProps.join(', ')}`);
-                }
-              });
-              console.log('🔥 IMMEDIATE SANITIZATION - Complete');
+                  if (record && record.type === 'text' && record.props) {
+                    console.log(`🔥 FOUND TEXT SHAPE: ${record.id}`);
+                    const originalProps = Object.keys(record.props);
+                    console.log(`🔥 ORIGINAL PROPS: ${originalProps.join(', ')}`);
+                    
+                    // Check specifically for 'w' property
+                    if (record.props.w !== undefined) {
+                      console.log(`🔥 REMOVING W PROPERTY: ${record.props.w}`);
+                      delete record.props.w;
+                    }
+                    
+                    // Remove all other deprecated properties
+                    delete record.props.h;
+                    delete record.props.align;
+                    delete record.props.verticalAlign;
+                    delete record.props.autoSize;
+                    delete record.props.text;
+                    delete record.props.handles;
+                    
+                    const finalProps = Object.keys(record.props);
+                    console.log(`🔥 FINAL PROPS: ${finalProps.join(', ')}`);
+                  }
+                });
+                console.log('🔥 IMMEDIATE SANITIZATION - Complete');
+              } else {
+                console.log('🔥 NO STORE OBJECT FOUND FOR SANITIZATION');
+              }
+            } catch (sanitizeError) {
+              console.error('🔥 SANITIZATION ERROR:', sanitizeError);
+              // Continue anyway, sanitization error shouldn't stop the process
             }
             
             console.log('Parsed .tldr file structure:');
