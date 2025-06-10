@@ -730,40 +730,84 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                 } catch (loadMethodError) {
                   console.error('Error with loadSnapshot function:', loadMethodError);
                   
-                  // Fallback: try without schema migration
-                  try {
-                    console.log('Trying direct store loading without schema...');
-                    editorInstance.store.clear();
+                  // If validation error mentions "w" property, create completely clean text shapes
+                  if (loadMethodError.message && loadMethodError.message.includes('"w"')) {
+                    console.log('Detected "w" property validation error - creating clean text shapes...');
                     
-                    // Add essential records first (document, page)
-                    const essentialRecords = Object.values(sanitizedStore).filter((record: any) => 
-                      record.typeName === 'document' || record.typeName === 'page'
-                    );
+                    // Create completely sanitized store
+                    const ultraCleanStore: any = {};
                     
-                    const shapeRecords = Object.values(sanitizedStore).filter((record: any) => 
-                      record.typeName === 'shape'
-                    );
-                    
-                    const assetRecords = Object.values(sanitizedStore).filter((record: any) => 
-                      record.typeName === 'asset'
-                    );
-                    
-                    console.log(`Loading ${essentialRecords.length} essential records, ${shapeRecords.length} shapes, ${assetRecords.length} assets`);
-                    
-                    // Load records in order: first essentials, then assets, then shapes
-                    [...essentialRecords, ...assetRecords, ...shapeRecords].forEach((record: any) => {
-                      try {
-                        if (record && record.id && record.typeName) {
-                          editorInstance.store.put([record]);
-                        }
-                      } catch (recordError) {
-                        console.warn('Skipping invalid record:', record.id, recordError);
+                    Object.keys(preSanitizedStore).forEach(key => {
+                      const record = preSanitizedStore[key];
+                      
+                      if (record && record.type === 'text') {
+                        // Rebuild text shape from scratch with minimal valid properties
+                        ultraCleanStore[key] = {
+                          id: record.id,
+                          type: 'text',
+                          typeName: 'shape',
+                          x: record.x || 0,
+                          y: record.y || 0,
+                          rotation: record.rotation || 0,
+                          isLocked: record.isLocked || false,
+                          opacity: record.opacity || 1,
+                          meta: record.meta || {},
+                          parentId: record.parentId || 'page:page',
+                          index: record.index || 'a1',
+                          props: {
+                            color: 'black',
+                            size: 'm',
+                            font: 'draw',
+                            textAlign: 'start',
+                            scale: 1
+                          }
+                        };
+                      } else {
+                        ultraCleanStore[key] = record;
                       }
                     });
                     
-                  } catch (manualError) {
-                    console.error('Manual loading also failed:', manualError);
-                    throw new Error('Falha ao carregar arquivo .tldr. O arquivo pode estar corrompido ou em formato incompatível.');
+                    // Try loading with ultra-clean store
+                    try {
+                      const ultraCleanSnapshot = {
+                        store: ultraCleanStore,
+                        schema: fullSnapshot.schema
+                      };
+                      loadSnapshot(editorInstance.store, ultraCleanSnapshot);
+                    } catch (ultraCleanError) {
+                      console.error('Ultra-clean loading failed:', ultraCleanError);
+                      // Final fallback to manual loading
+                      editorInstance.store.clear();
+                      Object.values(ultraCleanStore).forEach((record: any) => {
+                        try {
+                          if (record && record.id) {
+                            editorInstance.store.put([record]);
+                          }
+                        } catch (recordError) {
+                          console.warn('Skipping record:', record.id, recordError);
+                        }
+                      });
+                    }
+                  } else {
+                    // Original fallback logic for other errors
+                    try {
+                      console.log('Trying direct store loading without schema...');
+                      editorInstance.store.clear();
+                      
+                      Object.values(preSanitizedStore).forEach((record: any) => {
+                        try {
+                          if (record && record.id) {
+                            editorInstance.store.put([record]);
+                          }
+                        } catch (recordError) {
+                          console.warn('Skipping invalid record:', record.id, recordError);
+                        }
+                      });
+                      
+                    } catch (manualError) {
+                      console.error('Manual loading also failed:', manualError);
+                      throw new Error('Falha ao carregar arquivo .tldr. O arquivo pode estar corrompido ou em formato incompatível.');
+                    }
                   }
                 }
                 
@@ -822,7 +866,13 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             });
           }
         };
-        reader.readAsText(file);
+        try {
+          reader.readAsText(file);
+          console.log('🔥 FileReader.readAsText called successfully');
+        } catch (readerError) {
+          console.error('🔥 FileReader.readAsText failed:', readerError);
+          throw readerError;
+        }
         return;
       }
 
