@@ -2,6 +2,7 @@ import React, { useCallback, useState, useRef } from 'react';
 import { Tldraw, TldrawProps } from 'tldraw';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Upload, Image as ImageIcon, FileImage, ImagePlus, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -18,6 +19,7 @@ interface VectorGraphPluginProps {
 const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, globalAssets = [], documentArtifacts = [], selectedEdition }) => {
   const [showImageModal, setShowImageModal] = useState(false);
   const [editorInstance, setEditorInstance] = useState<any>(null);
+  const [fileName, setFileName] = useState('vector-graph');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   
@@ -117,9 +119,10 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           // Get tldraw snapshot for metadata
           const snapshot = editorInstance.store.getSnapshot();
           
-          // Create filename with timestamp
+          // Create filename using user input with timestamp
           const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-          const filename = `vector-graph-${timestamp}.png`;
+          const baseFileName = fileName.trim() || 'vector-graph';
+          const filename = `${baseFileName}-${timestamp}.png`;
 
           // Check if there's a composer document selected
           const documentId = selectedEdition?.documentId || selectedEdition?.id;
@@ -623,9 +626,19 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     <div className="w-full h-full flex flex-col bg-white">
       {/* Header com controles */}
       <div className="flex items-center justify-between p-3 border-b bg-gray-50">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
           <h3 className="font-medium text-sm">Vector Graph Editor</h3>
+          <div className="flex items-center gap-2 ml-4">
+            <span className="text-xs text-gray-600">Nome:</span>
+            <Input
+              type="text"
+              value={fileName}
+              onChange={(e) => setFileName(e.target.value)}
+              placeholder="vector-graph"
+              className="h-7 w-32 text-xs"
+            />
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <button
