@@ -2005,6 +2005,11 @@ export default function LexicalPage() {
                                           </span>
                                         )}
                                       </div>
+                                      {artifact.description && (
+                                        <p className="text-xs text-gray-600 mt-1 truncate">
+                                          {artifact.description}
+                                        </p>
+                                      )}
                                     </div>
                                   </div>
                                 </div>
