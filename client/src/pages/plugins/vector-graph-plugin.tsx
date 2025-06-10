@@ -101,7 +101,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         const dataUrl = e.target?.result as string;
         
         // Create image asset in tldraw
-        const assetId = editorInstance.createId();
+        const assetId = `asset_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         const imageAsset = {
           id: assetId,
           type: 'image',
@@ -113,7 +113,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         editorInstance.createAssets([imageAsset]);
         
         // Create image shape
-        const shapeId = editorInstance.createId();
+        const shapeId = `shape_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         editorInstance.createShapes([{
           id: shapeId,
           type: 'image',
@@ -142,8 +142,8 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         ? asset.fileData 
         : `data:image/png;base64,${asset.fileData}`;
 
-      // Create asset ID using editor's createId method
-      const assetId = editorInstance.createId();
+      // Create asset ID using custom generation
+      const assetId = `asset_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
       // Create the asset with the image - exact structure from example
       editorInstance.createAssets([{
