@@ -4938,6 +4938,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota para criar artifacts via document edition
+  app.post("/api/document-editions/:editionId/artifacts", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const edition = await storage.getDocumentEdition(req.params.editionId);
+      if (!edition) {
+        return res.status(404).send("Edição de documento não encontrada");
+      }
+      
+      const artifactData = {
+        ...req.body,
+        documentoId: edition.documentId
+      };
+      
+      const artifact = await storage.createDocumentArtifact(artifactData);
+      res.status(201).json(artifact);
+    } catch (error: any) {
+      console.error("Erro ao criar artefato via edição:", error);
+      res.status(500).send("Erro ao criar artefato");
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 
