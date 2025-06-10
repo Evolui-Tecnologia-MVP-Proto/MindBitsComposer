@@ -2707,15 +2707,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
+      console.log("Dados recebidos para criação de artefato:", {
+        documentoId: req.params.documentoId,
+        bodyKeys: Object.keys(req.body),
+        name: req.body.name,
+        fileDataLength: req.body.fileData?.length
+      });
+      
       const artifactData = {
         ...req.body,
         documentoId: req.params.documentoId
       };
+      
       const artifact = await storage.createDocumentArtifact(artifactData);
+      console.log("Artefato criado com sucesso:", artifact.id);
       res.status(201).json(artifact);
     } catch (error: any) {
-      console.error("Erro ao criar artefato:", error);
-      res.status(500).send("Erro ao criar artefato");
+      console.error("Erro detalhado ao criar artefato:", {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      res.status(500).json({ error: `Erro ao criar artefato: ${error.message}` });
     }
   });
 

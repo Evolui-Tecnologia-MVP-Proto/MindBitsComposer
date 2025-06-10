@@ -70,6 +70,8 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             isImage: 'true'
           };
 
+          console.log('Artifact data completo:', artifactData);
+
           // Save to My Assets via API
           if (!selectedEdition?.documentId) {
             throw new Error('Documento não selecionado');
@@ -98,13 +100,15 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               });
             }
           } else {
-            throw new Error('Falha ao salvar');
+            const errorText = await response.text();
+            console.error('Erro HTTP:', response.status, errorText);
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
           }
         } catch (error) {
           console.error('Erro ao salvar:', error);
           toast({
             title: "Erro",
-            description: "Falha ao salvar a imagem",
+            description: error instanceof Error ? error.message : "Falha ao salvar a imagem",
             variant: "destructive"
           });
         }
