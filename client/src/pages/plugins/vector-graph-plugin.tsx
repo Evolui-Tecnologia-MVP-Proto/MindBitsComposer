@@ -461,12 +461,12 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                     let createdCount = 0;
                     
                     for (const shape of shapes) {
+                      // Store text content before processing
+                      const originalText = shape.props?.text;
+                      
                       try {
                         // Migrate old shape properties to new format
                         const migratedProps = { ...shape.props };
-                        
-                        // Store text content before removing properties
-                        const originalText = migratedProps.text;
                         
                         // Remove deprecated/incompatible properties
                         const deprecatedProps = ['handles', 'align', 'verticalAlign', 'autoSize'];
@@ -533,16 +533,20 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                         // Try creating a simplified version of the shape
                         try {
                           let simplifiedShape;
+                          const textContent = shape.props?.text;
                           
-                          if (shape.type === 'text' && originalText) {
-                            // For text shapes, create a note shape instead which supports text
+                          if (shape.type === 'text' && textContent) {
+                            // For text shapes, create a geo shape with text property that tldraw supports
                             simplifiedShape = {
                               id: shape.id + '_simplified',
-                              type: 'note',
+                              type: 'geo',
                               x: shape.x || 0,
                               y: shape.y || 0,
                               props: {
-                                text: originalText,
+                                geo: 'rectangle',
+                                text: textContent,
+                                w: Math.max(100, textContent.length * 8),
+                                h: 50,
                                 size: 'm',
                                 color: 'black'
                               }
