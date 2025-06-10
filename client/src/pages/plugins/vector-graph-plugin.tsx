@@ -26,48 +26,85 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
   // Function to sanitize tldraw snapshot data by removing deprecated properties
   const sanitizeSnapshotData = useCallback((store: any) => {
     const sanitizedStore = { ...store };
+    let shapesProcessed = 0;
+    let deprecatedPropsRemoved = 0;
     
     Object.keys(sanitizedStore).forEach(key => {
       const record = sanitizedStore[key];
       if (record && typeof record === 'object') {
-        // Remove deprecated properties from different shape types
-        if (record.type === 'shape') {
+        // Handle shape records based on typeName
+        if (record.typeName === 'shape') {
+          shapesProcessed++;
           const shape = { ...record };
           
           // Remove deprecated properties based on shape type
           if (shape.props) {
             const props = { ...shape.props };
+            let propsRemoved = false;
             
             // Remove deprecated text properties from geo shapes
-            if (shape.typeName === 'geo' || (shape.type && shape.type.includes('geo'))) {
-              console.log('Removing deprecated property \'text\' from geo shape');
-              console.log('Removing deprecated property \'verticalAlign\' from geo shape');
-              delete props.text;
-              delete props.verticalAlign;
+            if (shape.type === 'geo') {
+              if (props.text !== undefined) {
+                console.log('Removing deprecated property \'text\' from geo shape');
+                delete props.text;
+                propsRemoved = true;
+              }
+              if (props.verticalAlign !== undefined) {
+                console.log('Removing deprecated property \'verticalAlign\' from geo shape');
+                delete props.verticalAlign;
+                propsRemoved = true;
+              }
+              if (props.align !== undefined) {
+                console.log('Removing deprecated property \'align\' from geo shape');
+                delete props.align;
+                propsRemoved = true;
+              }
             }
             
             // Remove deprecated text properties from text shapes
-            if (shape.typeName === 'text' || (shape.type && shape.type.includes('text'))) {
-              console.log('Removing deprecated property \'align\' from text shape');
-              console.log('Removing deprecated property \'autoSize\' from text shape');
-              console.log('Removing deprecated property \'w\' from text shape');
-              console.log('Removing deprecated property \'text\' from text shape');
-              delete props.align;
-              delete props.autoSize;
-              delete props.w;
-              delete props.text;
+            if (shape.type === 'text') {
+              if (props.align !== undefined) {
+                console.log('Removing deprecated property \'align\' from text shape');
+                delete props.align;
+                propsRemoved = true;
+              }
+              if (props.autoSize !== undefined) {
+                console.log('Removing deprecated property \'autoSize\' from text shape');
+                delete props.autoSize;
+                propsRemoved = true;
+              }
+              if (props.w !== undefined) {
+                console.log('Removing deprecated property \'w\' from text shape');
+                delete props.w;
+                propsRemoved = true;
+              }
+              if (props.text !== undefined) {
+                console.log('Removing deprecated property \'text\' from text shape');
+                delete props.text;
+                propsRemoved = true;
+              }
             }
             
             // Remove deprecated note properties
-            if (shape.typeName === 'note' || (shape.type && shape.type.includes('note'))) {
-              console.log('Removing deprecated property \'text\' from note shape');
-              delete props.text;
+            if (shape.type === 'note') {
+              if (props.text !== undefined) {
+                console.log('Removing deprecated property \'text\' from note shape');
+                delete props.text;
+                propsRemoved = true;
+              }
             }
             
             // Remove deprecated line properties
-            if (shape.typeName === 'line' || (shape.type && shape.type.includes('line'))) {
-              console.log('Removing deprecated property \'handles\' from line shape');
-              delete props.handles;
+            if (shape.type === 'line') {
+              if (props.handles !== undefined) {
+                console.log('Removing deprecated property \'handles\' from line shape');
+                delete props.handles;
+                propsRemoved = true;
+              }
+            }
+            
+            if (propsRemoved) {
+              deprecatedPropsRemoved++;
             }
             
             shape.props = props;
@@ -78,7 +115,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
       }
     });
     
-    console.log('Sanitization complete. Removed deprecated properties from shapes.');
+    console.log(`Sanitization complete. Processed ${shapesProcessed} shapes, removed deprecated properties from ${deprecatedPropsRemoved} shapes.`);
     return sanitizedStore;
   }, []);
   
@@ -534,7 +571,21 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               
             } catch (loadError) {
               console.error('Error loading .tldr content:', loadError);
-              throw new Error(`Erro ao carregar arquivo .tldr: ${loadError instanceof Error ? loadError.message : 'Formato incompatível'}`);
+              console.error('LoadError details:', {
+                name: loadError instanceof Error ? loadError.name : 'Unknown',
+                message: loadError instanceof Error ? loadError.message : String(loadError),
+                stack: loadError instanceof Error ? loadError.stack : 'No stack'
+              });
+              
+              // More specific error handling
+              const errorMessage = loadError instanceof Error ? loadError.message : String(loadError);
+              if (errorMessage.includes('schemaVersion') || errorMessage.includes('Cannot read properties of undefined')) {
+                throw new Error('Arquivo .tldr incompatível com esta versão do editor. Tente criar um novo desenho.');
+              } else if (errorMessage.includes('ValidationError')) {
+                throw new Error('Arquivo .tldr contém dados inválidos. Verifique se o arquivo não foi corrompido.');
+              } else {
+                throw new Error(`Erro ao carregar arquivo .tldr: ${errorMessage}`);
+              }
             }
             
             toast({
