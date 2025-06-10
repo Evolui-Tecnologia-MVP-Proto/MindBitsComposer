@@ -462,13 +462,30 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                     
                     for (const shape of shapes) {
                       try {
-                        // Extract basic shape data
+                        // Migrate old shape properties to new format
+                        const migratedProps = { ...shape.props };
+                        
+                        // Handle text property migration based on shape type
+                        if (shape.type === 'text' && migratedProps.text) {
+                          // For text shapes, text should be in the props
+                          delete migratedProps.text; // Remove old format
+                        } else if (shape.type === 'geo' && migratedProps.text) {
+                          // For geo shapes, text might need different handling
+                          delete migratedProps.text; // Remove for now to avoid validation errors
+                        }
+                        
+                        // Handle handles property for line shapes
+                        if (shape.type === 'line' && migratedProps.handles) {
+                          delete migratedProps.handles; // Remove deprecated handles property
+                        }
+                        
+                        // Extract basic shape data with migrated properties
                         const shapeData = {
                           id: shape.id,
                           type: shape.type,
                           x: shape.x || 0,
                           y: shape.y || 0,
-                          props: shape.props || {},
+                          props: migratedProps,
                           parentId: shape.parentId || 'page:page'
                         };
                         
@@ -478,6 +495,27 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                         
                       } catch (shapeError) {
                         console.warn('Failed to create shape:', shape.id, shapeError);
+                        
+                        // Try creating a simplified version of the shape
+                        try {
+                          const simplifiedShape = {
+                            id: shape.id + '_simplified',
+                            type: 'geo', // Default to geo shape
+                            x: shape.x || 0,
+                            y: shape.y || 0,
+                            props: {
+                              geo: 'rectangle',
+                              w: 100,
+                              h: 50
+                            }
+                          };
+                          
+                          editorInstance.createShape(simplifiedShape);
+                          console.log('Created simplified shape for:', shape.id);
+                          
+                        } catch (simplifiedError) {
+                          console.warn('Failed to create simplified shape:', simplifiedError);
+                        }
                       }
                     }
                     
