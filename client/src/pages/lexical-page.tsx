@@ -248,7 +248,7 @@ export default function LexicalPage() {
     enabled: showAttachments,
   });
 
-  // Query para buscar plugins ativos - apenas quando há um documento em edição
+  // Query para buscar plugins ativos - sempre ativa para mostrar seletor quando editor está vazio
   const { data: activePlugins = [], isLoading: isLoadingPlugins } = useQuery<Plugin[]>({
     queryKey: ['/api/plugins', 'active'],
     queryFn: async () => {
@@ -257,7 +257,7 @@ export default function LexicalPage() {
       const plugins = await response.json();
       return plugins.filter((plugin: Plugin) => plugin.status === 'active');
     },
-    enabled: showAttachments && (currentDocumentId !== null || hasEditorContent),
+    enabled: true,
   });
 
   // Função para abrir plugin selecionado
