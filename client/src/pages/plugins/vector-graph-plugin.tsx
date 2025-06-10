@@ -88,6 +88,15 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               title: "Sucesso",
               description: "Imagem salva em Meus Assets",
             });
+            
+            // Trigger parent data refresh by sending data exchange signal
+            if (onDataExchange) {
+              onDataExchange({
+                type: 'artifact-saved',
+                artifactData: await response.json(),
+                timestamp: new Date().toISOString()
+              });
+            }
           } else {
             throw new Error('Falha ao salvar');
           }

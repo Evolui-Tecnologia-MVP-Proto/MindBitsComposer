@@ -130,7 +130,7 @@ export default function PluginModal({
         {(actualPluginName !== 'simple-excalidraw-plugin' || isReadyToMountPlugin) ? (
           <PluginComponent
             onDataExchange={handleDataExchange}
-            selectedEdition={actualPluginName === 'mermaid-graph-plugin' ? selectedEdition : undefined}
+            selectedEdition={actualPluginName === 'mermaid-graph-plugin' || actualPluginName === 'vector-graph-plugin' ? selectedEdition : undefined}
             globalAssets={actualPluginName === 'vector-graph-plugin' ? globalAssets : undefined}
             documentArtifacts={actualPluginName === 'vector-graph-plugin' ? documentArtifacts : undefined}
           />
