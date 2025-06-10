@@ -1685,9 +1685,33 @@ export default function LexicalPage() {
               <CardContent className="p-0 h-full relative overflow-hidden">
                 {/* Placeholder quando não há conteúdo nem template selecionado */}
                 {!hasEditorContent && (!content || content.trim() === '') && !selectedTemplate && !selectedEdition && viewMode === 'editor' && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 pointer-events-none">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
                     <PenTool className="w-[100px] h-[100px] mb-4 opacity-20" />
-                    <p className="text-lg font-medium text-center">Selecione um documento ou template para iniciar...</p>
+                    <p className="text-lg font-medium text-center mb-6 pointer-events-none">Selecione um documento ou template para iniciar...</p>
+                    
+                    {/* Seletor de Plugins quando editor está vazio */}
+                    {activePlugins.length > 0 && (
+                      <div className="pointer-events-auto">
+                        <div className="flex flex-col items-center gap-3">
+                          <p className="text-sm text-gray-500">Ou use um plugin para começar:</p>
+                          <Select value={pluginSelectValue} onValueChange={handleOpenPlugin}>
+                            <SelectTrigger className="w-48 h-10 bg-white border-gray-300">
+                              <SelectValue placeholder="Selecionar Plugin" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {activePlugins.map((plugin) => (
+                                <SelectItem key={plugin.id} value={plugin.id}>
+                                  <div className="flex items-center gap-2">
+                                    {getPluginIcon(plugin.icon)}
+                                    <span>{plugin.name}</span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
                 <LexicalEditor
