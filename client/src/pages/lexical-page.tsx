@@ -1396,9 +1396,9 @@ export default function LexicalPage() {
                   {selectedEdition.origem} - {selectedEdition.objeto}
                 </Badge>
               )}
-              {selectedTemplate && (
+              {(selectedTemplate || selectedEdition) && (
                 <Badge variant="secondary" className="text-xs">
-                  Template: {selectedTemplate.code}
+                  Template: {selectedTemplate?.code || selectedEdition?.templateCode}
                 </Badge>
               )}
               {loadedFileName && (
