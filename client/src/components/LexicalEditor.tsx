@@ -135,11 +135,68 @@ function ImageEventListenerPlugin(): JSX.Element | null {
       });
     };
 
-    // Escutar evento customizado de inserção de imagem
+    const handleInsertMermaidTable = (event: CustomEvent) => {
+      const { imageUrl, altText, artifactId, mermaidCode } = event.detail;
+      
+      editor.update(() => {
+        const selection = $getSelection();
+        if ($isRangeSelection(selection)) {
+          // Create table with 1 row and 2 columns
+          const table = $createTableNode();
+          
+          // Create row
+          const tableRow = $createTableRowNode();
+          
+          // First column: Image
+          const imageCell = $createTableCellNode(0);
+          
+          // Generate unique ID for the image
+          const imageId = Math.floor(Math.random() * 10000000000).toString();
+          
+          // Create HTTPS public URL using artifact ID
+          let httpsUrl = imageUrl;
+          if (artifactId) {
+            httpsUrl = `${window.location.origin}/api/public/images/${artifactId}`;
+          }
+          
+          const metadataText = `[image_id: ${imageId}] - [${httpsUrl}]`;
+          
+          // Create image with metadata
+          const imageWithMetadataPayload: ImageWithMetadataPayload = {
+            src: imageUrl,
+            altText: altText || 'Diagrama Mermaid',
+            imageId,
+            metadataText,
+          };
+          
+          const imageWithMetadataNode = $createImageWithMetadataNode(imageWithMetadataPayload);
+          imageCell.append(imageWithMetadataNode);
+          
+          // Second column: Mermaid code as code block
+          const codeCell = $createTableCellNode(0);
+          const codeNode = $createCodeNode();
+          codeNode.setTextContent(mermaidCode || '// Código Mermaid não disponível');
+          codeCell.append(codeNode);
+          
+          // Add cells to row
+          tableRow.append(imageCell, codeCell);
+          
+          // Add row to table
+          table.append(tableRow);
+          
+          // Insert table into document
+          $insertNodes([table]);
+        }
+      });
+    };
+
+    // Escutar eventos customizados
     window.addEventListener('insertImage', handleInsertImage as EventListener);
+    window.addEventListener('insertMermaidTable', handleInsertMermaidTable as EventListener);
 
     return () => {
       window.removeEventListener('insertImage', handleInsertImage as EventListener);
+      window.removeEventListener('insertMermaidTable', handleInsertMermaidTable as EventListener);
     };
   }, [editor]);
 
