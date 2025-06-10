@@ -308,7 +308,7 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
           </div>
           
           {/* Save controls */}
-          <div className="flex items-center gap-3 mr-5">
+          <div className="flex items-center gap-3 mr-6">
             <Input
               type="text"
               placeholder="Nome do diagrama..."
