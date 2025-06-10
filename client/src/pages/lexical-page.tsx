@@ -286,22 +286,44 @@ export default function LexicalPage() {
       if (artifact.fileData && artifact.mimeType) {
         const imageUrl = `data:${artifact.mimeType};base64,${artifact.fileData}`;
         
-        // Criar evento customizado para inserir imagem
-        const insertImageEvent = new CustomEvent('insertImage', {
-          detail: {
-            src: imageUrl,
-            altText: artifact.name || 'Imagem',
-            artifactId: artifact.id, // Passar o ID do artifact para gerar URL HTTPS
-          }
-        });
-        
-        // Disparar evento para o editor
-        window.dispatchEvent(insertImageEvent);
-        
-        toast({
-          title: "Imagem inserida",
-          description: `A imagem "${artifact.name}" foi inserida no documento.`,
-        });
+        // Check if this is a Mermaid asset
+        if (artifact.originAssetId === "Mermaid") {
+          // For Mermaid assets, create a table with image and code block
+          const mermaidCode = (artifact as any).fileMetadata || '';
+          
+          const insertMermaidTableEvent = new CustomEvent('insertMermaidTable', {
+            detail: {
+              imageUrl,
+              altText: artifact.name || 'Diagrama Mermaid',
+              artifactId: artifact.id,
+              mermaidCode
+            }
+          });
+          
+          window.dispatchEvent(insertMermaidTableEvent);
+          
+          toast({
+            title: "Diagrama Mermaid inserido",
+            description: `O diagrama "${artifact.name}" foi inserido como tabela com código.`,
+          });
+        } else {
+          // For regular images, use the existing logic
+          const insertImageEvent = new CustomEvent('insertImage', {
+            detail: {
+              src: imageUrl,
+              altText: artifact.name || 'Imagem',
+              artifactId: artifact.id, // Passar o ID do artifact para gerar URL HTTPS
+            }
+          });
+          
+          // Disparar evento para o editor
+          window.dispatchEvent(insertImageEvent);
+          
+          toast({
+            title: "Imagem inserida",
+            description: `A imagem "${artifact.name}" foi inserida no documento.`,
+          });
+        }
       }
     } catch (error) {
       toast({
