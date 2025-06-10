@@ -121,83 +121,116 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
           const filename = `vector-graph-${timestamp}.png`;
 
-          // Prepare the artifact data  
+          // Check if there's a composer document selected
           const documentId = selectedEdition?.documentId || selectedEdition?.id;
           
-          // Create a completely new artifact object
-          const artifactData = {
-            documentoId: documentId,
-            name: filename,
-            fileName: filename,
-            fileData: pngData,
-            fileSize: pngBlob.size.toString(),
-            mimeType: 'image/png',
-            type: 'image/png',
-            originAssetId: "Graph_TLD",
-            fileMetadata: JSON.stringify(snapshot),
-            isImage: 'true'
-          };
-
-          console.log('Artifact data completo:', artifactData);
-          console.log('Selected edition:', selectedEdition);
-          console.log('Document ID:', documentId);
-
-          // Save to My Assets via API
           if (!documentId) {
-            console.error('Documento não selecionado. selectedEdition:', selectedEdition);
-            throw new Error('Documento não selecionado');
-          }
+            // Save to Global Assets when no composer document is selected
+            const globalAssetData = {
+              name: filename,
+              fileData: pngData,
+              fileSize: pngBlob.size.toString(),
+              mimeType: 'image/png',
+              isImage: 'true',
+              description: 'Gráfico vetorial gerado com tldraw'
+            };
 
-          console.log('Making API call to:', `/api/documentos/${documentId}/artifacts`);
-          
-          // Check authentication first
-          const authResponse = await fetch('/api/user');
-          console.log('Auth check status:', authResponse.status);
-          
-          if (!authResponse.ok) {
-            throw new Error('Usuário não autenticado. Faça login novamente.');
-          }
-          
-          const response = await fetch(`/api/documentos/${documentId}/artifacts`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(artifactData),
-            credentials: 'include' // Ensure cookies are sent
-          });
-
-          console.log('Response received, status:', response.status, 'ok:', response.ok);
-
-          if (response.ok) {
-            console.log('Response is OK, processing response...');
-            const resultData = await response.json();
-            console.log('Response data:', resultData);
+            console.log('Saving to Global Assets:', globalAssetData);
             
-            toast({
-              title: "Sucesso",
-              description: "Imagem salva em Meus Assets",
+            const response = await fetch('/api/global-assets', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(globalAssetData),
+              credentials: 'include'
             });
-            
-            // Invalidate query cache to refresh My Assets list
-            queryClient.invalidateQueries({ 
-              queryKey: ['/api/document-editions', selectedEdition?.id || selectedEdition?.documentId, 'artifacts'] 
-            });
-            
-            // Trigger parent data refresh by sending data exchange signal
-            if (onDataExchange) {
-              console.log('Triggering data exchange callback...');
-              onDataExchange({
-                type: 'artifact-saved',
-                artifactData: resultData,
-                timestamp: new Date().toISOString()
+
+            if (response.ok) {
+              const resultData = await response.json();
+              
+              toast({
+                title: "Sucesso",
+                description: "Imagem salva em Global Assets",
               });
+              
+              // Invalidate global assets cache
+              queryClient.invalidateQueries({ 
+                queryKey: ['/api/global-assets'] 
+              });
+              
+              if (onDataExchange) {
+                onDataExchange({
+                  type: 'global-asset-saved',
+                  assetData: resultData,
+                  timestamp: new Date().toISOString()
+                });
+              }
+            } else {
+              const errorText = await response.text();
+              console.error('Erro ao salvar em Global Assets:', response.status, errorText);
+              throw new Error(`HTTP ${response.status}: ${errorText}`);
             }
           } else {
-            console.log('Response not OK, reading error...');
-            const errorText = await response.text();
-            console.error('Erro HTTP:', response.status, errorText);
-            throw new Error(`HTTP ${response.status}: ${errorText}`);
+            // Save to My Assets when composer document is selected
+            const artifactData = {
+              documentoId: documentId,
+              name: filename,
+              fileName: filename,
+              fileData: pngData,
+              fileSize: pngBlob.size.toString(),
+              mimeType: 'image/png',
+              type: 'image/png',
+              originAssetId: "Graph_TLD",
+              fileMetadata: JSON.stringify(snapshot),
+              isImage: 'true'
+            };
+
+            console.log('Saving to My Assets:', artifactData);
+            
+            // Check authentication first
+            const authResponse = await fetch('/api/user');
+            
+            if (!authResponse.ok) {
+              throw new Error('Usuário não autenticado. Faça login novamente.');
+            }
+            
+            const response = await fetch(`/api/documentos/${documentId}/artifacts`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(artifactData),
+              credentials: 'include'
+            });
+
+            if (response.ok) {
+              const resultData = await response.json();
+              
+              toast({
+                title: "Sucesso",
+                description: "Imagem salva em Meus Assets",
+              });
+              
+              // Invalidate query cache to refresh My Assets list
+              queryClient.invalidateQueries({ 
+                queryKey: ['/api/document-editions', selectedEdition?.id || selectedEdition?.documentId, 'artifacts'] 
+              });
+              
+              // Trigger parent data refresh by sending data exchange signal
+              if (onDataExchange) {
+                onDataExchange({
+                  type: 'artifact-saved',
+                  artifactData: resultData,
+                  timestamp: new Date().toISOString()
+                });
+              } else {
+                console.log('Response not OK, reading error...');
+                const errorText = await response.text();
+                console.error('Erro HTTP:', response.status, errorText);
+                throw new Error(`HTTP ${response.status}: ${errorText}`);
+              }
+            }
           }
         } catch (error) {
           console.error('Erro ao salvar - full error object:', error);

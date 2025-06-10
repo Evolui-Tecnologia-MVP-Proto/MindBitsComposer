@@ -1704,22 +1704,7 @@ export default function LexicalPage() {
                     {activePlugins.length > 0 && (
                       <div className="pointer-events-auto">
                         <div className="flex flex-col items-center gap-3">
-                          <p className="text-sm text-gray-500">Ou use um plugin para começar:</p>
-                          <Select value={pluginSelectValue} onValueChange={handleOpenPlugin}>
-                            <SelectTrigger className="w-48 h-10 bg-white border-gray-300">
-                              <SelectValue placeholder="Selecionar Plugin" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {activePlugins.map((plugin) => (
-                                <SelectItem key={plugin.id} value={plugin.id}>
-                                  <div className="flex items-center gap-2">
-                                    {getPluginIcon(plugin.icon)}
-                                    <span>{plugin.name}</span>
-                                  </div>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          {/* Plugin selector removed */}
                         </div>
                       </div>
                     )}

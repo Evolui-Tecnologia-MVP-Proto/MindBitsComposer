@@ -32,15 +32,27 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
   // Mutation para salvar diagram como imagem
   const saveDiagramMutation = useMutation({
     mutationFn: async (data: { name: string; imageData: string; mermaidDefinition: string }) => {
+      // Se não há documento composer, salvar em global assets
       if (!selectedEdition) {
-        throw new Error('Nenhum documento selecionado');
+        const globalAssetData = {
+          name: data.name,
+          fileData: data.imageData,
+          fileSize: Math.round(data.imageData.length * 0.75).toString(),
+          mimeType: 'image/png',
+          isImage: 'true',
+          description: 'Diagrama Mermaid gerado'
+        };
+
+        const response = await apiRequest('POST', '/api/global-assets', globalAssetData);
+        return response.json();
       }
 
+      // Se há documento composer, salvar como artifact
       const artifactData = {
         name: data.name,
         fileData: data.imageData,
         fileName: data.name,
-        fileSize: Math.round(data.imageData.length * 0.75).toString(), // Approximate base64 to bytes
+        fileSize: Math.round(data.imageData.length * 0.75).toString(),
         mimeType: 'image/png',
         type: 'png',
         isImage: 'true',
@@ -52,14 +64,21 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
       return response.json();
     },
     onSuccess: () => {
-      // Invalidate artifacts cache to refresh the list
+      // Invalidate the appropriate cache based on where the diagram was saved
       if (selectedEdition) {
         queryClient.invalidateQueries({ queryKey: ['/api/document-editions', selectedEdition.id, 'artifacts'] });
+        toast({
+          title: "Diagrama salvo",
+          description: "O diagrama foi salvo em My Assets com sucesso.",
+        });
+      } else {
+        queryClient.invalidateQueries({ queryKey: ['/api/global-assets'] });
+        toast({
+          title: "Diagrama salvo",
+          description: "O diagrama foi salvo em Global Assets com sucesso.",
+        });
       }
-      toast({
-        title: "Diagrama salvo",
-        description: "O diagrama foi salvo em My Assets com sucesso.",
-      });
+      
       setDiagramName(''); // Clear the name field
       
       // Close the modal by calling onDataExchange with close signal
