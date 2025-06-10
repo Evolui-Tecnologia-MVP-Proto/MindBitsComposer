@@ -1910,7 +1910,7 @@ export default function LexicalPage() {
                             </p>
                           </div>
                         ) : (
-                          <div className="space-y-3">
+                          <div className="space-y-3 max-h-96 overflow-y-auto">
                             {documentArtifacts
                               .filter(artifact => 
                                 artifact.originAssetId === "Uploaded" || 
