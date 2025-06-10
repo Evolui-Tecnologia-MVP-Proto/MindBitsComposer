@@ -1839,7 +1839,11 @@ export default function LexicalPage() {
                           <span className="font-medium">My Assets</span>
                         </div>
                         <Badge variant="secondary">
-                          {documentArtifacts.filter(artifact => artifact.originAssetId === "Uploaded").length}
+                          {documentArtifacts.filter(artifact => 
+                            artifact.originAssetId === "Uploaded" || 
+                            !artifact.mondayColumn || 
+                            artifact.mondayColumn.trim() === ""
+                          ).length}
                         </Badge>
                       </div>
                     </AccordionTrigger>
@@ -1859,7 +1863,11 @@ export default function LexicalPage() {
                           <div className="text-center py-4">
                             <p className="text-sm text-gray-400">Carregando...</p>
                           </div>
-                        ) : documentArtifacts.filter(artifact => artifact.originAssetId === "Uploaded").length === 0 ? (
+                        ) : documentArtifacts.filter(artifact => 
+                            artifact.originAssetId === "Uploaded" || 
+                            !artifact.mondayColumn || 
+                            artifact.mondayColumn.trim() === ""
+                          ).length === 0 ? (
                           <div className="text-center py-4">
                             <p className="text-sm text-gray-400">
                               Nenhum arquivo carregado
@@ -1868,7 +1876,11 @@ export default function LexicalPage() {
                         ) : (
                           <div className="space-y-3">
                             {documentArtifacts
-                              .filter(artifact => artifact.originAssetId === "Uploaded")
+                              .filter(artifact => 
+                                artifact.originAssetId === "Uploaded" || 
+                                !artifact.mondayColumn || 
+                                artifact.mondayColumn.trim() === ""
+                              )
                               .map((artifact: DocumentArtifact) => (
                                 <div 
                                   key={artifact.id}
@@ -1923,7 +1935,9 @@ export default function LexicalPage() {
                                       </p>
                                       <div className="flex items-center gap-2 mt-2">
                                         <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
-                                          Uploaded
+                                          {artifact.originAssetId === "Uploaded" ? "Uploaded" : 
+                                           artifact.originAssetId === "Mermaid" ? "Mermaid" : 
+                                           "My Asset"}
                                         </Badge>
                                         {artifact.fileSize && (
                                           <span className="text-xs text-gray-500">
