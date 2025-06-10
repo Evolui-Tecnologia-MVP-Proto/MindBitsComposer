@@ -575,6 +575,49 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           
           console.log('Store data to load:', storeData);
           
+          // Check if there are image shapes that need assets
+          const storeEntries = Object.values(storeData);
+          const imageShapes = storeEntries.filter((entry: any) => entry.type === 'image');
+          const existingAssets = storeEntries.filter((entry: any) => entry.typeName === 'asset');
+          
+          console.log('Found image shapes:', imageShapes.length);
+          console.log('Found existing assets:', existingAssets.length);
+          
+          // If there are image shapes but no assets, we need to create placeholder assets
+          if (imageShapes.length > 0 && existingAssets.length === 0) {
+            console.log('Creating placeholder assets for image shapes...');
+            
+            // Create assets for each unique assetId referenced by image shapes
+            const assetIds = new Set();
+            imageShapes.forEach((shape: any) => {
+              if (shape.props?.assetId) {
+                assetIds.add(shape.props.assetId);
+              }
+            });
+            
+            console.log('Asset IDs to create:', Array.from(assetIds));
+            
+            // Create placeholder assets
+            assetIds.forEach((assetId: string) => {
+              storeData[assetId] = {
+                id: assetId,
+                type: 'image',
+                typeName: 'asset',
+                props: {
+                  name: 'Loaded Image',
+                  src: asset.fileData.startsWith('data:') ? asset.fileData : `data:image/png;base64,${asset.fileData}`,
+                  w: 300,
+                  h: 300,
+                  mimeType: 'image/png',
+                  isAnimated: false,
+                },
+                meta: {},
+              };
+            });
+            
+            console.log('Updated store data with assets:', Object.keys(storeData));
+          }
+          
           // Use the modern tldraw loadSnapshot method
           console.log('Using imported loadSnapshot function...');
           loadSnapshot(editorInstance.store, storeData);
