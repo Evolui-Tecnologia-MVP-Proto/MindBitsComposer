@@ -3,7 +3,7 @@ import { Tldraw, TldrawProps } from 'tldraw';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, Image as ImageIcon, FileImage } from 'lucide-react';
+import { Upload, Image as ImageIcon, FileImage, ImagePlus } from 'lucide-react';
 import 'tldraw/tldraw.css';
 
 interface VectorGraphPluginProps {
@@ -48,11 +48,42 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     (window as any).tldrawEditor = editor;
     setEditorInstance(editor);
     
-    // Override the default image insertion behavior
-    editor.registerExternalAssetHandler('image', async () => {
-      setShowImageModal(true);
-      return null; // Prevent default behavior
-    });
+    // Override the default image insertion behavior by listening to asset creation
+    const originalCreateAssets = editor.createAssets;
+    editor.createAssets = (assets: any[]) => {
+      const imageAssets = assets.filter(asset => asset.type === 'image');
+      if (imageAssets.length > 0) {
+        // If this is an external image insertion, show our modal instead
+        const firstImageAsset = imageAssets[0];
+        if (firstImageAsset.props?.src && !firstImageAsset.props.src.startsWith('data:')) {
+          setShowImageModal(true);
+          return; // Prevent default asset creation
+        }
+      }
+      return originalCreateAssets.call(editor, assets);
+    };
+
+    // Also intercept paste events for images
+    const handlePaste = (event: ClipboardEvent) => {
+      const items = event.clipboardData?.items;
+      if (items) {
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type.indexOf('image') !== -1) {
+            event.preventDefault();
+            setShowImageModal(true);
+            return;
+          }
+        }
+      }
+    };
+
+    // Add paste event listener
+    document.addEventListener('paste', handlePaste);
+    
+    // Cleanup function
+    return () => {
+      document.removeEventListener('paste', handlePaste);
+    };
   }, []);
 
   const handleLocalFileUpload = useCallback(() => {
@@ -166,6 +197,14 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           <h3 className="font-medium text-sm">Vector Graph Editor</h3>
         </div>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowImageModal(true)}
+            className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors flex items-center gap-1"
+            title="Inserir Imagem"
+          >
+            <ImagePlus className="w-3 h-3" />
+            Inserir Imagem
+          </button>
           <button
             onClick={handleExport}
             className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
