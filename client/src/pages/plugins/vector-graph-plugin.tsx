@@ -403,66 +403,35 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               console.log('Sample records:', sampleRecords);
             }
             
-            // Try using tldraw's native snapshot loading
+            // Load the .tldr content into the editor
             try {
-              console.log('Loading .tldr content using native snapshot method...');
+              console.log('Loading .tldr content into editor...');
               
-              // Use the editor's loadSnapshot method if available
-              if (editorInstance.loadSnapshot && snapshotData) {
-                console.log('Using loadSnapshot method');
-                editorInstance.loadSnapshot(snapshotData);
+              if (snapshotData && snapshotData.store) {
+                console.log('Loading snapshot with store data...');
                 
-                // Zoom to fit the loaded content
+                // Use store.loadSnapshot for proper tldraw loading
+                editorInstance.store.loadSnapshot(snapshotData.store);
+                
+                console.log('Content loaded successfully');
+                
+                // Zoom to fit the loaded content after a delay
                 setTimeout(() => {
                   try {
                     editorInstance.zoomToFit();
-                    console.log('Content loaded and zoomed to fit');
+                    console.log('Zoomed to fit loaded content');
                   } catch (zoomError) {
-                    console.warn('Zoom failed:', zoomError);
+                    console.warn('Zoom to fit failed:', zoomError);
                   }
-                }, 500);
+                }, 1000);
                 
               } else {
-                console.log('Fallback: Manual shape loading');
-                
-                // Fallback to manual loading if loadSnapshot not available
-                if (snapshotData.store && typeof snapshotData.store === 'object') {
-                  const records = Object.values(snapshotData.store);
-                  const shapes = records.filter((record: any) => 
-                    record && record.typeName === 'shape'
-                  );
-                  
-                  console.log(`Found ${shapes.length} shapes to import`);
-                  
-                  if (shapes.length > 0) {
-                    // Clear existing shapes
-                    editorInstance.selectAll();
-                    editorInstance.deleteShapes(editorInstance.getSelectedShapeIds());
-                    
-                    // Use createShapes method for better compatibility
-                    const shapesToCreate = shapes.map((shape: any, index: number) => ({
-                      ...shape,
-                      id: `shape:imported_${Date.now()}_${index}`
-                    }));
-                    
-                    editorInstance.createShapes(shapesToCreate);
-                    console.log(`Created ${shapesToCreate.length} shapes`);
-                    
-                    // Zoom to fit
-                    setTimeout(() => {
-                      editorInstance.zoomToFit();
-                    }, 300);
-                  } else {
-                    throw new Error('Nenhum conteúdo visual encontrado no arquivo');
-                  }
-                } else {
-                  throw new Error('Formato de arquivo inválido');
-                }
+                throw new Error('Dados de snapshot inválidos');
               }
               
             } catch (loadError) {
               console.error('Error loading .tldr content:', loadError);
-              throw new Error(`Erro ao carregar arquivo: ${loadError instanceof Error ? loadError.message : 'Formato incompatível'}`);
+              throw new Error(`Erro ao carregar arquivo .tldr: ${loadError instanceof Error ? loadError.message : 'Formato incompatível'}`);
             }
             
             toast({
