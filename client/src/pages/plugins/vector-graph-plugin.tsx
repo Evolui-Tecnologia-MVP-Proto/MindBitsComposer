@@ -56,9 +56,11 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
           const filename = `vector-graph-${timestamp}.png`;
 
-          // Prepare the artifact data
+          // Prepare the artifact data  
+          const documentId = selectedEdition?.documentId || selectedEdition?.id;
+          
           const artifactData = {
-            documentoId: selectedEdition?.documentId,
+            documentoId: documentId,
             name: filename,
             fileName: filename,
             fileData: pngData,
@@ -71,13 +73,15 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           };
 
           console.log('Artifact data completo:', artifactData);
+          console.log('Selected edition:', selectedEdition);
 
           // Save to My Assets via API
-          if (!selectedEdition?.documentId) {
+          if (!documentId) {
+            console.error('Documento não selecionado. selectedEdition:', selectedEdition);
             throw new Error('Documento não selecionado');
           }
 
-          const response = await fetch(`/api/documentos/${selectedEdition.documentId}/artifacts`, {
+          const response = await fetch(`/api/documentos/${documentId}/artifacts`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
