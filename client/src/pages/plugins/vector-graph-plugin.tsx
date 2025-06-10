@@ -445,15 +445,26 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               
               if (snapshotData && snapshotData.store) {
                 console.log('Loading snapshot with store data...');
+                console.log('Store size before load:', Object.keys(editorInstance.store.allRecords()).length);
                 
                 // Use the modern loadSnapshot function from tldraw
                 loadSnapshot(editorInstance.store, snapshotData.store);
                 
                 console.log('Content loaded successfully');
+                console.log('Store size after load:', Object.keys(editorInstance.store.allRecords()).length);
                 
-                // Zoom to fit the loaded content after a delay
+                // Check if we have shapes
+                const shapes = editorInstance.store.allRecords().filter((record: any) => record.typeName === 'shape');
+                console.log('Number of shapes loaded:', shapes.length);
+                
+                if (shapes.length > 0) {
+                  console.log('Sample shapes:', shapes.slice(0, 3).map((s: any) => ({ id: s.id, type: s.type })));
+                }
+                
+                // Force a re-render and then zoom to fit
                 setTimeout(() => {
                   try {
+                    console.log('Current page shapes:', editorInstance.getCurrentPageShapes().length);
                     editorInstance.zoomToFit();
                     console.log('Zoomed to fit loaded content');
                   } catch (zoomError) {
