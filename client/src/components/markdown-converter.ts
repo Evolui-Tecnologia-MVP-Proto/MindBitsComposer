@@ -98,46 +98,118 @@ export function createMarkdownConverter() {
         markdown += `![${img.imageId}](${img.url})\n\n`;
       });
     } else if (node.getType() === 'table') {
-      // Process table with universal image extraction
+      // Check if this is a Mermaid table by looking for code blocks with Mermaid content
       const rows = node.getChildren();
-      if (rows.length > 0) {
-        rows.forEach((row: any, rowIndex: number) => {
-          const cells = row.getChildren();
-          let rowContent = '|';
-          
-          cells.forEach((cell: any) => {
-            // Extract all images from this cell recursively
-            const cellImages = extractImagesRecursively(cell);
-            
-            // Get text content
-            let cellText = cell.getTextContent() || '';
-            
-            // Combine text and images
-            let cellContent = cellText.trim();
-            if (cellImages.length > 0) {
-              const imageMarkdown = cellImages.map(img => `![${img.imageId}](${img.url})`).join(' ');
-              cellContent = cellContent ? `${cellContent} ${imageMarkdown}` : imageMarkdown;
-            }
-            
-            if (!cellContent.trim()) {
-              cellContent = ' ';
-            }
-            
-            rowContent += ` ${cellContent} |`;
-          });
-          
-          markdown += rowContent + '\n';
-          
-          // Add separator after header (first row)
-          if (rowIndex === 0) {
-            let separator = '|';
-            cells.forEach(() => {
-              separator += ' --- |';
-            });
-            markdown += separator + '\n';
+      let isMermaidTable = false;
+      
+      // Check if any cell contains Mermaid code (graph TD, flowchart, etc.)
+      rows.forEach((row: any) => {
+        const cells = row.getChildren();
+        cells.forEach((cell: any) => {
+          const cellText = cell.getTextContent() || '';
+          if (cellText.includes('graph TD') || cellText.includes('flowchart') || 
+              cellText.includes('sequenceDiagram') || cellText.includes('classDiagram') ||
+              cellText.includes('stateDiagram') || cellText.includes('erDiagram') ||
+              cellText.includes('journey') || cellText.includes('gantt')) {
+            isMermaidTable = true;
           }
         });
-        markdown += '\n';
+      });
+      
+      if (isMermaidTable && rows.length > 0) {
+        // Generate HTML table for Mermaid content
+        markdown += '<table>\n';
+        
+        rows.forEach((row: any, rowIndex: number) => {
+          const cells = row.getChildren();
+          
+          if (rowIndex === 0) {
+            // Header row
+            markdown += '  <thead>\n    <tr>\n';
+            cells.forEach((cell: any) => {
+              const cellText = cell.getTextContent() || '';
+              markdown += `      <th>${cellText}</th>\n`;
+            });
+            markdown += '    </tr>\n  </thead>\n  <tbody>\n';
+          } else {
+            // Content row
+            markdown += '    <tr>\n';
+            cells.forEach((cell: any) => {
+              // Extract images from this cell
+              const cellImages = extractImagesRecursively(cell);
+              const cellText = cell.getTextContent() || '';
+              
+              markdown += '      <td>\n';
+              
+              if (cellImages.length > 0) {
+                // Render image with proper HTML
+                cellImages.forEach(img => {
+                  markdown += `        <img src="${img.url}" alt="${img.imageId}" style="max-width: 100%; height: auto;" />\n`;
+                });
+              } else if (cellText.trim()) {
+                // Check if it's Mermaid code content
+                if (cellText.includes('graph TD') || cellText.includes('flowchart') || 
+                    cellText.includes('sequenceDiagram') || cellText.includes('classDiagram') ||
+                    cellText.includes('stateDiagram') || cellText.includes('erDiagram') ||
+                    cellText.includes('journey') || cellText.includes('gantt')) {
+                  // Render as Mermaid code block
+                  markdown += '        <pre><code class="language-mermaid">\n';
+                  markdown += cellText + '\n';
+                  markdown += '        </code></pre>\n';
+                } else {
+                  // Regular text content
+                  markdown += `        ${cellText}\n`;
+                }
+              }
+              
+              markdown += '      </td>\n';
+            });
+            markdown += '    </tr>\n';
+          }
+        });
+        
+        markdown += '  </tbody>\n</table>\n\n';
+      } else {
+        // Regular markdown table for non-Mermaid content
+        if (rows.length > 0) {
+          rows.forEach((row: any, rowIndex: number) => {
+            const cells = row.getChildren();
+            let rowContent = '|';
+            
+            cells.forEach((cell: any) => {
+              // Extract all images from this cell recursively
+              const cellImages = extractImagesRecursively(cell);
+              
+              // Get text content
+              let cellText = cell.getTextContent() || '';
+              
+              // Combine text and images
+              let cellContent = cellText.trim();
+              if (cellImages.length > 0) {
+                const imageMarkdown = cellImages.map(img => `![${img.imageId}](${img.url})`).join(' ');
+                cellContent = cellContent ? `${cellContent} ${imageMarkdown}` : imageMarkdown;
+              }
+              
+              if (!cellContent.trim()) {
+                cellContent = ' ';
+              }
+              
+              rowContent += ` ${cellContent} |`;
+            });
+            
+            markdown += rowContent + '\n';
+            
+            // Add separator after header (first row)
+            if (rowIndex === 0) {
+              let separator = '|';
+              cells.forEach(() => {
+                separator += ' --- |';
+              });
+              markdown += separator + '\n';
+            }
+          });
+          markdown += '\n';
+        }
       }
     } else if (node.getType() === 'collapsible-container') {
       // Process collapsible container
