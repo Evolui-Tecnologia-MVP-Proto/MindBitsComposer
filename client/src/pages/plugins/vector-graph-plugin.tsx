@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useRef } from 'react';
-import { Tldraw, TldrawProps } from 'tldraw';
+import { Tldraw, TldrawProps, loadSnapshot, getSnapshot } from 'tldraw';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -546,8 +546,107 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                 const sanitizedStore = sanitizeSnapshotData(snapshotData.store);
                 console.log('Store size after sanitization:', Object.keys(sanitizedStore).length);
                 
-                // Use store.loadSnapshot for proper tldraw loading
-                editorInstance.store.loadSnapshot(sanitizedStore);
+                // Create proper snapshot format for tldraw
+                const fullSnapshot = {
+                  store: sanitizedStore,
+                  schema: snapshotData.schema || {
+                    schemaVersion: 2,
+                    sequences: {
+                      "com.tldraw.store": 4,
+                      "com.tldraw.asset": 1,
+                      "com.tldraw.camera": 1,
+                      "com.tldraw.document": 2,
+                      "com.tldraw.instance": 25,
+                      "com.tldraw.instance_page_state": 5,
+                      "com.tldraw.page": 1,
+                      "com.tldraw.instance_presence": 6,
+                      "com.tldraw.pointer": 1,
+                      "com.tldraw.shape": 4,
+                      "com.tldraw.asset.bookmark": 2,
+                      "com.tldraw.asset.image": 5,
+                      "com.tldraw.asset.video": 5,
+                      "com.tldraw.shape.group": 0,
+                      "com.tldraw.shape.text": 3,
+                      "com.tldraw.shape.bookmark": 2,
+                      "com.tldraw.shape.draw": 2,
+                      "com.tldraw.shape.geo": 10,
+                      "com.tldraw.shape.note": 9,
+                      "com.tldraw.shape.line": 5,
+                      "com.tldraw.shape.frame": 1,
+                      "com.tldraw.shape.arrow": 6,
+                      "com.tldraw.shape.highlight": 1,
+                      "com.tldraw.shape.embed": 4,
+                      "com.tldraw.shape.image": 5,
+                      "com.tldraw.shape.video": 3,
+                      "com.tldraw.binding.arrow": 1
+                    }
+                  }
+                };
+                
+                console.log('Full snapshot structure:', {
+                  hasStore: !!fullSnapshot.store,
+                  hasSchema: !!fullSnapshot.schema,
+                  schemaVersion: fullSnapshot.schema?.schemaVersion
+                });
+                
+                // Use the proper loadSnapshot function from tldraw
+                try {
+                  console.log('Using tldraw loadSnapshot function...');
+                  
+                  // Create a proper snapshot with both store and schema
+                  const properSnapshot = {
+                    store: sanitizedStore,
+                    schema: fullSnapshot.schema
+                  };
+                  
+                  console.log('Snapshot to load:', {
+                    storeKeys: Object.keys(properSnapshot.store).length,
+                    hasSchema: !!properSnapshot.schema,
+                    schemaVersion: properSnapshot.schema?.schemaVersion
+                  });
+                  
+                  // Use the imported loadSnapshot function
+                  loadSnapshot(editorInstance.store, properSnapshot);
+                  
+                } catch (loadMethodError) {
+                  console.error('Error with loadSnapshot function:', loadMethodError);
+                  
+                  // Fallback: try without schema migration
+                  try {
+                    console.log('Trying direct store loading without schema...');
+                    editorInstance.store.clear();
+                    
+                    // Add essential records first (document, page)
+                    const essentialRecords = Object.values(sanitizedStore).filter((record: any) => 
+                      record.typeName === 'document' || record.typeName === 'page'
+                    );
+                    
+                    const shapeRecords = Object.values(sanitizedStore).filter((record: any) => 
+                      record.typeName === 'shape'
+                    );
+                    
+                    const assetRecords = Object.values(sanitizedStore).filter((record: any) => 
+                      record.typeName === 'asset'
+                    );
+                    
+                    console.log(`Loading ${essentialRecords.length} essential records, ${shapeRecords.length} shapes, ${assetRecords.length} assets`);
+                    
+                    // Load records in order: first essentials, then assets, then shapes
+                    [...essentialRecords, ...assetRecords, ...shapeRecords].forEach((record: any) => {
+                      try {
+                        if (record && record.id && record.typeName) {
+                          editorInstance.store.put([record]);
+                        }
+                      } catch (recordError) {
+                        console.warn('Skipping invalid record:', record.id, recordError);
+                      }
+                    });
+                    
+                  } catch (manualError) {
+                    console.error('Manual loading also failed:', manualError);
+                    throw new Error('Falha ao carregar arquivo .tldr. O arquivo pode estar corrompido ou em formato incompatível.');
+                  }
+                }
                 
                 console.log('Content loaded successfully');
                 console.log('Store size after load:', editorInstance.store.allRecords().length);
