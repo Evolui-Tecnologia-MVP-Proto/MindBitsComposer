@@ -126,11 +126,16 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           
           if (!documentId) {
             // Save to Global Assets when no composer document is selected
+            // Get the tldraw snapshot for file_metadata
+            const snapshot = editorInstance.getSnapshot();
+            const tldrawData = JSON.stringify(snapshot);
+            
             const formData = new FormData();
             formData.append('file', pngBlob, filename);
             formData.append('name', filename.replace('.png', ''));
             formData.append('type', 'image');
             formData.append('description', 'Gráfico vetorial gerado com tldraw');
+            formData.append('fileMetadata', tldrawData);
 
             console.log('Saving to Global Assets:', filename);
             

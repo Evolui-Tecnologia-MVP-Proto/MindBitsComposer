@@ -256,6 +256,7 @@ export const globalAssets = pgTable("global_assets", {
   uploadedBy: integer("uploaded_by").references(() => users.id), // User who uploaded
   description: text("description").default(""), // Optional description
   tags: text("tags").default(""), // Comma-separated tags for organization
+  fileMetadata: text("file_metadata"), // Metadata específicos do arquivo (ex: definições tldraw, Mermaid)
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

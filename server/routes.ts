@@ -4586,7 +4586,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const file = req.file;
-      const { name, description = "", tags = "" } = req.body;
+      const { name, description = "", tags = "", fileMetadata = null } = req.body;
       
       if (!file) {
         return res.status(400).send("Arquivo é obrigatório");
@@ -4611,7 +4611,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isImage,
         uploadedBy: req.user.id,
         description,
-        tags
+        tags,
+        fileMetadata
       };
 
       const asset = await storage.createGlobalAsset(assetData);
