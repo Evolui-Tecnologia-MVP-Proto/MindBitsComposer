@@ -1486,7 +1486,7 @@ export default function LexicalPage() {
                   size="sm"
                   className={showAttachments ? "bg-green-600 text-white hover:bg-green-700" : ""}
                   title="Anexos"
-                  disabled={viewMode === 'preview'}
+                  disabled={viewMode === 'preview' || (selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId)}
                 >
                   <Paperclip className={`w-4 h-4 ${showAttachments ? "text-white" : ""}`} />
                 </Button>
