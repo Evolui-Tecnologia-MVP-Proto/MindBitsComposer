@@ -465,18 +465,29 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                         // Migrate old shape properties to new format
                         const migratedProps = { ...shape.props };
                         
-                        // Handle text property migration based on shape type
-                        if (shape.type === 'text' && migratedProps.text) {
-                          // For text shapes, text should be in the props
-                          delete migratedProps.text; // Remove old format
-                        } else if (shape.type === 'geo' && migratedProps.text) {
-                          // For geo shapes, text might need different handling
-                          delete migratedProps.text; // Remove for now to avoid validation errors
-                        }
+                        // Remove all deprecated/incompatible properties
+                        const deprecatedProps = ['text', 'handles', 'align', 'verticalAlign', 'autoSize'];
                         
-                        // Handle handles property for line shapes
-                        if (shape.type === 'line' && migratedProps.handles) {
-                          delete migratedProps.handles; // Remove deprecated handles property
+                        deprecatedProps.forEach(prop => {
+                          if (migratedProps[prop] !== undefined) {
+                            console.log(`Removing deprecated property '${prop}' from ${shape.type} shape`);
+                            delete migratedProps[prop];
+                          }
+                        });
+                        
+                        // Add required properties based on shape type
+                        if (shape.type === 'text') {
+                          // Text shapes need specific properties
+                          if (!migratedProps.w) migratedProps.w = 100;
+                          if (!migratedProps.h) migratedProps.h = 20;
+                        } else if (shape.type === 'geo') {
+                          // Geo shapes need specific properties
+                          if (!migratedProps.w) migratedProps.w = 100;
+                          if (!migratedProps.h) migratedProps.h = 100;
+                          if (!migratedProps.geo) migratedProps.geo = 'rectangle';
+                        } else if (shape.type === 'line') {
+                          // Line shapes need specific properties
+                          if (!migratedProps.spline) migratedProps.spline = 'line';
                         }
                         
                         // Extract basic shape data with migrated properties
