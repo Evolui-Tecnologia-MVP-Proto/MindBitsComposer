@@ -277,13 +277,16 @@ export default function LexicalPage() {
     setSelectedPlugin(null);
   };
 
-  // useEffect para abrir painel quando há documentos composer disponíveis
+  // useEffect para abrir painel quando há documentos composer disponíveis (apenas na inicialização)
+  const [hasInitializedPanel, setHasInitializedPanel] = useState(false);
+  
   useEffect(() => {
-    if (Array.isArray(documentEditions) && documentEditions.length > 0 && !showDocumentList) {
-      console.log('🔥 Detectados documentos composer, abrindo painel esquerdo', documentEditions.length);
+    if (Array.isArray(documentEditions) && documentEditions.length > 0 && !hasInitializedPanel) {
+      console.log('🔥 Detectados documentos composer, abrindo painel esquerdo na inicialização', documentEditions.length);
       setShowDocumentList(true);
+      setHasInitializedPanel(true);
     }
-  }, [documentEditions, showDocumentList]);
+  }, [documentEditions, hasInitializedPanel]);
 
   // Função para receber dados do plugin
   const handlePluginDataExchange = (data: any) => {
