@@ -675,7 +675,7 @@ export default function LexicalPage() {
     mutationFn: (artifactId: string) => apiRequest("DELETE", `/api/artifacts/${artifactId}`),
     onSuccess: () => {
       if (selectedEdition) {
-        queryClient.invalidateQueries({ queryKey: [`/api/document-editions/${selectedEdition.id}/artifacts`] });
+        queryClient.invalidateQueries({ queryKey: ['/api/document-editions', selectedEdition.id, 'artifacts'] });
       }
       toast({
         title: "Arquivo excluído",
