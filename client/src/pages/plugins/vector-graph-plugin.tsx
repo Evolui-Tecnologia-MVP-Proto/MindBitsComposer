@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useRef } from 'react';
-import { Tldraw, TldrawProps } from 'tldraw';
+import { Tldraw, TldrawProps, loadSnapshot } from 'tldraw';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -554,11 +554,39 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         
         try {
           // Parse the stored tldraw snapshot
-          const snapshot = JSON.parse(metadataField);
-          console.log('Parsed snapshot from metadata:', snapshot);
+          const snapshotData = JSON.parse(metadataField);
+          console.log('Parsed snapshot from metadata:', snapshotData);
           
-          // Load the snapshot into the editor
-          editorInstance.store.loadSnapshot(snapshot);
+          // Handle different snapshot formats
+          let storeData;
+          
+          if (snapshotData.document && snapshotData.document.store) {
+            // Format: { document: { store: {...} } }
+            storeData = snapshotData.document.store;
+          } else if (snapshotData.store) {
+            // Format: { store: {...} }
+            storeData = snapshotData.store;
+          } else if (typeof snapshotData === 'object' && Object.keys(snapshotData).length > 0) {
+            // Direct store format
+            storeData = snapshotData;
+          } else {
+            throw new Error('Formato de snapshot não reconhecido');
+          }
+          
+          console.log('Store data to load:', storeData);
+          
+          // Use the modern tldraw loadSnapshot method
+          console.log('Using imported loadSnapshot function...');
+          loadSnapshot(editorInstance.store, storeData);
+          
+          // Zoom to fit content after loading
+          setTimeout(() => {
+            try {
+              editorInstance.zoomToFit();
+            } catch (zoomError) {
+              console.warn('Zoom to fit failed:', zoomError);
+            }
+          }, 500);
           
           toast({
             title: "Sucesso",
@@ -569,6 +597,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           return;
         } catch (parseError) {
           console.error('Erro ao carregar snapshot tldraw do metadata:', parseError);
+          console.error('Parse error details:', parseError.message);
           toast({
             title: "Erro",
             description: "Erro ao carregar dados do arquivo tldraw do metadata",
