@@ -92,46 +92,69 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
     }
 
     try {
-      // Clone SVG and ensure it has proper dimensions
+      // Get SVG dimensions - use viewBox if available, otherwise computed dimensions
+      const viewBox = svgElement.getAttribute('viewBox');
+      let width, height;
+      
+      if (viewBox) {
+        const [, , w, h] = viewBox.split(' ').map(Number);
+        width = w || 800;
+        height = h || 600;
+      } else {
+        const rect = svgElement.getBoundingClientRect();
+        width = rect.width || 800;
+        height = rect.height || 600;
+      }
+
+      // Clone and prepare SVG
       const svgClone = svgElement.cloneNode(true) as SVGElement;
-      const svgRect = svgElement.getBoundingClientRect();
-      
-      // Set explicit dimensions on the clone
-      svgClone.setAttribute('width', svgRect.width.toString());
-      svgClone.setAttribute('height', svgRect.height.toString());
-      
-      // Create canvas and convert to PNG
+      svgClone.setAttribute('width', width.toString());
+      svgClone.setAttribute('height', height.toString());
+      svgClone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+      // Create canvas
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('Failed to get canvas context');
 
-      canvas.width = svgRect.width;
-      canvas.height = svgRect.height;
+      canvas.width = width;
+      canvas.height = height;
 
       // Set white background
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Convert SVG to data URL
-      const svgData = new XMLSerializer().serializeToString(svgClone);
-      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-      const svgUrl = URL.createObjectURL(svgBlob);
+      // Convert SVG to string and create blob
+      const svgString = new XMLSerializer().serializeToString(svgClone);
+      console.log('SVG dimensions:', { width, height });
+      console.log('SVG string length:', svgString.length);
 
-      // Create image and draw to canvas
+      // Create image and convert
       const img = new Image();
-      await new Promise((resolve, reject) => {
+      const imagePromise = new Promise((resolve, reject) => {
         img.onload = () => {
-          ctx.drawImage(img, 0, 0);
-          URL.revokeObjectURL(svgUrl);
-          resolve(void 0);
+          try {
+            ctx.drawImage(img, 0, 0, width, height);
+            const pngDataUrl = canvas.toDataURL('image/png', 0.95);
+            const base64Data = pngDataUrl.split(',')[1];
+            console.log('PNG conversion successful, base64 length:', base64Data.length);
+            resolve(base64Data);
+          } catch (drawError) {
+            console.error('Error drawing to canvas:', drawError);
+            reject(drawError);
+          }
         };
-        img.onerror = reject;
-        img.src = svgUrl;
+        img.onerror = (error) => {
+          console.error('Image load error:', error);
+          reject(new Error('Failed to load SVG as image'));
+        };
       });
 
-      // Convert to PNG base64
-      const pngDataUrl = canvas.toDataURL('image/png');
-      const base64Data = pngDataUrl.split(',')[1];
+      // Use data URL directly instead of blob
+      const svgDataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgString)}`;
+      img.src = svgDataUrl;
+
+      const base64Data = await imagePromise as string;
 
       // Save using mutation
       const fileName = diagramName.endsWith('.png') ? diagramName : `${diagramName}.png`;
@@ -139,9 +162,10 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
 
     } catch (error) {
       console.error('Error saving diagram:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
       toast({
         title: "Erro ao salvar",
-        description: "Falha ao converter o diagrama para imagem.",
+        description: `Falha ao converter o diagrama: ${errorMessage}`,
         variant: "destructive",
       });
     }
