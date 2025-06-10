@@ -1999,7 +1999,12 @@ export default function LexicalPage() {
                 )}
 
                 {/* Origin Assets */}
-                {documentArtifacts.filter(artifact => artifact.originAssetId !== "Uploaded").length > 0 && (
+                {documentArtifacts.filter(artifact => 
+                  artifact.originAssetId && 
+                  artifact.originAssetId.trim() !== "" && 
+                  artifact.originAssetId !== "Uploaded" && 
+                  artifact.originAssetId !== "Mermaid"
+                ).length > 0 && (
                   <AccordionItem value="origin-assets" className="border rounded-lg bg-white">
                     <AccordionTrigger className="px-4 py-3 hover:no-underline">
                       <div className="flex items-center justify-between w-full pr-2">
@@ -2008,7 +2013,12 @@ export default function LexicalPage() {
                           <span className="font-medium">Origin Assets</span>
                         </div>
                         <Badge variant="secondary">
-                          {documentArtifacts.filter(artifact => artifact.originAssetId !== "Uploaded").length}
+                          {documentArtifacts.filter(artifact => 
+                            artifact.originAssetId && 
+                            artifact.originAssetId.trim() !== "" && 
+                            artifact.originAssetId !== "Uploaded" && 
+                            artifact.originAssetId !== "Mermaid"
+                          ).length}
                         </Badge>
                       </div>
                     </AccordionTrigger>
@@ -2018,7 +2028,12 @@ export default function LexicalPage() {
                           <div className="text-center py-4">
                             <p className="text-sm text-gray-400">Carregando...</p>
                           </div>
-                        ) : documentArtifacts.filter(artifact => artifact.originAssetId !== "Uploaded").length === 0 ? (
+                        ) : documentArtifacts.filter(artifact => 
+                          artifact.originAssetId && 
+                          artifact.originAssetId.trim() !== "" && 
+                          artifact.originAssetId !== "Uploaded" && 
+                          artifact.originAssetId !== "Mermaid"
+                        ).length === 0 ? (
                           <div className="text-center py-4">
                             <p className="text-sm text-gray-400">
                               Nenhum arquivo vinculado
@@ -2027,7 +2042,12 @@ export default function LexicalPage() {
                         ) : (
                           <div className="space-y-3">
                             {documentArtifacts
-                              .filter(artifact => artifact.originAssetId !== "Uploaded")
+                              .filter(artifact => 
+                                artifact.originAssetId && 
+                                artifact.originAssetId.trim() !== "" && 
+                                artifact.originAssetId !== "Uploaded" && 
+                                artifact.originAssetId !== "Mermaid"
+                              )
                               .map((artifact: DocumentArtifact) => {
                               // Log para debug dos campos
                               console.log('Artifact data completo:', artifact);
