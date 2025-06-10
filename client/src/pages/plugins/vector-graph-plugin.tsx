@@ -250,6 +250,45 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     }
   }, [onDataExchange]);
 
+  const handleExportTldr = useCallback(async () => {
+    if (!editorInstance) return;
+
+    try {
+      // Get the current snapshot
+      const snapshot = editorInstance.store.getSnapshot();
+      
+      // Convert to JSON string
+      const jsonContent = JSON.stringify(snapshot, null, 2);
+      
+      // Create filename with timestamp
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const filename = `vector-graph-${timestamp}.tldr`;
+      
+      // Create and download file
+      const blob = new Blob([jsonContent], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: "Sucesso",
+        description: `Arquivo .tldr "${filename}" exportado com sucesso`,
+      });
+    } catch (error) {
+      console.error('Erro ao exportar .tldr:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao exportar arquivo .tldr",
+        variant: "destructive"
+      });
+    }
+  }, [editorInstance, toast]);
+
   const handleMount = useCallback((editor: any) => {
     // Store editor instance globally for access
     (window as any).tldrawEditor = editor;
@@ -302,7 +341,42 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     if (!file || !editorInstance) return;
 
     try {
-      // Convert file to base64 for tldraw
+      // Check if it's a .tldr file
+      if (file.name.toLowerCase().endsWith('.tldr')) {
+        console.log('Loading .tldr file:', file.name);
+        
+        // Read .tldr file as text (JSON)
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          try {
+            const fileContent = e.target?.result as string;
+            const tldrawData = JSON.parse(fileContent);
+            
+            console.log('Parsed .tldr file:', tldrawData);
+            
+            // Load the snapshot into the editor
+            editorInstance.store.loadSnapshot(tldrawData);
+            
+            toast({
+              title: "Sucesso",
+              description: `Arquivo .tldr "${file.name}" carregado com sucesso`,
+            });
+            
+            setShowImageModal(false);
+          } catch (parseError) {
+            console.error('Erro ao analisar arquivo .tldr:', parseError);
+            toast({
+              title: "Erro",
+              description: "Arquivo .tldr inválido ou corrompido",
+              variant: "destructive"
+            });
+          }
+        };
+        reader.readAsText(file);
+        return;
+      }
+
+      // Handle image files (existing logic)
       const reader = new FileReader();
       reader.onload = async (e) => {
         const dataUrl = e.target?.result as string;
@@ -344,7 +418,12 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
       reader.readAsDataURL(file);
       setShowImageModal(false);
     } catch (error) {
-      console.error('Erro ao carregar imagem:', error);
+      console.error('Erro ao carregar arquivo:', error);
+      toast({
+        title: "Erro",
+        description: "Erro ao carregar arquivo",
+        variant: "destructive"
+      });
     }
   }, [editorInstance]);
 
@@ -461,6 +540,12 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             Exportar SVG
           </button>
           <button
+            onClick={handleExportTldr}
+            className="px-3 py-1 text-xs bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+          >
+            Baixar .tldr
+          </button>
+          <button
             onClick={() => onDataExchange?.({ closeModal: true })}
             className="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
           >
@@ -481,7 +566,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,.tldr"
         onChange={handleFileSelect}
         className="hidden"
       />
@@ -513,10 +598,15 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-300 rounded-lg">
                 <Upload className="w-12 h-12 text-gray-400 mb-4" />
                 <h3 className="text-lg font-medium mb-2">Carregar arquivo local</h3>
-                <p className="text-sm text-gray-500 mb-4">Selecione uma imagem do seu computador</p>
+                <p className="text-sm text-gray-500 mb-4">Selecione uma imagem ou arquivo .tldr do seu computador</p>
                 <Button onClick={handleLocalFileUpload}>
                   Selecionar Arquivo
                 </Button>
+                <div className="mt-4 text-xs text-gray-400 text-center">
+                  <p>Formatos suportados:</p>
+                  <p>• Imagens: PNG, JPG, GIF, etc.</p>
+                  <p>• Arquivos tldraw: .tldr</p>
+                </div>
               </div>
             </TabsContent>
 
