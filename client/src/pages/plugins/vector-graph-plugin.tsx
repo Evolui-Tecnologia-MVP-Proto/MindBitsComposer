@@ -465,12 +465,17 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                         // Migrate old shape properties to new format
                         const migratedProps = { ...shape.props };
                         
-                        // Remove all deprecated/incompatible properties
-                        const deprecatedProps = ['text', 'handles', 'align', 'verticalAlign', 'autoSize'];
+                        // Store text content before removing properties
+                        const originalText = migratedProps.text;
                         
-                        // For text shapes, also remove w and h properties that are not supported
+                        // Remove deprecated/incompatible properties
+                        const deprecatedProps = ['handles', 'align', 'verticalAlign', 'autoSize'];
+                        
+                        // For text shapes, remove size properties but keep text
                         if (shape.type === 'text') {
-                          deprecatedProps.push('w', 'h');
+                          deprecatedProps.push('w', 'h', 'text'); // Remove old text format
+                        } else if (shape.type === 'geo') {
+                          deprecatedProps.push('text'); // Remove text from geo shapes
                         }
                         
                         // For arrow shapes, handle start/end point structure changes
@@ -492,8 +497,10 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                         
                         // Add required properties based on shape type
                         if (shape.type === 'text') {
-                          // Text shapes in current tldraw version are simpler
-                          // Just keep basic properties
+                          // Restore text content for text shapes
+                          if (originalText) {
+                            migratedProps.text = originalText;
+                          }
                         } else if (shape.type === 'geo') {
                           // Geo shapes need specific properties
                           if (!migratedProps.w) migratedProps.w = 100;
