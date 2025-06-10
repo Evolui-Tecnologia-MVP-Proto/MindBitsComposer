@@ -653,7 +653,7 @@ export default function LexicalPage() {
 
   // Mutation para excluir asset global
   const deleteGlobalAssetMutation = useMutation({
-    mutationFn: (assetId: string) => apiRequest(`/api/global-assets/${assetId}`, "DELETE"),
+    mutationFn: (assetId: string) => apiRequest("DELETE", `/api/global-assets/${assetId}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/global-assets'] });
       toast({
@@ -675,7 +675,7 @@ export default function LexicalPage() {
     mutationFn: (artifactId: string) => apiRequest("DELETE", `/api/artifacts/${artifactId}`),
     onSuccess: () => {
       if (selectedEdition) {
-        queryClient.invalidateQueries({ queryKey: [`/api/documentos/${selectedEdition.documentId}/artifacts`] });
+        queryClient.invalidateQueries({ queryKey: [`/api/document-editions/${selectedEdition.id}/artifacts`] });
       }
       toast({
         title: "Arquivo excluído",
@@ -1983,30 +1983,41 @@ export default function LexicalPage() {
                                   className="p-3 bg-gray-50 rounded-lg border"
                                 >
                                 {/* Botões de ação no topo */}
-                                <div className="flex justify-start mb-3">
-                                  {artifact.isImage === 'true' ? (
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="text-xs px-2 py-1 h-7"
-                                      onClick={() => handleInsertImage(artifact)}
-                                      title="Inserir imagem no documento"
-                                    >
-                                      <CircleChevronLeft className="w-3 h-3 mr-1" />
-                                      Inserir
-                                    </Button>
-                                  ) : (
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="text-xs px-2 py-1 h-7"
-                                      onClick={() => handleDownloadFile(artifact)}
-                                      title="Baixar arquivo"
-                                    >
-                                      <Download className="w-3 h-3 mr-1" />
-                                      Baixar
-                                    </Button>
-                                  )}
+                                <div className="flex justify-between mb-3">
+                                  <div className="flex gap-2">
+                                    {artifact.isImage === 'true' ? (
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="text-xs px-2 py-1 h-7"
+                                        onClick={() => handleInsertImage(artifact)}
+                                        title="Inserir imagem no documento"
+                                      >
+                                        <CircleChevronLeft className="w-3 h-3 mr-1" />
+                                        Inserir
+                                      </Button>
+                                    ) : (
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="text-xs px-2 py-1 h-7"
+                                        onClick={() => handleDownloadFile(artifact)}
+                                        title="Baixar arquivo"
+                                      >
+                                        <Download className="w-3 h-3 mr-1" />
+                                        Baixar
+                                      </Button>
+                                    )}
+                                  </div>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-xs px-2 py-1 h-7 text-red-600 hover:text-red-800 hover:bg-red-50"
+                                    onClick={() => handleDeleteMyAsset(artifact.id)}
+                                    title="Excluir arquivo"
+                                  >
+                                    <Trash2 className="w-3 h-3" />
+                                  </Button>
                                 </div>
                                 
                                 {/* Conteúdo do card */}
