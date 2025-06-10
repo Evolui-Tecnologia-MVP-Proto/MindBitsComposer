@@ -149,42 +149,68 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         ? asset.fileData 
         : `data:image/png;base64,${asset.fileData}`;
       
-      // Create image asset in tldraw
-      const assetId = editorInstance.createAssetId();
-      const imageAsset = {
-        id: assetId,
-        type: 'image',
-        typeName: 'asset',
-        props: {
+      // Use tldraw's built-in putExternalContent method for image insertion
+      await editorInstance.putExternalContent({
+        type: 'files',
+        files: [{
           name: asset.name,
-          src: dataUrl,
-          w: 0, // Will be set when image loads
-          h: 0,
-          mimeType: 'image/png',
-          isAnimated: false,
-        },
-        meta: {},
-      };
-
-      editorInstance.createAssets([imageAsset]);
-      
-      // Create image shape
-      const shapeId = editorInstance.createShapeId();
-      editorInstance.createShapes([{
-        id: shapeId,
-        type: 'image',
-        x: editorInstance.getViewportPageCenter().x - 100,
-        y: editorInstance.getViewportPageCenter().y - 100,
-        props: {
-          assetId,
-          w: 200,
-          h: 200,
-        },
-      }]);
+          type: 'image/png',
+          size: dataUrl.length,
+          lastModified: Date.now(),
+          stream: () => Promise.resolve(new ReadableStream()),
+          slice: () => new File([], asset.name),
+          text: () => Promise.resolve(''),
+          arrayBuffer: async () => {
+            const response = await fetch(dataUrl);
+            return response.arrayBuffer();
+          }
+        }],
+        point: editorInstance.getViewportPageCenter(),
+        ignoreParent: false
+      });
       
       setShowImageModal(false);
     } catch (error) {
       console.error('Erro ao inserir imagem:', error);
+      
+      // Fallback: try direct shape creation
+      try {
+        const assetId = editorInstance.createId();
+        const imageAsset = {
+          id: assetId,
+          type: 'image',
+          typeName: 'asset',
+          props: {
+            name: asset.name,
+            src: dataUrl,
+            w: 0,
+            h: 0,
+            mimeType: 'image/png',
+            isAnimated: false,
+          },
+          meta: {},
+        };
+
+        editorInstance.createAssets([imageAsset]);
+        
+        const shapeId = editorInstance.createId();
+        const viewportCenter = editorInstance.getViewportPageCenter();
+        editorInstance.createShapes([{
+          id: shapeId,
+          type: 'image',
+          x: viewportCenter.x - 100,
+          y: viewportCenter.y - 100,
+          props: {
+            assetId,
+            w: 200,
+            h: 200,
+          },
+        }]);
+        
+        setShowImageModal(false);
+      } catch (fallbackError) {
+        console.error('Fallback também falhou:', fallbackError);
+      }
     }
   }, [editorInstance]);
 
