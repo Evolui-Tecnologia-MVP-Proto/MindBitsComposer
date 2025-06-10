@@ -852,8 +852,54 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                 stack: loadError instanceof Error ? loadError.stack : 'No stack'
               });
               
-              // More specific error handling
+              // Handle validation errors related to deprecated properties
               const errorMessage = loadError instanceof Error ? loadError.message : String(loadError);
+              
+              if (errorMessage.includes('ValidationError') && errorMessage.includes('"w"')) {
+                console.log('🔥 ATTEMPTING RECOVERY FROM W PROPERTY VALIDATION ERROR');
+                
+                try {
+                  // Regex-based sanitization as last resort
+                  const sanitizedContent = fileContent
+                    .replace(/"w":\s*[0-9.]+,?/g, '')
+                    .replace(/"h":\s*[0-9.]+,?/g, '')
+                    .replace(/"align":\s*"[^"]*",?/g, '')
+                    .replace(/"verticalAlign":\s*"[^"]*",?/g, '')
+                    .replace(/"autoSize":\s*(true|false),?/g, '')
+                    .replace(/"text":\s*"[^"]*",?/g, '')
+                    .replace(/"handles":\s*\[[^\]]*\],?/g, '')
+                    .replace(/,\s*}/g, '}')
+                    .replace(/{\s*,/g, '{');
+                  
+                  const cleanData = JSON.parse(sanitizedContent);
+                  
+                  if (cleanData.store && editorInstance) {
+                    editorInstance.store.clear();
+                    
+                    // Load records one by one
+                    Object.values(cleanData.store).forEach((record: any) => {
+                      try {
+                        if (record && record.id) {
+                          editorInstance.store.put([record]);
+                        }
+                      } catch (recordError) {
+                        console.warn('Skipping invalid record:', record.id);
+                      }
+                    });
+                    
+                    console.log('🔥 RECOVERY SUCCESSFUL');
+                    toast({
+                      title: "Sucesso",
+                      description: `Arquivo "${file.name}" carregado com correções automáticas`,
+                    });
+                    return;
+                  }
+                } catch (recoveryError) {
+                  console.error('🔥 RECOVERY FAILED:', recoveryError);
+                }
+              }
+              
+              // Standard error handling
               if (errorMessage.includes('schemaVersion') || errorMessage.includes('Cannot read properties of undefined')) {
                 throw new Error('Arquivo .tldr incompatível com esta versão do editor. Tente criar um novo desenho.');
               } else if (errorMessage.includes('ValidationError')) {
