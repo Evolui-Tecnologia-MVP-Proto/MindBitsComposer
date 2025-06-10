@@ -499,7 +499,37 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         reader.onload = async (e) => {
           try {
             const fileContent = e.target?.result as string;
-            const tldrawData = JSON.parse(fileContent);
+            console.log('🔥 RAW FILE CONTENT LENGTH:', fileContent.length);
+            
+            let tldrawData = JSON.parse(fileContent);
+            console.log('🔥 PARSED DATA TOP LEVEL KEYS:', Object.keys(tldrawData));
+            
+            // Immediate sanitization after parsing - remove all deprecated properties
+            console.log('🔥 IMMEDIATE SANITIZATION - Starting...');
+            if (tldrawData.store && typeof tldrawData.store === 'object') {
+              console.log('🔥 SANITIZING STORE OBJECT...');
+              Object.keys(tldrawData.store).forEach(key => {
+                const record = tldrawData.store[key];
+                if (record && record.type === 'text' && record.props) {
+                  console.log(`🔥 SANITIZING TEXT SHAPE: ${record.id}`);
+                  const originalProps = Object.keys(record.props);
+                  console.log(`🔥 ORIGINAL PROPS: ${originalProps.join(', ')}`);
+                  
+                  // Remove all deprecated properties
+                  delete record.props.w;
+                  delete record.props.h;
+                  delete record.props.align;
+                  delete record.props.verticalAlign;
+                  delete record.props.autoSize;
+                  delete record.props.text;
+                  delete record.props.handles;
+                  
+                  const finalProps = Object.keys(record.props);
+                  console.log(`🔥 FINAL PROPS: ${finalProps.join(', ')}`);
+                }
+              });
+              console.log('🔥 IMMEDIATE SANITIZATION - Complete');
+            }
             
             console.log('Parsed .tldr file structure:');
             console.log('- tldrawFileFormatVersion:', tldrawData.tldrawFileFormatVersion);
