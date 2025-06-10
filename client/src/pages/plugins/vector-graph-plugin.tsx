@@ -390,53 +390,72 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             
             console.log('Snapshot data to load:', snapshotData);
             
-            // Load the snapshot into the editor with comprehensive error handling
+            // Load content safely without breaking the editor state
             try {
-              // Clear the store first to avoid conflicts
-              editorInstance.store.clear();
+              console.log('Loading .tldr content safely...');
               
-              // Method 1: Try direct store loading
               if (snapshotData.store && typeof snapshotData.store === 'object') {
-                console.log('Attempting direct store loading...');
                 const records = Object.values(snapshotData.store);
+                console.log('Found', records.length, 'records to load');
                 
-                // Load records in batches to avoid overwhelming the store
-                for (let i = 0; i < records.length; i += 10) {
-                  const batch = records.slice(i, i + 10);
+                // Only load shapes and assets - leave system records untouched
+                const contentTypes = ['shape', 'asset'];
+                const safeRecords = records.filter((record: any) => 
+                  record && record.typeName && contentTypes.includes(record.typeName)
+                );
+                
+                console.log('Safe content records to load:', safeRecords.length);
+                
+                if (safeRecords.length > 0) {
+                  // Clear existing shapes to make room for new content
+                  const existingShapes = editorInstance.getShapes();
+                  if (existingShapes.length > 0) {
+                    console.log('Clearing existing shapes:', existingShapes.length);
+                    editorInstance.deleteShapes(existingShapes.map(s => s.id));
+                  }
+                  
+                  // Load new content records
                   try {
-                    editorInstance.store.put(batch);
-                  } catch (batchError) {
-                    console.warn('Batch loading failed, trying individual records:', batchError);
-                    // Try loading each record individually
-                    batch.forEach((record: any) => {
+                    editorInstance.store.put(safeRecords);
+                    console.log('Content loaded successfully');
+                  } catch (contentError) {
+                    console.warn('Batch load failed, trying individual records:', contentError);
+                    // Load individually
+                    let successCount = 0;
+                    safeRecords.forEach((record: any) => {
                       try {
-                        if (record && record.id && record.typeName) {
-                          editorInstance.store.put([record]);
-                        }
+                        editorInstance.store.put([record]);
+                        successCount++;
                       } catch (recordError) {
                         console.warn('Could not load record:', record?.id, recordError);
                       }
                     });
+                    console.log(`Loaded ${successCount}/${safeRecords.length} records individually`);
                   }
+                } else {
+                  console.warn('No compatible content found in .tldr file');
                 }
                 
-                console.log('Store loaded successfully with', records.length, 'records');
+                // Zoom to fit the new content
+                setTimeout(() => {
+                  try {
+                    const shapes = editorInstance.getShapes();
+                    if (shapes.length > 0) {
+                      editorInstance.zoomToFit();
+                      console.log('Zoomed to fit new content');
+                    }
+                  } catch (zoomError) {
+                    console.warn('Could not zoom to fit:', zoomError);
+                  }
+                }, 200);
+                
               } else {
                 throw new Error('Invalid store data structure');
               }
               
-              // Force a camera reset to make sure content is visible
-              setTimeout(() => {
-                try {
-                  editorInstance.zoomToFit();
-                } catch (zoomError) {
-                  console.warn('Could not zoom to fit:', zoomError);
-                }
-              }, 100);
-              
             } catch (loadError) {
-              console.error('Error loading snapshot:', loadError);
-              throw new Error('Não foi possível carregar o arquivo .tldr');
+              console.error('Error loading .tldr content:', loadError);
+              throw new Error('Não foi possível carregar o conteúdo do arquivo .tldr');
             }
             
             toast({
