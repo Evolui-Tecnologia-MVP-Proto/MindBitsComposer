@@ -3,20 +3,115 @@ import { Tldraw, TldrawProps } from 'tldraw';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, Image as ImageIcon, FileImage, ImagePlus } from 'lucide-react';
+import { Upload, Image as ImageIcon, FileImage, ImagePlus, Save } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 import 'tldraw/tldraw.css';
 
 interface VectorGraphPluginProps {
   onDataExchange?: (data: any) => void;
   globalAssets?: any[];
   documentArtifacts?: any[];
+  selectedEdition?: any;
 }
 
-const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, globalAssets = [], documentArtifacts = [] }) => {
+const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, globalAssets = [], documentArtifacts = [], selectedEdition }) => {
   const [showImageModal, setShowImageModal] = useState(false);
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
   
+  const handleSaveToAssets = useCallback(async () => {
+    try {
+      if (!editorInstance) {
+        toast({
+          title: "Erro",
+          description: "Editor não está disponível",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Export as PNG
+      const pngBlob = await editorInstance.exportAsPng();
+      if (!pngBlob) {
+        toast({
+          title: "Erro",
+          description: "Não foi possível exportar a imagem",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Convert blob to base64
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const base64Data = reader.result as string;
+          const pngData = base64Data.split(',')[1]; // Remove data:image/png;base64,
+
+          // Get tldraw snapshot for metadata
+          const snapshot = editorInstance.store.getSnapshot();
+          
+          // Create filename with timestamp
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+          const filename = `vector-graph-${timestamp}.png`;
+
+          // Prepare the artifact data
+          const artifactData = {
+            documentoId: selectedEdition?.documentId,
+            name: filename,
+            fileName: filename,
+            fileData: pngData,
+            fileSize: pngBlob.size.toString(),
+            mimeType: 'image/png',
+            type: 'image/png',
+            originAssetId: "Graph_TLD",
+            fileMetadata: JSON.stringify(snapshot),
+            isImage: 'true'
+          };
+
+          // Save to My Assets via API
+          if (!selectedEdition?.documentId) {
+            throw new Error('Documento não selecionado');
+          }
+
+          const response = await fetch(`/api/documentos/${selectedEdition.documentId}/artifacts`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(artifactData)
+          });
+
+          if (response.ok) {
+            toast({
+              title: "Sucesso",
+              description: "Imagem salva em Meus Assets",
+            });
+          } else {
+            throw new Error('Falha ao salvar');
+          }
+        } catch (error) {
+          console.error('Erro ao salvar:', error);
+          toast({
+            title: "Erro",
+            description: "Falha ao salvar a imagem",
+            variant: "destructive"
+          });
+        }
+      };
+      
+      reader.readAsDataURL(pngBlob);
+    } catch (error) {
+      console.error('Erro ao salvar imagem:', error);
+      toast({
+        title: "Erro",
+        description: "Falha ao processar a imagem",
+        variant: "destructive"
+      });
+    }
+  }, [editorInstance, toast]);
+
   const handleExport = useCallback(async () => {
     try {
       // Get the editor instance from tldraw
@@ -208,6 +303,14 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           >
             <ImagePlus className="w-3 h-3" />
             Inserir Imagem
+          </button>
+          <button
+            onClick={handleSaveToAssets}
+            className="px-3 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors flex items-center gap-1"
+            title="Salvar em Meus Assets"
+          >
+            <Save className="w-3 h-3" />
+            Salvar
           </button>
           <button
             onClick={handleExport}
