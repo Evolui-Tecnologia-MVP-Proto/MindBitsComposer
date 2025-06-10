@@ -22,6 +22,65 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
   const [fileName, setFileName] = useState('vector-graph');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Function to sanitize tldraw snapshot data by removing deprecated properties
+  const sanitizeSnapshotData = useCallback((store: any) => {
+    const sanitizedStore = { ...store };
+    
+    Object.keys(sanitizedStore).forEach(key => {
+      const record = sanitizedStore[key];
+      if (record && typeof record === 'object') {
+        // Remove deprecated properties from different shape types
+        if (record.type === 'shape') {
+          const shape = { ...record };
+          
+          // Remove deprecated properties based on shape type
+          if (shape.props) {
+            const props = { ...shape.props };
+            
+            // Remove deprecated text properties from geo shapes
+            if (shape.typeName === 'geo' || (shape.type && shape.type.includes('geo'))) {
+              console.log('Removing deprecated property \'text\' from geo shape');
+              console.log('Removing deprecated property \'verticalAlign\' from geo shape');
+              delete props.text;
+              delete props.verticalAlign;
+            }
+            
+            // Remove deprecated text properties from text shapes
+            if (shape.typeName === 'text' || (shape.type && shape.type.includes('text'))) {
+              console.log('Removing deprecated property \'align\' from text shape');
+              console.log('Removing deprecated property \'autoSize\' from text shape');
+              console.log('Removing deprecated property \'w\' from text shape');
+              console.log('Removing deprecated property \'text\' from text shape');
+              delete props.align;
+              delete props.autoSize;
+              delete props.w;
+              delete props.text;
+            }
+            
+            // Remove deprecated note properties
+            if (shape.typeName === 'note' || (shape.type && shape.type.includes('note'))) {
+              console.log('Removing deprecated property \'text\' from note shape');
+              delete props.text;
+            }
+            
+            // Remove deprecated line properties
+            if (shape.typeName === 'line' || (shape.type && shape.type.includes('line'))) {
+              console.log('Removing deprecated property \'handles\' from line shape');
+              delete props.handles;
+            }
+            
+            shape.props = props;
+          }
+          
+          sanitizedStore[key] = shape;
+        }
+      }
+    });
+    
+    console.log('Sanitization complete. Removed deprecated properties from shapes.');
+    return sanitizedStore;
+  }, []);
   
   const handleSaveToAssets = useCallback(async () => {
     try {
@@ -446,10 +505,18 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               if (snapshotData && snapshotData.store) {
                 console.log('Loading snapshot with store data...');
                 
+                // Sanitize data before loading to remove deprecated properties
+                const sanitizedStore = sanitizeSnapshotData(snapshotData.store);
+                console.log('Store size after sanitization:', Object.keys(sanitizedStore).length);
+                
                 // Use store.loadSnapshot for proper tldraw loading
-                editorInstance.store.loadSnapshot(snapshotData.store);
+                editorInstance.store.loadSnapshot(sanitizedStore);
                 
                 console.log('Content loaded successfully');
+                console.log('Store size after load:', editorInstance.store.allRecords().length);
+                console.log('Number of shapes loaded:', editorInstance.getCurrentPageShapeIds().size);
+                console.log('Sample shapes:', Array.from(editorInstance.getCurrentPageShapeIds()).slice(0, 3).map(id => ({ id, type: editorInstance.getShape(id)?.type })));
+                console.log('Current page shapes:', editorInstance.getCurrentPageShapeIds().size);
                 
                 // Zoom to fit the loaded content after a delay
                 setTimeout(() => {
