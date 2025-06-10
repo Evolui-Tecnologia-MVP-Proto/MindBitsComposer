@@ -505,9 +505,22 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             
             let tldrawData;
             try {
-              tldrawData = JSON.parse(fileContent);
+              const rawData = JSON.parse(fileContent);
               console.log('🔥 JSON PARSE SUCCESS');
-              console.log('🔥 PARSED DATA TOP LEVEL KEYS:', Object.keys(tldrawData));
+              console.log('🔥 PARSED DATA TOP LEVEL KEYS:', Object.keys(rawData));
+              
+              // IMMEDIATE DEEP SANITIZATION
+              tldrawData = JSON.parse(JSON.stringify(rawData, (key, value) => {
+                // Remove deprecated properties during JSON stringification
+                if (key === 'w' || key === 'h' || key === 'align' || key === 'verticalAlign' || 
+                    key === 'autoSize' || key === 'text' || key === 'handles') {
+                  console.log(`🔥 REMOVING DEPRECATED KEY: ${key}`);
+                  return undefined; // This removes the property
+                }
+                return value;
+              }));
+              
+              console.log('🔥 DEEP SANITIZATION COMPLETE');
             } catch (parseError) {
               console.error('🔥 JSON PARSE ERROR:', parseError);
               throw parseError;
