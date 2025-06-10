@@ -672,7 +672,7 @@ export default function LexicalPage() {
 
   // Mutation para excluir artifact do documento
   const deleteMyAssetMutation = useMutation({
-    mutationFn: (artifactId: string) => apiRequest(`/api/artifacts/${artifactId}`, "DELETE"),
+    mutationFn: (artifactId: string) => apiRequest("DELETE", `/api/artifacts/${artifactId}`),
     onSuccess: () => {
       if (selectedEdition) {
         queryClient.invalidateQueries({ queryKey: [`/api/documentos/${selectedEdition.documentId}/artifacts`] });
