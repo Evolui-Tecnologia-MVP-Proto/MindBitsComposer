@@ -61,6 +61,11 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
         description: "O diagrama foi salvo em My Assets com sucesso.",
       });
       setDiagramName(''); // Clear the name field
+      
+      // Close the modal by calling onDataExchange with close signal
+      if (onDataExchange) {
+        onDataExchange({ action: 'close' });
+      }
     },
     onError: (error: any) => {
       toast({
@@ -303,7 +308,7 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
           </div>
           
           {/* Save controls */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mr-5">
             <Input
               type="text"
               placeholder="Nome do diagrama..."
