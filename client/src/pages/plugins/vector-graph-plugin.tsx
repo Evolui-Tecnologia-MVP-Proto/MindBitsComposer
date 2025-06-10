@@ -352,6 +352,36 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     if (!editorInstance) return;
 
     try {
+      // Check if this is a tldraw file with metadata
+      if (asset.originAssetId === "Graph_TLD" && asset.fileMetadata) {
+        console.log('Loading tldraw file with metadata...');
+        try {
+          // Parse the stored tldraw snapshot
+          const snapshot = JSON.parse(asset.fileMetadata);
+          console.log('Parsed snapshot:', snapshot);
+          
+          // Load the snapshot into the editor
+          editorInstance.store.loadSnapshot(snapshot);
+          
+          toast({
+            title: "Sucesso",
+            description: `Arquivo tldraw "${asset.name}" carregado com sucesso`,
+          });
+          
+          setShowImageModal(false);
+          return;
+        } catch (parseError) {
+          console.error('Erro ao carregar snapshot tldraw:', parseError);
+          toast({
+            title: "Erro",
+            description: "Erro ao carregar dados do arquivo tldraw",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+
+      // For regular images (non-tldraw files)
       // Convert base64 to data URL if needed
       const src = asset.fileData.startsWith('data:') 
         ? asset.fileData 
@@ -411,10 +441,10 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           <button
             onClick={() => setShowImageModal(true)}
             className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors flex items-center gap-1"
-            title="Inserir Imagem"
+            title="Carregar arquivo ou inserir imagem"
           >
             <ImagePlus className="w-3 h-3" />
-            Inserir Imagem
+            Carregar/Inserir
           </button>
           <button
             onClick={handleSaveToAssets}
@@ -521,30 +551,82 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
 
             <TabsContent value="document" className="space-y-4">
               <div className="max-h-96 overflow-y-auto">
-                {documentArtifacts.filter(artifact => artifact.originAssetId === "Uploaded").length === 0 ? (
+                {documentArtifacts.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     Nenhum asset do documento disponível
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {documentArtifacts
-                      .filter(artifact => artifact.originAssetId === "Uploaded")
-                      .map((artifact: any) => (
-                        <div
-                          key={artifact.id}
-                          className="border rounded-lg p-3 cursor-pointer hover:bg-gray-50 transition-colors"
-                          onClick={() => handleAssetSelect(artifact)}
-                        >
-                          <div className="aspect-square bg-gray-100 rounded mb-2 overflow-hidden">
-                            <img
-                              src={artifact.fileData.startsWith('data:') ? artifact.fileData : `data:image/png;base64,${artifact.fileData}`}
-                              alt={artifact.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <p className="text-xs text-gray-600 truncate">{artifact.name}</p>
+                  <div className="space-y-4">
+                    {/* Separar arquivos tldraw dos outros */}
+                    {documentArtifacts.filter(artifact => artifact.originAssetId === "Graph_TLD").length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-medium mb-3 text-blue-700 flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/>
+                          </svg>
+                          Arquivos tldraw (clique para carregar)
+                        </h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                          {documentArtifacts
+                            .filter(artifact => artifact.originAssetId === "Graph_TLD")
+                            .map((artifact: any) => (
+                              <div
+                                key={artifact.id}
+                                className="border-2 border-blue-200 rounded-lg p-3 cursor-pointer hover:bg-blue-50 transition-colors bg-blue-25"
+                                onClick={() => handleAssetSelect(artifact)}
+                              >
+                                <div className="aspect-square bg-gray-100 rounded mb-2 overflow-hidden">
+                                  <img
+                                    src={artifact.fileData.startsWith('data:') ? artifact.fileData : `data:image/png;base64,${artifact.fileData}`}
+                                    alt={artifact.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <p className="text-xs text-center truncate text-blue-700 font-medium" title={artifact.name}>
+                                  {artifact.name}
+                                </p>
+                                <div className="text-center mt-1">
+                                  <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
+                                    tldraw
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
                         </div>
-                      ))}
+                      </div>
+                    )}
+
+                    {/* Outros arquivos de imagem */}
+                    {documentArtifacts.filter(artifact => artifact.originAssetId === "Uploaded").length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-medium mb-3 text-gray-700 flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/>
+                          </svg>
+                          Outras imagens (inserir como shape)
+                        </h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                          {documentArtifacts
+                            .filter(artifact => artifact.originAssetId === "Uploaded")
+                            .map((artifact: any) => (
+                              <div
+                                key={artifact.id}
+                                className="border rounded-lg p-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                                onClick={() => handleAssetSelect(artifact)}
+                              >
+                                <div className="aspect-square bg-gray-100 rounded mb-2 overflow-hidden">
+                                  <img
+                                    src={artifact.fileData.startsWith('data:') ? artifact.fileData : `data:image/png;base64,${artifact.fileData}`}
+                                    alt={artifact.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <p className="text-xs text-gray-600 truncate">{artifact.name}</p>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
