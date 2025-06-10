@@ -1860,7 +1860,7 @@ export default function LexicalPage() {
                                   </p>
                                   <div className="flex items-center gap-2 mt-2">
                                     <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
-                                      Global
+                                      {asset.editor || asset.type || 'Global'}
                                     </Badge>
                                     {asset.fileSize && (
                                       <span className="text-xs text-gray-500">
