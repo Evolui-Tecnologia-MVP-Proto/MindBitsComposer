@@ -120,7 +120,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         editorInstance.createAssets([imageAsset]);
         
         // Create image shape
-        const shapeId = `shape_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const shapeId = `shape:${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         const center = editorInstance.getViewportPageBounds().center;
         editorInstance.createShapes([{
           id: shapeId,
@@ -173,7 +173,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
       const viewportCenter = editorInstance.getViewportPageBounds().center;
       
       // Create the shape on screen with proper ID
-      const shapeId = `shape_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const shapeId = `shape:${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       editorInstance.createShapes([{
         id: shapeId,
         type: 'image',
