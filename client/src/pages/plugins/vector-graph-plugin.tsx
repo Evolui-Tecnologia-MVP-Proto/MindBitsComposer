@@ -666,7 +666,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                 <ImageIcon className="w-4 h-4 mr-2" />
                 Global Assets
               </TabsTrigger>
-              <TabsTrigger value="document">
+              <TabsTrigger value="document" disabled={!selectedEdition}>
                 <FileImage className="w-4 h-4 mr-2" />
                 My Assets
               </TabsTrigger>
