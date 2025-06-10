@@ -126,23 +126,17 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           
           if (!documentId) {
             // Save to Global Assets when no composer document is selected
-            const globalAssetData = {
-              name: filename,
-              fileData: pngData,
-              fileSize: pngBlob.size.toString(),
-              mimeType: 'image/png',
-              isImage: 'true',
-              description: 'Gráfico vetorial gerado com tldraw'
-            };
+            const formData = new FormData();
+            formData.append('file', pngBlob, filename);
+            formData.append('name', filename.replace('.png', ''));
+            formData.append('type', 'image');
+            formData.append('description', 'Gráfico vetorial gerado com tldraw');
 
-            console.log('Saving to Global Assets:', globalAssetData);
+            console.log('Saving to Global Assets:', filename);
             
             const response = await fetch('/api/global-assets', {
               method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(globalAssetData),
+              body: formData,
               credentials: 'include'
             });
 
