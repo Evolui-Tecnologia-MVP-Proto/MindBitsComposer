@@ -147,11 +147,31 @@ function ImageEventListenerPlugin(): JSX.Element | null {
         if ($isRangeSelection(selection)) {
           console.log('✅ Range selection confirmed, creating table...');
           
-          // Create table with 1 row and 2 columns
+          // Create table with 2 rows and 2 columns (header + content)
           const table = $createTableNode();
           
-          // Create row
-          const tableRow = $createTableRowNode();
+          // Create header row
+          const headerRow = $createTableRowNode();
+          
+          // Header cell 1: "Diagrama"
+          const headerCell1 = $createTableCellNode(1); // 1 indicates header cell
+          const headerText1 = $createTextNode('Diagrama');
+          const headerParagraph1 = $createParagraphNode();
+          headerParagraph1.append(headerText1);
+          headerCell1.append(headerParagraph1);
+          
+          // Header cell 2: "Semantica"
+          const headerCell2 = $createTableCellNode(1); // 1 indicates header cell
+          const headerText2 = $createTextNode('Semantica');
+          const headerParagraph2 = $createParagraphNode();
+          headerParagraph2.append(headerText2);
+          headerCell2.append(headerParagraph2);
+          
+          // Add header cells to header row
+          headerRow.append(headerCell1, headerCell2);
+          
+          // Create content row
+          const contentRow = $createTableRowNode();
           
           // First column: Image
           const imageCell = $createTableCellNode(0);
@@ -190,13 +210,13 @@ function ImageEventListenerPlugin(): JSX.Element | null {
           
           console.log('📝 Created code node with text:', mermaidCode);
           
-          // Add cells to row
-          tableRow.append(imageCell, codeCell);
+          // Add cells to content row
+          contentRow.append(imageCell, codeCell);
           
-          // Add row to table
-          table.append(tableRow);
+          // Add both rows to table (header first, then content)
+          table.append(headerRow, contentRow);
           
-          console.log('📋 Table structure created, inserting into document...');
+          console.log('📋 Table structure created with header, inserting into document...');
           
           // Insert table into document
           $insertNodes([table]);
