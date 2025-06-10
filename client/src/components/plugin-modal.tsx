@@ -14,6 +14,8 @@ interface PluginModalProps {
   onDataExchange?: (data: any) => void;
   onImageExport?: (imageUrl: string) => void;
   selectedEdition?: any;
+  globalAssets?: any[];
+  documentArtifacts?: any[];
 }
 
 const PLUGIN_COMPONENTS: Record<string, React.ComponentType<any>> = {
@@ -30,7 +32,9 @@ export default function PluginModal({
   plugin,
   onDataExchange,
   onImageExport,
-  selectedEdition
+  selectedEdition,
+  globalAssets = [],
+  documentArtifacts = []
 }: PluginModalProps) {
   // Determinar o nome do plugin a partir do objeto plugin ou do pluginName
   const actualPluginName = plugin?.pageName || pluginName || "";
