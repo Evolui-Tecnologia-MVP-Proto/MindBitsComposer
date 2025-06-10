@@ -29,6 +29,11 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     let shapesProcessed = 0;
     let deprecatedPropsRemoved = 0;
     
+    // List of all deprecated properties to remove
+    const deprecatedProperties = [
+      'text', 'verticalAlign', 'align', 'autoSize', 'w', 'h', 'handles'
+    ];
+    
     Object.keys(sanitizedStore).forEach(key => {
       const record = sanitizedStore[key];
       if (record && typeof record === 'object') {
@@ -39,75 +44,79 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           
           // Remove deprecated properties based on shape type
           if (shape.props) {
-            const props = { ...shape.props };
+            const originalProps = { ...shape.props };
+            const cleanProps = { ...shape.props };
             let propsRemoved = false;
             
-            // Remove deprecated text properties from geo shapes
-            if (shape.type === 'geo') {
-              if (props.text !== undefined) {
-                console.log('Removing deprecated property \'text\' from geo shape');
-                delete props.text;
+            // Remove all deprecated properties regardless of shape type
+            deprecatedProperties.forEach(prop => {
+              if (cleanProps[prop] !== undefined) {
+                console.log(`Removing deprecated property '${prop}' from ${shape.type} shape (${shape.id})`);
+                delete cleanProps[prop];
                 propsRemoved = true;
               }
-              if (props.verticalAlign !== undefined) {
-                console.log('Removing deprecated property \'verticalAlign\' from geo shape');
-                delete props.verticalAlign;
-                propsRemoved = true;
-              }
-              if (props.align !== undefined) {
-                console.log('Removing deprecated property \'align\' from geo shape');
-                delete props.align;
-                propsRemoved = true;
-              }
-            }
+            });
             
-            // Remove deprecated text properties from text shapes
+            // Special handling for text shapes - ensure specific properties are preserved
             if (shape.type === 'text') {
-              if (props.align !== undefined) {
-                console.log('Removing deprecated property \'align\' from text shape');
-                delete props.align;
-                propsRemoved = true;
-              }
-              if (props.autoSize !== undefined) {
-                console.log('Removing deprecated property \'autoSize\' from text shape');
-                delete props.autoSize;
-                propsRemoved = true;
-              }
-              if (props.w !== undefined) {
-                console.log('Removing deprecated property \'w\' from text shape');
-                delete props.w;
-                propsRemoved = true;
-              }
-              if (props.text !== undefined) {
-                console.log('Removing deprecated property \'text\' from text shape');
-                delete props.text;
-                propsRemoved = true;
-              }
+              // Keep only essential text properties
+              const allowedTextProps = {
+                color: originalProps.color,
+                size: originalProps.size,
+                font: originalProps.font,
+                textAlign: originalProps.textAlign,
+                scale: originalProps.scale,
+                richText: originalProps.richText
+              };
+              
+              // Clear all props and add back only allowed ones
+              Object.keys(cleanProps).forEach(prop => {
+                if (!allowedTextProps.hasOwnProperty(prop)) {
+                  delete cleanProps[prop];
+                  propsRemoved = true;
+                }
+              });
+              
+              // Add back allowed properties
+              Object.assign(cleanProps, allowedTextProps);
             }
             
-            // Remove deprecated note properties
-            if (shape.type === 'note') {
-              if (props.text !== undefined) {
-                console.log('Removing deprecated property \'text\' from note shape');
-                delete props.text;
-                propsRemoved = true;
-              }
-            }
-            
-            // Remove deprecated line properties
-            if (shape.type === 'line') {
-              if (props.handles !== undefined) {
-                console.log('Removing deprecated property \'handles\' from line shape');
-                delete props.handles;
-                propsRemoved = true;
-              }
+            // Special handling for geo shapes
+            if (shape.type === 'geo') {
+              // Keep only essential geo properties
+              const allowedGeoProps = {
+                w: originalProps.w,
+                h: originalProps.h,
+                geo: originalProps.geo,
+                color: originalProps.color,
+                labelColor: originalProps.labelColor,
+                fill: originalProps.fill,
+                dash: originalProps.dash,
+                size: originalProps.size,
+                font: originalProps.font,
+                growY: originalProps.growY,
+                url: originalProps.url,
+                scale: originalProps.scale,
+                richText: originalProps.richText
+              };
+              
+              // Clear deprecated props and add back allowed ones
+              Object.keys(cleanProps).forEach(prop => {
+                if (!allowedGeoProps.hasOwnProperty(prop)) {
+                  delete cleanProps[prop];
+                  propsRemoved = true;
+                }
+              });
+              
+              // Add back allowed properties
+              Object.assign(cleanProps, allowedGeoProps);
             }
             
             if (propsRemoved) {
               deprecatedPropsRemoved++;
             }
             
-            shape.props = props;
+            shape.props = cleanProps;
           }
           
           sanitizedStore[key] = shape;
@@ -115,7 +124,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
       }
     });
     
-    console.log(`Sanitization complete. Processed ${shapesProcessed} shapes, removed deprecated properties from ${deprecatedPropsRemoved} shapes.`);
+    console.log(`Sanitization complete. Processed ${shapesProcessed} shapes, cleaned ${deprecatedPropsRemoved} shapes.`);
     return sanitizedStore;
   }, []);
   
