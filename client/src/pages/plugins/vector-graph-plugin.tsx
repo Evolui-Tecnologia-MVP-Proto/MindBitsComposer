@@ -354,8 +354,90 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             
             console.log('Parsed .tldr file:', tldrawData);
             
-            // Load the snapshot into the editor
-            editorInstance.store.loadSnapshot(tldrawData);
+            // Handle different tldraw file formats
+            let snapshotData;
+            
+            if (tldrawData.tldrawFileFormatVersion && tldrawData.records) {
+              // New format (v1+) - records array format
+              console.log('Loading new format .tldr file with records array');
+              snapshotData = {
+                store: tldrawData.records.reduce((acc: any, record: any) => {
+                  acc[record.id] = record;
+                  return acc;
+                }, {}),
+                schema: tldrawData.schema || {}
+              };
+            } else if (tldrawData.store) {
+              // Middle format - store object format
+              console.log('Loading middle format .tldr file with store object');
+              snapshotData = tldrawData;
+            } else if (Array.isArray(tldrawData)) {
+              // Legacy format - direct records array
+              console.log('Loading legacy format .tldr file with direct records array');
+              snapshotData = {
+                store: tldrawData.reduce((acc: any, record: any) => {
+                  acc[record.id] = record;
+                  return acc;
+                }, {})
+              };
+            } else if (typeof tldrawData === 'object' && Object.keys(tldrawData).length > 0) {
+              // Try to detect if it's already a store format
+              console.log('Loading assumed store format .tldr file');
+              snapshotData = { store: tldrawData };
+            } else {
+              throw new Error('Formato de arquivo .tldr não reconhecido');
+            }
+            
+            console.log('Snapshot data to load:', snapshotData);
+            
+            // Load the snapshot into the editor with comprehensive error handling
+            try {
+              // Clear the store first to avoid conflicts
+              editorInstance.store.clear();
+              
+              // Method 1: Try direct store loading
+              if (snapshotData.store && typeof snapshotData.store === 'object') {
+                console.log('Attempting direct store loading...');
+                const records = Object.values(snapshotData.store);
+                
+                // Load records in batches to avoid overwhelming the store
+                for (let i = 0; i < records.length; i += 10) {
+                  const batch = records.slice(i, i + 10);
+                  try {
+                    editorInstance.store.put(batch);
+                  } catch (batchError) {
+                    console.warn('Batch loading failed, trying individual records:', batchError);
+                    // Try loading each record individually
+                    batch.forEach((record: any) => {
+                      try {
+                        if (record && record.id && record.typeName) {
+                          editorInstance.store.put([record]);
+                        }
+                      } catch (recordError) {
+                        console.warn('Could not load record:', record?.id, recordError);
+                      }
+                    });
+                  }
+                }
+                
+                console.log('Store loaded successfully with', records.length, 'records');
+              } else {
+                throw new Error('Invalid store data structure');
+              }
+              
+              // Force a camera reset to make sure content is visible
+              setTimeout(() => {
+                try {
+                  editorInstance.zoomToFit();
+                } catch (zoomError) {
+                  console.warn('Could not zoom to fit:', zoomError);
+                }
+              }, 100);
+              
+            } catch (loadError) {
+              console.error('Error loading snapshot:', loadError);
+              throw new Error('Não foi possível carregar o arquivo .tldr');
+            }
             
             toast({
               title: "Sucesso",
