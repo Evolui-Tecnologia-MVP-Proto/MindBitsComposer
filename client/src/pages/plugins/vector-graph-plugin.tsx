@@ -31,9 +31,22 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         return;
       }
 
-      // Export as PNG
+      // Export as PNG using correct tldraw v3.13.1 API
       console.log('Starting PNG export...');
-      const pngBlob = await editorInstance.exportAsPng();
+      console.log('Editor instance methods:', Object.getOwnPropertyNames(editorInstance));
+      
+      // Use the correct export method for tldraw v3.13.1
+      const shapeIds = Array.from(editorInstance.getCurrentPageShapeIds());
+      console.log('Shape IDs to export:', shapeIds);
+      
+      if (shapeIds.length === 0) {
+        throw new Error('Nenhum conteúdo para exportar. Desenhe algo antes de salvar.');
+      }
+      
+      const pngBlob = await editorInstance.exportAs(shapeIds, 'png', {
+        scale: 1,
+        background: true
+      });
       console.log('PNG export result:', pngBlob ? 'Success' : 'Failed');
       
       if (!pngBlob) {
