@@ -393,74 +393,80 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               throw new Error('Formato de arquivo .tldr não reconhecido');
             }
             
-            console.log('Snapshot data to load:', snapshotData);
+            console.log('Snapshot data to load:');
+            console.log('- snapshotData.store exists:', !!snapshotData.store);
+            console.log('- snapshotData.store keys:', snapshotData.store ? Object.keys(snapshotData.store).length : 0);
             
-            // Load content safely without breaking the editor state
+            // Log a few sample records to understand structure
+            if (snapshotData.store) {
+              const sampleRecords = Object.values(snapshotData.store).slice(0, 3);
+              console.log('Sample records:', sampleRecords);
+            }
+            
+            // Simple and direct content loading
             try {
-              console.log('Loading .tldr content safely...');
+              console.log('Loading .tldr content directly...');
               
               if (snapshotData.store && typeof snapshotData.store === 'object') {
                 const records = Object.values(snapshotData.store);
-                console.log('Found', records.length, 'records to load');
+                console.log('Total records found:', records.length);
                 
-                // Only load shapes and assets - leave system records untouched
-                const contentTypes = ['shape', 'asset'];
-                const safeRecords = records.filter((record: any) => 
-                  record && record.typeName && contentTypes.includes(record.typeName)
+                // Find shapes only (the visual content we want to import)
+                const shapes = records.filter((record: any) => 
+                  record && record.typeName === 'shape'
                 );
                 
-                console.log('Safe content records to load:', safeRecords.length);
+                console.log('Shape records to import:', shapes.length);
                 
-                if (safeRecords.length > 0) {
-                  // Clear existing shapes to make room for new content
-                  const existingShapes = editorInstance.getShapes();
-                  if (existingShapes.length > 0) {
-                    console.log('Clearing existing shapes:', existingShapes.length);
-                    editorInstance.deleteShapes(existingShapes.map(s => s.id));
+                if (shapes.length > 0) {
+                  // Clear existing content first
+                  const currentShapes = editorInstance.getShapes();
+                  if (currentShapes.length > 0) {
+                    console.log('Clearing', currentShapes.length, 'existing shapes');
+                    editorInstance.deleteShapes(currentShapes.map((s: any) => s.id));
                   }
                   
-                  // Load new content records
-                  try {
-                    editorInstance.store.put(safeRecords);
-                    console.log('Content loaded successfully');
-                  } catch (contentError) {
-                    console.warn('Batch load failed, trying individual records:', contentError);
-                    // Load individually
-                    let successCount = 0;
-                    safeRecords.forEach((record: any) => {
-                      try {
-                        editorInstance.store.put([record]);
-                        successCount++;
-                      } catch (recordError) {
-                        console.warn('Could not load record:', record?.id, recordError);
-                      }
-                    });
-                    console.log(`Loaded ${successCount}/${safeRecords.length} records individually`);
-                  }
+                  // Import shapes one by one with error handling
+                  let imported = 0;
+                  shapes.forEach((shape: any, index: number) => {
+                    try {
+                      // Give each shape a new ID to avoid conflicts
+                      const newShape = {
+                        ...shape,
+                        id: `shape:imported_${Date.now()}_${index}`,
+                        parentId: 'page:page' // Ensure it's on the current page
+                      };
+                      
+                      editorInstance.store.put([newShape]);
+                      imported++;
+                    } catch (shapeError) {
+                      console.warn(`Failed to import shape ${index}:`, shapeError);
+                    }
+                  });
+                  
+                  console.log(`Successfully imported ${imported}/${shapes.length} shapes`);
+                  
+                  // Zoom to fit after a delay
+                  setTimeout(() => {
+                    try {
+                      editorInstance.zoomToFit();
+                    } catch (zoomError) {
+                      console.warn('Zoom failed:', zoomError);
+                    }
+                  }, 300);
+                  
                 } else {
-                  console.warn('No compatible content found in .tldr file');
+                  console.warn('No shapes found in .tldr file');
+                  throw new Error('Nenhum conteúdo visual encontrado no arquivo .tldr');
                 }
                 
-                // Zoom to fit the new content
-                setTimeout(() => {
-                  try {
-                    const shapes = editorInstance.getShapes();
-                    if (shapes.length > 0) {
-                      editorInstance.zoomToFit();
-                      console.log('Zoomed to fit new content');
-                    }
-                  } catch (zoomError) {
-                    console.warn('Could not zoom to fit:', zoomError);
-                  }
-                }, 200);
-                
               } else {
-                throw new Error('Invalid store data structure');
+                throw new Error('Estrutura de dados inválida no arquivo .tldr');
               }
               
             } catch (loadError) {
               console.error('Error loading .tldr content:', loadError);
-              throw new Error('Não foi possível carregar o conteúdo do arquivo .tldr');
+              throw loadError;
             }
             
             toast({
