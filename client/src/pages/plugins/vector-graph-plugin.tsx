@@ -524,6 +524,20 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             } else if (tldrawData.store) {
               // Middle format - store object format
               console.log('Loading middle format .tldr file with store object');
+              console.log('🔥 MIDDLE FORMAT - Store keys count:', Object.keys(tldrawData.store).length);
+              console.log('🔥 MIDDLE FORMAT - Sample shape with w property check...');
+              
+              // Log shapes with 'w' property to confirm the issue
+              Object.values(tldrawData.store).forEach((record: any, index) => {
+                if (record.type === 'text' && record.props && record.props.w !== undefined) {
+                  console.log(`🔥 FOUND TEXT SHAPE WITH W: ${record.id}`, {
+                    type: record.type,
+                    props: Object.keys(record.props),
+                    wValue: record.props.w
+                  });
+                }
+              });
+              
               snapshotData = tldrawData;
             } else if (Array.isArray(tldrawData)) {
               // Legacy format - direct records array
