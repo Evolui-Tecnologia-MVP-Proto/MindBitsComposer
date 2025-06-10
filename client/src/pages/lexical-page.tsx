@@ -1214,7 +1214,7 @@ export default function LexicalPage() {
           setSelectedTemplate(null); // Limpar template ao carregar documento
           setLoadedFileName(null); // Limpar arquivo carregado
           setSelectedEdition(null); // Limpar edition selecionada
-          setShowDocumentList(false);
+          setShowDocumentList(false); // Fechar painel esquerdo automaticamente
         },
         confirmText: "Continuar",
         cancelText: "Cancelar",
@@ -1227,7 +1227,7 @@ export default function LexicalPage() {
       setSelectedTemplate(null); // Limpar template ao carregar documento
       setLoadedFileName(null); // Limpar arquivo carregado
       setSelectedEdition(null); // Limpar edition selecionada
-      setShowDocumentList(false);
+      setShowDocumentList(false); // Fechar painel esquerdo automaticamente
     }
   };
 
@@ -1298,7 +1298,7 @@ export default function LexicalPage() {
       setEditorKey(prev => prev + 1);
     }
     
-    setShowDocumentList(false);
+    setShowDocumentList(false); // Fechar painel esquerdo automaticamente
   };
 
   const convertTemplateToContent = (structure: any): string => {
