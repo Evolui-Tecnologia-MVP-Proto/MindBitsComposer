@@ -32,8 +32,12 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
       }
 
       // Export as PNG
+      console.log('Starting PNG export...');
       const pngBlob = await editorInstance.exportAsPng();
+      console.log('PNG export result:', pngBlob ? 'Success' : 'Failed');
+      
       if (!pngBlob) {
+        console.error('PNG export failed - no blob returned');
         toast({
           title: "Erro",
           description: "Não foi possível exportar a imagem",
