@@ -352,7 +352,12 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             const fileContent = e.target?.result as string;
             const tldrawData = JSON.parse(fileContent);
             
-            console.log('Parsed .tldr file:', tldrawData);
+            console.log('Parsed .tldr file structure:');
+            console.log('- tldrawFileFormatVersion:', tldrawData.tldrawFileFormatVersion);
+            console.log('- schema:', tldrawData.schema ? 'present' : 'missing');
+            console.log('- records:', Array.isArray(tldrawData.records) ? `array with ${tldrawData.records.length} items` : 'not array');
+            console.log('- store:', tldrawData.store ? `object with ${Object.keys(tldrawData.store).length} keys` : 'missing');
+            console.log('- root keys:', Object.keys(tldrawData));
             
             // Handle different tldraw file formats
             let snapshotData;
@@ -466,9 +471,10 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             setShowImageModal(false);
           } catch (parseError) {
             console.error('Erro ao analisar arquivo .tldr:', parseError);
+            console.error('Conteúdo do arquivo:', e.target?.result ? String(e.target.result).substring(0, 500) : 'vazio');
             toast({
               title: "Erro",
-              description: "Arquivo .tldr inválido ou corrompido",
+              description: `Erro ao carregar arquivo .tldr: ${parseError instanceof Error ? parseError.message : 'Formato inválido'}`,
               variant: "destructive"
             });
           }
