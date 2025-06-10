@@ -2089,6 +2089,7 @@ export default function LexicalPage() {
           pluginName={selectedPlugin.name}
           plugin={selectedPlugin}
           onDataExchange={handlePluginDataExchange}
+          selectedEdition={selectedEdition}
         />
       )}
     </div>
