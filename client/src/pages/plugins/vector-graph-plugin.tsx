@@ -447,8 +447,24 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                 console.log('Loading snapshot with store data...');
                 console.log('Store size before load:', Object.keys(editorInstance.store.allRecords()).length);
                 
-                // Use the modern loadSnapshot function from tldraw
-                loadSnapshot(editorInstance.store, snapshotData.store);
+                // Try different loading approaches
+                try {
+                  console.log('Attempting to load with loadSnapshot function...');
+                  loadSnapshot(editorInstance.store, snapshotData.store);
+                } catch (loadSnapshotError) {
+                  console.warn('loadSnapshot failed, trying store.loadSnapshot:', loadSnapshotError);
+                  try {
+                    editorInstance.store.loadSnapshot(snapshotData.store);
+                  } catch (storeLoadError) {
+                    console.warn('store.loadSnapshot failed, trying manual record insertion:', storeLoadError);
+                    
+                    // Manual approach: put each record individually
+                    const records = Object.values(snapshotData.store);
+                    console.log('Manually inserting', records.length, 'records...');
+                    
+                    editorInstance.store.put(records);
+                  }
+                }
                 
                 console.log('Content loaded successfully');
                 console.log('Store size after load:', Object.keys(editorInstance.store.allRecords()).length);
