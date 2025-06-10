@@ -447,8 +447,8 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                 console.log('Loading snapshot with store data...');
                 console.log('Store size before load:', Object.keys(editorInstance.store.allRecords()).length);
                 
-                // Try to load only the shapes since tldraw compatibility is problematic
-                console.log('Attempting to extract and create shapes manually...');
+                // Simple manual creation approach
+                console.log('Creating shapes manually...');
                 
                 try {
                   const records = Object.values(snapshotData.store) as any[];
@@ -457,16 +457,85 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                   console.log(`Found ${shapes.length} shapes to create`);
                   
                   if (shapes.length > 0) {
-                    // Create shapes one by one using tldraw's createShape method
                     let createdCount = 0;
                     
                     for (const shape of shapes) {
-                      // Store text content before processing
                       const originalText = shape.props?.text;
                       
                       try {
-                        // Migrate old shape properties to new format
-                        const migratedProps = { ...shape.props };
+                        // For text shapes with content, convert to geo with text
+                        if (shape.type === 'text' && originalText) {
+                          const geoShape = {
+                            id: shape.id,
+                            type: 'geo',
+                            x: shape.x || 0,
+                            y: shape.y || 0,
+                            props: {
+                              geo: 'rectangle',
+                              text: originalText,
+                              w: Math.max(100, originalText.length * 8),
+                              h: 50,
+                              size: 'm',
+                              color: 'black'
+                            }
+                          };
+                          editorInstance.createShape(geoShape);
+                        } else {
+                          // For other shapes, clean up properties and create
+                          const cleanProps = { ...shape.props };
+                          
+                          // Remove problematic properties
+                          delete cleanProps.text;
+                          delete cleanProps.handles;
+                          delete cleanProps.align;
+                          delete cleanProps.verticalAlign;
+                          delete cleanProps.autoSize;
+                          delete cleanProps.w;
+                          delete cleanProps.h;
+                          
+                          // Add required properties for different shape types
+                          if (shape.type === 'geo') {
+                            cleanProps.geo = cleanProps.geo || 'rectangle';
+                            cleanProps.w = cleanProps.w || 100;
+                            cleanProps.h = cleanProps.h || 50;
+                          }
+                          
+                          const cleanShape = {
+                            id: shape.id,
+                            type: shape.type,
+                            x: shape.x || 0,
+                            y: shape.y || 0,
+                            props: cleanProps
+                          };
+                          
+                          editorInstance.createShape(cleanShape);
+                        }
+                        
+                        createdCount++;
+                        
+                      } catch (shapeError) {
+                        console.warn('Failed to create shape:', shape.id, shapeError);
+                        
+                        // Create simple fallback
+                        try {
+                          const fallbackShape = {
+                            id: shape.id + '_fallback',
+                            type: 'geo',
+                            x: shape.x || 0,
+                            y: shape.y || 0,
+                            props: {
+                              geo: 'rectangle',
+                              w: 100,
+                              h: 50
+                            }
+                          };
+                          editorInstance.createShape(fallbackShape);
+                          console.log('Created fallback shape for:', shape.id);
+                        } catch (fallbackError) {
+                          console.warn('Failed to create fallback shape:', fallbackError);
+                        }
+                      }
+                    }
                         
                         // Remove deprecated/incompatible properties
                         const deprecatedProps = ['handles', 'align', 'verticalAlign', 'autoSize'];
