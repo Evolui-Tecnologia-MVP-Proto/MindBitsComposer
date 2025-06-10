@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import LexicalEditor from "@/components/LexicalEditor";
 import SaveFileModal from "@/components/SaveFileModal";
 import { Button } from "@/components/ui/button";
@@ -273,6 +273,13 @@ export default function LexicalPage() {
     setIsPluginModalOpen(false);
     setSelectedPlugin(null);
   };
+
+  // useEffect para abrir painel quando há documentos composer disponíveis
+  useEffect(() => {
+    if (documentEditions && documentEditions.length > 0 && !showDocumentList) {
+      setShowDocumentList(true);
+    }
+  }, [documentEditions, showDocumentList]);
 
   // Função para receber dados do plugin
   const handlePluginDataExchange = (data: any) => {
