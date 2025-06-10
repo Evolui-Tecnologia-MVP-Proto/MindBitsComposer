@@ -473,6 +473,16 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                           deprecatedProps.push('w', 'h');
                         }
                         
+                        // For arrow shapes, handle start/end point structure changes
+                        if (shape.type === 'arrow') {
+                          if (migratedProps.start && migratedProps.start.type) {
+                            delete migratedProps.start.type;
+                          }
+                          if (migratedProps.end && migratedProps.end.type) {
+                            delete migratedProps.end.type;
+                          }
+                        }
+                        
                         deprecatedProps.forEach(prop => {
                           if (migratedProps[prop] !== undefined) {
                             console.log(`Removing deprecated property '${prop}' from ${shape.type} shape`);
