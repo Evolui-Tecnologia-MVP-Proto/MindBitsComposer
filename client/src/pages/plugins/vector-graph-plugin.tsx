@@ -403,70 +403,66 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               console.log('Sample records:', sampleRecords);
             }
             
-            // Simple and direct content loading
+            // Try using tldraw's native snapshot loading
             try {
-              console.log('Loading .tldr content directly...');
+              console.log('Loading .tldr content using native snapshot method...');
               
-              if (snapshotData.store && typeof snapshotData.store === 'object') {
-                const records = Object.values(snapshotData.store);
-                console.log('Total records found:', records.length);
+              // Use the editor's loadSnapshot method if available
+              if (editorInstance.loadSnapshot && snapshotData) {
+                console.log('Using loadSnapshot method');
+                editorInstance.loadSnapshot(snapshotData);
                 
-                // Find shapes only (the visual content we want to import)
-                const shapes = records.filter((record: any) => 
-                  record && record.typeName === 'shape'
-                );
-                
-                console.log('Shape records to import:', shapes.length);
-                
-                if (shapes.length > 0) {
-                  // Clear existing content first
-                  const currentShapes = editorInstance.getShapes();
-                  if (currentShapes.length > 0) {
-                    console.log('Clearing', currentShapes.length, 'existing shapes');
-                    editorInstance.deleteShapes(currentShapes.map((s: any) => s.id));
+                // Zoom to fit the loaded content
+                setTimeout(() => {
+                  try {
+                    editorInstance.zoomToFit();
+                    console.log('Content loaded and zoomed to fit');
+                  } catch (zoomError) {
+                    console.warn('Zoom failed:', zoomError);
                   }
-                  
-                  // Import shapes one by one with error handling
-                  let imported = 0;
-                  shapes.forEach((shape: any, index: number) => {
-                    try {
-                      // Give each shape a new ID to avoid conflicts
-                      const newShape = {
-                        ...shape,
-                        id: `shape:imported_${Date.now()}_${index}`,
-                        parentId: 'page:page' // Ensure it's on the current page
-                      };
-                      
-                      editorInstance.store.put([newShape]);
-                      imported++;
-                    } catch (shapeError) {
-                      console.warn(`Failed to import shape ${index}:`, shapeError);
-                    }
-                  });
-                  
-                  console.log(`Successfully imported ${imported}/${shapes.length} shapes`);
-                  
-                  // Zoom to fit after a delay
-                  setTimeout(() => {
-                    try {
-                      editorInstance.zoomToFit();
-                    } catch (zoomError) {
-                      console.warn('Zoom failed:', zoomError);
-                    }
-                  }, 300);
-                  
-                } else {
-                  console.warn('No shapes found in .tldr file');
-                  throw new Error('Nenhum conteúdo visual encontrado no arquivo .tldr');
-                }
+                }, 500);
                 
               } else {
-                throw new Error('Estrutura de dados inválida no arquivo .tldr');
+                console.log('Fallback: Manual shape loading');
+                
+                // Fallback to manual loading if loadSnapshot not available
+                if (snapshotData.store && typeof snapshotData.store === 'object') {
+                  const records = Object.values(snapshotData.store);
+                  const shapes = records.filter((record: any) => 
+                    record && record.typeName === 'shape'
+                  );
+                  
+                  console.log(`Found ${shapes.length} shapes to import`);
+                  
+                  if (shapes.length > 0) {
+                    // Clear existing shapes
+                    editorInstance.selectAll();
+                    editorInstance.deleteShapes(editorInstance.getSelectedShapeIds());
+                    
+                    // Use createShapes method for better compatibility
+                    const shapesToCreate = shapes.map((shape: any, index: number) => ({
+                      ...shape,
+                      id: `shape:imported_${Date.now()}_${index}`
+                    }));
+                    
+                    editorInstance.createShapes(shapesToCreate);
+                    console.log(`Created ${shapesToCreate.length} shapes`);
+                    
+                    // Zoom to fit
+                    setTimeout(() => {
+                      editorInstance.zoomToFit();
+                    }, 300);
+                  } else {
+                    throw new Error('Nenhum conteúdo visual encontrado no arquivo');
+                  }
+                } else {
+                  throw new Error('Formato de arquivo inválido');
+                }
               }
               
             } catch (loadError) {
               console.error('Error loading .tldr content:', loadError);
-              throw loadError;
+              throw new Error(`Erro ao carregar arquivo: ${loadError instanceof Error ? loadError.message : 'Formato incompatível'}`);
             }
             
             toast({
