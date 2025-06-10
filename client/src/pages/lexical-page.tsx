@@ -218,10 +218,13 @@ export default function LexicalPage() {
     enabled: showDocumentList
   });
 
-  // Query para buscar document_editions em progresso
+  // Query para buscar document_editions em progresso - sempre ativa para detectar composer
   const { data: documentEditions = [], isLoading: isLoadingEditions } = useQuery({
     queryKey: ['/api/document-editions-in-progress'],
-    enabled: showDocumentList
+    enabled: true,
+    onSuccess: (data) => {
+      console.log('🔥 Query document-editions-in-progress carregada:', data?.length || 0, 'documentos');
+    }
   });
 
   // Query para buscar artifacts do documento selecionado
@@ -276,7 +279,8 @@ export default function LexicalPage() {
 
   // useEffect para abrir painel quando há documentos composer disponíveis
   useEffect(() => {
-    if (documentEditions && documentEditions.length > 0 && !showDocumentList) {
+    if (Array.isArray(documentEditions) && documentEditions.length > 0 && !showDocumentList) {
+      console.log('🔥 Detectados documentos composer, abrindo painel esquerdo', documentEditions.length);
       setShowDocumentList(true);
     }
   }, [documentEditions, showDocumentList]);
