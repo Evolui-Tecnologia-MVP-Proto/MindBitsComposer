@@ -143,72 +143,42 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
   const handleAssetSelect = useCallback(async (asset: any) => {
     if (!editorInstance) return;
 
-    // Convert base64 to data URL if needed (outside try block for scope)
-    const dataUrl = asset.fileData.startsWith('data:') 
-      ? asset.fileData 
-      : `data:image/png;base64,${asset.fileData}`;
-
     try {
-      // Create a proper File object from the data URL
-      const response = await fetch(dataUrl);
-      const blob = await response.blob();
-      const file = new File([blob], asset.name, { type: 'image/png' });
+      // Convert base64 to data URL if needed
+      const dataUrl = asset.fileData.startsWith('data:') 
+        ? asset.fileData 
+        : `data:image/png;base64,${asset.fileData}`;
+
+      // Create asset ID following tldraw pattern
+      const assetId = `asset:image:${asset.id}`;
       
-      // Use tldraw v3 API for external content
-      await editorInstance.putExternalContent({
-        type: 'files',
-        files: [file],
-        point: editorInstance.getViewportPageCenter(),
-        ignoreParent: false
+      // Create asset using tldraw structure from the guide
+      editorInstance.createAssets([{
+        id: assetId,
+        type: 'image',
+        typeName: 'image',
+        src: dataUrl,
+        fileName: asset.name
+      }]);
+
+      // Get viewport center for positioning
+      const viewportCenter = editorInstance.getViewportPageCenter();
+      
+      // Create image shape
+      editorInstance.createShape({
+        type: 'image',
+        x: viewportCenter.x - 100,
+        y: viewportCenter.y - 100,
+        props: {
+          assetId,
+          w: 200,
+          h: 200
+        }
       });
       
       setShowImageModal(false);
     } catch (error) {
       console.error('Erro ao inserir imagem:', error);
-      
-      // Fallback: direct asset and shape creation for tldraw v3
-      try {
-        // Create asset using tldraw v3 API
-        const assetId = editorInstance.createId();
-        
-        // Use proper tldraw v3 asset structure
-        const imageAsset = {
-          id: assetId,
-          type: 'image' as const,
-          typeName: 'asset' as const,
-          props: {
-            name: asset.name,
-            src: dataUrl,
-            w: 200,
-            h: 200,
-            mimeType: 'image/png',
-            isAnimated: false,
-          },
-          meta: {},
-        };
-
-        editorInstance.createAssets([imageAsset]);
-        
-        // Create shape using tldraw v3 API
-        const shapeId = editorInstance.createId();
-        const viewportCenter = editorInstance.getViewportPageCenter();
-        
-        editorInstance.createShapes([{
-          id: shapeId,
-          type: 'image' as const,
-          x: viewportCenter.x - 100,
-          y: viewportCenter.y - 100,
-          props: {
-            assetId,
-            w: 200,
-            h: 200,
-          },
-        }]);
-        
-        setShowImageModal(false);
-      } catch (fallbackError) {
-        console.error('Fallback também falhou:', fallbackError);
-      }
     }
   }, [editorInstance]);
 
