@@ -680,13 +680,41 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                   schemaVersion: fullSnapshot.schema?.schemaVersion
                 });
                 
+                // Pre-sanitize the store data before any tldraw operations
+                const preSanitizedStore: any = {};
+                console.log('🔥 PRE-SANITIZING STORE FOR TLDRAW...');
+                
+                Object.keys(sanitizedStore).forEach(key => {
+                  const record = sanitizedStore[key];
+                  console.log(`🔥 PRE-SANITIZE RECORD: ${key}, type: ${record?.type}`);
+                  
+                  if (record && record.type === 'text' && record.props) {
+                    // Create a completely clean text shape
+                    const cleanTextRecord = {
+                      ...record,
+                      props: {
+                        color: record.props.color || 'black',
+                        size: record.props.size || 'm',
+                        font: record.props.font || 'draw',
+                        textAlign: record.props.textAlign || 'start',
+                        scale: record.props.scale || 1,
+                        richText: record.props.richText || null
+                      }
+                    };
+                    console.log(`🔥 CLEANED TEXT RECORD ${key}:`, Object.keys(cleanTextRecord.props));
+                    preSanitizedStore[key] = cleanTextRecord;
+                  } else {
+                    preSanitizedStore[key] = record;
+                  }
+                });
+                
                 // Use the proper loadSnapshot function from tldraw
                 try {
                   console.log('Using tldraw loadSnapshot function...');
                   
                   // Create a proper snapshot with both store and schema
                   const properSnapshot = {
-                    store: sanitizedStore,
+                    store: preSanitizedStore,
                     schema: fullSnapshot.schema
                   };
                   
