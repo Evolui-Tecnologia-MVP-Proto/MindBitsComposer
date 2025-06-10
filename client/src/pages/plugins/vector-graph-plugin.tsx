@@ -105,20 +105,27 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         const imageAsset = {
           id: assetId,
           type: 'image',
-          typeName: 'image',
-          src: dataUrl,
-          fileName: file.name
+          typeName: 'asset',
+          props: {
+            name: file.name,
+            src: dataUrl,
+            w: 0,
+            h: 0,
+            mimeType: file.type,
+            isAnimated: false,
+          },
         };
 
         editorInstance.createAssets([imageAsset]);
         
         // Create image shape
         const shapeId = `shape_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const center = editorInstance.getViewportPageCenter();
         editorInstance.createShapes([{
           id: shapeId,
           type: 'image',
-          x: editorInstance.getViewportPageCenter().x - 100,
-          y: editorInstance.getViewportPageCenter().y - 100,
+          x: center.x - 100,
+          y: center.y - 100,
           props: {
             assetId,
             w: 200,
@@ -145,20 +152,28 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
       // Create asset ID using custom generation
       const assetId = `asset_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-      // Create the asset with the image - exact structure from example
+      // Create the asset with the image - correct structure for tldraw
       editorInstance.createAssets([{
         id: assetId,
         type: 'image',
-        typeName: 'image',
-        src,
-        fileName: asset.name
+        typeName: 'asset',
+        props: {
+          name: asset.name,
+          src,
+          w: 0,
+          h: 0,
+          mimeType: 'image/png',
+          isAnimated: false,
+        },
       }]);
 
       // Get viewport center for positioning
       const viewportCenter = editorInstance.getViewportPageCenter();
-
-      // Create the shape on screen - exact structure from example
-      editorInstance.createShape({
+      
+      // Create the shape on screen with proper ID
+      const shapeId = `shape_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      editorInstance.createShapes([{
+        id: shapeId,
         type: 'image',
         x: viewportCenter.x - 150,
         y: viewportCenter.y - 150,
@@ -167,7 +182,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           w: 300,
           h: 300
         }
-      });
+      }]);
 
       setShowImageModal(false);
     } catch (error) {
