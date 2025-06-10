@@ -25,6 +25,9 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
 
   // Function to sanitize tldraw snapshot data by removing deprecated properties
   const sanitizeSnapshotData = useCallback((store: any) => {
+    console.log('🔥 SANITIZE FUNCTION CALLED - Starting sanitization process');
+    console.log('🔥 Input store keys:', Object.keys(store).length);
+    
     const sanitizedStore = { ...store };
     let shapesProcessed = 0;
     let deprecatedPropsRemoved = 0;
@@ -33,6 +36,8 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     const deprecatedProperties = [
       'text', 'verticalAlign', 'align', 'autoSize', 'w', 'h', 'handles'
     ];
+    
+    console.log('🔥 Deprecated properties to remove:', deprecatedProperties);
     
     Object.keys(sanitizedStore).forEach(key => {
       const record = sanitizedStore[key];
