@@ -545,13 +545,46 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     if (!editorInstance) return;
 
     try {
-      // Check if this is a tldraw file with metadata
+      // Check if this asset has file_metadata (tldraw snapshot data)
+      const metadataField = asset.file_metadata || asset.fileMetadata;
+      
+      if (metadataField) {
+        console.log('Loading asset with file_metadata/fileMetadata...');
+        console.log('Metadata content:', metadataField);
+        
+        try {
+          // Parse the stored tldraw snapshot
+          const snapshot = JSON.parse(metadataField);
+          console.log('Parsed snapshot from metadata:', snapshot);
+          
+          // Load the snapshot into the editor
+          editorInstance.store.loadSnapshot(snapshot);
+          
+          toast({
+            title: "Sucesso",
+            description: `Conteúdo tldraw "${asset.description || asset.name}" carregado com sucesso`,
+          });
+          
+          setShowImageModal(false);
+          return;
+        } catch (parseError) {
+          console.error('Erro ao carregar snapshot tldraw do metadata:', parseError);
+          toast({
+            title: "Erro",
+            description: "Erro ao carregar dados do arquivo tldraw do metadata",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+      
+      // Legacy check for Graph_TLD assets with fileMetadata (keep for backwards compatibility)
       if (asset.originAssetId === "Graph_TLD" && asset.fileMetadata) {
-        console.log('Loading tldraw file with metadata...');
+        console.log('Loading legacy tldraw file with fileMetadata...');
         try {
           // Parse the stored tldraw snapshot
           const snapshot = JSON.parse(asset.fileMetadata);
-          console.log('Parsed snapshot:', snapshot);
+          console.log('Parsed legacy snapshot:', snapshot);
           
           // Load the snapshot into the editor
           editorInstance.store.loadSnapshot(snapshot);
@@ -564,10 +597,10 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           setShowImageModal(false);
           return;
         } catch (parseError) {
-          console.error('Erro ao carregar snapshot tldraw:', parseError);
+          console.error('Erro ao carregar snapshot tldraw legacy:', parseError);
           toast({
             title: "Erro",
-            description: "Erro ao carregar dados do arquivo tldraw",
+            description: "Erro ao carregar dados do arquivo tldraw legacy",
             variant: "destructive"
           });
           return;
