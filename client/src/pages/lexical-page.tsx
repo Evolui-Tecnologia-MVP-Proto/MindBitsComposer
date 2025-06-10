@@ -1868,11 +1868,6 @@ export default function LexicalPage() {
                                       </span>
                                     )}
                                   </div>
-                                  {asset.description && (
-                                    <p className="text-xs text-gray-600 mt-1 truncate" title={asset.name}>
-                                      {asset.name}
-                                    </p>
-                                  )}
                                 </div>
                               </div>
                             </div>
