@@ -145,72 +145,40 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
 
     try {
       // Convert base64 to data URL if needed
-      const dataUrl = asset.fileData.startsWith('data:') 
+      const src = asset.fileData.startsWith('data:') 
         ? asset.fileData 
         : `data:image/png;base64,${asset.fileData}`;
 
-      // Convert dataUrl to blob and then to File
-      const response = await fetch(dataUrl);
-      const blob = await response.blob();
-      const file = new File([blob], asset.name || 'image.png', { 
-        type: blob.type || 'image/png' 
-      });
+      // Create asset ID following the exact pattern from the example
+      const assetId = 'asset:image:' + asset.name;
 
-      // Use putExternalContent which is the standard way in tldraw v3
-      await editorInstance.putExternalContent({
-        type: 'files',
-        files: [file],
-        point: editorInstance.getViewportPageCenter(),
-        ignoreParent: false
+      // Create the asset with the image - exact structure from example
+      editorInstance.createAssets([{
+        id: assetId,
+        type: 'image',
+        typeName: 'image',
+        src,
+        fileName: asset.name
+      }]);
+
+      // Get viewport center for positioning
+      const viewportCenter = editorInstance.getViewportPageCenter();
+
+      // Create the shape on screen - exact structure from example
+      editorInstance.createShape({
+        type: 'image',
+        x: viewportCenter.x - 150,
+        y: viewportCenter.y - 150,
+        props: {
+          assetId,
+          w: 300,
+          h: 300
+        }
       });
 
       setShowImageModal(false);
     } catch (error) {
-      console.error('Erro ao inserir imagem via putExternalContent:', error);
-      
-      // Direct approach: manually create elements
-      try {
-        const dataUrl = asset.fileData.startsWith('data:') 
-          ? asset.fileData 
-          : `data:image/png;base64,${asset.fileData}`;
-
-        // Use unique ID generation
-        const uniqueId = `image_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        
-        // Create the asset manually
-        editorInstance.createAssets([{
-          id: uniqueId,
-          type: 'image',
-          typeName: 'asset',
-          props: {
-            name: asset.name,
-            src: dataUrl,
-            w: 300,
-            h: 300,
-            mimeType: 'image/png',
-            isAnimated: false,
-          },
-          meta: {}
-        }]);
-
-        // Create the shape
-        const viewportCenter = editorInstance.getViewportPageCenter();
-        editorInstance.createShapes([{
-          id: editorInstance.createId(),
-          type: 'image',
-          x: viewportCenter.x - 150,
-          y: viewportCenter.y - 150,
-          props: {
-            assetId: uniqueId,
-            w: 300,
-            h: 300,
-          }
-        }]);
-
-        setShowImageModal(false);
-      } catch (fallbackError) {
-        console.error('Fallback method failed:', fallbackError);
-      }
+      console.error('Erro ao inserir imagem:', error);
     }
   }, [editorInstance]);
 
