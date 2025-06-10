@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useRef } from 'react';
-import { Tldraw, TldrawProps, loadSnapshot } from 'tldraw';
+import { Tldraw, TldrawProps } from 'tldraw';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -445,230 +445,15 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               
               if (snapshotData && snapshotData.store) {
                 console.log('Loading snapshot with store data...');
-                console.log('Store size before load:', Object.keys(editorInstance.store.allRecords()).length);
                 
-                // Simple manual creation approach
-                console.log('Creating shapes manually...');
-                
-                try {
-                  const records = Object.values(snapshotData.store) as any[];
-                  const shapes = records.filter((record: any) => record.typeName === 'shape');
-                  
-                  console.log(`Found ${shapes.length} shapes to create`);
-                  
-                  if (shapes.length > 0) {
-                    let createdCount = 0;
-                    
-                    for (const shape of shapes) {
-                      const originalText = shape.props?.text;
-                      
-                      try {
-                        // For text shapes with content, convert to geo with text
-                        if (shape.type === 'text' && originalText) {
-                          const geoShape = {
-                            id: shape.id,
-                            type: 'geo',
-                            x: shape.x || 0,
-                            y: shape.y || 0,
-                            props: {
-                              geo: 'rectangle',
-                              text: originalText,
-                              w: Math.max(100, originalText.length * 8),
-                              h: 50,
-                              size: 'm',
-                              color: 'black'
-                            }
-                          };
-                          editorInstance.createShape(geoShape);
-                        } else {
-                          // For other shapes, clean up properties and create
-                          const cleanProps = { ...shape.props };
-                          
-                          // Remove problematic properties
-                          delete cleanProps.text;
-                          delete cleanProps.handles;
-                          delete cleanProps.align;
-                          delete cleanProps.verticalAlign;
-                          delete cleanProps.autoSize;
-                          delete cleanProps.w;
-                          delete cleanProps.h;
-                          
-                          // Add required properties for different shape types
-                          if (shape.type === 'geo') {
-                            cleanProps.geo = cleanProps.geo || 'rectangle';
-                            cleanProps.w = cleanProps.w || 100;
-                            cleanProps.h = cleanProps.h || 50;
-                          }
-                          
-                          const cleanShape = {
-                            id: shape.id,
-                            type: shape.type,
-                            x: shape.x || 0,
-                            y: shape.y || 0,
-                            props: cleanProps
-                          };
-                          
-                          editorInstance.createShape(cleanShape);
-                        }
-                        
-                        createdCount++;
-                        
-                      } catch (shapeError) {
-                        console.warn('Failed to create shape:', shape.id, shapeError);
-                        
-                        // Create simple fallback
-                        try {
-                          const fallbackShape = {
-                            id: shape.id + '_fallback',
-                            type: 'geo',
-                            x: shape.x || 0,
-                            y: shape.y || 0,
-                            props: {
-                              geo: 'rectangle',
-                              w: 100,
-                              h: 50
-                            }
-                          };
-                          editorInstance.createShape(fallbackShape);
-                          console.log('Created fallback shape for:', shape.id);
-                        } catch (fallbackError) {
-                          console.warn('Failed to create fallback shape:', fallbackError);
-                        }
-                      }
-                    }
-                        
-                        // Remove deprecated/incompatible properties
-                        const deprecatedProps = ['handles', 'align', 'verticalAlign', 'autoSize'];
-                        
-                        // For text shapes, remove size properties but keep text
-                        if (shape.type === 'text') {
-                          deprecatedProps.push('w', 'h', 'text'); // Remove old text format
-                        } else if (shape.type === 'geo') {
-                          deprecatedProps.push('text'); // Remove text from geo shapes
-                        }
-                        
-                        // For arrow shapes, handle start/end point structure changes
-                        if (shape.type === 'arrow') {
-                          if (migratedProps.start && migratedProps.start.type) {
-                            delete migratedProps.start.type;
-                          }
-                          if (migratedProps.end && migratedProps.end.type) {
-                            delete migratedProps.end.type;
-                          }
-                        }
-                        
-                        deprecatedProps.forEach(prop => {
-                          if (migratedProps[prop] !== undefined) {
-                            console.log(`Removing deprecated property '${prop}' from ${shape.type} shape`);
-                            delete migratedProps[prop];
-                          }
-                        });
-                        
-                        // Add required properties based on shape type
-                        if (shape.type === 'text') {
-                          // In modern tldraw, text content is not in props.text
-                          // Text shapes don't have text property in props anymore
-                          // The text content is managed differently
-                          if (!migratedProps.font) migratedProps.font = 'draw';
-                          if (!migratedProps.size) migratedProps.size = 'm';
-                          if (!migratedProps.color) migratedProps.color = 'black';
-                        } else if (shape.type === 'geo') {
-                          // Geo shapes need specific properties
-                          if (!migratedProps.w) migratedProps.w = 100;
-                          if (!migratedProps.h) migratedProps.h = 100;
-                          if (!migratedProps.geo) migratedProps.geo = 'rectangle';
-                        } else if (shape.type === 'line') {
-                          // Line shapes need specific properties
-                          if (!migratedProps.spline) migratedProps.spline = 'line';
-                        }
-                        
-                        // Extract basic shape data with migrated properties
-                        const shapeData = {
-                          id: shape.id,
-                          type: shape.type,
-                          x: shape.x || 0,
-                          y: shape.y || 0,
-                          props: migratedProps,
-                          parentId: shape.parentId || 'page:page'
-                        };
-                        
-                        console.log('Creating shape:', shapeData.type, shapeData.id);
-                        editorInstance.createShape(shapeData);
-                        createdCount++;
-                        
-                      } catch (shapeError) {
-                        console.warn('Failed to create shape:', shape.id, shapeError);
-                        
-                        // Try creating a simplified version of the shape
-                        try {
-                          let simplifiedShape;
-                          const textContent = shape.props?.text;
-                          
-                          if (shape.type === 'text' && textContent) {
-                            // For text shapes, create a geo shape with text property that tldraw supports
-                            simplifiedShape = {
-                              id: shape.id + '_simplified',
-                              type: 'geo',
-                              x: shape.x || 0,
-                              y: shape.y || 0,
-                              props: {
-                                geo: 'rectangle',
-                                text: textContent,
-                                w: Math.max(100, textContent.length * 8),
-                                h: 50,
-                                size: 'm',
-                                color: 'black'
-                              }
-                            };
-                          } else {
-                            // Default fallback to geo shape
-                            simplifiedShape = {
-                              id: shape.id + '_simplified',
-                              type: 'geo',
-                              x: shape.x || 0,
-                              y: shape.y || 0,
-                              props: {
-                                geo: 'rectangle',
-                                w: 100,
-                                h: 50
-                              }
-                            };
-                          }
-                          
-                          editorInstance.createShape(simplifiedShape);
-                          console.log('Created simplified shape for:', shape.id);
-                          
-                        } catch (simplifiedError) {
-                          console.warn('Failed to create simplified shape:', simplifiedError);
-                        }
-                      }
-                    }
-                    
-                    console.log(`Successfully created ${createdCount} out of ${shapes.length} shapes`);
-                    
-                  } else {
-                    console.log('No shapes found in the .tldr file');
-                  }
-                  
-                } catch (extractError) {
-                  console.error('Failed to extract shapes:', extractError);
-                }
+                // Use store.loadSnapshot for proper tldraw loading
+                editorInstance.store.loadSnapshot(snapshotData.store);
                 
                 console.log('Content loaded successfully');
-                console.log('Store size after load:', Object.keys(editorInstance.store.allRecords()).length);
                 
-                // Check if we have shapes
-                const shapes = editorInstance.store.allRecords().filter((record: any) => record.typeName === 'shape');
-                console.log('Number of shapes loaded:', shapes.length);
-                
-                if (shapes.length > 0) {
-                  console.log('Sample shapes:', shapes.slice(0, 3).map((s: any) => ({ id: s.id, type: s.type })));
-                }
-                
-                // Force a re-render and then zoom to fit
+                // Zoom to fit the loaded content after a delay
                 setTimeout(() => {
                   try {
-                    console.log('Current page shapes:', editorInstance.getCurrentPageShapes().length);
                     editorInstance.zoomToFit();
                     console.log('Zoomed to fit loaded content');
                   } catch (zoomError) {
@@ -760,118 +545,13 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     if (!editorInstance) return;
 
     try {
-      // Check if this asset has file_metadata (tldraw snapshot data)
-      const metadataField = asset.file_metadata || asset.fileMetadata;
-      
-      if (metadataField) {
-        console.log('Loading asset with file_metadata/fileMetadata...');
-        console.log('Metadata content:', metadataField);
-        
-        try {
-          // Parse the stored tldraw snapshot
-          const snapshotData = JSON.parse(metadataField);
-          console.log('Parsed snapshot from metadata:', snapshotData);
-          
-          // Handle different snapshot formats
-          let storeData;
-          
-          if (snapshotData.document && snapshotData.document.store) {
-            // Format: { document: { store: {...} } }
-            storeData = snapshotData.document.store;
-          } else if (snapshotData.store) {
-            // Format: { store: {...} }
-            storeData = snapshotData.store;
-          } else if (typeof snapshotData === 'object' && Object.keys(snapshotData).length > 0) {
-            // Direct store format
-            storeData = snapshotData;
-          } else {
-            throw new Error('Formato de snapshot não reconhecido');
-          }
-          
-          console.log('Store data to load:', storeData);
-          
-          // Check if there are image shapes that need assets
-          const storeEntries = Object.values(storeData);
-          const imageShapes = storeEntries.filter((entry: any) => entry.type === 'image');
-          const existingAssets = storeEntries.filter((entry: any) => entry.typeName === 'asset');
-          
-          console.log('Found image shapes:', imageShapes.length);
-          console.log('Found existing assets:', existingAssets.length);
-          
-          // If there are image shapes but no assets, we need to create placeholder assets
-          if (imageShapes.length > 0 && existingAssets.length === 0) {
-            console.log('Creating placeholder assets for image shapes...');
-            
-            // Create assets for each unique assetId referenced by image shapes
-            const assetIds = new Set();
-            imageShapes.forEach((shape: any) => {
-              if (shape.props?.assetId) {
-                assetIds.add(shape.props.assetId);
-              }
-            });
-            
-            console.log('Asset IDs to create:', Array.from(assetIds));
-            
-            // Create placeholder assets
-            Array.from(assetIds).forEach((assetId: string) => {
-              storeData[assetId] = {
-                id: assetId,
-                type: 'image',
-                typeName: 'asset',
-                props: {
-                  name: 'Loaded Image',
-                  src: asset.fileData.startsWith('data:') ? asset.fileData : `data:image/png;base64,${asset.fileData}`,
-                  w: 300,
-                  h: 300,
-                  mimeType: 'image/png',
-                  isAnimated: false,
-                },
-                meta: {},
-              };
-            });
-            
-            console.log('Updated store data with assets:', Object.keys(storeData));
-          }
-          
-          // Use the modern tldraw loadSnapshot method
-          console.log('Using imported loadSnapshot function...');
-          loadSnapshot(editorInstance.store, storeData);
-          
-          // Zoom to fit content after loading
-          setTimeout(() => {
-            try {
-              editorInstance.zoomToFit();
-            } catch (zoomError) {
-              console.warn('Zoom to fit failed:', zoomError);
-            }
-          }, 500);
-          
-          toast({
-            title: "Sucesso",
-            description: `Conteúdo tldraw "${asset.description || asset.name}" carregado com sucesso`,
-          });
-          
-          setShowImageModal(false);
-          return;
-        } catch (parseError) {
-          console.error('Erro ao carregar snapshot tldraw do metadata:', parseError);
-          console.error('Parse error details:', parseError.message);
-          toast({
-            title: "Erro",
-            description: "Erro ao carregar dados do arquivo tldraw do metadata",
-            variant: "destructive"
-          });
-          return;
-        }
-      }
-      
-      // Legacy check for Graph_TLD assets with fileMetadata (keep for backwards compatibility)
+      // Check if this is a tldraw file with metadata
       if (asset.originAssetId === "Graph_TLD" && asset.fileMetadata) {
-        console.log('Loading legacy tldraw file with fileMetadata...');
+        console.log('Loading tldraw file with metadata...');
         try {
           // Parse the stored tldraw snapshot
           const snapshot = JSON.parse(asset.fileMetadata);
-          console.log('Parsed legacy snapshot:', snapshot);
+          console.log('Parsed snapshot:', snapshot);
           
           // Load the snapshot into the editor
           editorInstance.store.loadSnapshot(snapshot);
@@ -884,10 +564,10 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           setShowImageModal(false);
           return;
         } catch (parseError) {
-          console.error('Erro ao carregar snapshot tldraw legacy:', parseError);
+          console.error('Erro ao carregar snapshot tldraw:', parseError);
           toast({
             title: "Erro",
-            description: "Erro ao carregar dados do arquivo tldraw legacy",
+            description: "Erro ao carregar dados do arquivo tldraw",
             variant: "destructive"
           });
           return;
