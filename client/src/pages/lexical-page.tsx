@@ -1707,7 +1707,7 @@ export default function LexicalPage() {
           </div>
         </div>
 
-        {/* Painel de Anexos - desabilitado quando há template struct sem documento composer */}
+        {/* Painel de Anexos - desabilitado apenas quando há template struct sem documento composer */}
         {showAttachments && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) && (
           <div className="w-80 border-l bg-gray-50 flex flex-col">
             {/* Header fixo */}
@@ -1717,7 +1717,7 @@ export default function LexicalPage() {
                   <Paperclip className="w-5 h-5" />
                   <h3 className="font-semibold">Anexos</h3>
                 </div>
-                {/* Combo de Plugins - habilitado exceto quando há template struct sem documento composer */}
+                {/* Combo de Plugins - desabilitado apenas quando há template struct sem documento composer */}
                 {activePlugins.length > 0 && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) && (
                   <div className="flex items-center gap-2">
                     <Select value={pluginSelectValue} onValueChange={handleOpenPlugin}>
