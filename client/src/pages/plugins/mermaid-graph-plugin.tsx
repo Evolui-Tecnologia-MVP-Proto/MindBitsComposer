@@ -31,7 +31,7 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
 
   // Mutation para salvar diagram como imagem
   const saveDiagramMutation = useMutation({
-    mutationFn: async (data: { name: string; imageData: string }) => {
+    mutationFn: async (data: { name: string; imageData: string; mermaidDefinition: string }) => {
       if (!selectedEdition) {
         throw new Error('Nenhum documento selecionado');
       }
@@ -44,7 +44,8 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
         mimeType: 'image/png',
         type: 'png',
         isImage: 'true',
-        originAssetId: 'Uploaded'
+        originAssetId: 'Mermaid',
+        fileMetadata: data.mermaidDefinition
       };
 
       const response = await apiRequest('POST', `/api/document-editions/${selectedEdition.id}/artifacts`, artifactData);
@@ -158,7 +159,11 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
 
       // Save using mutation
       const fileName = diagramName.endsWith('.png') ? diagramName : `${diagramName}.png`;
-      saveDiagramMutation.mutate({ name: fileName, imageData: base64Data });
+      saveDiagramMutation.mutate({ 
+        name: fileName, 
+        imageData: base64Data,
+        mermaidDefinition: mermaidCode 
+      });
 
     } catch (error) {
       console.error('Error saving diagram:', error);

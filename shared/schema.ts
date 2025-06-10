@@ -238,6 +238,7 @@ export const documentsArtifacts = pgTable("documents_artifacts", {
   originAssetId: text("origin_asset_id"), // ID do asset de origem (ex: Monday.com)
   isImage: text("is_image"), // Se é imagem ("true"/"false")
   mondayColumn: text("monday_column"), // Coluna Monday.com de origem do anexo
+  fileMetadata: text("file_metadata"), // Metadados específicos do arquivo (ex: definição Mermaid)
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
