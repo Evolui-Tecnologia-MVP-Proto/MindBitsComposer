@@ -143,28 +143,21 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
   const handleAssetSelect = useCallback(async (asset: any) => {
     if (!editorInstance) return;
 
+    // Convert base64 to data URL if needed (outside try block for scope)
+    const dataUrl = asset.fileData.startsWith('data:') 
+      ? asset.fileData 
+      : `data:image/png;base64,${asset.fileData}`;
+
     try {
-      // Convert base64 to data URL if needed
-      const dataUrl = asset.fileData.startsWith('data:') 
-        ? asset.fileData 
-        : `data:image/png;base64,${asset.fileData}`;
+      // Create a proper File object from the data URL
+      const response = await fetch(dataUrl);
+      const blob = await response.blob();
+      const file = new File([blob], asset.name, { type: 'image/png' });
       
-      // Use tldraw's built-in putExternalContent method for image insertion
+      // Use tldraw v3 API for external content
       await editorInstance.putExternalContent({
         type: 'files',
-        files: [{
-          name: asset.name,
-          type: 'image/png',
-          size: dataUrl.length,
-          lastModified: Date.now(),
-          stream: () => Promise.resolve(new ReadableStream()),
-          slice: () => new File([], asset.name),
-          text: () => Promise.resolve(''),
-          arrayBuffer: async () => {
-            const response = await fetch(dataUrl);
-            return response.arrayBuffer();
-          }
-        }],
+        files: [file],
         point: editorInstance.getViewportPageCenter(),
         ignoreParent: false
       });
@@ -173,18 +166,21 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     } catch (error) {
       console.error('Erro ao inserir imagem:', error);
       
-      // Fallback: try direct shape creation
+      // Fallback: direct asset and shape creation for tldraw v3
       try {
+        // Create asset using tldraw v3 API
         const assetId = editorInstance.createId();
+        
+        // Use proper tldraw v3 asset structure
         const imageAsset = {
           id: assetId,
-          type: 'image',
-          typeName: 'asset',
+          type: 'image' as const,
+          typeName: 'asset' as const,
           props: {
             name: asset.name,
             src: dataUrl,
-            w: 0,
-            h: 0,
+            w: 200,
+            h: 200,
             mimeType: 'image/png',
             isAnimated: false,
           },
@@ -193,11 +189,13 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
 
         editorInstance.createAssets([imageAsset]);
         
+        // Create shape using tldraw v3 API
         const shapeId = editorInstance.createId();
         const viewportCenter = editorInstance.getViewportPageCenter();
+        
         editorInstance.createShapes([{
           id: shapeId,
-          type: 'image',
+          type: 'image' as const,
           x: viewportCenter.x - 100,
           y: viewportCenter.y - 100,
           props: {
