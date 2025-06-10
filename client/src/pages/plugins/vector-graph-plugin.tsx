@@ -149,8 +149,8 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         ? asset.fileData 
         : `data:image/png;base64,${asset.fileData}`;
 
-      // Create asset ID following the exact pattern from the example
-      const assetId = 'asset:image:' + asset.name;
+      // Create asset ID using editor's createId method
+      const assetId = editorInstance.createId();
 
       // Create the asset with the image - exact structure from example
       editorInstance.createAssets([{
