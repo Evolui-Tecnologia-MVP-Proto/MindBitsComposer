@@ -114,6 +114,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             mimeType: file.type,
             isAnimated: false,
           },
+          meta: {},
         };
 
         editorInstance.createAssets([imageAsset]);
@@ -165,6 +166,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           mimeType: 'image/png',
           isAnimated: false,
         },
+        meta: {},
       }]);
 
       // Get viewport center for positioning
