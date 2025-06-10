@@ -283,13 +283,21 @@ export default function LexicalPage() {
   // Função para inserir imagem no editor
   const handleInsertImage = (artifact: DocumentArtifact) => {
     try {
+      console.log('🚀 handleInsertImage chamado com artifact:', artifact);
+      
       if (artifact.fileData && artifact.mimeType) {
         const imageUrl = `data:${artifact.mimeType};base64,${artifact.fileData}`;
         
         // Check if this is a Mermaid asset
+        console.log('🔍 Verificando se é asset Mermaid. originAssetId:', artifact.originAssetId);
+        
         if (artifact.originAssetId === "Mermaid") {
           // For Mermaid assets, create a table with image and code block
           const mermaidCode = (artifact as any).fileMetadata || '';
+          
+          console.log('✅ Asset Mermaid detectado!');
+          console.log('📝 Código Mermaid recuperado:', mermaidCode);
+          console.log('🖼️ URL da imagem:', imageUrl.substring(0, 100) + '...');
           
           const insertMermaidTableEvent = new CustomEvent('insertMermaidTable', {
             detail: {
@@ -300,6 +308,7 @@ export default function LexicalPage() {
             }
           });
           
+          console.log('📡 Disparando evento insertMermaidTable com detail:', insertMermaidTableEvent.detail);
           window.dispatchEvent(insertMermaidTableEvent);
           
           toast({
@@ -307,6 +316,8 @@ export default function LexicalPage() {
             description: `O diagrama "${artifact.name}" foi inserido como tabela com código.`,
           });
         } else {
+          console.log('📷 Asset regular detectado, usando inserção normal');
+          
           // For regular images, use the existing logic
           const insertImageEvent = new CustomEvent('insertImage', {
             detail: {
@@ -326,6 +337,7 @@ export default function LexicalPage() {
         }
       }
     } catch (error) {
+      console.error('❌ Erro em handleInsertImage:', error);
       toast({
         title: "Erro ao inserir imagem",
         description: "Não foi possível inserir a imagem no documento.",

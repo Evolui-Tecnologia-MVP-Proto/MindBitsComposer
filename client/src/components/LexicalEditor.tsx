@@ -136,11 +136,17 @@ function ImageEventListenerPlugin(): JSX.Element | null {
     };
 
     const handleInsertMermaidTable = (event: CustomEvent) => {
+      console.log('🎯 handleInsertMermaidTable event received:', event.detail);
       const { imageUrl, altText, artifactId, mermaidCode } = event.detail;
       
       editor.update(() => {
+        console.log('🔄 Starting editor update for Mermaid table insertion');
         const selection = $getSelection();
+        console.log('📍 Current selection:', selection);
+        
         if ($isRangeSelection(selection)) {
+          console.log('✅ Range selection confirmed, creating table...');
+          
           // Create table with 1 row and 2 columns
           const table = $createTableNode();
           
@@ -169,14 +175,20 @@ function ImageEventListenerPlugin(): JSX.Element | null {
             metadataText,
           };
           
+          console.log('🖼️ Creating image node with payload:', imageWithMetadataPayload);
           const imageWithMetadataNode = $createImageWithMetadataNode(imageWithMetadataPayload);
           imageCell.append(imageWithMetadataNode);
           
           // Second column: Mermaid code as code block
           const codeCell = $createTableCellNode(0);
           const codeNode = $createCodeNode();
-          codeNode.setTextContent(mermaidCode || '// Código Mermaid não disponível');
+          
+          // Create a text node with the Mermaid code and append it to the code node
+          const textNode = $createTextNode(mermaidCode || '// Código Mermaid não disponível');
+          codeNode.append(textNode);
           codeCell.append(codeNode);
+          
+          console.log('📝 Created code node with text:', mermaidCode);
           
           // Add cells to row
           tableRow.append(imageCell, codeCell);
@@ -184,8 +196,14 @@ function ImageEventListenerPlugin(): JSX.Element | null {
           // Add row to table
           table.append(tableRow);
           
+          console.log('📋 Table structure created, inserting into document...');
+          
           // Insert table into document
           $insertNodes([table]);
+          
+          console.log('✅ Mermaid table inserted successfully!');
+        } else {
+          console.log('❌ No valid range selection found');
         }
       });
     };
