@@ -447,36 +447,48 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                 console.log('Loading snapshot with store data...');
                 console.log('Store size before load:', Object.keys(editorInstance.store.allRecords()).length);
                 
-                // Since loadSnapshot is not working, use manual record insertion
-                const records = Object.values(snapshotData.store);
-                console.log('Manually inserting', records.length, 'records...');
+                // Try to load only the shapes since tldraw compatibility is problematic
+                console.log('Attempting to extract and create shapes manually...');
                 
                 try {
-                  // Clear existing content first
-                  editorInstance.store.clear();
-                  console.log('Store cleared');
+                  const records = Object.values(snapshotData.store) as any[];
+                  const shapes = records.filter((record: any) => record.typeName === 'shape');
                   
-                  // Insert all records at once
-                  editorInstance.store.put(records);
-                  console.log('Records inserted successfully');
+                  console.log(`Found ${shapes.length} shapes to create`);
                   
-                } catch (manualError) {
-                  console.error('Manual insertion failed:', manualError);
-                  
-                  // Last resort: insert records one by one
-                  console.log('Trying individual record insertion...');
-                  let successCount = 0;
-                  
-                  for (const record of records) {
-                    try {
-                      editorInstance.store.put([record]);
-                      successCount++;
-                    } catch (recordError) {
-                      console.warn('Failed to insert record:', record.id, recordError);
+                  if (shapes.length > 0) {
+                    // Create shapes one by one using tldraw's createShape method
+                    let createdCount = 0;
+                    
+                    for (const shape of shapes) {
+                      try {
+                        // Extract basic shape data
+                        const shapeData = {
+                          id: shape.id,
+                          type: shape.type,
+                          x: shape.x || 0,
+                          y: shape.y || 0,
+                          props: shape.props || {},
+                          parentId: shape.parentId || 'page:page'
+                        };
+                        
+                        console.log('Creating shape:', shapeData.type, shapeData.id);
+                        editorInstance.createShape(shapeData);
+                        createdCount++;
+                        
+                      } catch (shapeError) {
+                        console.warn('Failed to create shape:', shape.id, shapeError);
+                      }
                     }
+                    
+                    console.log(`Successfully created ${createdCount} out of ${shapes.length} shapes`);
+                    
+                  } else {
+                    console.log('No shapes found in the .tldr file');
                   }
                   
-                  console.log(`Successfully inserted ${successCount} out of ${records.length} records`);
+                } catch (extractError) {
+                  console.error('Failed to extract shapes:', extractError);
                 }
                 
                 console.log('Content loaded successfully');
