@@ -71,9 +71,13 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             fileMetadata: JSON.stringify(snapshot),
             isImage: 'true'
           };
+          
+          // Remove any existing id field to ensure new artifact creation
+          delete (artifactData as any).id;
 
           console.log('Artifact data completo:', artifactData);
           console.log('Selected edition:', selectedEdition);
+          console.log('Document ID:', documentId);
 
           // Save to My Assets via API
           if (!documentId) {
@@ -81,6 +85,8 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             throw new Error('Documento não selecionado');
           }
 
+          console.log('Making API call to:', `/api/documentos/${documentId}/artifacts`);
+          
           const response = await fetch(`/api/documentos/${documentId}/artifacts`, {
             method: 'POST',
             headers: {
@@ -89,7 +95,13 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             body: JSON.stringify(artifactData)
           });
 
+          console.log('Response received, status:', response.status, 'ok:', response.ok);
+
           if (response.ok) {
+            console.log('Response is OK, processing response...');
+            const resultData = await response.json();
+            console.log('Response data:', resultData);
+            
             toast({
               title: "Sucesso",
               description: "Imagem salva em Meus Assets",
@@ -97,19 +109,25 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             
             // Trigger parent data refresh by sending data exchange signal
             if (onDataExchange) {
+              console.log('Triggering data exchange callback...');
               onDataExchange({
                 type: 'artifact-saved',
-                artifactData: await response.json(),
+                artifactData: resultData,
                 timestamp: new Date().toISOString()
               });
             }
           } else {
+            console.log('Response not OK, reading error...');
             const errorText = await response.text();
             console.error('Erro HTTP:', response.status, errorText);
             throw new Error(`HTTP ${response.status}: ${errorText}`);
           }
         } catch (error) {
-          console.error('Erro ao salvar:', error);
+          console.error('Erro ao salvar - full error object:', error);
+          console.error('Error name:', error instanceof Error ? error.name : 'Unknown');
+          console.error('Error message:', error instanceof Error ? error.message : String(error));
+          console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
+          
           toast({
             title: "Erro",
             description: error instanceof Error ? error.message : "Falha ao salvar a imagem",
