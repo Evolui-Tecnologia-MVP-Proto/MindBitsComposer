@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { X, Save } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import mermaid from "mermaid";
 
 interface MermaidGraphPluginProps {
@@ -18,8 +22,132 @@ export default function MermaidGraphPlugin({ onDataExchange }: MermaidGraphPlugi
   const canvasRef = useRef<HTMLDivElement>(null);
   const [isRendering, setIsRendering] = useState(false);
   const [renderError, setRenderError] = useState<string | null>(null);
+  const [diagramName, setDiagramName] = useState('');
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [lastSvg, setLastSvg] = useState<string>('');
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
+
+  // Mutation para salvar diagram como imagem
+  const saveDiagramMutation = useMutation({
+    mutationFn: async (data: { name: string; imageData: string }) => {
+      // Get selected edition from parent context (assuming it's available)
+      const selectedEdition = (window as any).selectedEdition;
+      if (!selectedEdition) {
+        throw new Error('Nenhum documento selecionado');
+      }
+
+      const artifactData = {
+        name: data.name,
+        fileData: data.imageData,
+        fileName: data.name,
+        fileSize: Math.round(data.imageData.length * 0.75).toString(), // Approximate base64 to bytes
+        mimeType: 'image/png',
+        type: 'png',
+        isImage: 'true',
+        originAssetId: 'Uploaded'
+      };
+
+      const response = await apiRequest('POST', `/api/document-editions/${selectedEdition.id}/artifacts`, artifactData);
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate artifacts cache to refresh the list
+      const selectedEdition = (window as any).selectedEdition;
+      if (selectedEdition) {
+        queryClient.invalidateQueries({ queryKey: [`/api/document-editions/${selectedEdition.id}/artifacts`] });
+      }
+      toast({
+        title: "Diagrama salvo",
+        description: "O diagrama foi salvo em My Assets com sucesso.",
+      });
+      setDiagramName(''); // Clear the name field
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao salvar",
+        description: error.message || "Ocorreu um erro ao salvar o diagrama.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  // Função para converter SVG para PNG e salvar
+  const handleSaveDiagram = async () => {
+    if (!diagramName.trim()) {
+      toast({
+        title: "Nome obrigatório",
+        description: "Digite um nome para o diagrama antes de salvar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const svgElement = canvasRef.current?.querySelector('svg');
+    if (!svgElement) {
+      toast({
+        title: "Erro ao salvar",
+        description: "Nenhum diagrama encontrado para salvar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Clone SVG and ensure it has proper dimensions
+      const svgClone = svgElement.cloneNode(true) as SVGElement;
+      const svgRect = svgElement.getBoundingClientRect();
+      
+      // Set explicit dimensions on the clone
+      svgClone.setAttribute('width', svgRect.width.toString());
+      svgClone.setAttribute('height', svgRect.height.toString());
+      
+      // Create canvas and convert to PNG
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Failed to get canvas context');
+
+      canvas.width = svgRect.width;
+      canvas.height = svgRect.height;
+
+      // Set white background
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Convert SVG to data URL
+      const svgData = new XMLSerializer().serializeToString(svgClone);
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      const svgUrl = URL.createObjectURL(svgBlob);
+
+      // Create image and draw to canvas
+      const img = new Image();
+      await new Promise((resolve, reject) => {
+        img.onload = () => {
+          ctx.drawImage(img, 0, 0);
+          URL.revokeObjectURL(svgUrl);
+          resolve(void 0);
+        };
+        img.onerror = reject;
+        img.src = svgUrl;
+      });
+
+      // Convert to PNG base64
+      const pngDataUrl = canvas.toDataURL('image/png');
+      const base64Data = pngDataUrl.split(',')[1];
+
+      // Save using mutation
+      const fileName = diagramName.endsWith('.png') ? diagramName : `${diagramName}.png`;
+      saveDiagramMutation.mutate({ name: fileName, imageData: base64Data });
+
+    } catch (error) {
+      console.error('Error saving diagram:', error);
+      toast({
+        title: "Erro ao salvar",
+        description: "Falha ao converter o diagrama para imagem.",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Função para redimensionar SVG baseada no canvas real
   const resizeSvgToCanvas = () => {
@@ -138,21 +266,46 @@ export default function MermaidGraphPlugin({ onDataExchange }: MermaidGraphPlugi
   return (
     <div className="w-full h-full flex flex-col bg-white">
       {/* Header */}
-      <div className="p-4 pb-3 border-b flex items-center justify-between">
-        <div>
-          <h1 className="text-lg font-semibold">Mermaid Graph Plugin</h1>
-          <p className="text-xs text-gray-600 mt-1">
-            Editor e visualizador de diagramas Mermaid em tempo real
-          </p>
+      <div className="p-4 pb-3 border-b">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-lg font-semibold">Mermaid Graph Plugin</h1>
+            <p className="text-xs text-gray-600 mt-1">
+              Editor e visualizador de diagramas Mermaid em tempo real
+            </p>
+          </div>
+          
+          {/* Save controls */}
+          <div className="flex items-center gap-3">
+            <Input
+              type="text"
+              placeholder="Nome do diagrama..."
+              value={diagramName}
+              onChange={(e) => setDiagramName(e.target.value)}
+              className="w-48 h-8 text-sm"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && diagramName.trim()) {
+                  handleSaveDiagram();
+                }
+              }}
+            />
+            <Button
+              size="sm"
+              onClick={handleSaveDiagram}
+              disabled={!diagramName.trim() || saveDiagramMutation.isPending}
+              className="h-8 px-3"
+            >
+              {saveDiagramMutation.isPending ? (
+                <>Salvando...</>
+              ) : (
+                <>
+                  <Save className="w-3 h-3 mr-1" />
+                  Salvar
+                </>
+              )}
+            </Button>
+          </div>
         </div>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={handleClose}
-          className="h-8 w-8 p-0"
-        >
-          <X className="h-4 w-4" />
-        </Button>
       </div>
       
       {/* Conteúdo principal */}

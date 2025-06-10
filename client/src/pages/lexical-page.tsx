@@ -2009,15 +2009,7 @@ export default function LexicalPage() {
                                       </Button>
                                     )}
                                   </div>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="text-xs px-2 py-1 h-7 text-red-600 hover:text-red-800 hover:bg-red-50"
-                                    onClick={() => handleDeleteMyAsset(artifact.id)}
-                                    title="Excluir arquivo"
-                                  >
-                                    <Trash2 className="w-3 h-3" />
-                                  </Button>
+                                  
                                 </div>
                                 
                                 {/* Conteúdo do card */}
