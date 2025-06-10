@@ -1709,9 +1709,10 @@ export default function LexicalPage() {
 
         {/* Painel de Anexos */}
         {showAttachments && (
-          <div className="w-80 border-l bg-gray-50 p-4">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between mb-4">
+          <div className="w-80 border-l bg-gray-50 flex flex-col">
+            {/* Header fixo */}
+            <div className="p-4 border-b bg-gray-50">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Paperclip className="w-5 h-5" />
                   <h3 className="font-semibold">Anexos</h3>
@@ -1737,7 +1738,10 @@ export default function LexicalPage() {
                   </div>
                 )}
               </div>
+            </div>
 
+            {/* Área de conteúdo com scroll */}
+            <div className="flex-1 overflow-y-auto p-4">
               <Accordion type="multiple" className="w-full space-y-2">
                 {/* Global Assets */}
                 <AccordionItem value="global-assets" className="border rounded-lg bg-white">
@@ -1910,7 +1914,7 @@ export default function LexicalPage() {
                             </p>
                           </div>
                         ) : (
-                          <div className="space-y-3 max-h-96 overflow-y-auto">
+                          <div className="space-y-3">
                             {documentArtifacts
                               .filter(artifact => 
                                 artifact.originAssetId === "Uploaded" || 
