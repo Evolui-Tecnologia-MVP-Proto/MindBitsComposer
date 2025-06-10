@@ -257,6 +257,7 @@ export const globalAssets = pgTable("global_assets", {
   description: text("description").default(""), // Optional description
   tags: text("tags").default(""), // Comma-separated tags for organization
   fileMetadata: text("file_metadata"), // Metadata específicos do arquivo (ex: definições tldraw, Mermaid)
+  editor: text("editor"), // Editor/plugin que criou o asset (ex: Graph_TLD, Mermaid, etc.)
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

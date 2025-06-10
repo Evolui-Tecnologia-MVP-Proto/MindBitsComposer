@@ -136,6 +136,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             formData.append('type', 'image');
             formData.append('description', 'Gráfico vetorial gerado com tldraw');
             formData.append('fileMetadata', tldrawData);
+            formData.append('editor', 'Graph_TLD');
 
             console.log('Saving to Global Assets:', filename);
             
