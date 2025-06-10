@@ -560,8 +560,12 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                 console.log('Loading snapshot with store data...');
                 
                 // Sanitize data before loading to remove deprecated properties
+                console.log('🔥 ABOUT TO CALL SANITIZE - Input store type:', typeof snapshotData.store);
+                console.log('🔥 ABOUT TO CALL SANITIZE - Input store keys count:', Object.keys(snapshotData.store).length);
+                console.log('🔥 ABOUT TO CALL SANITIZE - Sample key:', Object.keys(snapshotData.store)[0]);
+                
                 const sanitizedStore = sanitizeSnapshotData(snapshotData.store);
-                console.log('Store size after sanitization:', Object.keys(sanitizedStore).length);
+                console.log('🔥 AFTER SANITIZE - Store size after sanitization:', Object.keys(sanitizedStore).length);
                 
                 // Create proper snapshot format for tldraw
                 const fullSnapshot = {
