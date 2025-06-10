@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Upload, Image as ImageIcon, FileImage, ImagePlus, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { queryClient } from '@/lib/queryClient';
 import 'tldraw/tldraw.css';
 
 interface VectorGraphPluginProps {
@@ -176,6 +177,11 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             toast({
               title: "Sucesso",
               description: "Imagem salva em Meus Assets",
+            });
+            
+            // Invalidate query cache to refresh My Assets list
+            queryClient.invalidateQueries({ 
+              queryKey: ['/api/document-editions', selectedEdition?.id || selectedEdition?.documentId, 'artifacts'] 
             });
             
             // Trigger parent data refresh by sending data exchange signal

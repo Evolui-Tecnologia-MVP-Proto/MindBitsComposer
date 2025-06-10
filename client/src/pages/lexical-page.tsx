@@ -1880,6 +1880,7 @@ export default function LexicalPage() {
                           {documentArtifacts.filter(artifact => 
                             artifact.originAssetId === "Uploaded" || 
                             artifact.originAssetId === "Mermaid" ||
+                            artifact.originAssetId === "Graph_TLD" ||
                             !artifact.mondayColumn || 
                             artifact.mondayColumn.trim() === ""
                           ).length}
@@ -1919,6 +1920,7 @@ export default function LexicalPage() {
                               .filter(artifact => 
                                 artifact.originAssetId === "Uploaded" || 
                                 artifact.originAssetId === "Mermaid" ||
+                                artifact.originAssetId === "Graph_TLD" ||
                                 !artifact.mondayColumn || 
                                 artifact.mondayColumn.trim() === ""
                               )
@@ -1978,6 +1980,7 @@ export default function LexicalPage() {
                                         <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
                                           {artifact.originAssetId === "Uploaded" ? "Uploaded" : 
                                            artifact.originAssetId === "Mermaid" ? "Mermaid" : 
+                                           artifact.originAssetId === "Graph_TLD" ? "Graph_TLD" :
                                            "My Asset"}
                                         </Badge>
                                         {artifact.fileSize && (
