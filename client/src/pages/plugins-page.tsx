@@ -198,7 +198,7 @@ export default function PluginsPage() {
 
   // Query para buscar plugins
   const { data: plugins = [], isLoading, refetch } = useQuery<Plugin[]>({
-    queryKey: ["/api/plugins"],
+    queryKey: ["/api/plugins", "all"],
   });
 
   // Mutation para criar/editar plugin
@@ -220,7 +220,8 @@ export default function PluginsPage() {
       setIsModalOpen(false);
       setSelectedPlugin(null);
       form.reset();
-      queryClient.invalidateQueries({ queryKey: ["/api/plugins"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/plugins", "all"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/plugins", "active"] });
     },
     onError: (error: Error) => {
       toast({
@@ -242,7 +243,8 @@ export default function PluginsPage() {
         title: "Status alterado",
         description: "Status do plugin foi alterado com sucesso.",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/plugins"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/plugins", "all"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/plugins", "active"] });
     },
     onError: (error: Error) => {
       toast({
@@ -265,7 +267,8 @@ export default function PluginsPage() {
       });
       setIsDeleteDialogOpen(false);
       setSelectedPlugin(null);
-      queryClient.invalidateQueries({ queryKey: ["/api/plugins"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/plugins", "all"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/plugins", "active"] });
     },
     onError: (error: Error) => {
       toast({
