@@ -1717,8 +1717,8 @@ export default function LexicalPage() {
                   <Paperclip className="w-5 h-5" />
                   <h3 className="font-semibold">Anexos</h3>
                 </div>
-                {/* Combo de Plugins - apenas quando há documento em edição */}
-                {activePlugins.length > 0 && (currentDocumentId !== null || hasEditorContent) && (
+                {/* Combo de Plugins - habilitado exceto quando há template struct sem documento composer */}
+                {activePlugins.length > 0 && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) && (
                   <div className="flex items-center gap-2">
                     <Select value={pluginSelectValue} onValueChange={handleOpenPlugin}>
                       <SelectTrigger className="w-32 h-8 text-xs">
