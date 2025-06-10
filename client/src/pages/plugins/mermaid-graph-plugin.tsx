@@ -54,7 +54,7 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
     onSuccess: () => {
       // Invalidate artifacts cache to refresh the list
       if (selectedEdition) {
-        queryClient.invalidateQueries({ queryKey: [`/api/document-editions/${selectedEdition.id}/artifacts`] });
+        queryClient.invalidateQueries({ queryKey: ['/api/document-editions', selectedEdition.id, 'artifacts'] });
       }
       toast({
         title: "Diagrama salvo",
