@@ -312,23 +312,62 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           });
           
           if (svg) {
-            // Convert SVG to PNG using canvas
+            console.log('SVG obtained, converting to PNG...');
+            // Convert SVG to PNG using canvas with better error handling
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
+            
+            if (!ctx) {
+              throw new Error('Could not get canvas context');
+            }
+            
             const img = new Image();
             
-            await new Promise((resolve, reject) => {
+            pngBlob = await new Promise((resolve, reject) => {
               img.onload = () => {
-                canvas.width = img.width || 800;
-                canvas.height = img.height || 600;
-                ctx?.drawImage(img, 0, 0);
-                canvas.toBlob(resolve, 'image/png');
+                try {
+                  console.log('Image loaded, dimensions:', img.width, img.height);
+                  canvas.width = img.width || 800;
+                  canvas.height = img.height || 600;
+                  
+                  // Clear canvas with white background
+                  ctx.fillStyle = 'white';
+                  ctx.fillRect(0, 0, canvas.width, canvas.height);
+                  
+                  // Draw the image
+                  ctx.drawImage(img, 0, 0);
+                  
+                  canvas.toBlob((blob) => {
+                    if (blob) {
+                      console.log('PNG blob created successfully, size:', blob.size);
+                      resolve(blob);
+                    } else {
+                      reject(new Error('Failed to create PNG blob'));
+                    }
+                  }, 'image/png', 0.95);
+                } catch (error) {
+                  console.error('Error in image processing:', error);
+                  reject(error);
+                }
               };
-              img.onerror = reject;
-              img.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString(svg));
-            }).then(blob => {
-              pngBlob = blob;
+              
+              img.onerror = (error) => {
+                console.error('Image load error:', error);
+                reject(new Error('Failed to load SVG as image'));
+              };
+              
+              try {
+                const svgString = new XMLSerializer().serializeToString(svg);
+                console.log('SVG string length:', svgString.length);
+                const svgDataUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+                img.src = svgDataUrl;
+              } catch (error) {
+                console.error('Error creating SVG data URL:', error);
+                reject(error);
+              }
             });
+          } else {
+            throw new Error('Failed to get SVG from editor');
           }
         } else {
           throw new Error('Nenhum método de exportação disponível no editor');
