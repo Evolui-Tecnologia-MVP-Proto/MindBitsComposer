@@ -1064,6 +1064,14 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     if (!editorInstance) return;
 
     try {
+      // Debug: Log all asset properties
+      console.log('🔥 ASSET DEBUG - Full asset object:', asset);
+      console.log('🔥 ASSET DEBUG - originAssetId:', asset.originAssetId);
+      console.log('🔥 ASSET DEBUG - fileMetadata exists:', !!asset.fileMetadata);
+      console.log('🔥 ASSET DEBUG - fileMetadata length:', asset.fileMetadata?.length);
+      console.log('🔥 ASSET DEBUG - name:', asset.name);
+      console.log('🔥 ASSET DEBUG - mimeType:', asset.mimeType);
+      
       // Check if this is a tldraw file with metadata
       if (asset.originAssetId === "Graph_TLD" && asset.fileMetadata) {
         console.log('Loading tldraw file from asset metadata...');
