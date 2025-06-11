@@ -16,6 +16,67 @@ interface VectorGraphPluginProps {
   selectedEdition?: any;
 }
 
+// Função para sanitizar richText
+function sanitizeRichText(richText: any) {
+  if (
+    !richText ||
+    typeof richText !== 'object' ||
+    richText.type !== 'doc' ||
+    !Array.isArray(richText.content)
+  ) {
+    return {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          attrs: { dir: "auto" },
+          content: []
+        }
+      ]
+    };
+  }
+
+  // Filtra apenas paragraphs válidos
+  const validContent = richText.content.filter((node: any) => {
+    if (!node || typeof node !== 'object') return false;
+    if (node.type === 'paragraph') {
+      // Se tiver content, filtra só text nodes válidos
+      if (Array.isArray(node.content)) {
+        node.content = node.content.filter((child: any) =>
+          child && typeof child === 'object' && child.type === 'text' && typeof child.text === 'string'
+        );
+      }
+      return true;
+    }
+    return false;
+  });
+
+  return {
+    type: "doc",
+    content: validContent.length > 0 ? validContent : [
+      {
+        type: "paragraph",
+        attrs: { dir: "auto" },
+        content: []
+      }
+    ]
+  };
+}
+
+// Função para garantir align válido em shapes geo
+function ensureGeoAlign(snapshot: any) {
+  if (!snapshot || !snapshot.store) return snapshot;
+  Object.values(snapshot.store).forEach((record: any) => {
+    if (record.type === 'geo' && record.props) {
+      const allowedAligns = ["start", "middle", "end", "start-legacy", "end-legacy", "middle-legacy"];
+      if (!allowedAligns.includes(record.props.align)) {
+        record.props.align = "middle";
+      }
+    }
+  });
+  return snapshot;
+}
+
 const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, globalAssets = [], documentArtifacts = [], selectedEdition }) => {
   const [showImageModal, setShowImageModal] = useState(false);
   const [editorInstance, setEditorInstance] = useState<any>(null);
@@ -136,6 +197,72 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     return sanitizedStore;
   }, []);
   
+  // Função de sanitização robusta para shapes do tldraw
+  function sanitizeTldrawStore(store: any) {
+    const deprecatedProps = ['w', 'h', 'align', 'verticalAlign', 'autoSize', 'text', 'handles'];
+    const newStore: any = {};
+
+    Object.entries(store).forEach(([key, record]: [string, any]) => {
+      if (record.typeName === 'shape') {
+        // Garante que props existe
+        const cleanProps = { ...(record.props || {}) };
+        // Para shapes de texto, NÃO remover 'w', mas garantir que seja número
+        if (record.type === 'text') {
+          cleanProps.color = cleanProps.color || 'black';
+          cleanProps.size = cleanProps.size || 'm';
+          cleanProps.font = cleanProps.font || 'draw';
+          cleanProps.textAlign = cleanProps.textAlign || 'start';
+          cleanProps.scale = cleanProps.scale || 1;
+          cleanProps.richText = sanitizeRichText(cleanProps.richText);
+          cleanProps.w = typeof cleanProps.w === 'number' ? cleanProps.w : 100;
+          cleanProps.autoSize = typeof cleanProps.autoSize === 'boolean' ? cleanProps.autoSize : false;
+          // Remover apenas propriedades realmente deprecadas, mas NÃO 'w' nem 'autoSize'
+          deprecatedProps.filter(p => p !== 'w' && p !== 'autoSize').forEach((prop) => {
+            if (cleanProps[prop] !== undefined) {
+              delete cleanProps[prop];
+            }
+          });
+        } else if (record.type === 'geo') {
+          // Para geo, pode remover 'w' e 'h' se quiser, mas garantir defaults
+          deprecatedProps.forEach((prop) => {
+            if (cleanProps[prop] !== undefined) {
+              delete cleanProps[prop];
+            }
+          });
+          cleanProps.w = typeof cleanProps.w === 'number' ? cleanProps.w : 100;
+          cleanProps.h = typeof cleanProps.h === 'number' ? cleanProps.h : 100;
+          cleanProps.geo = cleanProps.geo || 'rectangle';
+          cleanProps.color = cleanProps.color || 'black';
+          cleanProps.labelColor = cleanProps.labelColor || 'black';
+          cleanProps.fill = cleanProps.fill || 'none';
+          cleanProps.dash = cleanProps.dash || 'draw';
+          cleanProps.size = cleanProps.size || 'm';
+          cleanProps.font = cleanProps.font || 'draw';
+          cleanProps.growY = cleanProps.growY || 0;
+          cleanProps.url = cleanProps.url || '';
+          cleanProps.scale = cleanProps.scale || 1;
+          cleanProps.richText = sanitizeRichText(cleanProps.richText);
+          const allowedAligns = ["start", "middle", "end", "start-legacy", "end-legacy", "middle-legacy"];
+          cleanProps.align = allowedAligns.includes(cleanProps.align) ? cleanProps.align : "middle";
+          const allowedVerticalAligns = ["start", "middle", "end"];
+          cleanProps.verticalAlign = allowedVerticalAligns.includes(cleanProps.verticalAlign) ? cleanProps.verticalAlign : "middle";
+        } else {
+          // Para outros tipos, remover tudo normalmente
+          deprecatedProps.forEach((prop) => {
+            if (cleanProps[prop] !== undefined) {
+              delete cleanProps[prop];
+            }
+          });
+        }
+        newStore[key] = { ...record, props: cleanProps };
+      } else {
+        newStore[key] = record;
+      }
+    });
+
+    return newStore;
+  }
+
   const handleSaveToAssets = useCallback(async () => {
     try {
       if (!editorInstance) {
@@ -229,8 +356,9 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           const base64Data = reader.result as string;
           const pngData = base64Data.split(',')[1]; // Remove data:image/png;base64,
 
-          // Get tldraw snapshot for metadata
+          // Get tldraw snapshot for metadata - using same logic as handleExportTldr
           const snapshot = editorInstance.store.getSnapshot();
+          const fixedSnapshot = ensureGeoAlign(snapshot);
           
           // Create filename using user input with timestamp
           const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -242,9 +370,10 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           
           if (!documentId) {
             // Save to Global Assets when no composer document is selected
-            // Get the tldraw snapshot for file_metadata
-            const snapshot = editorInstance.getSnapshot();
-            const tldrawData = JSON.stringify(snapshot);
+            // Get the tldraw snapshot for file_metadata - using same logic as handleExportTldr
+            const snapshotForGlobal = editorInstance.store.getSnapshot();
+            const fixedSnapshotForGlobal = ensureGeoAlign(snapshotForGlobal);
+            const tldrawData = JSON.stringify(fixedSnapshotForGlobal);
             
             const formData = new FormData();
             formData.append('file', pngBlob, filename);
@@ -298,7 +427,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               mimeType: 'image/png',
               type: 'image/png',
               originAssetId: "Graph_TLD",
-              fileMetadata: JSON.stringify(snapshot),
+              fileMetadata: JSON.stringify(fixedSnapshot),
               isImage: 'true'
             };
 
@@ -405,9 +534,10 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     try {
       // Get the current snapshot
       const snapshot = editorInstance.store.getSnapshot();
+      const fixedSnapshot = ensureGeoAlign(snapshot);
       
       // Convert to JSON string
-      const jsonContent = JSON.stringify(snapshot, null, 2);
+      const jsonContent = JSON.stringify(fixedSnapshot, null, 2);
       
       // Create filename with timestamp
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -503,72 +633,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             console.log('🔥 RAW FILE CONTENT LENGTH:', fileContent.length);
             console.log('🔥 FILE CONTENT PREVIEW:', fileContent.substring(0, 200));
             
-            let tldrawData;
-            try {
-              const rawData = JSON.parse(fileContent);
-              console.log('🔥 JSON PARSE SUCCESS');
-              console.log('🔥 PARSED DATA TOP LEVEL KEYS:', Object.keys(rawData));
-              
-              // IMMEDIATE DEEP SANITIZATION
-              tldrawData = JSON.parse(JSON.stringify(rawData, (key, value) => {
-                // Remove deprecated properties during JSON stringification
-                if (key === 'w' || key === 'h' || key === 'align' || key === 'verticalAlign' || 
-                    key === 'autoSize' || key === 'text' || key === 'handles') {
-                  console.log(`🔥 REMOVING DEPRECATED KEY: ${key}`);
-                  return undefined; // This removes the property
-                }
-                return value;
-              }));
-              
-              console.log('🔥 DEEP SANITIZATION COMPLETE');
-            } catch (parseError) {
-              console.error('🔥 JSON PARSE ERROR:', parseError);
-              throw parseError;
-            }
-            
-            // Immediate sanitization after parsing - remove all deprecated properties
-            console.log('🔥 IMMEDIATE SANITIZATION - Starting...');
-            try {
-              if (tldrawData.store && typeof tldrawData.store === 'object') {
-                console.log('🔥 SANITIZING STORE OBJECT...');
-                const storeKeys = Object.keys(tldrawData.store);
-                console.log('🔥 STORE HAS KEYS:', storeKeys.length);
-                
-                storeKeys.forEach((key, index) => {
-                  const record = tldrawData.store[key];
-                  console.log(`🔥 PROCESSING RECORD ${index + 1}/${storeKeys.length}: ${key}, type: ${record?.type}`);
-                  
-                  if (record && record.type === 'text' && record.props) {
-                    console.log(`🔥 FOUND TEXT SHAPE: ${record.id}`);
-                    const originalProps = Object.keys(record.props);
-                    console.log(`🔥 ORIGINAL PROPS: ${originalProps.join(', ')}`);
-                    
-                    // Check specifically for 'w' property
-                    if (record.props.w !== undefined) {
-                      console.log(`🔥 REMOVING W PROPERTY: ${record.props.w}`);
-                      delete record.props.w;
-                    }
-                    
-                    // Remove all other deprecated properties
-                    delete record.props.h;
-                    delete record.props.align;
-                    delete record.props.verticalAlign;
-                    delete record.props.autoSize;
-                    delete record.props.text;
-                    delete record.props.handles;
-                    
-                    const finalProps = Object.keys(record.props);
-                    console.log(`🔥 FINAL PROPS: ${finalProps.join(', ')}`);
-                  }
-                });
-                console.log('🔥 IMMEDIATE SANITIZATION - Complete');
-              } else {
-                console.log('🔥 NO STORE OBJECT FOUND FOR SANITIZATION');
-              }
-            } catch (sanitizeError) {
-              console.error('🔥 SANITIZATION ERROR:', sanitizeError);
-              // Continue anyway, sanitization error shouldn't stop the process
-            }
+            let tldrawData = JSON.parse(fileContent);
             
             console.log('Parsed .tldr file structure:');
             console.log('- tldrawFileFormatVersion:', tldrawData.tldrawFileFormatVersion);
@@ -635,286 +700,125 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               console.log('Sample records:', sampleRecords);
             }
             
-            // Load the .tldr content into the editor
-            try {
-              console.log('Loading .tldr content into editor...');
-              
-              if (snapshotData && snapshotData.store) {
-                console.log('Loading snapshot with store data...');
-                
-                // Sanitize data before loading to remove deprecated properties
-                console.log('🔥 ABOUT TO CALL SANITIZE - Input store type:', typeof snapshotData.store);
-                console.log('🔥 ABOUT TO CALL SANITIZE - Input store keys count:', Object.keys(snapshotData.store).length);
-                console.log('🔥 ABOUT TO CALL SANITIZE - Sample key:', Object.keys(snapshotData.store)[0]);
-                
-                const sanitizedStore = sanitizeSnapshotData(snapshotData.store);
-                console.log('🔥 AFTER SANITIZE - Store size after sanitization:', Object.keys(sanitizedStore).length);
-                
-                // Create proper snapshot format for tldraw
-                const fullSnapshot = {
-                  store: sanitizedStore,
-                  schema: snapshotData.schema || {
-                    schemaVersion: 2,
-                    sequences: {
-                      "com.tldraw.store": 4,
-                      "com.tldraw.asset": 1,
-                      "com.tldraw.camera": 1,
-                      "com.tldraw.document": 2,
-                      "com.tldraw.instance": 25,
-                      "com.tldraw.instance_page_state": 5,
-                      "com.tldraw.page": 1,
-                      "com.tldraw.instance_presence": 6,
-                      "com.tldraw.pointer": 1,
-                      "com.tldraw.shape": 4,
-                      "com.tldraw.asset.bookmark": 2,
-                      "com.tldraw.asset.image": 5,
-                      "com.tldraw.asset.video": 5,
-                      "com.tldraw.shape.group": 0,
-                      "com.tldraw.shape.text": 3,
-                      "com.tldraw.shape.bookmark": 2,
-                      "com.tldraw.shape.draw": 2,
-                      "com.tldraw.shape.geo": 10,
-                      "com.tldraw.shape.note": 9,
-                      "com.tldraw.shape.line": 5,
-                      "com.tldraw.shape.frame": 1,
-                      "com.tldraw.shape.arrow": 6,
-                      "com.tldraw.shape.highlight": 1,
-                      "com.tldraw.shape.embed": 4,
-                      "com.tldraw.shape.image": 5,
-                      "com.tldraw.shape.video": 3,
-                      "com.tldraw.binding.arrow": 1
-                    }
-                  }
-                };
-                
-                console.log('Full snapshot structure:', {
-                  hasStore: !!fullSnapshot.store,
-                  hasSchema: !!fullSnapshot.schema,
-                  schemaVersion: fullSnapshot.schema?.schemaVersion
-                });
-                
-                // Pre-sanitize the store data before any tldraw operations
-                const preSanitizedStore: any = {};
-                console.log('🔥 PRE-SANITIZING STORE FOR TLDRAW...');
-                
-                Object.keys(sanitizedStore).forEach(key => {
-                  const record = sanitizedStore[key];
-                  console.log(`🔥 PRE-SANITIZE RECORD: ${key}, type: ${record?.type}`);
-                  
-                  if (record && record.type === 'text' && record.props) {
-                    // Create a completely clean text shape
-                    const cleanTextRecord = {
-                      ...record,
-                      props: {
-                        color: record.props.color || 'black',
-                        size: record.props.size || 'm',
-                        font: record.props.font || 'draw',
-                        textAlign: record.props.textAlign || 'start',
-                        scale: record.props.scale || 1,
-                        richText: record.props.richText || null
-                      }
-                    };
-                    console.log(`🔥 CLEANED TEXT RECORD ${key}:`, Object.keys(cleanTextRecord.props));
-                    preSanitizedStore[key] = cleanTextRecord;
-                  } else {
-                    preSanitizedStore[key] = record;
-                  }
-                });
-                
-                // Use the proper loadSnapshot function from tldraw
-                try {
-                  console.log('Using tldraw loadSnapshot function...');
-                  
-                  // Create a proper snapshot with both store and schema
-                  const properSnapshot = {
-                    store: preSanitizedStore,
-                    schema: fullSnapshot.schema
-                  };
-                  
-                  console.log('Snapshot to load:', {
-                    storeKeys: Object.keys(properSnapshot.store).length,
-                    hasSchema: !!properSnapshot.schema,
-                    schemaVersion: properSnapshot.schema?.schemaVersion
-                  });
-                  
-                  // Use the imported loadSnapshot function
-                  loadSnapshot(editorInstance.store, properSnapshot);
-                  
-                } catch (loadMethodError) {
-                  console.error('Error with loadSnapshot function:', loadMethodError);
-                  
-                  // If validation error mentions "w" property, create completely clean text shapes
-                  if (loadMethodError.message && loadMethodError.message.includes('"w"')) {
-                    console.log('Detected "w" property validation error - creating clean text shapes...');
-                    
-                    // Create completely sanitized store
-                    const ultraCleanStore: any = {};
-                    
-                    Object.keys(preSanitizedStore).forEach(key => {
-                      const record = preSanitizedStore[key];
-                      
-                      if (record && record.type === 'text') {
-                        // Rebuild text shape from scratch with minimal valid properties
-                        ultraCleanStore[key] = {
-                          id: record.id,
-                          type: 'text',
-                          typeName: 'shape',
-                          x: record.x || 0,
-                          y: record.y || 0,
-                          rotation: record.rotation || 0,
-                          isLocked: record.isLocked || false,
-                          opacity: record.opacity || 1,
-                          meta: record.meta || {},
-                          parentId: record.parentId || 'page:page',
-                          index: record.index || 'a1',
-                          props: {
-                            color: 'black',
-                            size: 'm',
-                            font: 'draw',
-                            textAlign: 'start',
-                            scale: 1
-                          }
-                        };
-                      } else {
-                        ultraCleanStore[key] = record;
-                      }
-                    });
-                    
-                    // Try loading with ultra-clean store
-                    try {
-                      const ultraCleanSnapshot = {
-                        store: ultraCleanStore,
-                        schema: fullSnapshot.schema
-                      };
-                      loadSnapshot(editorInstance.store, ultraCleanSnapshot);
-                    } catch (ultraCleanError) {
-                      console.error('Ultra-clean loading failed:', ultraCleanError);
-                      // Final fallback to manual loading
-                      editorInstance.store.clear();
-                      Object.values(ultraCleanStore).forEach((record: any) => {
-                        try {
-                          if (record && record.id) {
-                            editorInstance.store.put([record]);
-                          }
-                        } catch (recordError) {
-                          console.warn('Skipping record:', record.id, recordError);
-                        }
-                      });
-                    }
-                  } else {
-                    // Original fallback logic for other errors
-                    try {
-                      console.log('Trying direct store loading without schema...');
-                      editorInstance.store.clear();
-                      
-                      Object.values(preSanitizedStore).forEach((record: any) => {
-                        try {
-                          if (record && record.id) {
-                            editorInstance.store.put([record]);
-                          }
-                        } catch (recordError) {
-                          console.warn('Skipping invalid record:', record.id, recordError);
-                        }
-                      });
-                      
-                    } catch (manualError) {
-                      console.error('Manual loading also failed:', manualError);
-                      throw new Error('Falha ao carregar arquivo .tldr. O arquivo pode estar corrompido ou em formato incompatível.');
-                    }
-                  }
+            let snapshotToLoad = snapshotData;
+
+            // Se o arquivo tem a estrutura padrão (exportado pelo editor), não sanitize!
+            if (
+              snapshotData &&
+              typeof snapshotData === 'object' &&
+              snapshotData.store &&
+              typeof snapshotData.store === 'object' &&
+              snapshotData.schema
+            ) {
+              // Log shapes de texto antes do loadSnapshot
+              Object.values(snapshotData.store).forEach((record: any) => {
+                if (record.type === 'text') {
+                  console.log('Antes do loadSnapshot - Shape de texto:', record.id, 'props.w:', record.props.w, 'typeof:', typeof record.props.w);
                 }
-                
-                console.log('Content loaded successfully');
-                console.log('Store size after load:', editorInstance.store.allRecords().length);
-                console.log('Number of shapes loaded:', editorInstance.getCurrentPageShapeIds().size);
-                console.log('Sample shapes:', Array.from(editorInstance.getCurrentPageShapeIds()).slice(0, 3).map(id => ({ id, type: editorInstance.getShape(id)?.type })));
-                console.log('Current page shapes:', editorInstance.getCurrentPageShapeIds().size);
-                
-                // Zoom to fit the loaded content after a delay
-                setTimeout(() => {
-                  try {
-                    editorInstance.zoomToFit();
-                    console.log('Zoomed to fit loaded content');
-                  } catch (zoomError) {
-                    console.warn('Zoom to fit failed:', zoomError);
-                  }
-                }, 1000);
-                
-              } else {
-                throw new Error('Dados de snapshot inválidos');
-              }
-              
-            } catch (loadError) {
-              console.error('Error loading .tldr content:', loadError);
-              console.error('LoadError details:', {
-                name: loadError instanceof Error ? loadError.name : 'Unknown',
-                message: loadError instanceof Error ? loadError.message : String(loadError),
-                stack: loadError instanceof Error ? loadError.stack : 'No stack'
               });
-              
-              // Handle validation errors related to deprecated properties
-              const errorMessage = loadError instanceof Error ? loadError.message : String(loadError);
-              
-              if (errorMessage.includes('ValidationError') && errorMessage.includes('"w"')) {
-                console.log('🔥 ATTEMPTING RECOVERY FROM W PROPERTY VALIDATION ERROR');
-                
+              // Carregue diretamente
+              loadSnapshot(editorInstance.store, snapshotData);
+              // Forçar página ativa para a primeira encontrada
+              const pageIds = Object.values(editorInstance.store.allRecords())
+                .filter((r: any) => r.typeName === 'page')
+                .map((r: any) => r.id);
+              if (pageIds.length > 0) {
+                editorInstance.setCurrentPage(pageIds[0]);
+              }
+              // Logs para debug
+              console.log('IDs dos shapes na página atual:', Array.from(editorInstance.getCurrentPageShapeIds()));
+              console.log('Todos os shapes no store:', editorInstance.store.allRecords().filter((r: any) => r.typeName === 'shape'));
+              setTimeout(() => {
                 try {
-                  // Regex-based sanitization as last resort
-                  const sanitizedContent = fileContent
-                    .replace(/"w":\s*[0-9.]+,?/g, '')
-                    .replace(/"h":\s*[0-9.]+,?/g, '')
-                    .replace(/"align":\s*"[^"]*",?/g, '')
-                    .replace(/"verticalAlign":\s*"[^"]*",?/g, '')
-                    .replace(/"autoSize":\s*(true|false),?/g, '')
-                    .replace(/"text":\s*"[^"]*",?/g, '')
-                    .replace(/"handles":\s*\[[^\]]*\],?/g, '')
-                    .replace(/,\s*}/g, '}')
-                    .replace(/{\s*,/g, '{');
-                  
-                  const cleanData = JSON.parse(sanitizedContent);
-                  
-                  if (cleanData.store && editorInstance) {
-                    editorInstance.store.clear();
-                    
-                    // Load records one by one
-                    Object.values(cleanData.store).forEach((record: any) => {
-                      try {
-                        if (record && record.id) {
-                          editorInstance.store.put([record]);
-                        }
-                      } catch (recordError) {
-                        console.warn('Skipping invalid record:', record.id);
-                      }
-                    });
-                    
-                    console.log('🔥 RECOVERY SUCCESSFUL');
-                    toast({
-                      title: "Sucesso",
-                      description: `Arquivo "${file.name}" carregado com correções automáticas`,
-                    });
-                    return;
-                  }
-                } catch (recoveryError) {
-                  console.error('🔥 RECOVERY FAILED:', recoveryError);
+                  editorInstance.setZoom(1);
+                } catch (e) {
+                  console.warn('setZoom falhou:', e);
                 }
+              }, 500);
+              setTimeout(() => {
+                try {
+                  editorInstance.setZoom(1);
+                } catch (e) {
+                  console.warn('setZoom falhou:', e);
+                }
+              }, 1500);
+            } else {
+              // Caso contrário, sanitize (para arquivos antigos ou de outras fontes)
+              const sanitizedStore = sanitizeTldrawStore(snapshotData.store);
+              // Log shapes de texto antes do loadSnapshot
+              Object.values(sanitizedStore).forEach((record: any) => {
+                if (record.type === 'text') {
+                  console.log('Antes do loadSnapshot (sanitized) - Shape de texto:', record.id, 'props.w:', record.props.w, 'typeof:', typeof record.props.w);
+                }
+              });
+              const fullSnapshot = {
+                store: sanitizedStore,
+                schema: snapshotData.schema || {
+                  schemaVersion: 2,
+                  sequences: {
+                    "com.tldraw.store": 4,
+                    "com.tldraw.asset": 1,
+                    "com.tldraw.camera": 1,
+                    "com.tldraw.document": 2,
+                    "com.tldraw.instance": 25,
+                    "com.tldraw.instance_page_state": 5,
+                    "com.tldraw.page": 1,
+                    "com.tldraw.instance_presence": 6,
+                    "com.tldraw.pointer": 1,
+                    "com.tldraw.shape": 4,
+                    "com.tldraw.asset.bookmark": 2,
+                    "com.tldraw.asset.image": 5,
+                    "com.tldraw.asset.video": 5,
+                    "com.tldraw.shape.group": 0,
+                    "com.tldraw.shape.text": 3,
+                    "com.tldraw.shape.bookmark": 2,
+                    "com.tldraw.shape.draw": 2,
+                    "com.tldraw.shape.geo": 10,
+                    "com.tldraw.shape.note": 9,
+                    "com.tldraw.shape.line": 5,
+                    "com.tldraw.shape.frame": 1,
+                    "com.tldraw.shape.arrow": 6,
+                    "com.tldraw.shape.highlight": 1,
+                    "com.tldraw.shape.embed": 4,
+                    "com.tldraw.shape.image": 5,
+                    "com.tldraw.shape.video": 3,
+                    "com.tldraw.binding.arrow": 1
+                  }
+                }
+              };
+              loadSnapshot(editorInstance.store, fullSnapshot);
+              // Forçar página ativa para a primeira encontrada
+              const pageIds = Object.values(editorInstance.store.allRecords())
+                .filter((r: any) => r.typeName === 'page')
+                .map((r: any) => r.id);
+              if (pageIds.length > 0) {
+                editorInstance.setCurrentPage(pageIds[0]);
               }
-              
-              // Standard error handling
-              if (errorMessage.includes('schemaVersion') || errorMessage.includes('Cannot read properties of undefined')) {
-                throw new Error('Arquivo .tldr incompatível com esta versão do editor. Tente criar um novo desenho.');
-              } else if (errorMessage.includes('ValidationError')) {
-                throw new Error('Arquivo .tldr contém dados inválidos. Verifique se o arquivo não foi corrompido.');
-              } else {
-                throw new Error(`Erro ao carregar arquivo .tldr: ${errorMessage}`);
-              }
+              // Logs para debug
+              console.log('IDs dos shapes na página atual:', Array.from(editorInstance.getCurrentPageShapeIds()));
+              console.log('Todos os shapes no store:', editorInstance.store.allRecords().filter((r: any) => r.typeName === 'shape'));
+              setTimeout(() => {
+                try {
+                  editorInstance.setZoom(1);
+                } catch (e) {
+                  console.warn('setZoom falhou:', e);
+                }
+              }, 500);
+              setTimeout(() => {
+                try {
+                  editorInstance.setZoom(1);
+                } catch (e) {
+                  console.warn('setZoom falhou:', e);
+                }
+              }, 1500);
             }
             
-            toast({
-              title: "Sucesso",
-              description: `Arquivo .tldr "${file.name}" carregado com sucesso`,
-            });
+            console.log('Content loaded successfully');
+            console.log('Store size after load:', editorInstance.store.allRecords().length);
+            console.log('Number of shapes loaded:', editorInstance.getCurrentPageShapeIds().size);
+            console.log('Sample shapes:', Array.from(editorInstance.getCurrentPageShapeIds()).slice(0, 3).map(id => ({ id, type: editorInstance.getShape(id)?.type })));
+            console.log('Current page shapes:', editorInstance.getCurrentPageShapeIds().size);
             
-            setShowImageModal(false);
           } catch (parseError) {
             console.error('Erro ao analisar arquivo .tldr:', parseError);
             console.error('Conteúdo do arquivo:', e.target?.result ? String(e.target.result).substring(0, 500) : 'vazio');
