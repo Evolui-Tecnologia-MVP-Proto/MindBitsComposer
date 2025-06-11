@@ -337,14 +337,60 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                   // Draw the image
                   ctx.drawImage(img, 0, 0);
                   
+                  // Compress the image if it's too large
+                  const maxSize = 2 * 1024 * 1024; // 2MB limit
+                  let quality = 0.8;
+                  let scale = 1;
+                  
+                  // If canvas is very large, scale it down
+                  if (canvas.width > 2048 || canvas.height > 2048) {
+                    scale = Math.min(2048 / canvas.width, 2048 / canvas.height);
+                    const scaledCanvas = document.createElement('canvas');
+                    const scaledCtx = scaledCanvas.getContext('2d');
+                    
+                    scaledCanvas.width = canvas.width * scale;
+                    scaledCanvas.height = canvas.height * scale;
+                    
+                    if (scaledCtx) {
+                      // Fill with white background
+                      scaledCtx.fillStyle = 'white';
+                      scaledCtx.fillRect(0, 0, scaledCanvas.width, scaledCanvas.height);
+                      
+                      // Draw scaled image
+                      scaledCtx.drawImage(canvas, 0, 0, scaledCanvas.width, scaledCanvas.height);
+                      
+                      scaledCanvas.toBlob((blob) => {
+                        if (blob) {
+                          console.log('Scaled PNG blob created, size:', blob.size, 'scale:', scale);
+                          resolve(blob);
+                        } else {
+                          reject(new Error('Failed to create scaled PNG blob'));
+                        }
+                      }, 'image/png', quality);
+                      return;
+                    }
+                  }
+                  
                   canvas.toBlob((blob) => {
                     if (blob) {
                       console.log('PNG blob created successfully, size:', blob.size);
-                      resolve(blob);
+                      if (blob.size > maxSize) {
+                        console.log('Image too large, trying with lower quality...');
+                        canvas.toBlob((compressedBlob) => {
+                          if (compressedBlob) {
+                            console.log('Compressed PNG blob created, size:', compressedBlob.size);
+                            resolve(compressedBlob);
+                          } else {
+                            resolve(blob); // Use original if compression fails
+                          }
+                        }, 'image/jpeg', 0.6); // Use JPEG with lower quality for compression
+                      } else {
+                        resolve(blob);
+                      }
                     } else {
                       reject(new Error('Failed to create PNG blob'));
                     }
-                  }, 'image/png', 0.95);
+                  }, 'image/png', quality);
                 } catch (error) {
                   console.error('Error in image processing:', error);
                   reject(error);
