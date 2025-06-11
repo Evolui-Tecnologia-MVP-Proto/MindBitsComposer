@@ -1065,175 +1065,127 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
 
     try {
       // Debug: Log all asset properties
-      console.log('🔥 ASSET DEBUG - Full asset object:', asset);
-      console.log('🔥 ASSET DEBUG - originAssetId:', asset.originAssetId);
-      console.log('🔥 ASSET DEBUG - fileMetadata exists:', !!asset.fileMetadata);
-      console.log('🔥 ASSET DEBUG - fileMetadata length:', asset.fileMetadata?.length);
-      console.log('🔥 ASSET DEBUG - name:', asset.name);
-      console.log('🔥 ASSET DEBUG - mimeType:', asset.mimeType);
+      console.log('ASSET DEBUG - Full asset object:', asset);
+      console.log('ASSET DEBUG - originAssetId:', asset.originAssetId);
+      console.log('ASSET DEBUG - fileMetadata exists:', !!asset.fileMetadata);
+      console.log('ASSET DEBUG - fileMetadata length:', asset.fileMetadata?.length);
+      console.log('ASSET DEBUG - name:', asset.name);
+      console.log('ASSET DEBUG - mimeType:', asset.mimeType);
       
       // Check if this is a tldraw file with metadata
-      if (asset.originAssetId === "Graph_TLD" && asset.fileMetadata) {
-        console.log('Loading tldraw file from asset metadata...');
-        
-        // Use EXACT same implementation as handleFileSelect for .tldr files
-        const fileContent = asset.fileMetadata;
-        console.log('RAW FILE CONTENT LENGTH:', fileContent.length);
-        console.log('FILE CONTENT PREVIEW:', fileContent.substring(0, 200));
-        
-        let tldrawData;
+      // Files saved with the new system have fileMetadata containing .tldr content
+      if (asset.fileMetadata && asset.fileMetadata.length > 1000) {
+        // Try to detect if the fileMetadata contains tldraw JSON structure
         try {
-          const rawData = JSON.parse(fileContent);
-          console.log('JSON PARSE SUCCESS');
-          console.log('PARSED DATA TOP LEVEL KEYS:', Object.keys(rawData));
+          const testParse = JSON.parse(asset.fileMetadata.substring(0, 1000));
+          const isTldrawFile = testParse && (testParse.store || testParse.document || testParse.records);
           
-          // IMMEDIATE DEEP SANITIZATION - same as in handleFileSelect
-          tldrawData = JSON.parse(JSON.stringify(rawData, (key, value) => {
-            // Remove deprecated properties during JSON stringification
-            if (key === 'w' || key === 'h' || key === 'align' || key === 'verticalAlign' || 
-                key === 'autoSize' || key === 'text' || key === 'handles') {
-              console.log(`REMOVING DEPRECATED KEY: ${key}`);
-              return undefined; // This removes the property
-            }
-            return value;
-          }));
+          console.log('METADATA TEST - Is tldraw file:', isTldrawFile);
+          console.log('METADATA TEST - Test parse keys:', Object.keys(testParse));
           
-          console.log('DEEP SANITIZATION COMPLETE');
-        } catch (parseError) {
-          console.error('JSON PARSE ERROR:', parseError);
-          throw parseError;
-        }
-        
-        // Immediate sanitization after parsing - same as in handleFileSelect
-        console.log('IMMEDIATE SANITIZATION - Starting...');
-        
-        try {
-          if (tldrawData && tldrawData.store && editorInstance) {
-            console.log('Attempting to load snapshot with tldraw data');
-            console.log('Store keys:', Object.keys(tldrawData.store).length);
+          if (isTldrawFile) {
+            console.log('Loading tldraw file from asset metadata...');
             
-            let loadMethod;
+            // Use EXACT same implementation as handleFileSelect for .tldr files
+            const fileContent = asset.fileMetadata;
+            console.log('RAW FILE CONTENT LENGTH:', fileContent.length);
+            console.log('FILE CONTENT PREVIEW:', fileContent.substring(0, 200));
             
-            // Try loading with loadSnapshot function - same as handleFileSelect
+            let tldrawData;
             try {
-              const { loadSnapshot } = await import('tldraw');
-              loadSnapshot(editorInstance.store, tldrawData);
-              loadMethod = 'loadSnapshot';
-              console.log('loadSnapshot function succeeded');
-            } catch (loadMethodError) {
-              console.error('Error with loadSnapshot function:', loadMethodError);
+              const rawData = JSON.parse(fileContent);
+              console.log('JSON PARSE SUCCESS');
+              console.log('PARSED DATA TOP LEVEL KEYS:', Object.keys(rawData));
               
-              // Try manual loading - same as handleFileSelect
-              console.log('Trying manual loading method...');
-              editorInstance.store.clear();
-              
-              const records = Object.values(tldrawData.store).filter((record: any) => {
-                return record && record.typeName && record.id;
-              });
-              
-              console.log('Records to load:', records.length);
-              editorInstance.store.put(records);
-              
-              console.log('Manual loading succeeded');
-              loadMethod = 'manual put';
-            }
-            
-            console.log(`SUCCESS: Loaded using ${loadMethod}`);
-            console.log(`Final check - Store size: ${editorInstance.store.allRecords().length}`);
-            
-            if (editorInstance.store.allRecords().length > 0) {
-              // Content loaded successfully - same verification as handleFileSelect
-              console.log('Content loaded successfully');
-              console.log('Store size after load:', editorInstance.store.allRecords().length);
-              
-              const shapes = editorInstance.store.allRecords().filter((r: any) => r.typeName === 'shape');
-              console.log('Number of shapes loaded:', shapes.length);
-              console.log('Sample shapes:', Array.from(editorInstance.getCurrentPageShapeIds()).slice(0, 3).map(id => ({ id, type: editorInstance.getShape(id)?.type })));
-              console.log('Current page shapes:', editorInstance.getCurrentPageShapeIds().size);
-              
-              // Zoom to fit the loaded content - same as handleFileSelect
-              setTimeout(() => {
-                try {
-                  editorInstance.zoomToFit();
-                  console.log('Zoomed to fit loaded content');
-                } catch (zoomError) {
-                  console.warn('Zoom to fit failed:', zoomError);
+              // IMMEDIATE DEEP SANITIZATION - same as in handleFileSelect
+              tldrawData = JSON.parse(JSON.stringify(rawData, (key, value) => {
+                // Remove deprecated properties during JSON stringification
+                if (key === 'w' || key === 'h' || key === 'align' || key === 'verticalAlign' || 
+                    key === 'autoSize' || key === 'text' || key === 'handles') {
+                  console.log(`REMOVING DEPRECATED KEY: ${key}`);
+                  return undefined; // This removes the property
                 }
-              }, 1000);
+                return value;
+              }));
               
-            } else {
-              throw new Error('Dados de snapshot inválidos');
+              console.log('DEEP SANITIZATION COMPLETE');
+            } catch (parseError) {
+              console.error('JSON PARSE ERROR:', parseError);
+              throw parseError;
             }
-          }
-          
-          toast({
-            title: "Sucesso",
-            description: `Arquivo .tldr "${asset.name}" carregado com sucesso`,
-          });
-          
-        } catch (loadError) {
-          console.error('Error loading .tldr content:', loadError);
-          
-          // Handle validation errors related to deprecated properties - same as handleFileSelect
-          const errorMessage = loadError instanceof Error ? loadError.message : String(loadError);
-          
-          if (errorMessage.includes('ValidationError') && errorMessage.includes('"w"')) {
-            console.log('ATTEMPTING RECOVERY FROM W PROPERTY VALIDATION ERROR');
             
-            try {
-              // Regex-based sanitization as last resort - same as handleFileSelect
-              const sanitizedContent = fileContent
-                .replace(/"w":\s*[0-9.]+,?/g, '')
-                .replace(/"h":\s*[0-9.]+,?/g, '')
-                .replace(/"align":\s*"[^"]*",?/g, '')
-                .replace(/"verticalAlign":\s*"[^"]*",?/g, '')
-                .replace(/"autoSize":\s*(true|false),?/g, '')
-                .replace(/"text":\s*"[^"]*",?/g, '')
-                .replace(/"handles":\s*\[[^\]]*\],?/g, '')
-                .replace(/,\s*}/g, '}')
-                .replace(/{\s*,/g, '{');
+            // Load tldraw data - same as in handleFileSelect
+            console.log('IMMEDIATE SANITIZATION - Starting...');
+            
+            if (tldrawData && tldrawData.store && editorInstance) {
+              console.log('Attempting to load snapshot with tldraw data');
+              console.log('Store keys:', Object.keys(tldrawData.store).length);
               
-              const cleanData = JSON.parse(sanitizedContent);
+              let loadMethod;
               
-              if (cleanData.store && editorInstance) {
+              // Try loading with loadSnapshot function - same as handleFileSelect
+              try {
+                const { loadSnapshot } = await import('tldraw');
+                loadSnapshot(editorInstance.store, tldrawData);
+                loadMethod = 'loadSnapshot';
+                console.log('loadSnapshot function succeeded');
+              } catch (loadMethodError) {
+                console.error('Error with loadSnapshot function:', loadMethodError);
+                
+                // Try manual loading - same as handleFileSelect
+                console.log('Trying manual loading method...');
                 editorInstance.store.clear();
                 
-                // Load records one by one - same as handleFileSelect
-                Object.values(cleanData.store).forEach((record: any) => {
-                  try {
-                    if (record && record.id) {
-                      editorInstance.store.put([record]);
-                    }
-                  } catch (recordError) {
-                    console.warn('Skipping invalid record:', record.id);
-                  }
+                const records = Object.values(tldrawData.store).filter((record: any) => {
+                  return record && record.typeName && record.id;
                 });
                 
-                console.log('RECOVERY SUCCESSFUL');
-                toast({
-                  title: "Sucesso",
-                  description: `Arquivo "${asset.name}" carregado com correções automáticas`,
-                });
-                setShowImageModal(false);
-                return;
+                console.log('Records to load:', records.length);
+                editorInstance.store.put(records);
+                
+                console.log('Manual loading succeeded');
+                loadMethod = 'manual put';
               }
-            } catch (recoveryError) {
-              console.error('RECOVERY FAILED:', recoveryError);
+              
+              console.log(`SUCCESS: Loaded using ${loadMethod}`);
+              console.log(`Final check - Store size: ${editorInstance.store.allRecords().length}`);
+              
+              if (editorInstance.store.allRecords().length > 0) {
+                // Content loaded successfully - same verification as handleFileSelect
+                console.log('Content loaded successfully');
+                console.log('Store size after load:', editorInstance.store.allRecords().length);
+                
+                const shapes = editorInstance.store.allRecords().filter((r: any) => r.typeName === 'shape');
+                console.log('Number of shapes loaded:', shapes.length);
+                console.log('Sample shapes:', Array.from(editorInstance.getCurrentPageShapeIds()).slice(0, 3).map(id => ({ id, type: editorInstance.getShape(id)?.type })));
+                console.log('Current page shapes:', editorInstance.getCurrentPageShapeIds().size);
+                
+                // Zoom to fit the loaded content - same as handleFileSelect
+                setTimeout(() => {
+                  try {
+                    editorInstance.zoomToFit();
+                    console.log('Zoomed to fit loaded content');
+                  } catch (zoomError) {
+                    console.warn('Zoom to fit failed:', zoomError);
+                  }
+                }, 1000);
+                
+              } else {
+                throw new Error('Dados de snapshot inválidos');
+              }
             }
+            
+            toast({
+              title: "Sucesso",
+              description: `Arquivo .tldr "${asset.name}" carregado com sucesso`,
+            });
+            
+            setShowImageModal(false);
+            return;
           }
-          
-          // Standard error handling - same as handleFileSelect
-          if (errorMessage.includes('schemaVersion') || errorMessage.includes('Cannot read properties of undefined')) {
-            throw new Error('Arquivo .tldr incompatível com esta versão do editor. Tente criar um novo desenho.');
-          } else if (errorMessage.includes('ValidationError')) {
-            throw new Error('Arquivo .tldr contém dados inválidos. Verifique se o arquivo não foi corrompido.');
-          } else {
-            throw new Error(`Erro ao carregar arquivo .tldr: ${errorMessage}`);
-          }
+        } catch (detectionError) {
+          console.log('Not a tldraw file, treating as regular image:', detectionError);
         }
-        
-        setShowImageModal(false);
-        return;
       }
 
       // For regular images (non-tldraw files)
