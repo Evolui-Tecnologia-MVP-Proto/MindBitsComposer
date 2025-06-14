@@ -3196,7 +3196,16 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                     viewport: flowDiagramModal.flowData?.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
                                   };
 
-                                  const response = await fetch(`/api/document-flow-executions/${flowDiagramModal.flowData?.documentId}`, {
+                                  // Verificar se documentId está disponível
+                                  const documentId = flowDiagramModal.flowData?.documentId;
+                                  if (!documentId) {
+                                    console.error('❌ DocumentId não encontrado no flowData:', flowDiagramModal.flowData);
+                                    throw new Error('ID do documento não encontrado');
+                                  }
+
+                                  console.log('🔄 Salvando alterações para documento:', documentId);
+                                  
+                                  const response = await fetch(`/api/document-flow-executions/${documentId}`, {
                                     method: 'PUT',
                                     headers: {
                                       'Content-Type': 'application/json',
@@ -3207,7 +3216,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   });
 
                                   if (!response.ok) {
-                                    throw new Error('Erro ao salvar alterações');
+                                    const errorText = await response.text();
+                                    console.error('❌ Erro na resposta:', response.status, errorText);
+                                    throw new Error(`Erro ao salvar alterações: ${response.status}`);
                                   }
 
                                   // Atualizar estado local

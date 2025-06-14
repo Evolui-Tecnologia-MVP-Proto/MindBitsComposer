@@ -4270,6 +4270,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('🔄 Atualizando execução de fluxo para documento:', documentId);
       console.log('🔄 Dados recebidos:', { flowTasks, status, completedAt });
       
+      // Validate documentId is a valid UUID
+      if (!documentId || documentId === 'undefined' || documentId === 'null') {
+        console.error('❌ DocumentId inválido:', documentId);
+        return res.status(400).json({ error: "DocumentId é obrigatório e deve ser um UUID válido" });
+      }
+      
+      // Additional UUID format validation
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(documentId)) {
+        console.error('❌ DocumentId não é um UUID válido:', documentId);
+        return res.status(400).json({ error: "DocumentId deve ser um UUID válido" });
+      }
+      
       // Verificar se existe uma execução ativa para este documento
       const execution = await db.select()
         .from(documentFlowExecutions)
