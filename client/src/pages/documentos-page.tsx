@@ -1339,18 +1339,25 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   const openFlowDiagramModal = (execution: any) => {
     console.log("🔴 Dados recebidos na função:", execution);
     if (execution) {
-      // Garantir que o documentId está incluído nos dados do fluxo
+      // Garantir que o documentId e edges estão incluídos nos dados do fluxo
+      const baseFlowData = execution.flowTasks || execution;
       const flowDataWithDocumentId = {
-        ...(execution.flowTasks || execution),
-        documentId: execution.documentId || execution.document_id || execution.id
+        ...baseFlowData,
+        documentId: execution.documentId || execution.document_id || execution.id,
+        // Preservar edges explicitamente
+        edges: baseFlowData.edges || execution.edges || [],
+        nodes: baseFlowData.nodes || execution.nodes || [],
+        viewport: baseFlowData.viewport || execution.viewport || { x: 0, y: 0, zoom: 1 }
       };
+      
+      console.log("🔗 Edges preservadas no modal:", flowDataWithDocumentId.edges);
       
       setFlowDiagramModal({
         isOpen: true,
         flowData: flowDataWithDocumentId,
         documentTitle: execution.document?.objeto || execution.flowName || "Documento"
       });
-      console.log("🔴 Estado atualizado com documentId:", {
+      console.log("🔴 Estado atualizado com documentId e edges:", {
         isOpen: true,
         flowData: flowDataWithDocumentId,
         documentTitle: execution.document?.objeto || execution.flowName || "Documento"
@@ -3196,10 +3203,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   });
 
                                   // Salvar alterações no banco de dados imediatamente
+                                  const currentEdges = flowDiagramModal.flowData?.flowTasks?.edges || flowDiagramModal.flowData?.edges || [];
+                                  console.log('🔗 Preservando edges:', currentEdges);
+                                  
                                   const updatedFlowTasks = {
                                     nodes: updatedNodes,
-                                    edges: flowDiagramModal.flowData?.flowTasks?.edges || [],
-                                    viewport: flowDiagramModal.flowData?.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
+                                    edges: currentEdges,
+                                    viewport: flowDiagramModal.flowData?.flowTasks?.viewport || flowDiagramModal.flowData?.viewport || { x: 0, y: 0, zoom: 1 }
                                   };
 
                                   // Verificar se documentId está disponível
