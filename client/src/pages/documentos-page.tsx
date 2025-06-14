@@ -1339,14 +1339,20 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   const openFlowDiagramModal = (execution: any) => {
     console.log("🔴 Dados recebidos na função:", execution);
     if (execution) {
+      // Garantir que o documentId está incluído nos dados do fluxo
+      const flowDataWithDocumentId = {
+        ...(execution.flowTasks || execution),
+        documentId: execution.documentId || execution.document_id || execution.id
+      };
+      
       setFlowDiagramModal({
         isOpen: true,
-        flowData: execution.flowTasks || execution,
+        flowData: flowDataWithDocumentId,
         documentTitle: execution.document?.objeto || execution.flowName || "Documento"
       });
-      console.log("🔴 Estado atualizado:", {
+      console.log("🔴 Estado atualizado com documentId:", {
         isOpen: true,
-        flowData: execution.flowTasks || execution,
+        flowData: flowDataWithDocumentId,
         documentTitle: execution.document?.objeto || execution.flowName || "Documento"
       });
     }
