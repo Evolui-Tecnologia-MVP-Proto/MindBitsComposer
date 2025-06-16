@@ -4269,6 +4269,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('🔄 Atualizando execução de fluxo para documento:', documentId);
       console.log('🔄 Dados recebidos:', { flowTasks, status, completedAt });
+      console.log('🔗 FlowTasks estrutura:', {
+        hasNodes: flowTasks?.nodes ? flowTasks.nodes.length : 'undefined',
+        hasEdges: flowTasks?.edges ? flowTasks.edges.length : 'undefined',
+        hasViewport: flowTasks?.viewport ? 'sim' : 'não',
+        keys: flowTasks ? Object.keys(flowTasks) : 'flowTasks é undefined'
+      });
       
       // Validate documentId is a valid UUID
       if (!documentId || documentId === 'undefined' || documentId === 'null') {
