@@ -2441,8 +2441,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 }
               }
             });
-          } else {
-            // Para outros tipos de nós, verificar suas conexões de saída
+          } else if (connectedNode?.type !== 'endNode') {
+            // Para outros tipos de nós (EXCETO endNodes), verificar suas conexões de saída
+            // EndNodes não têm conexões de saída, portanto não aplicam pendência a outros nós
             const nodeOutgoingEdges = edges.filter(e => e.source === connectedNode.id);
             nodeOutgoingEdges.forEach(nodeEdge => {
               const finalTargetNode = updatedNodes.find(n => n.id === nodeEdge.target);
@@ -2634,18 +2635,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             if (shouldBeActive) {
               pendingConnectedNodes.add(edge.target);
             }
-          } else {
-            // Para outros tipos de nós, aplicar lógica normal
+          } else if (targetNode.type !== 'endNode') {
+            // Para outros tipos de nós (EXCETO endNodes), aplicar lógica normal
+            // EndNodes recebem conexões mas não propagam pendência
             pendingConnectedNodes.add(edge.target);
           }
-        }
-      }
-      
-      // Se o nó de destino está executado e o nó de origem não está executado
-      if (executedNodes.has(edge.target)) {
-        const sourceNode = nodes.find((n: any) => n.id === edge.source);
-        if (sourceNode && sourceNode.data?.isExecuted !== 'TRUE') {
-          pendingConnectedNodes.add(edge.source);
         }
       }
     }
@@ -3829,9 +3823,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         )}
       </div>
     );
-  };
+  }
 
-return (
+  return (
     <div className="container mx-auto py-6">
       <EditDocumentModal
         isOpen={isEditModalOpen}
