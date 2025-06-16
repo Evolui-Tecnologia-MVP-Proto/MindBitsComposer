@@ -2501,13 +2501,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           }
         }
 
-        // 6. Preparar dados para envio ao servidor
+        // 6. Preparar dados para envio ao servidor - PRESERVAR EDGES DO ESTADO ATUAL
         const updatedFlowTasks = {
-          ...flowData.flowTasks,
           nodes: updatedNodes,
-          edges: flowData.flowTasks?.edges || [],
+          edges: edges, // Usar edges do estado atual do React Flow
           viewport: flowData.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
         };
+        
+        console.log('🔗 Preservando edges do estado atual:', {
+          edgesCount: edges.length,
+          nodesCount: updatedNodes.length
+        });
 
         // 5. Enviar para o servidor (atualizar execução do fluxo, não o template)
         const requestBody: any = {
