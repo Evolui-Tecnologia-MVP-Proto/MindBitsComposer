@@ -133,9 +133,8 @@ export function FlowDiagramModal({
             Diagrama do Fluxo - {flowDiagramModal.documentTitle}
           </DialogTitle>
           <DialogDescription>
-            Visualização do diagrama de fluxo de trabalho aplicado ao documento
             {flowDiagramModal.documentObject && (
-              <div className="mt-2 text-sm font-medium text-gray-700">
+              <div className="text-sm font-medium text-gray-700">
                 Documento: {flowDiagramModal.documentObject}
               </div>
             )}
