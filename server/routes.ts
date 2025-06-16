@@ -2595,7 +2595,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("Processando flow_tasks para atualizar nós de execução");
       // Processar o flowData para atualizar os nós iniciais
-      let updatedFlowTasks = { ...flow[0].flowData } || {};
+      let updatedFlowTasks = { 
+        nodes: flow[0].flowData?.nodes || [],
+        edges: flow[0].flowData?.edges || [],
+        viewport: flow[0].flowData?.viewport || { x: 0, y: 0, zoom: 1 }
+      };
+      
+      console.log('🔗 Template original tem:', {
+        nodes: updatedFlowTasks.nodes.length,
+        edges: updatedFlowTasks.edges.length,
+        viewport: updatedFlowTasks.viewport ? 'sim' : 'não'
+      });
       
       if (updatedFlowTasks.nodes && Array.isArray(updatedFlowTasks.nodes)) {
         // 1. Encontrar o startNode e marcar como executado
