@@ -136,10 +136,12 @@ export default function DocumentosPage() {
     isOpen: boolean;
     flowData: any;
     documentTitle: string;
+    documentObject?: string;
   }>({
     isOpen: false,
     flowData: null,
     documentTitle: "",
+    documentObject: "",
   });
   
   // Estado simples para forçar re-render
@@ -1339,6 +1341,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   const openFlowDiagramModal = (execution: any) => {
     console.log("🔴 Dados recebidos na função:", execution);
     if (execution) {
+      // Buscar o documento correspondente na lista de documentos
+      const documento = documentos?.find(doc => doc.id === execution.documentId);
+      const documentObject = documento?.objeto || execution.document?.objeto || "";
+      
+      console.log("📄 Documento encontrado:", documento);
+      console.log("📋 Objeto do documento:", documentObject);
+      
       // Garantir que o documentId e edges estão incluídos nos dados do fluxo
       const baseFlowData = execution.flowTasks || execution;
       const flowDataWithDocumentId = {
@@ -1355,14 +1364,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       setFlowDiagramModal({
         isOpen: true,
         flowData: flowDataWithDocumentId,
-        documentTitle: execution.document?.objeto || execution.flowName || "Documento",
-        documentObject: execution.document?.objeto || ""
+        documentTitle: documentObject || execution.flowName || "Documento",
+        documentObject: documentObject
       });
-      console.log("🔴 Estado atualizado com documentId e edges:", {
-        isOpen: true,
-        flowData: flowDataWithDocumentId,
-        documentTitle: execution.document?.objeto || execution.flowName || "Documento"
-      });
+      console.log("🔴 Estado atualizado com documentObject:", documentObject);
     }
   };
 
