@@ -22,6 +22,7 @@ interface FlowDiagramModalData {
   isOpen: boolean;
   flowData: any | null;
   documentTitle: string;
+  documentObject?: string;
 }
 
 interface FlowDiagramModalProps {
@@ -133,6 +134,11 @@ export function FlowDiagramModal({
           </DialogTitle>
           <DialogDescription>
             Visualização do diagrama de fluxo de trabalho aplicado ao documento
+            {flowDiagramModal.documentObject && (
+              <div className="mt-2 text-sm font-medium text-gray-700">
+                Documento: {flowDiagramModal.documentObject}
+              </div>
+            )}
           </DialogDescription>
         </DialogHeader>
         

@@ -1355,7 +1355,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       setFlowDiagramModal({
         isOpen: true,
         flowData: flowDataWithDocumentId,
-        documentTitle: execution.document?.objeto || execution.flowName || "Documento"
+        documentTitle: execution.document?.objeto || execution.flowName || "Documento",
+        documentObject: execution.document?.objeto || ""
       });
       console.log("🔴 Estado atualizado com documentId e edges:", {
         isOpen: true,
