@@ -2298,7 +2298,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           try {
             const finalFlowTasks = {
               ...flowDiagramModal.flowData.flowTasks,
-              nodes: updatedNodes
+              nodes: updatedNodes,
+              edges: flowDiagramModal.flowData.flowTasks?.edges || [],
+              viewport: flowDiagramModal.flowData.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
             };
 
             const response = await fetch(`/api/document-flow-executions/${flowDiagramModal.flowData.documentId}`, {
@@ -2502,7 +2504,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         // 6. Preparar dados para envio ao servidor
         const updatedFlowTasks = {
           ...flowData.flowTasks,
-          nodes: updatedNodes
+          nodes: updatedNodes,
+          edges: flowData.flowTasks?.edges || [],
+          viewport: flowData.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
         };
 
         // 5. Enviar para o servidor (atualizar execução do fluxo, não o template)
