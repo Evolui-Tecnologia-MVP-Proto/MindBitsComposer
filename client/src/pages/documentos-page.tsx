@@ -3203,14 +3203,26 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   });
 
                                   // Salvar alterações no banco de dados imediatamente
-                                  const currentEdges = flowDiagramModal.flowData?.flowTasks?.edges || flowDiagramModal.flowData?.edges || [];
-                                  console.log('🔗 Preservando edges:', currentEdges);
+                                  // Obter edges do modal atual - garantir que não são perdidas
+                                  const currentEdges = flowDiagramModal.flowData?.edges || 
+                                                      flowDiagramModal.flowData?.flowTasks?.edges || [];
+                                  
+                                  console.log('🔗 Edges encontradas no modal:', currentEdges.length);
+                                  console.log('🔗 Estrutura completa do flowData:', flowDiagramModal.flowData);
                                   
                                   const updatedFlowTasks = {
                                     nodes: updatedNodes,
                                     edges: currentEdges,
-                                    viewport: flowDiagramModal.flowData?.flowTasks?.viewport || flowDiagramModal.flowData?.viewport || { x: 0, y: 0, zoom: 1 }
+                                    viewport: flowDiagramModal.flowData?.viewport || 
+                                             flowDiagramModal.flowData?.flowTasks?.viewport || 
+                                             { x: 0, y: 0, zoom: 1 }
                                   };
+                                  
+                                  console.log('🔗 Dados enviados para salvamento:', {
+                                    nodes: updatedFlowTasks.nodes.length,
+                                    edges: updatedFlowTasks.edges.length,
+                                    viewport: updatedFlowTasks.viewport
+                                  });
 
                                   // Verificar se documentId está disponível
                                   const documentId = flowDiagramModal.flowData?.documentId;
