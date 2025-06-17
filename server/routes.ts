@@ -5007,19 +5007,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Generic tables routes
   app.get("/api/generic-tables/:name", async (req, res) => {
+    console.log("🔍 [API] Requisição para generic-tables:", req.params.name);
+    console.log("🔍 [API] Usuário autenticado:", req.isAuthenticated());
+    
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const { name } = req.params;
+      console.log("🔍 [API] Buscando tabela:", name);
+      
       const genericTable = await storage.getGenericTableByName(name);
+      console.log("🔍 [API] Resultado encontrado:", !!genericTable);
       
       if (!genericTable) {
+        console.log("❌ [API] Tabela não encontrada:", name);
         return res.status(404).json({ error: "Tabela genérica não encontrada" });
       }
       
+      console.log("✅ [API] Retornando dados:", genericTable);
       res.json(genericTable);
     } catch (error: any) {
-      console.error("Erro ao buscar tabela genérica:", error);
+      console.error("❌ [API] Erro ao buscar tabela genérica:", error);
       res.status(500).send("Erro ao buscar tabela genérica");
     }
   });

@@ -92,18 +92,28 @@ export function CreateDocumentModal({
   resetFormData,
 }: CreateDocumentModalProps) {
   // Query para buscar tipos de documento da tabela generic_tables
-  const { data: docTypesData } = useQuery({
+  const { data: docTypesData, isLoading, error } = useQuery({
     queryKey: ['/api/generic-tables/manual_doc_types'],
     queryFn: async () => {
+      console.log('🔍 Fazendo query para tipos de documento...');
       const response = await fetch('/api/generic-tables/manual_doc_types');
+      console.log('📄 Response status:', response.status);
       if (!response.ok) throw new Error('Erro ao buscar tipos de documento');
-      return response.json();
+      const data = await response.json();
+      console.log('📋 Dados recebidos:', data);
+      return data;
     },
     enabled: isOpen,
   });
 
   // Extrair as opções de tipos de documento do conteúdo JSON
   const docTypeOptions = docTypesData?.content?.manual_doc_types || [];
+  
+  console.log('🎯 Modal aberto:', isOpen);
+  console.log('🎯 Loading:', isLoading);
+  console.log('🎯 Error:', error);
+  console.log('🎯 DocTypesData:', docTypesData);
+  console.log('🎯 DocTypeOptions:', docTypeOptions);
 
   return (
     <Dialog
