@@ -1064,29 +1064,54 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     if (!editorInstance) return;
 
     try {
-      // Check if this is a tldraw file with metadata
-      if (asset.originAssetId === "Graph_TLD" && asset.fileMetadata) {
-        console.log('Loading tldraw file with metadata...');
+      // Check if this is a TLD file that should be loaded from file_metadata
+      const isTldAsset = (asset.originAssetId === "Graph_TLD") || (asset.editor === "Graph_TLD");
+      
+      if (isTldAsset && asset.fileMetadata) {
+        console.log('Loading TLD file from file_metadata...', {
+          assetName: asset.name,
+          assetType: asset.originAssetId || asset.editor,
+          hasMetadata: !!asset.fileMetadata
+        });
+        
         try {
-          // Parse the stored tldraw snapshot
+          // Parse the stored tldraw snapshot from file_metadata
           const snapshot = JSON.parse(asset.fileMetadata);
-          console.log('Parsed snapshot:', snapshot);
+          console.log('Parsed TLD snapshot:', {
+            hasStore: !!snapshot.store,
+            hasSchema: !!snapshot.schema,
+            storeKeys: snapshot.store ? Object.keys(snapshot.store).length : 0
+          });
           
-          // Load the snapshot into the editor
-          editorInstance.store.loadSnapshot(snapshot);
+          // Load the snapshot into the editor using the same logic as file loading
+          if (snapshot.store && snapshot.schema) {
+            // Use loadSnapshot for proper schema handling
+            loadSnapshot(editorInstance.store, snapshot);
+          } else {
+            // Fallback for older formats
+            editorInstance.store.loadSnapshot(snapshot);
+          }
+          
+          // Set active page if available
+          const pageIds = Object.values(editorInstance.store.allRecords())
+            .filter((r: any) => r.typeName === 'page')
+            .map((r: any) => r.id);
+          if (pageIds.length > 0) {
+            editorInstance.setCurrentPage(pageIds[0]);
+          }
           
           toast({
             title: "Sucesso",
-            description: `Arquivo tldraw "${asset.name}" carregado com sucesso`,
+            description: `Arquivo TLD "${asset.name}" carregado com sucesso`,
           });
           
           setShowImageModal(false);
           return;
         } catch (parseError) {
-          console.error('Erro ao carregar snapshot tldraw:', parseError);
+          console.error('Erro ao carregar snapshot TLD:', parseError);
           toast({
             title: "Erro",
-            description: "Erro ao carregar dados do arquivo tldraw",
+            description: "Erro ao carregar dados do arquivo TLD",
             variant: "destructive"
           });
           return;
@@ -1260,23 +1285,77 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                     Nenhum asset global disponível
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {globalAssets.map((asset: any) => (
-                      <div
-                        key={asset.id}
-                        className="border rounded-lg p-3 cursor-pointer hover:bg-gray-50 transition-colors"
-                        onClick={() => handleAssetSelect(asset)}
-                      >
-                        <div className="aspect-square bg-gray-100 rounded mb-2 overflow-hidden">
-                          <img
-                            src={asset.fileData.startsWith('data:') ? asset.fileData : `data:image/png;base64,${asset.fileData}`}
-                            alt={asset.name}
-                            className="w-full h-full object-cover"
-                          />
+                  <div className="space-y-4">
+                    {/* Separar arquivos TLD dos outros */}
+                    {globalAssets.filter(asset => asset.editor === "Graph_TLD").length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-medium mb-3 text-green-700 flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/>
+                          </svg>
+                          Arquivos TLD globais (clique para carregar)
+                        </h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                          {globalAssets
+                            .filter(asset => asset.editor === "Graph_TLD")
+                            .map((asset: any) => (
+                              <div
+                                key={asset.id}
+                                className="border-2 border-green-200 rounded-lg p-3 cursor-pointer hover:bg-green-50 transition-colors bg-green-25"
+                                onClick={() => handleAssetSelect(asset)}
+                              >
+                                <div className="aspect-square bg-gray-100 rounded mb-2 overflow-hidden">
+                                  <img
+                                    src={asset.fileData.startsWith('data:') ? asset.fileData : `data:image/png;base64,${asset.fileData}`}
+                                    alt={asset.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <p className="text-xs text-center truncate text-green-700 font-medium" title={asset.name}>
+                                  {asset.name}
+                                </p>
+                                <div className="text-center mt-1">
+                                  <span className="inline-block px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
+                                    tldraw
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
                         </div>
-                        <p className="text-xs text-gray-600 truncate">{asset.name}</p>
                       </div>
-                    ))}
+                    )}
+
+                    {/* Outros assets globais */}
+                    {globalAssets.filter(asset => asset.editor !== "Graph_TLD").length > 0 && (
+                      <div>
+                        <h4 className="text-sm font-medium mb-3 text-gray-700 flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"/>
+                          </svg>
+                          Outras imagens globais (inserir como shape)
+                        </h4>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                          {globalAssets
+                            .filter(asset => asset.editor !== "Graph_TLD")
+                            .map((asset: any) => (
+                              <div
+                                key={asset.id}
+                                className="border rounded-lg p-3 cursor-pointer hover:bg-gray-50 transition-colors"
+                                onClick={() => handleAssetSelect(asset)}
+                              >
+                                <div className="aspect-square bg-gray-100 rounded mb-2 overflow-hidden">
+                                  <img
+                                    src={asset.fileData.startsWith('data:') ? asset.fileData : `data:image/png;base64,${asset.fileData}`}
+                                    alt={asset.name}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                                <p className="text-xs text-gray-600 truncate">{asset.name}</p>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
