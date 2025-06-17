@@ -5017,7 +5017,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { name } = req.params;
       console.log("🔍 [API] Buscando tabela:", name);
       
-      const genericTable = await storage.getGenericTableByName(name);
+      // Use direct database helper to avoid circular dependency
+      const { getGenericTableByNameDirect } = await import("./db-helpers");
+      const genericTable = await getGenericTableByNameDirect(name);
       console.log("🔍 [API] Resultado encontrado:", !!genericTable);
       
       if (!genericTable) {

@@ -1848,11 +1848,29 @@ export class MemStorage implements IStorage {
   async getGenericTableByName(name: string): Promise<GenericTable | undefined> {
     try {
       console.log("🔍 [Storage] Buscando tabela genérica:", name);
-      console.log("🔍 [Storage] Database disponível:", !!db);
-      console.log("🔍 [Storage] genericTables disponível:", !!genericTables);
       
-      const [genericTable] = await db.select().from(genericTables).where(eq(genericTables.name, name));
-      console.log("🔍 [Storage] Resultado:", genericTable);
+      // Use direct SQL query to avoid potential circular dependency issues
+      const result = await pool.query(
+        'SELECT id, name, description, content, created_at, updated_at FROM generic_tables WHERE name = $1 LIMIT 1',
+        [name]
+      );
+      
+      if (result.rows.length === 0) {
+        console.log("🔍 [Storage] Nenhum resultado encontrado para:", name);
+        return undefined;
+      }
+      
+      const row = result.rows[0];
+      const genericTable: GenericTable = {
+        id: row.id,
+        name: row.name,
+        description: row.description,
+        content: row.content || {},
+        createdAt: row.created_at,
+        updatedAt: row.updated_at
+      };
+      
+      console.log("🔍 [Storage] Resultado encontrado:", genericTable);
       return genericTable;
     } catch (error) {
       console.error("❌ [Storage] Erro ao buscar tabela genérica:", error);
