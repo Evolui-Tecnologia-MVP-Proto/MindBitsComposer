@@ -858,8 +858,52 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           console.log('Antes do loadSnapshot - Shape de texto:', record.id, 'props.w:', record.props.w, 'typeof:', typeof record.props.w);
         }
       });
-      // Carregue diretamente
-      loadSnapshot(editorInstance.store, snapshotData);
+      
+      // Verificar se o schema está presente e válido
+      console.log('Schema check:', {
+        hasSchema: !!snapshotData.schema,
+        schemaKeys: snapshotData.schema ? Object.keys(snapshotData.schema) : [],
+        schemaVersion: snapshotData.schema?.schemaVersion,
+        storeVersion: snapshotData.schema?.storeVersion
+      });
+      
+      // Se não tem schema válido, criar um padrão
+      if (!snapshotData.schema || !snapshotData.schema.schemaVersion) {
+        console.log('Criando schema padrão para dados sem schema...');
+        snapshotData = {
+          ...snapshotData,
+          schema: {
+            schemaVersion: 1,
+            storeVersion: 4,
+            recordVersions: {
+              asset: { version: 1, subTypeKey: "type", subTypeVersions: { image: 2, video: 2, bookmark: 0 } },
+              camera: { version: 1 },
+              document: { version: 2 },
+              instance: { version: 22 },
+              instance_page_state: { version: 5 },
+              page: { version: 1 },
+              shape: { version: 3, subTypeKey: "type", subTypeVersions: { group: 0, text: 1, bookmark: 1, draw: 1, geo: 7, note: 4, line: 1, frame: 0, arrow: 2, highlight: 0, embed: 4, image: 2, video: 1 } },
+              instance_presence: { version: 5 },
+              pointer: { version: 1 }
+            }
+          }
+        };
+      }
+      
+      // Carregue com try/catch para capturar erros específicos
+      try {
+        console.log('Tentando loadSnapshot...');
+        loadSnapshot(editorInstance.store, snapshotData);
+        console.log('loadSnapshot executado com sucesso!');
+      } catch (migrationError) {
+        console.error('Error migrating store', migrationError);
+        console.error('Detailed error:', {
+          name: migrationError.name,
+          message: migrationError.message,
+          stack: migrationError.stack
+        });
+        throw migrationError;
+      }
       // Forçar página ativa para a primeira encontrada
       const pageIds = Object.values(editorInstance.store.allRecords())
         .filter((r: any) => r.typeName === 'page')
