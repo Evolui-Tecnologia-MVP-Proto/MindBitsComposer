@@ -12,6 +12,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useConfirmationToast } from "@/hooks/use-confirmation-toast";
+import { useNavigationGuard } from "@/hooks/use-navigation-guard";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Link } from "wouter";
@@ -114,6 +115,7 @@ export default function LexicalPage() {
   const [pluginSelectValue, setPluginSelectValue] = useState<string>("");
   const { toast } = useToast();
   const { showConfirmation } = useConfirmationToast();
+  const { hasUnsavedChanges, setHasUnsavedChanges, setSaveFunction } = useNavigationGuard();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const lexicalFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -289,6 +291,18 @@ export default function LexicalPage() {
       setHasInitializedPanel(true);
     }
   }, [documentEditions, hasInitializedPanel]);
+
+  // Configurar função de salvamento para o sistema de proteção de navegação
+  useEffect(() => {
+    setSaveFunction(() => () => handleSave(true)); // forceExit = true para navegação
+  }, [setSaveFunction, selectedEdition, handleSave]);
+
+  // Monitorar mudanças no conteúdo do editor para detectar alterações não salvas
+  useEffect(() => {
+    // Verificar se há conteúdo no editor e se não está salvo
+    const hasUnsaved = hasEditorContent && (selectedEdition || currentDocumentId);
+    setHasUnsavedChanges(hasUnsaved);
+  }, [hasEditorContent, selectedEdition, currentDocumentId, setHasUnsavedChanges]);
 
   // Função para receber dados do plugin
   const handlePluginDataExchange = (data: any) => {
@@ -751,7 +765,12 @@ export default function LexicalPage() {
     deleteMyAssetMutation.mutate(artifactId);
   };
 
-  const handleSave = () => {
+  const handleSave = (forceExit = false) => {
+    // Se está forçando saída (navegando para outro menu) e não há conteúdo, apenas sair
+    if (forceExit && !hasEditorContent) {
+      return;
+    }
+
     // 1. Documentos Composer selecionado: salvar com estado do editor
     if (selectedEdition) {
       const plainText = content.replace(/<[^>]*>/g, '').trim();
@@ -775,8 +794,8 @@ export default function LexicalPage() {
       return;
     }
 
-    // 2. Templates Estruturais selecionado: mostrar toast
-    if (selectedTemplate) {
+    // 2. Templates Estruturais selecionado: mostrar toast (apenas se não for navegação forçada)
+    if (selectedTemplate && !forceExit) {
       toast({
         title: "Funcionalidade a Implementar",
         description: "O salvamento de templates estruturais será implementado em breve.",
@@ -785,8 +804,10 @@ export default function LexicalPage() {
       return;
     }
 
-    // 3. Editor sem seleção: salvar localmente no formato .lexical
-    handleSaveLocal();
+    // 3. Editor sem seleção: salvar localmente no formato .lexical (apenas se não for navegação forçada)
+    if (!forceExit) {
+      handleSaveLocal();
+    }
   };
 
   const handleSaveLocal = () => {
@@ -1565,7 +1586,7 @@ export default function LexicalPage() {
                   <Trash2 className="w-4 h-4" />
                 </Button>
                 <Button
-                  onClick={handleSave}
+                  onClick={() => handleSave()}
                   disabled={saveMutation.isPending || !hasEditorContent || viewMode === 'preview'}
                   size="sm"
                   title={saveMutation.isPending ? "Salvando..." : "Salvar"}
