@@ -479,3 +479,23 @@ export const repoStructureRelations = {
     columns: [repoStructure.uid],
   },
 };
+
+// Generic Tables
+export const genericTables = pgTable("generic_tables", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  content: json("content").$type<Record<string, any>>().default({}),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Generic Tables schema
+export const insertGenericTableSchema = createInsertSchema(genericTables).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertGenericTable = z.infer<typeof insertGenericTableSchema>;
+export type GenericTable = typeof genericTables.$inferSelect;
