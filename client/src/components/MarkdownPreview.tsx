@@ -15,7 +15,9 @@ function MermaidDiagram({ chart }: { chart: string }) {
   const elementRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (elementRef.current) {
+    if (elementRef.current && chart.trim()) {
+      console.log('Rendering Mermaid diagram:', chart);
+      
       // Initialize mermaid if not already done
       mermaid.initialize({
         startOnLoad: false,
@@ -27,24 +29,29 @@ function MermaidDiagram({ chart }: { chart: string }) {
       // Generate unique ID for this diagram
       const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
       
+      // Clean the chart content
+      const cleanChart = chart.trim();
+      
       // Render the diagram
-      mermaid.render(id, chart).then((result) => {
+      mermaid.render(id, cleanChart).then((result) => {
+        console.log('Mermaid render success:', result);
         if (elementRef.current) {
           elementRef.current.innerHTML = result.svg;
         }
       }).catch((error) => {
-        console.error('Mermaid rendering error:', error);
+        console.error('Mermaid rendering error:', error, 'Chart:', cleanChart);
         if (elementRef.current) {
           elementRef.current.innerHTML = `<div class="p-4 bg-red-50 border border-red-200 rounded text-red-700">
             <strong>Erro ao renderizar diagrama Mermaid:</strong><br/>
-            <pre class="mt-2 text-sm">${chart}</pre>
+            <pre class="mt-2 text-sm whitespace-pre-wrap">${cleanChart}</pre>
+            <div class="mt-2 text-xs text-gray-600">Erro: ${error.message || error}</div>
           </div>`;
         }
       });
     }
   }, [chart]);
 
-  return <div ref={elementRef} className="my-4 flex justify-center" />;
+  return <div ref={elementRef} className="my-4 flex justify-center w-full" />;
 }
 
 // Custom components for MDX rendering
@@ -231,11 +238,14 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
   const flushCodeBlock = (language?: string) => {
     if (codeBlock.length > 0) {
       const content = codeBlock.join('\n');
+      console.log('Flushing code block with language:', language, 'Content:', content);
       
       // Check if it's a Mermaid diagram
       if (language === 'mermaid') {
+        console.log('Detected Mermaid diagram, rendering...');
         elements.push(<MermaidDiagram key={elements.length} chart={content} />);
       } else {
+        console.log('Regular code block, language:', language);
         elements.push(
           <pre key={elements.length} className="bg-gray-900 text-gray-100 p-4 rounded-lg mb-4 overflow-x-auto">
             <code className="text-sm font-mono">{content}</code>
