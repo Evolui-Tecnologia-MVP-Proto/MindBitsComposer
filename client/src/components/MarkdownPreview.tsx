@@ -373,10 +373,15 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
               const alt = img.getAttribute('alt') || '';
               row.push(`![${alt}](${src})`);
             } 
-            // Check if cell contains Mermaid code
+            // Check if cell contains Mermaid code (with language-mermaid class)
             else if (cell.querySelector('pre code.language-mermaid')) {
               const codeContent = cell.querySelector('pre code')?.textContent || '';
               row.push(`\`\`\`mermaid\n${codeContent}\n\`\`\``);
+            }
+            // Check if cell contains regular code block
+            else if (cell.querySelector('pre code:not(.language-mermaid)')) {
+              const codeContent = cell.querySelector('pre code')?.textContent || '';
+              row.push(`\`\`\`\n${codeContent}\n\`\`\``);
             }
             // Regular text content
             else {
@@ -408,6 +413,10 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
                           {/* Handle Mermaid diagrams in cells */}
                           {cell.startsWith('```mermaid') ? (
                             <MermaidDiagram chart={cell.replace(/```mermaid\n|\n```/g, '')} />
+                          ) : cell.startsWith('```\n') && cell.endsWith('\n```') ? (
+                            <pre className="bg-gray-900 text-gray-100 p-3 rounded text-xs font-mono overflow-x-auto">
+                              <code>{cell.replace(/```\n|\n```/g, '')}</code>
+                            </pre>
                           ) : (
                             processInlineFormatting(cell)
                           )}

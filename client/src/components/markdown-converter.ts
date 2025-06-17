@@ -152,8 +152,8 @@ export function createMarkdownConverter() {
                     cellText.includes('sequenceDiagram') || cellText.includes('classDiagram') ||
                     cellText.includes('stateDiagram') || cellText.includes('erDiagram') ||
                     cellText.includes('journey') || cellText.includes('gantt')) {
-                  // Render as Mermaid code block
-                  markdown += '        <pre><code class="language-mermaid">\n';
+                  // Render as regular code block (no Mermaid rendering)
+                  markdown += '        <pre><code>\n';
                   markdown += cellText + '\n';
                   markdown += '        </code></pre>\n';
                 } else {
