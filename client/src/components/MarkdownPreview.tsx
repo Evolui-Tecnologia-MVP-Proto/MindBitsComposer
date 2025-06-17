@@ -58,6 +58,107 @@ const mdxComponents = {
   em: (props: any) => <em className="italic text-gray-700" {...props} />,
 };
 
+// Process inline formatting like bold, italic, links, and inline images
+function processInlineFormatting(text: string): React.ReactNode {
+  const parts: React.ReactNode[] = [];
+  let remaining = text;
+  let key = 0;
+
+  while (remaining.length > 0) {
+    // Check for images first
+    const imageMatch = remaining.match(/!\[(.*?)\]\((.*?)\)/);
+    if (imageMatch) {
+      const beforeImage = remaining.substring(0, imageMatch.index);
+      if (beforeImage) {
+        parts.push(beforeImage);
+      }
+      const [, alt, src] = imageMatch;
+      parts.push(
+        <img 
+          key={key++} 
+          src={src} 
+          alt={alt} 
+          className="inline max-w-full h-auto rounded shadow-sm mx-1" 
+          style={{ maxHeight: '200px' }}
+        />
+      );
+      remaining = remaining.substring((imageMatch.index || 0) + imageMatch[0].length);
+      continue;
+    }
+
+    // Check for links
+    const linkMatch = remaining.match(/\[([^\]]+)\]\(([^)]+)\)/);
+    if (linkMatch) {
+      const beforeLink = remaining.substring(0, linkMatch.index);
+      if (beforeLink) {
+        parts.push(beforeLink);
+      }
+      const [, linkText, linkUrl] = linkMatch;
+      parts.push(
+        <a key={key++} href={linkUrl} className="text-blue-600 hover:text-blue-800 underline">
+          {linkText}
+        </a>
+      );
+      remaining = remaining.substring((linkMatch.index || 0) + linkMatch[0].length);
+      continue;
+    }
+
+    // Check for bold
+    const boldMatch = remaining.match(/\*\*(.*?)\*\*/);
+    if (boldMatch) {
+      const beforeBold = remaining.substring(0, boldMatch.index);
+      if (beforeBold) {
+        parts.push(beforeBold);
+      }
+      parts.push(
+        <strong key={key++} className="font-semibold text-gray-900">
+          {boldMatch[1]}
+        </strong>
+      );
+      remaining = remaining.substring((boldMatch.index || 0) + boldMatch[0].length);
+      continue;
+    }
+
+    // Check for italic
+    const italicMatch = remaining.match(/\*(.*?)\*/);
+    if (italicMatch) {
+      const beforeItalic = remaining.substring(0, italicMatch.index);
+      if (beforeItalic) {
+        parts.push(beforeItalic);
+      }
+      parts.push(
+        <em key={key++} className="italic text-gray-700">
+          {italicMatch[1]}
+        </em>
+      );
+      remaining = remaining.substring((italicMatch.index || 0) + italicMatch[0].length);
+      continue;
+    }
+
+    // Check for inline code
+    const codeMatch = remaining.match(/`([^`]+)`/);
+    if (codeMatch) {
+      const beforeCode = remaining.substring(0, codeMatch.index);
+      if (beforeCode) {
+        parts.push(beforeCode);
+      }
+      parts.push(
+        <code key={key++} className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm font-mono">
+          {codeMatch[1]}
+        </code>
+      );
+      remaining = remaining.substring((codeMatch.index || 0) + codeMatch[0].length);
+      continue;
+    }
+
+    // No more formatting found, add remaining text
+    parts.push(remaining);
+    break;
+  }
+
+  return parts.length === 1 ? parts[0] : <>{parts}</>;
+}
+
 // Simple markdown to React renderer
 function parseMarkdownToReact(markdown: string): React.ReactNode {
   if (!markdown) {
@@ -81,7 +182,8 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
     if (currentParagraph.length > 0) {
       const content = currentParagraph.join('\n').trim();
       if (content) {
-        elements.push(<p key={elements.length} className="mb-4 leading-relaxed text-gray-700">{content}</p>);
+        const processedContent = processInlineFormatting(content);
+        elements.push(<p key={elements.length} className="mb-4 leading-relaxed text-gray-700">{processedContent}</p>);
       }
       currentParagraph = [];
     }
@@ -207,6 +309,24 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
           <li className="text-gray-700">{text}</li>
         </ListComponent>
       );
+      return;
+    }
+
+    // Handle images
+    if (line.match(/!\[.*?\]\(.*?\)/)) {
+      flushParagraph();
+      const imageMatch = line.match(/!\[(.*?)\]\((.*?)\)/);
+      if (imageMatch) {
+        const [, alt, src] = imageMatch;
+        elements.push(
+          <img 
+            key={elements.length} 
+            src={src} 
+            alt={alt} 
+            className="max-w-full h-auto rounded-lg shadow-sm mb-4" 
+          />
+        );
+      }
       return;
     }
 
