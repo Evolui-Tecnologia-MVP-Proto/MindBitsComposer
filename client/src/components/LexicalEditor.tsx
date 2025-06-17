@@ -769,14 +769,37 @@ interface LexicalEditorProps {
   markdownContent?: string;
 }
 
-// Função para converter conteúdo Lexical para markdown
+// Função para converter conteúdo Lexical para markdown com limpeza
 function convertToMarkdown(editorState: any): string {
   const converter = createMarkdownConverter();
   
-  return editorState.read(() => {
+  const rawMarkdown = editorState.read(() => {
     const root = $getRoot();
     return converter.convert(root);
   });
+  
+  // Aplicar limpeza consistente do markdown
+  return cleanMarkdownContent(rawMarkdown);
+}
+
+// Função para limpar conteúdo markdown de forma consistente
+function cleanMarkdownContent(markdown: string): string {
+  if (!markdown?.trim()) return markdown;
+  
+  return markdown
+    .split('\n')
+    .map(line => line.trimEnd()) // Remove trailing whitespace
+    .join('\n')
+    .replace(/\n{4,}/g, '\n\n\n') // Limit consecutive newlines
+    .replace(/\n{3,}(?=\|)/g, '\n\n') // Before tables, max 2 newlines
+    .replace(/(?<=\|.*)\n{3,}(?=\|)/g, '\n') // Between table rows, single newline
+    .replace(/(?<=\|.*)\n{2,}(?=[^|\n])/g, '\n\n') // After tables, 2 newlines
+    // Clean table cell content specifically
+    .replace(/(\|[^|]*)\n\n+([^|]*\|)/g, '$1 $2') // Remove blank lines in cells
+    .replace(/(\|[^|]*)\n+(\s*\|)/g, '$1 $2') // Normalize cell spacing
+    .replace(/\|\s{2,}/g, '| ') // Normalize spaces after pipes
+    .replace(/\s{2,}\|/g, ' |') // Normalize spaces before pipes
+    .trim();
 }
 
 // Plugin para inserir seções de template automaticamente
@@ -1165,7 +1188,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                       <p className="text-sm text-gray-600 mt-1">Visualização renderizada do conteúdo markdown</p>
                     </div>
                     <MarkdownPreview 
-                      content={mdxContent || currentMarkdown} 
+                      content={currentMarkdown} 
                       className="prose prose-lg max-w-none"
                     />
                   </div>

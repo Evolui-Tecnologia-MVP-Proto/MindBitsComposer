@@ -212,19 +212,28 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
     );
   }
 
-  // Clean up markdown: remove excessive empty lines and normalize line breaks
-  const cleanMarkdown = markdown
-    .split('\n')
-    .map(line => line.trimEnd()) // Remove trailing whitespace from each line
-    .join('\n')
-    .replace(/\n{4,}/g, '\n\n\n') // Replace 4+ consecutive newlines with just 3 (allows proper section breaks)
-    .replace(/\n{3,}(?=\|)/g, '\n\n') // Before table rows, limit to 2 newlines
-    .replace(/(?<=\|.*)\n{3,}(?=\|)/g, '\n') // Between table rows, use single newline
-    .replace(/(?<=\|.*)\n{2,}(?=[^|\n])/g, '\n\n') // After tables, allow 2 newlines before next content
-    // Clean table content specifically
-    .replace(/(\|[^|]*)\n\n+([^|]*\|)/g, '$1 $2') // Remove blank lines between table cell content
-    .replace(/(\|[^|]*)\n+(\s*\|)/g, '$1 $2') // Normalize spacing in table cells
-    .trim(); // Remove leading/trailing whitespace
+  // Função para limpar conteúdo markdown de forma consistente (mesma que LexicalEditor)
+  function cleanMarkdownContent(markdown: string): string {
+    if (!markdown?.trim()) return markdown;
+    
+    return markdown
+      .split('\n')
+      .map(line => line.trimEnd()) // Remove trailing whitespace
+      .join('\n')
+      .replace(/\n{4,}/g, '\n\n\n') // Limit consecutive newlines
+      .replace(/\n{3,}(?=\|)/g, '\n\n') // Before tables, max 2 newlines
+      .replace(/(?<=\|.*)\n{3,}(?=\|)/g, '\n') // Between table rows, single newline
+      .replace(/(?<=\|.*)\n{2,}(?=[^|\n])/g, '\n\n') // After tables, 2 newlines
+      // Clean table cell content specifically
+      .replace(/(\|[^|]*)\n\n+([^|]*\|)/g, '$1 $2') // Remove blank lines in cells
+      .replace(/(\|[^|]*)\n+(\s*\|)/g, '$1 $2') // Normalize cell spacing
+      .replace(/\|\s{2,}/g, '| ') // Normalize spaces after pipes
+      .replace(/\s{2,}\|/g, ' |') // Normalize spaces before pipes
+      .trim();
+  }
+
+  // Apply the same cleaning function used in LexicalEditor for consistency
+  const cleanMarkdown = cleanMarkdownContent(markdown);
 
   const lines = cleanMarkdown.split('\n');
   const elements: React.ReactNode[] = [];
