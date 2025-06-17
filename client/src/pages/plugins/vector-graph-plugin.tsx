@@ -785,6 +785,188 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     fileInputRef.current?.click();
   }, []);
 
+  // Função compartilhada para carregar dados TLD (usada tanto para arquivos quanto para assets)
+  const loadTldrawData = useCallback((tldrawData: any, source: string) => {
+    if (!editorInstance) return;
+
+    console.log(`Parsed .tldr file structure from ${source}:`);
+    console.log('- tldrawFileFormatVersion:', tldrawData.tldrawFileFormatVersion);
+    console.log('- schema:', tldrawData.schema ? 'present' : 'missing');
+    console.log('- records:', Array.isArray(tldrawData.records) ? `array with ${tldrawData.records.length} items` : 'not array');
+    console.log('- store:', tldrawData.store ? `object with ${Object.keys(tldrawData.store).length} keys` : 'missing');
+    console.log('- root keys:', Object.keys(tldrawData));
+    
+    // Handle different tldraw file formats
+    let snapshotData;
+    
+    if (tldrawData.tldrawFileFormatVersion && tldrawData.records) {
+      // New format (v1+) - records array format
+      console.log('Loading new format .tldr file with records array');
+      snapshotData = {
+        store: tldrawData.records.reduce((acc: any, record: any) => {
+          acc[record.id] = record;
+          return acc;
+        }, {}),
+        schema: tldrawData.schema || {}
+      };
+    } else if (tldrawData.store) {
+      // Middle format - store object format
+      console.log('Loading middle format .tldr file with store object');
+      console.log('🔥 MIDDLE FORMAT - Store keys count:', Object.keys(tldrawData.store).length);
+      console.log('🔥 MIDDLE FORMAT - Sample shape with w property check...');
+      
+      // Log shapes with 'w' property to confirm the issue
+      Object.values(tldrawData.store).forEach((record: any, index) => {
+        if (record.type === 'text' && record.props && record.props.w !== undefined) {
+          console.log(`🔥 FOUND TEXT SHAPE WITH W: ${record.id}`, {
+            type: record.type,
+            props: Object.keys(record.props),
+            wValue: record.props.w
+          });
+        }
+      });
+      
+      snapshotData = tldrawData;
+    } else if (Array.isArray(tldrawData)) {
+      // Legacy format - direct records array
+      console.log('Loading legacy format .tldr file with direct records array');
+      snapshotData = {
+        store: tldrawData.reduce((acc: any, record: any) => {
+          acc[record.id] = record;
+          return acc;
+        }, {})
+      };
+    } else if (typeof tldrawData === 'object' && Object.keys(tldrawData).length > 0) {
+      // Try to detect if it's already a store format
+      console.log('Loading assumed store format .tldr file');
+      snapshotData = { store: tldrawData };
+    } else {
+      throw new Error('Formato de arquivo .tldr não reconhecido');
+    }
+    
+    console.log('Snapshot data to load:');
+    console.log('- snapshotData.store exists:', !!snapshotData.store);
+    console.log('- snapshotData.store keys:', snapshotData.store ? Object.keys(snapshotData.store).length : 0);
+    
+    // Log a few sample records to understand structure
+    if (snapshotData.store) {
+      const sampleRecords = Object.values(snapshotData.store).slice(0, 3);
+      console.log('Sample records:', sampleRecords);
+    }
+    
+    let snapshotToLoad = snapshotData;
+
+    // Se o arquivo tem a estrutura padrão (exportado pelo editor), não sanitize!
+    if (
+      snapshotData &&
+      typeof snapshotData === 'object' &&
+      snapshotData.store &&
+      typeof snapshotData.store === 'object' &&
+      snapshotData.schema
+    ) {
+      // Log shapes de texto antes do loadSnapshot
+      Object.values(snapshotData.store).forEach((record: any) => {
+        if (record.type === 'text') {
+          console.log('Antes do loadSnapshot - Shape de texto:', record.id, 'props.w:', record.props.w, 'typeof:', typeof record.props.w);
+        }
+      });
+      // Carregue diretamente
+      loadSnapshot(editorInstance.store, snapshotData);
+      // Forçar página ativa para a primeira encontrada
+      const pageIds = Object.values(editorInstance.store.allRecords())
+        .filter((r: any) => r.typeName === 'page')
+        .map((r: any) => r.id);
+      if (pageIds.length > 0) {
+        editorInstance.setCurrentPage(pageIds[0]);
+      }
+      // Logs para debug
+      console.log('IDs dos shapes na página atual:', Array.from(editorInstance.getCurrentPageShapeIds()));
+      console.log('Todos os shapes no store:', editorInstance.store.allRecords().filter((r: any) => r.typeName === 'shape'));
+      setTimeout(() => {
+        try {
+          editorInstance.setZoom(1);
+        } catch (e) {
+          console.warn('setZoom falhou:', e);
+        }
+      }, 500);
+      setTimeout(() => {
+        try {
+          editorInstance.setZoom(1);
+        } catch (e) {
+          console.warn('setZoom falhou:', e);
+        }
+      }, 1500);
+    } else {
+      // Caso contrário, sanitize (para arquivos antigos ou de outras fontes)
+      const sanitizedStore = sanitizeTldrawStore(snapshotData.store);
+      // Log shapes de texto antes do loadSnapshot
+      Object.values(sanitizedStore).forEach((record: any) => {
+        if (record.type === 'text') {
+          console.log('Antes do loadSnapshot (sanitized) - Shape de texto:', record.id, 'props.w:', record.props.w, 'typeof:', typeof record.props.w);
+        }
+      });
+      const fullSnapshot = {
+        store: sanitizedStore,
+        schema: snapshotData.schema || {
+          schemaVersion: 2,
+          sequences: {
+            "com.tldraw.store": 4,
+            "com.tldraw.asset": 1,
+            "com.tldraw.camera": 1,
+            "com.tldraw.document": 2,
+            "com.tldraw.instance": 25,
+            "com.tldraw.instance_page_state": 5,
+            "com.tldraw.page": 1,
+            "com.tldraw.instance_presence": 6,
+            "com.tldraw.pointer": 1,
+            "com.tldraw.shape": 4,
+            "com.tldraw.asset.bookmark": 2,
+            "com.tldraw.asset.image": 5,
+            "com.tldraw.asset.video": 5,
+            "com.tldraw.shape.group": 0,
+            "com.tldraw.shape.text": 3,
+            "com.tldraw.shape.bookmark": 2,
+            "com.tldraw.shape.draw": 2,
+            "com.tldraw.shape.geo": 10,
+            "com.tldraw.shape.note": 9,
+            "com.tldraw.shape.line": 5,
+            "com.tldraw.shape.frame": 1,
+            "com.tldraw.shape.arrow": 6,
+            "com.tldraw.shape.highlight": 2,
+            "com.tldraw.shape.embed": 5,
+            "com.tldraw.shape.image": 4,
+            "com.tldraw.shape.video": 3
+          }
+        }
+      };
+      loadSnapshot(editorInstance.store, fullSnapshot);
+      // Forçar página ativa para a primeira encontrada
+      const pageIds = Object.values(editorInstance.store.allRecords())
+        .filter((r: any) => r.typeName === 'page')
+        .map((r: any) => r.id);
+      if (pageIds.length > 0) {
+        editorInstance.setCurrentPage(pageIds[0]);
+      }
+      // Logs para debug
+      console.log('IDs dos shapes na página atual:', Array.from(editorInstance.getCurrentPageShapeIds()));
+      console.log('Todos os shapes no store:', editorInstance.store.allRecords().filter((r: any) => r.typeName === 'shape'));
+      setTimeout(() => {
+        try {
+          editorInstance.setZoom(1);
+        } catch (e) {
+          console.warn('setZoom falhou:', e);
+        }
+      }, 500);
+      setTimeout(() => {
+        try {
+          editorInstance.setZoom(1);
+        } catch (e) {
+          console.warn('setZoom falhou:', e);
+        }
+      }, 1500);
+    }
+  }, [editorInstance]);
+
   const handleFileSelect = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !editorInstance) return;
@@ -803,11 +985,8 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             console.log('🔥 RAW FILE CONTENT LENGTH:', fileContent.length);
             console.log('🔥 FILE CONTENT PREVIEW:', fileContent.substring(0, 200));
             
-            let tldrawData = JSON.parse(fileContent);
-            
-            console.log('Parsed .tldr file structure:');
-            console.log('- tldrawFileFormatVersion:', tldrawData.tldrawFileFormatVersion);
-            console.log('- schema:', tldrawData.schema ? 'present' : 'missing');
+            const tldrawData = JSON.parse(fileContent);
+            loadTldrawData(tldrawData, 'disk file');
             console.log('- records:', Array.isArray(tldrawData.records) ? `array with ${tldrawData.records.length} items` : 'not array');
             console.log('- store:', tldrawData.store ? `object with ${Object.keys(tldrawData.store).length} keys` : 'missing');
             console.log('- root keys:', Object.keys(tldrawData));
