@@ -334,7 +334,121 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
     }
   };
 
+  // Handle HTML tables
+  let inHtmlTable = false;
+  let htmlTableContent: string[] = [];
+
+  const flushHtmlTable = () => {
+    if (htmlTableContent.length > 0) {
+      const tableHtml = htmlTableContent.join('\n');
+      
+      // Parse the HTML table and convert to React components
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(`<div>${tableHtml}</div>`, 'text/html');
+      const tableElement = doc.querySelector('table');
+      
+      if (tableElement) {
+        const headers: string[] = [];
+        const rows: string[][] = [];
+        
+        // Extract headers
+        const headerRows = tableElement.querySelectorAll('thead tr');
+        headerRows.forEach(headerRow => {
+          const headerCells = headerRow.querySelectorAll('th');
+          headerCells.forEach(cell => {
+            headers.push(cell.textContent || '');
+          });
+        });
+        
+        // Extract body rows
+        const bodyRows = tableElement.querySelectorAll('tbody tr');
+        bodyRows.forEach(bodyRow => {
+          const row: string[] = [];
+          const cells = bodyRow.querySelectorAll('td');
+          cells.forEach(cell => {
+            // Check if cell contains an image
+            const img = cell.querySelector('img');
+            if (img) {
+              const src = img.getAttribute('src') || '';
+              const alt = img.getAttribute('alt') || '';
+              row.push(`![${alt}](${src})`);
+            } 
+            // Check if cell contains Mermaid code
+            else if (cell.querySelector('pre code.language-mermaid')) {
+              const codeContent = cell.querySelector('pre code')?.textContent || '';
+              row.push(`\`\`\`mermaid\n${codeContent}\n\`\`\``);
+            }
+            // Regular text content
+            else {
+              row.push(cell.textContent || '');
+            }
+          });
+          rows.push(row);
+        });
+        
+        // Render as custom table component
+        if (headers.length > 0) {
+          elements.push(
+            <div key={elements.length} className="overflow-x-auto mb-4">
+              <table className="min-w-full border border-gray-300 rounded-lg">
+                <thead className="bg-gray-50">
+                  <tr>
+                    {headers.map((header: string, i: number) => (
+                      <th key={i} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300">
+                        {processInlineFormatting(header)}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {rows.map((row: string[], i: number) => (
+                    <tr key={i} className="hover:bg-gray-50">
+                      {row.map((cell: string, j: number) => (
+                        <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200 align-top">
+                          {/* Handle Mermaid diagrams in cells */}
+                          {cell.startsWith('```mermaid') ? (
+                            <MermaidDiagram chart={cell.replace(/```mermaid\n|\n```/g, '')} />
+                          ) : (
+                            processInlineFormatting(cell)
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        }
+      }
+      
+      htmlTableContent = [];
+    }
+  };
+
   lines.forEach((line, index) => {
+    // Handle HTML table start
+    if (line.trim() === '<table>') {
+      flushParagraph();
+      inHtmlTable = true;
+      htmlTableContent.push(line);
+      return;
+    }
+    
+    // Handle HTML table end
+    if (line.trim() === '</table>') {
+      htmlTableContent.push(line);
+      flushHtmlTable();
+      inHtmlTable = false;
+      return;
+    }
+    
+    // Collect HTML table content
+    if (inHtmlTable) {
+      htmlTableContent.push(line);
+      return;
+    }
+
     // Handle code blocks
     if (line.startsWith('```')) {
       if (inCodeBlock) {
@@ -453,6 +567,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
   flushParagraph();
   flushCodeBlock(codeBlockLanguage);
   flushTable();
+  flushHtmlTable();
 
   return elements;
 }
