@@ -902,7 +902,51 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           message: migrationError.message,
           stack: migrationError.stack
         });
-        throw migrationError;
+        
+        // Fallback: recriar shapes manualmente se loadSnapshot falhar
+        console.log('Tentando fallback: recriar shapes manualmente...');
+        
+        try {
+          // Limpar editor atual
+          editorInstance.deleteShapes(editorInstance.getCurrentPageShapeIds());
+          
+          // Filtrar apenas shapes válidos
+          const shapes = Object.values(snapshotData.store)
+            .filter((record: any) => record.typeName === 'shape')
+            .map((shape: any) => {
+              // Garantir que o shape tem todas as propriedades necessárias
+              const cleanShape = {
+                id: shape.id,
+                type: shape.type,
+                x: shape.x || 0,
+                y: shape.y || 0,
+                rotation: shape.rotation || 0,
+                isLocked: shape.isLocked || false,
+                opacity: shape.opacity || 1,
+                props: { ...shape.props },
+                parentId: shape.parentId === 'page:page' ? editorInstance.getCurrentPageId() : shape.parentId,
+                index: shape.index || 'a1',
+                meta: shape.meta || {}
+              };
+              
+              return cleanShape;
+            });
+          
+          console.log(`Recriando ${shapes.length} shapes manualmente...`);
+          
+          // Criar shapes em lotes menores para evitar problemas
+          const batchSize = 10;
+          for (let i = 0; i < shapes.length; i += batchSize) {
+            const batch = shapes.slice(i, i + batchSize);
+            editorInstance.createShapes(batch);
+          }
+          
+          console.log('Shapes recriados com sucesso via fallback!');
+          
+        } catch (fallbackError) {
+          console.error('Fallback também falhou:', fallbackError);
+          throw new Error('Não foi possível carregar o arquivo TLD. Formato pode estar corrompido.');
+        }
       }
       // Forçar página ativa para a primeira encontrada
       const pageIds = Object.values(editorInstance.store.allRecords())
