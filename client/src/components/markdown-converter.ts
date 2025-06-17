@@ -170,9 +170,9 @@ export function createMarkdownConverter() {
         
         markdown += '  </tbody>\n</table>\n\n';
       } else {
-        // Convert to HTML table for perfect alignment control
+        // Convert to HTML table with proper alignment for MDX
         if (rows.length > 0) {
-          markdown += '<table style={{ width: "100%" }}>\n';
+          markdown += '\n<table style="width: 100%">\n';
           
           rows.forEach((row: any, rowIndex: number) => {
             const cells = row.getChildren();
@@ -182,7 +182,7 @@ export function createMarkdownConverter() {
               markdown += '  <thead>\n    <tr>\n';
               cells.forEach((cell: any) => {
                 const cellText = cell.getTextContent() || '';
-                markdown += `      <th style={{ verticalAlign: "top", padding: "12px" }}>${cellText}</th>\n`;
+                markdown += `      <th style="vertical-align: top; padding: 12px">${cellText}</th>\n`;
               });
               markdown += '    </tr>\n  </thead>\n  <tbody>\n';
             } else {
@@ -196,12 +196,12 @@ export function createMarkdownConverter() {
                 let cellText = cell.getTextContent() || '';
                 cellText = cellText.replace(/\s*\n\s*/g, ' ').replace(/\s+/g, ' ').trim();
                 
-                markdown += '      <td style={{ verticalAlign: "top", padding: "12px" }}>\n';
+                markdown += '      <td style="vertical-align: top; padding: 12px">\n';
                 
                 // Render images with block display for proper alignment
                 if (cellImages.length > 0) {
                   cellImages.forEach(img => {
-                    markdown += `        <img src="${img.url}" alt="${img.imageId}" style={{ display: "block", maxWidth: "100%", height: "auto" }} />\n`;
+                    markdown += `        <img src="${img.url}" alt="${img.imageId}" style="display: block; max-width: 100%; height: auto" />\n`;
                   });
                 }
                 
