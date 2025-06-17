@@ -319,8 +319,12 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
                 {rows.map((row: string[], i: number) => (
                   <tr key={i} className="hover:bg-gray-50">
                     {row.map((cell: string, j: number) => (
-                      <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200 align-top">
-                        {processInlineFormatting(cell)}
+                      <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200 align-top text-left">
+                        <div className="flex flex-col items-start justify-start w-full">
+                          <div className="text-left w-full">
+                            {processInlineFormatting(cell)}
+                          </div>
+                        </div>
                       </td>
                     ))}
                   </tr>
@@ -409,17 +413,21 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
                   {rows.map((row: string[], i: number) => (
                     <tr key={i} className="hover:bg-gray-50">
                       {row.map((cell: string, j: number) => (
-                        <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200 align-top">
-                          {/* Handle Mermaid diagrams in cells */}
-                          {cell.startsWith('```mermaid') ? (
-                            <MermaidDiagram chart={cell.replace(/```mermaid\n|\n```/g, '')} />
-                          ) : cell.startsWith('```\n') && cell.endsWith('\n```') ? (
-                            <pre className="bg-gray-900 text-gray-100 p-3 rounded text-xs font-mono overflow-x-auto">
-                              <code>{cell.replace(/```\n|\n```/g, '')}</code>
-                            </pre>
-                          ) : (
-                            processInlineFormatting(cell)
-                          )}
+                        <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200 align-top text-left">
+                          <div className="flex flex-col items-start justify-start w-full">
+                            {/* Handle Mermaid diagrams in cells */}
+                            {cell.startsWith('```mermaid') ? (
+                              <MermaidDiagram chart={cell.replace(/```mermaid\n|\n```/g, '')} />
+                            ) : cell.startsWith('```\n') && cell.endsWith('\n```') ? (
+                              <pre className="bg-gray-900 text-gray-100 p-3 rounded text-xs font-mono overflow-x-auto text-left">
+                                <code>{cell.replace(/```\n|\n```/g, '')}</code>
+                              </pre>
+                            ) : (
+                              <div className="text-left w-full">
+                                {processInlineFormatting(cell)}
+                              </div>
+                            )}
+                          </div>
                         </td>
                       ))}
                     </tr>
