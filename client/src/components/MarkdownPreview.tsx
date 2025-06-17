@@ -593,7 +593,9 @@ export default function MarkdownPreview({ content, className = '' }: MarkdownPre
               vertical-align: top !important;
             }
             .markdown-preview table td img {
-              vertical-align: top !important;
+              display: block !important;
+              max-width: 100% !important;
+              height: auto !important;
               margin-top: 0 !important;
             }
             .markdown-preview table tbody td {
