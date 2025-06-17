@@ -298,6 +298,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
     // Handle code blocks
     if (line.startsWith('```')) {
       if (inCodeBlock) {
+        console.log('Closing code block with language:', codeBlockLanguage);
         flushCodeBlock(codeBlockLanguage);
         inCodeBlock = false;
         codeBlockLanguage = '';
@@ -305,8 +306,9 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
         flushParagraph();
         inCodeBlock = true;
         // Extract language from the opening fence
-        const match = line.match(/^```(\w+)?/);
+        const match = line.match(/^```\s*(\w+)?/);
         codeBlockLanguage = match?.[1] || '';
+        console.log('Opening code block, detected language:', codeBlockLanguage, 'from line:', line);
       }
       return;
     }
