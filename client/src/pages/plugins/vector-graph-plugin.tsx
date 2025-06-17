@@ -441,35 +441,47 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           const base64Data = reader.result as string;
           const pngData = base64Data.split(',')[1]; // Remove data:image/png;base64,
 
-          // Get tldraw snapshot for metadata - using same logic as handleExportTldr
+          // Get tldraw snapshot for metadata - preserving new format (tldrawFileFormatVersion + records)
           const snapshot = editorInstance.store.getSnapshot();
           const fixedSnapshot = ensureGeoAlign(snapshot);
           
+          // Convert to new format like the original TLD files
+          const newFormatSnapshot = {
+            tldrawFileFormatVersion: 1,
+            schema: {
+              schemaVersion: 1,
+              storeVersion: 4,
+              recordVersions: {
+                asset: { version: 1, subTypeKey: "type", subTypeVersions: { image: 2, video: 2, bookmark: 0 } },
+                camera: { version: 1 },
+                document: { version: 2 },
+                instance: { version: 22 },
+                instance_page_state: { version: 5 },
+                page: { version: 1 },
+                shape: { version: 3, subTypeKey: "type", subTypeVersions: { group: 0, text: 1, bookmark: 1, draw: 1, geo: 7, note: 4, line: 1, frame: 0, arrow: 2, highlight: 0, embed: 4, image: 2, video: 1 } },
+                instance_presence: { version: 5 },
+                pointer: { version: 1 }
+              }
+            },
+            records: Object.values(fixedSnapshot.store)
+          };
+          
           // Check if tldraw data is too large and compress if needed for My Assets too
-          let metadataToSave = JSON.stringify(fixedSnapshot);
+          let metadataToSave = JSON.stringify(newFormatSnapshot);
           const maxMetadataSize = 500 * 1024; // 500KB limit for metadata
           console.log('Original tldraw metadata size for My Assets:', metadataToSave.length);
           
           if (metadataToSave.length > maxMetadataSize) {
             console.log('My Assets metadata too large, creating simplified version...');
-            // Create a simplified version with only essential data
-            const simplifiedSnapshot: any = {
-              store: {},
-              schema: fixedSnapshot.schema || {
-                schemaVersion: 2,
-                sequences: {
-                  "com.tldraw.store": 4,
-                  "com.tldraw.shape": 4
-                }
-              }
-            };
+            // Create a simplified version with only essential data in new format
+            const simplifiedRecords: any[] = [];
             
             // Keep only shapes and pages, remove large data
-            Object.entries(fixedSnapshot.store).forEach(([key, record]: [string, any]) => {
+            Object.values(fixedSnapshot.store).forEach((record: any) => {
               if (record.typeName === 'shape' || record.typeName === 'page') {
                 // For shapes, keep only basic properties
                 if (record.typeName === 'shape') {
-                  simplifiedSnapshot.store[key] = {
+                  simplifiedRecords.push({
                     ...record,
                     props: {
                       ...record.props,
@@ -477,12 +489,32 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                       richText: undefined,
                       text: record.props?.text ? record.props.text.substring(0, 100) : undefined
                     }
-                  };
+                  });
                 } else {
-                  simplifiedSnapshot.store[key] = record;
+                  simplifiedRecords.push(record);
                 }
               }
             });
+            
+            const simplifiedSnapshot = {
+              tldrawFileFormatVersion: 1,
+              schema: {
+                schemaVersion: 1,
+                storeVersion: 4,
+                recordVersions: {
+                  asset: { version: 1, subTypeKey: "type", subTypeVersions: { image: 2, video: 2, bookmark: 0 } },
+                  camera: { version: 1 },
+                  document: { version: 2 },
+                  instance: { version: 22 },
+                  instance_page_state: { version: 5 },
+                  page: { version: 1 },
+                  shape: { version: 3, subTypeKey: "type", subTypeVersions: { group: 0, text: 1, bookmark: 1, draw: 1, geo: 7, note: 4, line: 1, frame: 0, arrow: 2, highlight: 0, embed: 4, image: 2, video: 1 } },
+                  instance_presence: { version: 5 },
+                  pointer: { version: 1 }
+                }
+              },
+              records: simplifiedRecords
+            };
             
             metadataToSave = JSON.stringify(simplifiedSnapshot);
             console.log('Simplified My Assets metadata size:', metadataToSave.length);
@@ -498,10 +530,32 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           
           if (!documentId) {
             // Save to Global Assets when no composer document is selected
-            // Get the tldraw snapshot for file_metadata - using same logic as handleExportTldr
+            // Get the tldraw snapshot for file_metadata - preserving new format (tldrawFileFormatVersion + records)
             const snapshotForGlobal = editorInstance.store.getSnapshot();
             const fixedSnapshotForGlobal = ensureGeoAlign(snapshotForGlobal);
-            let tldrawData = JSON.stringify(fixedSnapshotForGlobal);
+            
+            // Convert to new format like the original TLD files
+            const newFormatSnapshotForGlobal = {
+              tldrawFileFormatVersion: 1,
+              schema: {
+                schemaVersion: 1,
+                storeVersion: 4,
+                recordVersions: {
+                  asset: { version: 1, subTypeKey: "type", subTypeVersions: { image: 2, video: 2, bookmark: 0 } },
+                  camera: { version: 1 },
+                  document: { version: 2 },
+                  instance: { version: 22 },
+                  instance_page_state: { version: 5 },
+                  page: { version: 1 },
+                  shape: { version: 3, subTypeKey: "type", subTypeVersions: { group: 0, text: 1, bookmark: 1, draw: 1, geo: 7, note: 4, line: 1, frame: 0, arrow: 2, highlight: 0, embed: 4, image: 2, video: 1 } },
+                  instance_presence: { version: 5 },
+                  pointer: { version: 1 }
+                }
+              },
+              records: Object.values(fixedSnapshotForGlobal.store)
+            };
+            
+            let tldrawData = JSON.stringify(newFormatSnapshotForGlobal);
             
             // Check if tldraw data is too large and compress if needed
             const maxMetadataSize = 500 * 1024; // 500KB limit for metadata
@@ -509,24 +563,15 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             
             if (tldrawData.length > maxMetadataSize) {
               console.log('Metadata too large, creating simplified version...');
-              // Create a simplified version with only essential data
-              const simplifiedSnapshot: any = {
-                store: {},
-                schema: fixedSnapshotForGlobal.schema || {
-                  schemaVersion: 2,
-                  sequences: {
-                    "com.tldraw.store": 4,
-                    "com.tldraw.shape": 4
-                  }
-                }
-              };
+              // Create a simplified version with only essential data in new format
+              const simplifiedRecords: any[] = [];
               
               // Keep only shapes and pages, remove large data
-              Object.entries(fixedSnapshotForGlobal.store).forEach(([key, record]: [string, any]) => {
+              Object.values(fixedSnapshotForGlobal.store).forEach((record: any) => {
                 if (record.typeName === 'shape' || record.typeName === 'page') {
                   // For shapes, keep only basic properties
                   if (record.typeName === 'shape') {
-                    simplifiedSnapshot.store[key] = {
+                    simplifiedRecords.push({
                       ...record,
                       props: {
                         ...record.props,
@@ -534,12 +579,32 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                         richText: undefined,
                         text: record.props?.text ? record.props.text.substring(0, 100) : undefined
                       }
-                    };
+                    });
                   } else {
-                    simplifiedSnapshot.store[key] = record;
+                    simplifiedRecords.push(record);
                   }
                 }
               });
+              
+              const simplifiedSnapshot = {
+                tldrawFileFormatVersion: 1,
+                schema: {
+                  schemaVersion: 1,
+                  storeVersion: 4,
+                  recordVersions: {
+                    asset: { version: 1, subTypeKey: "type", subTypeVersions: { image: 2, video: 2, bookmark: 0 } },
+                    camera: { version: 1 },
+                    document: { version: 2 },
+                    instance: { version: 22 },
+                    instance_page_state: { version: 5 },
+                    page: { version: 1 },
+                    shape: { version: 3, subTypeKey: "type", subTypeVersions: { group: 0, text: 1, bookmark: 1, draw: 1, geo: 7, note: 4, line: 1, frame: 0, arrow: 2, highlight: 0, embed: 4, image: 2, video: 1 } },
+                    instance_presence: { version: 5 },
+                    pointer: { version: 1 }
+                  }
+                },
+                records: simplifiedRecords
+              };
               
               tldrawData = JSON.stringify(simplifiedSnapshot);
               console.log('Simplified tldraw metadata size:', tldrawData.length);
