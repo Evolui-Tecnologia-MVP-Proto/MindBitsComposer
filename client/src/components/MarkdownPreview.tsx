@@ -221,6 +221,9 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
     .replace(/\n{3,}(?=\|)/g, '\n\n') // Before table rows, limit to 2 newlines
     .replace(/(?<=\|.*)\n{3,}(?=\|)/g, '\n') // Between table rows, use single newline
     .replace(/(?<=\|.*)\n{2,}(?=[^|\n])/g, '\n\n') // After tables, allow 2 newlines before next content
+    // Clean table content specifically
+    .replace(/(\|[^|]*)\n\n+([^|]*\|)/g, '$1 $2') // Remove blank lines between table cell content
+    .replace(/(\|[^|]*)\n+(\s*\|)/g, '$1 $2') // Normalize spacing in table cells
     .trim(); // Remove leading/trailing whitespace
 
   const lines = cleanMarkdown.split('\n');
@@ -280,7 +283,13 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
       
       const rows = bodyRows.map((row: string) => {
         const cells = row.split('|')
-          .map((cell: string) => cell.trim())
+          .map((cell: string) => {
+            // Clean cell content: remove excessive whitespace and normalize line breaks
+            return cell.trim()
+              .replace(/\n\s*\n/g, '\n') // Remove empty lines within cell content
+              .replace(/\s+/g, ' ') // Normalize whitespace to single spaces
+              .trim();
+          })
           .filter((cell: string) => cell !== '');
         
         // Ensure row has same number of cells as header
