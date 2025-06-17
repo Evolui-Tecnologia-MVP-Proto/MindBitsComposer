@@ -436,8 +436,8 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
   };
 
   lines.forEach((line, index) => {
-    // Handle HTML table start
-    if (line.trim() === '<table>') {
+    // Handle HTML table start (with any attributes)
+    if (line.trim().match(/^<table[^>]*>/)) {
       flushParagraph();
       inHtmlTable = true;
       htmlTableContent.push(line);
