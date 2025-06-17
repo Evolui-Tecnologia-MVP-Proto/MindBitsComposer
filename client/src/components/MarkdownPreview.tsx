@@ -1,12 +1,50 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { MDXProvider } from '@mdx-js/react';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
+import mermaid from 'mermaid';
 
 interface MarkdownPreviewProps {
   content: string;
   className?: string;
+}
+
+// Mermaid diagram component
+function MermaidDiagram({ chart }: { chart: string }) {
+  const elementRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (elementRef.current) {
+      // Initialize mermaid if not already done
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'default',
+        securityLevel: 'loose',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+      });
+
+      // Generate unique ID for this diagram
+      const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Render the diagram
+      mermaid.render(id, chart).then((result) => {
+        if (elementRef.current) {
+          elementRef.current.innerHTML = result.svg;
+        }
+      }).catch((error) => {
+        console.error('Mermaid rendering error:', error);
+        if (elementRef.current) {
+          elementRef.current.innerHTML = `<div class="p-4 bg-red-50 border border-red-200 rounded text-red-700">
+            <strong>Erro ao renderizar diagrama Mermaid:</strong><br/>
+            <pre class="mt-2 text-sm">${chart}</pre>
+          </div>`;
+        }
+      });
+    }
+  }, [chart]);
+
+  return <div ref={elementRef} className="my-4 flex justify-center" />;
 }
 
 // Custom components for MDX rendering
@@ -175,6 +213,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
   let currentParagraph: string[] = [];
   let inCodeBlock = false;
   let codeBlock: string[] = [];
+  let codeBlockLanguage = '';
   let inTable = false;
   let tableRows: string[] = [];
 
@@ -189,13 +228,20 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
     }
   };
 
-  const flushCodeBlock = () => {
+  const flushCodeBlock = (language?: string) => {
     if (codeBlock.length > 0) {
-      elements.push(
-        <pre key={elements.length} className="bg-gray-900 text-gray-100 p-4 rounded-lg mb-4 overflow-x-auto">
-          <code className="text-sm font-mono">{codeBlock.join('\n')}</code>
-        </pre>
-      );
+      const content = codeBlock.join('\n');
+      
+      // Check if it's a Mermaid diagram
+      if (language === 'mermaid') {
+        elements.push(<MermaidDiagram key={elements.length} chart={content} />);
+      } else {
+        elements.push(
+          <pre key={elements.length} className="bg-gray-900 text-gray-100 p-4 rounded-lg mb-4 overflow-x-auto">
+            <code className="text-sm font-mono">{content}</code>
+          </pre>
+        );
+      }
       codeBlock = [];
     }
   };
@@ -242,11 +288,15 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
     // Handle code blocks
     if (line.startsWith('```')) {
       if (inCodeBlock) {
-        flushCodeBlock();
+        flushCodeBlock(codeBlockLanguage);
         inCodeBlock = false;
+        codeBlockLanguage = '';
       } else {
         flushParagraph();
         inCodeBlock = true;
+        // Extract language from the opening fence
+        const match = line.match(/^```(\w+)?/);
+        codeBlockLanguage = match?.[1] || '';
       }
       return;
     }
@@ -342,7 +392,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
 
   // Flush remaining content
   flushParagraph();
-  flushCodeBlock();
+  flushCodeBlock(codeBlockLanguage);
   flushTable();
 
   return elements;
