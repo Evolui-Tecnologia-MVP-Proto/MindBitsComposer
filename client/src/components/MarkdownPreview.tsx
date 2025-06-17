@@ -340,99 +340,16 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
 
   const flushHtmlTable = () => {
     if (htmlTableContent.length > 0) {
-      console.log('🔥 Processing HTML table content:', htmlTableContent);
+      // Instead of parsing, directly render the HTML table using dangerouslySetInnerHTML
       const tableHtml = htmlTableContent.join('\n');
-      console.log('🔥 HTML string to parse:', tableHtml);
       
-      // Parse the HTML table and convert to React components
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(`<div>${tableHtml}</div>`, 'text/html');
-      const tableElement = doc.querySelector('table');
-      console.log('🔥 Parsed table element:', tableElement);
-      
-      if (tableElement) {
-        const headers: string[] = [];
-        const rows: string[][] = [];
-        
-        // Extract headers
-        const headerRows = tableElement.querySelectorAll('thead tr');
-        headerRows.forEach(headerRow => {
-          const headerCells = headerRow.querySelectorAll('th');
-          headerCells.forEach(cell => {
-            headers.push(cell.textContent || '');
-          });
-        });
-        
-        // Extract body rows
-        const bodyRows = tableElement.querySelectorAll('tbody tr');
-        bodyRows.forEach(bodyRow => {
-          const row: string[] = [];
-          const cells = bodyRow.querySelectorAll('td');
-          cells.forEach(cell => {
-            // Check if cell contains an image
-            const img = cell.querySelector('img');
-            if (img) {
-              const src = img.getAttribute('src') || '';
-              const alt = img.getAttribute('alt') || '';
-              row.push(`![${alt}](${src})`);
-            } 
-            // Check if cell contains Mermaid code (with language-mermaid class)
-            else if (cell.querySelector('pre code.language-mermaid')) {
-              const codeContent = cell.querySelector('pre code')?.textContent || '';
-              row.push(`\`\`\`mermaid\n${codeContent}\n\`\`\``);
-            }
-            // Check if cell contains regular code block
-            else if (cell.querySelector('pre code:not(.language-mermaid)')) {
-              const codeContent = cell.querySelector('pre code')?.textContent || '';
-              row.push(`\`\`\`\n${codeContent}\n\`\`\``);
-            }
-            // Regular text content
-            else {
-              row.push(cell.textContent || '');
-            }
-          });
-          rows.push(row);
-        });
-        
-        // Render as custom table component
-        if (headers.length > 0) {
-          elements.push(
-            <div key={elements.length} className="overflow-x-auto mb-4">
-              <table className="min-w-full border border-gray-300 rounded-lg">
-                <thead className="bg-gray-50">
-                  <tr>
-                    {headers.map((header: string, i: number) => (
-                      <th key={i} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300">
-                        {processInlineFormatting(header)}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {rows.map((row: string[], i: number) => (
-                    <tr key={i} className="hover:bg-gray-50">
-                      {row.map((cell: string, j: number) => (
-                        <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200" style={{ verticalAlign: 'top' }}>
-                          {/* Handle Mermaid diagrams in cells */}
-                          {cell.startsWith('```mermaid') ? (
-                            <MermaidDiagram chart={cell.replace(/```mermaid\n|\n```/g, '')} />
-                          ) : cell.startsWith('```\n') && cell.endsWith('\n```') ? (
-                            <pre className="bg-gray-900 text-gray-100 p-3 rounded text-xs font-mono overflow-x-auto text-left">
-                              <code>{cell.replace(/```\n|\n```/g, '')}</code>
-                            </pre>
-                          ) : (
-                            processInlineFormatting(cell)
-                          )}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          );
-        }
-      }
+      elements.push(
+        <div 
+          key={elements.length} 
+          className="overflow-x-auto mb-4"
+          dangerouslySetInnerHTML={{ __html: tableHtml }}
+        />
+      );
       
       htmlTableContent = [];
     }
@@ -441,7 +358,6 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
   lines.forEach((line, index) => {
     // Handle HTML table start (with any attributes)
     if (line.trim().match(/^<table[^>]*>/)) {
-      console.log('🔥 HTML Table detected:', line.trim());
       flushParagraph();
       inHtmlTable = true;
       htmlTableContent.push(line);
@@ -450,7 +366,6 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
     
     // Handle HTML table end
     if (line.trim() === '</table>') {
-      console.log('🔥 HTML Table end detected, processing content');
       htmlTableContent.push(line);
       flushHtmlTable();
       inHtmlTable = false;
