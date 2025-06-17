@@ -35,6 +35,7 @@ import CustomTablePlugin, { INSERT_CUSTOM_TABLE_COMMAND } from './lexical/TableP
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import MarkdownPreview from './MarkdownPreview';
 import {
   Bold,
   Italic,
@@ -1141,7 +1142,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                 placeholder={<Placeholder />}
                 ErrorBoundary={LexicalErrorBoundary}
               />
-            ) : (
+            ) : viewMode === 'preview' ? (
               <div className="w-full h-full p-6 overflow-auto bg-slate-100">
                 <div className="max-w-4xl mx-auto">
                   <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -1150,8 +1151,23 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                       <p className="text-sm text-gray-600 mt-1">Representação em markdown do conteúdo do editor</p>
                     </div>
                     <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed text-gray-900 bg-gray-50 p-4 rounded-md border border-gray-300 overflow-x-auto">
-                      {markdownContent || '// Nenhum conteúdo para visualizar\n// Adicione texto no editor para ver a conversão markdown'}
+                      {currentMarkdown || '// Nenhum conteúdo para visualizar\n// Adicione texto no editor para ver a conversão markdown'}
                     </pre>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="w-full h-full p-6 overflow-auto bg-slate-100">
+                <div className="max-w-4xl mx-auto">
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div className="mb-4 pb-3 border-b border-gray-200">
+                      <h3 className="text-lg font-semibold text-gray-800">Preview MDX</h3>
+                      <p className="text-sm text-gray-600 mt-1">Visualização renderizada do conteúdo markdown</p>
+                    </div>
+                    <MarkdownPreview 
+                      content={mdxContent || currentMarkdown} 
+                      className="prose prose-lg max-w-none"
+                    />
                   </div>
                 </div>
               </div>

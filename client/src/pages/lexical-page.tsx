@@ -1750,6 +1750,7 @@ export default function LexicalPage() {
                   templateSections={selectedTemplate ? extractTemplateSections(selectedTemplate) : undefined}
                   viewMode={viewMode}
                   initialEditorState={initialEditorState}
+                  markdownContent={markdownContent}
                 />
               </CardContent>
             </Card>
