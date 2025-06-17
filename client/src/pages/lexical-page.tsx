@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import LexicalEditor from "@/components/LexicalEditor";
+import MarkdownPreview from "@/components/MarkdownPreview";
 import SaveFileModal from "@/components/SaveFileModal";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -93,12 +94,13 @@ interface Plugin {
 
 export default function LexicalPage() {
   const [content, setContent] = useState("");
+  const [markdownContent, setMarkdownContent] = useState("");
   const [currentDocumentId, setCurrentDocumentId] = useState<string | null>(null);
   const [title, setTitle] = useState("Novo Documento");
   const [showDocumentList, setShowDocumentList] = useState(false);
   const [showAttachments, setShowAttachments] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
-  const [viewMode, setViewMode] = useState<'editor' | 'preview'>('editor');
+  const [viewMode, setViewMode] = useState<'editor' | 'preview' | 'mdx'>('editor');
   const [selectedEdition, setSelectedEdition] = useState<any>(null);
   const [editorState, setEditorState] = useState<string>('');
   const [initialEditorState, setInitialEditorState] = useState<string | undefined>(undefined);
@@ -1054,6 +1056,22 @@ export default function LexicalPage() {
     }
   };
 
+  // Function to capture markdown content from editor for MDX preview
+  const captureMarkdownContent = () => {
+    try {
+      if (editorInstance) {
+        const editorState = editorInstance.getEditorState();
+        const markdown = convertToMarkdown(editorState);
+        setMarkdownContent(markdown);
+        return markdown;
+      }
+      return "";
+    } catch (error) {
+      console.error('Erro ao capturar markdown para preview:', error);
+      return "";
+    }
+  };
+
   const handleSaveFile = (filename: string, format: string, includeImages?: boolean) => {
     const cleanFilename = filename.replace(/[^a-z0-9\-_\s]/gi, '').trim();
     
@@ -1470,14 +1488,29 @@ export default function LexicalPage() {
                   <Edit className={`w-4 h-4 ${viewMode === 'editor' ? "text-white" : ""}`} />
                 </Button>
                 <Button
-                  onClick={() => setViewMode('preview')}
+                  onClick={() => {
+                    setViewMode('preview');
+                  }}
                   variant={viewMode === 'preview' ? "default" : "outline"}
                   size="sm"
                   className={viewMode === 'preview' ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
-                  title="Visualizar Markdown"
+                  title="Visualizar Markdown Raw"
                   disabled={!hasEditorContent}
                 >
                   <FileCode2 className={`w-4 h-4 ${viewMode === 'preview' ? "text-white" : ""}`} />
+                </Button>
+                <Button
+                  onClick={() => {
+                    captureMarkdownContent();
+                    setViewMode('mdx');
+                  }}
+                  variant={viewMode === 'mdx' ? "default" : "outline"}
+                  size="sm"
+                  className={viewMode === 'mdx' ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
+                  title="Preview MDX"
+                  disabled={!hasEditorContent}
+                >
+                  <Eye className={`w-4 h-4 ${viewMode === 'mdx' ? "text-white" : ""}`} />
                 </Button>
               </div>
             </div>
