@@ -93,13 +93,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     let shapesProcessed = 0;
     let deprecatedPropsRemoved = 0;
     
-    // List of all deprecated properties to remove
-    const deprecatedProperties = [
-      'text', 'verticalAlign', 'align', 'autoSize', 'w', 'h', 'handles'
-    ];
-    
-    console.log('🔥 Deprecated properties to remove:', deprecatedProperties);
-    
+    // Don't remove any properties - just sanitize richText if present
     Object.keys(sanitizedStore).forEach(key => {
       const record = sanitizedStore[key];
       if (record && typeof record === 'object') {
@@ -108,84 +102,13 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           shapesProcessed++;
           const shape = { ...record };
           
-          // Remove deprecated properties based on shape type
-          if (shape.props) {
-            const originalProps = { ...shape.props };
-            const cleanProps = { ...shape.props };
-            let propsRemoved = false;
-            
-            // Remove all deprecated properties regardless of shape type
-            deprecatedProperties.forEach(prop => {
-              if (cleanProps[prop] !== undefined) {
-                console.log(`Removing deprecated property '${prop}' from ${shape.type} shape (${shape.id})`);
-                delete cleanProps[prop];
-                propsRemoved = true;
-              }
-            });
-            
-            // Special handling for text shapes - ensure specific properties are preserved
-            if (shape.type === 'text') {
-              console.log(`Original text props for ${shape.id}:`, Object.keys(originalProps));
-              
-              // Keep only essential text properties
-              const allowedTextProps: any = {};
-              
-              // Only add properties that exist and are not deprecated
-              if (originalProps.color !== undefined) allowedTextProps.color = originalProps.color;
-              if (originalProps.size !== undefined) allowedTextProps.size = originalProps.size;
-              if (originalProps.font !== undefined) allowedTextProps.font = originalProps.font;
-              if (originalProps.textAlign !== undefined) allowedTextProps.textAlign = originalProps.textAlign;
-              if (originalProps.scale !== undefined) allowedTextProps.scale = originalProps.scale;
-              if (originalProps.richText !== undefined) allowedTextProps.richText = originalProps.richText;
-              
-              console.log(`Allowed text props for ${shape.id}:`, Object.keys(allowedTextProps));
-              
-              // Replace all props with only allowed ones
-              shape.props = allowedTextProps;
-              propsRemoved = true;
-              
-              console.log(`Final text props for ${shape.id}:`, Object.keys(shape.props));
-            }
-            
-            // Special handling for geo shapes
-            if (shape.type === 'geo') {
-              console.log(`Original geo props for ${shape.id}:`, Object.keys(originalProps));
-              
-              // Keep only essential geo properties
-              const allowedGeoProps: any = {};
-              
-              // Only add properties that exist and are not deprecated
-              if (originalProps.w !== undefined) allowedGeoProps.w = originalProps.w;
-              if (originalProps.h !== undefined) allowedGeoProps.h = originalProps.h;
-              if (originalProps.geo !== undefined) allowedGeoProps.geo = originalProps.geo;
-              if (originalProps.color !== undefined) allowedGeoProps.color = originalProps.color;
-              if (originalProps.labelColor !== undefined) allowedGeoProps.labelColor = originalProps.labelColor;
-              if (originalProps.fill !== undefined) allowedGeoProps.fill = originalProps.fill;
-              if (originalProps.dash !== undefined) allowedGeoProps.dash = originalProps.dash;
-              if (originalProps.size !== undefined) allowedGeoProps.size = originalProps.size;
-              if (originalProps.font !== undefined) allowedGeoProps.font = originalProps.font;
-              if (originalProps.growY !== undefined) allowedGeoProps.growY = originalProps.growY;
-              if (originalProps.url !== undefined) allowedGeoProps.url = originalProps.url;
-              if (originalProps.scale !== undefined) allowedGeoProps.scale = originalProps.scale;
-              if (originalProps.richText !== undefined) allowedGeoProps.richText = originalProps.richText;
-              
-              console.log(`Allowed geo props for ${shape.id}:`, Object.keys(allowedGeoProps));
-              
-              // Replace all props with only allowed ones
-              shape.props = allowedGeoProps;
-              propsRemoved = true;
-              
-              console.log(`Final geo props for ${shape.id}:`, Object.keys(shape.props));
-            }
-            
-            // For other shape types, just remove deprecated properties
-            if (shape.type !== 'text' && shape.type !== 'geo') {
-              shape.props = cleanProps;
-            }
-            
-            if (propsRemoved) {
-              deprecatedPropsRemoved++;
-            }
+          // Only sanitize richText property if it exists
+          if (shape.props && shape.props.richText) {
+            shape.props = {
+              ...shape.props,
+              richText: sanitizeRichText(shape.props.richText)
+            };
+            deprecatedPropsRemoved++;
           }
           
           sanitizedStore[key] = shape;
