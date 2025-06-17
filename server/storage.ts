@@ -1,4 +1,4 @@
-import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos, documentsArtifacts, globalAssets, repoStructure, systemLogs, documentEditions,
+import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos, documentsArtifacts, globalAssets, repoStructure, systemLogs, documentEditions, genericTables,
   type User, type InsertUser, type Template, type InsertTemplate, 
   type MondayMapping, type InsertMondayMapping, type MondayColumn, type InsertMondayColumn, 
   type MappingColumn, type InsertMappingColumn, type ServiceConnection, type InsertServiceConnection,
@@ -6,6 +6,7 @@ import { users, templates, mondayMappings, mondayColumns, mappingColumns, servic
   type DocumentArtifact, type InsertDocumentArtifact, type GlobalAsset, type InsertGlobalAsset,
   type RepoStructure, type InsertRepoStructure,
   type SystemLog, type InsertSystemLog, type DocumentEdition, type InsertDocumentEdition,
+  type GenericTable, type InsertGenericTable,
   UserStatus, UserRole, TemplateType, PluginStatus, PluginType } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, isNull, sql } from "drizzle-orm";
@@ -136,6 +137,9 @@ export interface IStorage {
   updateDocumentEditionStatus(id: string, status: string): Promise<DocumentEdition>;
   publishDocumentEdition(id: string): Promise<DocumentEdition>;
   deleteDocumentEdition(id: string): Promise<void>;
+  
+  // Generic Table operations
+  getGenericTableByName(name: string): Promise<GenericTable | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1838,6 +1842,12 @@ export class MemStorage implements IStorage {
 
   async deleteDocumentEdition(id: string): Promise<void> {
     await db.delete(documentEditions).where(eq(documentEditions.id, id));
+  }
+
+  // Generic Table operations
+  async getGenericTableByName(name: string): Promise<GenericTable | undefined> {
+    const [genericTable] = await db.select().from(genericTables).where(eq(genericTables.name, name));
+    return genericTable;
   }
 
 }
