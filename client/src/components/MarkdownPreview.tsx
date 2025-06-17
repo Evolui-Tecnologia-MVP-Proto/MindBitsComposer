@@ -319,9 +319,9 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
                 {rows.map((row: string[], i: number) => (
                   <tr key={i} className="hover:bg-gray-50">
                     {row.map((cell: string, j: number) => (
-                      <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200 align-top text-left">
-                        <div className="flex flex-col items-start justify-start w-full">
-                          <div className="text-left w-full">
+                      <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200 align-top text-left" style={{ verticalAlign: 'top' }}>
+                        <div className="table-cell-content flex flex-row items-start justify-start w-full gap-2" style={{ alignItems: 'flex-start' }}>
+                          <div className="text-left w-full" style={{ alignSelf: 'flex-start', verticalAlign: 'top' }}>
                             {processInlineFormatting(cell)}
                           </div>
                         </div>
@@ -413,8 +413,8 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
                   {rows.map((row: string[], i: number) => (
                     <tr key={i} className="hover:bg-gray-50">
                       {row.map((cell: string, j: number) => (
-                        <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200 align-top text-left">
-                          <div className="flex flex-col items-start justify-start w-full">
+                        <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200 align-top text-left" style={{ verticalAlign: 'top' }}>
+                          <div className="table-cell-content flex flex-row items-start justify-start w-full gap-2" style={{ alignItems: 'flex-start' }}>
                             {/* Handle Mermaid diagrams in cells */}
                             {cell.startsWith('```mermaid') ? (
                               <MermaidDiagram chart={cell.replace(/```mermaid\n|\n```/g, '')} />
@@ -423,7 +423,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
                                 <code>{cell.replace(/```\n|\n```/g, '')}</code>
                               </pre>
                             ) : (
-                              <div className="text-left w-full">
+                              <div className="text-left w-full" style={{ alignSelf: 'flex-start', verticalAlign: 'top' }}>
                                 {processInlineFormatting(cell)}
                               </div>
                             )}
@@ -595,6 +595,22 @@ export default function MarkdownPreview({ content, className = '' }: MarkdownPre
   return (
     <MDXProvider components={mdxComponents}>
       <div className={`markdown-preview prose prose-gray max-w-none ${className}`}>
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            .table-cell-content {
+              vertical-align: top !important;
+              align-items: flex-start !important;
+            }
+            .table-cell-content img {
+              vertical-align: top !important;
+              margin-top: 0 !important;
+            }
+            .table-cell-content > div {
+              vertical-align: top !important;
+              align-self: flex-start !important;
+            }
+          `
+        }} />
         <div className="space-y-4">
           {renderedContent}
         </div>
