@@ -340,12 +340,15 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
 
   const flushHtmlTable = () => {
     if (htmlTableContent.length > 0) {
+      console.log('🔥 Processing HTML table content:', htmlTableContent);
       const tableHtml = htmlTableContent.join('\n');
+      console.log('🔥 HTML string to parse:', tableHtml);
       
       // Parse the HTML table and convert to React components
       const parser = new DOMParser();
       const doc = parser.parseFromString(`<div>${tableHtml}</div>`, 'text/html');
       const tableElement = doc.querySelector('table');
+      console.log('🔥 Parsed table element:', tableElement);
       
       if (tableElement) {
         const headers: string[] = [];
@@ -438,6 +441,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
   lines.forEach((line, index) => {
     // Handle HTML table start (with any attributes)
     if (line.trim().match(/^<table[^>]*>/)) {
+      console.log('🔥 HTML Table detected:', line.trim());
       flushParagraph();
       inHtmlTable = true;
       htmlTableContent.push(line);
@@ -446,6 +450,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
     
     // Handle HTML table end
     if (line.trim() === '</table>') {
+      console.log('🔥 HTML Table end detected, processing content');
       htmlTableContent.push(line);
       flushHtmlTable();
       inHtmlTable = false;
