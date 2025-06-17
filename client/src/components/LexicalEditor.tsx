@@ -790,15 +790,24 @@ function cleanMarkdownContent(markdown: string): string {
     .split('\n')
     .map(line => line.trimEnd()) // Remove trailing whitespace
     .join('\n')
-    .replace(/\n{4,}/g, '\n\n\n') // Limit consecutive newlines
-    .replace(/\n{3,}(?=\|)/g, '\n\n') // Before tables, max 2 newlines
-    .replace(/(?<=\|.*)\n{3,}(?=\|)/g, '\n') // Between table rows, single newline
-    .replace(/(?<=\|.*)\n{2,}(?=[^|\n])/g, '\n\n') // After tables, 2 newlines
-    // Clean table cell content specifically
-    .replace(/(\|[^|]*)\n\n+([^|]*\|)/g, '$1 $2') // Remove blank lines in cells
-    .replace(/(\|[^|]*)\n+(\s*\|)/g, '$1 $2') // Normalize cell spacing
+    // Clean excessive newlines but preserve structure
+    .replace(/\n{4,}/g, '\n\n') // Limit to max 2 consecutive newlines
+    // Ensure proper spacing around headers
+    .replace(/(\n|^)(#{1,6}\s[^\n]+)(\n|$)/g, '\n\n$2\n\n') // Headers need blank lines
+    // Ensure proper spacing around tables
+    .replace(/(\n|^)(\|.*\|)(\n|$)/g, (match, before, tableRow, after) => {
+      // If this is the first row of a table (contains |), ensure blank line before
+      if (before !== '\n\n' && before !== '') {
+        before = '\n\n';
+      }
+      return before + tableRow + after;
+    })
+    // Clean table cell content - remove internal line breaks but preserve structure
+    .replace(/(\|[^|]*?)\n+([^|\n])/g, '$1 $2') // Join broken cell content
     .replace(/\|\s{2,}/g, '| ') // Normalize spaces after pipes
     .replace(/\s{2,}\|/g, ' |') // Normalize spaces before pipes
+    // Final cleanup
+    .replace(/\n{3,}/g, '\n\n') // Ensure max 2 newlines anywhere
     .trim();
 }
 
