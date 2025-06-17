@@ -212,7 +212,18 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
     );
   }
 
-  const lines = markdown.split('\n');
+  // Clean up markdown: remove excessive empty lines and normalize line breaks
+  const cleanMarkdown = markdown
+    .split('\n')
+    .map(line => line.trimEnd()) // Remove trailing whitespace from each line
+    .join('\n')
+    .replace(/\n{4,}/g, '\n\n\n') // Replace 4+ consecutive newlines with just 3 (allows proper section breaks)
+    .replace(/\n{3,}(?=\|)/g, '\n\n') // Before table rows, limit to 2 newlines
+    .replace(/(?<=\|.*)\n{3,}(?=\|)/g, '\n') // Between table rows, use single newline
+    .replace(/(?<=\|.*)\n{2,}(?=[^|\n])/g, '\n\n') // After tables, allow 2 newlines before next content
+    .trim(); // Remove leading/trailing whitespace
+
+  const lines = cleanMarkdown.split('\n');
   const elements: React.ReactNode[] = [];
   let currentParagraph: string[] = [];
   let inCodeBlock = false;
@@ -252,38 +263,62 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
 
   const flushTable = () => {
     if (tableRows.length > 0) {
-      const [headerRow, ...bodyRows] = tableRows;
-      const headers = headerRow.split('|').map((h: string) => h.trim()).filter((h: string) => h);
-      const rows = bodyRows.filter((row: string) => !row.includes('---')).map((row: string) => 
-        row.split('|').map((cell: string) => cell.trim()).filter((cell: string) => cell)
+      // Filter out empty rows and separator rows
+      const validRows = tableRows.filter((row: string) => 
+        row.trim() !== '' && !row.match(/^\s*\|\s*[-:]+\s*\|\s*[-:]*\s*\|/)
       );
+      
+      if (validRows.length === 0) {
+        tableRows = [];
+        return;
+      }
 
-      elements.push(
-        <div key={elements.length} className="overflow-x-auto mb-4">
-          <table className="min-w-full border border-gray-300 rounded-lg">
-            <thead className="bg-gray-50">
-              <tr>
-                {headers.map((header: string, i: number) => (
-                  <th key={i} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300">
-                    {processInlineFormatting(header)}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {rows.map((row: string[], i: number) => (
-                <tr key={i} className="hover:bg-gray-50">
-                  {row.map((cell: string, j: number) => (
-                    <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200">
-                      {processInlineFormatting(cell)}
-                    </td>
+      const [headerRow, ...bodyRows] = validRows;
+      const headers = headerRow.split('|')
+        .map((h: string) => h.trim())
+        .filter((h: string) => h !== '');
+      
+      const rows = bodyRows.map((row: string) => {
+        const cells = row.split('|')
+          .map((cell: string) => cell.trim())
+          .filter((cell: string) => cell !== '');
+        
+        // Ensure row has same number of cells as header
+        while (cells.length < headers.length) {
+          cells.push('');
+        }
+        
+        return cells.slice(0, headers.length); // Trim excess cells
+      });
+
+      if (headers.length > 0) {
+        elements.push(
+          <div key={elements.length} className="overflow-x-auto mb-4">
+            <table className="min-w-full border border-gray-300 rounded-lg">
+              <thead className="bg-gray-50">
+                <tr>
+                  {headers.map((header: string, i: number) => (
+                    <th key={i} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300">
+                      {processInlineFormatting(header)}
+                    </th>
                   ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      );
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {rows.map((row: string[], i: number) => (
+                  <tr key={i} className="hover:bg-gray-50">
+                    {row.map((cell: string, j: number) => (
+                      <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200 align-top">
+                        {processInlineFormatting(cell)}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      }
       tableRows = [];
     }
   };
@@ -316,11 +351,20 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
         flushParagraph();
         inTable = true;
       }
-      tableRows.push(line);
+      // Clean up table row - normalize spaces and ensure proper pipe formatting
+      const cleanRow = line.trim()
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .replace(/\|\s*\|\s*\|/g, '| |') // Fix empty cells with multiple pipes
+        .replace(/^\s*\|/, '|') // Ensure starts with pipe
+        .replace(/\|\s*$/, '|'); // Ensure ends with pipe
+      tableRows.push(cleanRow);
       return;
-    } else if (inTable) {
+    } else if (inTable && line.trim() !== '') {
       flushTable();
       inTable = false;
+    } else if (inTable && line.trim() === '') {
+      // Skip empty lines within tables
+      return;
     }
 
     // Handle headings
