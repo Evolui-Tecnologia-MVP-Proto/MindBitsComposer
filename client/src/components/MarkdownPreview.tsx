@@ -16,8 +16,6 @@ function MermaidDiagram({ chart }: { chart: string }) {
 
   useEffect(() => {
     if (elementRef.current && chart.trim()) {
-      console.log('Rendering Mermaid diagram:', chart);
-      
       // Initialize mermaid if not already done
       mermaid.initialize({
         startOnLoad: false,
@@ -34,12 +32,11 @@ function MermaidDiagram({ chart }: { chart: string }) {
       
       // Render the diagram
       mermaid.render(id, cleanChart).then((result) => {
-        console.log('Mermaid render success:', result);
         if (elementRef.current) {
           elementRef.current.innerHTML = result.svg;
         }
       }).catch((error) => {
-        console.error('Mermaid rendering error:', error, 'Chart:', cleanChart);
+        console.error('Mermaid rendering error:', error);
         if (elementRef.current) {
           elementRef.current.innerHTML = `<div class="p-4 bg-red-50 border border-red-200 rounded text-red-700">
             <strong>Erro ao renderizar diagrama Mermaid:</strong><br/>
@@ -238,14 +235,11 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
   const flushCodeBlock = (language?: string) => {
     if (codeBlock.length > 0) {
       const content = codeBlock.join('\n');
-      console.log('Flushing code block with language:', language, 'Content:', content);
       
       // Check if it's a Mermaid diagram
       if (language === 'mermaid') {
-        console.log('Detected Mermaid diagram, rendering...');
         elements.push(<MermaidDiagram key={elements.length} chart={content} />);
       } else {
-        console.log('Regular code block, language:', language);
         elements.push(
           <pre key={elements.length} className="bg-gray-900 text-gray-100 p-4 rounded-lg mb-4 overflow-x-auto">
             <code className="text-sm font-mono">{content}</code>
@@ -271,7 +265,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
               <tr>
                 {headers.map((header: string, i: number) => (
                   <th key={i} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300">
-                    {header}
+                    {processInlineFormatting(header)}
                   </th>
                 ))}
               </tr>
@@ -281,7 +275,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
                 <tr key={i} className="hover:bg-gray-50">
                   {row.map((cell: string, j: number) => (
                     <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200">
-                      {cell}
+                      {processInlineFormatting(cell)}
                     </td>
                   ))}
                 </tr>
@@ -298,7 +292,6 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
     // Handle code blocks
     if (line.startsWith('```')) {
       if (inCodeBlock) {
-        console.log('Closing code block with language:', codeBlockLanguage);
         flushCodeBlock(codeBlockLanguage);
         inCodeBlock = false;
         codeBlockLanguage = '';
@@ -308,7 +301,6 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
         // Extract language from the opening fence
         const match = line.match(/^```\s*(\w+)?/);
         codeBlockLanguage = match?.[1] || '';
-        console.log('Opening code block, detected language:', codeBlockLanguage, 'from line:', line);
       }
       return;
     }
