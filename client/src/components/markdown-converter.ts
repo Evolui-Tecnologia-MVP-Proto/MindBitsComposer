@@ -172,6 +172,9 @@ export function createMarkdownConverter() {
       } else {
         // Regular markdown table for non-Mermaid content
         if (rows.length > 0) {
+          // Add blank line before table
+          markdown += '\n';
+          
           rows.forEach((row: any, rowIndex: number) => {
             const cells = row.getChildren();
             let rowContent = '|';
@@ -180,14 +183,16 @@ export function createMarkdownConverter() {
               // Extract all images from this cell recursively
               const cellImages = extractImagesRecursively(cell);
               
-              // Get text content
+              // Get text content and clean it of internal line breaks
               let cellText = cell.getTextContent() || '';
+              // Remove internal line breaks and normalize whitespace in cell content
+              cellText = cellText.replace(/\s*\n\s*/g, ' ').replace(/\s+/g, ' ').trim();
               
               // Combine text and images
-              let cellContent = cellText.trim();
+              let cellContent = cellText;
               if (cellImages.length > 0) {
                 const imageMarkdown = cellImages.map(img => `![${img.imageId}](${img.url})`).join(' ');
-                cellContent = cellContent ? `${cellContent} ${imageMarkdown}` : imageMarkdown;
+                cellContent = cellContent ? `${imageMarkdown} ${cellContent}` : imageMarkdown;
               }
               
               if (!cellContent.trim()) {
@@ -208,6 +213,8 @@ export function createMarkdownConverter() {
               markdown += separator + '\n';
             }
           });
+          
+          // Add blank line after table
           markdown += '\n';
         }
       }
