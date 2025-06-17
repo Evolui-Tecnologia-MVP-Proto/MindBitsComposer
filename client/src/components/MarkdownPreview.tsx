@@ -319,10 +319,30 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
                 {rows.map((row: string[], i: number) => (
                   <tr key={i} className="hover:bg-gray-50">
                     {row.map((cell: string, j: number) => (
-                      <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200 align-top text-left" style={{ verticalAlign: 'top' }}>
-                        <div className="table-cell-content flex flex-row items-start justify-start w-full gap-2" style={{ alignItems: 'flex-start' }}>
-                          <div className="text-left w-full" style={{ alignSelf: 'flex-start', verticalAlign: 'top' }}>
-                            {processInlineFormatting(cell)}
+                      <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200" style={{ 
+                        verticalAlign: 'top', 
+                        textAlign: 'left',
+                        lineHeight: '1.2'
+                      }}>
+                        <div style={{ 
+                          display: 'table',
+                          width: '100%',
+                          tableLayout: 'fixed'
+                        }}>
+                          <div style={{
+                            display: 'table-cell',
+                            verticalAlign: 'top',
+                            textAlign: 'left',
+                            width: '100%'
+                          }}>
+                            <div style={{ 
+                              textAlign: 'left', 
+                              width: '100%',
+                              lineHeight: '1.2',
+                              verticalAlign: 'top'
+                            }}>
+                              {processInlineFormatting(cell)}
+                            </div>
                           </div>
                         </div>
                       </td>
@@ -413,20 +433,40 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
                   {rows.map((row: string[], i: number) => (
                     <tr key={i} className="hover:bg-gray-50">
                       {row.map((cell: string, j: number) => (
-                        <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200 align-top text-left" style={{ verticalAlign: 'top' }}>
-                          <div className="table-cell-content flex flex-row items-start justify-start w-full gap-2" style={{ alignItems: 'flex-start' }}>
-                            {/* Handle Mermaid diagrams in cells */}
-                            {cell.startsWith('```mermaid') ? (
-                              <MermaidDiagram chart={cell.replace(/```mermaid\n|\n```/g, '')} />
-                            ) : cell.startsWith('```\n') && cell.endsWith('\n```') ? (
-                              <pre className="bg-gray-900 text-gray-100 p-3 rounded text-xs font-mono overflow-x-auto text-left">
-                                <code>{cell.replace(/```\n|\n```/g, '')}</code>
-                              </pre>
-                            ) : (
-                              <div className="text-left w-full" style={{ alignSelf: 'flex-start', verticalAlign: 'top' }}>
-                                {processInlineFormatting(cell)}
-                              </div>
-                            )}
+                        <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200" style={{ 
+                          verticalAlign: 'top', 
+                          textAlign: 'left',
+                          lineHeight: '1.2'
+                        }}>
+                          <div style={{ 
+                            display: 'table',
+                            width: '100%',
+                            tableLayout: 'fixed'
+                          }}>
+                            <div style={{
+                              display: 'table-cell',
+                              verticalAlign: 'top',
+                              textAlign: 'left',
+                              width: '100%'
+                            }}>
+                              {/* Handle Mermaid diagrams in cells */}
+                              {cell.startsWith('```mermaid') ? (
+                                <MermaidDiagram chart={cell.replace(/```mermaid\n|\n```/g, '')} />
+                              ) : cell.startsWith('```\n') && cell.endsWith('\n```') ? (
+                                <pre className="bg-gray-900 text-gray-100 p-3 rounded text-xs font-mono overflow-x-auto text-left">
+                                  <code>{cell.replace(/```\n|\n```/g, '')}</code>
+                                </pre>
+                              ) : (
+                                <div style={{ 
+                                  textAlign: 'left', 
+                                  width: '100%',
+                                  lineHeight: '1.2',
+                                  verticalAlign: 'top'
+                                }}>
+                                  {processInlineFormatting(cell)}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </td>
                       ))}
