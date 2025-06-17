@@ -5005,6 +5005,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Generic tables routes
+  app.get("/api/generic-tables/:name", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { name } = req.params;
+      const genericTable = await storage.getGenericTableByName(name);
+      
+      if (!genericTable) {
+        return res.status(404).json({ error: "Tabela genérica não encontrada" });
+      }
+      
+      res.json(genericTable);
+    } catch (error: any) {
+      console.error("Erro ao buscar tabela genérica:", error);
+      res.status(500).send("Erro ao buscar tabela genérica");
+    }
+  });
+
   // The httpServer is needed for potential WebSocket connections later
   const httpServer = createServer(app);
 

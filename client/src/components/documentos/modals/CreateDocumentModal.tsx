@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -90,6 +91,20 @@ export function CreateDocumentModal({
   onOpenEditArtifactModal,
   resetFormData,
 }: CreateDocumentModalProps) {
+  // Query para buscar tipos de documento da tabela generic_tables
+  const { data: docTypesData } = useQuery({
+    queryKey: ['/api/generic-tables/manual_doc_types'],
+    queryFn: async () => {
+      const response = await fetch('/api/generic-tables/manual_doc_types');
+      if (!response.ok) throw new Error('Erro ao buscar tipos de documento');
+      return response.json();
+    },
+    enabled: isOpen,
+  });
+
+  // Extrair as opções de tipos de documento do conteúdo JSON
+  const docTypeOptions = docTypesData?.content?.manual_doc_types || [];
+
   return (
     <Dialog
       open={isOpen}
@@ -159,15 +174,11 @@ export function CreateDocumentModal({
                       <SelectValue placeholder="Selecione o tipo" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="CRP-Req.Cliente">
-                        CRP-Req.Cliente
-                      </SelectItem>
-                      <SelectItem value="RRP-Impl.Roadmap">
-                        RRP-Impl.Roadmap
-                      </SelectItem>
-                      <SelectItem value="ODI-Instr.Oper.">
-                        ODI-Instr.Oper.
-                      </SelectItem>
+                      {docTypeOptions.map((option: [string, string]) => (
+                        <SelectItem key={option[0]} value={option[0]}>
+                          {option[1]}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
