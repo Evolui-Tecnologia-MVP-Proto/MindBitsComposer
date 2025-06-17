@@ -172,23 +172,14 @@ export function createMarkdownConverter() {
       } else {
         // Convert to HTML table with proper alignment for MDX
         if (rows.length > 0) {
-          markdown += '\n<table style="width: 100%">\n';
+          markdown += '\n<table style="width: 100%">\n  <tbody>\n';
           
           rows.forEach((row: any, rowIndex: number) => {
             const cells = row.getChildren();
             
-            if (rowIndex === 0) {
-              // Header row
-              markdown += '  <thead>\n    <tr>\n';
-              cells.forEach((cell: any) => {
-                const cellText = cell.getTextContent() || '';
-                markdown += `      <th style="vertical-align: top; padding: 12px">${cellText}</th>\n`;
-              });
-              markdown += '    </tr>\n  </thead>\n  <tbody>\n';
-            } else {
-              // Content row
-              markdown += '    <tr>\n';
-              cells.forEach((cell: any) => {
+            // All rows are content rows
+            markdown += '    <tr>\n';
+            cells.forEach((cell: any) => {
                 // Extract images from this specific cell without affecting global processing
                 function extractCellImages(node: any): Array<{imageId: string, url: string}> {
                   const images: Array<{imageId: string, url: string}> = [];
@@ -259,7 +250,6 @@ export function createMarkdownConverter() {
                 markdown += '      </td>\n';
               });
               markdown += '    </tr>\n';
-            }
           });
           
           markdown += '  </tbody>\n</table>\n\n';
