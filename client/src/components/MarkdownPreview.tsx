@@ -203,9 +203,9 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
   const flushTable = () => {
     if (tableRows.length > 0) {
       const [headerRow, ...bodyRows] = tableRows;
-      const headers = headerRow.split('|').map(h => h.trim()).filter(h => h);
-      const rows = bodyRows.filter(row => !row.includes('---')).map(row => 
-        row.split('|').map(cell => cell.trim()).filter(cell => cell)
+      const headers = headerRow.split('|').map((h: string) => h.trim()).filter((h: string) => h);
+      const rows = bodyRows.filter((row: string) => !row.includes('---')).map((row: string) => 
+        row.split('|').map((cell: string) => cell.trim()).filter((cell: string) => cell)
       );
 
       elements.push(
@@ -213,7 +213,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
           <table className="min-w-full border border-gray-300 rounded-lg">
             <thead className="bg-gray-50">
               <tr>
-                {headers.map((header, i) => (
+                {headers.map((header: string, i: number) => (
                   <th key={i} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300">
                     {header}
                   </th>
@@ -221,9 +221,9 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {rows.map((row, i) => (
+              {rows.map((row: string[], i: number) => (
                 <tr key={i} className="hover:bg-gray-50">
-                  {row.map((cell, j) => (
+                  {row.map((cell: string, j: number) => (
                     <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200">
                       {cell}
                     </td>
@@ -312,8 +312,8 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
       return;
     }
 
-    // Handle images
-    if (line.match(/!\[.*?\]\(.*?\)/)) {
+    // Handle standalone images
+    if (line.match(/^\s*!\[.*?\]\(.*?\)\s*$/)) {
       flushParagraph();
       const imageMatch = line.match(/!\[(.*?)\]\((.*?)\)/);
       if (imageMatch) {
