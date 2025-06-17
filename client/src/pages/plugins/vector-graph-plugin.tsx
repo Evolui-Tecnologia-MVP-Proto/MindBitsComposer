@@ -845,12 +845,12 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     let snapshotToLoad = snapshotData;
 
     // Se o arquivo tem a estrutura padrão (exportado pelo editor), não sanitize!
+    // Isso inclui tanto arquivos do disco quanto assets salvos no formato correto
     if (
       snapshotData &&
       typeof snapshotData === 'object' &&
       snapshotData.store &&
-      typeof snapshotData.store === 'object' &&
-      snapshotData.schema
+      typeof snapshotData.store === 'object'
     ) {
       // Log shapes de texto antes do loadSnapshot
       Object.values(snapshotData.store).forEach((record: any) => {
