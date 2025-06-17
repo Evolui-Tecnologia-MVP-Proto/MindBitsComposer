@@ -786,28 +786,12 @@ function convertToMarkdown(editorState: any): string {
 function cleanMarkdownContent(markdown: string): string {
   if (!markdown?.trim()) return markdown;
   
+  // Simply trim whitespace and limit excessive newlines without aggressive regex
   return markdown
     .split('\n')
-    .map(line => line.trimEnd()) // Remove trailing whitespace
+    .map(line => line.trimEnd()) // Remove trailing whitespace only
     .join('\n')
-    // Clean excessive newlines but preserve structure
-    .replace(/\n{4,}/g, '\n\n') // Limit to max 2 consecutive newlines
-    // Ensure proper spacing around headers
-    .replace(/(\n|^)(#{1,6}\s[^\n]+)(\n|$)/g, '\n\n$2\n\n') // Headers need blank lines
-    // Ensure proper spacing around tables
-    .replace(/(\n|^)(\|.*\|)(\n|$)/g, (match, before, tableRow, after) => {
-      // If this is the first row of a table (contains |), ensure blank line before
-      if (before !== '\n\n' && before !== '') {
-        before = '\n\n';
-      }
-      return before + tableRow + after;
-    })
-    // Clean table cell content - remove internal line breaks but preserve structure
-    .replace(/(\|[^|]*?)\n+([^|\n])/g, '$1 $2') // Join broken cell content
-    .replace(/\|\s{2,}/g, '| ') // Normalize spaces after pipes
-    .replace(/\s{2,}\|/g, ' |') // Normalize spaces before pipes
-    // Final cleanup
-    .replace(/\n{3,}/g, '\n\n') // Ensure max 2 newlines anywhere
+    .replace(/\n{4,}/g, '\n\n\n') // Limit to max 3 consecutive newlines
     .trim();
 }
 
