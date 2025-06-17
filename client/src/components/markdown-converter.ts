@@ -189,8 +189,48 @@ export function createMarkdownConverter() {
               // Content row
               markdown += '    <tr>\n';
               cells.forEach((cell: any) => {
-                // Extract all images from this cell recursively
-                const cellImages = extractImagesRecursively(cell);
+                // Extract images from this specific cell without affecting global processing
+                function extractCellImages(node: any): Array<{imageId: string, url: string}> {
+                  const images: Array<{imageId: string, url: string}> = [];
+                  
+                  if (node.getType() === 'image-with-metadata') {
+                    const metadataText = node.getMetadataText();
+                    const imageId = node.getImageId();
+                    
+                    const httpsUrlMatch = metadataText.match(/\[(https?:\/\/.*?)\]/);
+                    const httpsUrl = httpsUrlMatch ? httpsUrlMatch[1] : '';
+                    
+                    const blobUrlMatch = metadataText.match(/\[blob:(.*?)\]/);
+                    const blobUrl = blobUrlMatch ? blobUrlMatch[1] : '';
+                    
+                    let finalUrl = '';
+                    if (httpsUrl) {
+                      finalUrl = httpsUrl;
+                    } else if (blobUrl) {
+                      finalUrl = `blob:${blobUrl}`;
+                    } else {
+                      finalUrl = node.getSrc();
+                    }
+                    
+                    images.push({imageId, url: finalUrl});
+                  } else if (node.getType() === 'image') {
+                    const src = node.getSrc();
+                    const imageId = `img_${Math.random().toString(36).substr(2, 9)}`;
+                    images.push({imageId, url: src});
+                  }
+                  
+                  if (node.getChildren) {
+                    const children = node.getChildren();
+                    children.forEach((child: any) => {
+                      const childImages = extractCellImages(child);
+                      images.push(...childImages);
+                    });
+                  }
+                  
+                  return images;
+                }
+                
+                const cellImages = extractCellImages(cell);
                 
                 // Get text content and clean it of internal line breaks
                 let cellText = cell.getTextContent() || '';
