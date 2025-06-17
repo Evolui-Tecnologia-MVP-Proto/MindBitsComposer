@@ -763,8 +763,9 @@ interface LexicalEditorProps {
   onEditorInstanceChange?: (editor: any) => void;
   className?: string;
   templateSections?: string[];
-  viewMode?: 'editor' | 'preview';
+  viewMode?: 'editor' | 'preview' | 'mdx';
   initialEditorState?: string; // Estado serializado do Lexical para restaurar
+  markdownContent?: string;
 }
 
 // Função para converter conteúdo Lexical para markdown
@@ -937,8 +938,7 @@ function ImageIdAutoConvertPlugin() {
 }
 
 // Componente principal do editor Lexical completo
-export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, onEditorInstanceChange, className = '', templateSections, viewMode = 'editor', initialEditorState }: LexicalEditorProps): JSX.Element {
-  const [markdownContent, setMarkdownContent] = useState('');
+export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, onEditorInstanceChange, className = '', templateSections, viewMode = 'editor', initialEditorState, markdownContent: mdxContent = '' }: LexicalEditorProps): JSX.Element {
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [tableRows, setTableRows] = useState(2);
   const [tableColumns, setTableColumns] = useState(3);
@@ -1025,12 +1025,15 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
     });
   }, [selectedTableKey, editorInstance]);
   
+  // State para controlar o markdown atual
+  const [currentMarkdown, setCurrentMarkdown] = useState('');
+  
   // Hook para capturar markdown quando mudar para preview
   React.useEffect(() => {
     if (viewMode === 'preview' && editorInstance) {
       editorInstance.getEditorState().read(() => {
         const markdown = convertToMarkdown(editorInstance.getEditorState());
-        setMarkdownContent(markdown);
+        setCurrentMarkdown(markdown);
       });
     }
   }, [viewMode, editorInstance]);
@@ -1091,7 +1094,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       // Gerar markdown em tempo real
       const markdown = convertToMarkdown(editorState);
 
-      setMarkdownContent(markdown);
+      setCurrentMarkdown(markdown);
       
       if (onChange) {
         onChange(textContent);
