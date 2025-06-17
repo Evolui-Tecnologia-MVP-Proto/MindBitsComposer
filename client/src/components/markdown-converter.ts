@@ -170,52 +170,59 @@ export function createMarkdownConverter() {
         
         markdown += '  </tbody>\n</table>\n\n';
       } else {
-        // Regular markdown table for non-Mermaid content
+        // Convert to HTML table for perfect alignment control
         if (rows.length > 0) {
-          // Add blank line before table
-          markdown += '\n';
+          markdown += '<table style={{ width: "100%" }}>\n';
           
           rows.forEach((row: any, rowIndex: number) => {
             const cells = row.getChildren();
-            let rowContent = '|';
             
-            cells.forEach((cell: any) => {
-              // Extract all images from this cell recursively
-              const cellImages = extractImagesRecursively(cell);
-              
-              // Get text content and clean it of internal line breaks
-              let cellText = cell.getTextContent() || '';
-              // Remove internal line breaks and normalize whitespace in cell content
-              cellText = cellText.replace(/\s*\n\s*/g, ' ').replace(/\s+/g, ' ').trim();
-              
-              // Combine text and images
-              let cellContent = cellText;
-              if (cellImages.length > 0) {
-                const imageMarkdown = cellImages.map(img => `![${img.imageId}](${img.url})`).join(' ');
-                cellContent = cellContent ? `${imageMarkdown} ${cellContent}` : imageMarkdown;
-              }
-              
-              if (!cellContent.trim()) {
-                cellContent = ' ';
-              }
-              
-              rowContent += ` ${cellContent} |`;
-            });
-            
-            markdown += rowContent + '\n';
-            
-            // Add separator after header (first row)
             if (rowIndex === 0) {
-              let separator = '|';
-              cells.forEach(() => {
-                separator += ' --- |';
+              // Header row
+              markdown += '  <thead>\n    <tr>\n';
+              cells.forEach((cell: any) => {
+                const cellText = cell.getTextContent() || '';
+                markdown += `      <th style={{ verticalAlign: "top", padding: "12px" }}>${cellText}</th>\n`;
               });
-              markdown += separator + '\n';
+              markdown += '    </tr>\n  </thead>\n  <tbody>\n';
+            } else {
+              // Content row
+              markdown += '    <tr>\n';
+              cells.forEach((cell: any) => {
+                // Extract all images from this cell recursively
+                const cellImages = extractImagesRecursively(cell);
+                
+                // Get text content and clean it of internal line breaks
+                let cellText = cell.getTextContent() || '';
+                cellText = cellText.replace(/\s*\n\s*/g, ' ').replace(/\s+/g, ' ').trim();
+                
+                markdown += '      <td style={{ verticalAlign: "top", padding: "12px" }}>\n';
+                
+                // Render images with block display for proper alignment
+                if (cellImages.length > 0) {
+                  cellImages.forEach(img => {
+                    markdown += `        <img src="${img.url}" alt="${img.imageId}" style={{ display: "block", maxWidth: "100%", height: "auto" }} />\n`;
+                  });
+                }
+                
+                // Add text content if available
+                if (cellText.trim()) {
+                  if (cellImages.length > 0) {
+                    markdown += `        <p>${cellText}</p>\n`;
+                  } else {
+                    markdown += `        ${cellText}\n`;
+                  }
+                } else if (cellImages.length === 0) {
+                  markdown += '        \n';
+                }
+                
+                markdown += '      </td>\n';
+              });
+              markdown += '    </tr>\n';
             }
           });
           
-          // Add blank line after table
-          markdown += '\n';
+          markdown += '  </tbody>\n</table>\n\n';
         }
       }
     } else if (node.getType() === 'collapsible-container') {
