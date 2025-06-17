@@ -292,15 +292,12 @@ export default function LexicalPage() {
     }
   }, [documentEditions, hasInitializedPanel]);
 
-  // Configurar função de salvamento para o sistema de proteção de navegação
-  useEffect(() => {
-    setSaveFunction(() => () => handleSave(true)); // forceExit = true para navegação
-  }, [setSaveFunction, selectedEdition, handleSave]);
+
 
   // Monitorar mudanças no conteúdo do editor para detectar alterações não salvas
   useEffect(() => {
-    // Verificar se há conteúdo no editor e se não está salvo
-    const hasUnsaved = hasEditorContent && (selectedEdition || currentDocumentId);
+    // Verificar se há conteúdo no editor que pode ser salvo
+    const hasUnsaved = hasEditorContent && (selectedEdition || !currentDocumentId);
     setHasUnsavedChanges(hasUnsaved);
   }, [hasEditorContent, selectedEdition, currentDocumentId, setHasUnsavedChanges]);
 
@@ -813,6 +810,11 @@ export default function LexicalPage() {
   const handleSaveLocal = () => {
     setShowSaveModal(true);
   };
+
+  // Configurar função de salvamento para o sistema de proteção de navegação
+  useEffect(() => {
+    setSaveFunction(() => () => handleSave(true)); // forceExit = true para navegação
+  }, [setSaveFunction, selectedEdition]);
 
   // Função para obter nome padrão do arquivo baseado no contexto
   const getDefaultFilename = () => {
