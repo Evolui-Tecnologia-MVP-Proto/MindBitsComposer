@@ -1255,29 +1255,10 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         
         try {
           // Parse the stored tldraw snapshot from file_metadata
-          const snapshot = JSON.parse(asset.fileMetadata);
-          console.log('Parsed TLD snapshot:', {
-            hasStore: !!snapshot.store,
-            hasSchema: !!snapshot.schema,
-            storeKeys: snapshot.store ? Object.keys(snapshot.store).length : 0
-          });
+          const tldrawData = JSON.parse(asset.fileMetadata);
           
-          // Load the snapshot into the editor using the same logic as file loading
-          if (snapshot.store && snapshot.schema) {
-            // Use loadSnapshot for proper schema handling
-            loadSnapshot(editorInstance.store, snapshot);
-          } else {
-            // Fallback for older formats
-            editorInstance.store.loadSnapshot(snapshot);
-          }
-          
-          // Set active page if available
-          const pageIds = Object.values(editorInstance.store.allRecords())
-            .filter((r: any) => r.typeName === 'page')
-            .map((r: any) => r.id);
-          if (pageIds.length > 0) {
-            editorInstance.setCurrentPage(pageIds[0]);
-          }
+          // Use the same loading function as disk files
+          loadTldrawData(tldrawData, 'asset metadata');
           
           toast({
             title: "Sucesso",
