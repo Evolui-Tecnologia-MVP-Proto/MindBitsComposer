@@ -1169,54 +1169,10 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           // Parse the stored tldraw snapshot from file_metadata
           const tldrawData = JSON.parse(asset.fileMetadata);
           
-          console.log('🔥 ASSET - USANDO EXATAMENTE A MESMA LÓGICA DO DISCO');
-          console.log('🔥 ASSET - Raw file_metadata structure:');
-          console.log('- tldrawFileFormatVersion:', tldrawData.tldrawFileFormatVersion);
-          console.log('- schema:', tldrawData.schema ? 'present' : 'missing');
-          console.log('- records:', Array.isArray(tldrawData.records) ? `array with ${tldrawData.records.length} items` : 'not array');
-          console.log('- store:', tldrawData.store ? `object with ${Object.keys(tldrawData.store).length} keys` : 'missing');
-          console.log('- root keys:', Object.keys(tldrawData));
+          console.log('🔥 ASSET - USANDO EXATAMENTE A MESMA FUNÇÃO DO DISCO');
           
-          // USAR EXATAMENTE A MESMA LÓGICA QUE FUNCIONA PARA O DISCO
-          if (tldrawData.tldrawFileFormatVersion && tldrawData.records) {
-            // New format (v1+) - records array format
-            console.log('🔥 ASSET - Loading new format .tldr file with records array');
-            const snapshotData = {
-              store: tldrawData.records.reduce((acc: any, record: any) => {
-                acc[record.id] = record;
-                return acc;
-              }, {}),
-              schema: tldrawData.schema || {}
-            };
-            
-            console.log('🔥 ASSET - Snapshot data prepared, loading...');
-            console.log('- snapshotData.store exists:', !!snapshotData.store);
-            console.log('- snapshotData.store keys:', snapshotData.store ? Object.keys(snapshotData.store).length : 0);
-            
-            // Load the snapshot using the detected format
-            loadSnapshot(editorInstance.store, snapshotData);
-            
-            // Forçar página ativa para a primeira encontrada após o carregamento
-            const pageIds = Object.values(editorInstance.store.allRecords())
-              .filter((r: any) => r.typeName === 'page')
-              .map((r: any) => r.id);
-            if (pageIds.length > 0) {
-              editorInstance.setCurrentPage(pageIds[0]);
-            }
-            
-            // Ajustar zoom após carregamento
-            setTimeout(() => {
-              try {
-                editorInstance.setZoom(1);
-              } catch (e) {
-                console.warn('setZoom falhou:', e);
-              }
-            }, 500);
-            
-            console.log('🔥 ASSET - Carregamento concluído usando lógica idêntica ao disco');
-          } else {
-            throw new Error('Formato de arquivo .tldr não reconhecido');
-          }
+          // USAR EXATAMENTE A MESMA FUNÇÃO QUE FUNCIONA NO DISCO
+          loadTldrawData(tldrawData, 'asset file');
           
           toast({
             title: "Sucesso",
