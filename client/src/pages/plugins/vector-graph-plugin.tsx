@@ -1092,7 +1092,10 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             <Input
               type="text"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => {
+                console.log('🔥 DESCRIPTION ONCHANGE:', e.target.value);
+                setDescription(e.target.value);
+              }}
               placeholder="Descrição do arquivo"
               className="h-7 w-40 text-xs"
             />
