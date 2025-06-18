@@ -506,7 +506,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             formData.append('file', pngBlob, filename);
             formData.append('name', filename.replace('.png', ''));
             formData.append('type', 'image');
-            formData.append('description', description || baseFileName);
+            formData.append('description', description || '');
             formData.append('fileMetadata', tldrawData);
             formData.append('editor', 'Graph_TLD');
 
@@ -549,7 +549,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               documentoId: documentId,
               name: filename,
               fileName: filename,
-              description: description || baseFileName,
+              description: description || '',
               fileData: pngData,
               fileSize: pngBlob.size.toString(),
               mimeType: 'image/png',
