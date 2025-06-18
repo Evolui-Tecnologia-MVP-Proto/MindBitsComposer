@@ -1147,7 +1147,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
       const isTldAsset = (asset.originAssetId === "Graph_TLD") || (asset.editor === "Graph_TLD");
       
       if (isTldAsset && asset.fileMetadata) {
-        console.log('Loading TLD file from file_metadata...', {
+        console.log('🔥 ASSET LOADING - Loading TLD file from file_metadata...', {
           assetName: asset.name,
           assetType: asset.originAssetId || asset.editor,
           hasMetadata: !!asset.fileMetadata
@@ -1156,6 +1156,13 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         try {
           // Parse the stored tldraw snapshot from file_metadata
           const tldrawData = JSON.parse(asset.fileMetadata);
+          
+          console.log('🔥 ASSET LOADING - Raw asset file_metadata structure:');
+          console.log('- tldrawFileFormatVersion:', tldrawData.tldrawFileFormatVersion);
+          console.log('- schema:', tldrawData.schema ? 'present' : 'missing');
+          console.log('- records:', Array.isArray(tldrawData.records) ? `array with ${tldrawData.records.length} items` : 'not array');
+          console.log('- store:', tldrawData.store ? `object with ${Object.keys(tldrawData.store).length} keys` : 'missing');
+          console.log('- root keys:', Object.keys(tldrawData));
           
           // Use the same loading function as disk files
           loadTldrawData(tldrawData, 'asset metadata');
