@@ -489,7 +489,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               });
               
               const simplifiedSnapshot = {
-                store: Object.fromEntries(simplifiedRecords.map(record => [record.id, record])),
+                store: Object.fromEntries(simplifiedRecords.map((record: any) => [record.id, record])),
                 schema: fixedSnapshotForGlobal.schema
               };
               
