@@ -843,14 +843,42 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
       } catch (nativeError) {
         console.warn('🔥 CARREGAMENTO NATIVO FALHOU, tentando fallback:', nativeError);
         
-        // Fallback para conversão manual
-        snapshotData = {
-          store: tldrawData.records.reduce((acc: any, record: any) => {
-            acc[record.id] = record;
-            return acc;
-          }, {}),
-          schema: tldrawData.schema || {}
-        };
+        // Fallback: usar clearAll e putRecords diretamente
+        console.log('🔥 Usando fallback - clearAll + putRecords');
+        
+        // Limpar store atual
+        editorInstance.store.clear();
+        
+        // Adicionar records diretamente
+        editorInstance.store.put(tldrawData.records);
+        
+        // Forçar página ativa
+        const pageRecords = tldrawData.records.filter((r: any) => r.typeName === 'page');
+        if (pageRecords.length > 0) {
+          console.log('🔥 Configurando página ativa (fallback):', pageRecords[0].id);
+          editorInstance.setCurrentPage(pageRecords[0].id);
+        }
+        
+        // Debug após fallback
+        console.log('🔥 DEBUG FALLBACK PÓS-CARREGAMENTO:');
+        console.log('- Total records no store:', editorInstance.store.allRecords().length);
+        console.log('- Pages no store:', editorInstance.store.allRecords().filter((r: any) => r.typeName === 'page'));
+        console.log('- Shapes no store:', editorInstance.store.allRecords().filter((r: any) => r.typeName === 'shape').length);
+        console.log('- Current page ID:', editorInstance.getCurrentPageId());
+        console.log('- Current page shape IDs:', Array.from(editorInstance.getCurrentPageShapeIds()));
+        
+        // Ajustar zoom
+        setTimeout(() => {
+          try {
+            console.log('🔥 Ajustando zoom (fallback)');
+            editorInstance.zoomToFit();
+          } catch (e) {
+            console.warn('Zoom adjust falhou (fallback):', e);
+          }
+        }, 100);
+        
+        console.log('🔥 FALLBACK CONCLUÍDO');
+        return; // Sucesso via fallback
       }
     } else if (tldrawData.store) {
       // Middle format - store object format
