@@ -790,13 +790,34 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     if (tldrawData.tldrawFileFormatVersion && tldrawData.records) {
       // New format (v1+) - records array format
       console.log('Loading new format .tldr file with records array');
-      snapshotData = {
-        store: tldrawData.records.reduce((acc: any, record: any) => {
-          acc[record.id] = record;
-          return acc;
-        }, {}),
-        schema: tldrawData.schema || {}
-      };
+      
+      // Tentar carregar diretamente no formato nativo do tldraw
+      try {
+        console.log('🔥 TENTANDO CARREGAMENTO NATIVO');
+        loadSnapshot(editorInstance.store, tldrawData);
+        
+        // Forçar página ativa para a primeira encontrada após o carregamento
+        const pageIds = Object.values(editorInstance.store.allRecords())
+          .filter((r: any) => r.typeName === 'page')
+          .map((r: any) => r.id);
+        if (pageIds.length > 0) {
+          editorInstance.setCurrentPage(pageIds[0]);
+        }
+        
+        console.log('🔥 CARREGAMENTO NATIVO SUCESSO');
+        return; // Sucesso, não continuar
+      } catch (nativeError) {
+        console.warn('🔥 CARREGAMENTO NATIVO FALHOU, tentando fallback:', nativeError);
+        
+        // Fallback para conversão manual
+        snapshotData = {
+          store: tldrawData.records.reduce((acc: any, record: any) => {
+            acc[record.id] = record;
+            return acc;
+          }, {}),
+          schema: tldrawData.schema || {}
+        };
+      }
     } else if (tldrawData.store) {
       // Middle format - store object format
       console.log('Loading middle format .tldr file with store object');
