@@ -794,7 +794,14 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
       // Tentar carregar diretamente no formato nativo do tldraw
       try {
         console.log('🔥 TENTANDO CARREGAMENTO NATIVO');
-        loadSnapshot(editorInstance.store, tldrawData);
+        
+        // Use migrateSnapshot para processar corretamente o schema
+        const migratedSnapshot = editorInstance.store.schema.migrateStoreSnapshot(tldrawData);
+        console.log('🔥 Snapshot migrado:', {
+          originalRecords: tldrawData.records.length,
+          migratedRecords: Object.keys(migratedSnapshot.store).length
+        });
+        loadSnapshot(editorInstance.store, migratedSnapshot);
         
         // Debug após carregamento
         console.log('🔥 DEBUG PÓS-CARREGAMENTO:');
