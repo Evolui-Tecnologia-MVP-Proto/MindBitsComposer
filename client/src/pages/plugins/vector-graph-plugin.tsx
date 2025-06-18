@@ -368,15 +368,13 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           const snapshot = editorInstance.store.getSnapshot();
           const fixedSnapshot = ensureGeoAlign(snapshot);
           
-          // USAR EXATAMENTE O FORMATO QUE FUNCIONA NO DISCO - exportar snapshot nativo  
-          console.log('🔥 SAVE MY ASSETS - Exportando snapshot nativo do tldraw (igual ao disco)');
-          const nativeSnapshot = editorInstance.store.getSnapshot();
+          // USAR EXATAMENTE O FORMATO DO ARQUIVO ANEXO QUE FUNCIONA  
+          console.log('🔥 SAVE MY ASSETS - Exportando no formato exato do arquivo anexo');
           
-          // Criar exatamente o mesmo formato que o arquivo funcional do disco
+          // Formato exato do arquivo anexo: { store: {...}, schema: {...} }
           const diskFormatSnapshotMyAssets = {
-            tldrawFileFormatVersion: 1,
-            schema: nativeSnapshot.schema,
-            records: Object.values(fixedSnapshot.store)
+            store: fixedSnapshot.store,
+            schema: fixedSnapshot.schema
           };
           
           // Check if tldraw data is too large and compress if needed for My Assets too
@@ -443,30 +441,20 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           
           if (!documentId) {
             // Save to Global Assets when no composer document is selected
-            // Get the tldraw snapshot for file_metadata - preserving new format (tldrawFileFormatVersion + records)
+            console.log('🔥 SAVE - Exportando no formato exato do arquivo anexo que funciona');
             const snapshotForGlobal = editorInstance.store.getSnapshot();
             const fixedSnapshotForGlobal = ensureGeoAlign(snapshotForGlobal);
             
-            // USAR EXATAMENTE O FORMATO QUE FUNCIONA NO DISCO - exportar snapshot nativo
-            console.log('🔥 SAVE - Exportando snapshot nativo do tldraw (igual ao disco)');
-            const tldrawNativeSnapshot = editorInstance.store.getSnapshot();
-            console.log('🔥 SAVE - Native snapshot structure:', {
-              hasStore: !!tldrawNativeSnapshot.store,
-              storeKeys: tldrawNativeSnapshot.store ? Object.keys(tldrawNativeSnapshot.store).length : 0,
-              hasSchema: !!tldrawNativeSnapshot.schema
-            });
-            
-            // Criar exatamente o mesmo formato que o arquivo funcional do disco
+            // Formato exato do arquivo anexo: { store: {...}, schema: {...} }
             const diskFormatSnapshot = {
-              tldrawFileFormatVersion: 1,
-              schema: tldrawNativeSnapshot.schema,
-              records: Object.values(tldrawNativeSnapshot.store)
+              store: fixedSnapshotForGlobal.store,
+              schema: fixedSnapshotForGlobal.schema
             };
             
-            console.log('🔥 SAVE - Disk format snapshot structure:', {
-              tldrawFileFormatVersion: diskFormatSnapshot.tldrawFileFormatVersion,
+            console.log('🔥 SAVE - Formato exato do arquivo anexo:', {
+              hasStore: !!diskFormatSnapshot.store,
               hasSchema: !!diskFormatSnapshot.schema,
-              recordsCount: diskFormatSnapshot.records.length
+              storeKeys: diskFormatSnapshot.store ? Object.keys(diskFormatSnapshot.store).length : 0
             });
             
             let tldrawData = JSON.stringify(diskFormatSnapshot);
@@ -501,9 +489,8 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               });
               
               const simplifiedSnapshot = {
-                tldrawFileFormatVersion: 1,
-                schema: tldrawNativeSnapshot.schema,
-                records: simplifiedRecords
+                store: Object.fromEntries(simplifiedRecords.map(record => [record.id, record])),
+                schema: fixedSnapshotForGlobal.schema
               };
               
               tldrawData = JSON.stringify(simplifiedSnapshot);
