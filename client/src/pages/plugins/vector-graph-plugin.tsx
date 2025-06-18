@@ -368,29 +368,19 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
           const snapshot = editorInstance.store.getSnapshot();
           const fixedSnapshot = ensureGeoAlign(snapshot);
           
-          // Convert to new format like the original TLD files
-          const newFormatSnapshot = {
+          // USAR EXATAMENTE O FORMATO QUE FUNCIONA NO DISCO - exportar snapshot nativo  
+          console.log('🔥 SAVE MY ASSETS - Exportando snapshot nativo do tldraw (igual ao disco)');
+          const nativeSnapshot = editorInstance.store.getSnapshot();
+          
+          // Criar exatamente o mesmo formato que o arquivo funcional do disco
+          const diskFormatSnapshotMyAssets = {
             tldrawFileFormatVersion: 1,
-            schema: {
-              schemaVersion: 1,
-              storeVersion: 4,
-              recordVersions: {
-                asset: { version: 1, subTypeKey: "type", subTypeVersions: { image: 2, video: 2, bookmark: 0 } },
-                camera: { version: 1 },
-                document: { version: 2 },
-                instance: { version: 22 },
-                instance_page_state: { version: 5 },
-                page: { version: 1 },
-                shape: { version: 3, subTypeKey: "type", subTypeVersions: { group: 0, text: 1, bookmark: 1, draw: 1, geo: 7, note: 4, line: 1, frame: 0, arrow: 2, highlight: 0, embed: 4, image: 2, video: 1 } },
-                instance_presence: { version: 5 },
-                pointer: { version: 1 }
-              }
-            },
+            schema: nativeSnapshot.schema,
             records: Object.values(fixedSnapshot.store)
           };
           
           // Check if tldraw data is too large and compress if needed for My Assets too
-          let metadataToSave = JSON.stringify(newFormatSnapshot);
+          let metadataToSave = JSON.stringify(diskFormatSnapshotMyAssets);
           const maxMetadataSize = 500 * 1024; // 500KB limit for metadata
           console.log('Original tldraw metadata size for My Assets:', metadataToSave.length);
           
@@ -457,28 +447,29 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             const snapshotForGlobal = editorInstance.store.getSnapshot();
             const fixedSnapshotForGlobal = ensureGeoAlign(snapshotForGlobal);
             
-            // Convert to new format like the original TLD files
-            const newFormatSnapshotForGlobal = {
+            // USAR EXATAMENTE O FORMATO QUE FUNCIONA NO DISCO - exportar snapshot nativo
+            console.log('🔥 SAVE - Exportando snapshot nativo do tldraw (igual ao disco)');
+            const tldrawNativeSnapshot = editorInstance.store.getSnapshot();
+            console.log('🔥 SAVE - Native snapshot structure:', {
+              hasStore: !!tldrawNativeSnapshot.store,
+              storeKeys: tldrawNativeSnapshot.store ? Object.keys(tldrawNativeSnapshot.store).length : 0,
+              hasSchema: !!tldrawNativeSnapshot.schema
+            });
+            
+            // Criar exatamente o mesmo formato que o arquivo funcional do disco
+            const diskFormatSnapshot = {
               tldrawFileFormatVersion: 1,
-              schema: {
-                schemaVersion: 1,
-                storeVersion: 4,
-                recordVersions: {
-                  asset: { version: 1, subTypeKey: "type", subTypeVersions: { image: 2, video: 2, bookmark: 0 } },
-                  camera: { version: 1 },
-                  document: { version: 2 },
-                  instance: { version: 22 },
-                  instance_page_state: { version: 5 },
-                  page: { version: 1 },
-                  shape: { version: 3, subTypeKey: "type", subTypeVersions: { group: 0, text: 1, bookmark: 1, draw: 1, geo: 7, note: 4, line: 1, frame: 0, arrow: 2, highlight: 0, embed: 4, image: 2, video: 1 } },
-                  instance_presence: { version: 5 },
-                  pointer: { version: 1 }
-                }
-              },
-              records: Object.values(fixedSnapshotForGlobal.store)
+              schema: tldrawNativeSnapshot.schema,
+              records: Object.values(tldrawNativeSnapshot.store)
             };
             
-            let tldrawData = JSON.stringify(newFormatSnapshotForGlobal);
+            console.log('🔥 SAVE - Disk format snapshot structure:', {
+              tldrawFileFormatVersion: diskFormatSnapshot.tldrawFileFormatVersion,
+              hasSchema: !!diskFormatSnapshot.schema,
+              recordsCount: diskFormatSnapshot.records.length
+            });
+            
+            let tldrawData = JSON.stringify(diskFormatSnapshot);
             
             // Check if tldraw data is too large and compress if needed
             const maxMetadataSize = 500 * 1024; // 500KB limit for metadata
@@ -511,21 +502,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               
               const simplifiedSnapshot = {
                 tldrawFileFormatVersion: 1,
-                schema: {
-                  schemaVersion: 1,
-                  storeVersion: 4,
-                  recordVersions: {
-                    asset: { version: 1, subTypeKey: "type", subTypeVersions: { image: 2, video: 2, bookmark: 0 } },
-                    camera: { version: 1 },
-                    document: { version: 2 },
-                    instance: { version: 22 },
-                    instance_page_state: { version: 5 },
-                    page: { version: 1 },
-                    shape: { version: 3, subTypeKey: "type", subTypeVersions: { group: 0, text: 1, bookmark: 1, draw: 1, geo: 7, note: 4, line: 1, frame: 0, arrow: 2, highlight: 0, embed: 4, image: 2, video: 1 } },
-                    instance_presence: { version: 5 },
-                    pointer: { version: 1 }
-                  }
-                },
+                schema: tldrawNativeSnapshot.schema,
                 records: simplifiedRecords
               };
               
