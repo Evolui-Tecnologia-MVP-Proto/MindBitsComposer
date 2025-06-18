@@ -81,6 +81,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
   const [showImageModal, setShowImageModal] = useState(false);
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [fileName, setFileName] = useState('vector-graph');
+  const [description, setDescription] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -505,7 +506,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             formData.append('file', pngBlob, filename);
             formData.append('name', filename.replace('.png', ''));
             formData.append('type', 'image');
-            formData.append('description', baseFileName);
+            formData.append('description', description || baseFileName);
             formData.append('fileMetadata', tldrawData);
             formData.append('editor', 'Graph_TLD');
 
@@ -548,6 +549,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               documentoId: documentId,
               name: filename,
               fileName: filename,
+              description: description || baseFileName,
               fileData: pngData,
               fileSize: pngBlob.size.toString(),
               mimeType: 'image/png',
@@ -1079,6 +1081,16 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               onChange={(e) => setFileName(e.target.value)}
               placeholder="vector-graph"
               className="h-7 w-32 text-xs"
+            />
+          </div>
+          <div className="flex items-center gap-2 ml-4">
+            <span className="text-xs text-gray-600">Descrição:</span>
+            <Input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Descrição do arquivo"
+              className="h-7 w-40 text-xs"
             />
           </div>
         </div>
