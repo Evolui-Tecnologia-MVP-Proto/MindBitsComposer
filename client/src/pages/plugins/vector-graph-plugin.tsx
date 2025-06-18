@@ -387,18 +387,20 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             // Create a simplified version with only essential data in new format
             const simplifiedRecords: any[] = [];
             
-            // Keep only shapes and pages, remove large data
+            // Keep only shapes and pages, preserve richText for validation
             Object.values(fixedSnapshot.store).forEach((record: any) => {
               if (record.typeName === 'shape' || record.typeName === 'page') {
-                // For shapes, keep only basic properties
+                // For shapes, keep all essential properties including richText
                 if (record.typeName === 'shape') {
                   simplifiedRecords.push({
                     ...record,
                     props: {
                       ...record.props,
-                      // Remove potentially large data
-                      richText: undefined,
-                      text: record.props?.text ? record.props.text.substring(0, 100) : undefined
+                      // Keep richText - it's essential for tldraw validation
+                      // Only truncate very large text content if needed
+                      text: record.props?.text && record.props.text.length > 1000 
+                        ? record.props.text.substring(0, 1000) 
+                        : record.props?.text
                     }
                   });
                 } else {
@@ -468,18 +470,20 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               // Create a simplified version with only essential data in new format
               const simplifiedRecords: any[] = [];
               
-              // Keep only shapes and pages, remove large data
+              // Keep only shapes and pages, preserve richText for validation
               Object.values(fixedSnapshotForGlobal.store).forEach((record: any) => {
                 if (record.typeName === 'shape' || record.typeName === 'page') {
-                  // For shapes, keep only basic properties
+                  // For shapes, keep all essential properties including richText
                   if (record.typeName === 'shape') {
                     simplifiedRecords.push({
                       ...record,
                       props: {
                         ...record.props,
-                        // Remove potentially large data
-                        richText: undefined,
-                        text: record.props?.text ? record.props.text.substring(0, 100) : undefined
+                        // Keep richText - it's essential for tldraw validation
+                        // Only truncate very large text content if needed
+                        text: record.props?.text && record.props.text.length > 1000 
+                          ? record.props.text.substring(0, 1000) 
+                          : record.props?.text
                       }
                     });
                   } else {
