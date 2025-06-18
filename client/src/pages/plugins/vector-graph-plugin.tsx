@@ -510,6 +510,8 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
             formData.append('fileMetadata', tldrawData);
             formData.append('editor', 'Graph_TLD');
 
+            console.log('🔥 SAVE DEBUG - Description value:', description);
+            console.log('🔥 SAVE DEBUG - FormData description:', description || '');
             console.log('Saving to Global Assets:', filename);
             
             const response = await fetch('/api/global-assets', {
@@ -559,6 +561,8 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
               isImage: 'true'
             };
 
+            console.log('🔥 SAVE MY ASSETS DEBUG - Description value:', description);
+            console.log('🔥 SAVE MY ASSETS DEBUG - artifactData.description:', artifactData.description);
             console.log('Saving to My Assets:', artifactData);
             
             // Check authentication first
