@@ -846,10 +846,17 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         // Fallback: usar clearAll e putRecords diretamente
         console.log('🔥 Usando fallback - clearAll + putRecords');
         
-        // Limpar store atual
-        editorInstance.store.clear();
+        // Remover apenas shapes e páginas, manter records essenciais do editor
+        const currentRecords = editorInstance.store.allRecords();
+        const recordsToRemove = currentRecords.filter((r: any) => 
+          r.typeName === 'shape' || r.typeName === 'page'
+        );
+        
+        console.log('🔥 Removendo records existentes:', recordsToRemove.length);
+        editorInstance.store.remove(recordsToRemove.map((r: any) => r.id));
         
         // Adicionar records diretamente
+        console.log('🔥 Adicionando novos records:', tldrawData.records.length);
         editorInstance.store.put(tldrawData.records);
         
         // Forçar página ativa
