@@ -796,13 +796,40 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         console.log('🔥 TENTANDO CARREGAMENTO NATIVO');
         loadSnapshot(editorInstance.store, tldrawData);
         
+        // Debug após carregamento
+        console.log('🔥 DEBUG PÓS-CARREGAMENTO:');
+        console.log('- Total records no store:', editorInstance.store.allRecords().length);
+        console.log('- Pages no store:', editorInstance.store.allRecords().filter((r: any) => r.typeName === 'page'));
+        console.log('- Shapes no store:', editorInstance.store.allRecords().filter((r: any) => r.typeName === 'shape').length);
+        console.log('- Current page ID:', editorInstance.getCurrentPageId());
+        console.log('- Current page shape IDs:', Array.from(editorInstance.getCurrentPageShapeIds()));
+        console.log('- Camera:', editorInstance.getCamera());
+        console.log('- Viewport page bounds:', editorInstance.getViewportPageBounds());
+        
         // Forçar página ativa para a primeira encontrada após o carregamento
         const pageIds = Object.values(editorInstance.store.allRecords())
           .filter((r: any) => r.typeName === 'page')
           .map((r: any) => r.id);
         if (pageIds.length > 0) {
+          console.log('🔥 Configurando página ativa:', pageIds[0]);
           editorInstance.setCurrentPage(pageIds[0]);
         }
+        
+        // Forçar zoom para ajustar conteúdo
+        setTimeout(() => {
+          try {
+            console.log('🔥 Ajustando zoom para ver todo conteúdo');
+            editorInstance.zoomToFit();
+            editorInstance.resetZoom();
+          } catch (e) {
+            console.warn('Zoom adjust falhou:', e);
+            try {
+              editorInstance.setZoom(0.5);
+            } catch (e2) {
+              console.warn('setZoom backup falhou:', e2);
+            }
+          }
+        }, 100);
         
         console.log('🔥 CARREGAMENTO NATIVO SUCESSO');
         return; // Sucesso, não continuar
