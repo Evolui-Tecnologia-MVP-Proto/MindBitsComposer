@@ -85,6 +85,8 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
+  console.log('🔥 COMPONENT RENDER - description state:', description);
+
   // Function to sanitize tldraw snapshot data by removing deprecated properties
   const sanitizeSnapshotData = useCallback((store: any) => {
     console.log('🔥 SANITIZE FUNCTION CALLED - Starting sanitization process');
