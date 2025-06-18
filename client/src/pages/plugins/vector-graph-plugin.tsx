@@ -827,7 +827,10 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     } else if (typeof tldrawData === 'object' && Object.keys(tldrawData).length > 0) {
       // Try to detect if it's already a store format
       console.log('Loading assumed store format .tldr file');
-      snapshotData = { store: tldrawData };
+      snapshotData = { 
+        store: tldrawData,
+        schema: {}
+      };
     } else {
       throw new Error('Formato de arquivo .tldr não reconhecido');
     }
@@ -842,205 +845,25 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
       console.log('Sample records:', sampleRecords);
     }
     
-    let snapshotToLoad = snapshotData;
-
-    // Se o arquivo tem a estrutura padrão (exportado pelo editor), não sanitize!
-    // Isso inclui tanto arquivos do disco quanto assets salvos no formato correto
-    if (
-      snapshotData &&
-      typeof snapshotData === 'object' &&
-      snapshotData.store &&
-      typeof snapshotData.store === 'object'
-    ) {
-      // Log shapes de texto antes do loadSnapshot
-      Object.values(snapshotData.store).forEach((record: any) => {
-        if (record.type === 'text') {
-          console.log('Antes do loadSnapshot - Shape de texto:', record.id, 'props.w:', record.props.w, 'typeof:', typeof record.props.w);
-        }
-      });
-      
-      // Verificar se o schema está presente e válido
-      console.log('Schema check:', {
-        hasSchema: !!snapshotData.schema,
-        schemaKeys: snapshotData.schema ? Object.keys(snapshotData.schema) : [],
-        schemaVersion: snapshotData.schema?.schemaVersion,
-        storeVersion: snapshotData.schema?.storeVersion
-      });
-      
-      // Se não tem schema válido, criar um padrão
-      if (!snapshotData.schema || !snapshotData.schema.schemaVersion) {
-        console.log('Criando schema padrão para dados sem schema...');
-        snapshotData = {
-          ...snapshotData,
-          schema: {
-            schemaVersion: 1,
-            storeVersion: 4,
-            recordVersions: {
-              asset: { version: 1, subTypeKey: "type", subTypeVersions: { image: 2, video: 2, bookmark: 0 } },
-              camera: { version: 1 },
-              document: { version: 2 },
-              instance: { version: 22 },
-              instance_page_state: { version: 5 },
-              page: { version: 1 },
-              shape: { version: 3, subTypeKey: "type", subTypeVersions: { group: 0, text: 1, bookmark: 1, draw: 1, geo: 7, note: 4, line: 1, frame: 0, arrow: 2, highlight: 0, embed: 4, image: 2, video: 1 } },
-              instance_presence: { version: 5 },
-              pointer: { version: 1 }
-            }
-          }
-        };
-      }
-      
-      // Carregue com try/catch para capturar erros específicos
-      try {
-        console.log('Tentando loadSnapshot...');
-        loadSnapshot(editorInstance.store, snapshotData);
-        console.log('loadSnapshot executado com sucesso!');
-      } catch (migrationError) {
-        console.error('Error migrating store', migrationError);
-        console.error('Detailed error:', {
-          name: migrationError.name,
-          message: migrationError.message,
-          stack: migrationError.stack
-        });
-        
-        // Fallback: recriar shapes manualmente se loadSnapshot falhar
-        console.log('Tentando fallback: recriar shapes manualmente...');
-        
-        try {
-          // Limpar editor atual
-          editorInstance.deleteShapes(editorInstance.getCurrentPageShapeIds());
-          
-          // Filtrar apenas shapes válidos
-          const shapes = Object.values(snapshotData.store)
-            .filter((record: any) => record.typeName === 'shape')
-            .map((shape: any) => {
-              // Garantir que o shape tem todas as propriedades necessárias
-              const cleanShape = {
-                id: shape.id,
-                type: shape.type,
-                x: shape.x || 0,
-                y: shape.y || 0,
-                rotation: shape.rotation || 0,
-                isLocked: shape.isLocked || false,
-                opacity: shape.opacity || 1,
-                props: { ...shape.props },
-                parentId: shape.parentId === 'page:page' ? editorInstance.getCurrentPageId() : shape.parentId,
-                index: shape.index || 'a1',
-                meta: shape.meta || {}
-              };
-              
-              return cleanShape;
-            });
-          
-          console.log(`Recriando ${shapes.length} shapes manualmente...`);
-          
-          // Criar shapes em lotes menores para evitar problemas
-          const batchSize = 10;
-          for (let i = 0; i < shapes.length; i += batchSize) {
-            const batch = shapes.slice(i, i + batchSize);
-            editorInstance.createShapes(batch);
-          }
-          
-          console.log('Shapes recriados com sucesso via fallback!');
-          
-        } catch (fallbackError) {
-          console.error('Fallback também falhou:', fallbackError);
-          throw new Error('Não foi possível carregar o arquivo TLD. Formato pode estar corrompido.');
-        }
-      }
-      // Forçar página ativa para a primeira encontrada
-      const pageIds = Object.values(editorInstance.store.allRecords())
-        .filter((r: any) => r.typeName === 'page')
-        .map((r: any) => r.id);
-      if (pageIds.length > 0) {
-        editorInstance.setCurrentPage(pageIds[0]);
-      }
-      // Logs para debug
-      console.log('IDs dos shapes na página atual:', Array.from(editorInstance.getCurrentPageShapeIds()));
-      console.log('Todos os shapes no store:', editorInstance.store.allRecords().filter((r: any) => r.typeName === 'shape'));
-      setTimeout(() => {
-        try {
-          editorInstance.setZoom(1);
-        } catch (e) {
-          console.warn('setZoom falhou:', e);
-        }
-      }, 500);
-      setTimeout(() => {
-        try {
-          editorInstance.setZoom(1);
-        } catch (e) {
-          console.warn('setZoom falhou:', e);
-        }
-      }, 1500);
-    } else {
-      // Caso contrário, sanitize (para arquivos antigos ou de outras fontes)
-      const sanitizedStore = sanitizeTldrawStore(snapshotData.store);
-      // Log shapes de texto antes do loadSnapshot
-      Object.values(sanitizedStore).forEach((record: any) => {
-        if (record.type === 'text') {
-          console.log('Antes do loadSnapshot (sanitized) - Shape de texto:', record.id, 'props.w:', record.props.w, 'typeof:', typeof record.props.w);
-        }
-      });
-      const fullSnapshot = {
-        store: sanitizedStore,
-        schema: snapshotData.schema || {
-          schemaVersion: 2,
-          sequences: {
-            "com.tldraw.store": 4,
-            "com.tldraw.asset": 1,
-            "com.tldraw.camera": 1,
-            "com.tldraw.document": 2,
-            "com.tldraw.instance": 25,
-            "com.tldraw.instance_page_state": 5,
-            "com.tldraw.page": 1,
-            "com.tldraw.instance_presence": 6,
-            "com.tldraw.pointer": 1,
-            "com.tldraw.shape": 4,
-            "com.tldraw.asset.bookmark": 2,
-            "com.tldraw.asset.image": 5,
-            "com.tldraw.asset.video": 5,
-            "com.tldraw.shape.group": 0,
-            "com.tldraw.shape.text": 3,
-            "com.tldraw.shape.bookmark": 2,
-            "com.tldraw.shape.draw": 2,
-            "com.tldraw.shape.geo": 10,
-            "com.tldraw.shape.note": 9,
-            "com.tldraw.shape.line": 5,
-            "com.tldraw.shape.frame": 1,
-            "com.tldraw.shape.arrow": 6,
-            "com.tldraw.shape.highlight": 2,
-            "com.tldraw.shape.embed": 5,
-            "com.tldraw.shape.image": 4,
-            "com.tldraw.shape.video": 3
-          }
-        }
-      };
-      loadSnapshot(editorInstance.store, fullSnapshot);
-      // Forçar página ativa para a primeira encontrada
-      const pageIds = Object.values(editorInstance.store.allRecords())
-        .filter((r: any) => r.typeName === 'page')
-        .map((r: any) => r.id);
-      if (pageIds.length > 0) {
-        editorInstance.setCurrentPage(pageIds[0]);
-      }
-      // Logs para debug
-      console.log('IDs dos shapes na página atual:', Array.from(editorInstance.getCurrentPageShapeIds()));
-      console.log('Todos os shapes no store:', editorInstance.store.allRecords().filter((r: any) => r.typeName === 'shape'));
-      setTimeout(() => {
-        try {
-          editorInstance.setZoom(1);
-        } catch (e) {
-          console.warn('setZoom falhou:', e);
-        }
-      }, 500);
-      setTimeout(() => {
-        try {
-          editorInstance.setZoom(1);
-        } catch (e) {
-          console.warn('setZoom falhou:', e);
-        }
-      }, 1500);
+    // Load the snapshot using the detected format
+    loadSnapshot(editorInstance.store, snapshotData);
+    
+    // Forçar página ativa para a primeira encontrada após o carregamento
+    const pageIds = Object.values(editorInstance.store.allRecords())
+      .filter((r: any) => r.typeName === 'page')
+      .map((r: any) => r.id);
+    if (pageIds.length > 0) {
+      editorInstance.setCurrentPage(pageIds[0]);
     }
+    
+    // Ajustar zoom após carregamento
+    setTimeout(() => {
+      try {
+        editorInstance.setZoom(1);
+      } catch (e) {
+        console.warn('setZoom falhou:', e);
+      }
+    }, 500);
   }, [editorInstance]);
 
   const handleFileSelect = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
