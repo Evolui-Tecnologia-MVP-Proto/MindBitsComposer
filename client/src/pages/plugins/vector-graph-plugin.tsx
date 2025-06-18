@@ -822,7 +822,8 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         store: tldrawData.reduce((acc: any, record: any) => {
           acc[record.id] = record;
           return acc;
-        }, {})
+        }, {}),
+        schema: {}
       };
     } else if (typeof tldrawData === 'object' && Object.keys(tldrawData).length > 0) {
       // Try to detect if it's already a store format
