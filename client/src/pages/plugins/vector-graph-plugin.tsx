@@ -773,32 +773,95 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     fileInputRef.current?.click();
   }, []);
 
-  // Função para carregar dados TLD do disco (funcionamento original)
-  const loadTldrawDataFromDisk = useCallback((tldrawData: any) => {
+  // Função compartilhada para carregar dados TLD (usada tanto para arquivos quanto para assets)
+  const loadTldrawData = useCallback((tldrawData: any, source: string) => {
     if (!editorInstance) return;
 
-    console.log('Carregando dados TLD do disco:');
+    console.log(`Parsed .tldr file structure from ${source}:`);
     console.log('- tldrawFileFormatVersion:', tldrawData.tldrawFileFormatVersion);
     console.log('- schema:', tldrawData.schema ? 'present' : 'missing');
     console.log('- records:', Array.isArray(tldrawData.records) ? `array with ${tldrawData.records.length} items` : 'not array');
     console.log('- store:', tldrawData.store ? `object with ${Object.keys(tldrawData.store).length} keys` : 'missing');
+    console.log('- root keys:', Object.keys(tldrawData));
     
-    // Handle different tldraw file formats - VERSÃO ORIGINAL QUE FUNCIONAVA
+    // Handle different tldraw file formats
     let snapshotData;
     
     if (tldrawData.tldrawFileFormatVersion && tldrawData.records) {
       // New format (v1+) - records array format
       console.log('Loading new format .tldr file with records array');
-      snapshotData = {
-        store: tldrawData.records.reduce((acc: any, record: any) => {
-          acc[record.id] = record;
-          return acc;
-        }, {}),
-        schema: tldrawData.schema || {}
-      };
+      
+      // Tentar carregar diretamente no formato nativo do tldraw
+      try {
+        console.log('🔥 TENTANDO CARREGAMENTO NATIVO');
+        loadSnapshot(editorInstance.store, tldrawData);
+        
+        // Debug após carregamento
+        console.log('🔥 DEBUG PÓS-CARREGAMENTO:');
+        console.log('- Total records no store:', editorInstance.store.allRecords().length);
+        console.log('- Pages no store:', editorInstance.store.allRecords().filter((r: any) => r.typeName === 'page'));
+        console.log('- Shapes no store:', editorInstance.store.allRecords().filter((r: any) => r.typeName === 'shape').length);
+        console.log('- Current page ID:', editorInstance.getCurrentPageId());
+        console.log('- Current page shape IDs:', Array.from(editorInstance.getCurrentPageShapeIds()));
+        console.log('- Camera:', editorInstance.getCamera());
+        console.log('- Viewport page bounds:', editorInstance.getViewportPageBounds());
+        
+        // Forçar página ativa para a primeira encontrada após o carregamento
+        const pageIds = Object.values(editorInstance.store.allRecords())
+          .filter((r: any) => r.typeName === 'page')
+          .map((r: any) => r.id);
+        if (pageIds.length > 0) {
+          console.log('🔥 Configurando página ativa:', pageIds[0]);
+          editorInstance.setCurrentPage(pageIds[0]);
+        }
+        
+        // Forçar zoom para ajustar conteúdo
+        setTimeout(() => {
+          try {
+            console.log('🔥 Ajustando zoom para ver todo conteúdo');
+            editorInstance.zoomToFit();
+            editorInstance.resetZoom();
+          } catch (e) {
+            console.warn('Zoom adjust falhou:', e);
+            try {
+              editorInstance.setZoom(0.5);
+            } catch (e2) {
+              console.warn('setZoom backup falhou:', e2);
+            }
+          }
+        }, 100);
+        
+        console.log('🔥 CARREGAMENTO NATIVO SUCESSO');
+        return; // Sucesso, não continuar
+      } catch (nativeError) {
+        console.warn('🔥 CARREGAMENTO NATIVO FALHOU, tentando fallback:', nativeError);
+        
+        // Fallback para conversão manual
+        snapshotData = {
+          store: tldrawData.records.reduce((acc: any, record: any) => {
+            acc[record.id] = record;
+            return acc;
+          }, {}),
+          schema: tldrawData.schema || {}
+        };
+      }
     } else if (tldrawData.store) {
       // Middle format - store object format
       console.log('Loading middle format .tldr file with store object');
+      console.log('🔥 MIDDLE FORMAT - Store keys count:', Object.keys(tldrawData.store).length);
+      console.log('🔥 MIDDLE FORMAT - Sample shape with w property check...');
+      
+      // Log shapes with 'w' property to confirm the issue
+      Object.values(tldrawData.store).forEach((record: any, index) => {
+        if (record.type === 'text' && record.props && record.props.w !== undefined) {
+          console.log(`🔥 FOUND TEXT SHAPE WITH W: ${record.id}`, {
+            type: record.type,
+            props: Object.keys(record.props),
+            wValue: record.props.w
+          });
+        }
+      });
+      
       snapshotData = tldrawData;
     } else if (Array.isArray(tldrawData)) {
       // Legacy format - direct records array
@@ -825,6 +888,12 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     console.log('- snapshotData.store exists:', !!snapshotData.store);
     console.log('- snapshotData.store keys:', snapshotData.store ? Object.keys(snapshotData.store).length : 0);
     
+    // Log a few sample records to understand structure
+    if (snapshotData.store) {
+      const sampleRecords = Object.values(snapshotData.store).slice(0, 3);
+      console.log('Sample records:', sampleRecords);
+    }
+    
     // Load the snapshot using the detected format
     loadSnapshot(editorInstance.store, snapshotData);
     
@@ -844,65 +913,6 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         console.warn('setZoom falhou:', e);
       }
     }, 500);
-  }, [editorInstance]);
-
-  // Função separada para carregar dados TLD de assets (com lógica específica)
-  const loadTldrawDataFromAsset = useCallback((tldrawData: any) => {
-    if (!editorInstance) return;
-
-    console.log('🔥 ASSET LOADING - Loading TLD file from file_metadata...');
-    console.log('🔥 ASSET LOADING - Raw asset file_metadata structure:');
-    console.log('- tldrawFileFormatVersion:', tldrawData.tldrawFileFormatVersion);
-    console.log('- schema:', tldrawData.schema ? 'present' : 'missing');
-    console.log('- records:', Array.isArray(tldrawData.records) ? `array with ${tldrawData.records.length} items` : 'not array');
-    console.log('- store:', tldrawData.store ? 'present' : 'missing');
-    console.log('- root keys:', Object.keys(tldrawData));
-    
-    if (tldrawData.tldrawFileFormatVersion && tldrawData.records) {
-      console.log('🔥 ASSET - Carregamento direto de records');
-      
-      // Limpar shapes e páginas existentes
-      const currentRecords = editorInstance.store.allRecords();
-      const recordsToRemove = currentRecords.filter((r: any) => 
-        r.typeName === 'shape' || r.typeName === 'page'
-      );
-      
-      if (recordsToRemove.length > 0) {
-        console.log('🔥 ASSET - Removendo records existentes:', recordsToRemove.length);
-        editorInstance.store.remove(recordsToRemove.map((r: any) => r.id));
-      }
-      
-      // Adicionar novos records
-      console.log('🔥 ASSET - Adicionando novos records:', tldrawData.records.length);
-      editorInstance.store.put(tldrawData.records);
-      
-      // Configurar página ativa
-      const pageRecords = tldrawData.records.filter((r: any) => r.typeName === 'page');
-      if (pageRecords.length > 0) {
-        console.log('🔥 ASSET - Configurando página ativa:', pageRecords[0].id);
-        editorInstance.setCurrentPage(pageRecords[0].id);
-      }
-      
-      // Debug
-      console.log('🔥 ASSET - Debug pós-carregamento:');
-      console.log('- Total records:', editorInstance.store.allRecords().length);
-      console.log('- Shapes:', editorInstance.store.allRecords().filter((r: any) => r.typeName === 'shape').length);
-      console.log('- Current page shapes:', Array.from(editorInstance.getCurrentPageShapeIds()).length);
-      
-      // Ajustar zoom
-      setTimeout(() => {
-        try {
-          console.log('🔥 ASSET - Ajustando zoom');
-          editorInstance.zoomToFit();
-        } catch (e) {
-          console.warn('ASSET - Zoom falhou:', e);
-        }
-      }, 100);
-      
-      console.log('🔥 ASSET - Carregamento concluído');
-    } else {
-      throw new Error('Formato de asset TLD não suportado');
-    }
   }, [editorInstance]);
 
   const handleFileSelect = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
