@@ -634,7 +634,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         variant: "destructive"
       });
     }
-  }, [editorInstance, toast]);
+  }, [editorInstance, toast, description]);
 
   const handleExport = useCallback(async () => {
     try {
