@@ -109,6 +109,295 @@ Drizzle Kit 0.30        // Migrações de schema
 
 ## 📋 Estrutura de Banco de Dados
 
+### Diagrama Entidade-Relacionamento
+
+```mermaid
+erDiagram
+    %% Core User Management
+    users {
+        serial id PK
+        text name
+        text email UK
+        text password
+        text role
+        text status
+        text avatar_url
+        boolean must_change_password
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% Document Management System
+    documentos {
+        uuid id PK
+        text origem
+        text objeto
+        text tipo
+        text cliente
+        text responsavel
+        text sistema
+        text modulo
+        text descricao
+        text status
+        text status_origem
+        text solicitante
+        text aprovador
+        text agente
+        text task_state
+        bigint id_origem
+        text id_origem_txt
+        json general_columns
+        json monday_item_values
+        boolean assets_synced
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    lexical_documents {
+        uuid id PK
+        text title
+        text content
+        text plain_text
+        integer user_id FK
+        boolean is_public
+        text[] tags
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    document_editions {
+        uuid id PK
+        uuid document_id FK
+        uuid template_id FK
+        integer started_by FK
+        text status
+        text lex_file
+        json json_file
+        text md_file
+        timestamp init
+        timestamp publish
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% Template System
+    templates {
+        uuid id PK
+        text name
+        text code
+        text description
+        text type
+        json structure
+        json mappings
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% Assets Management
+    documents_artifacts {
+        uuid id PK
+        uuid documento_id FK
+        text name
+        text file_data
+        text file_name
+        text file_size
+        text mime_type
+        text type
+        text origin_asset_id
+        text is_image
+        text monday_column
+        text file_metadata
+        text description
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    global_assets {
+        uuid id PK
+        text name
+        text file_data
+        text file_name
+        text file_size
+        text mime_type
+        text type
+        text is_image
+        integer uploaded_by FK
+        text description
+        text tags
+        text file_metadata
+        text editor
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% Monday.com Integration
+    monday_mappings {
+        uuid id PK
+        text name
+        text description
+        text board_id
+        text quadro_monday
+        text status_column
+        text responsible_column
+        text mapping_filter
+        json default_values
+        json assets_mappings
+        json schedules_params
+        timestamp last_sync
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    monday_columns {
+        uuid id PK
+        uuid mapping_id FK
+        text column_id
+        text title
+        text type
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    mapping_columns {
+        uuid id PK
+        uuid mapping_id FK
+        text monday_column_id
+        text monday_column_title
+        text cpx_field
+        text transform_function
+        boolean is_key
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% Workflow System
+    flow_types {
+        uuid id PK
+        text name
+        text description
+        json node_metadata
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    documents_flows {
+        uuid id PK
+        text name
+        text description
+        text code UK
+        uuid flow_type_id FK
+        json flow_data
+        integer user_id FK
+        integer created_by FK
+        integer updated_by FK
+        boolean is_locked
+        boolean is_enabled
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    document_flow_executions {
+        uuid id PK
+        uuid document_id FK
+        uuid flow_id FK
+        text status
+        json execution_data
+        json flow_tasks
+        integer started_by FK
+        timestamp completed_at
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% GitHub Integration
+    repo_structure {
+        uuid uid PK
+        text folder_name
+        uuid linked_to FK
+        boolean is_sync
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% Service Connections
+    service_connections {
+        uuid id PK
+        text service_name UK
+        text token
+        text description
+        text[] parameters
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% Plugin System
+    plugins {
+        text id PK
+        text name
+        text description
+        text type
+        text status
+        text version
+        text author
+        text icon
+        text page_name
+        json configuration
+        json endpoints
+        text[] permissions
+        text[] dependencies
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% System Monitoring
+    app_logs {
+        uuid id PK
+        text event_type
+        text message
+        json parameters
+        timestamp timestamp
+        integer user_id FK
+        timestamp created_at
+    }
+
+    %% Generic Tables
+    generic_tables {
+        uuid id PK
+        text name
+        text description
+        json content
+        timestamp created_at
+        timestamp updated_at
+    }
+
+    %% Relationships
+    users ||--o{ lexical_documents : creates
+    users ||--o{ global_assets : uploads
+    users ||--o{ document_editions : starts
+    users ||--o{ documents_flows : owns
+    users ||--o{ documents_flows : creates
+    users ||--o{ documents_flows : updates
+    users ||--o{ document_flow_executions : starts
+    users ||--o{ app_logs : performs
+
+    documentos ||--o{ documents_artifacts : contains
+    documentos ||--o{ document_editions : has
+    documentos ||--o{ document_flow_executions : executes
+
+    templates ||--o{ document_editions : guides
+
+    monday_mappings ||--o{ monday_columns : defines
+    monday_mappings ||--o{ mapping_columns : maps
+
+    flow_types ||--o{ documents_flows : categorizes
+    documents_flows ||--o{ document_flow_executions : executes
+
+    repo_structure ||--o{ repo_structure : contains
+
+    %% Self-referencing relationships
+    repo_structure }o--|| repo_structure : linked_to
+```
+
 ### Tabelas Principais
 - **users**: Usuários com roles (ADMIN, EDITOR, USER) e status
 - **lexicalDocuments**: Documentos do editor com conteúdo serializado
