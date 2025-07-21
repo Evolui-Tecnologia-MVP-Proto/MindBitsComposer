@@ -972,7 +972,7 @@ table:not(.lexical-editor-container table) th {
 
 .dark [data-page="admin"] thead,
 .dark [data-page="admin"] .table-header {
-  background-color: #111827 !important;
+  background-color: #1F2937 !important;
 }
 
 .dark [data-page="admin"] tbody,
@@ -987,6 +987,34 @@ table:not(.lexical-editor-container table) th {
 
 .dark [data-page="admin"] tbody td,
 .dark [data-page="admin"] .table-cell {
+  background-color: #0F172A !important;
+}
+
+/* FORCE MODAL TABLE COLORS - SAME PATTERN AS ADMIN TABLES */
+.dark [data-radix-dialog-content] table,
+.dark [data-radix-dialog-content] .table {
+  background-color: #0F172A !important;
+}
+
+.dark [data-radix-dialog-content] thead,
+.dark [data-radix-dialog-content] .table-header,
+.dark [data-radix-dialog-content] thead tr,
+.dark [data-radix-dialog-content] thead th {
+  background-color: #1F2937 !important;
+}
+
+.dark [data-radix-dialog-content] tbody,
+.dark [data-radix-dialog-content] .table-body {
+  background-color: #0F172A !important;
+}
+
+.dark [data-radix-dialog-content] tbody tr,
+.dark [data-radix-dialog-content] .table-row {
+  background-color: #0F172A !important;
+}
+
+.dark [data-radix-dialog-content] tbody td,
+.dark [data-radix-dialog-content] .table-cell {
   background-color: #0F172A !important;
 }
 
@@ -1008,11 +1036,12 @@ table:not(.lexical-editor-container table) th {
   background-color: rgb(249 250 251) !important;
 }
 
-/* Modal table headers - specific color #1F2937 for dark mode */
-.dark [data-radix-dialog-content] table thead tr th {
+/* Additional enforced overrides for modal tables */
+.dark [data-radix-dialog-content] [data-table-header],
+.dark [data-radix-dialog-content] .bg-background {
   background-color: #1F2937 !important;
 }
 
-.dark [data-radix-dialog-content] table thead {
+.dark [data-radix-dialog-content] .bg-white {
   background-color: #1F2937 !important;
 }
