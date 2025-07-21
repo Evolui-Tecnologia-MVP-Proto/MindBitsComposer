@@ -59,25 +59,14 @@
   }
 }
 
-/* Force modal background color with maximum specificity */
+/* Force modal background color ONLY for modals */
 [data-radix-dialog-content],
-[data-radix-alert-dialog-content],
-.bg-background,
-[style*="background"] {
+[data-radix-alert-dialog-content] {
   background-color: #0F1729 !important;
   background: #0F1729 !important;
 }
 
-/* Override Tailwind background utilities for modals */
-[data-radix-dialog-content].bg-background {
-  background-color: #0F1729 !important;
-}
-
-[data-radix-alert-dialog-content].bg-background {
-  background-color: #0F1729 !important;
-}
-
-/* Custom modal class with highest priority */
+/* Custom modal class specific */
 .modal-0f1729 {
   background-color: #0F1729 !important;
   background: #0F1729 !important;
