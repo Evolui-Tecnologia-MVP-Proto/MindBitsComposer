@@ -136,19 +136,19 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex bg-background text-foreground">
+    <div className="min-h-screen flex">
       {/* Lado esquerdo - Formulário de login */}
-      <div className="w-1/2 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="w-1/2 flex items-center justify-center" style={{ backgroundColor: "#2D3748" }}>
         <div className="w-full max-w-md mx-4">
           {/* Logo removido da tela de login conforme solicitado */}
-          <Card className="shadow-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+          <Card className="shadow-lg" style={{ backgroundColor: "#2D3748", border: "none" }}>
             <CardContent className="pt-6">
               {isFirstLogin ? (
                 <div className="fade-in">
-                  <h2 className="text-xl font-semibold text-center text-gray-900 dark:text-gray-100 mb-2">
+                  <h2 className="text-xl font-semibold text-center text-white mb-2">
                     Alterar Senha
                   </h2>
-                  <p className="text-center text-gray-600 dark:text-gray-400 mb-6">
+                  <p className="text-center text-gray-300 mb-6">
                     Você precisa alterar sua senha no primeiro acesso.
                   </p>
 
@@ -159,9 +159,9 @@ export default function AuthPage() {
                         name="currentPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Senha Atual</FormLabel>
+                            <FormLabel className="text-white">Senha Atual</FormLabel>
                             <FormControl>
-                              <Input type="password" {...field} />
+                              <Input type="password" {...field} className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -173,9 +173,9 @@ export default function AuthPage() {
                         name="newPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Nova Senha</FormLabel>
+                            <FormLabel className="text-white">Nova Senha</FormLabel>
                             <FormControl>
-                              <Input type="password" {...field} />
+                              <Input type="password" {...field} className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -187,9 +187,9 @@ export default function AuthPage() {
                         name="confirmPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Confirmar Nova Senha</FormLabel>
+                            <FormLabel className="text-white">Confirmar Nova Senha</FormLabel>
                             <FormControl>
-                              <Input type="password" {...field} />
+                              <Input type="password" {...field} className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -208,10 +208,10 @@ export default function AuthPage() {
                 </div>
               ) : (
                 <div className="fade-in">
-                  <h2 className="text-xl font-semibold text-left text-gray-900 dark:text-gray-100 mb-2">
+                  <h2 className="text-xl font-semibold text-left text-white mb-2">
                     Entrar
                   </h2>
-                  <p className="text-left text-gray-600 dark:text-gray-400 mb-6">
+                  <p className="text-left text-gray-300 mb-6">
                     Entre com suas credenciais para acessar a plataforma
                   </p>
 
@@ -222,9 +222,9 @@ export default function AuthPage() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>E-mail</FormLabel>
+                            <FormLabel className="text-white">E-mail</FormLabel>
                             <FormControl>
-                              <Input type="email" {...field} />
+                              <Input type="email" {...field} className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -236,9 +236,9 @@ export default function AuthPage() {
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Senha</FormLabel>
+                            <FormLabel className="text-white">Senha</FormLabel>
                             <FormControl>
-                              <Input type="password" {...field} />
+                              <Input type="password" {...field} className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -247,7 +247,8 @@ export default function AuthPage() {
 
                       <Button 
                         type="submit" 
-                        className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white"
+                        className="w-full text-white"
+                        style={{ backgroundColor: "#3182CE" }}
                         disabled={loginMutation.isPending}
                       >
                         {loginMutation.isPending ? "Entrando..." : "Entrar"}
@@ -262,7 +263,7 @@ export default function AuthPage() {
       </div>
       
       {/* Lado direito - Hero/Imagem */}
-      <div className="w-1/2 flex flex-col bg-blue-900 dark:bg-blue-950">
+      <div className="w-1/2 flex flex-col" style={{ background: "linear-gradient(135deg, #4299E1 0%, #3182CE 50%, #2B77CB 100%)" }}>
         {/* Imagem na parte superior */}
         <div className="mt-10 ml-10">
           <img 
@@ -276,53 +277,53 @@ export default function AuthPage() {
         <div className="mt-8 ml-10 flex flex-col">
           {/* Título com logo alinhado horizontalmente */}
           <div className="flex items-center">
-            <div className="w-16 h-16 rounded-full overflow-hidden flex justify-center items-center mr-3 bg-white border-2 border-blue-300 dark:border-blue-400">
+            <div className="w-16 h-16 rounded-full overflow-hidden flex justify-center items-center mr-3 bg-white border-2 border-white">
               <img 
                 src="/logo-icon.jpg" 
                 alt="Logo da Aplicação" 
                 className="h-16 w-16 object-cover"
               />
             </div>
-            <h1 className="text-4xl font-bold text-blue-300 dark:text-blue-200">
-              EVO-MindBits CPx
+            <h1 className="text-4xl font-bold text-white">
+              EVO-MindBits CTx
             </h1>
           </div>
           
           {/* Textos descritivos com mesma margem da imagem principal */}
-          <div className="mt-6 text-blue-300 dark:text-blue-200">
+          <div className="mt-6 text-white">
             <p className="text-xl mb-8">
-              Compositor integrado para documentação técnica e empresarial, assistido por IA e para a IA.
+              Sistema de triagem inteligente de mensagens de chatbots com IA para análise de eficácia e geração de auto treinamento da base de conhecimento.
             </p>
             <ul className="space-y-4">
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-blue-300 dark:bg-blue-200 text-blue-900 dark:text-blue-900">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-white text-blue-600">
                   1
                 </div>
-                Integração com sistemas externos
+                Integração com Chatbots Omnichannel
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-blue-300 dark:bg-blue-200 text-blue-900 dark:text-blue-900">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-white text-blue-600">
                   2
                 </div>
-                Workflows de fluxo de documentos
+                Workflows de análise e triagem para detalhamento funcional
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-blue-300 dark:bg-blue-200 text-blue-900 dark:text-blue-900">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-white text-blue-600">
                   3
                 </div>
-                Aprovações e assinaturas eletrônicas
+                Integração com o MindBits CPx para edição avançada de base de conhecimento
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-blue-300 dark:bg-blue-200 text-blue-900 dark:text-blue-900">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-white text-blue-600">
                   4
                 </div>
-                Versionamento documental
+                Designação de equipe especialista com base em "Skills"
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-blue-300 dark:bg-blue-200 text-blue-900 dark:text-blue-900">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-white text-blue-600">
                   5
                 </div>
-                Metodologia AI-First
+                Integração com agentes de IA para análise de triagem automática
               </li>
             </ul>
           </div>
