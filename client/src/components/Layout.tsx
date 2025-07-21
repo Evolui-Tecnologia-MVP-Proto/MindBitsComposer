@@ -21,13 +21,13 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
-      <header className="bg-white dark:bg-gray-900 shadow-sm z-10 w-full flex-shrink-0">
+      <header className="shadow-sm z-10 w-full flex-shrink-0" style={{ backgroundColor: "#111827" }}>
         <div className="w-full px-0 mx-0">
           <div className="flex justify-between h-16 w-full">
             <div className="flex items-center pl-5" style={{ marginLeft: 0 }}>
               <div className="flex items-center">
                 <Logo />
-                <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                <h1 className="text-xl font-semibold" style={{ color: "#e5e7eb" }}>
                   EVO-MindBits Composer
                 </h1>
               </div>
