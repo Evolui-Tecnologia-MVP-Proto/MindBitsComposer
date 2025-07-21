@@ -61,13 +61,15 @@
 
 /* Force modal background color ONLY for modals */
 [data-radix-dialog-content],
-[data-radix-alert-dialog-content] {
+[data-radix-alert-dialog-content],
+.modal-0f1729 {
   background-color: #0F1729 !important;
   background: #0F1729 !important;
 }
 
-/* Custom modal class specific */
-.modal-0f1729 {
+/* Specific override for modal dialog content */
+div[data-radix-dialog-content],
+div[data-radix-alert-dialog-content] {
   background-color: #0F1729 !important;
   background: #0F1729 !important;
 }
