@@ -1142,6 +1142,122 @@ table:not(.lexical-editor-container table) th {
   color: #FFFFFF !important;
 }
 
+/* Select triggers in modal "Editar Mapeamento" */
+.dark [data-radix-dialog-content] .SelectTrigger,
+.dark [data-radix-dialog-content] select {
+  background-color: #0F172A !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+.dark [data-radix-dialog-content] .SelectContent {
+  background-color: #0F172A !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark [data-radix-dialog-content] .SelectItem {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
+
+.dark [data-radix-dialog-content] .SelectItem:hover {
+  background-color: #1E293B !important;
+  color: #FFFFFF !important;
+}
+
+/* Native select elements in modal */
+.dark [data-radix-dialog-content] select option {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
+
+/* Select in assets-map and agendamento tabs specifically */
+.dark [data-radix-tabs-content="assets-map"] select,
+.dark [data-radix-tabs-content="agendamento"] select {
+  background-color: #0F172A !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+.dark [data-radix-tabs-content="assets-map"] select option,
+.dark [data-radix-tabs-content="agendamento"] select option {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
+
+/* Radix SelectTrigger components in modal */
+.dark [data-radix-dialog-content] [role="combobox"] {
+  background-color: #0F172A !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+.dark [data-radix-dialog-content] [data-state="open"] {
+  background-color: #0F172A !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Select trigger for GitHub repositories */
+.dark [data-radix-dialog-content] button[role="combobox"] {
+  background-color: #0F172A !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+/* SelectContent dropdown for modal */
+.dark [data-radix-popper-content-wrapper] [role="listbox"] {
+  background-color: #0F172A !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark [data-radix-popper-content-wrapper] [role="option"] {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
+
+.dark [data-radix-popper-content-wrapper] [role="option"]:hover,
+.dark [data-radix-popper-content-wrapper] [role="option"][data-highlighted] {
+  background-color: #1E293B !important;
+  color: #FFFFFF !important;
+}
+
+/* All button elements with combobox role in dark modal */
+.dark [data-radix-dialog-content] button[role="combobox"],
+.dark [data-radix-dialog-content] div[role="combobox"] {
+  background-color: #0F172A !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+/* Ensure all select-like elements in modal have dark styling */
+.dark [data-radix-dialog-content] [data-placeholder],
+.dark [data-radix-dialog-content] [data-value] {
+  color: #E5E7EB !important;
+}
+
+/* Additional CSS for shadcn/ui Select components */
+.dark [data-radix-dialog-content] [data-radix-select-trigger] {
+  background-color: #0F172A !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+.dark [data-radix-dialog-content] [data-radix-select-content] {
+  background-color: #0F172A !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark [data-radix-dialog-content] [data-radix-select-item] {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
+
+.dark [data-radix-dialog-content] [data-radix-select-item]:hover,
+.dark [data-radix-dialog-content] [data-radix-select-item][data-highlighted] {
+  background-color: #1E293B !important;
+  color: #FFFFFF !important;
+}
+
 /* More specific targeting for time picker dropdown */
 .dark input[type="time"]::-webkit-list-menu-button:hover {
   background-color: #1A1A1A !important;
