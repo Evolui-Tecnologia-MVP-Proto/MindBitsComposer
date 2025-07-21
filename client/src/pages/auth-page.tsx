@@ -248,7 +248,7 @@ export default function AuthPage() {
                       <Button 
                         type="submit" 
                         className="w-full text-white"
-                        style={{ backgroundColor: "#3182CE" }}
+                        style={{ backgroundColor: "#1E3A8A" }}
                         disabled={loginMutation.isPending}
                       >
                         {loginMutation.isPending ? "Entrando..." : "Entrar"}
