@@ -296,31 +296,31 @@ export default function AuthPage() {
             </p>
             <ul className="space-y-4">
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-white text-blue-600">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600" style={{ backgroundColor: "#ACC3E3" }}>
                   1
                 </div>
                 <span style={{ color: "#ACC3E3" }}>Integração com Chatbots Omnichannel</span>
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-white text-blue-600">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600" style={{ backgroundColor: "#ACC3E3" }}>
                   2
                 </div>
                 <span style={{ color: "#ACC3E3" }}>Workflows de análise e triagem para detalhamento funcional</span>
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-white text-blue-600">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600" style={{ backgroundColor: "#ACC3E3" }}>
                   3
                 </div>
                 <span style={{ color: "#ACC3E3" }}>Integração com o MindBits CPx para edição avançada de base de conhecimento</span>
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-white text-blue-600">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600" style={{ backgroundColor: "#ACC3E3" }}>
                   4
                 </div>
                 <span style={{ color: "#ACC3E3" }}>Designação de equipe especialista com base em "Skills"</span>
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-white text-blue-600">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600" style={{ backgroundColor: "#ACC3E3" }}>
                   5
                 </div>
                 <span style={{ color: "#ACC3E3" }}>Integração com agentes de IA para análise de triagem automática</span>
