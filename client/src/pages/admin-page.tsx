@@ -2044,7 +2044,7 @@ export default function AdminPage() {
             <TabsContent value="colunas" className="py-4">
               {!selectedMapping ? (
                 <div className="text-center py-6">
-                  <p className="text-gray-500">
+                  <p className="text-gray-500 dark:text-gray-300">
                     Salve o mapeamento primeiro para adicionar colunas.
                   </p>
                 </div>
@@ -2193,7 +2193,7 @@ export default function AdminPage() {
               ) : (
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <h2 className="text-lg font-semibold leading-none tracking-tight">Colunas Mapeadas</h2>
+                    <h2 className="text-lg font-semibold leading-none tracking-tight dark:text-gray-100">Colunas Mapeadas</h2>
                     <Button
                       size="sm"
                       onClick={() => {
@@ -2211,40 +2211,40 @@ export default function AdminPage() {
                       <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                     </div>
                   ) : mappingColumns.length === 0 ? (
-                    <div className="text-center py-6 text-gray-500">
+                    <div className="text-center py-6 text-gray-500 dark:text-gray-300">
                       <p>Nenhuma coluna mapeada.</p>
                       <p className="text-sm mt-1">
                         Clique em "Nova Coluna" para adicionar um mapeamento.
                       </p>
                     </div>
                   ) : (
-                    <div className="max-h-[300px] overflow-y-auto border rounded-md border-white rounded-lg">
+                    <div className="max-h-[300px] overflow-y-auto border rounded-md border-white rounded-lg dark:bg-[#0F172A]">
                       <Table>
-                        <TableHeader className="sticky top-0 bg-background z-10">
+                        <TableHeader className="sticky top-0 bg-background z-10 dark:bg-[#111827]">
                           <TableRow>
-                            <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">COLUNA MONDAY</TableHead>
-                            <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">CAMPO CPX</TableHead>
-                            <TableHead className="w-[100px] text-center text-xs font-medium text-gray-500 uppercase tracking-wider">AÇÕES</TableHead>
+                            <TableHead className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">COLUNA MONDAY</TableHead>
+                            <TableHead className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">CAMPO CPX</TableHead>
+                            <TableHead className="w-[100px] text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">AÇÕES</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                         {mappingColumns.map((column) => (
                           <TableRow key={column.id} className="h-6">
-                            <TableCell className="py-0">
+                            <TableCell className="py-0 dark:text-gray-100">
                               <div className="flex items-center gap-2">
                                 <span className="text-xs font-mono">
                                   {column.mondayColumnTitle}
                                 </span>
-                                <Badge variant="outline" className="text-xs font-mono bg-blue-50 text-blue-700 border-blue-200">
+                                <Badge variant="outline" className="text-xs font-mono bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-800/30 dark:text-blue-300 dark:border-blue-600">
                                   {(column as any).columnType || "desconhecido"}
                                 </Badge>
                               </div>
                             </TableCell>
-                            <TableCell className="py-0">
+                            <TableCell className="py-0 dark:text-gray-100">
                               <div className="flex items-center gap-2">
                                 {/* Ícone de chave vermelho se for campo chave */}
                                 {column.isKey && (
-                                  <Key className="h-3 w-3 text-red-600" />
+                                  <Key className="h-3 w-3 text-red-600 dark:text-red-400" />
                                 )}
                                 <span className="text-xs font-mono">
                                   {column.cpxField === 'generalColumns' 
@@ -2260,11 +2260,11 @@ export default function AdminPage() {
                                 </span>
                                 {/* Tag f(x) verde para função de transformação */}
                                 {column.transformFunction && column.transformFunction.trim() && (
-                                  <Badge variant="outline" className="text-xs font-mono bg-green-50 text-green-700 border-green-200">
+                                  <Badge variant="outline" className="text-xs font-mono bg-green-50 text-green-700 border-green-200 dark:bg-green-800/30 dark:text-green-300 dark:border-green-600">
                                     f(x)
                                   </Badge>
                                 )}
-                                <Badge variant="outline" className="text-xs font-mono bg-blue-50 text-blue-700 border-blue-200">
+                                <Badge variant="outline" className="text-xs font-mono bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-800/30 dark:text-blue-300 dark:border-blue-600">
                                   {column.cpxField === 'objeto' ? 'texto' :
                                    column.cpxField === 'tipo' ? 'seleção' :
                                    column.cpxField === 'cliente' ? 'texto' :
@@ -2315,25 +2315,25 @@ export default function AdminPage() {
             <TabsContent value="defaults" className="py-4">
               <div className="space-y-4">
                 <div className="mb-4">
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-gray-300">
                     Configure valores padrão para campos quando não há mapeamento ou a API não retorna valor
                   </p>
                 </div>
                 
                 {/* Tabela de valores padrão */}
-                <div className="border rounded-md max-h-96 overflow-y-auto">
+                <div className="border rounded-md max-h-96 overflow-y-auto dark:bg-[#0F172A]">
                   <Table>
-                    <TableHeader className="sticky top-0 bg-white z-10">
+                    <TableHeader className="sticky top-0 bg-white z-10 dark:bg-[#111827]">
                       <TableRow>
-                        <TableHead className="w-[200px] text-center text-xs font-medium text-gray-500 uppercase tracking-wider">CAMPO</TableHead>
-                        <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">VALOR PADRÃO</TableHead>
-                        <TableHead className="w-[100px] text-center text-xs font-medium text-gray-500 uppercase tracking-wider">OBG-MAP</TableHead>
+                        <TableHead className="w-[200px] text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">CAMPO</TableHead>
+                        <TableHead className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">VALOR PADRÃO</TableHead>
+                        <TableHead className="w-[100px] text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">OBG-MAP</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {getDefaultableFields().map((fieldInfo) => (
                         <TableRow key={fieldInfo.field} className="h-9">
-                          <TableCell className="py-0">
+                          <TableCell className="py-0 dark:text-gray-100">
                             <span className="text-xs font-medium font-mono">
                               {fieldInfo.field}
                             </span>
@@ -2369,13 +2369,13 @@ export default function AdminPage() {
                               const badgeText = `${obligatoryLetter}-${mappedLetter}`;
                               
                               // Define cor baseada no status
-                              let badgeColor = "bg-gray-100 text-gray-600 border-gray-200";
+                              let badgeColor = "bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600";
                               if (fieldInfo.required && isMapped) {
-                                badgeColor = "bg-green-100 text-green-700 border-green-200";
+                                badgeColor = "bg-green-100 text-green-700 border-green-200 dark:bg-green-800/30 dark:text-green-300 dark:border-green-600";
                               } else if (fieldInfo.required && !isMapped) {
-                                badgeColor = "bg-red-100 text-red-700 border-red-200";
+                                badgeColor = "bg-red-100 text-red-700 border-red-200 dark:bg-red-800/30 dark:text-red-300 dark:border-red-600";
                               } else if (!fieldInfo.required && isMapped) {
-                                badgeColor = "bg-blue-100 text-blue-700 border-blue-200";
+                                badgeColor = "bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-800/30 dark:text-blue-300 dark:border-blue-600";
                               }
                               
                               return (
@@ -2405,10 +2405,10 @@ export default function AdminPage() {
                     name="mappingFilter"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-sm font-medium">
+                        <FormLabel className="text-sm font-medium dark:text-gray-100">
                           Condição de Filtragem (JavaScript)
                         </FormLabel>
-                        <p className="text-xs text-gray-500 mb-2">
+                        <p className="text-xs text-gray-500 dark:text-gray-300 mb-2">
                           Defina uma função JavaScript para filtrar os itens do quadro Monday. 
                           Use a variável 'item' para acessar os dados de cada linha.
                         </p>
@@ -2428,13 +2428,13 @@ return item.column_values.some(col =>
                     )}
                   />
                   
-                  <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
-                    <h4 className="text-sm font-medium text-blue-800 mb-2">💡 Dicas de uso:</h4>
-                    <ul className="text-xs text-blue-700 space-y-1">
-                      <li>• Use <code className="bg-blue-100 px-1 rounded">item.column_values</code> para acessar os valores das colunas</li>
-                      <li>• Acesse o título da coluna com <code className="bg-blue-100 px-1 rounded">col.column.title</code></li>
-                      <li>• Use <code className="bg-blue-100 px-1 rounded">col.text</code> para o valor em texto da coluna</li>
-                      <li>• A função deve retornar <code className="bg-blue-100 px-1 rounded">true</code> para incluir o item ou <code className="bg-blue-100 px-1 rounded">false</code> para excluí-lo</li>
+                  <div className="bg-blue-50 border border-blue-200 rounded-md p-3 dark:bg-blue-900/20 dark:border-blue-600">
+                    <h4 className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">💡 Dicas de uso:</h4>
+                    <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
+                      <li>• Use <code className="bg-blue-100 px-1 rounded dark:bg-blue-800/30 dark:text-blue-200">item.column_values</code> para acessar os valores das colunas</li>
+                      <li>• Acesse o título da coluna com <code className="bg-blue-100 px-1 rounded dark:bg-blue-800/30 dark:text-blue-200">col.column.title</code></li>
+                      <li>• Use <code className="bg-blue-100 px-1 rounded dark:bg-blue-800/30 dark:text-blue-200">col.text</code> para o valor em texto da coluna</li>
+                      <li>• A função deve retornar <code className="bg-blue-100 px-1 rounded dark:bg-blue-800/30 dark:text-blue-200">true</code> para incluir o item ou <code className="bg-blue-100 px-1 rounded dark:bg-blue-800/30 dark:text-blue-200">false</code> para excluí-lo</li>
                     </ul>
                   </div>
                 </div>
@@ -2445,7 +2445,7 @@ return item.column_values.some(col =>
             <TabsContent value="assets-map" className="py-4">
               <div className="space-y-4">
                 <div className="space-y-3">
-                  <label className="text-sm font-medium">Relacionamento de Tabela</label>
+                  <label className="text-sm font-medium dark:text-gray-100">Relacionamento de Tabela</label>
                   <DocumentRelationshipSelect 
                     selectedMapping={selectedMapping}
                     onRelationshipChange={(relationship) => {
@@ -2461,15 +2461,15 @@ return item.column_values.some(col =>
                 
                 {/* Lista de mapeamentos de anexos */}
                 {attachmentMappings.length > 0 && (
-                  <div className="space-y-2 pt-4 border-t">
-                    <label className="text-sm font-medium">Anexos Mapeados</label>
+                  <div className="space-y-2 pt-4 border-t dark:border-gray-600">
+                    <label className="text-sm font-medium dark:text-gray-100">Anexos Mapeados</label>
                     <div className="space-y-1">
                       {attachmentMappings.map((mapping) => (
-                        <div key={mapping.id} className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-md p-2">
+                        <div key={mapping.id} className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-md p-2 dark:bg-gray-700 dark:border-gray-600">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-mono font-bold">documents_artifacts</span>
-                            <span className="text-xs text-gray-500">→</span>
-                            <span className="text-sm font-mono">
+                            <span className="text-sm font-mono font-bold dark:text-gray-100">documents_artifacts</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">→</span>
+                            <span className="text-sm font-mono dark:text-gray-100">
                               {mapping.columnId === "documents_item" 
                                 ? mapping.columnTitle 
                                 : `${mapping.columnTitle} [file]`
@@ -2496,9 +2496,9 @@ return item.column_values.some(col =>
             {/* Aba Agendamento */}
             <TabsContent value="agendamento" className="py-4">
               <div className="space-y-4">
-                <div className="bg-green-50 border border-green-200 rounded-md p-4">
-                  <h4 className="text-sm font-medium text-green-800 mb-2">⏰ Sincronização Automática</h4>
-                  <p className="text-sm text-green-700">
+                <div className="bg-green-50 border border-green-200 rounded-md p-4 dark:bg-green-900/20 dark:border-green-600">
+                  <h4 className="text-sm font-medium text-green-800 dark:text-green-300 mb-2">⏰ Sincronização Automática</h4>
+                  <p className="text-sm text-green-700 dark:text-green-300">
                     Configure quando e como a sincronização com o Monday.com deve ocorrer automaticamente.
                   </p>
                 </div>
@@ -2507,7 +2507,7 @@ return item.column_values.some(col =>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-3">
-                    <label className="text-sm font-medium">Frequência de Sincronização</label>
+                    <label className="text-sm font-medium dark:text-gray-100">Frequência de Sincronização</label>
                     <select 
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:bg-gray-50 disabled:text-gray-500"
                       value={schedulingFrequency}
@@ -2524,7 +2524,7 @@ return item.column_values.some(col =>
                   </div>
                   
                   <div className="space-y-3">
-                    <label className="text-sm font-medium">Horário de Início</label>
+                    <label className="text-sm font-medium dark:text-gray-100">Horário de Início</label>
                     <input 
                       type="time" 
                       value={schedulingTime}
@@ -2538,12 +2538,12 @@ return item.column_values.some(col =>
                 {/* Botão para ativar/parar job */}
                 {selectedMapping && (
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-md p-4">
+                    <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-md p-4 dark:bg-blue-900/20 dark:border-blue-600">
                       <div>
-                        <h5 className="text-sm font-medium text-blue-800">
+                        <h5 className="text-sm font-medium text-blue-800 dark:text-blue-300">
                           {jobStatus?.hasActiveJob ? '🟢 Job Ativo' : '⚪ Job Inativo'}
                         </h5>
-                        <p className="text-xs text-blue-700 mt-1">
+                        <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
                           {jobStatus?.hasActiveJob 
                             ? `Sincronização automática ativa (${jobStatus.activeJob?.frequency} às ${jobStatus.activeJob?.time})`
                             : 'Clique em "Ativar Job" para iniciar a sincronização automática'
@@ -2578,8 +2578,8 @@ return item.column_values.some(col =>
                   </div>
                 )}
                 
-                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
-                  <p className="text-sm text-yellow-800">
+                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 dark:bg-yellow-900/20 dark:border-yellow-600">
+                  <p className="text-sm text-yellow-800 dark:text-yellow-300">
                     <strong>Atenção:</strong> A sincronização automática pode gerar muitas requisições à API do Monday.com. 
                     Verifique os limites da sua conta antes de configurar intervalos muito curtos.
                   </p>
