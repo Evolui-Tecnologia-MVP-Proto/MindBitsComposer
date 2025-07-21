@@ -59,6 +59,11 @@
   }
 }
 
+/* Force header text color in dark mode */
+.dark header h1 {
+  color: #F3F4F6 !important;
+}
+
 /* Force modal background color ONLY for modals */
 [data-radix-dialog-content],
 [data-radix-alert-dialog-content],
