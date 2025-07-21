@@ -50,6 +50,7 @@ Preferred communication style: Simple, everyday language.
 ✓ Applied color #0F172A to user avatar dropdown menu in header (dark mode only)
 ✓ Applied dark theme colors to user status badges (green, yellow, gray with transparency)
 ✓ Applied color #1E40AF to primary buttons in dark mode (same as active tabs)
+✓ Applied color #1E40AF to all modal buttons in dark mode (NewUserModal, CreateDocumentModal)
 ✓ Applied icon and adjusted title text color to #6B7280 in dark mode only
 ✓ Reduced title font size from text-3xl to text-2xl in both themes
 ✓ Preserved original light theme colors unchanged across entire application

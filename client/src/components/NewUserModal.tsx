@@ -206,7 +206,11 @@ export default function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="bg-primary hover:bg-primary/90 dark:bg-[#1E40AF] dark:hover:bg-[#1E40AF]/90"
+              >
                 {isSubmitting ? "Salvando..." : "Salvar"}
               </Button>
             </DialogFooter>

@@ -353,7 +353,7 @@ export function CreateDocumentModal({
                     <h3 className="text-lg font-medium">Anexos do Documento</h3>
                     <Button
                       onClick={() => onOpenAddArtifactModal(currentCreatedDocumentId)}
-                      className="bg-blue-600 hover:bg-blue-700"
+                      className="bg-blue-600 hover:bg-blue-700 dark:bg-[#1E40AF] dark:hover:bg-[#1E40AF]/90"
                       size="sm"
                     >
                       <Plus className="mr-2 h-4 w-4" />
@@ -448,7 +448,7 @@ export function CreateDocumentModal({
             <Button
               onClick={onCreateDocument}
               disabled={createDocumentoMutation.isPending}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-600 hover:bg-blue-700 dark:bg-[#1E40AF] dark:hover:bg-[#1E40AF]/90"
             >
               {createDocumentoMutation.isPending ? (
                 <>
@@ -474,7 +474,7 @@ export function CreateDocumentModal({
                 }
               }}
               disabled={updateDocumentoMutation.isPending}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-green-600 hover:bg-green-700 dark:bg-[#1E40AF] dark:hover:bg-[#1E40AF]/90"
             >
               {updateDocumentoMutation.isPending ? (
                 <>
