@@ -999,22 +999,20 @@ table:not(.lexical-editor-container table) th {
 .dark [data-radix-dialog-content] thead,
 .dark [data-radix-dialog-content] .table-header,
 .dark [data-radix-dialog-content] thead tr,
-.dark [data-radix-dialog-content] thead th {
+.dark [data-radix-dialog-content] thead th,
+.dark [data-radix-dialog-content] table thead tr th,
+.dark [data-radix-dialog-content] [data-table="header"],
+.dark [data-radix-dialog-content] th[class*="TableHead"] {
   background-color: #1F2937 !important;
 }
 
 .dark [data-radix-dialog-content] tbody,
-.dark [data-radix-dialog-content] .table-body {
-  background-color: #0F172A !important;
-}
-
+.dark [data-radix-dialog-content] .table-body,
 .dark [data-radix-dialog-content] tbody tr,
-.dark [data-radix-dialog-content] .table-row {
-  background-color: #0F172A !important;
-}
-
+.dark [data-radix-dialog-content] .table-row,
 .dark [data-radix-dialog-content] tbody td,
-.dark [data-radix-dialog-content] .table-cell {
+.dark [data-radix-dialog-content] .table-cell,
+.dark [data-radix-dialog-content] td {
   background-color: #0F172A !important;
 }
 
@@ -1038,10 +1036,23 @@ table:not(.lexical-editor-container table) th {
 
 /* Additional enforced overrides for modal tables */
 .dark [data-radix-dialog-content] [data-table-header],
-.dark [data-radix-dialog-content] .bg-background {
+.dark [data-radix-dialog-content] .bg-background.sticky,
+.dark [data-radix-dialog-content] .sticky.top-0,
+.dark [data-radix-dialog-content] .sticky.bg-background,
+.dark [data-radix-dialog-content] .sticky.bg-white {
   background-color: #1F2937 !important;
 }
 
-.dark [data-radix-dialog-content] .bg-white {
+.dark [data-radix-dialog-content] .bg-white:not(td):not(.table-cell) {
+  background-color: #1F2937 !important;
+}
+
+/* Force override for any remaining table header elements */
+.dark [data-radix-dialog-content] table > thead > tr > th {
+  background-color: #1F2937 !important;
+}
+
+.dark [data-radix-dialog-content] .border.rounded-md.max-h-96 table thead th,
+.dark [data-radix-dialog-content] .max-h-[300px] table thead th {
   background-color: #1F2937 !important;
 }
