@@ -1073,42 +1073,119 @@ table:not(.lexical-editor-container table) th {
 
 /* Time input dropdown styling for dark mode */
 .dark input[type="time"]::-webkit-calendar-picker-indicator {
-  background-color: #0F172A !important;
-  border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #E5E7EB !important;
-  filter: invert(1);
+  filter: invert(1) brightness(0) !important;
+  cursor: pointer;
+  opacity: 0.8 !important;
 }
 
 .dark input[type="time"]::-webkit-datetime-edit-fields-wrapper {
-  background-color: #0F172A !important;
+  background: transparent !important;
   color: #E5E7EB !important;
+}
+
+.dark input[type="time"]::-webkit-datetime-edit-text {
+  color: #E5E7EB !important;
+}
+
+.dark input[type="time"]::-webkit-datetime-edit-hour-field,
+.dark input[type="time"]::-webkit-datetime-edit-minute-field {
+  background: transparent !important;
+  color: #E5E7EB !important;
+}
+
+/* Force dark color scheme for the entire time picker */
+.dark .time-picker-dark {
+  color-scheme: dark !important;
+}
+
+/* Alternative approach using CSS custom properties */
+.dark input[type="time"] {
+  --webkit-appearance: none;
+  color-scheme: dark !important;
+}
+
+/* Webkit time picker dropdown styling */
+.dark input[type="time"]::-webkit-list-menu {
+  background-color: #0F172A !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
 }
 
 .dark input[type="time"]::-webkit-list-menu-button {
   background-color: #0F172A !important;
   color: #E5E7EB !important;
+  border: none !important;
 }
 
-/* Time picker dropdown panel for dark mode */
-.dark input[type="time"]::-webkit-calendar-picker-indicator:hover {
+.dark input[type="time"]::-webkit-list-menu-button:hover {
   background-color: #1E293B !important;
 }
 
-/* Style for time picker popup/dropdown */
-.dark input[type="time"]::-webkit-list-menu {
-  background-color: #0F172A !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 6px !important;
-  color: #E5E7EB !important;
-}
-
-.dark input[type="time"]::-webkit-list-menu-button-pressed {
-  background-color: #1E293B !important;
-}
-
-/* Force dark mode for time picker dropdown options */
+/* Time picker option styling */
 .dark input[type="time"] option {
   background-color: #0F172A !important;
   color: #E5E7EB !important;
+}
+
+/* More specific targeting for time picker dropdown */
+.dark input[type="time"]::-webkit-list-menu-button:hover {
+  background-color: #1E293B !important;
+}
+
+/* Force dark theme on the time picker popup */
+.dark input[type="time"]::-webkit-list-menu-button:focus {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
+
+/* Additional webkit time picker styling */
+.dark input[type="time"]::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  display: none !important;
+}
+
+/* Target time picker in modal specifically */
+.dark [data-radix-dialog-content] input[type="time"] {
+  color-scheme: dark !important;
+}
+
+.dark [data-radix-dialog-content] input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0) !important;
+  cursor: pointer;
+}
+
+/* Force dark mode for time picker dropdown elements */
+.dark input[type="time"]::-webkit-time-wheel {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
+
+.dark input[type="time"]::-webkit-time-wheel-option {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
+
+.dark input[type="time"]::-webkit-time-wheel-option:hover {
+  background-color: #1E293B !important;
+}
+
+/* Alternative targeting for Chrome time picker */
+.dark input[type="time"]::-webkit-datetime-edit-ampm-field {
+  color: #E5E7EB !important;
+}
+
+/* Force entire time picker popup to dark */
+:root .dark input[type="time"] {
+  --webkit-datalist-text-color: #E5E7EB !important;
+  --webkit-datalist-background-color: #0F172A !important;
+}
+
+/* Global override for time picker */
+html.dark input[type="time"] {
+  color-scheme: dark !important;
+}
+
+html.dark input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0) !important;
 }

@@ -2640,12 +2640,15 @@ return item.column_values.some(col =>
                       value={schedulingTime}
                       onChange={(e) => setSchedulingTime(e.target.value)}
                       disabled={jobStatus?.hasActiveJob}
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:bg-gray-50 disabled:text-gray-500"
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:bg-gray-50 disabled:text-gray-500 time-picker-dark"
                       style={{
                         backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined,
                         borderColor: document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.1)' : undefined,
-                        color: document.documentElement.classList.contains('dark') ? '#E5E7EB' : undefined
-                      }}
+                        color: document.documentElement.classList.contains('dark') ? '#E5E7EB' : undefined,
+                        colorScheme: document.documentElement.classList.contains('dark') ? 'dark' : 'light',
+                        '--webkit-appearance': document.documentElement.classList.contains('dark') ? 'none' : undefined,
+                        '--webkit-color-scheme': document.documentElement.classList.contains('dark') ? 'dark' : undefined
+                      } as React.CSSProperties}
                     />
                   </div>
                 </div>
