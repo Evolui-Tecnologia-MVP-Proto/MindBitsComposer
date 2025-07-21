@@ -34,7 +34,7 @@ Preferred communication style: Simple, everyday language.
 ✓ Applied color #111827 to user search/new user container in dark mode
 ✓ Applied color #0F172A to main administration page background and user table card/body in dark mode
 ✓ Applied color #1E293B to container cards, tabs, and search header in dark mode
-✓ Applied color #1E293A to user table header background in dark mode
+✓ Applied color #111827 to all table headers background in dark mode
 ✓ Applied color #1E40AF to active/selected tabs in dark mode
 ✓ Preserved original light theme colors unchanged across entire application
 

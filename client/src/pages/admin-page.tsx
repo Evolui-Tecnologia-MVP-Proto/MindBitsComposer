@@ -1501,7 +1501,7 @@ export default function AdminPage() {
                   ) : mappingsData && mappingsData.length > 0 ? (
                     <div className="relative w-full overflow-auto">
                       <Table>
-                        <TableHeader>
+                        <TableHeader className="bg-gray-50 dark:bg-[#111827]">
                           <TableRow>
                             <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">NOME</TableHead>
                             <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ID DO QUADRO</TableHead>
