@@ -278,6 +278,11 @@ const DocumentRelationshipSelect = ({
         value={selectedRelationship}
         onChange={(e) => handleRelationshipChange(e.target.value)}
         className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 font-mono"
+        style={{
+          backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined,
+          borderColor: document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.1)' : undefined,
+          color: document.documentElement.classList.contains('dark') ? '#E5E7EB' : undefined
+        }}
       >
         <option value="">Selecione um relacionamento</option>
         {relationships?.map((relationship: any) => (
@@ -310,6 +315,11 @@ const DocumentRelationshipSelect = ({
                       value={selectedFileColumn}
                       onChange={(e) => setSelectedFileColumn(e.target.value)}
                       className="flex-1 h-8 rounded-md border border-gray-300 bg-white px-2 py-1 text-xs font-mono"
+                      style={{
+                        backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined,
+                        borderColor: document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.1)' : undefined,
+                        color: document.documentElement.classList.contains('dark') ? '#E5E7EB' : undefined
+                      }}
                     >
                       <option value="">Selecione uma coluna de arquivo...</option>
                       <option value="documents_item" className="font-mono text-green-700">
@@ -2598,6 +2608,11 @@ return item.column_values.some(col =>
                     <label className="text-sm font-medium dark:text-gray-100">Frequência de Sincronização</label>
                     <select 
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:bg-gray-50 disabled:text-gray-500"
+                      style={{
+                        backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined,
+                        borderColor: document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.1)' : undefined,
+                        color: document.documentElement.classList.contains('dark') ? '#E5E7EB' : undefined
+                      }}
                       value={schedulingFrequency}
                       onChange={(e) => setSchedulingFrequency(e.target.value)}
                       disabled={jobStatus?.hasActiveJob}
@@ -2619,6 +2634,11 @@ return item.column_values.some(col =>
                       onChange={(e) => setSchedulingTime(e.target.value)}
                       disabled={jobStatus?.hasActiveJob}
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:bg-gray-50 disabled:text-gray-500"
+                      style={{
+                        backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined,
+                        borderColor: document.documentElement.classList.contains('dark') ? 'rgba(255, 255, 255, 0.1)' : undefined,
+                        color: document.documentElement.classList.contains('dark') ? '#E5E7EB' : undefined
+                      }}
                     />
                   </div>
                 </div>

@@ -1064,3 +1064,9 @@ table:not(.lexical-editor-container table) th {
 .dark [data-radix-dialog-content] .max-h-[300px] table thead th {
   background-color: #1F2937 !important;
 }
+
+/* Select dropdown options styling for dark mode in modals */
+.dark [data-radix-dialog-content] select option {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
