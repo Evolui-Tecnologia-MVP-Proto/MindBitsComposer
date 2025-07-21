@@ -1425,23 +1425,23 @@ export default function AdminPage() {
         
         <Tabs defaultValue="usuarios" className="w-full">
           <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-[#1E293B]">
-            <TabsTrigger value="usuarios" className="text-center">
+            <TabsTrigger value="usuarios" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
               <Users className="h-4 w-4 mr-2" />
               Usuários
             </TabsTrigger>
-            <TabsTrigger value="monday" className="text-center">
+            <TabsTrigger value="monday" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
               <CalendarDays className="h-4 w-4 mr-2" />
               Integração Monday
             </TabsTrigger>
-            <TabsTrigger value="servicos" className="text-center">
+            <TabsTrigger value="servicos" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
               <Plug className="h-4 w-4 mr-2" />
               Integrações de Serviços
             </TabsTrigger>
-            <TabsTrigger value="logs" className="text-center">
+            <TabsTrigger value="logs" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
               <Database className="h-4 w-4 mr-2" />
               Logs
             </TabsTrigger>
-            <TabsTrigger value="configuracao" className="text-center">
+            <TabsTrigger value="configuracao" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
               <Settings className="h-4 w-4 mr-2" />
               Configuração
             </TabsTrigger>
