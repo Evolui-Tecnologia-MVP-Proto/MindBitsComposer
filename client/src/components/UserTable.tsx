@@ -215,7 +215,7 @@ export default function UserTable() {
         
         <Button 
           onClick={() => setIsNewUserModalOpen(true)}
-          className="w-full sm:w-auto"
+          className="w-full sm:w-auto bg-primary hover:bg-primary/90 dark:bg-[#1E40AF] dark:hover:bg-[#1E40AF]/90"
         >
           <UserPlus className="mr-2 h-4 w-4" />
           Novo Usuário
@@ -370,7 +370,7 @@ export default function UserTable() {
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction 
               onClick={() => userToDelete && deleteUserMutation.mutate(userToDelete.id)}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700"
             >
               {deleteUserMutation.isPending ? "Excluindo..." : "Excluir"}
             </AlertDialogAction>
@@ -392,6 +392,7 @@ export default function UserTable() {
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction 
               onClick={() => userToResetPassword && resetPasswordMutation.mutate(userToResetPassword.id)}
+              className="bg-primary hover:bg-primary/90 dark:bg-[#1E40AF] dark:hover:bg-[#1E40AF]/90"
             >
               {resetPasswordMutation.isPending ? "Resetando..." : "Resetar Senha"}
             </AlertDialogAction>

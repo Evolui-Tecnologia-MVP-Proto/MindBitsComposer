@@ -2596,6 +2596,7 @@ return item.column_values.some(col =>
                   type="submit" 
                   form="mappingForm"
                   disabled={isSubmitting || isSaveDisabled}
+                  className="bg-primary hover:bg-primary/90 dark:bg-[#1E40AF] dark:hover:bg-[#1E40AF]/90"
                 >
                   {isSubmitting ? (
                     <>
@@ -2625,7 +2626,7 @@ return item.column_values.some(col =>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction 
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700"
               onClick={async () => {
                 setIsSubmitting(true);
                 try {
@@ -2796,6 +2797,7 @@ return item.column_values.some(col =>
                 <Button 
                   type="submit"
                   disabled={isServiceSubmitting}
+                  className="bg-primary hover:bg-primary/90 dark:bg-[#1E40AF] dark:hover:bg-[#1E40AF]/90"
                 >
                   {isServiceSubmitting ? (
                     <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando...</>
@@ -2822,7 +2824,7 @@ return item.column_values.some(col =>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction 
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700"
               onClick={deleteServiceConnection}
             >
               {isServiceSubmitting ? (
@@ -2971,7 +2973,10 @@ return item.column_values.some(col =>
                 <Button variant="outline" onClick={() => setIsColumnModalOpen(false)}>
                   Cancelar
                 </Button>
-                <Button type="submit">
+                <Button 
+                  type="submit"
+                  className="bg-primary hover:bg-primary/90 dark:bg-[#1E40AF] dark:hover:bg-[#1E40AF]/90"
+                >
                   {selectedColumn ? "Atualizar" : "Adicionar"}
                 </Button>
               </DialogFooter>
@@ -2994,7 +2999,7 @@ return item.column_values.some(col =>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleClearLogs}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 dark:bg-destructive dark:hover:bg-destructive/90"
             >
               Limpar Logs
             </AlertDialogAction>

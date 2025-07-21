@@ -49,6 +49,7 @@ Preferred communication style: Simple, everyday language.
 ✓ Enhanced dropdown menu items contrast and hover states for dark mode
 ✓ Applied color #0F172A to user avatar dropdown menu in header (dark mode only)
 ✓ Applied dark theme colors to user status badges (green, yellow, gray with transparency)
+✓ Applied color #1E40AF to primary buttons in dark mode (same as active tabs)
 ✓ Preserved original light theme colors unchanged across entire application
 
 ## System Architecture
