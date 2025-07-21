@@ -551,6 +551,36 @@ export default function AdminPage() {
       setNotifyErrors(true);
     }
   }, [selectedMapping]);
+
+  // Force correct colors for select elements in dark mode
+  useEffect(() => {
+    const applySelectStyles = () => {
+      const selects = document.querySelectorAll('[data-radix-dialog-content] select');
+      selects.forEach((select: Element) => {
+        const htmlElement = select as HTMLElement;
+        if (document.documentElement.classList.contains('dark')) {
+          htmlElement.style.setProperty('background-color', '#0F172A', 'important');
+          htmlElement.style.setProperty('border-color', 'rgba(255, 255, 255, 0.1)', 'important');
+          htmlElement.style.setProperty('color', '#E5E7EB', 'important');
+        }
+      });
+    };
+
+    // Apply immediately
+    applySelectStyles();
+
+    // Apply when modal opens or content changes
+    const observer = new MutationObserver(() => {
+      setTimeout(applySelectStyles, 100);
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    return () => observer.disconnect();
+  }, [isColumnModalOpen]);
   
   // Queries
   const { data: mappingsData = [], isLoading: mappingsIsLoading, error: mappingsError } = useQuery<BoardMapping[]>({
