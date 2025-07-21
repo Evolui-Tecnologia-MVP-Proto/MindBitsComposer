@@ -64,17 +64,17 @@
   color: #6B7280 !important;
 }
 
-/* Force modal background color ONLY for modals */
-[data-radix-dialog-content],
-[data-radix-alert-dialog-content],
-.modal-0f1729 {
+/* Force modal background color ONLY for modals in DARK MODE */
+.dark [data-radix-dialog-content],
+.dark [data-radix-alert-dialog-content],
+.dark .modal-0f1729 {
   background-color: #0F1729 !important;
   background: #0F1729 !important;
 }
 
-/* Specific override for modal dialog content */
-div[data-radix-dialog-content],
-div[data-radix-alert-dialog-content] {
+/* Specific override for modal dialog content in DARK MODE */
+.dark div[data-radix-dialog-content],
+.dark div[data-radix-alert-dialog-content] {
   background-color: #0F1729 !important;
   background: #0F1729 !important;
 }
