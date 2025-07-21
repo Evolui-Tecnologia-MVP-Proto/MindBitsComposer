@@ -27,7 +27,7 @@ export default function Layout({ children }: LayoutProps) {
             <div className="flex items-center pl-5" style={{ marginLeft: 0 }}>
               <div className="flex items-center">
                 <Logo />
-                <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+                <h1 className="text-xl font-semibold text-gray-800 dark:!text-gray-100">
                   EVO-MindBits Composer
                 </h1>
               </div>
