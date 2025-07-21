@@ -283,7 +283,7 @@ export default function AuthPage() {
                 className="h-16 w-16 object-cover"
               />
             </div>
-            <h1 className="text-4xl font-bold text-[#ACC3DD] dark:text-[#ACC3E3]">
+            <h1 className="text-4xl font-bold text-[#ACC3DD] dark:text-[#6B655A]">
               EVO-MindBits CPx
             </h1>
           </div>
