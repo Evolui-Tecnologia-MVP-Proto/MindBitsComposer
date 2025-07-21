@@ -240,7 +240,7 @@ export default function UserTable() {
                 </div>
               ) : (
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-[#0F172A]">
-                  <thead className="bg-gray-50 dark:bg-[#111827]">
+                  <thead className="bg-gray-50" style={{ backgroundColor: '#111827' }}>
                     <tr>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Nome
