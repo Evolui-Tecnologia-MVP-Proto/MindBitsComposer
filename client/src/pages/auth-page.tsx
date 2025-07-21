@@ -289,7 +289,7 @@ export default function AuthPage() {
           </div>
           
           {/* Textos descritivos com mesma margem da imagem principal */}
-          <div className="mt-6 text-[#ACC3DD] dark:text-[#ACC3E3]">
+          <div className="mt-6 text-gray-800 dark:text-gray-100">
             <p className="text-xl mb-8">
               Compositor integrado para documentação técnica e empresarial, assistido por IA e para a IA.
             </p>
@@ -298,31 +298,31 @@ export default function AuthPage() {
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-[#ACC3DD] dark:bg-[#ACC3E3]">
                   1
                 </div>
-                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Integração com sistemas externos</span>
+                <span className="text-gray-800 dark:text-gray-100">Integração com sistemas externos</span>
               </li>
               <li className="flex items-center">
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-[#ACC3DD] dark:bg-[#ACC3E3]">
                   2
                 </div>
-                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Workflows de fluxo de documentos</span>
+                <span className="text-gray-800 dark:text-gray-100">Workflows de fluxo de documentos</span>
               </li>
               <li className="flex items-center">
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-[#ACC3DD] dark:bg-[#ACC3E3]">
                   3
                 </div>
-                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Aprovações e assinaturas eletrônicas</span>
+                <span className="text-gray-800 dark:text-gray-100">Aprovações e assinaturas eletrônicas</span>
               </li>
               <li className="flex items-center">
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-[#ACC3DD] dark:bg-[#ACC3E3]">
                   4
                 </div>
-                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Versionamento documental</span>
+                <span className="text-gray-800 dark:text-gray-100">Versionamento documental</span>
               </li>
               <li className="flex items-center">
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-[#ACC3DD] dark:bg-[#ACC3E3]">
                   5
                 </div>
-                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Metodologia AI-First</span>
+                <span className="text-gray-800 dark:text-gray-100">Metodologia AI-First</span>
               </li>
             </ul>
           </div>
