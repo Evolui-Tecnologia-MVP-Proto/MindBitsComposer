@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Menu } from "lucide-react";
 import Sidebar from "./Sidebar";
 import AvatarMenu from "./AvatarMenu";
@@ -12,31 +12,11 @@ type LayoutProps = {
 
 export default function Layout({ children }: LayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isDark, setIsDark] = useState(false);
   const { user } = useAuth();
   
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
-
-  useEffect(() => {
-    // Check initial theme
-    const checkTheme = () => {
-      const isDarkMode = document.documentElement.classList.contains('dark');
-      setIsDark(isDarkMode);
-    };
-    
-    checkTheme();
-    
-    // Watch for theme changes
-    const observer = new MutationObserver(checkTheme);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class']
-    });
-    
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <div className="h-screen flex flex-col">
@@ -47,11 +27,7 @@ export default function Layout({ children }: LayoutProps) {
             <div className="flex items-center pl-5" style={{ marginLeft: 0 }}>
               <div className="flex items-center">
                 <Logo />
-                <h1 
-                  className="text-xl font-semibold" 
-                  id="header-title"
-                  style={{ color: isDark ? '#F3F4F6' : '#1F2937' }}
-                >
+                <h1 className="text-xl font-semibold text-gray-800 dark:text-white">
                   EVO-MindBits Composer
                 </h1>
               </div>
