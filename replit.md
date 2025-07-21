@@ -17,6 +17,8 @@ Preferred communication style: Simple, everyday language.
 ✓ Applied translucent backgrounds in dark mode for visual depth
 ✓ Standardized table headers with #292C33 background
 ✓ Enhanced theme consistency across entire application
+✓ Fixed login page colors with specific values (#1F2937 left panel, #0E4F82 right panel)
+✓ Corrected modal colors to use #0F1729 for Dialog, AlertDialog, and login Card components
 
 ## System Architecture
 
