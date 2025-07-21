@@ -60,7 +60,20 @@
 }
 
 /* Force header text color in dark mode */
-.dark header h1 {
+.dark header h1,
+.dark header .text-xl,
+.dark #header-title {
+  color: #F3F4F6 !important;
+}
+
+html.dark header h1,
+html.dark header .text-xl,
+html.dark #header-title {
+  color: #F3F4F6 !important;
+}
+
+/* More specific selectors */
+.dark header div h1#header-title {
   color: #F3F4F6 !important;
 }
 
