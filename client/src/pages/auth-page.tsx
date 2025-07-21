@@ -208,7 +208,7 @@ export default function AuthPage() {
                 </div>
               ) : (
                 <div className="fade-in">
-                  <h2 className="text-xl font-semibold text-left text-gray-800 dark:text-white mb-2">
+                  <h2 className="text-xl font-semibold text-left text-gray-800 dark:text-[#6B7280] mb-2">
                     Entrar
                   </h2>
                   <p className="text-left text-gray-600 dark:text-gray-300 mb-6">
