@@ -1502,7 +1502,7 @@ export default function AdminPage() {
                       <span>Erro ao carregar mapeamentos</span>
                     </div>
                   ) : mappingsData && mappingsData.length > 0 ? (
-                    <div className="bg-white dark:bg-[#0F172A] p-4 rounded-lg">
+                    <div className="bg-white dark:bg-[#0F172A] p-4 rounded-lg border-2 border-white">
                       <div className="relative w-full overflow-auto">
                         <Table>
                         <TableHeader className="bg-gray-50 dark:bg-[#111827]">
