@@ -64,7 +64,10 @@
   color: #6B7280 !important;
 }
 
-/* Force modal background color ONLY for modals in DARK MODE */
+/* HIGH PRIORITY: Force modal background color ONLY for modals in DARK MODE */
+html.dark [data-radix-dialog-content],
+html.dark [data-radix-alert-dialog-content],
+html.dark .modal-0f172a,
 .dark [data-radix-dialog-content],
 .dark [data-radix-alert-dialog-content],
 .dark .modal-0f172a {
@@ -73,12 +76,66 @@
   color: #F9FAFB !important;
 }
 
-/* Specific override for modal dialog content in DARK MODE */
+/* HIGHEST PRIORITY: Specific override for modal dialog content in DARK MODE */
+html.dark div[data-radix-dialog-content],
+html.dark div[data-radix-alert-dialog-content],
 .dark div[data-radix-dialog-content],
 .dark div[data-radix-alert-dialog-content] {
   background-color: #0F172A !important;
   background: #0F172A !important;
   color: #F9FAFB !important;
+}
+
+/* Override Tailwind bg-background class specifically for modals */
+html.dark [data-radix-dialog-content].bg-background,
+.dark [data-radix-dialog-content].bg-background,
+html.dark [data-radix-alert-dialog-content].bg-background,
+.dark [data-radix-alert-dialog-content].bg-background {
+  background-color: #0F172A !important;
+  background: #0F172A !important;
+}
+
+/* ULTRA HIGH PRIORITY: Force all possible modal selectors in dark mode */
+body.dark [data-radix-dialog-content],
+body.dark [data-radix-alert-dialog-content],
+html body.dark [data-radix-dialog-content],
+html body.dark [data-radix-alert-dialog-content],
+.dark[data-theme="dark"] [data-radix-dialog-content],
+.dark[data-theme="dark"] [data-radix-alert-dialog-content] {
+  background-color: #0F172A !important;
+  background: #0F172A !important;
+  color: #F9FAFB !important;
+}
+
+/* FORCE OVERRIDE: Any modal with any background class in dark mode */
+.dark [data-radix-dialog-content][class*="bg-"],
+.dark [data-radix-alert-dialog-content][class*="bg-"],
+html.dark [data-radix-dialog-content][class*="bg-"],
+html.dark [data-radix-alert-dialog-content][class*="bg-"] {
+  background-color: #0F172A !important;
+  background: #0F172A !important;
+}
+
+/* ULTIMATE OVERRIDE: Target any dialog elements with CSS variables in dark mode */
+.dark [data-radix-dialog-content] {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(15 23 42 / var(--tw-bg-opacity)) !important;
+  background: #0F172A !important;
+  color: #F9FAFB !important;
+}
+
+.dark [data-radix-alert-dialog-content] {
+  --tw-bg-opacity: 1 !important;
+  background-color: rgb(15 23 42 / var(--tw-bg-opacity)) !important;
+  background: #0F172A !important;
+  color: #F9FAFB !important;
+}
+
+/* FINAL OVERRIDE: Direct attribute targeting with maximum specificity */
+body.dark [data-radix-dialog-content]:not([style*="background"]),
+body.dark [data-radix-alert-dialog-content]:not([style*="background"]) {
+  background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
 /* Modal text elements in DARK MODE */
