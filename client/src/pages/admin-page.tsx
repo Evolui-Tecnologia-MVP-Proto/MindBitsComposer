@@ -1417,7 +1417,7 @@ export default function AdminPage() {
   };
   
   return (
-    <div className="container mx-auto py-6 bg-background dark:bg-[#0F172A] text-foreground">
+    <div className="container mx-auto py-6 bg-background dark:bg-[#0F172A] text-foreground" data-page="admin">
       <div className="space-y-6">
         <div className="flex items-center justify-between p-6 rounded-lg bg-gray-50 dark:bg-[#1E293B]">
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Administração</h1>
@@ -1500,8 +1500,8 @@ export default function AdminPage() {
                     </div>
                   ) : mappingsData && mappingsData.length > 0 ? (
                     <div className="relative w-full overflow-auto">
-                      <Table style={{ backgroundColor: '#0F172A' }}>
-                        <TableHeader className="bg-gray-50" style={{ backgroundColor: '#111827' }}>
+                      <Table>
+                        <TableHeader className="bg-gray-50">
                           <TableRow>
                             <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">NOME</TableHead>
                             <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ID DO QUADRO</TableHead>
@@ -1510,7 +1510,7 @@ export default function AdminPage() {
                             <TableHead className="w-[100px] text-center text-xs font-medium text-gray-500 uppercase tracking-wider">AÇÕES</TableHead>
                           </TableRow>
                         </TableHeader>
-                        <TableBody style={{ backgroundColor: '#0F172A' }}>
+                        <TableBody>
                           {mappingsData.map((mapping: BoardMapping) => (
                             <TableRow key={mapping.id}>
                               <TableCell className="font-medium">{mapping.name}</TableCell>

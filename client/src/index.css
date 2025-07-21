@@ -752,43 +752,37 @@ table:not(.lexical-editor-container table) th {
   }
 }
 
-/* FORCE TABLE COLORS - AGGRESSIVE OVERRIDE FOR ADMIN PAGE */
-.dark table,
-.dark [data-table="true"],
-.dark .table {
+/* FORCE TABLE COLORS - SPECIFIC TO ADMIN PAGE ONLY */
+.dark [data-page="admin"] table,
+.dark [data-page="admin"] .table {
   background-color: #0F172A !important;
 }
 
-.dark thead,
-.dark .table-header {
+.dark [data-page="admin"] thead,
+.dark [data-page="admin"] .table-header {
   background-color: #111827 !important;
 }
 
-.dark tbody,
-.dark .table-body {
+.dark [data-page="admin"] tbody,
+.dark [data-page="admin"] .table-body {
   background-color: #0F172A !important;
 }
 
-.dark tbody tr,
-.dark .table-row {
+.dark [data-page="admin"] tbody tr,
+.dark [data-page="admin"] .table-row {
   background-color: #0F172A !important;
 }
 
-.dark tbody td,
-.dark .table-cell {
+.dark [data-page="admin"] tbody td,
+.dark [data-page="admin"] .table-cell {
   background-color: #0F172A !important;
 }
 
-/* Override all Tailwind table-related classes */
-.dark .bg-white,
-table.dark .bg-white,
-tr.dark .bg-white,
-td.dark .bg-white {
+/* Override Tailwind classes only in admin page */
+.dark [data-page="admin"] .bg-white {
   background-color: #0F172A !important;
 }
 
-.dark .bg-gray-50,
-table.dark .bg-gray-50,
-thead.dark .bg-gray-50 {
+.dark [data-page="admin"] .bg-gray-50 {
   background-color: #111827 !important;
 }
