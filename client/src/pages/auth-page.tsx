@@ -138,10 +138,10 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex">
       {/* Lado esquerdo - Formulário de login */}
-      <div className="w-1/2 flex items-center justify-center" style={{ backgroundColor: "#2D3748" }}>
+      <div className="w-1/2 flex items-center justify-center" style={{ backgroundColor: "#1F2937" }}>
         <div className="w-full max-w-md mx-4">
           {/* Logo removido da tela de login conforme solicitado */}
-          <Card className="shadow-lg" style={{ backgroundColor: "#2D3748", border: "none" }}>
+          <Card className="shadow-lg" style={{ backgroundColor: "#1F2937", border: "none" }}>
             <CardContent className="pt-6">
               {isFirstLogin ? (
                 <div className="fade-in">
