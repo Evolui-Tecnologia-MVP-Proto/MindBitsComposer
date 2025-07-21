@@ -1502,8 +1502,9 @@ export default function AdminPage() {
                       <span>Erro ao carregar mapeamentos</span>
                     </div>
                   ) : mappingsData && mappingsData.length > 0 ? (
-                    <div className="relative w-full overflow-auto">
-                      <Table>
+                    <div className="bg-white dark:bg-[#0F172A] p-4 rounded-lg">
+                      <div className="relative w-full overflow-auto">
+                        <Table>
                         <TableHeader className="bg-gray-50">
                           <TableRow>
                             <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">NOME</TableHead>
@@ -1562,7 +1563,8 @@ export default function AdminPage() {
                             </TableRow>
                           ))}
                         </TableBody>
-                      </Table>
+                        </Table>
+                      </div>
                     </div>
                   ) : (
                     <div className="text-center py-6 text-gray-500">
