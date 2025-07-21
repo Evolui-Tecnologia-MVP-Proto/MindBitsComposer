@@ -25,6 +25,11 @@ Preferred communication style: Simple, everyday language.
   - Dark theme: left panel #1F2937, card #0F1729, inputs #0F1729, button #1E3A8A, right panel text #ACC3E3, circular markers #ACC3E3
 ✓ Applied color #111827 to header, footer, and sidebar menu panel (dark theme only)
 ✓ Applied color #1F2937 to main content area background (dark theme only)
+✓ Applied color #1F2937 to selected sidebar menu items in dark mode
+✓ Applied color #6B7280 to header text "EVO-MindBits Composer" in dark mode
+✓ Applied color #1F2937 to administration page header background in dark mode
+✓ Applied color #1F2937 to administration tabs background in dark mode
+✓ Applied color #1F2937 to user search/new user container in dark mode
 ✓ Preserved original light theme colors unchanged across entire application
 
 ## System Architecture
