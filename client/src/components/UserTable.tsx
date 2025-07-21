@@ -239,7 +239,7 @@ export default function UserTable() {
                   <p className="text-gray-500">Nenhum usuário encontrado.</p>
                 </div>
               ) : (
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-[#111827]">
                   <thead className="bg-gray-50 dark:bg-[#1E293A]">
                     <tr>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
