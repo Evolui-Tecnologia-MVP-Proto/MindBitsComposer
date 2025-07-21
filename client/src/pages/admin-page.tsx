@@ -1500,7 +1500,7 @@ export default function AdminPage() {
                     </div>
                   ) : mappingsData && mappingsData.length > 0 ? (
                     <div className="relative w-full overflow-auto">
-                      <Table>
+                      <Table style={{ backgroundColor: '#0F172A' }}>
                         <TableHeader className="bg-gray-50" style={{ backgroundColor: '#111827' }}>
                           <TableRow>
                             <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">NOME</TableHead>
@@ -1510,7 +1510,7 @@ export default function AdminPage() {
                             <TableHead className="w-[100px] text-center text-xs font-medium text-gray-500 uppercase tracking-wider">AÇÕES</TableHead>
                           </TableRow>
                         </TableHeader>
-                        <TableBody>
+                        <TableBody style={{ backgroundColor: '#0F172A' }}>
                           {mappingsData.map((mapping: BoardMapping) => (
                             <TableRow key={mapping.id}>
                               <TableCell className="font-medium">{mapping.name}</TableCell>
