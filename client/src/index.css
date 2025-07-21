@@ -778,11 +778,20 @@ table:not(.lexical-editor-container table) th {
   background-color: #0F172A !important;
 }
 
-/* Override Tailwind classes only in admin page */
+/* Override Tailwind classes only in admin page - DARK MODE ONLY */
 .dark [data-page="admin"] .bg-white {
   background-color: #0F172A !important;
 }
 
 .dark [data-page="admin"] .bg-gray-50 {
   background-color: #0F172A !important;
+}
+
+/* Ensure light mode preserves original colors */
+[data-page="admin"] .bg-white:not(.dark *) {
+  background-color: white !important;
+}
+
+[data-page="admin"] .bg-gray-50:not(.dark *) {
+  background-color: rgb(249 250 251) !important;
 }
