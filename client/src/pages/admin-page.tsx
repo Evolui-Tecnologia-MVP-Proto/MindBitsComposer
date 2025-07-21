@@ -1417,7 +1417,7 @@ export default function AdminPage() {
   };
   
   return (
-    <div className="container mx-auto py-6 bg-background text-foreground">
+    <div className="container mx-auto py-6 bg-background dark:bg-[#1F2937] text-foreground">
       <div className="space-y-6">
         <div className="flex items-center justify-between p-6 rounded-lg bg-gray-50 dark:bg-[#1F2937]">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Administração</h1>
