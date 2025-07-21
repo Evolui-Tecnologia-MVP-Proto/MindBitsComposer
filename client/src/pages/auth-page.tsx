@@ -284,13 +284,13 @@ export default function AuthPage() {
                 className="h-16 w-16 object-cover"
               />
             </div>
-            <h1 className="text-4xl font-bold text-white">
+            <h1 className="text-4xl font-bold" style={{ color: "#ACC3E3" }}>
               EVO-MindBits CTx
             </h1>
           </div>
           
           {/* Textos descritivos com mesma margem da imagem principal */}
-          <div className="mt-6 text-white">
+          <div className="mt-6" style={{ color: "#ACC3E3" }}>
             <p className="text-xl mb-8">
               Sistema de triagem inteligente de mensagens de chatbots com IA para análise de eficácia e geração de auto treinamento da base de conhecimento.
             </p>
@@ -299,31 +299,31 @@ export default function AuthPage() {
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-white text-blue-600">
                   1
                 </div>
-                Integração com Chatbots Omnichannel
+                <span style={{ color: "#ACC3E3" }}>Integração com Chatbots Omnichannel</span>
               </li>
               <li className="flex items-center">
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-white text-blue-600">
                   2
                 </div>
-                Workflows de análise e triagem para detalhamento funcional
+                <span style={{ color: "#ACC3E3" }}>Workflows de análise e triagem para detalhamento funcional</span>
               </li>
               <li className="flex items-center">
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-white text-blue-600">
                   3
                 </div>
-                Integração com o MindBits CPx para edição avançada de base de conhecimento
+                <span style={{ color: "#ACC3E3" }}>Integração com o MindBits CPx para edição avançada de base de conhecimento</span>
               </li>
               <li className="flex items-center">
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-white text-blue-600">
                   4
                 </div>
-                Designação de equipe especialista com base em "Skills"
+                <span style={{ color: "#ACC3E3" }}>Designação de equipe especialista com base em "Skills"</span>
               </li>
               <li className="flex items-center">
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-white text-blue-600">
                   5
                 </div>
-                Integração com agentes de IA para análise de triagem automática
+                <span style={{ color: "#ACC3E3" }}>Integração com agentes de IA para análise de triagem automática</span>
               </li>
             </ul>
           </div>
