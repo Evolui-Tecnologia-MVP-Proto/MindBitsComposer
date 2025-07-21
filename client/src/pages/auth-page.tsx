@@ -284,45 +284,45 @@ export default function AuthPage() {
               />
             </div>
             <h1 className="text-4xl font-bold text-[#ACC3DD] dark:text-[#ACC3E3]">
-              EVO-MindBits CTx
+              EVO-MindBits CPx
             </h1>
           </div>
           
           {/* Textos descritivos com mesma margem da imagem principal */}
           <div className="mt-6 text-[#ACC3DD] dark:text-[#ACC3E3]">
             <p className="text-xl mb-8">
-              Sistema de triagem inteligente de mensagens de chatbots com IA para análise de eficácia e geração de auto treinamento da base de conhecimento.
+              Compositor integrado para documentação técnica e empresarial, assistido por IA e para a IA.
             </p>
             <ul className="space-y-4">
               <li className="flex items-center">
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-[#ACC3DD] dark:bg-[#ACC3E3]">
                   1
                 </div>
-                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Integração com Chatbots Omnichannel</span>
+                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Integração com sistemas externos</span>
               </li>
               <li className="flex items-center">
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-[#ACC3DD] dark:bg-[#ACC3E3]">
                   2
                 </div>
-                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Workflows de análise e triagem para detalhamento funcional</span>
+                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Workflows de fluxo de documentos</span>
               </li>
               <li className="flex items-center">
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-[#ACC3DD] dark:bg-[#ACC3E3]">
                   3
                 </div>
-                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Integração com o MindBits CPx para edição avançada de base de conhecimento</span>
+                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Aprovações e assinaturas eletrônicas</span>
               </li>
               <li className="flex items-center">
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-[#ACC3DD] dark:bg-[#ACC3E3]">
                   4
                 </div>
-                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Designação de equipe especialista com base em "Skills"</span>
+                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Versionamento documental</span>
               </li>
               <li className="flex items-center">
                 <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-[#ACC3DD] dark:bg-[#ACC3E3]">
                   5
                 </div>
-                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Integração com agentes de IA para análise de triagem automática</span>
+                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Metodologia AI-First</span>
               </li>
             </ul>
           </div>
