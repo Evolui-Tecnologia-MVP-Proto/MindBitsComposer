@@ -1417,14 +1417,14 @@ export default function AdminPage() {
   };
   
   return (
-    <div className="container mx-auto py-6 bg-background dark:bg-[#1F2937] text-foreground">
+    <div className="container mx-auto py-6 bg-background dark:bg-[#0F172A] text-foreground">
       <div className="space-y-6">
-        <div className="flex items-center justify-between p-6 rounded-lg bg-gray-50 dark:bg-[#1F2937]">
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Administração</h1>
+        <div className="flex items-center justify-between p-6 rounded-lg bg-gray-50 dark:bg-[#1E293B]">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Administração</h1>
         </div>
         
         <Tabs defaultValue="usuarios" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-[#1F2937]">
+          <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-[#1E293B]">
             <TabsTrigger value="usuarios" className="text-center">
               <Users className="h-4 w-4 mr-2" />
               Usuários
@@ -1456,7 +1456,7 @@ export default function AdminPage() {
             <div className="space-y-4">
               {/* Indicador de progresso durante execução */}
               {isExecutingMapping && (
-                <Card className="border-blue-200 bg-blue-50">
+                <Card className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-[#1E293B]">
                   <CardContent className="pt-6">
                     <div className="flex items-center space-x-4">
                       <div className="animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
@@ -1472,7 +1472,7 @@ export default function AdminPage() {
                 </Card>
               )}
               
-              <Card>
+              <Card className="bg-white dark:bg-[#1E293B] border-gray-200 dark:border-gray-700">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <CardTitle>Mapeamentos de Quadros do Monday</CardTitle>

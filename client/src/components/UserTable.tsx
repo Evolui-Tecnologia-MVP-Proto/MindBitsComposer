@@ -197,8 +197,8 @@ export default function UserTable() {
   }
 
   return (
-    <div className="bg-white dark:bg-[#111827] p-4 rounded-lg">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 p-4 rounded-lg bg-gray-50 dark:bg-[#111827]">
+    <div className="bg-white dark:bg-[#0F172A] p-4 rounded-lg">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 p-4 rounded-lg bg-gray-50 dark:bg-[#1E293B]">
         <div className="w-full sm:w-1/3">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -224,7 +224,7 @@ export default function UserTable() {
 
       <div className="mt-2">
         <div className="overflow-hidden">
-          <div className="border rounded-lg bg-white dark:bg-[#111827]">
+          <div className="border rounded-lg bg-white dark:bg-[#0F172A] border-gray-200 dark:border-gray-700">
             <div className="overflow-x-auto">
               {isLoading ? (
                 <div className="bg-white px-4 py-5 text-center">
@@ -239,7 +239,7 @@ export default function UserTable() {
                   <p className="text-gray-500">Nenhum usuário encontrado.</p>
                 </div>
               ) : (
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-[#111827]">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-[#0F172A]">
                   <thead className="bg-gray-50 dark:bg-[#1E293A]">
                     <tr>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -259,7 +259,7 @@ export default function UserTable() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white dark:bg-[#111827] divide-y divide-gray-200 dark:divide-gray-700">
+                  <tbody className="bg-white dark:bg-[#0F172A] divide-y divide-gray-200 dark:divide-gray-700">
                     {filteredUsers?.map((user) => (
                       <tr key={user.id}>
                         <td className="px-6 py-4 whitespace-nowrap">
