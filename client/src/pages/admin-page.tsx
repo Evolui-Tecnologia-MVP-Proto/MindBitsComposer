@@ -1462,7 +1462,7 @@ export default function AdminPage() {
       <div className="space-y-6 bg-[#F9FAFB] dark:bg-[#1F2937]">
         <div className="flex items-center justify-between p-6 rounded-lg bg-gray-50 dark:bg-[#1F2937]">
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-[#6B7280] flex items-center gap-3">
-            <Settings className="h-6 w-6 text-blue-600" />
+            <Settings className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             Administração
           </h1>
         </div>
@@ -1582,7 +1582,7 @@ export default function AdminPage() {
                                         <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
                                       </div>
                                     ) : (
-                                      <Play className="h-4 w-4 text-green-600" />
+                                      <Play className="h-4 w-4 text-green-600 dark:text-green-400" />
                                     )}
                                   </Button>
                                   <Button
@@ -1628,8 +1628,8 @@ export default function AdminPage() {
                 <div className="p-6">
                   <div className="flex justify-between items-start">
                     <div className="flex items-center space-x-4">
-                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100">
-                        <CalendarDays className="h-6 w-6 text-blue-600" />
+                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30">
+                        <CalendarDays className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                       </div>
                       <div>
                         <h3 className="font-medium text-lg">Monday.com</h3>
@@ -1666,8 +1666,8 @@ export default function AdminPage() {
                 <div className="p-6">
                   <div className="flex justify-between items-start">
                     <div className="flex items-center space-x-4">
-                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-purple-100">
-                        <Github className="h-6 w-6 text-purple-600" />
+                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30">
+                        <Github className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                       </div>
                       <div>
                         <h3 className="font-medium text-lg">GitHub</h3>
@@ -1704,8 +1704,8 @@ export default function AdminPage() {
                 <div className="p-6">
                   <div className="flex justify-between items-start">
                     <div className="flex items-center space-x-4">
-                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-100">
-                        <Lightbulb className="h-6 w-6 text-green-600" />
+                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30">
+                        <Lightbulb className="h-6 w-6 text-green-600 dark:text-green-400" />
                       </div>
                       <div>
                         <h3 className="font-medium text-lg">OpenAI</h3>

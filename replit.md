@@ -74,6 +74,12 @@ Preferred communication style: Simple, everyday language.
   - Created comprehensive CSS rules for select elements in dark mode
   - Ensured consistent #0F172A background for all select triggers
   - Applied to forms, modals, and all application areas
+✓ Fixed service integration icons for dark theme consistency:
+  - Adjusted Settings icon title to text-blue-600 dark:text-blue-400
+  - Fixed Monday.com CalendarDays icon and background (blue-600 dark:blue-400, bg-blue-100 dark:bg-blue-900/30)
+  - Corrected GitHub icon colors (purple-600 dark:purple-400, bg-purple-100 dark:bg-purple-900/30)
+  - Updated OpenAI Lightbulb icon (green-600 dark:green-400, bg-green-100 dark:bg-green-900/30)
+  - Enhanced Play button icon for execution (green-600 dark:green-400)
 
 ## System Architecture
 
