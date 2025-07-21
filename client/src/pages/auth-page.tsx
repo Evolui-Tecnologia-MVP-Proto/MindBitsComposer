@@ -262,7 +262,7 @@ export default function AuthPage() {
       </div>
       
       {/* Lado direito - Hero/Imagem */}
-      <div className="w-1/2 flex flex-col bg-blue-600 dark:bg-[#0E4F82]">
+      <div className="w-1/2 flex flex-col" style={{ backgroundColor: "#0E4F82" }}>
         {/* Imagem na parte superior */}
         <div className="mt-10 ml-10">
           <img 
