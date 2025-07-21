@@ -1,0 +1,146 @@
+# EVO-MindBits Composer (CPx)
+
+## Overview
+
+EVO-MindBits Composer is an integrated technical and business documentation platform with AI assistance. It's an advanced business workflow synchronization platform that enables intelligent document management and collaborative editing through cutting-edge technologies.
+
+## User Preferences
+
+Preferred communication style: Simple, everyday language.
+
+## System Architecture
+
+### Technology Stack
+- **Frontend**: React 18 + TypeScript with modern responsive interface
+- **Backend**: Node.js + Express with robust REST APIs
+- **Database**: PostgreSQL with Drizzle ORM for maximum performance
+- **Editor**: Lexical Framework for professional rich text editing
+- **UI Components**: Shadcn/ui with Radix UI primitives and Tailwind CSS
+- **File System**: Local file handling with base64 encoding for asset management
+
+### Architecture Decision Rationale
+The system uses a monorepo structure with shared TypeScript schemas to maintain type safety across frontend and backend. The choice of Lexical over simpler editors provides extensibility for complex document structures needed in business workflows.
+
+## Key Components
+
+### 1. Lexical Rich Text Editor
+- **Purpose**: Professional document editing with advanced formatting capabilities
+- **Features**: 
+  - Custom nodes for images, tables, collapsible sections
+  - Bidirectional Markdown conversion
+  - Multiple export formats (Lexical JSON, Markdown)
+  - Plugin architecture for extensibility
+- **Implementation**: Custom nodes extend base Lexical functionality with business-specific requirements
+
+### 2. Monday.com Integration Engine
+- **Purpose**: Synchronize business workflows with external project management
+- **Features**:
+  - Flexible column mapping between Monday and CPx fields
+  - Scheduled job execution (daily/weekly/monthly)
+  - Automatic file processing with base64 conversion
+  - Retry logic with intelligent failure handling
+- **Architecture**: Job manager handles cron-based scheduling with persistent job state
+
+### 3. Asset Management System
+- **Purpose**: Centralized file and resource management
+- **Components**:
+  - Global Assets: System-wide accessible resources
+  - Document Artifacts: Document-specific attachments
+  - Automatic metadata extraction and processing
+- **Storage Strategy**: Local uploads with base64 encoding for database storage, supporting both blob URLs and HTTPS references
+
+### 4. GitHub Repository Integration
+- **Purpose**: Version control integration for documentation workflows
+- **Features**:
+  - Interactive repository tree navigation
+  - Structure synchronization between remote and local repositories
+  - Hierarchical folder and file mapping
+- **Implementation**: REST API endpoints for repository exploration with real-time sync status
+
+### 5. Plugin System
+- **Purpose**: Extensible functionality for specialized business needs
+- **Types**:
+  - Data sources (external system connections)
+  - AI agents (intelligent automation)
+  - Charts and visualizations
+  - Formatters and utilities
+- **Architecture**: Modal-based plugin loading with data exchange capabilities
+
+### 6. Template Engine
+- **Purpose**: Standardized document structures for business processes
+- **Types**:
+  - Struct templates: Define document organization
+  - Output templates: Control final document formatting
+- **Implementation**: JSON-based structure definitions with flexible mapping capabilities
+
+## Data Flow
+
+### Document Creation Flow
+1. User selects template type (struct/output)
+2. Template structure loads into Lexical editor
+3. Real-time content synchronization with backend
+4. Automatic asset processing and storage
+5. Version tracking through document editions
+
+### Monday.com Sync Flow
+1. Job manager triggers based on cron schedule
+2. API authentication with stored credentials
+3. Board data retrieval with column filtering
+4. Automatic asset download and base64 conversion
+5. Document creation/update with mapped fields
+6. Comprehensive logging for audit trails
+
+### Asset Processing Flow
+1. File upload through browser APIs
+2. MIME type validation and metadata extraction
+3. Base64 encoding for database storage
+4. Reference creation for editor integration
+5. Categorization through tag system
+
+## External Dependencies
+
+### Core Infrastructure
+- **@neondatabase/serverless**: PostgreSQL connection management
+- **drizzle-orm**: Type-safe database operations
+- **express**: REST API server framework
+- **passport**: Authentication middleware
+
+### Frontend Dependencies
+- **@lexical/react**: Rich text editor framework
+- **@radix-ui/***: Accessible UI component primitives
+- **tailwindcss**: Utility-first CSS framework
+- **@tanstack/react-query**: Server state management
+- **wouter**: Lightweight client-side routing
+
+### Business Integrations
+- **Monday.com API**: Project management synchronization
+- **GitHub API**: Repository integration
+- **OpenAI API**: AI-powered content assistance (planned)
+
+### File Processing
+- **multer**: File upload handling
+- **node-cron**: Job scheduling
+- **ws**: WebSocket support for Neon database
+
+## Deployment Strategy
+
+### Development Environment
+- **Runtime**: Node.js with TypeScript compilation
+- **Build Tool**: Vite for frontend bundling
+- **Database**: PostgreSQL via Neon serverless
+- **File Storage**: Local filesystem with uploads directory
+
+### Production Considerations
+- **Backend**: Express server with esbuild bundling
+- **Frontend**: Static build served through Express
+- **Database**: Persistent PostgreSQL with connection pooling
+- **Assets**: Local file storage with backup strategies
+- **Monitoring**: System logs with structured event tracking
+
+### Environment Configuration
+- Database URL configuration through environment variables
+- API keys stored securely for external service integration
+- Session management with both memory and PostgreSQL stores
+- CORS and security middleware for production deployment
+
+The system is designed for incremental deployment with the ability to add Postgres later while maintaining compatibility with the existing Drizzle ORM schema definitions.

@@ -1417,10 +1417,10 @@ export default function AdminPage() {
   };
   
   return (
-    <div className="container mx-auto py-6">
+    <div className="container mx-auto py-6 bg-background text-foreground">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">Administração</h1>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Administração</h1>
         </div>
         
         <Tabs defaultValue="usuarios" className="w-full">
