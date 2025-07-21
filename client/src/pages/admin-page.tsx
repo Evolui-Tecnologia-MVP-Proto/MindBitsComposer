@@ -2220,12 +2220,7 @@ export default function AdminPage() {
                   ) : (
                     <div className="max-h-[300px] overflow-y-auto border rounded-md border-white rounded-lg dark:bg-[#0F172A]">
                       <Table>
-                        <TableHeader 
-                          className="sticky top-0 bg-background z-10" 
-                          style={{
-                            backgroundColor: document.documentElement.classList.contains('dark') ? '#1F2937' : undefined
-                          }}
-                        >
+                        <TableHeader className="sticky top-0 bg-background z-10">
                           <TableRow>
                             <TableHead className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">COLUNA MONDAY</TableHead>
                             <TableHead className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">CAMPO CPX</TableHead>
@@ -2328,12 +2323,7 @@ export default function AdminPage() {
                 {/* Tabela de valores padrão */}
                 <div className="border rounded-md max-h-96 overflow-y-auto dark:bg-[#0F172A]">
                   <Table>
-                    <TableHeader 
-                      className="sticky top-0 bg-white z-10" 
-                      style={{
-                        backgroundColor: document.documentElement.classList.contains('dark') ? '#1F2937' : undefined
-                      }}
-                    >
+                    <TableHeader className="sticky top-0 bg-white z-10">
                       <TableRow>
                         <TableHead className="w-[200px] text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">CAMPO</TableHead>
                         <TableHead className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">VALOR PADRÃO</TableHead>

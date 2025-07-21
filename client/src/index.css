@@ -1007,3 +1007,12 @@ table:not(.lexical-editor-container table) th {
 [data-page="admin"] .bg-gray-50:not(.dark *) {
   background-color: rgb(249 250 251) !important;
 }
+
+/* Modal table headers - specific color #1F2937 for dark mode */
+.dark [data-radix-dialog-content] table thead tr th {
+  background-color: #1F2937 !important;
+}
+
+.dark [data-radix-dialog-content] table thead {
+  background-color: #1F2937 !important;
+}
