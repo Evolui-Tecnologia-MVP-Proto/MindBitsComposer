@@ -503,7 +503,12 @@ table:not(.lexical-editor-container table) th {
   }
 
   .sidebar-active {
-    @apply bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 font-medium;
+    @apply bg-blue-50 text-blue-700 dark:text-blue-300 font-medium;
+    background-color: rgb(239 246 255); /* bg-blue-50 */
+  }
+
+  .dark .sidebar-active {
+    background-color: #1F2937 !important;
   }
 
   .sidebar-item-container {
