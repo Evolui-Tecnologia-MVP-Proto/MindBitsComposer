@@ -59,13 +59,28 @@
   }
 }
 
-/* Force modal background color */
-[data-radix-dialog-content] {
+/* Force modal background color with maximum specificity */
+[data-radix-dialog-content],
+[data-radix-alert-dialog-content],
+.bg-background,
+[style*="background"] {
+  background-color: #0F1729 !important;
+  background: #0F1729 !important;
+}
+
+/* Override Tailwind background utilities for modals */
+[data-radix-dialog-content].bg-background {
   background-color: #0F1729 !important;
 }
 
-[data-radix-alert-dialog-content] {
+[data-radix-alert-dialog-content].bg-background {
   background-color: #0F1729 !important;
+}
+
+/* Custom modal class with highest priority */
+.modal-0f1729 {
+  background-color: #0F1729 !important;
+  background: #0F1729 !important;
 }
 
 /* Lexical Editor Styles */
