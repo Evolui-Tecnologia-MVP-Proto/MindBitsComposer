@@ -32,11 +32,11 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 221 48% 11%; /* #0F172A converted to HSL */
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 221 48% 11%; /* #0F172A converted to HSL */
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 221 48% 11%; /* #0F172A converted to HSL */
     --popover-foreground: 210 40% 98%;
     --primary: 217.2 91.2% 59.8%;
     --primary-foreground: 222.2 84% 4.9%;
