@@ -161,7 +161,7 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel className="text-white">Senha Atual</FormLabel>
                             <FormControl>
-                              <Input type="password" {...field} className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400" />
+                              <Input type="password" {...field} className="border-gray-600 text-white placeholder:text-gray-400" style={{ backgroundColor: "#0F1729" }} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -175,7 +175,7 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel className="text-white">Nova Senha</FormLabel>
                             <FormControl>
-                              <Input type="password" {...field} className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400" />
+                              <Input type="password" {...field} className="border-gray-600 text-white placeholder:text-gray-400" style={{ backgroundColor: "#0F1729" }} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -189,7 +189,7 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel className="text-white">Confirmar Nova Senha</FormLabel>
                             <FormControl>
-                              <Input type="password" {...field} className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400" />
+                              <Input type="password" {...field} className="border-gray-600 text-white placeholder:text-gray-400" style={{ backgroundColor: "#0F1729" }} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -224,7 +224,7 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel className="text-white">E-mail</FormLabel>
                             <FormControl>
-                              <Input type="email" {...field} className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400" />
+                              <Input type="email" {...field} className="border-gray-600 text-white placeholder:text-gray-400" style={{ backgroundColor: "#0F1729" }} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -238,7 +238,7 @@ export default function AuthPage() {
                           <FormItem>
                             <FormLabel className="text-white">Senha</FormLabel>
                             <FormControl>
-                              <Input type="password" {...field} className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400" />
+                              <Input type="password" {...field} className="border-gray-600 text-white placeholder:text-gray-400" style={{ backgroundColor: "#0F1729" }} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
