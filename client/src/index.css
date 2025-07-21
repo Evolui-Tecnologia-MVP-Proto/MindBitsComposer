@@ -751,3 +751,44 @@ table:not(.lexical-editor-container table) th {
     border: none;
   }
 }
+
+/* FORCE TABLE COLORS - AGGRESSIVE OVERRIDE FOR ADMIN PAGE */
+.dark table,
+.dark [data-table="true"],
+.dark .table {
+  background-color: #0F172A !important;
+}
+
+.dark thead,
+.dark .table-header {
+  background-color: #111827 !important;
+}
+
+.dark tbody,
+.dark .table-body {
+  background-color: #0F172A !important;
+}
+
+.dark tbody tr,
+.dark .table-row {
+  background-color: #0F172A !important;
+}
+
+.dark tbody td,
+.dark .table-cell {
+  background-color: #0F172A !important;
+}
+
+/* Override all Tailwind table-related classes */
+.dark .bg-white,
+table.dark .bg-white,
+tr.dark .bg-white,
+td.dark .bg-white {
+  background-color: #0F172A !important;
+}
+
+.dark .bg-gray-50,
+table.dark .bg-gray-50,
+thead.dark .bg-gray-50 {
+  background-color: #111827 !important;
+}

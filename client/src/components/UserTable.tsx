@@ -239,8 +239,8 @@ export default function UserTable() {
                   <p className="text-gray-500">Nenhum usuário encontrado.</p>
                 </div>
               ) : (
-                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white" style={{ backgroundColor: '#0F172A' }}>
-                  <thead className="bg-gray-50" style={{ backgroundColor: '#111827' }}>
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white" style={{ backgroundColor: '#0F172A !important' }}>
+                  <thead className="bg-gray-50" style={{ backgroundColor: '#111827 !important' }}>
                     <tr>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Nome
@@ -259,9 +259,9 @@ export default function UserTable() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700" style={{ backgroundColor: '#0F172A' }}>
+                  <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700" style={{ backgroundColor: '#0F172A !important' }}>
                     {filteredUsers?.map((user) => (
-                      <tr key={user.id}>
+                      <tr key={user.id} style={{ backgroundColor: '#0F172A !important' }}>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div className="flex-shrink-0 h-10 w-10">
