@@ -138,17 +138,17 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex">
       {/* Lado esquerdo - Formulário de login */}
-      <div className="w-1/2 flex items-center justify-center" style={{ backgroundColor: "#1F2937" }}>
+      <div className="w-1/2 flex items-center justify-center bg-gray-50 dark:bg-[#1F2937]">
         <div className="w-full max-w-md mx-4">
           {/* Logo removido da tela de login conforme solicitado */}
-          <Card className="shadow-lg" style={{ backgroundColor: "#0F1729", border: "none" }}>
+          <Card className="shadow-lg bg-white dark:bg-[#0F1729] border-gray-200 dark:border-none">
             <CardContent className="pt-6">
               {isFirstLogin ? (
                 <div className="fade-in">
-                  <h2 className="text-xl font-semibold text-center text-white mb-2">
+                  <h2 className="text-xl font-semibold text-center text-gray-800 dark:text-white mb-2">
                     Alterar Senha
                   </h2>
-                  <p className="text-center text-gray-300 mb-6">
+                  <p className="text-center text-gray-600 dark:text-gray-300 mb-6">
                     Você precisa alterar sua senha no primeiro acesso.
                   </p>
 
@@ -159,9 +159,9 @@ export default function AuthPage() {
                         name="currentPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Senha Atual</FormLabel>
+                            <FormLabel className="text-gray-800 dark:text-white">Senha Atual</FormLabel>
                             <FormControl>
-                              <Input type="password" {...field} className="border-gray-600 text-white placeholder:text-gray-400" style={{ backgroundColor: "#0F1729" }} />
+                              <Input type="password" {...field} className="bg-white dark:bg-[#0F1729] border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -173,9 +173,9 @@ export default function AuthPage() {
                         name="newPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Nova Senha</FormLabel>
+                            <FormLabel className="text-gray-800 dark:text-white">Nova Senha</FormLabel>
                             <FormControl>
-                              <Input type="password" {...field} className="border-gray-600 text-white placeholder:text-gray-400" style={{ backgroundColor: "#0F1729" }} />
+                              <Input type="password" {...field} className="bg-white dark:bg-[#0F1729] border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -187,9 +187,9 @@ export default function AuthPage() {
                         name="confirmPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Confirmar Nova Senha</FormLabel>
+                            <FormLabel className="text-gray-800 dark:text-white">Confirmar Nova Senha</FormLabel>
                             <FormControl>
-                              <Input type="password" {...field} className="border-gray-600 text-white placeholder:text-gray-400" style={{ backgroundColor: "#0F1729" }} />
+                              <Input type="password" {...field} className="bg-white dark:bg-[#0F1729] border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -208,10 +208,10 @@ export default function AuthPage() {
                 </div>
               ) : (
                 <div className="fade-in">
-                  <h2 className="text-xl font-semibold text-left text-white mb-2">
+                  <h2 className="text-xl font-semibold text-left text-gray-800 dark:text-white mb-2">
                     Entrar
                   </h2>
-                  <p className="text-left text-gray-300 mb-6">
+                  <p className="text-left text-gray-600 dark:text-gray-300 mb-6">
                     Entre com suas credenciais para acessar a plataforma
                   </p>
 
@@ -222,9 +222,9 @@ export default function AuthPage() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">E-mail</FormLabel>
+                            <FormLabel className="text-gray-800 dark:text-white">E-mail</FormLabel>
                             <FormControl>
-                              <Input type="email" {...field} className="border-gray-600 text-white placeholder:text-gray-400" style={{ backgroundColor: "#0F1729" }} />
+                              <Input type="email" {...field} className="bg-white dark:bg-[#0F1729] border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -236,9 +236,9 @@ export default function AuthPage() {
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel className="text-white">Senha</FormLabel>
+                            <FormLabel className="text-gray-800 dark:text-white">Senha</FormLabel>
                             <FormControl>
-                              <Input type="password" {...field} className="border-gray-600 text-white placeholder:text-gray-400" style={{ backgroundColor: "#0F1729" }} />
+                              <Input type="password" {...field} className="bg-white dark:bg-[#0F1729] border-gray-300 dark:border-gray-600 text-gray-800 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -247,8 +247,7 @@ export default function AuthPage() {
 
                       <Button 
                         type="submit" 
-                        className="w-full text-white"
-                        style={{ backgroundColor: "#1E3A8A" }}
+                        className="w-full bg-blue-600 dark:bg-[#1E3A8A] text-white hover:bg-blue-700 dark:hover:bg-blue-700"
                         disabled={loginMutation.isPending}
                       >
                         {loginMutation.isPending ? "Entrando..." : "Entrar"}
@@ -263,7 +262,7 @@ export default function AuthPage() {
       </div>
       
       {/* Lado direito - Hero/Imagem */}
-      <div className="w-1/2 flex flex-col" style={{ backgroundColor: "#0E4F82" }}>
+      <div className="w-1/2 flex flex-col bg-blue-600 dark:bg-[#0E4F82]">
         {/* Imagem na parte superior */}
         <div className="mt-10 ml-10">
           <img 
@@ -284,46 +283,46 @@ export default function AuthPage() {
                 className="h-16 w-16 object-cover"
               />
             </div>
-            <h1 className="text-4xl font-bold" style={{ color: "#ACC3E3" }}>
+            <h1 className="text-4xl font-bold text-white dark:text-[#ACC3E3]">
               EVO-MindBits CTx
             </h1>
           </div>
           
           {/* Textos descritivos com mesma margem da imagem principal */}
-          <div className="mt-6" style={{ color: "#ACC3E3" }}>
+          <div className="mt-6 text-white dark:text-[#ACC3E3]">
             <p className="text-xl mb-8">
               Sistema de triagem inteligente de mensagens de chatbots com IA para análise de eficácia e geração de auto treinamento da base de conhecimento.
             </p>
             <ul className="space-y-4">
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600" style={{ backgroundColor: "#ACC3E3" }}>
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-white dark:bg-[#ACC3E3]">
                   1
                 </div>
-                <span style={{ color: "#ACC3E3" }}>Integração com Chatbots Omnichannel</span>
+                <span className="text-white dark:text-[#ACC3E3]">Integração com Chatbots Omnichannel</span>
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600" style={{ backgroundColor: "#ACC3E3" }}>
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-white dark:bg-[#ACC3E3]">
                   2
                 </div>
-                <span style={{ color: "#ACC3E3" }}>Workflows de análise e triagem para detalhamento funcional</span>
+                <span className="text-white dark:text-[#ACC3E3]">Workflows de análise e triagem para detalhamento funcional</span>
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600" style={{ backgroundColor: "#ACC3E3" }}>
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-white dark:bg-[#ACC3E3]">
                   3
                 </div>
-                <span style={{ color: "#ACC3E3" }}>Integração com o MindBits CPx para edição avançada de base de conhecimento</span>
+                <span className="text-white dark:text-[#ACC3E3]">Integração com o MindBits CPx para edição avançada de base de conhecimento</span>
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600" style={{ backgroundColor: "#ACC3E3" }}>
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-white dark:bg-[#ACC3E3]">
                   4
                 </div>
-                <span style={{ color: "#ACC3E3" }}>Designação de equipe especialista com base em "Skills"</span>
+                <span className="text-white dark:text-[#ACC3E3]">Designação de equipe especialista com base em "Skills"</span>
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600" style={{ backgroundColor: "#ACC3E3" }}>
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-white dark:bg-[#ACC3E3]">
                   5
                 </div>
-                <span style={{ color: "#ACC3E3" }}>Integração com agentes de IA para análise de triagem automática</span>
+                <span className="text-white dark:text-[#ACC3E3]">Integração com agentes de IA para análise de triagem automática</span>
               </li>
             </ul>
           </div>
