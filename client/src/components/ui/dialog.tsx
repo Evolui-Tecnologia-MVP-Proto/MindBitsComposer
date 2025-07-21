@@ -42,7 +42,10 @@ const DialogContent = React.forwardRef<
         offset && "left-[65%] top-[35%]",
         className
       )}
-      style={{ backgroundColor: "#0F1729" }}
+      style={{ 
+        backgroundColor: "#0F1729",
+        background: "#0F1729"
+      }}
       {...props}
     >
       {children}
