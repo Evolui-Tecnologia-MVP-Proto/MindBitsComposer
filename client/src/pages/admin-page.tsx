@@ -1934,7 +1934,7 @@ export default function AdminPage() {
                           </FormControl>
                           <Button 
                             type="button"
-                            className={`${buttonStyle} hover:opacity-90 text-white disabled:opacity-50 disabled:text-gray-100 disabled:cursor-not-allowed`}
+                            className={`${buttonStyle} hover:opacity-90 text-white disabled:opacity-50 disabled:text-gray-100 disabled:cursor-not-allowed dark:bg-green-600 dark:hover:bg-green-700`}
                             disabled={isConnectDisabled}
                             onClick={async () => {
                               if (!field.value) {
