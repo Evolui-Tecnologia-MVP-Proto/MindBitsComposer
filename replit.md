@@ -61,6 +61,14 @@ Preferred communication style: Simple, everyday language.
   - Standardized visual pattern across all modal tables
   - Applied dark mode colors to select triggers in Assets Map and Agendamento tabs
   - Enhanced form field icons with proper contrast (Clock icon for time, Calendar for frequency)
+✓ Fixed time picker styling in dark mode:
+  - Applied darker dropdown colors (#000000, #1A1A1A for hover)
+  - White internal icon using filter: brightness(0) invert(1)
+  - Consistent dark theme across all time picker states
+✓ Corrected "Editar Mapeamento" modal select triggers from incorrect #09090B to standard #0F172A:
+  - Fixed "Coluna Monday" and "Campo na aplicação" select colors
+  - Applied maximum CSS specificity to override problematic inherited styles
+  - Ensured all form select elements in modal follow dark mode standards
 
 ## System Architecture
 

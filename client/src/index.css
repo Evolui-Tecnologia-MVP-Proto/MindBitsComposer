@@ -1258,6 +1258,69 @@ table:not(.lexical-editor-container table) th {
   color: #FFFFFF !important;
 }
 
+/* Specific selectors for column mapping modal select elements */
+.dark [data-radix-dialog-content] select[data-field="mondayColumnId"],
+.dark [data-radix-dialog-content] select[data-field="cpxField"],
+.dark [data-radix-dialog-content] form select {
+  background-color: #0F172A !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+.dark [data-radix-dialog-content] select[data-field="mondayColumnId"] option,
+.dark [data-radix-dialog-content] select[data-field="cpxField"] option,
+.dark [data-radix-dialog-content] form select option {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
+
+/* Force override for any incorrectly styled selects in modal */
+.dark [data-radix-dialog-content] select {
+  background-color: #0F172A !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+.dark [data-radix-dialog-content] select option {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
+
+/* Extra specificity for form selects */
+.dark [data-radix-dialog-content] form[id] select,
+.dark [data-radix-dialog-content] .space-y-4 select {
+  background-color: #0F172A !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+/* Maximum specificity override for problematic selects with #09090B color */
+html.dark [data-radix-dialog-content] select:not([data-placeholder]) {
+  background-color: #0F172A !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+html.dark [data-radix-dialog-content] form select:not([data-placeholder]) {
+  background-color: #0F172A !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+/* Override any inherited styles causing #09090B background */
+html.dark [data-radix-dialog-content] div[data-radix-form-item] select {
+  background-color: #0F172A !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+/* Force correct styling for all form control selects in modal */
+html.dark [data-radix-dialog-content] [data-radix-form-control] select {
+  background-color: #0F172A !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
 /* More specific targeting for time picker dropdown */
 .dark input[type="time"]::-webkit-list-menu-button:hover {
   background-color: #1A1A1A !important;
