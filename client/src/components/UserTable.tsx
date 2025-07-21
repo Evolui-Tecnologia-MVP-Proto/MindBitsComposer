@@ -295,10 +295,10 @@ export default function UserTable() {
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
+                            <DropdownMenuContent align="end" className="bg-white dark:bg-[#0F172A] border-gray-200 dark:border-gray-700">
                               <DropdownMenuItem
                                 onClick={() => console.log("Editar", user.id)}
-                                className="cursor-pointer"
+                                className="cursor-pointer text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
                               >
                                 <Edit className="mr-2 h-4 w-4" />
                                 Editar
@@ -306,7 +306,7 @@ export default function UserTable() {
                               
                               <DropdownMenuItem
                                 onClick={() => toggleStatus(user)}
-                                className="cursor-pointer"
+                                className="cursor-pointer text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
                               >
                                 {user.status === UserStatus.ACTIVE ? (
                                   <>
@@ -323,7 +323,7 @@ export default function UserTable() {
                               
                               <DropdownMenuItem
                                 onClick={() => setUserToResetPassword(user)}
-                                className="cursor-pointer"
+                                className="cursor-pointer text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
                               >
                                 <KeyRound className="mr-2 h-4 w-4" />
                                 Resetar Senha
@@ -333,7 +333,7 @@ export default function UserTable() {
                               
                               <DropdownMenuItem
                                 onClick={() => setUserToDelete(user)}
-                                className="cursor-pointer text-red-600"
+                                className="cursor-pointer text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800"
                               >
                                 <Trash2 className="mr-2 h-4 w-4" />
                                 Excluir
