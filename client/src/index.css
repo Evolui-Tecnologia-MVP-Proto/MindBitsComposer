@@ -79,6 +79,27 @@ div[data-radix-alert-dialog-content] {
   background: #0F1729 !important;
 }
 
+/* MODAL SELECT COMPONENTS - DARK MODE ONLY */
+.dark [data-radix-dialog-content] [data-radix-select-trigger],
+.dark [data-radix-alert-dialog-content] [data-radix-select-trigger] {
+  background-color: #0F172A !important;
+  border-color: #374151 !important;
+}
+
+.dark [data-radix-select-content] {
+  background-color: #0F172A !important;
+  border-color: #374151 !important;
+}
+
+.dark [data-radix-select-item] {
+  background-color: #0F172A !important;
+}
+
+.dark [data-radix-select-item]:hover,
+.dark [data-radix-select-item][data-highlighted] {
+  background-color: #1F2937 !important;
+}
+
 /* Lexical Editor Styles */
 .editor-input {
   min-height: 100%;
