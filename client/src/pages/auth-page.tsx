@@ -283,46 +283,46 @@ export default function AuthPage() {
                 className="h-16 w-16 object-cover"
               />
             </div>
-            <h1 className="text-4xl font-bold text-white dark:text-[#ACC3E3]">
+            <h1 className="text-4xl font-bold text-[#ACC3DD] dark:text-[#ACC3E3]">
               EVO-MindBits CTx
             </h1>
           </div>
           
           {/* Textos descritivos com mesma margem da imagem principal */}
-          <div className="mt-6 text-white dark:text-[#ACC3E3]">
+          <div className="mt-6 text-[#ACC3DD] dark:text-[#ACC3E3]">
             <p className="text-xl mb-8">
               Sistema de triagem inteligente de mensagens de chatbots com IA para análise de eficácia e geração de auto treinamento da base de conhecimento.
             </p>
             <ul className="space-y-4">
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-white dark:bg-[#ACC3E3]">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-[#ACC3DD] dark:bg-[#ACC3E3]">
                   1
                 </div>
-                <span className="text-white dark:text-[#ACC3E3]">Integração com Chatbots Omnichannel</span>
+                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Integração com Chatbots Omnichannel</span>
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-white dark:bg-[#ACC3E3]">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-[#ACC3DD] dark:bg-[#ACC3E3]">
                   2
                 </div>
-                <span className="text-white dark:text-[#ACC3E3]">Workflows de análise e triagem para detalhamento funcional</span>
+                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Workflows de análise e triagem para detalhamento funcional</span>
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-white dark:bg-[#ACC3E3]">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-[#ACC3DD] dark:bg-[#ACC3E3]">
                   3
                 </div>
-                <span className="text-white dark:text-[#ACC3E3]">Integração com o MindBits CPx para edição avançada de base de conhecimento</span>
+                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Integração com o MindBits CPx para edição avançada de base de conhecimento</span>
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-white dark:bg-[#ACC3E3]">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-[#ACC3DD] dark:bg-[#ACC3E3]">
                   4
                 </div>
-                <span className="text-white dark:text-[#ACC3E3]">Designação de equipe especialista com base em "Skills"</span>
+                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Designação de equipe especialista com base em "Skills"</span>
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-white dark:bg-[#ACC3E3]">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 text-blue-600 bg-[#ACC3DD] dark:bg-[#ACC3E3]">
                   5
                 </div>
-                <span className="text-white dark:text-[#ACC3E3]">Integração com agentes de IA para análise de triagem automática</span>
+                <span className="text-[#ACC3DD] dark:text-[#ACC3E3]">Integração com agentes de IA para análise de triagem automática</span>
               </li>
             </ul>
           </div>
