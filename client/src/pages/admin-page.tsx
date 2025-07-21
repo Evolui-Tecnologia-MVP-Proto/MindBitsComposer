@@ -1879,13 +1879,13 @@ export default function AdminPage() {
           <Form {...mappingForm}>
             <form id="mappingForm" onSubmit={mappingForm.handleSubmit(onSubmitMapping)} className="space-y-4">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-6">
-                  <TabsTrigger value="quadro">Quadro</TabsTrigger>
-                  <TabsTrigger value="colunas" disabled={!selectedMapping}>Colunas</TabsTrigger>
-                  <TabsTrigger value="defaults" disabled={!selectedMapping}>Defaults</TabsTrigger>
-                  <TabsTrigger value="filtros" disabled={!selectedMapping}>Filtros</TabsTrigger>
-                  <TabsTrigger value="assets-map" disabled={!selectedMapping}>Assets Map</TabsTrigger>
-                  <TabsTrigger value="agendamento" disabled={!selectedMapping}>Agendamento</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-6 bg-gray-100 dark:bg-[#1E293B]">
+                  <TabsTrigger value="quadro" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Quadro</TabsTrigger>
+                  <TabsTrigger value="colunas" disabled={!selectedMapping} className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Colunas</TabsTrigger>
+                  <TabsTrigger value="defaults" disabled={!selectedMapping} className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Defaults</TabsTrigger>
+                  <TabsTrigger value="filtros" disabled={!selectedMapping} className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Filtros</TabsTrigger>
+                  <TabsTrigger value="assets-map" disabled={!selectedMapping} className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Assets Map</TabsTrigger>
+                  <TabsTrigger value="agendamento" disabled={!selectedMapping} className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Agendamento</TabsTrigger>
                 </TabsList>
                 
                 {/* Aba de informações do quadro */}
