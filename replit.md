@@ -44,6 +44,7 @@ Preferred communication style: Simple, everyday language.
 ✓ Ensured CSS overrides apply only to dark mode, preserving light theme original colors
 ✓ Applied color #1F2937 to main container div (outermost div in admin page)
 ✓ Applied color #F9FAFB to inner content div (space-y-6) in light mode, #1F2937 in dark mode
+✓ Increased text contrast in user table cells for dark mode (gray-100, gray-300)
 ✓ Preserved original light theme colors unchanged across entire application
 
 ## System Architecture
