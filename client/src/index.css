@@ -1070,3 +1070,45 @@ table:not(.lexical-editor-container table) th {
   background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
+
+/* Time input dropdown styling for dark mode */
+.dark input[type="time"]::-webkit-calendar-picker-indicator {
+  background-color: #0F172A !important;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #E5E7EB !important;
+  filter: invert(1);
+}
+
+.dark input[type="time"]::-webkit-datetime-edit-fields-wrapper {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
+
+.dark input[type="time"]::-webkit-list-menu-button {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
+
+/* Time picker dropdown panel for dark mode */
+.dark input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  background-color: #1E293B !important;
+}
+
+/* Style for time picker popup/dropdown */
+.dark input[type="time"]::-webkit-list-menu {
+  background-color: #0F172A !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 6px !important;
+  color: #E5E7EB !important;
+}
+
+.dark input[type="time"]::-webkit-list-menu-button-pressed {
+  background-color: #1E293B !important;
+}
+
+/* Force dark mode for time picker dropdown options */
+.dark input[type="time"] option {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
