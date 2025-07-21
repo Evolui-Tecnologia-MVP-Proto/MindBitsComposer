@@ -1106,37 +1106,55 @@ table:not(.lexical-editor-container table) th {
 
 /* Webkit time picker dropdown styling */
 .dark input[type="time"]::-webkit-list-menu {
-  background-color: #0F172A !important;
+  background-color: #000000 !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 6px !important;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5) !important;
 }
 
 .dark input[type="time"]::-webkit-list-menu-button {
-  background-color: #0F172A !important;
+  background-color: #000000 !important;
   color: #E5E7EB !important;
   border: none !important;
 }
 
 .dark input[type="time"]::-webkit-list-menu-button:hover {
-  background-color: #1E293B !important;
+  background-color: #1A1A1A !important;
+}
+
+.dark input[type="time"]::-webkit-list-menu-button:active {
+  background-color: #0A0A0A !important;
 }
 
 /* Time picker option styling */
 .dark input[type="time"] option {
-  background-color: #0F172A !important;
+  background-color: #000000 !important;
   color: #E5E7EB !important;
+}
+
+.dark input[type="time"] option:hover {
+  background-color: #1A1A1A !important;
+  color: #FFFFFF !important;
+}
+
+.dark input[type="time"] option:checked {
+  background-color: #0A0A0A !important;
+  color: #FFFFFF !important;
 }
 
 /* More specific targeting for time picker dropdown */
 .dark input[type="time"]::-webkit-list-menu-button:hover {
-  background-color: #1E293B !important;
+  background-color: #1A1A1A !important;
 }
 
 /* Force dark theme on the time picker popup */
 .dark input[type="time"]::-webkit-list-menu-button:focus {
-  background-color: #0F172A !important;
+  background-color: #000000 !important;
   color: #E5E7EB !important;
+}
+
+.dark input[type="time"]::-webkit-list-menu-button:active {
+  background-color: #0A0A0A !important;
 }
 
 /* Additional webkit time picker styling */
@@ -1158,17 +1176,27 @@ table:not(.lexical-editor-container table) th {
 
 /* Force dark mode for time picker dropdown elements */
 .dark input[type="time"]::-webkit-time-wheel {
-  background-color: #0F172A !important;
+  background-color: #000000 !important;
   color: #E5E7EB !important;
 }
 
 .dark input[type="time"]::-webkit-time-wheel-option {
-  background-color: #0F172A !important;
+  background-color: #000000 !important;
   color: #E5E7EB !important;
 }
 
 .dark input[type="time"]::-webkit-time-wheel-option:hover {
-  background-color: #1E293B !important;
+  background-color: #1A1A1A !important;
+}
+
+.dark input[type="time"]::-webkit-time-wheel-option:checked {
+  background-color: #0A0A0A !important;
+  color: #FFFFFF !important;
+}
+
+.dark input[type="time"]::-webkit-time-wheel-option:focus {
+  background-color: #1A1A1A !important;
+  outline: none !important;
 }
 
 /* Alternative targeting for Chrome time picker */
