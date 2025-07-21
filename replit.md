@@ -32,18 +32,19 @@ Preferred communication style: Simple, everyday language.
 ✓ Applied color #1F2937 to administration tabs background in dark mode
 ✓ Applied color #111827 to main user table container background in dark mode
 ✓ Applied color #111827 to user search/new user container in dark mode
-✓ Applied color #0F172A to main administration page background and all table containers/bodies in dark mode
+✓ Applied color #1F2937 to main administration page background and all table containers/bodies in dark mode
 ✓ Applied color #1E293B to container cards, tabs, and search header in dark mode
 ✓ Applied color #111827 to all table headers background in dark mode
 ✓ Applied color #1E40AF to active/selected tabs in dark mode
 ✓ Implemented CSS targeting specific to admin page only using [data-page="admin"] selector
 ✓ Removed aggressive CSS rules that affected header, footer, and sidebar
 ✓ Applied color #1F2937 to main content container div in administration page (dark mode only)
-✓ Applied color #0F172A to user search and new user container section
+✓ Applied color #1F2937 to user search and new user container section
 ✓ Applied color #1F2937 to administration page header with title "Administração"
 ✓ Ensured CSS overrides apply only to dark mode, preserving light theme original colors
 ✓ Applied color #1F2937 to main container div (outermost div in admin page)
 ✓ Applied color #1F2937 to inner content div (space-y-6) in dark mode only, white in light mode
+✓ Converted all #0F172A colors to #1F2937 in CSS rules (dark mode only - light mode preserved)
 ✓ Preserved original light theme colors unchanged across entire application
 
 ## System Architecture
