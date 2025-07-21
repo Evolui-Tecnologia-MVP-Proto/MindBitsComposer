@@ -2218,7 +2218,7 @@ export default function AdminPage() {
                       </p>
                     </div>
                   ) : (
-                    <div className="max-h-[300px] overflow-y-auto border rounded-md">
+                    <div className="max-h-[300px] overflow-y-auto border rounded-md border-white rounded-lg">
                       <Table>
                         <TableHeader className="sticky top-0 bg-background z-10">
                           <TableRow>
