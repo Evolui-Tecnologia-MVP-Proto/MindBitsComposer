@@ -2076,7 +2076,7 @@ export default function AdminPage() {
                               <div className="space-y-4">
                                 <div className="relative">
                                   <select
-                                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                    className="flex h-10 w-full rounded-md border border-input bg-white dark:bg-[#0F172A] px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 dark:text-gray-200 dark:border-gray-600"
                                     {...field}
                                   >
                                     <option value="">Selecione uma coluna</option>
@@ -2117,7 +2117,7 @@ export default function AdminPage() {
                             <FormLabel>Campo CPX</FormLabel>
                             <FormControl>
                               <select
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-mono"
+                                className="flex h-10 w-full rounded-md border border-input bg-white dark:bg-[#0F172A] px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-mono dark:text-gray-200 dark:border-gray-600"
                                 {...field}
                               >
                                 <option value="">Selecione o campo</option>

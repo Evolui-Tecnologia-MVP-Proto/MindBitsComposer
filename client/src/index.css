@@ -1321,6 +1321,50 @@ html.dark [data-radix-dialog-content] [data-radix-form-control] select {
   color: #E5E7EB !important;
 }
 
+/* Maximum specificity override for select elements in edit mapping modal */
+html.dark body div[data-radix-dialog-content] form select,
+html.dark body div[data-radix-dialog-content] div[data-radix-form-item] select,
+html.dark body div[data-radix-dialog-content] select.flex.h-10 {
+  background-color: #0F172A !important;
+  background: #0F172A !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+/* Force override any inherited dark colors */
+html.dark div[data-radix-dialog-content] select {
+  background-color: #0F172A !important;
+  background: #0F172A !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+/* Target the specific select elements that are still wrong */
+html.dark div[data-radix-dialog-content] form[id="columnForm"] select,
+html.dark div[data-radix-dialog-content] form[id="mappingForm"] select {
+  background-color: #0F172A !important;
+  background: #0F172A !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+/* Nuclear option - override everything with maximum specificity */
+html.dark body div[role="dialog"] div[data-radix-dialog-content] form div[data-radix-form-item] div[data-radix-form-control] select,
+html.dark body div[role="dialog"] div[data-radix-dialog-content] select {
+  background-color: #0F172A !important;
+  background: #0F172A !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+/* One more specific override for the problematic selects */
+html.dark [data-radix-portal] [data-radix-dialog-content] select:not([data-radix-select-trigger]) {
+  background-color: #0F172A !important;
+  background: #0F172A !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
 /* More specific targeting for time picker dropdown */
 .dark input[type="time"]::-webkit-list-menu-button:hover {
   background-color: #1A1A1A !important;
