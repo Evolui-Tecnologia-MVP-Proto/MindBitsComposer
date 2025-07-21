@@ -64,7 +64,7 @@ export default function AvatarMenu() {
       </button>
 
       {isOpen && (
-        <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 dark:divide-gray-700 focus:outline-none z-50">
+        <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-[#0F172A] ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 dark:divide-gray-700 focus:outline-none z-50">
           {/* Seção do Tema */}
           <div className="py-2" role="none">
             <div className="flex items-center justify-between px-4 py-2">
@@ -74,7 +74,7 @@ export default function AvatarMenu() {
                 ) : (
                   <Sun className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                 )}
-                <span className="text-sm text-gray-700 dark:text-gray-300">
+                <span className="text-sm text-gray-700 dark:text-gray-100">
                   {isDark ? "Modo Escuro" : "Modo Claro"}
                 </span>
               </div>
@@ -90,13 +90,13 @@ export default function AvatarMenu() {
           <div className="py-1" role="none">
             <button
               onClick={handlePreferences}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               Preferências
             </button>
             <button
               onClick={handleLogout}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
               Sair
             </button>

@@ -47,6 +47,7 @@ Preferred communication style: Simple, everyday language.
 ✓ Increased text contrast in user table cells for dark mode (gray-100, gray-300)
 ✓ Applied color #0F172A to dropdown menus background in dark mode
 ✓ Enhanced dropdown menu items contrast and hover states for dark mode
+✓ Applied color #0F172A to user avatar dropdown menu in header (dark mode only)
 ✓ Preserved original light theme colors unchanged across entire application
 
 ## System Architecture
