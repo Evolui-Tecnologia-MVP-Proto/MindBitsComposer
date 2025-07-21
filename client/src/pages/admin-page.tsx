@@ -2631,8 +2631,7 @@ return item.column_values.some(col =>
                   </div>
                   
                   <div className="space-y-3">
-                    <label className="text-sm font-medium dark:text-gray-100 flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-gray-600 dark:text-black" />
+                    <label className="text-sm font-medium dark:text-gray-100">
                       Horário de Início
                     </label>
                     <input 

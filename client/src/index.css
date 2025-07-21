@@ -1073,7 +1073,7 @@ table:not(.lexical-editor-container table) th {
 
 /* Time input dropdown styling for dark mode */
 .dark input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(1) brightness(0) !important;
+  filter: invert(1) !important;
   cursor: pointer;
   opacity: 0.8 !important;
 }
@@ -1151,7 +1151,7 @@ table:not(.lexical-editor-container table) th {
 }
 
 .dark [data-radix-dialog-content] input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(1) brightness(0) !important;
+  filter: invert(1) !important;
   cursor: pointer;
 }
 
@@ -1187,5 +1187,5 @@ html.dark input[type="time"] {
 }
 
 html.dark input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(1) brightness(0) !important;
+  filter: invert(1) !important;
 }
