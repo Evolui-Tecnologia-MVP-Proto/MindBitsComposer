@@ -284,8 +284,8 @@ export default function ConfiguracoesPage() {
   };
 
   return (
-    <div className="container mx-auto py-6">
-      <h1 className="text-2xl font-bold mb-6">Configurações do Sistema</h1>
+    <div className="container mx-auto py-6 bg-background text-foreground">
+      <h1 className="text-2xl font-bold mb-6 text-foreground">Configurações do Sistema</h1>
       
       <Tabs defaultValue="integracoes" className="w-full">
         <TabsList className="mb-4">
