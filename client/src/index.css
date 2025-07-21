@@ -755,7 +755,7 @@ table:not(.lexical-editor-container table) th {
 /* FORCE TABLE COLORS - SPECIFIC TO ADMIN PAGE ONLY */
 .dark [data-page="admin"] table,
 .dark [data-page="admin"] .table {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-page="admin"] thead,
@@ -765,26 +765,26 @@ table:not(.lexical-editor-container table) th {
 
 .dark [data-page="admin"] tbody,
 .dark [data-page="admin"] .table-body {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-page="admin"] tbody tr,
 .dark [data-page="admin"] .table-row {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-page="admin"] tbody td,
 .dark [data-page="admin"] .table-cell {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Override Tailwind classes only in admin page - DARK MODE ONLY */
 .dark [data-page="admin"] .bg-white {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-page="admin"] .bg-gray-50 {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Ensure light mode preserves original colors */
