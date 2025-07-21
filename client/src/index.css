@@ -59,9 +59,9 @@
   }
 }
 
-/* Ensure text colors work properly in dark mode */
-.dark .text-white {
-  color: white !important;
+/* Ensure header text color in dark mode */
+.dark header h1 {
+  color: #6B7280 !important;
 }
 
 /* Force modal background color ONLY for modals */
