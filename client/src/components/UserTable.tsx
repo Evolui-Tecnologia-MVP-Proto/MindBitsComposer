@@ -198,7 +198,7 @@ export default function UserTable() {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 p-4 rounded-lg bg-gray-50 dark:bg-[#111827]">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 p-4 rounded-lg bg-gray-50 dark:bg-[#1F2937]">
         <div className="w-full sm:w-1/3">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -224,7 +224,7 @@ export default function UserTable() {
 
       <div className="mt-2">
         <div className="overflow-hidden">
-          <div className="border rounded-lg bg-white dark:bg-[#111827]">
+          <div className="border rounded-lg bg-white dark:bg-[#1F2937]">
             <div className="overflow-x-auto">
               {isLoading ? (
                 <div className="bg-white px-4 py-5 text-center">
@@ -259,7 +259,7 @@ export default function UserTable() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white dark:bg-[#111827] divide-y divide-gray-200 dark:divide-gray-700">
+                  <tbody className="bg-white dark:bg-[#1F2937] divide-y divide-gray-200 dark:divide-gray-700">
                     {filteredUsers?.map((user) => (
                       <tr key={user.id}>
                         <td className="px-6 py-4 whitespace-nowrap">
