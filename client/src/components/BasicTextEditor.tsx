@@ -1226,7 +1226,7 @@ export default function BasicTextEditor() {
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => removeTableRow(index, tableIndex, rowIndex)}
-                                        className="h-6 w-6 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                        className="h-6 w-6 p-0 text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20"
                                         disabled={table.lines.length <= 1}
                                       >
                                         <Trash className="w-3 h-3" />

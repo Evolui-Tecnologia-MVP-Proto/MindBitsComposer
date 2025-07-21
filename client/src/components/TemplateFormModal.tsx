@@ -495,7 +495,7 @@ export default function TemplateFormModal({
                                         open={openAccordions[`${groupKey}-${sectionKey}`] ?? false}
                                         onOpenChange={() => toggleAccordion(`${groupKey}-${sectionKey}`)}
                                       >
-                                        <CollapsibleTrigger className="flex items-center justify-between w-full p-2 text-left bg-blue-50 hover:bg-blue-100 rounded border transition-colors">
+                                        <CollapsibleTrigger className="flex items-center justify-between w-full p-2 text-left bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 rounded border border-blue-200 dark:border-blue-700 transition-colors">
                                           <div className="flex items-center gap-2">
                                             {openAccordions[`${groupKey}-${sectionKey}`] ?? false ? (
                                               <ChevronDown className="h-3 w-3 text-blue-500" />
@@ -533,7 +533,7 @@ export default function TemplateFormModal({
                                                         <SelectValue placeholder="Selecione uma coluna" />
                                                       </SelectTrigger>
                                                       <SelectContent>
-                                                        {documentosColumns.map((column: any) => (
+                                                        {Array.isArray(documentosColumns) && documentosColumns.map((column: any) => (
                                                           <SelectItem key={column.name} value={column.name}>
                                                             <div className="flex flex-col">
                                                               <span className="font-mono text-xs">{column.name}</span>
@@ -578,7 +578,7 @@ export default function TemplateFormModal({
                                                 <SelectValue placeholder="Selecione uma coluna" />
                                               </SelectTrigger>
                                               <SelectContent>
-                                                {documentosColumns.map((column: any) => (
+                                                {Array.isArray(documentosColumns) && documentosColumns.map((column: any) => (
                                                   <SelectItem key={column.name} value={column.name}>
                                                     <div className="flex flex-col">
                                                       <span className="font-mono text-sm">{column.name}</span>

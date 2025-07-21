@@ -136,19 +136,19 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-background text-foreground">
       {/* Lado esquerdo - Formulário de login */}
-      <div className="w-1/2 flex items-center justify-center bg-gray-50">
+      <div className="w-1/2 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="w-full max-w-md mx-4">
           {/* Logo removido da tela de login conforme solicitado */}
-          <Card className="shadow-lg">
+          <Card className="shadow-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
             <CardContent className="pt-6">
               {isFirstLogin ? (
                 <div className="fade-in">
-                  <h2 className="text-xl font-semibold text-center text-gray-800 mb-2">
+                  <h2 className="text-xl font-semibold text-center text-gray-900 dark:text-gray-100 mb-2">
                     Alterar Senha
                   </h2>
-                  <p className="text-center text-gray-600 mb-6">
+                  <p className="text-center text-gray-600 dark:text-gray-400 mb-6">
                     Você precisa alterar sua senha no primeiro acesso.
                   </p>
 
@@ -208,10 +208,10 @@ export default function AuthPage() {
                 </div>
               ) : (
                 <div className="fade-in">
-                  <h2 className="text-xl font-semibold text-left text-gray-800 mb-2">
+                  <h2 className="text-xl font-semibold text-left text-gray-900 dark:text-gray-100 mb-2">
                     Entrar
                   </h2>
-                  <p className="text-left text-gray-600 mb-6">
+                  <p className="text-left text-gray-600 dark:text-gray-400 mb-6">
                     Entre com suas credenciais para acessar a plataforma
                   </p>
 
@@ -247,8 +247,7 @@ export default function AuthPage() {
 
                       <Button 
                         type="submit" 
-                        className="w-full" 
-                        style={{ backgroundColor: "#224c72" }}
+                        className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white"
                         disabled={loginMutation.isPending}
                       >
                         {loginMutation.isPending ? "Entrando..." : "Entrar"}
@@ -263,18 +262,13 @@ export default function AuthPage() {
       </div>
       
       {/* Lado direito - Hero/Imagem */}
-      <div className="w-1/2 flex flex-col" style={{ backgroundColor: "#0e4f82" }}>
+      <div className="w-1/2 flex flex-col bg-blue-900 dark:bg-blue-950">
         {/* Imagem na parte superior */}
         <div className="mt-10 ml-10">
           <img 
             src="/login-image.png" 
             alt="Compositor de Documentação" 
-            style={{ 
-              height: "400px", 
-              width: "auto", 
-              objectFit: "contain",
-              borderRadius: "12px"
-            }} 
+            className="h-96 w-auto object-contain rounded-xl" 
           />
         </div>
         
@@ -282,67 +276,50 @@ export default function AuthPage() {
         <div className="mt-8 ml-10 flex flex-col">
           {/* Título com logo alinhado horizontalmente */}
           <div className="flex items-center">
-            <div 
-              style={{
-                width: "64px",
-                height: "64px",
-                borderRadius: "50%",
-                overflow: "hidden",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                marginRight: "12px",
-                backgroundColor: "white",
-                border: "2px solid #acc3e3"
-              }}
-            >
+            <div className="w-16 h-16 rounded-full overflow-hidden flex justify-center items-center mr-3 bg-white border-2 border-blue-300 dark:border-blue-400">
               <img 
                 src="/logo-icon.jpg" 
                 alt="Logo da Aplicação" 
-                style={{ 
-                  height: "64px",
-                  width: "64px", 
-                  objectFit: "cover"
-                }} 
+                className="h-16 w-16 object-cover"
               />
             </div>
-            <h1 className="text-4xl font-bold" style={{ color: "#acc3e3" }}>
+            <h1 className="text-4xl font-bold text-blue-300 dark:text-blue-200">
               EVO-MindBits CPx
             </h1>
           </div>
           
           {/* Textos descritivos com mesma margem da imagem principal */}
-          <div className="mt-6" style={{ color: "#acc3e3" }}>
+          <div className="mt-6 text-blue-300 dark:text-blue-200">
             <p className="text-xl mb-8">
               Compositor integrado para documentação técnica e empresarial, assistido por IA e para a IA.
             </p>
             <ul className="space-y-4">
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-blue-300 dark:bg-blue-200 text-blue-900 dark:text-blue-900">
                   1
                 </div>
                 Integração com sistemas externos
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-blue-300 dark:bg-blue-200 text-blue-900 dark:text-blue-900">
                   2
                 </div>
                 Workflows de fluxo de documentos
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-blue-300 dark:bg-blue-200 text-blue-900 dark:text-blue-900">
                   3
                 </div>
                 Aprovações e assinaturas eletrônicas
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-blue-300 dark:bg-blue-200 text-blue-900 dark:text-blue-900">
                   4
                 </div>
                 Versionamento documental
               </li>
               <li className="flex items-center">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2" style={{ backgroundColor: "#acc3e3", color: "#0e4f82" }}>
+                <div className="flex items-center justify-center w-6 h-6 rounded-full font-bold text-sm mr-2 bg-blue-300 dark:bg-blue-200 text-blue-900 dark:text-blue-900">
                   5
                 </div>
                 Metodologia AI-First

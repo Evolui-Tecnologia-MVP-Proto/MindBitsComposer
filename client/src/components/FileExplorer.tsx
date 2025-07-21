@@ -157,7 +157,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
         <div key={item.id} className="select-none">
           <div
             className={`flex items-center py-1 px-2 hover:bg-gray-100 rounded cursor-pointer transition-colors ${
-              item.type === 'file' ? 'hover:bg-blue-50' : ''
+              item.type === 'file' ? 'hover:bg-blue-50 dark:hover:bg-blue-900/20' : ''
             }`}
             style={{ paddingLeft }}
             onClick={() => {
@@ -355,26 +355,26 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     switch (syncStatus) {
       case 'synced':
         return (
-          <Badge variant="outline" className="text-xs text-green-600 border-green-200">
+          <Badge variant="outline" className="text-xs text-green-600 dark:text-green-400 border-green-200 dark:border-green-700">
             ✓ Sincronizada
           </Badge>
         );
       case 'unsynced':
         return (
-          <Badge variant="outline" className="text-xs text-red-600 border-red-200">
+          <Badge variant="outline" className="text-xs text-red-600 dark:text-red-400 border-red-200 dark:border-red-700">
             <AlertCircle className="h-3 w-3 mr-1" />
             Não sincronizada
           </Badge>
         );
       case 'github-only':
         return (
-          <Badge variant="outline" className="text-xs text-yellow-600 border-yellow-200">
+          <Badge variant="outline" className="text-xs text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-700">
             ⚠ Apenas no GitHub
           </Badge>
         );
       case 'local-only':
         return (
-          <Badge variant="outline" className="text-xs text-red-600 border-red-200">
+          <Badge variant="outline" className="text-xs text-red-600 dark:text-red-400 border-red-200 dark:border-red-700">
             <AlertCircle className="h-3 w-3 mr-1" />
             Somente Local
           </Badge>
