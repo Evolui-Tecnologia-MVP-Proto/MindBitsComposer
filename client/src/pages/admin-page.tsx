@@ -1418,7 +1418,7 @@ export default function AdminPage() {
   
   return (
     <div className="container mx-auto py-6 bg-background dark:bg-[#1F2937] text-foreground" data-page="admin">
-      <div className="space-y-6 bg-[#1F2937] dark:bg-[#1F2937]">
+      <div className="space-y-6 bg-[#F9FAFB] dark:bg-[#1F2937]">
         <div className="flex items-center justify-between p-6 rounded-lg bg-gray-50 dark:bg-[#1F2937]">
           <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Administração</h1>
         </div>
