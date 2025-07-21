@@ -1007,13 +1007,21 @@ table:not(.lexical-editor-container table) th {
 }
 
 .dark [data-radix-dialog-content] tbody,
-.dark [data-radix-dialog-content] .table-body,
+.dark [data-radix-dialog-content] .table-body {
+  background-color: #0F172A !important;
+}
+
 .dark [data-radix-dialog-content] tbody tr,
-.dark [data-radix-dialog-content] .table-row,
+.dark [data-radix-dialog-content] .table-row {
+  background-color: #0F172A !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
 .dark [data-radix-dialog-content] tbody td,
 .dark [data-radix-dialog-content] .table-cell,
 .dark [data-radix-dialog-content] td {
   background-color: #0F172A !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Override Tailwind classes only in admin page - DARK MODE ONLY */

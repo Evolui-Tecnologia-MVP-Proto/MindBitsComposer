@@ -2251,8 +2251,20 @@ export default function AdminPage() {
                         </TableHeader>
                         <TableBody>
                         {mappingColumns.map((column) => (
-                          <TableRow key={column.id} className="h-6">
-                            <TableCell className="py-0 dark:text-gray-100">
+                          <TableRow 
+                            key={column.id} 
+                            className="h-6"
+                            style={{
+                              backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined,
+                              borderBottom: document.documentElement.classList.contains('dark') ? '1px solid rgba(255, 255, 255, 0.1)' : undefined
+                            }}
+                          >
+                            <TableCell 
+                              className="py-0 dark:text-gray-100"
+                              style={{
+                                backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined
+                              }}
+                            >
                               <div className="flex items-center gap-2">
                                 <span className="text-xs font-mono">
                                   {column.mondayColumnTitle}
@@ -2262,7 +2274,12 @@ export default function AdminPage() {
                                 </Badge>
                               </div>
                             </TableCell>
-                            <TableCell className="py-0 dark:text-gray-100">
+                            <TableCell 
+                              className="py-0 dark:text-gray-100"
+                              style={{
+                                backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined
+                              }}
+                            >
                               <div className="flex items-center gap-2">
                                 {/* Ícone de chave vermelho se for campo chave */}
                                 {column.isKey && (
@@ -2304,7 +2321,12 @@ export default function AdminPage() {
                                 </Badge>
                               </div>
                             </TableCell>
-                            <TableCell className="py-0">
+                            <TableCell 
+                              className="py-0"
+                              style={{
+                                backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined
+                              }}
+                            >
                               <div className="flex space-x-2">
                                 <Button
                                   variant="ghost"
@@ -2376,13 +2398,30 @@ export default function AdminPage() {
                     </TableHeader>
                     <TableBody>
                       {getDefaultableFields().map((fieldInfo) => (
-                        <TableRow key={fieldInfo.field} className="h-9">
-                          <TableCell className="py-0 dark:text-gray-100">
+                        <TableRow 
+                          key={fieldInfo.field} 
+                          className="h-9"
+                          style={{
+                            backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined,
+                            borderBottom: document.documentElement.classList.contains('dark') ? '1px solid rgba(255, 255, 255, 0.1)' : undefined
+                          }}
+                        >
+                          <TableCell 
+                            className="py-0 dark:text-gray-100"
+                            style={{
+                              backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined
+                            }}
+                          >
                             <span className="text-xs font-medium font-mono">
                               {fieldInfo.field}
                             </span>
                           </TableCell>
-                          <TableCell className="py-0">
+                          <TableCell 
+                            className="py-0"
+                            style={{
+                              backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined
+                            }}
+                          >
                             <Input
                               value={selectedMapping?.defaultValues?.[fieldInfo.field] || ""}
                               onChange={(e) => {
@@ -2401,7 +2440,12 @@ export default function AdminPage() {
                               className="text-xs h-6 font-mono !text-xs"
                             />
                           </TableCell>
-                          <TableCell className="py-0">
+                          <TableCell 
+                            className="py-0"
+                            style={{
+                              backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined
+                            }}
+                          >
                             {(() => {
                               // Verifica se o campo está mapeado em alguma coluna
                               const isMapped = mappingColumns?.some((mapping: any) => 
