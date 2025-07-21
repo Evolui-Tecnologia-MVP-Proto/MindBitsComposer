@@ -198,7 +198,7 @@ export default function UserTable() {
 
   return (
     <div className="bg-white dark:bg-[#0F172A] p-4 rounded-lg">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 p-4 rounded-lg bg-gray-50 dark:bg-[#1E293B]">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4 p-4 rounded-lg bg-gray-50 dark:bg-[#0F172A]">
         <div className="w-full sm:w-1/3">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
