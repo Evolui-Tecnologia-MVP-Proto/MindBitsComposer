@@ -141,7 +141,7 @@ function JobStatusBadge({ mappingId }: { mappingId: string }) {
 
   if (isLoading) {
     return (
-      <Badge variant="outline" className="text-xs">
+      <Badge variant="outline" className="text-xs bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600">
         Carregando...
       </Badge>
     );
@@ -149,14 +149,14 @@ function JobStatusBadge({ mappingId }: { mappingId: string }) {
 
   if (jobStatus?.hasActiveJob) {
     return (
-      <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+      <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200 dark:bg-green-800/30 dark:text-green-300 dark:border-green-600">
         Job Ativo
       </Badge>
     );
   }
 
   return (
-    <Badge variant="outline" className="text-xs bg-red-50 text-red-700 border-red-200">
+    <Badge variant="outline" className="text-xs bg-red-50 text-red-700 border-red-200 dark:bg-red-800/30 dark:text-red-300 dark:border-red-600">
       Nenhum
     </Badge>
   );
@@ -1523,7 +1523,7 @@ export default function AdminPage() {
                                 <JobStatusBadge mappingId={mapping.id} />
                               </TableCell>
                               <TableCell>
-                                <Badge variant="secondary" className="text-xs">
+                                <Badge variant="secondary" className="text-xs bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
                                   {mapping.columnCount || 0} cols
                                 </Badge>
                               </TableCell>
