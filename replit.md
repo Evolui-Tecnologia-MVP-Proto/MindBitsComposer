@@ -21,7 +21,7 @@ Preferred communication style: Simple, everyday language.
 ✓ Corrected modal colors to use #0F1729 for Dialog, AlertDialog, and login Card components
 ✓ Applied complete login page color scheme:
   - Right panel #0E4F82 (both light and dark themes)
-  - Light theme: left panel standard gray, card white
+  - Light theme: left panel standard gray, card white, button #224C72
   - Dark theme: left panel #1F2937, card #0F1729, inputs #0F1729, button #1E3A8A
   - Dark theme texts: right panel text #ACC3E3, circular markers #ACC3E3
 ✓ Applied color #111827 to header, footer, and sidebar menu panel (dark theme only)
