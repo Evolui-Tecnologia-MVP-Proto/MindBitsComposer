@@ -69,6 +69,11 @@ Preferred communication style: Simple, everyday language.
   - Fixed "Coluna Monday" and "Campo na aplicação" select colors
   - Applied maximum CSS specificity to override problematic inherited styles
   - Ensured all form select elements in modal follow dark mode standards
+✓ Applied global dark mode standards to ALL select elements across entire application:
+  - Replaced all bg-background classes with explicit dark mode colors
+  - Created comprehensive CSS rules for select elements in dark mode
+  - Ensured consistent #0F172A background for all select triggers
+  - Applied to forms, modals, and all application areas
 
 ## System Architecture
 

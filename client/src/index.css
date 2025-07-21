@@ -1365,6 +1365,37 @@ html.dark [data-radix-portal] [data-radix-dialog-content] select:not([data-radix
   color: #E5E7EB !important;
 }
 
+/* GLOBAL OVERRIDE: ALL select elements in dark mode follow same pattern */
+html.dark select,
+.dark select {
+  background-color: #0F172A !important;
+  background: #0F172A !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+html.dark select option,
+.dark select option {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
+
+/* Ensure all forms select elements follow pattern */
+html.dark form select,
+.dark form select {
+  background-color: #0F172A !important;
+  background: #0F172A !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #E5E7EB !important;
+}
+
+/* Override any utility class that might interfere */
+html.dark .bg-background select,
+.dark .bg-background select {
+  background-color: #0F172A !important;
+  background: #0F172A !important;
+}
+
 /* More specific targeting for time picker dropdown */
 .dark input[type="time"]::-webkit-list-menu-button:hover {
   background-color: #1A1A1A !important;
