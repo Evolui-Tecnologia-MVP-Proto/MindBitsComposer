@@ -67,16 +67,86 @@
 /* Force modal background color ONLY for modals in DARK MODE */
 .dark [data-radix-dialog-content],
 .dark [data-radix-alert-dialog-content],
-.dark .modal-0f1729 {
-  background-color: #0F1729 !important;
-  background: #0F1729 !important;
+.dark .modal-0f172a {
+  background-color: #0F172A !important;
+  background: #0F172A !important;
+  color: #F9FAFB !important;
 }
 
 /* Specific override for modal dialog content in DARK MODE */
 .dark div[data-radix-dialog-content],
 .dark div[data-radix-alert-dialog-content] {
-  background-color: #0F1729 !important;
-  background: #0F1729 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
+  color: #F9FAFB !important;
+}
+
+/* Modal text elements in DARK MODE */
+.dark [data-radix-dialog-content] h2,
+.dark [data-radix-dialog-content] h3,
+.dark [data-radix-dialog-content] p,
+.dark [data-radix-dialog-content] label,
+.dark [data-radix-alert-dialog-content] h2,
+.dark [data-radix-alert-dialog-content] h3,
+.dark [data-radix-alert-dialog-content] p,
+.dark [data-radix-alert-dialog-content] label {
+  color: #F9FAFB !important;
+}
+
+/* Modal inputs and form elements in DARK MODE */
+.dark [data-radix-dialog-content] input,
+.dark [data-radix-dialog-content] textarea,
+.dark [data-radix-alert-dialog-content] input,
+.dark [data-radix-alert-dialog-content] textarea {
+  background-color: #0F172A !important;
+  border-color: #374151 !important;
+  color: #F9FAFB !important;
+}
+
+.dark [data-radix-dialog-content] input:focus,
+.dark [data-radix-dialog-content] textarea:focus,
+.dark [data-radix-alert-dialog-content] input:focus,
+.dark [data-radix-alert-dialog-content] textarea:focus {
+  border-color: #1E40AF !important;
+  box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.1) !important;
+}
+
+/* Modal buttons in DARK MODE */
+.dark [data-radix-dialog-content] button[type="submit"],
+.dark [data-radix-dialog-content] .btn-primary,
+.dark [data-radix-alert-dialog-content] button[type="submit"],
+.dark [data-radix-alert-dialog-content] .btn-primary {
+  background-color: #1E40AF !important;
+  border-color: #1E40AF !important;
+  color: #F9FAFB !important;
+}
+
+.dark [data-radix-dialog-content] button[type="submit"]:hover,
+.dark [data-radix-dialog-content] .btn-primary:hover,
+.dark [data-radix-alert-dialog-content] button[type="submit"]:hover,
+.dark [data-radix-alert-dialog-content] .btn-primary:hover {
+  background-color: #1D4ED8 !important;
+  border-color: #1D4ED8 !important;
+}
+
+/* Modal radio buttons and checkboxes in DARK MODE */
+.dark [data-radix-dialog-content] [data-radix-radio-group-item],
+.dark [data-radix-dialog-content] [data-radix-checkbox-root],
+.dark [data-radix-alert-dialog-content] [data-radix-radio-group-item],
+.dark [data-radix-alert-dialog-content] [data-radix-checkbox-root] {
+  background-color: #0F172A !important;
+  border-color: #374151 !important;
+  color: #F9FAFB !important;
+}
+
+/* Modal alert/info boxes in DARK MODE */
+.dark [data-radix-dialog-content] .alert,
+.dark [data-radix-dialog-content] .info,
+.dark [data-radix-alert-dialog-content] .alert,
+.dark [data-radix-alert-dialog-content] .info {
+  background-color: rgba(15, 23, 42, 0.8) !important;
+  border-color: #374151 !important;
+  color: #F9FAFB !important;
 }
 
 /* MODAL SELECT COMPONENTS - DARK MODE ONLY */
@@ -84,6 +154,7 @@
 .dark [data-radix-alert-dialog-content] [data-radix-select-trigger] {
   background-color: #0F172A !important;
   border-color: #374151 !important;
+  color: #F9FAFB !important;
 }
 
 /* Select Content - targets dropdown list */
