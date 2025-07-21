@@ -1505,20 +1505,20 @@ export default function AdminPage() {
                     <div className="bg-white dark:bg-[#0F172A] p-4 rounded-lg">
                       <div className="relative w-full overflow-auto">
                         <Table>
-                        <TableHeader className="bg-gray-50">
+                        <TableHeader className="bg-gray-50 dark:bg-[#111827]">
                           <TableRow>
-                            <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">NOME</TableHead>
-                            <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">ID DO QUADRO</TableHead>
-                            <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">SYNC JOBS</TableHead>
-                            <TableHead className="text-center text-xs font-medium text-gray-500 uppercase tracking-wider">COLUNAS</TableHead>
-                            <TableHead className="w-[100px] text-center text-xs font-medium text-gray-500 uppercase tracking-wider">AÇÕES</TableHead>
+                            <TableHead className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">NOME</TableHead>
+                            <TableHead className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID DO QUADRO</TableHead>
+                            <TableHead className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">SYNC JOBS</TableHead>
+                            <TableHead className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">COLUNAS</TableHead>
+                            <TableHead className="w-[100px] text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">AÇÕES</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {mappingsData.map((mapping: BoardMapping) => (
                             <TableRow key={mapping.id}>
-                              <TableCell className="font-medium">{mapping.name}</TableCell>
-                              <TableCell className="font-mono font-bold text-blue-700">{mapping.boardId}</TableCell>
+                              <TableCell className="font-medium dark:text-gray-100">{mapping.name}</TableCell>
+                              <TableCell className="font-mono font-bold text-blue-700 dark:text-blue-400">{mapping.boardId}</TableCell>
                               <TableCell>
                                 <JobStatusBadge mappingId={mapping.id} />
                               </TableCell>
