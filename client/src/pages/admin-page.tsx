@@ -46,7 +46,8 @@ import {
   XCircle,
   Play,
   PlayCircle,
-  Key
+  Key,
+  Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -2605,7 +2606,10 @@ return item.column_values.some(col =>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-3">
-                    <label className="text-sm font-medium dark:text-gray-100">Frequência de Sincronização</label>
+                    <label className="text-sm font-medium dark:text-gray-100 flex items-center gap-2">
+                      <CalendarDays className="h-4 w-4 text-gray-500 dark:text-gray-300" />
+                      Frequência de Sincronização
+                    </label>
                     <select 
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm disabled:bg-gray-50 disabled:text-gray-500"
                       style={{
@@ -2627,7 +2631,10 @@ return item.column_values.some(col =>
                   </div>
                   
                   <div className="space-y-3">
-                    <label className="text-sm font-medium dark:text-gray-100">Horário de Início</label>
+                    <label className="text-sm font-medium dark:text-gray-100 flex items-center gap-2">
+                      <Clock className="h-4 w-4 text-gray-500 dark:text-gray-300" />
+                      Horário de Início
+                    </label>
                     <input 
                       type="time" 
                       value={schedulingTime}

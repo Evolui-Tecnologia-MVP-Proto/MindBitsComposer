@@ -55,6 +55,12 @@ Preferred communication style: Simple, everyday language.
 ✓ Applied icon and adjusted title text color to #6B7280 in dark mode only
 ✓ Reduced title font size from text-3xl to text-2xl in both themes
 ✓ Preserved original light theme colors unchanged across entire application
+✓ Complete modal tables dark mode implementation:
+  - Applied #1F2937 to table headers with inline JavaScript for maximum specificity
+  - Applied #0F172A to table cells with white translucent separators
+  - Standardized visual pattern across all modal tables
+  - Applied dark mode colors to select triggers in Assets Map and Agendamento tabs
+  - Enhanced form field icons with proper contrast (Clock icon for time, Calendar for frequency)
 
 ## System Architecture
 
