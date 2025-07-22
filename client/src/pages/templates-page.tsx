@@ -335,7 +335,7 @@ export default function TemplatesPage() {
 
   return (
     <div className="container mx-auto py-6 bg-background dark:bg-[#1F2937] text-foreground" data-page="templates">
-      <div className="space-y-6 bg-[#F9FAFB] dark:bg-[#1F2937]">
+      <div className="space-y-6 bg-[#F9FAFB] dark:bg-[#0F172A]">
         <div className="flex items-center justify-between p-6 rounded-lg bg-gray-50 dark:bg-[#0F172A]">
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-[#6B7280] flex items-center gap-3">
             <FileCode className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -346,7 +346,8 @@ export default function TemplatesPage() {
         <Tabs 
           defaultValue="struct" 
           onValueChange={(value) => setActiveTab(value)}
-          className="w-full"
+          className="w-full dark:bg-[#0F172A]"
+          style={{ backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined }}
         >
           <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-[#1E293B] mb-6">
             <TabsTrigger value="struct">Struct Templates</TabsTrigger>
