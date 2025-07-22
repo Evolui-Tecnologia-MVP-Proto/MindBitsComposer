@@ -857,19 +857,6 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
           });
           
           // Não adicionar parágrafo final - edição restrita aos containers
-          
-          // Remover qualquer nó solto que não seja collapsible container
-          setTimeout(() => {
-            editor.update(() => {
-              const root = $getRoot();
-              const rootChildren = root.getChildren();
-              rootChildren.forEach((child) => {
-                if (child.getType() !== 'collapsible-container') {
-                  child.remove();
-                }
-              });
-            });
-          }, 100);
         });
       }, 50);
       
@@ -975,8 +962,8 @@ function RestrictEditingPlugin({ hasTemplate }: { hasTemplate: boolean }) {
     // Função para verificar se está dentro de área editável
     const isInsideEditableArea = (node: any): boolean => {
       let currentNode = node;
-      while (currentNode && currentNode.getParent) {
-        if (currentNode.getType && currentNode.getType() === 'collapsible-content') {
+      while (currentNode) {
+        if (currentNode.getType() === 'collapsible-content') {
           return true;
         }
         currentNode = currentNode.getParent();
@@ -997,7 +984,7 @@ function RestrictEditingPlugin({ hasTemplate }: { hasTemplate: boolean }) {
               const contentChildren = containerChild.getChildren();
               if (contentChildren.length > 0) {
                 const firstParagraph = contentChildren[0];
-                if (firstParagraph && firstParagraph.getType() === 'paragraph') {
+                if (firstParagraph.getType() === 'paragraph') {
                   firstParagraph.selectStart();
                   return true;
                 }
@@ -1009,50 +996,123 @@ function RestrictEditingPlugin({ hasTemplate }: { hasTemplate: boolean }) {
       return false;
     };
 
-    // Monitor contínuo da posição do cursor
-    const intervalId = setInterval(() => {
-      try {
-        editor.getEditorState().read(() => {
+    // Interceptar cliques
+    const removeClickListener = editor.registerCommand(
+      'click',
+      (event: MouseEvent) => {
+        setTimeout(() => {
+          editor.update(() => {
+            const selection = $getSelection();
+            if (!$isRangeSelection(selection)) return;
+
+            const anchorNode = selection.anchor.getNode();
+            
+            if (!isInsideEditableArea(anchorNode)) {
+              event.preventDefault();
+              redirectToEditableArea();
+            }
+          });
+        }, 10);
+        return false;
+      },
+      COMMAND_PRIORITY_HIGH
+    );
+
+    // Interceptar mudanças de seleção
+    const removeSelectionChangeListener = editor.registerCommand(
+      'change',
+      () => {
+        editor.update(() => {
           const selection = $getSelection();
           if (!$isRangeSelection(selection)) return;
 
           const anchorNode = selection.anchor.getNode();
           
           if (!isInsideEditableArea(anchorNode)) {
-            // Usar queueMicrotask para evitar problemas de reentrância
-            queueMicrotask(() => {
-              editor.update(() => {
-                redirectToEditableArea();
-              });
-            });
+            redirectToEditableArea();
           }
         });
-      } catch (error) {
-        // Silenciosamente ignorar erros para evitar spam no console
-      }
-    }, 100);
+        return false;
+      },
+      COMMAND_PRIORITY_HIGH
+    );
 
-    // Interceptar mudanças do estado do editor
-    const removeStateListener = editor.registerUpdateListener(({ editorState }) => {
-      editorState.read(() => {
+    // Interceptar teclas
+    const removeKeyDownListener = editor.registerCommand(
+      'keydown',
+      (event: KeyboardEvent) => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) return false;
+
+        const anchorNode = selection.anchor.getNode();
+        
+        if (!isInsideEditableArea(anchorNode)) {
+          // Permitir apenas teclas de navegação e comandos do sistema
+          const allowedKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End', 'PageUp', 'PageDown'];
+          const isSystemCommand = event.ctrlKey || event.metaKey || event.altKey;
+          
+          if (!allowedKeys.includes(event.key) && !isSystemCommand) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            editor.update(() => {
+              redirectToEditableArea();
+            });
+            
+            return true;
+          }
+        }
+        return false;
+      },
+      COMMAND_PRIORITY_CRITICAL
+    );
+
+    // Interceptar input de texto
+    const removeTextListener = editor.registerCommand(
+      'input',
+      (event: InputEvent) => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) return false;
+
+        const anchorNode = selection.anchor.getNode();
+        
+        if (!isInsideEditableArea(anchorNode)) {
+          event.preventDefault();
+          event.stopPropagation();
+          
+          editor.update(() => {
+            redirectToEditableArea();
+          });
+          
+          return true;
+        }
+        return false;
+      },
+      COMMAND_PRIORITY_CRITICAL
+    );
+
+    // Monitor contínuo da posição do cursor
+    const intervalId = setInterval(() => {
+      editor.getEditorState().read(() => {
         const selection = $getSelection();
         if (!$isRangeSelection(selection)) return;
 
         const anchorNode = selection.anchor.getNode();
         
         if (!isInsideEditableArea(anchorNode)) {
-          queueMicrotask(() => {
-            editor.update(() => {
-              redirectToEditableArea();
-            });
+          editor.update(() => {
+            redirectToEditableArea();
           });
         }
       });
-    });
+    }, 100);
 
     return () => {
+      removeClickListener();
+      removeSelectionChangeListener();
+      removeKeyDownListener();
+      removeTextListener();
       clearInterval(intervalId);
-      removeStateListener();
     };
   }, [editor, hasTemplate]);
 
