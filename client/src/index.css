@@ -103,6 +103,23 @@ body.dark .Collapsible__title:hover {
   background: #020203 !important;
 }
 
+/* Markdown Preview Table Dark Mode */
+.dark .markdown-preview table th,
+.dark .markdown-preview table td {
+  background-color: #1B2028 !important;
+  background: #1B2028 !important;
+}
+
+.dark .markdown-preview table thead th {
+  background-color: #1B2028 !important;
+  background: #1B2028 !important;
+}
+
+.dark .markdown-preview table tbody td {
+  background-color: #1B2028 !important;
+  background: #1B2028 !important;
+}
+
 .composer-library-panel * {
   max-width: 100% !important;
 }
