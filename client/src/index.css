@@ -1273,6 +1273,41 @@ html[class*="dark"] input[type="date"] {
   background-color: #1F2937 !important;
 }
 
+/* Native select elements hover for admin page */
+.dark [data-page="admin"] select:hover {
+  background-color: #1F2937 !important;
+  border-color: #374151 !important;
+}
+
+/* Force native select styling in dark mode */
+.dark select.bg-background:hover,
+.dark [data-page="admin"] select.bg-background:hover {
+  background-color: #1F2937 !important;
+}
+
+/* Target specific select classes used in logs filters */
+.dark select.border-input:hover,
+.dark [data-page="admin"] select.border-input:hover {
+  background-color: #1F2937 !important;
+  border-color: #374151 !important;
+}
+
+/* Maximum specificity for admin page select hover */
+.dark [data-page="admin"] .grid select:hover,
+.dark [data-page="admin"] .space-y-2 select:hover,
+html.dark [data-page="admin"] select:hover {
+  background-color: #1F2937 !important;
+  border-color: #374151 !important;
+}
+
+/* Force override for all select combinations in admin */
+.dark [data-page="admin"] select.w-full:hover,
+.dark [data-page="admin"] select.h-9:hover,
+.dark [data-page="admin"] select.px-3:hover,
+.dark [data-page="admin"] select.rounded-md:hover {
+  background-color: #1F2937 !important;
+}
+
 .dark input[type="time"]::-webkit-datetime-edit-fields-wrapper {
   background: transparent !important;
   color: #E5E7EB !important;
