@@ -1469,9 +1469,7 @@ export default function LexicalPage() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header com navegação */}
-      <div className="flex-shrink-0 p-6 pb-4 bg-gray-50 dark:bg-[#1F2937] border-b border-gray-200 dark:border-[#374151]" style={{ 
-        marginRight: showAttachments && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) ? '305px' : '0px' 
-      }}>
+      <div className="flex-shrink-0 p-6 pb-4 bg-gray-50 dark:bg-[#1F2937] border-b border-gray-200 dark:border-[#374151]">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-4">
             <div>
@@ -1566,7 +1564,7 @@ export default function LexicalPage() {
               </div>
             </div>
             
-            <div className={`flex flex-col items-center space-y-1 border border-gray-300 rounded-lg p-3 pl-[12px] pr-[12px] ${showAttachments && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) ? 'mr-6' : 'mr-4'}`}>
+            <div className="absolute right-6 flex flex-col items-center space-y-1 border border-gray-300 rounded-lg p-3 pl-[12px] pr-[12px]">
               <span className="text-xs text-gray-500 font-medium">Ações</span>
               <div className="flex items-center space-x-2">
                 <Button
