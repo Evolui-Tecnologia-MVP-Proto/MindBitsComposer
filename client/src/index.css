@@ -1475,6 +1475,31 @@ html.dark body [data-radix-select-item][data-state="checked"] {
   background: #1F2937 !important;
 }
 
+/* Target ONLY the hover state of dropdown items, not selected items */
+.dark [data-radix-select-content] [data-radix-select-item]:hover {
+  background-color: #1F2937 !important;
+  background: #1F2937 !important;
+}
+
+/* Target the data-highlighted state which is the mouse hover */
+.dark [data-radix-select-content] [data-radix-select-item][data-highlighted] {
+  background-color: #1F2937 !important;
+  background: #1F2937 !important;
+}
+
+/* Specific to dropdown list items on mouse over */
+.dark [role="listbox"] [role="option"]:hover,
+.dark [role="listbox"] [role="option"][data-highlighted] {
+  background-color: #1F2937 !important;
+  background: #1F2937 !important;
+}
+
+/* Override any .focus:bg-accent classes */
+.dark .focus\\:bg-accent:focus,
+.dark [data-radix-select-item].focus\\:bg-accent:focus {
+  background-color: #1F2937 !important;
+}
+
 .dark input[type="time"]::-webkit-datetime-edit-fields-wrapper {
   background: transparent !important;
   color: #E5E7EB !important;
