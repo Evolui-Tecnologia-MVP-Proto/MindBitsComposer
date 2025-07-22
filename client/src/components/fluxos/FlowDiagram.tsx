@@ -2,6 +2,7 @@ import React, { RefObject } from 'react';
 import ReactFlow, {
   Controls,
   Background,
+  BackgroundVariant,
   MiniMap,
   MarkerType,
   ConnectionLineType,
@@ -142,7 +143,14 @@ export const FlowDiagram = ({
                 connectionLineType={ConnectionLineType.SmoothStep}
               >
                 <Controls />
-                {showGrid && <Background color={isDark ? "#ffffff" : "#6b7280"} gap={12} size={1} />}
+                {showGrid && (
+                  <Background 
+                    variant={BackgroundVariant.Dots}
+                    color={isDark ? "#ffffff" : "#6b7280"} 
+                    gap={12} 
+                    size={1} 
+                  />
+                )}
                 {showMiniMap && <MiniMap />}
               </ReactFlow>
             </div>
@@ -198,7 +206,14 @@ export const FlowDiagram = ({
             connectionLineType={ConnectionLineType.SmoothStep}
           >
             <Controls />
-            {showGrid && <Background color={isDark ? "#ffffff" : "#6b7280"} gap={12} size={1} />}
+            {showGrid && (
+              <Background 
+                variant={BackgroundVariant.Dots}
+                color={isDark ? "#ffffff" : "#6b7280"} 
+                gap={12} 
+                size={1} 
+              />
+            )}
             {showMiniMap && <MiniMap />}
           </ReactFlow>
         </div>
