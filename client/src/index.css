@@ -2138,7 +2138,7 @@ html.dark [data-radix-select-item][data-highlighted] {
 .dark [data-page="templates"] .space-y-4 > .card,
 .dark [data-page="templates"] [data-radix-dialog-content],
 .dark [data-page="templates"] [data-radix-collapsible-content] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Button variants */
