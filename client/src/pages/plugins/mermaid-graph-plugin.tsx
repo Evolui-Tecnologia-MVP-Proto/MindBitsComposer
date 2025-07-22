@@ -145,8 +145,9 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
       canvas.width = width;
       canvas.height = height;
 
-      // Set white background
-      ctx.fillStyle = 'white';
+      // Set background color based on theme
+      const isDarkMode = document.documentElement.classList.contains('dark');
+      ctx.fillStyle = isDarkMode ? '#1B2028' : 'white';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       // Convert SVG to string and create blob
@@ -219,29 +220,28 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
     }
   };
 
-  // Função para configurar tema do Mermaid baseado no sistema
+  // Função para configurar tema do Mermaid baseado no sistema (usando mesmas configurações do MDX)
   const configureMermaidTheme = useCallback(() => {
     const isDarkMode = document.documentElement.classList.contains('dark');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const shouldUseDark = isDarkMode || systemPrefersDark;
     
     mermaid.initialize({
-      startOnLoad: true,
+      startOnLoad: false,
       theme: shouldUseDark ? 'dark' : 'default',
       securityLevel: 'loose',
       fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
-      fontSize: 14,
       themeVariables: shouldUseDark ? {
-        primaryColor: '#1E293B',
-        primaryTextColor: '#E5E7EB',
-        primaryBorderColor: '#374151',
-        lineColor: '#60A5FA',
-        secondaryColor: '#0F172A',
-        tertiaryColor: '#1F2937',
-        background: '#111827',
-        mainBkg: '#1E293B',
-        secondBkg: '#0F172A',
-        tertiaryBkg: '#1F2937',
+        primaryColor: '#1B2028',
+        primaryTextColor: '#FFFFFF',
+        primaryBorderColor: '#FFFFFF',
+        lineColor: '#FFFFFF',
+        secondaryColor: '#1E293B',
+        tertiaryColor: '#374151',
+        background: '#1B2028',
+        mainBkg: '#1B2028',
+        secondBkg: '#1E293B',
+        tertiaryBkg: '#374151',
       } : {}
     });
   }, []);
@@ -300,7 +300,7 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
     const renderMermaid = async () => {
       if (!mermaidCode.trim()) {
         if (canvasRef.current) {
-          canvasRef.current.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">Digite código Mermaid no editor</div>';
+          canvasRef.current.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500 dark:text-white">Digite código Mermaid no editor</div>';
         }
         return;
       }
@@ -336,7 +336,7 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
         
         if (canvasRef.current) {
           canvasRef.current.innerHTML = `
-            <div class="flex flex-col items-center justify-center h-full text-red-500 dark:text-red-400 p-4">
+            <div class="flex flex-col items-center justify-center h-full text-red-500 dark:text-red-300 p-4">
               <div class="text-lg font-semibold mb-2">Erro na sintaxe</div>
               <div class="text-sm text-center">${error instanceof Error ? error.message : 'Erro desconhecido'}</div>
             </div>
@@ -438,12 +438,12 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
               )}
             </div>
           </div>
-          <div className="flex-1 p-3 overflow-auto bg-white dark:bg-[#1E293B]">
+          <div className="flex-1 p-3 overflow-auto bg-white dark:bg-[#1B2028]">
             <div 
               ref={canvasRef}
-              className="w-full h-full flex items-center justify-center border-2 border-dashed border-gray-200 dark:border-[#374151] rounded-lg bg-white dark:bg-[#0F172A]"
+              className="w-full h-full flex items-center justify-center border-2 border-dashed border-gray-200 dark:border-[#374151] rounded-lg bg-white dark:bg-[#1B2028]"
             >
-              <div className="text-gray-500 dark:text-[#9CA3AF] text-sm">
+              <div className="text-gray-500 dark:text-[#FFFFFF] text-sm">
                 {isRendering ? 'Renderizando gráfico...' : 'Aguardando código...'}
               </div>
             </div>
