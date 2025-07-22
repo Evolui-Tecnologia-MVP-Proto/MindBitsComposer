@@ -1469,7 +1469,7 @@ export default function AdminPage() {
           </h1>
         </div>
         
-        <Tabs defaultValue="usuarios" className="w-full">
+        <Tabs defaultValue="usuarios" className="w-full dark:bg-[#0F172A]">
           <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-[#1E293B]">
             <TabsTrigger value="usuarios" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
               <Users className="h-4 w-4 mr-2" />
