@@ -1767,7 +1767,7 @@ export default function LexicalPage() {
                 {!hasEditorContent && (!content || content.trim() === '') && !selectedTemplate && !currentDocumentId && viewMode === 'editor' && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
                     <PenTool className="w-[100px] h-[100px] mb-4 opacity-20" />
-                    <p className="text-lg font-medium text-center mb-6 pointer-events-none">Selecione um documento ou template para iniciar...</p>
+                    <p className="text-lg font-medium text-center mb-6 pointer-events-none dark:text-[#111214]">Selecione um documento ou template para iniciar...</p>
                     
 
                   </div>
