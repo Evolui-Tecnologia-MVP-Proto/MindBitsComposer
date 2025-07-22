@@ -153,6 +153,9 @@ body.dark .Collapsible__title:hover {
 .dark .ContentEditable__root table {
   background-color: #020203 !important;
   background: #020203 !important;
+  border: 2px solid #FFFFFF !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
 }
 
 .dark .lexical-editor-container table th,
@@ -164,8 +167,8 @@ body.dark .Collapsible__title:hover {
   background-color: #020203 !important;
   background: #020203 !important;
   color: #FFFFFF !important;
-  border-color: #FFFFFF !important;
   border: 1px solid #FFFFFF !important;
+  border-color: #FFFFFF !important;
 }
 
 .dark .lexical-editor-container .TableNode__tableCell,
@@ -174,8 +177,9 @@ body.dark .Collapsible__title:hover {
   background-color: #020203 !important;
   background: #020203 !important;
   color: #FFFFFF !important;
-  border-color: #FFFFFF !important;
   border: 1px solid #FFFFFF !important;
+  border-color: #FFFFFF !important;
+  outline: 1px solid #FFFFFF !important;
 }
 
 .dark .lexical-editor-container .TableNode__tableRow,
@@ -183,6 +187,7 @@ body.dark .Collapsible__title:hover {
 .dark .ContentEditable__root .TableNode__tableRow {
   background-color: #020203 !important;
   background: #020203 !important;
+  border: 1px solid #FFFFFF !important;
 }
 
 .dark .lexical-editor-container .TableNode__table,
@@ -190,7 +195,24 @@ body.dark .Collapsible__title:hover {
 .dark .ContentEditable__root .TableNode__table {
   background-color: #020203 !important;
   background: #020203 !important;
+  border: 2px solid #FFFFFF !important;
   border-color: #FFFFFF !important;
+  outline: 2px solid #FFFFFF !important;
+}
+
+/* Additional table border enforcement for Lexical editor */
+.dark .lexical-editor-container table *,
+.dark [data-lexical-editor] table *,
+.dark .ContentEditable__root table * {
+  border-color: #FFFFFF !important;
+}
+
+.dark .lexical-editor-container .TableNode__table table,
+.dark [data-lexical-editor] .TableNode__table table,
+.dark .ContentEditable__root .TableNode__table table {
+  border: 2px solid #FFFFFF !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
 }
 
 .composer-library-panel * {
