@@ -1432,6 +1432,21 @@ html.dark .bg-background select,
   background-color: #0F172A !important;
 }
 
+/* Fix next level divs that might be using #09090B */
+.dark [data-page="admin"] div[class*="bg-gray-900"],
+.dark [data-page="admin"] .bg-gray-900,
+.dark [data-page="admin"] [style*="background-color: rgb(9, 9, 11)"],
+.dark [data-page="admin"] [style*="background-color: #09090B"] {
+  background-color: #111827 !important;
+}
+
+/* Fix table containers and card backgrounds that might use #09090B */
+.dark [data-page="admin"] .card,
+.dark [data-page="admin"] div[class*="bg-card"],
+.dark [data-page="admin"] div[class*="bg-background"]:not(select):not(input) {
+  background-color: #111827 !important;
+}
+
 
 
 /* More specific targeting for time picker dropdown */
