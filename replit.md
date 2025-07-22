@@ -119,7 +119,7 @@ Preferred communication style: Simple, everyday language.
   - Overrode shadcn/ui conflicting classes (bg-card, bg-background)
   - Consistent card styling across entire application
 ✓ Fixed template modal button container for dark mode:
-  - Applied #1E293B background to button footer area
+  - Applied #0F172A background to button footer area (updated per request)
   - Removed white background from button container
   - Applied #374151 border color to top border
   - Enhanced button colors: #1E40AF (primary), transparent outline with #6B7280 borders

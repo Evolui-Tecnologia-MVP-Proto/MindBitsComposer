@@ -162,7 +162,7 @@
 /* Template Form Modal - Button container */
 .dark [data-radix-dialog-content] .border-t.pt-4.mt-4,
 .dark [data-radix-dialog-content] div[class*="border-t pt-4 mt-4"] {
-  background-color: #1E293B !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
 }
 
@@ -192,7 +192,7 @@
 
 /* Specific fix for template modal button container */
 .dark .bg-white.dark\\:bg-slate-800 {
-  background-color: #1E293B !important;
+  background-color: #0F172A !important;
 }
 
 .dark .dark\\:border-gray-600 {
