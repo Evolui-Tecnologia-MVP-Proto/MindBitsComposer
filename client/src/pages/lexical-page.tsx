@@ -1617,7 +1617,7 @@ export default function LexicalPage() {
         <div className="flex h-full">
           {/* Sidebar de documentos (condicional) */}
         {showDocumentList && (
-          <div className="w-80 border-r bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151] p-4 overflow-y-auto" style={{ marginTop: '16px' }}>
+          <div className="w-80 border-r bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] p-4 overflow-y-auto" style={{ marginTop: '16px' }}>
             <div className="space-y-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">Biblioteca</h3>
               
@@ -1784,7 +1784,7 @@ export default function LexicalPage() {
 
         {/* Painel de Anexos - desabilitado apenas quando há template struct sem documento composer */}
         {showAttachments && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) && (
-          <div className="w-80 border-l bg-gray-50 dark:bg-[#1E293B] border-gray-200 dark:border-[#374151] flex flex-col" style={{ marginTop: '16px' }}>
+          <div className="w-80 border-l bg-gray-50 dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col" style={{ marginTop: '16px' }}>
             {/* Header fixo */}
             <div className="p-4 border-b bg-gray-50 dark:bg-[#111827] border-gray-200 dark:border-[#374151]">
               <div className="flex items-center justify-between">
