@@ -2766,24 +2766,9 @@ html.dark [data-radix-select-item][data-highlighted] {
 
 /* Removed - was overriding background */
 
-.dark [data-page="fluxos"] .react-flow__pane {
-  background-color: #0F172A !important;
-}
+/* Removed - was interfering with background visibility */
 
-/* Canvas container styling */
-.dark [data-page="fluxos"] .react-flow__viewport {
-  background-color: #0F172A !important;
-}
-
-.dark [data-page="fluxos"] .react-flow__container {
-  background-color: #0F172A !important;
-  border-color: #111827 !important;
-}
-
-/* Canvas border styling */
-.dark [data-page="fluxos"] .react-flow__renderer {
-  border-color: #111827 !important;
-}
+/* Removed - was interfering with background visibility */
 
 /* Empty state styling for dark theme - center canvas text and icon */
 .dark [data-page="fluxos"] .text-gray-300 {
@@ -2963,15 +2948,7 @@ html.dark [data-radix-select-item][data-highlighted] {
   stroke: #1B2028 !important;
 }
 
-/* ReactFlow Background pattern for dark theme */
-.dark [data-page="fluxos"] .react-flow__background {
-  background-color: #1B2028 !important;
-}
-
-.dark [data-page="fluxos"] .react-flow__background circle,
-.dark [data-page="fluxos"] .react-flow__background line {
-  stroke: #374151 !important;
-}
+/* Removed - was hiding background grid */
 
 /* ReactFlow attribution/logo styling for dark theme */
 .dark [data-page="fluxos"] .react-flow__attribution {
