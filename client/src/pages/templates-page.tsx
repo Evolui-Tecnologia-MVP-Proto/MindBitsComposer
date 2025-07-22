@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -18,6 +18,36 @@ export default function TemplatesPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const { toast } = useToast();
+  const structTabRef = useRef<HTMLDivElement>(null);
+  const outputTabRef = useRef<HTMLDivElement>(null);
+
+  // Force background color application
+  useEffect(() => {
+    const applyBackgroundColor = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      if (isDark) {
+        if (structTabRef.current) {
+          structTabRef.current.style.backgroundColor = '#0F172A';
+          structTabRef.current.style.background = '#0F172A';
+        }
+        if (outputTabRef.current) {
+          outputTabRef.current.style.backgroundColor = '#0F172A';
+          outputTabRef.current.style.background = '#0F172A';
+        }
+      }
+    };
+
+    applyBackgroundColor();
+    
+    // Observer for theme changes
+    const observer = new MutationObserver(applyBackgroundColor);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, [activeTab]);
 
   // Consulta templates por tipo (struct ou output)
   const { data: templates, isLoading } = useQuery<Template[]>({
@@ -323,7 +353,7 @@ export default function TemplatesPage() {
             <TabsTrigger value="output">Out Templates</TabsTrigger>
           </TabsList>
         
-        <TabsContent value="struct" className="space-y-4 dark:bg-[#0F172A]" style={{ backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined }}>
+        <TabsContent value="struct" className="space-y-4 dark:bg-[#0F172A]" ref={structTabRef}>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
@@ -359,7 +389,7 @@ export default function TemplatesPage() {
           </Card>
         </TabsContent>
         
-        <TabsContent value="output" className="space-y-4 dark:bg-[#0F172A]" style={{ backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined }}>
+        <TabsContent value="output" className="space-y-4 dark:bg-[#0F172A]" ref={outputTabRef}>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
