@@ -215,24 +215,6 @@ body.dark .Collapsible__title:hover {
   border-spacing: 0 !important;
 }
 
-/* Prevent cursor/selection outside collapsible containers */
-.lexical-editor-container .ContentEditable__root > p:not([data-lexical-collapsible-content] p) {
-  pointer-events: none !important;
-  user-select: none !important;
-}
-
-.lexical-editor-container .ContentEditable__root > *:not([data-lexical-collapsible-container]) {
-  pointer-events: none !important;
-  user-select: none !important;
-}
-
-/* Allow interaction only within collapsible content */
-.lexical-editor-container [data-lexical-collapsible-content],
-.lexical-editor-container [data-lexical-collapsible-content] * {
-  pointer-events: auto !important;
-  user-select: text !important;
-}
-
 .composer-library-panel * {
   max-width: 100% !important;
 }

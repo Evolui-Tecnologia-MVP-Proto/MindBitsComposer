@@ -856,7 +856,9 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
             root.append(container);
           });
           
-          // Não adicionar parágrafo final - edição restrita aos containers
+          // Adicionar parágrafo final para permitir edição após os containers
+          const finalParagraph = $createParagraphNode();
+          root.append(finalParagraph);
         });
       }, 50);
       
@@ -948,173 +950,6 @@ function ImageIdAutoConvertPlugin() {
       COMMAND_PRIORITY_LOW
     );
   }, [editor]);
-
-  return null;
-}
-
-// Plugin para restringir edição apenas aos collapsible containers
-function RestrictEditingPlugin({ hasTemplate }: { hasTemplate: boolean }) {
-  const [editor] = useLexicalComposerContext();
-
-  useEffect(() => {
-    if (!hasTemplate) return;
-
-    // Função para verificar se está dentro de área editável
-    const isInsideEditableArea = (node: any): boolean => {
-      let currentNode = node;
-      while (currentNode) {
-        if (currentNode.getType() === 'collapsible-content') {
-          return true;
-        }
-        currentNode = currentNode.getParent();
-      }
-      return false;
-    };
-
-    // Função para redirecionar para área editável
-    const redirectToEditableArea = () => {
-      const root = $getRoot();
-      const children = root.getChildren();
-      
-      for (const child of children) {
-        if (child.getType() === 'collapsible-container') {
-          const containerChildren = child.getChildren();
-          for (const containerChild of containerChildren) {
-            if (containerChild.getType() === 'collapsible-content') {
-              const contentChildren = containerChild.getChildren();
-              if (contentChildren.length > 0) {
-                const firstParagraph = contentChildren[0];
-                if (firstParagraph.getType() === 'paragraph') {
-                  firstParagraph.selectStart();
-                  return true;
-                }
-              }
-            }
-          }
-        }
-      }
-      return false;
-    };
-
-    // Interceptar cliques
-    const removeClickListener = editor.registerCommand(
-      'click',
-      (event: MouseEvent) => {
-        setTimeout(() => {
-          editor.update(() => {
-            const selection = $getSelection();
-            if (!$isRangeSelection(selection)) return;
-
-            const anchorNode = selection.anchor.getNode();
-            
-            if (!isInsideEditableArea(anchorNode)) {
-              event.preventDefault();
-              redirectToEditableArea();
-            }
-          });
-        }, 10);
-        return false;
-      },
-      COMMAND_PRIORITY_HIGH
-    );
-
-    // Interceptar mudanças de seleção
-    const removeSelectionChangeListener = editor.registerCommand(
-      'change',
-      () => {
-        editor.update(() => {
-          const selection = $getSelection();
-          if (!$isRangeSelection(selection)) return;
-
-          const anchorNode = selection.anchor.getNode();
-          
-          if (!isInsideEditableArea(anchorNode)) {
-            redirectToEditableArea();
-          }
-        });
-        return false;
-      },
-      COMMAND_PRIORITY_HIGH
-    );
-
-    // Interceptar teclas
-    const removeKeyDownListener = editor.registerCommand(
-      'keydown',
-      (event: KeyboardEvent) => {
-        const selection = $getSelection();
-        if (!$isRangeSelection(selection)) return false;
-
-        const anchorNode = selection.anchor.getNode();
-        
-        if (!isInsideEditableArea(anchorNode)) {
-          // Permitir apenas teclas de navegação e comandos do sistema
-          const allowedKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End', 'PageUp', 'PageDown'];
-          const isSystemCommand = event.ctrlKey || event.metaKey || event.altKey;
-          
-          if (!allowedKeys.includes(event.key) && !isSystemCommand) {
-            event.preventDefault();
-            event.stopPropagation();
-            
-            editor.update(() => {
-              redirectToEditableArea();
-            });
-            
-            return true;
-          }
-        }
-        return false;
-      },
-      COMMAND_PRIORITY_CRITICAL
-    );
-
-    // Interceptar input de texto
-    const removeTextListener = editor.registerCommand(
-      'input',
-      (event: InputEvent) => {
-        const selection = $getSelection();
-        if (!$isRangeSelection(selection)) return false;
-
-        const anchorNode = selection.anchor.getNode();
-        
-        if (!isInsideEditableArea(anchorNode)) {
-          event.preventDefault();
-          event.stopPropagation();
-          
-          editor.update(() => {
-            redirectToEditableArea();
-          });
-          
-          return true;
-        }
-        return false;
-      },
-      COMMAND_PRIORITY_CRITICAL
-    );
-
-    // Monitor contínuo da posição do cursor
-    const intervalId = setInterval(() => {
-      editor.getEditorState().read(() => {
-        const selection = $getSelection();
-        if (!$isRangeSelection(selection)) return;
-
-        const anchorNode = selection.anchor.getNode();
-        
-        if (!isInsideEditableArea(anchorNode)) {
-          editor.update(() => {
-            redirectToEditableArea();
-          });
-        }
-      });
-    }, 100);
-
-    return () => {
-      removeClickListener();
-      removeSelectionChangeListener();
-      removeKeyDownListener();
-      removeTextListener();
-      clearInterval(intervalId);
-    };
-  }, [editor, hasTemplate]);
 
   return null;
 }
@@ -1387,7 +1222,6 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <ImageEventListenerPlugin />
           <ImageIdAutoConvertPlugin />
           <TemplateSectionsPlugin sections={templateSections} />
-          <RestrictEditingPlugin hasTemplate={!!templateSections && templateSections.length > 0} />
           <EditorInstancePlugin setEditorInstance={(editor) => {
             setEditorInstance(editor);
             if (onEditorInstanceChange) {
