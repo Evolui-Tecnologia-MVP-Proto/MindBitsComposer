@@ -500,13 +500,13 @@ function ToolbarPlugin({
   };
 
   return (
-    <div className="flex items-center gap-1 p-3 border-b bg-gray-50">
+    <div className="flex items-center gap-1 p-3 border-b bg-gray-50 dark:bg-[#111827] border-gray-200 dark:border-[#374151]">
       {/* Undo/Redo buttons */}
       <div className="flex items-center gap-1 mr-3">
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100"
+          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB]"
           title="Desfazer (Ctrl+Z)"
           onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
         >
@@ -515,7 +515,7 @@ function ToolbarPlugin({
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100"
+          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB]"
           title="Refazer (Ctrl+Y)"
           onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
         >
@@ -523,14 +523,14 @@ function ToolbarPlugin({
         </Button>
       </div>
       
-      <Separator orientation="vertical" className="h-6 mx-1" />
+      <Separator orientation="vertical" className="h-6 mx-1 dark:bg-[#374151]" />
       
       {/* Text formatting buttons */}
       <div className="flex items-center gap-1 mr-3">
         <Button
           variant={isBold ? "default" : "ghost"}
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100"
+          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB] dark:data-[state=active]:bg-[#1E40AF]"
           title="Negrito"
           onClick={() => formatText('bold')}
         >
@@ -539,7 +539,7 @@ function ToolbarPlugin({
         <Button
           variant={isItalic ? "default" : "ghost"}
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100"
+          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB] dark:data-[state=active]:bg-[#1E40AF]"
           title="Itálico"
           onClick={() => formatText('italic')}
         >
@@ -548,7 +548,7 @@ function ToolbarPlugin({
         <Button
           variant={isUnderline ? "default" : "ghost"}
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100"
+          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB] dark:data-[state=active]:bg-[#1E40AF]"
           title="Sublinhado"
           onClick={() => formatText('underline')}
         >
@@ -557,7 +557,7 @@ function ToolbarPlugin({
         <Button
           variant={isStrikethrough ? "default" : "ghost"}
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100"
+          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB] dark:data-[state=active]:bg-[#1E40AF]"
           title="Tachado"
           onClick={() => formatText('strikethrough')}
         >
@@ -566,7 +566,7 @@ function ToolbarPlugin({
         <Button
           variant={isCode ? "default" : "ghost"}
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100"
+          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB] dark:data-[state=active]:bg-[#1E40AF]"
           title="Código Inline"
           onClick={() => formatText('code')}
         >
@@ -574,13 +574,13 @@ function ToolbarPlugin({
         </Button>
       </div>
 
-      <Separator orientation="vertical" className="h-6 mx-1" />
+      <Separator orientation="vertical" className="h-6 mx-1 dark:bg-[#374151]" />
 
       <div className="flex items-center gap-1 mr-3">
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100"
+          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB]"
           title="Título 1"
           onClick={() => insertHeading('h1')}
         >
@@ -589,7 +589,7 @@ function ToolbarPlugin({
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100"
+          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB]"
           title="Título 2"
           onClick={() => insertHeading('h2')}
         >
@@ -598,7 +598,7 @@ function ToolbarPlugin({
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100"
+          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB]"
           title="Título 3"
           onClick={() => insertHeading('h3')}
         >
@@ -606,13 +606,13 @@ function ToolbarPlugin({
         </Button>
       </div>
 
-      <Separator orientation="vertical" className="h-6 mx-1" />
+      <Separator orientation="vertical" className="h-6 mx-1 dark:bg-[#374151]" />
 
       <div className="flex items-center gap-1">
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100"
+          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB]"
           title="Citação"
           onClick={insertQuote}
         >
