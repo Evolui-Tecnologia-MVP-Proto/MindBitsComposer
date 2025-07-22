@@ -337,7 +337,7 @@ export default function TemplatesPage() {
                 Novo Template
               </Button>
             </CardHeader>
-            <CardContent className="dark:bg-[#0F172A]">
+            <CardContent className="dark:bg-[#0F172A] rounded-b-lg">
               {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[1, 2, 3, 4].map((i) => (
@@ -373,7 +373,7 @@ export default function TemplatesPage() {
                 Novo Template
               </Button>
             </CardHeader>
-            <CardContent className="dark:bg-[#0F172A]">
+            <CardContent className="dark:bg-[#0F172A] rounded-b-lg">
               {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[1, 2, 3, 4].map((i) => (
