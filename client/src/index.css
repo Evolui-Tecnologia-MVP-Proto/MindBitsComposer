@@ -1587,23 +1587,40 @@ html.dark [data-radix-select-item][data-highlighted] {
   background-color: #1E293B !important;
 }
 
-/* Tabs styling */
+/* Tabs styling - Same as admin page */
 .dark [data-page="templates"] [data-radix-tabs-list] {
-  background-color: #1E293B !important;
+  background-color: #1F2937 !important;
   border-color: #374151 !important;
 }
 
 .dark [data-page="templates"] [data-radix-tabs-trigger] {
-  background-color: transparent !important;
+  background-color: #1F2937 !important;
   color: #9CA3AF !important;
+  border: 1px solid #374151 !important;
 }
 
 .dark [data-page="templates"] [data-radix-tabs-trigger][data-state="active"] {
   background-color: #1E40AF !important;
   color: #FFFFFF !important;
+  border-color: #1E40AF !important;
 }
 
-/* Buttons */
+.dark [data-page="templates"] [data-radix-tabs-trigger]:hover:not([data-state="active"]) {
+  background-color: #1F2937 !important;
+  color: #E5E7EB !important;
+}
+
+/* Main tabs container */
+.dark [data-page="templates"] [data-radix-tabs-root] {
+  background-color: transparent !important;
+}
+
+/* Tab content areas */
+.dark [data-page="templates"] [data-radix-tabs-content] {
+  background-color: transparent !important;
+}
+
+/* Buttons - Same as admin page */
 .dark [data-page="templates"] .btn-primary,
 .dark [data-page="templates"] button[data-variant="default"] {
   background-color: #1E40AF !important;
@@ -1616,7 +1633,7 @@ html.dark [data-radix-select-item][data-highlighted] {
   background-color: #1D4ED8 !important;
 }
 
-/* Page title */
+/* Page title - Same as admin page */
 .dark [data-page="templates"] h1 {
   color: #6B7280 !important;
   font-size: 1.5rem !important;
@@ -1776,6 +1793,57 @@ html.dark [data-radix-select-item][data-highlighted] {
 .dark [data-page="templates"] .rounded-full {
   background-color: #374151 !important;
   color: #E5E7EB !important;
+}
+
+/* Additional button and element styling to match admin */
+.dark [data-page="templates"] button[size="sm"] {
+  background-color: #1E40AF !important;
+  border-color: #1E40AF !important;
+  color: #FFFFFF !important;
+}
+
+.dark [data-page="templates"] button[size="sm"]:hover {
+  background-color: #1D4ED8 !important;
+}
+
+/* Card headers in tabs content */
+.dark [data-page="templates"] [data-radix-card] [data-radix-card-header] {
+  background-color: #111827 !important;
+  border-bottom: 1px solid #374151 !important;
+}
+
+/* Card titles and descriptions */
+.dark [data-page="templates"] [data-radix-card-title] {
+  color: #E5E7EB !important;
+}
+
+.dark [data-page="templates"] [data-radix-card-description] {
+  color: #9CA3AF !important;
+}
+
+/* Ensure consistent spacing and layouts */
+.dark [data-page="templates"] .space-y-4 {
+  background-color: transparent !important;
+}
+
+.dark [data-page="templates"] .mb-6 {
+  background-color: transparent !important;
+}
+
+/* Grid layouts for template cards */
+.dark [data-page="templates"] .grid.grid-cols-1 {
+  background-color: transparent !important;
+}
+
+/* Specific styling for Plus icon buttons */
+.dark [data-page="templates"] button:has(.h-4.w-4) {
+  background-color: #1E40AF !important;
+  color: #FFFFFF !important;
+  border-color: #1E40AF !important;
+}
+
+.dark [data-page="templates"] button:has(.h-4.w-4):hover {
+  background-color: #1D4ED8 !important;
 }
 
 .dark input[type="time"]::-webkit-datetime-edit-fields-wrapper {
