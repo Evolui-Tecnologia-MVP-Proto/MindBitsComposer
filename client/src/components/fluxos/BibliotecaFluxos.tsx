@@ -468,23 +468,24 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-xl font-semibold">Biblioteca de Fluxos</h2>
-          <p className="text-muted-foreground">
-            Gerencie todos os seus fluxos de documentos
-          </p>
+      <div className="biblioteca-content-container">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-xl font-semibold">Biblioteca de Fluxos</h2>
+            <p className="text-muted-foreground">
+              Gerencie todos os seus fluxos de documentos
+            </p>
+          </div>
+          <Button
+            onClick={() => setShowNewFlowModal(true)}
+            className="flex items-center space-x-2"
+          >
+            <PlusCircle className="h-4 w-4" />
+            <span>Novo Fluxo</span>
+          </Button>
         </div>
-        <Button
-          onClick={() => setShowNewFlowModal(true)}
-          className="flex items-center space-x-2"
-        >
-          <PlusCircle className="h-4 w-4" />
-          <span>Novo Fluxo</span>
-        </Button>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {savedFlows.map((flow) => {
           const flowType = flowTypes?.find(type => 
             type.id === (flow.flowTypeId || flow.flow_type_id)
@@ -626,6 +627,7 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
             </Card>
           );
         })}
+        </div>
       </div>
 
       {/* Modal de edição de metadata */}
