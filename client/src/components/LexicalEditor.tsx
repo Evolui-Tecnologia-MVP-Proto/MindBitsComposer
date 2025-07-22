@@ -1141,12 +1141,12 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
               deleteSelectedTable={deleteSelectedTable}
             />
           )}
-          <div className="p-4" style={{ height: 'calc(100vh - 350px)', maxHeight: 'calc(100vh - 350px)', overflowY: 'auto' }}>
+          <div className="p-4 dark:bg-[#020203]" style={{ height: 'calc(100vh - 350px)', maxHeight: 'calc(100vh - 350px)', overflowY: 'auto' }}>
             {viewMode === 'editor' ? (
               <RichTextPlugin
                 contentEditable={
                   <ContentEditable 
-                    className="w-full outline-none resize-none text-gray-900"
+                    className="w-full outline-none resize-none text-gray-900 dark:text-[#E5E7EB] dark:bg-[#020203]"
                     style={{ 
                       fontFamily: 'system-ui, -apple-system, sans-serif',
                       lineHeight: '1.6',
