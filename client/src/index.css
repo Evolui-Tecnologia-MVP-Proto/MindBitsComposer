@@ -2,6 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fix for horizontal scrollbar during accordion animation */
+.composer-library-panel {
+  overflow-x: hidden !important;
+}
+
+.composer-library-panel * {
+  max-width: 100% !important;
+}
+
+.composer-library-panel [data-state="open"],
+.composer-library-panel [data-state="closed"],
+.composer-library-panel [data-state="opening"],
+.composer-library-panel [data-state="closing"] {
+  overflow-x: hidden !important;
+}
+
+.composer-library-panel [data-radix-accordion-content] {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+}
+
+.composer-library-panel .space-y-2,
+.composer-library-panel .space-y-3 {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
