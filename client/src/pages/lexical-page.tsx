@@ -1618,7 +1618,7 @@ export default function LexicalPage() {
         <div className="flex h-full">
           {/* Sidebar de documentos (condicional) */}
         {showDocumentList && (
-          <div className="w-80 border-r bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col composer-side-panel composer-library-panel rounded-tl-xl">
+          <div className="w-80 border-r bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col composer-side-panel composer-library-panel rounded-tl-xl overflow-hidden">
             {/* Header fixo */}
             <div className="p-4 border-b bg-white dark:bg-[#111827] border-gray-200 dark:border-[#374151] rounded-tl-xl">
               <div className="flex items-center gap-2">
@@ -1628,15 +1628,15 @@ export default function LexicalPage() {
             </div>
             
             {/* Área com scroll */}
-            <div className="flex-1 p-4 overflow-y-auto rounded-bl-xl">
-              <Accordion type="multiple" defaultValue={[]} className="w-full">
+            <div className="flex-1 p-4 overflow-y-auto overflow-x-hidden rounded-bl-xl">
+              <Accordion type="multiple" defaultValue={[]} className="w-full overflow-hidden">
                 {/* Grupo 1: Templates Estruturais */}
                 <AccordionItem value="templates">
                   <AccordionTrigger className="text-md font-medium text-gray-700 dark:text-[#9CA3AF] hover:no-underline">
                     Templates Estruturais
                   </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-2 pt-2">
+                  <AccordionContent className="overflow-hidden">
+                    <div className="space-y-2 pt-2 overflow-x-hidden">
                       {isLoadingTemplates ? (
                         <div className="text-center py-2 text-sm">Carregando templates...</div>
                       ) : (
@@ -1650,7 +1650,7 @@ export default function LexicalPage() {
                             Array.isArray(structTemplates) && structTemplates.map((template: Template) => (
                               <div
                                 key={template.id}
-                                className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E293B] border-green-200 dark:border-[#374151] hover:border-green-300 dark:hover:border-[#4B5563] bg-white dark:bg-[#111827]"
+                                className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E293B] border-green-200 dark:border-[#374151] hover:border-green-300 dark:hover:border-[#4B5563] bg-white dark:bg-[#111827] overflow-hidden"
                                 onClick={() => {
                                   // Verificar se há conteúdo não salvo no editor
                                   if (hasEditorContent && !currentDocumentId) {
@@ -1679,8 +1679,8 @@ export default function LexicalPage() {
                                   }
                                 }}
                               >
-                                <div className="flex-1">
-                                  <h5 className="font-medium text-sm text-green-700 dark:text-green-400">{template.code} - {template.name}</h5>
+                                <div className="flex-1 overflow-hidden">
+                                  <h5 className="font-medium text-sm text-green-700 dark:text-green-400 truncate">{template.code} - {template.name}</h5>
                                   <p className="text-xs text-gray-500 dark:text-[#9CA3AF] mt-1 line-clamp-2">
                                     {template.description}
                                   </p>
@@ -1702,8 +1702,8 @@ export default function LexicalPage() {
                   <AccordionTrigger className="text-md font-medium text-gray-700 dark:text-[#9CA3AF] hover:no-underline">
                     Documentos Composer
                   </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-2 pt-2">
+                  <AccordionContent className="overflow-hidden">
+                    <div className="space-y-2 pt-2 overflow-x-hidden">
                       {isLoadingEditions ? (
                         <div className="text-center py-2 text-sm">Carregando documentos em progresso...</div>
                       ) : (
@@ -1717,7 +1717,7 @@ export default function LexicalPage() {
                             Array.isArray(documentEditions) && documentEditions.map((edition: any) => (
                               <div
                                 key={edition.id}
-                                className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E293B] dark:bg-[#111827] dark:border-[#374151] relative ${
+                                className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E293B] dark:bg-[#111827] dark:border-[#374151] relative overflow-hidden ${
                                   selectedEdition?.id === edition.id ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/30' : ''
                                 }`}
                                 onClick={() => handleSelectEdition(edition)}
@@ -1730,15 +1730,15 @@ export default function LexicalPage() {
                                   </div>
                                 )}
                                 <div className="flex justify-between items-start">
-                                  <div className="flex-1 pr-8">
-                                    <h5 className="font-medium text-sm text-blue-600 dark:text-blue-400">
+                                  <div className="flex-1 pr-8 overflow-hidden">
+                                    <h5 className="font-medium text-sm text-blue-600 dark:text-blue-400 truncate">
                                       {edition.templateCode}
                                     </h5>
                                     <div className="mt-1 space-y-1">
-                                      <p className="text-xs text-gray-600 dark:text-[#9CA3AF]">
+                                      <p className="text-xs text-gray-600 dark:text-[#9CA3AF] truncate">
                                         <span className="font-medium">Origem:</span> {edition.origem || 'N/A'}
                                       </p>
-                                      <p className="text-xs text-gray-600 dark:text-[#9CA3AF]">
+                                      <p className="text-xs text-gray-600 dark:text-[#9CA3AF] truncate">
                                         <span className="font-medium">Objeto:</span> {edition.objeto || 'N/A'}
                                       </p>
                                     </div>
