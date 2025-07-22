@@ -1469,14 +1469,14 @@ export default function LexicalPage() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header com navegação */}
-      <div className="flex-shrink-0 p-6 pb-4" style={{ 
+      <div className="flex-shrink-0 p-6 pb-4 bg-gray-50 dark:bg-[#1F2937] border-b border-gray-200 dark:border-[#374151]" style={{ 
         marginRight: showAttachments && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) ? '305px' : '0px' 
       }}>
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-4">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">Composer Editor</h1>
-              <p className="text-muted-foreground">Edição avançada e integrada de documentação técnica de processos</p>
+              <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-[#E5E7EB]">Composer Editor</h1>
+              <p className="text-muted-foreground dark:text-[#9CA3AF]">Edição avançada e integrada de documentação técnica de processos</p>
             </div>
           </div>
           
@@ -1617,14 +1617,14 @@ export default function LexicalPage() {
         <div className="flex h-full">
           {/* Sidebar de documentos (condicional) */}
         {showDocumentList && (
-          <div className="w-80 border-r bg-white p-4 overflow-y-auto" style={{ marginTop: '16px' }}>
+          <div className="w-80 border-r bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151] p-4 overflow-y-auto" style={{ marginTop: '16px' }}>
             <div className="space-y-6">
-              <h3 className="text-lg font-semibold">Biblioteca</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">Biblioteca</h3>
               
               <Accordion type="multiple" defaultValue={[]} className="w-full">
                 {/* Grupo 1: Templates Estruturais */}
                 <AccordionItem value="templates">
-                  <AccordionTrigger className="text-md font-medium text-gray-700 hover:no-underline">
+                  <AccordionTrigger className="text-md font-medium text-gray-700 dark:text-[#9CA3AF] hover:no-underline">
                     Templates Estruturais
                   </AccordionTrigger>
                   <AccordionContent>
@@ -1691,7 +1691,7 @@ export default function LexicalPage() {
 
                 {/* Grupo 2: Documentos Composer */}
                 <AccordionItem value="documents">
-                  <AccordionTrigger className="text-md font-medium text-gray-700 hover:no-underline">
+                  <AccordionTrigger className="text-md font-medium text-gray-700 dark:text-[#9CA3AF] hover:no-underline">
                     Documentos Composer
                   </AccordionTrigger>
                   <AccordionContent>
@@ -1784,13 +1784,13 @@ export default function LexicalPage() {
 
         {/* Painel de Anexos - desabilitado apenas quando há template struct sem documento composer */}
         {showAttachments && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) && (
-          <div className="w-80 border-l bg-gray-50 flex flex-col" style={{ marginTop: '16px' }}>
+          <div className="w-80 border-l bg-gray-50 dark:bg-[#1E293B] border-gray-200 dark:border-[#374151] flex flex-col" style={{ marginTop: '16px' }}>
             {/* Header fixo */}
-            <div className="p-4 border-b bg-gray-50">
+            <div className="p-4 border-b bg-gray-50 dark:bg-[#111827] border-gray-200 dark:border-[#374151]">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Paperclip className="w-5 h-5" />
-                  <h3 className="font-semibold">Anexos</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-[#E5E7EB]">Anexos</h3>
                 </div>
                 {/* Combo de Plugins - desabilitado apenas quando há template struct sem documento composer */}
                 {activePlugins.length > 0 && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) && (
