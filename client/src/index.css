@@ -2570,6 +2570,53 @@ html.dark [data-radix-select-item][data-highlighted] {
   background-color: transparent !important;
 }
 
+/* NodeInspector panel styling for dark theme */
+.dark [data-page="fluxos"] .w-full.h-full.bg-white.border-l.border-gray-200.p-4.overflow-y-auto {
+  background-color: #0F172A !important;
+  border-color: #374151 !important;
+}
+
+/* Inspector header */
+.dark [data-page="fluxos"] .w-full.h-full.bg-white.border-l.border-gray-200.p-4.overflow-y-auto h3 {
+  color: #E5E7EB !important;
+}
+
+.dark [data-page="fluxos"] .w-full.h-full.bg-white.border-l.border-gray-200.p-4.overflow-y-auto .text-sm.text-gray-600.font-mono {
+  color: #9CA3AF !important;
+}
+
+/* Inspector table styling */
+.dark [data-page="fluxos"] .border.border-gray-200.rounded-lg.overflow-hidden {
+  border-color: #374151 !important;
+  background-color: #1E293B !important;
+}
+
+.dark [data-page="fluxos"] .border.border-gray-200.rounded-lg.overflow-hidden table {
+  background-color: #1E293B !important;
+}
+
+.dark [data-page="fluxos"] .border.border-gray-200.rounded-lg.overflow-hidden tr {
+  background-color: #1E293B !important;
+  border-color: #374151 !important;
+}
+
+.dark [data-page="fluxos"] .border.border-gray-200.rounded-lg.overflow-hidden td {
+  border-color: #374151 !important;
+  color: #E5E7EB !important;
+}
+
+.dark [data-page="fluxos"] .border.border-gray-200.rounded-lg.overflow-hidden .text-gray-700 {
+  color: #9CA3AF !important;
+}
+
+.dark [data-page="fluxos"] .border.border-gray-200.rounded-lg.overflow-hidden .text-gray-900 {
+  color: #E5E7EB !important;
+}
+
+.dark [data-page="fluxos"] .border.border-gray-200.rounded-lg.overflow-hidden .bg-gray-50 {
+  background-color: #0F172A !important;
+}
+
 .dark [data-page="fluxos"] [data-radix-tabs-trigger] {
   background-color: #0F172A !important;
   color: #9CA3AF !important;
