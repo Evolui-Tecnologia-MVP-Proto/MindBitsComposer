@@ -1166,7 +1166,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                       <h3 className="text-lg font-semibold text-gray-800 dark:text-[#E5E7EB]">Visualização Markdown</h3>
                       <p className="text-sm text-gray-600 dark:text-[#9CA3AF] mt-1">Representação em markdown do conteúdo do editor</p>
                     </div>
-                    <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed text-gray-900 dark:text-[#E5E7EB] bg-gray-50 dark:bg-[#111827] p-4 rounded-md border border-gray-300 dark:border-[#374151] overflow-x-auto">
+                    <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed text-gray-900 dark:text-[#E5E7EB] bg-gray-50 dark:bg-[#1B2028] p-4 rounded-md border border-gray-300 dark:border-[#374151] overflow-x-auto">
                       {currentMarkdown || '// Nenhum conteúdo para visualizar\n// Adicione texto no editor para ver a conversão markdown'}
                     </pre>
                   </div>
