@@ -1617,7 +1617,7 @@ export default function LexicalPage() {
         <div className="flex h-full">
           {/* Sidebar de documentos (condicional) */}
         {showDocumentList && (
-          <div className="w-80 border-r bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col composer-side-panel composer-library-panel" style={{ marginTop: '16px' }}>
+          <div className="w-80 border-r bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col composer-side-panel composer-library-panel">
             {/* Header fixo */}
             <div className="p-4 border-b bg-white dark:bg-[#111827] border-gray-200 dark:border-[#374151]">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">Biblioteca</h3>
@@ -1754,7 +1754,7 @@ export default function LexicalPage() {
         )}
 
         {/* Editor principal */}
-        <div className="flex-1 flex flex-col composer-editor-container" style={{ marginTop: '16px' }}>
+        <div className="flex-1 flex flex-col composer-editor-container">
           {/* Barra de ferramentas do editor integrada */}
           <div className="flex-1 pl-0 pr-0 pt-0 pb-0">
             <Card className="h-full composer-editor-card">
@@ -1788,7 +1788,7 @@ export default function LexicalPage() {
 
         {/* Painel de Anexos - desabilitado apenas quando há template struct sem documento composer */}
         {showAttachments && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) && (
-          <div className="w-80 border-l bg-gray-50 dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col composer-side-panel composer-attachments-panel" style={{ marginTop: '16px' }}>
+          <div className="w-80 border-l bg-gray-50 dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col composer-side-panel composer-attachments-panel">
             {/* Header fixo */}
             <div className="p-4 border-b bg-gray-50 dark:bg-[#111827] border-gray-200 dark:border-[#374151]">
               <div className="flex items-center justify-between">

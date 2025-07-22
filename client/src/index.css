@@ -2822,12 +2822,17 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   padding-bottom: 0 !important;
 }
 
+/* Align panel headers with editor toolbar - same padding as toolbar (p-3 = 12px) */
+.composer-side-panel > div:first-child {
+  padding: 12px 16px !important; /* Match toolbar's p-3 vertically, keep p-4 horizontally */
+}
+
 /* Library panel specific height matching */
 .composer-library-panel .flex-1 {
-  max-height: calc(100% - 70px); /* Account for fixed header */
+  max-height: calc(100% - 60px); /* Adjusted for smaller header padding */
 }
 
 /* Attachments panel specific height matching */
 .composer-attachments-panel .flex-1 {
-  max-height: calc(100% - 70px); /* Account for fixed header */
+  max-height: calc(100% - 60px); /* Adjusted for smaller header padding */
 }
