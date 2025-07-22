@@ -1141,7 +1141,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
               deleteSelectedTable={deleteSelectedTable}
             />
           )}
-          <div className="flex-1 p-4 dark:bg-[#020203] overflow-y-auto">
+          <div className="flex-1 p-4 dark:bg-[#020203] overflow-y-auto lexical-canvas">
             {viewMode === 'editor' ? (
               <RichTextPlugin
                 contentEditable={

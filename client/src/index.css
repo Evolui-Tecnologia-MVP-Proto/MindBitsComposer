@@ -2930,3 +2930,29 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 .editor-left-rounded .dark\\:bg-\\[\\#020203\\] {
   border-bottom-left-radius: 12px !important;
 }
+
+/* Direct targeting of the canvas container in Lexical */
+.editor-left-rounded .lexical-editor-container > div > div > div.flex-1 {
+  border-bottom-left-radius: 12px !important;
+}
+
+/* More specific targeting for the canvas area */
+.editor-left-rounded .lexical-editor-container .flex-1[style*="background-color"] {
+  border-bottom-left-radius: 12px !important;
+}
+
+/* Target any dark background element in the editor when left panel is retracted */
+.editor-left-rounded [style*="#020203"] {
+  border-bottom-left-radius: 12px !important;
+}
+
+/* Specific class targeting for Lexical canvas */
+.editor-left-rounded .lexical-canvas {
+  border-bottom-left-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* Force all child elements in canvas to respect the rounded corners */
+.editor-left-rounded .lexical-canvas * {
+  border-bottom-left-radius: inherit !important;
+}
