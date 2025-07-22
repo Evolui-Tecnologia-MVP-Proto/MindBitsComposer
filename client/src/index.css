@@ -219,11 +219,27 @@ body.dark .Collapsible__title:hover {
 .lexical-editor-container .ContentEditable__root > p:not([data-lexical-collapsible-content] p) {
   pointer-events: none !important;
   user-select: none !important;
+  display: none !important;
+  height: 0 !important;
+  overflow: hidden !important;
 }
 
 .lexical-editor-container .ContentEditable__root > *:not([data-lexical-collapsible-container]) {
   pointer-events: none !important;
   user-select: none !important;
+  display: none !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Hide any loose paragraphs or text nodes */
+.lexical-editor-container .ContentEditable__root > br,
+.lexical-editor-container .ContentEditable__root > div:not([data-lexical-collapsible-container]),
+.lexical-editor-container .ContentEditable__root > span:not([data-lexical-collapsible-container]),
+.lexical-editor-container .ContentEditable__root > text:not([data-lexical-collapsible-container]) {
+  display: none !important;
+  height: 0 !important;
+  pointer-events: none !important;
 }
 
 /* Allow interaction only within collapsible content */
@@ -231,6 +247,35 @@ body.dark .Collapsible__title:hover {
 .lexical-editor-container [data-lexical-collapsible-content] * {
   pointer-events: auto !important;
   user-select: text !important;
+  display: block !important;
+}
+
+/* Force ContentEditable to not accept clicks outside containers */
+.lexical-editor-container .ContentEditable__root::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.lexical-editor-container [data-lexical-collapsible-container] {
+  position: relative;
+  z-index: 1001;
+}
+
+/* Additional protection against loose elements */
+.lexical-editor-container .ContentEditable__root p:last-child:empty {
+  display: none !important;
+  height: 0 !important;
+}
+
+.lexical-editor-container .ContentEditable__root > p:only-child:empty {
+  display: none !important;
+  height: 0 !important;
 }
 
 .composer-library-panel * {
