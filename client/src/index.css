@@ -2620,24 +2620,24 @@ html.dark [data-radix-select-item][data-highlighted] {
 
 /* ReactFlow canvas styling for dark theme */
 .dark [data-page="fluxos"] .react-flow {
-  background-color: #020203 !important;
+  background-color: #191B20 !important;
 }
 
 .dark [data-page="fluxos"] .react-flow__background {
-  background-color: #020203 !important;
+  background-color: #191B20 !important;
 }
 
 .dark [data-page="fluxos"] .react-flow__pane {
-  background-color: #020203 !important;
+  background-color: #191B20 !important;
 }
 
 /* Canvas container styling */
 .dark [data-page="fluxos"] .react-flow__viewport {
-  background-color: #020203 !important;
+  background-color: #191B20 !important;
 }
 
 .dark [data-page="fluxos"] .react-flow__container {
-  background-color: #020203 !important;
+  background-color: #191B20 !important;
   border-color: #111827 !important;
 }
 
