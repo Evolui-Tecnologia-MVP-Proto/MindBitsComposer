@@ -1308,6 +1308,25 @@ html.dark [data-page="admin"] select:hover {
   background-color: #1F2937 !important;
 }
 
+/* Ultimate force for ALL interactive elements in admin page */
+.dark [data-page="admin"] select:hover,
+.dark [data-page="admin"] [role="combobox"]:hover,
+.dark [data-page="admin"] [data-radix-select-trigger]:hover,
+.dark [data-page="admin"] .bg-white:hover select,
+.dark [data-page="admin"] .bg-background:hover,
+html.dark [data-page="admin"] select:hover,
+html.dark [data-page="admin"] [role="combobox"]:hover {
+  background-color: #1F2937 !important;
+  border-color: #374151 !important;
+}
+
+/* Force all admin page select-like elements */
+.dark [data-page="admin"] *[class*="border-input"]:hover,
+.dark [data-page="admin"] *[class*="bg-white"]:hover select,
+.dark [data-page="admin"] *[class*="bg-background"]:hover select {
+  background-color: #1F2937 !important;
+}
+
 .dark input[type="time"]::-webkit-datetime-edit-fields-wrapper {
   background: transparent !important;
   color: #E5E7EB !important;

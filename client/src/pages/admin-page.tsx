@@ -2906,7 +2906,7 @@ return item.column_values.some(col =>
                 <div className="space-y-2">
                   <Label>Repositório Padrão</Label>
                   <Select value={selectedRepo} onValueChange={setSelectedRepo}>
-                    <SelectTrigger>
+                    <SelectTrigger className="hover:bg-[#1F2937] dark:hover:bg-[#1F2937]">
                       <SelectValue placeholder="Selecione um repositório..." />
                     </SelectTrigger>
                     <SelectContent>
