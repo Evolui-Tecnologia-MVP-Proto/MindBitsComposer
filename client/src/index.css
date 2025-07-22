@@ -47,37 +47,6 @@
   border-color: #374151 !important;
 }
 
-/* Lexical canvas scroll optimization */
-.lexical-canvas {
-  overflow: auto !important;
-  position: relative !important;
-  scrollbar-width: thin;
-  scrollbar-color: #374151 transparent;
-}
-
-/* Prevent content editable from expanding */
-.lexical-canvas [contenteditable="true"] {
-  overflow: auto !important;
-  height: calc(100vh - 280px) !important;
-}
-
-.lexical-canvas::-webkit-scrollbar {
-  width: 6px;
-}
-
-.lexical-canvas::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.lexical-canvas::-webkit-scrollbar-thumb {
-  background-color: #374151;
-  border-radius: 3px;
-}
-
-.lexical-canvas::-webkit-scrollbar-thumb:hover {
-  background-color: #4B5563;
-}
-
 @layer base {
   :root {
     --background: 0 0% 100%;
