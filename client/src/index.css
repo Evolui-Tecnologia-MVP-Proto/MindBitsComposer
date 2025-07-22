@@ -1975,10 +1975,10 @@ html.dark [data-radix-select-item][data-highlighted] {
   background-color: #1F2937 !important;
 }
 
-/* Card components */
+/* Card components - Main card containing all templates */
 .dark [data-page="templates"] [data-radix-card],
 .dark [data-page="templates"] .card {
-  background-color: #1E293B !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
 }
 
@@ -2085,10 +2085,10 @@ html.dark [data-radix-select-item][data-highlighted] {
   background-color: transparent !important;
 }
 
-/* Individual template cards */
+/* Individual template cards - Use lighter color for hierarchy */
 .dark [data-page="templates"] .grid .card,
 .dark [data-page="templates"] .grid [data-radix-card] {
-  background-color: #0F172A !important;
+  background-color: #1E293B !important;
   border-color: #374151 !important;
 }
 
