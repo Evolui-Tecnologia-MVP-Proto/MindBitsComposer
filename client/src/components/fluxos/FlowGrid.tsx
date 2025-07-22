@@ -8,9 +8,7 @@ interface FlowGridProps {
 export const FlowGrid: React.FC<FlowGridProps> = ({ isDark }) => {
   // Use document class for reliable theme detection
   const documentIsDark = document.documentElement.classList.contains('dark');
-  const gridColor = documentIsDark ? "#ffffff" : "#000000";
-  
-  console.log('🔧 Final test - documentIsDark:', documentIsDark, 'gridColor:', gridColor);
+  const gridColor = documentIsDark ? "#ffffff" : "#ff0000"; // Red for testing in light mode
   
   return (
     <Background 
