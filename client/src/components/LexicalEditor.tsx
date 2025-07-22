@@ -621,7 +621,7 @@ function ToolbarPlugin({
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100"
+          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB]"
           title="Bloco de Código"
           onClick={insertCodeBlock}
         >
@@ -630,7 +630,7 @@ function ToolbarPlugin({
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100"
+          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB]"
           title="Lista"
           onClick={insertBulletList}
         >
@@ -639,7 +639,7 @@ function ToolbarPlugin({
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100"
+          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB]"
           title="Lista Numerada"
           onClick={insertOrderedList}
         >
@@ -648,7 +648,7 @@ function ToolbarPlugin({
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100"
+          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB]"
           title="Container Colapsível"
           onClick={insertCollapsible}
         >
@@ -658,7 +658,7 @@ function ToolbarPlugin({
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100"
+          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB]"
           title="Inserir Tabela"
           onClick={insertTable}
         >

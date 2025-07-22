@@ -1819,8 +1819,8 @@ export default function LexicalPage() {
             <div className="flex-1 overflow-y-auto p-4">
               <Accordion type="multiple" className="w-full space-y-2">
                 {/* Global Assets */}
-                <AccordionItem value="global-assets" className="border rounded-lg bg-white">
-                  <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                <AccordionItem value="global-assets" className="border rounded-lg bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151]">
+                  <AccordionTrigger className="px-4 py-3 hover:no-underline dark:text-[#E5E7EB]">
                     <div className="flex items-center justify-between w-full pr-2">
                       <div className="flex items-center gap-2">
                         <Globe className="w-4 h-4" />
@@ -1858,7 +1858,7 @@ export default function LexicalPage() {
                           {globalAssets.map((asset: GlobalAsset) => (
                             <div 
                               key={asset.id}
-                              className="p-3 bg-gray-50 rounded-lg border"
+                              className="p-3 bg-gray-50 dark:bg-[#1E293B] rounded-lg border border-gray-200 dark:border-[#374151]"
                             >
                               {/* Botões de ação no topo */}
                               <div className="flex justify-between mb-3">
@@ -1907,14 +1907,14 @@ export default function LexicalPage() {
                                     className="w-12 h-12 object-cover rounded border"
                                   />
                                 ) : (
-                                  <div className="w-12 h-12 bg-gray-100 rounded border flex items-center justify-center">
+                                  <div className="w-12 h-12 bg-gray-100 dark:bg-[#374151] rounded border border-gray-200 dark:border-[#374151] flex items-center justify-center">
                                     {getFileIcon(asset.mimeType, asset.isImage)}
                                   </div>
                                 )}
                                 
                                 {/* Informações do arquivo */}
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-medium truncate" title={asset.description || asset.name}>
+                                  <p className="text-sm font-medium truncate text-gray-900 dark:text-[#E5E7EB]" title={asset.description || asset.name}>
                                     {asset.description || asset.name}
                                   </p>
                                   <div className="flex items-center gap-2 mt-2">
@@ -1939,8 +1939,8 @@ export default function LexicalPage() {
 
                 {/* My Assets */}
                 {selectedEdition && (
-                  <AccordionItem value="my-assets" className="border rounded-lg bg-white">
-                    <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                  <AccordionItem value="my-assets" className="border rounded-lg bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151]">
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline dark:text-[#E5E7EB]">
                       <div className="flex items-center justify-between w-full pr-2">
                         <div className="flex items-center gap-2">
                           <FileOutput className="w-4 h-4" />
@@ -1997,7 +1997,7 @@ export default function LexicalPage() {
                               .map((artifact: DocumentArtifact) => (
                                 <div 
                                   key={artifact.id}
-                                  className="p-3 bg-gray-50 rounded-lg border"
+                                  className="p-3 bg-gray-50 dark:bg-[#1E293B] rounded-lg border border-gray-200 dark:border-[#374151]"
                                 >
                                   {/* Botões de ação no topo */}
                                   <div className="flex justify-between mb-3">
@@ -2083,8 +2083,8 @@ export default function LexicalPage() {
                   artifact.originAssetId !== "Uploaded" && 
                   artifact.originAssetId !== "Mermaid"
                 ).length > 0 && (
-                  <AccordionItem value="origin-assets" className="border rounded-lg bg-white">
-                    <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                  <AccordionItem value="origin-assets" className="border rounded-lg bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151]">
+                    <AccordionTrigger className="px-4 py-3 hover:no-underline dark:text-[#E5E7EB]">
                       <div className="flex items-center justify-between w-full pr-2">
                         <div className="flex items-center gap-2">
                           <FileInput className="w-4 h-4" />
@@ -2133,7 +2133,7 @@ export default function LexicalPage() {
                               return (
                                 <div 
                                   key={artifact.id}
-                                  className="p-3 bg-gray-50 rounded-lg border"
+                                  className="p-3 bg-gray-50 dark:bg-[#1E293B] rounded-lg border border-gray-200 dark:border-[#374151]"
                                 >
                                 {/* Botões de ação no topo */}
                                 <div className="flex justify-between mb-3">
