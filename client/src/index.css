@@ -1982,10 +1982,10 @@ html.dark [data-radix-select-item][data-highlighted] {
   border-color: #374151 !important;
 }
 
-/* Card headers */
+/* Card headers - Use #0F172A for template cards headers */
 .dark [data-page="templates"] [data-radix-card-header],
 .dark [data-page="templates"] .card-header {
-  background-color: #111827 !important;
+  background-color: #0F172A !important;
   border-bottom: 1px solid #374151 !important;
 }
 
@@ -2049,6 +2049,11 @@ html.dark [data-radix-select-item][data-highlighted] {
 
 /* Title container - Use #0F172A */
 .dark [data-page="templates"] .flex.items-center.justify-between.p-6.rounded-lg {
+  background-color: #0F172A !important;
+}
+
+/* Card headers with buttons (Novo Template areas) */
+.dark [data-page="templates"] .flex.flex-row.items-center.justify-between {
   background-color: #0F172A !important;
 }
 
