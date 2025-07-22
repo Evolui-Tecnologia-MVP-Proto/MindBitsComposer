@@ -298,11 +298,11 @@
 }
 
 /* Force override any #374151 colors in the template modal */
-.dark [data-radix-dialog-content] * {
-  border-color: #0F172A !important;
+.dark [data-radix-dialog-content] [data-radix-collapsible-trigger]:hover {
+  background-color: #1E293B !important;
 }
 
-.dark [data-radix-dialog-content] [data-radix-collapsible-content] * {
+.dark [data-radix-dialog-content] [data-radix-collapsible-content] {
   background-color: #0F172A !important;
   border-color: #0F172A !important;
 }
