@@ -50,6 +50,8 @@
 /* Lexical canvas scroll optimization */
 .lexical-canvas {
   overflow-y: scroll !important;
+  overflow-x: hidden !important;
+  height: 100% !important;
   scrollbar-width: thin;
   scrollbar-color: #374151 transparent;
 }
