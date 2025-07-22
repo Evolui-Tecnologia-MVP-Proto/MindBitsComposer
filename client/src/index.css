@@ -2831,11 +2831,13 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 
 /* Match panel headers exactly with editor toolbar height */
 .composer-side-panel > div:first-child {
-  height: 56px !important; /* Exact height of toolbar (p-3 = 12px * 2 + content) */
-  padding: 12px 16px !important;
+  min-height: 56px !important; /* Match toolbar height exactly */
+  height: 56px !important;
+  padding: 12px 16px !important; /* Same as toolbar p-3 vertically */
   display: flex;
   align-items: center;
   box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 /* Ensure h3 titles in headers don't add extra height */
@@ -2846,12 +2848,21 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 
 /* Library panel specific - content area below header */
 .composer-library-panel .flex-1 {
-  height: calc(100% - 56px) !important; /* Subtract exact header height */
-  max-height: calc(100% - 56px) !important;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 /* Attachments panel specific - content area below header */
 .composer-attachments-panel .flex-1 {
-  height: calc(100% - 56px) !important; /* Subtract exact header height */
-  max-height: calc(100% - 56px) !important;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Ensure toolbar has consistent height */
+.lexical-editor-container .border-b.bg-gray-50.dark\\:bg-\\[\\#111827\\] {
+  min-height: 56px !important;
+  height: 56px !important;
+  flex-shrink: 0;
 }
