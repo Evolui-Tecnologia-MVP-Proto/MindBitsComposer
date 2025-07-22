@@ -90,9 +90,9 @@ const mdxComponents = {
   tbody: (props: any) => <tbody className="divide-y divide-gray-200 dark:divide-[#374151]" {...props} />,
   tr: (props: any) => <tr className="hover:bg-gray-50 dark:hover:bg-[#1E293B]" {...props} />,
   th: (props: any) => (
-    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-[#9CA3AF] uppercase tracking-wider border-b border-gray-300 dark:border-[#374151]" {...props} />
+    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-[#9CA3AF] uppercase tracking-wider border-b border-gray-300 dark:border-[#374151] bg-gray-50 dark:bg-[#1B2028]" {...props} />
   ),
-  td: (props: any) => <td className="px-4 py-3 text-sm text-gray-700 dark:text-[#D1D5DB] border-b border-gray-200 dark:border-[#374151]" {...props} />,
+  td: (props: any) => <td className="px-4 py-3 text-sm text-gray-700 dark:text-[#D1D5DB] border-b border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1B2028]" {...props} />,
   a: (props: any) => <a className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline" {...props} />,
   img: (props: any) => <img className="max-w-full h-auto rounded-lg shadow-sm mb-4" {...props} />,
   hr: (props: any) => <hr className="my-8 border-gray-300 dark:border-[#374151]" {...props} />,
