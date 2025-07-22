@@ -2756,6 +2756,21 @@ html.dark [data-radix-select-item][data-highlighted] {
   stroke: #374151 !important;
 }
 
+/* ReactFlow attribution/logo styling for dark theme */
+.dark [data-page="fluxos"] .react-flow__attribution {
+  background-color: #1B2028 !important;
+  color: #9CA3AF !important;
+  border-color: #374151 !important;
+}
+
+.dark [data-page="fluxos"] .react-flow__attribution a {
+  color: #9CA3AF !important;
+}
+
+.dark [data-page="fluxos"] .react-flow__attribution a:hover {
+  color: #E5E7EB !important;
+}
+
 .dark [data-page="fluxos"] [data-radix-tabs-trigger] {
   background-color: #0F172A !important;
   color: #9CA3AF !important;
