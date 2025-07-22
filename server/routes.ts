@@ -3855,7 +3855,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Documents Flows Routes
   
-  // Get all flows for a user
+  // Get all flows
   app.get("/api/documents-flows", async (req: Request, res: Response) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
@@ -3883,7 +3883,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .from(documentsFlows)
         .leftJoin(usersCreated, eq(documentsFlows.createdBy, usersCreated.id))
         .leftJoin(usersUpdated, eq(documentsFlows.updatedBy, usersUpdated.id))
-        .where(eq(documentsFlows.userId, req.user.id))
         .orderBy(desc(documentsFlows.updatedAt));
       
       res.json(flows);
@@ -3900,10 +3899,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const flow = await db.select()
         .from(documentsFlows)
-        .where(and(
-          eq(documentsFlows.id, req.params.id),
-          eq(documentsFlows.userId, req.user.id)
-        ))
+        .where(eq(documentsFlows.id, req.params.id))
         .limit(1);
       
       if (flow.length === 0) {
