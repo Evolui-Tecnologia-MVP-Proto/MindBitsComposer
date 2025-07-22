@@ -2508,6 +2508,7 @@ html.dark [data-radix-select-item][data-highlighted] {
 .dark [data-page="fluxos"] .biblioteca-content-container {
   background-color: #0F172A !important;
   padding: 20px !important;
+  border-radius: 8px !important;
 }
 
 .dark [data-page="fluxos"] .flex.justify-between.items-center {
