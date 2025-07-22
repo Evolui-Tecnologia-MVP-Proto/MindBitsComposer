@@ -667,7 +667,7 @@ function ToolbarPlugin({
         
         {/* Controles de dimensionamento da tabela - apenas quando uma tabela está selecionada */}
         {selectedTableKey && (
-          <div className="flex items-center gap-1 ml-2 text-xs text-gray-600">
+          <div className="flex items-center gap-1 ml-2 text-xs">
             <input
               type="number"
               min="1"
@@ -680,10 +680,10 @@ function ToolbarPlugin({
                   setTimeout(() => resizeSelectedTable(newRows, tableColumns), 0);
                 }
               }}
-              className="w-8 h-6 px-1 border border-gray-300 rounded text-center text-xs"
+              className="w-8 h-6 px-1 border-2 border-blue-400 dark:border-blue-500 bg-white dark:bg-[#1E293B] text-gray-900 dark:text-[#E5E7EB] rounded text-center text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-600 dark:focus:border-blue-400"
               title="Linhas"
             />
-            <span className="text-gray-400">×</span>
+            <span className="text-blue-600 dark:text-blue-400 font-bold">×</span>
             <input
               type="number"
               min="1"
@@ -696,7 +696,7 @@ function ToolbarPlugin({
                   setTimeout(() => resizeSelectedTable(tableRows, newColumns), 0);
                 }
               }}
-              className="w-8 h-6 px-1 border border-gray-300 rounded text-center text-xs"
+              className="w-8 h-6 px-1 border-2 border-blue-400 dark:border-blue-500 bg-white dark:bg-[#1E293B] text-gray-900 dark:text-[#E5E7EB] rounded text-center text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-600 dark:focus:border-blue-400"
               title="Colunas"
             />
           </div>
