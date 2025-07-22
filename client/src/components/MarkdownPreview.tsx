@@ -30,6 +30,10 @@ function MermaidDiagram({ chart }: { chart: string }) {
           lineColor: '#FFFFFF',
           secondaryColor: '#1E293B',
           tertiaryColor: '#374151',
+          edgeLabelBackground: '#333B4D',
+          labelBackground: '#333B4D',
+          labelTextColor: '#FFFFFF',
+          edgeLabelColor: '#FFFFFF',
         } : {}
       });
 
