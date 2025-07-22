@@ -415,7 +415,7 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
             <textarea
               value={mermaidCode}
               onChange={(e) => setMermaidCode(e.target.value)}
-              className="w-full h-full resize-none border border-gray-300 dark:border-[#374151] rounded-lg p-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-[#0F172A] text-gray-900 dark:text-[#E5E7EB] dark:placeholder-[#6B7280]"
+              className="w-full h-full resize-none border border-gray-300 dark:border-[#374151] rounded-lg p-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-[#020203] text-gray-900 dark:text-[#E5E7EB] dark:placeholder-[#6B7280]"
               placeholder="Digite seu código Mermaid aqui..."
               spellCheck={false}
             />
