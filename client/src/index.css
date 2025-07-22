@@ -2638,6 +2638,12 @@ html.dark [data-radix-select-item][data-highlighted] {
 
 .dark [data-page="fluxos"] .react-flow__container {
   background-color: #020203 !important;
+  border-color: #111827 !important;
+}
+
+/* Canvas border styling */
+.dark [data-page="fluxos"] .react-flow__renderer {
+  border-color: #111827 !important;
 }
 
 .dark [data-page="fluxos"] [data-radix-tabs-trigger] {
