@@ -1469,7 +1469,7 @@ export default function AdminPage() {
           </h1>
         </div>
         
-        <Tabs defaultValue="usuarios" className="w-full">
+        <Tabs defaultValue="usuarios" className="w-full mt-6">
           <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-[#0F172A]">
             <TabsTrigger value="usuarios" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
               <Users className="h-4 w-4 mr-2" />
@@ -1493,12 +1493,12 @@ export default function AdminPage() {
             </TabsTrigger>
           </TabsList>
           
-          <TabsContent value="usuarios" className="slide-in">
+          <TabsContent value="usuarios" className="slide-in mt-6">
             {/* Conteúdo da aba de usuários */}
             <UserTable />
           </TabsContent>
           
-          <TabsContent value="monday" className="slide-in">
+          <TabsContent value="monday" className="slide-in mt-6">
             <div className="space-y-4">
               {/* Indicador de progresso durante execução */}
               {isExecutingMapping && (
@@ -1624,7 +1624,7 @@ export default function AdminPage() {
             </div>
           </TabsContent>
           
-          <TabsContent value="servicos" className="slide-in">
+          <TabsContent value="servicos" className="slide-in mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Card Monday */}
               <div className="bg-white rounded-lg shadow-md transition-all hover:shadow-lg">
@@ -1742,7 +1742,7 @@ export default function AdminPage() {
             </div>
           </TabsContent>
           
-          <TabsContent value="logs" className="slide-in">
+          <TabsContent value="logs" className="slide-in mt-6">
             <Card>
               <CardHeader className="space-y-4 pb-4">
                 <div className="flex flex-row items-center justify-between">
@@ -1891,7 +1891,7 @@ export default function AdminPage() {
             </Card>
           </TabsContent>
           
-          <TabsContent value="configuracao" className="slide-in">
+          <TabsContent value="configuracao" className="slide-in mt-6">
             <div className="bg-white shadow-sm rounded-lg p-6">
               <h3 className="text-lg font-medium text-gray-900 mb-4">Configurações Gerais</h3>
               <p className="text-gray-500">Configurações globais do sistema.</p>
