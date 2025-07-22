@@ -1126,9 +1126,9 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
   };
 
   return (
-    <div className={`lexical-editor-container w-full h-full flex flex-col ${className}`}>
+    <div className={`lexical-editor-container w-full flex flex-col ${className}`} style={{ height: 'calc(100vh - 140px)' }}>
       <LexicalComposer initialConfig={initialConfig}>
-        <div className="w-full h-full flex flex-col min-h-0">
+        <div className="w-full flex flex-col" style={{ height: 'calc(100vh - 140px)' }}>
           {viewMode === 'editor' && (
             <ToolbarPlugin 
               tableRows={tableRows}
@@ -1141,7 +1141,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
               deleteSelectedTable={deleteSelectedTable}
             />
           )}
-          <div className="flex-1 p-4 dark:bg-[#020203] overflow-y-auto lexical-canvas">
+          <div className="p-4 dark:bg-[#020203] lexical-canvas" style={{ height: 'calc(100vh - 220px)', overflow: 'auto', position: 'relative' }}>
             {viewMode === 'editor' ? (
               <RichTextPlugin
                 contentEditable={
@@ -1150,8 +1150,8 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                     style={{ 
                       fontFamily: 'system-ui, -apple-system, sans-serif',
                       lineHeight: '1.6',
-                      minHeight: '400px',
-                      height: 'auto'
+                      height: 'calc(100vh - 280px)',
+                      overflow: 'auto'
                     }}
                   />
                 }

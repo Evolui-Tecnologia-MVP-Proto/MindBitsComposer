@@ -1467,9 +1467,9 @@ export default function LexicalPage() {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col overflow-hidden" style={{ height: '100vh' }}>
       {/* Header com navegação */}
-      <div className="flex-shrink-0 p-6 pb-4 bg-gray-50 dark:bg-[#1F2937] border-b border-gray-200 dark:border-[#374151]" style={{ marginTop: '64px', height: '140px' }}>
+      <div className="flex-shrink-0 p-6 pb-4 bg-gray-50 dark:bg-[#1F2937] border-b border-gray-200 dark:border-[#374151]" style={{ height: '140px', minHeight: '140px', maxHeight: '140px' }}>
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-4">
             <div>
@@ -1614,7 +1614,7 @@ export default function LexicalPage() {
         </div>
       </div>
       {/* Área do editor - ocupa todo o espaço restante */}
-      <div className="flex-1 px-6 py-0 min-h-0 composer-layout-container">
+      <div className="flex-1 px-6 py-0 pb-6 min-h-0 composer-layout-container">
         <div className="flex h-full">
           {/* Sidebar de documentos (condicional) */}
         {showDocumentList && (
@@ -1758,11 +1758,11 @@ export default function LexicalPage() {
         )}
 
         {/* Editor principal */}
-        <div className={`flex-1 flex flex-col composer-editor-container ${!showDocumentList ? 'editor-left-rounded' : ''} ${!showAttachments || (selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) ? 'editor-right-rounded' : ''}`}>
+        <div className={`composer-editor-container ${!showDocumentList ? 'editor-left-rounded' : ''} ${!showAttachments || (selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) ? 'editor-right-rounded' : ''}`} style={{ height: 'calc(100vh - 140px)', display: 'flex', flexDirection: 'column' }}>
           {/* Barra de ferramentas do editor integrada */}
-          <div className="flex-1 pl-0 pr-0 pt-0 pb-0">
-            <Card className="h-full composer-editor-card">
-              <CardContent className="p-0 h-full relative overflow-hidden">
+          <div className="pl-0 pr-0 pt-0 pb-0" style={{ height: 'calc(100vh - 140px)' }}>
+            <Card className="composer-editor-card" style={{ height: 'calc(100vh - 140px)' }}>
+              <CardContent className="p-0 relative flex flex-col" style={{ height: 'calc(100vh - 140px)' }}>
                 {/* Placeholder quando não há conteúdo nem template selecionado */}
                 {!hasEditorContent && (!content || content.trim() === '') && !selectedTemplate && !currentDocumentId && viewMode === 'editor' && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
