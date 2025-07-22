@@ -45,18 +45,18 @@ export function NodeInspector({
   const nodeMetadata = getNodeMetadata(selectedNode.type);
   
   return (
-    <div className="w-full h-full bg-white border-l border-gray-200 p-4 overflow-y-auto">
-      <div className="space-y-4">
-        <div className="border-b pb-2">
-          <h3 className="text-lg font-semibold">Inspector de Propriedades</h3>
-          <p className="text-sm text-gray-600 font-mono">
-            {nodeMetadata?.label || selectedNode.type} - {selectedNode.id}
-          </p>
-        </div>
-        
-        <div className="space-y-3">
-          {/* Tabela de propriedades do nó */}
-          <div className="border border-gray-200 rounded-lg overflow-hidden">
+    <div className="w-full h-full bg-white border-l border-gray-200 flex flex-col">
+      {/* Cabeçalho fixo */}
+      <div className="p-4 border-b pb-2 flex-shrink-0">
+        <h3 className="text-lg font-semibold">Inspector de Propriedades</h3>
+        <p className="text-sm text-gray-600 font-mono">
+          {nodeMetadata?.label || selectedNode.type} - {selectedNode.id}
+        </p>
+      </div>
+      
+      {/* Área da tabela com rolagem */}
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="border border-gray-200 rounded-lg overflow-hidden">
             <table className="w-full text-xs table-fixed">
               <colgroup>
                 <col className="w-24" />
@@ -408,20 +408,19 @@ export function NodeInspector({
           })}
               </tbody>
             </table>
-          </div>
-
-          {/* Botão para aplicar alterações */}
-          <div className="pt-4 border-t flex justify-end">
-            <Button 
-              onClick={applyInspectorChanges}
-              className="w-auto"
-              size="sm"
-            >
-              <Settings className="h-4 w-4 mr-2" />
-              Aplicar Alterações
-            </Button>
-          </div>
         </div>
+      </div>
+
+      {/* Rodapé fixo com botões */}
+      <div className="p-4 border-t flex justify-end flex-shrink-0">
+        <Button 
+          onClick={applyInspectorChanges}
+          className="w-auto"
+          size="sm"
+        >
+          <Settings className="h-4 w-4 mr-2" />
+          Aplicar Alterações
+        </Button>
       </div>
     </div>
   );
