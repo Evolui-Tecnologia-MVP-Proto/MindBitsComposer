@@ -140,7 +140,7 @@ export const FlowDiagram = ({
                 connectionLineType={ConnectionLineType.SmoothStep}
               >
                 <Controls />
-                {showGrid && <Background color="#f0f0f0" gap={12} size={1} />}
+                {showGrid && <Background color="#d1d5db" gap={12} size={1} />}
                 {showMiniMap && <MiniMap />}
               </ReactFlow>
             </div>
@@ -196,7 +196,7 @@ export const FlowDiagram = ({
             connectionLineType={ConnectionLineType.SmoothStep}
           >
             <Controls />
-            {showGrid && <Background color="#f0f0f0" gap={12} size={1} />}
+            {showGrid && <Background color="#d1d5db" gap={12} size={1} />}
             {showMiniMap && <MiniMap />}
           </ReactFlow>
         </div>
