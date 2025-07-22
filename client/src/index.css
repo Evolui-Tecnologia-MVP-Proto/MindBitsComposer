@@ -1436,6 +1436,17 @@ html.dark body [data-radix-select-item][data-state="checked"] {
   --accent-foreground: #E5E7EB !important;
 }
 
+/* Override the root CSS variables for dark mode globally */
+html.dark {
+  --accent: 240 3.7% 15.9% !important;
+  --accent-foreground: 0 0% 98% !important;
+}
+
+.dark {
+  --accent: 240 3.7% 15.9% !important;
+  --accent-foreground: 0 0% 98% !important;
+}
+
 /* Force styles with CSS specificity hack */
 .dark [data-radix-select-item][data-radix-select-item] {
   background-color: transparent !important;
