@@ -2803,9 +2803,23 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   height: 100%;
 }
 
+/* Remove padding from editor container to match side panels exactly */
+.composer-editor-container > div {
+  padding-right: 0 !important;
+  padding-bottom: 0 !important;
+}
+
 /* Ensures editor canvas matches panel heights precisely */
 .composer-editor-card {
-  height: calc(100% - 16px); /* Account for any internal padding */
+  height: 100% !important;
+  margin-bottom: 0 !important;
+}
+
+/* Remove any extra margins from card content */
+.composer-editor-card .card-content,
+.composer-editor-card [data-radix-card-content] {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 /* Library panel specific height matching */
