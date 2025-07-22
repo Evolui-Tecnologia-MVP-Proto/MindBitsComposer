@@ -1941,14 +1941,38 @@ html.dark [data-radix-select-item][data-highlighted] {
   background-color: #0F172A !important;
 }
 
-/* Main container and content areas */
+/* Main container and content areas - Use #1F2937 for better hierarchy */
 .dark [data-page="templates"] .fade-in {
-  background-color: #0F172A !important;
+  background-color: #1F2937 !important;
+}
+
+/* Main container div */
+.dark [data-page="templates"] .container {
+  background-color: #1F2937 !important;
+}
+
+/* Specific container classes used in templates page */
+.dark [data-page="templates"] .container.mx-auto {
+  background-color: #1F2937 !important;
+}
+
+.dark [data-page="templates"] div[class*="container"][class*="mx-auto"] {
+  background-color: #1F2937 !important;
+}
+
+/* Force the main container to use #1F2937 */
+.dark div[data-page="templates"].container.mx-auto {
+  background-color: #1F2937 !important;
+}
+
+/* Alternative selector for the main templates page container */
+.dark [data-page="templates"][class*="container"][class*="mx-auto"] {
+  background-color: #1F2937 !important;
 }
 
 /* Cards and containers */
 .dark [data-page="templates"] .bg-background {
-  background-color: #0F172A !important;
+  background-color: #1F2937 !important;
 }
 
 /* Card components */
