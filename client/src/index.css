@@ -1327,6 +1327,52 @@ html.dark [data-page="admin"] [role="combobox"]:hover {
   background-color: #1F2937 !important;
 }
 
+/* Dropdown list hover styling for admin page */
+.dark [data-page="admin"] [data-radix-select-content] [data-radix-select-item]:hover,
+.dark [data-page="admin"] [role="option"]:hover,
+.dark [data-page="admin"] [data-radix-select-item]:hover,
+.dark [data-radix-dialog-content] [data-radix-select-content] [data-radix-select-item]:hover {
+  background-color: #1F2937 !important;
+  color: #E5E7EB !important;
+}
+
+/* SelectContent background styling */
+.dark [data-page="admin"] [data-radix-select-content],
+.dark [data-radix-dialog-content] [data-radix-select-content] {
+  background-color: #0F172A !important;
+  border-color: #374151 !important;
+}
+
+/* Native select option hover */
+.dark [data-page="admin"] select option:hover,
+.dark [data-page="admin"] select option:checked,
+.dark [data-page="admin"] select option:focus {
+  background-color: #1F2937 !important;
+  color: #E5E7EB !important;
+}
+
+/* Global dropdown item styling for dark mode */
+.dark [data-radix-select-item]:hover,
+.dark [data-radix-popper-content] [data-radix-select-item]:hover,
+.dark [data-radix-select-content] [data-radix-select-item]:hover {
+  background-color: #1F2937 !important;
+  color: #E5E7EB !important;
+}
+
+/* Force dropdown content background */
+.dark [data-radix-select-content],
+.dark [data-radix-popper-content] {
+  background-color: #0F172A !important;
+  border-color: #374151 !important;
+}
+
+/* Additional targeting for SelectItem components */
+.dark [class*="SelectItem"]:hover,
+.dark [role="option"]:hover {
+  background-color: #1F2937 !important;
+  color: #E5E7EB !important;
+}
+
 .dark input[type="time"]::-webkit-datetime-edit-fields-wrapper {
   background: transparent !important;
   color: #E5E7EB !important;
