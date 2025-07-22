@@ -120,6 +120,33 @@ body.dark .Collapsible__title:hover {
   background: #1B2028 !important;
 }
 
+/* Mermaid Diagrams Dark Mode - White Lines */
+.dark .markdown-preview svg .edgePath path,
+.dark .markdown-preview svg .edgeLabel,
+.dark .markdown-preview svg .edge-thickness-normal,
+.dark .markdown-preview svg .edge-thickness-thick,
+.dark .markdown-preview svg line,
+.dark .markdown-preview svg path,
+.dark .markdown-preview svg .flowchart-link,
+.dark .markdown-preview svg .edgePath .path,
+.dark .markdown-preview svg .connection {
+  stroke: #FFFFFF !important;
+}
+
+.dark .markdown-preview svg rect,
+.dark .markdown-preview svg circle,
+.dark .markdown-preview svg ellipse,
+.dark .markdown-preview svg polygon {
+  stroke: #FFFFFF !important;
+}
+
+.dark .markdown-preview svg .node rect,
+.dark .markdown-preview svg .node circle,
+.dark .markdown-preview svg .node ellipse,
+.dark .markdown-preview svg .node polygon {
+  stroke: #FFFFFF !important;
+}
+
 .composer-library-panel * {
   max-width: 100% !important;
 }

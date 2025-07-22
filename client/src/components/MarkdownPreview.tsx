@@ -17,11 +17,20 @@ function MermaidDiagram({ chart }: { chart: string }) {
   useEffect(() => {
     if (elementRef.current && chart.trim()) {
       // Initialize mermaid if not already done
+      const isDarkMode = document.documentElement.classList.contains('dark');
       mermaid.initialize({
         startOnLoad: false,
-        theme: 'default',
+        theme: isDarkMode ? 'dark' : 'default',
         securityLevel: 'loose',
         fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+        themeVariables: isDarkMode ? {
+          primaryColor: '#1B2028',
+          primaryTextColor: '#FFFFFF',
+          primaryBorderColor: '#FFFFFF',
+          lineColor: '#FFFFFF',
+          secondaryColor: '#1E293B',
+          tertiaryColor: '#374151',
+        } : {}
       });
 
       // Generate unique ID for this diagram
