@@ -2841,25 +2841,20 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   height: 100% !important;
 }
 
-/* Side panel headers - match exact height of editor toolbar (p-3 = 12px + content + gap) */
+/* Side panel headers - align with editor toolbar */
 .composer-side-panel > div:first-child {
-  padding: 12px 16px !important; /* Match toolbar's p-3 = 12px */
+  padding: 12px 16px !important;
   margin: 0 !important;
   flex-shrink: 0;
-  height: 68px !important; /* Toolbar actual height: 12px + content + 12px + gap-1 */
-  display: flex !important;
-  align-items: center !important;
-  box-sizing: border-box !important;
 }
 
-/* Side panel content areas - adjust height to account for header */
+/* Side panel content areas */
 .composer-library-panel .flex-1,
 .composer-attachments-panel .flex-1 {
   flex: 1;
   overflow-y: auto;
   margin: 0 !important;
   padding: 16px !important;
-  height: calc(100% - 68px) !important; /* Subtract header height */
 }
 
 /* Force exact same bottom edge for all elements */
