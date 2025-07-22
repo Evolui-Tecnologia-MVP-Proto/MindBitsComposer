@@ -2570,6 +2570,24 @@ html.dark [data-radix-select-item][data-highlighted] {
   /* No spacing overrides - inherit everything from light mode */
 }
 
+/* FlowToolbar selects styling for dark theme */
+.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 select,
+.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 [data-radix-select-trigger] {
+  background-color: #0F172A !important;
+  border: 1px solid #6B7280 !important;
+  color: #E5E7EB !important;
+}
+
+.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 [data-radix-select-trigger]:hover {
+  border-color: #9CA3AF !important;
+}
+
+.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 [data-radix-select-trigger]:focus {
+  border-color: #1E40AF !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2) !important;
+}
+
 /* NodeInspector panel styling for dark theme */
 .dark [data-page="fluxos"] .w-full.h-full.bg-white.border-l.border-gray-200.p-4.overflow-y-auto {
   background-color: #0F172A !important;
