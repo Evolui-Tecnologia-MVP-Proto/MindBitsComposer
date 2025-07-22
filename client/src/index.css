@@ -34,7 +34,7 @@
   .dark {
     --background: 221 48% 11%; /* #0F172A converted to HSL */
     --foreground: 210 40% 98%;
-    --card: 221 48% 11%; /* #0F172A converted to HSL */
+    --card: 217 32% 17%; /* #1E293B converted to HSL - main cards */
     --card-foreground: 210 40% 98%;
     --popover: 221 48% 11%; /* #0F172A converted to HSL */
     --popover-foreground: 210 40% 98%;
@@ -66,6 +66,97 @@
 /* Ensure header text color in dark mode */
 .dark header h1 {
   color: #6B7280 !important;
+}
+
+/* Global cards styling for dark mode */
+.dark [data-radix-card],
+.dark .card,
+.dark div.card {
+  background-color: #1E293B !important;
+  border-color: #374151 !important;
+  color: #E5E7EB !important;
+}
+
+/* Card headers */
+.dark [data-radix-card-header],
+.dark .card-header {
+  background-color: #111827 !important;
+  border-bottom: 1px solid #374151 !important;
+  color: #E5E7EB !important;
+}
+
+/* Card content */
+.dark [data-radix-card-content],
+.dark .card-content,
+.dark .card-body {
+  background-color: #1E293B !important;
+  color: #E5E7EB !important;
+}
+
+/* Card footers */
+.dark [data-radix-card-footer],
+.dark .card-footer {
+  background-color: #1E293B !important;
+  border-top: 1px solid #374151 !important;
+  color: #9CA3AF !important;
+}
+
+/* Individual/nested cards - darker */
+.dark .card .card,
+.dark [data-radix-card] [data-radix-card] {
+  background-color: #0F172A !important;
+}
+
+/* Card titles and descriptions */
+.dark [data-radix-card-title],
+.dark .card-title {
+  color: #E5E7EB !important;
+}
+
+.dark [data-radix-card-description],
+.dark .card-description {
+  color: #9CA3AF !important;
+}
+
+/* Override shadcn/ui card classes in dark mode */
+.dark .bg-card {
+  background-color: #1E293B !important;
+}
+
+.dark .text-card-foreground {
+  color: #E5E7EB !important;
+}
+
+/* Override any potential conflicting background classes */
+.dark .card.bg-background,
+.dark [data-radix-card].bg-background {
+  background-color: #1E293B !important;
+}
+
+.dark .card.bg-muted,
+.dark [data-radix-card].bg-muted {
+  background-color: #1E293B !important;
+}
+
+/* Template cards specific styling */
+.dark .template-card,
+.dark .document-card {
+  background-color: #0F172A !important;
+  border: 1px solid #374151 !important;
+}
+
+/* Grid cards styling */
+.dark .grid .card,
+.dark .grid [data-radix-card] {
+  background-color: #0F172A !important;
+  border: 1px solid #374151 !important;
+}
+
+/* Modal cards */
+.dark [data-radix-dialog-content] .card,
+.dark [data-radix-dialog-content] [data-radix-card] {
+  background-color: #0F172A !important;
+  border: 1px solid #374151 !important;
 }
 
 /* MAXIMUM SPECIFICITY: Global tabs active state styling for dark mode */

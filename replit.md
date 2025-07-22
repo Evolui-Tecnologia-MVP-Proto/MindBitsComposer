@@ -108,6 +108,16 @@ Preferred communication style: Simple, everyday language.
   - Ensured consistent #1E40AF background across entire application
   - Applied white text color for proper contrast
   - Standardized hover states for active tabs
+  - Added maximum specificity overrides to prevent #09090B from appearing
+✓ Applied global cards color scheme for dark mode (January 22, 2025):
+  - Updated CSS --card variable to #1E293B for main cards
+  - Applied #1E293B background to all standard cards
+  - Headers: #111827 with #374151 borders
+  - Individual/nested cards: #0F172A for better hierarchy
+  - Grid and modal cards: #0F172A with proper borders
+  - Text colors: #E5E7EB (titles), #9CA3AF (descriptions)
+  - Overrode shadcn/ui conflicting classes (bg-card, bg-background)
+  - Consistent card styling across entire application
 
 ## System Architecture
 
