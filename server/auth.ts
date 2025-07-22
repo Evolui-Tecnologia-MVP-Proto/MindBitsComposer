@@ -65,29 +65,26 @@ const changePasswordSchema = z.object({
   newPassword: z.string().min(6),
 });
 
-// TEMPORARY: Helper function for development auth bypass
+// TEMPORARY: Override isAuthenticated for development
 // TODO: Remove this when login is re-enabled
-async function isAuthenticatedOrDev(req: any): Promise<boolean> {
-  // In development, always allow access
+function setupDevAuth(req: any) {
   if (process.env.NODE_ENV === "development") {
-    // Simulate authenticated user for development
-    if (!req.user) {
-      try {
-        const adminUser = await storage.getUserByEmail("admin@evoluitecnologia.com.br");
-        if (adminUser) {
-          req.user = adminUser;
-        }
-      } catch (error) {
-        console.log("Could not set dev user");
+    // Override the isAuthenticated method to always return true in dev
+    const originalIsAuthenticated = req.isAuthenticated;
+    req.isAuthenticated = function() {
+      // Set a fake admin user if not already set
+      if (!req.user) {
+        req.user = {
+          id: 3,
+          name: "Administrador",
+          email: "admin@evoluitecnologia.com.br",
+          mustChangePassword: false
+        };
       }
-    }
-    return true;
+      return true;
+    };
   }
-  
-  return req.isAuthenticated();
 }
-
-export { isAuthenticatedOrDev };
 
 export function setupAuth(app: Express) {
   const sessionSettings: session.SessionOptions = {
@@ -106,6 +103,13 @@ export function setupAuth(app: Express) {
   app.use(session(sessionSettings));
   app.use(passport.initialize());
   app.use(passport.session());
+
+  // TEMPORARY: Setup dev auth bypass middleware
+  // TODO: Remove this when login is re-enabled
+  app.use((req, res, next) => {
+    setupDevAuth(req);
+    next();
+  });
 
   passport.use(
     new LocalStrategy(
@@ -219,20 +223,7 @@ export function setupAuth(app: Express) {
   });
 
   // Get current user
-  app.get("/api/user", async (req, res) => {
-    // TEMPORARY: Auto-login as admin for development
-    // TODO: Remove this when login is re-enabled
-    if (process.env.NODE_ENV === "development") {
-      try {
-        const adminUser = await storage.getUserByEmail("admin@evoluitecnologia.com.br");
-        if (adminUser) {
-          return res.json(adminUser);
-        }
-      } catch (error) {
-        console.log("Admin user not found, falling back to normal auth");
-      }
-    }
-    
+  app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     res.json(req.user);
   });

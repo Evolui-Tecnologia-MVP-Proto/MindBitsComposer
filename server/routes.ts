@@ -1,6 +1,6 @@
 import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
-import { setupAuth, isAuthenticatedOrDev } from "./auth";
+import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, templates, lexicalDocuments, insertLexicalDocumentSchema } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
@@ -503,7 +503,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.setHeader('Content-Type', 'text/plain');
     res.setHeader('Cache-Control', 'no-cache');
     
-    if (!(await isAuthenticatedOrDev(req))) {
+    if (!req.isAuthenticated()) {
       console.log("🔥 Não autorizado");
       return res.status(401).send("UNAUTHORIZED");
     }
@@ -531,7 +531,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // File upload route
   app.post("/api/upload", upload.single('file'), async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     if (!req.file) {
       return res.status(400).json({ error: "Nenhum arquivo enviado" });
@@ -571,7 +571,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Template routes
   // Get all templates
   app.get("/api/templates", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const templates = await storage.getAllTemplates();
@@ -584,7 +584,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Get templates by type
   app.get("/api/templates/:type", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { type } = req.params;
     if (type !== 'struct' && type !== 'output') {
@@ -602,7 +602,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Get template by ID
   app.get("/api/template/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { id } = req.params;
     
@@ -620,7 +620,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Create template
   app.post("/api/templates", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       console.log("Body recebido para criação de template:", JSON.stringify(req.body, null, 2));
@@ -660,7 +660,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Update template
   app.put("/api/template/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { id } = req.params;
     
@@ -704,7 +704,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Delete template
   app.delete("/api/template/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { id } = req.params;
     
@@ -728,7 +728,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Listar todas as conexões de serviço
   app.get("/api/services/connections", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const connections = await storage.getAllServiceConnections();
@@ -741,7 +741,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Obter uma conexão específica por nome do serviço
   app.get("/api/services/connections/:serviceName", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { serviceName } = req.params;
     
@@ -759,7 +759,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Criar ou atualizar uma conexão de serviço
   app.post("/api/services/connections", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const connectionData = insertServiceConnectionSchema.parse(req.body);
@@ -779,7 +779,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Excluir uma conexão de serviço
   app.delete("/api/services/connections/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { id } = req.params;
     
@@ -796,7 +796,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Get API Key
   app.get("/api/monday/apikey", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const apiKey = await storage.getMondayApiKey();
@@ -809,7 +809,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Save API Key
   app.post("/api/monday/apikey", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { apiKey } = req.body;
     
@@ -829,7 +829,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Get all Monday mappings
   app.get("/api/monday/mappings", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const mappings = await storage.getAllMondayMappings();
@@ -867,7 +867,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Get Monday mapping by ID
   app.get("/api/monday/mappings/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { id } = req.params;
     
@@ -885,7 +885,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Create Monday mapping
   app.post("/api/monday/mappings", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       console.log("Body recebido para criação de mapeamento:", JSON.stringify(req.body, null, 2));
@@ -913,7 +913,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Update Monday mapping
   app.patch("/api/monday/mappings/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { id } = req.params;
     
@@ -947,7 +947,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Update last sync time for a Monday mapping
   app.post("/api/monday/mappings/:id/sync", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { id } = req.params;
     
@@ -968,7 +968,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Verify and get columns from a Monday.com board
   app.get("/api/monday/board/:boardId/columns", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { boardId } = req.params;
     
@@ -1049,7 +1049,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Validate Monday board
   app.get("/api/monday/boards/:boardId/validate", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { boardId } = req.params;
     
@@ -1125,7 +1125,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log("🔥 ROTA GET sendo executada para:", req.params.itemId);
     console.log("🔥 Método da requisição:", req.method);
     
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { itemId } = req.params;
     
@@ -1242,7 +1242,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       isAuthenticated: req.isAuthenticated?.() 
     });
     
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { itemId } = req.params;
     const { columnIds, boardId } = req.body;
@@ -1454,7 +1454,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Endpoint para salvar JSON do fluxo
   app.post("/api/documents-flows/:id/export-json", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const flowId = req.params.id;
@@ -1524,7 +1524,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Endpoint para listar fluxos salvos em JSON
   app.get("/api/documents-flows/saved-json-files", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const { flowId } = req.query;
@@ -1569,7 +1569,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Endpoint para importar JSON de fluxo
   app.post("/api/documents-flows/:id/import-json", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const flowId = req.params.id;
@@ -1638,7 +1638,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Endpoint para listar arquivos JSON salvos
   app.get("/api/monday/saved-json-files", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const fs = require('fs');
@@ -1672,7 +1672,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Debug: Verificar documentos com idOrigemTxt
   app.get("/api/debug/documentos-monday", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const allDocuments = await storage.getAllDocumentos();
@@ -1721,7 +1721,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rotas para mapeamento de colunas
   // Obter mapeamentos de colunas para um mapeamento
   app.get("/api/monday/mappings/:id/column-mappings", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { id } = req.params;
     
@@ -1756,7 +1756,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Criar mapeamento de coluna
   app.post("/api/monday/mappings/:id/column-mappings", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { id } = req.params;
     
@@ -1782,7 +1782,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Atualizar mapeamento de coluna
   app.patch("/api/monday/mappings/column-mappings/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { id } = req.params;
     
@@ -1803,7 +1803,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Excluir mapeamento de coluna
   app.delete("/api/monday/mappings/column-mappings/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { id } = req.params;
     
@@ -1824,7 +1824,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Delete Monday mapping
   app.delete("/api/monday/mappings/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { id } = req.params;
     
@@ -1849,7 +1849,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Get columns for a Monday mapping
   app.get("/api/monday/mappings/:id/columns", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { id } = req.params;
     
@@ -1894,7 +1894,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Execute Monday mapping synchronization
   app.post("/api/monday/mappings/:id/execute", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) {
+    if (!req.isAuthenticated()) {
       console.log("❌ USUÁRIO NÃO AUTORIZADO");
       return res.status(401).send("Não autorizado");
     }
@@ -1917,7 +1917,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
    // Fetch columns from Monday.com API and save them
   app.post("/api/monday/mappings/:id/fetch-columns", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { id } = req.params;
     
@@ -2004,7 +2004,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Obter todas as conexões de serviço
   app.get("/api/service-connections", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const connections = await storage.getAllServiceConnections();
@@ -2017,7 +2017,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Obter uma conexão de serviço pelo nome do serviço
   app.get("/api/service-connections/name/:serviceName", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { serviceName } = req.params;
     
@@ -2035,7 +2035,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Criar uma conexão de serviço
   app.post("/api/service-connections", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       // Validar os dados recebidos
@@ -2072,7 +2072,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Atualizar uma conexão de serviço
   app.put("/api/service-connections/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { id } = req.params;
     
@@ -2100,7 +2100,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Excluir uma conexão de serviço
   app.delete("/api/service-connections/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     const { id } = req.params;
     
@@ -2115,7 +2115,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Plugin routes
   app.get("/api/plugins", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const plugins = await storage.getAllPlugins();
@@ -2127,7 +2127,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/plugins/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const plugin = await storage.getPlugin(req.params.id);
@@ -2142,7 +2142,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/plugins", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const plugin = await storage.createPlugin(req.body);
@@ -2154,7 +2154,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.put("/api/plugins/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const plugin = await storage.updatePlugin(req.params.id, req.body);
@@ -2166,7 +2166,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/plugins/:id/toggle", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const plugin = await storage.togglePluginStatus(req.params.id);
@@ -2178,7 +2178,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.delete("/api/plugins/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       await storage.deletePlugin(req.params.id);
@@ -2191,7 +2191,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Testar plugin
   app.post("/api/plugins/:id/test", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const plugin = await storage.getPlugin(req.params.id);
@@ -2328,7 +2328,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Canvas selection upload endpoint
   app.post("/api/canvas/upload-selection", upload.single('image'), async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       // Verificar se há arquivo de imagem
@@ -2380,7 +2380,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Documento routes
   app.get("/api/documentos", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const documentos = await storage.getAllDocumentos();
@@ -2400,7 +2400,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Endpoint para buscar relacionamentos da tabela documentos
   app.get("/api/documentos-relationships", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     // Forçar cache bust
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -2429,7 +2429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/documentos/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const documento = await storage.getDocumento(req.params.id);
@@ -2451,7 +2451,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/documentos", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const documento = await storage.createDocumento(req.body);
@@ -2471,7 +2471,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('X-Content-Type-Options', 'nosniff');
     
-    if (!(await isAuthenticatedOrDev(req))) {
+    if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Não autorizado" });
     }
     
@@ -2499,7 +2499,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log("🚀 PUT /api/documentos/:id CHAMADO - ID:", req.params.id);
     console.log("🚀 DADOS RECEBIDOS:", JSON.stringify(req.body));
     
-    if (!(await isAuthenticatedOrDev(req))) {
+    if (!req.isAuthenticated()) {
       console.log("❌ Não autorizado");
       return res.status(401).json({ error: "Não autorizado" });
     }
@@ -2530,7 +2530,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.patch("/api/documentos/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const documento = await storage.updateDocumento(req.params.id, req.body);
@@ -2542,7 +2542,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.delete("/api/documentos/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       await storage.deleteDocumento(req.params.id);
@@ -2555,7 +2555,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Rota para iniciar documentação
   app.post("/api/documentos/start-documentation", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       console.log("=== INÍCIO ROTA START DOCUMENTATION ===");
@@ -2687,7 +2687,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Document Artifacts routes
   app.get("/api/documentos/:documentoId/artifacts", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const artifacts = await storage.getDocumentArtifactsByDocumento(req.params.documentoId);
@@ -2699,7 +2699,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/artifacts/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const artifact = await storage.getDocumentArtifact(req.params.id);
@@ -2714,7 +2714,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/documentos/:documentoId/artifacts", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       console.log("Dados recebidos para criação de artefato:", {
@@ -2743,7 +2743,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.patch("/api/artifacts/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const artifact = await storage.updateDocumentArtifact(req.params.id, req.body);
@@ -2755,7 +2755,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.delete("/api/artifacts/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       await storage.deleteDocumentArtifact(req.params.id);
@@ -2872,7 +2872,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log("🔥 ROTA INTEGRATE-ATTACHMENTS CHAMADA");
     
     try {
-      if (!(await isAuthenticatedOrDev(req))) {
+      if (!req.isAuthenticated()) {
         console.log("❌ Usuário não autenticado");
         return res.status(401).json({ error: "Não autorizado" });
       }
@@ -3011,7 +3011,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Repo Structure routes
   app.get("/api/repo-structure", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     // Desabilitar cache para forçar busca nova
     res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -3038,7 +3038,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/repo-structure", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const structure = await storage.createRepoStructure(req.body);
@@ -3050,7 +3050,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.put("/api/repo-structure/:uid/sync", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const { uid } = req.params;
@@ -3065,7 +3065,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // PATCH: Sync all repo structures (set all is_sync to true)
   app.patch("/api/repo-structure/sync-all", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const allStructures = await storage.getAllRepoStructures();
@@ -3096,7 +3096,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // DELETE: Remover pasta do banco local (não do GitHub)
   app.delete("/api/repo-structure/:uid", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const { uid } = req.params;
@@ -3304,7 +3304,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Endpoint para sincronizar pasta individual com GitHub (DEVE vir DEPOIS do sync-from-github)
   app.post("/api/repo-structure/:uid/sync-github", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const { uid } = req.params;
@@ -3405,7 +3405,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get unique event types from logs
   app.get("/api/logs/event-types", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       // Buscar todos os logs e extrair tipos únicos
@@ -3421,7 +3421,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get system logs
   app.get("/api/logs", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const limit = parseInt(req.query.limit as string) || 100;
@@ -3488,7 +3488,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Clear system logs
   app.delete("/api/logs", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       await db.delete(systemLogs);
@@ -3674,7 +3674,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rota para servir arquivos dos artifacts
   app.get("/api/artifacts/:artifactId/file", async (req: Request, res: Response) => {
     try {
-      if (!(await isAuthenticatedOrDev(req))) {
+      if (!req.isAuthenticated()) {
         return res.status(401).json({ error: "Não autorizado" });
       }
 
@@ -3776,7 +3776,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Endpoint para buscar colunas da tabela documentos dinamicamente
   app.get("/api/documentos-columns", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const columns = [
@@ -3813,7 +3813,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get all flow types
   // Endpoint para obter colunas da tabela documentos dinamicamente
   app.get("/api/schema/documentos/columns", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       // Consulta para obter informações das colunas da tabela documentos
@@ -3839,7 +3839,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/flow-types", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const types = await db.select()
@@ -3857,7 +3857,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Get all flows for a user
   app.get("/api/documents-flows", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const usersCreated = alias(users, 'usersCreated');
@@ -3895,7 +3895,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get a specific flow
   app.get("/api/documents-flows/:id", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const flow = await db.select()
@@ -3919,7 +3919,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Create a new flow
   app.post("/api/documents-flows", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const { name, code, description, flowTypeId, flowData } = req.body;
@@ -3966,7 +3966,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log("PUT /api/documents-flows/:id/metadata - Recebida requisição para:", req.params.id);
     console.log("Dados recebidos:", JSON.stringify(req.body, null, 2));
     
-    if (!(await isAuthenticatedOrDev(req))) {
+    if (!req.isAuthenticated()) {
       console.log("Usuário não autenticado");
       return res.status(401).send("Não autorizado");
     }
@@ -4003,7 +4003,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log("PUT /api/documents-flows/:id - Recebida requisição para:", req.params.id);
     console.log("Dados recebidos:", JSON.stringify(req.body, null, 2));
     
-    if (!(await isAuthenticatedOrDev(req))) {
+    if (!req.isAuthenticated()) {
       console.log("Usuário não autenticado");
       return res.status(401).send("Não autorizado");
     }
@@ -4076,7 +4076,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Toggle flow lock status
   app.patch("/api/documents-flows/:id/toggle-lock", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       // First get the current status
@@ -4116,7 +4116,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Toggle flow enabled status
   app.patch("/api/documents-flows/:id/toggle-enabled", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       // First get the current status
@@ -4156,7 +4156,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Delete a flow
   app.delete("/api/documents-flows/:id", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const deletedFlow = await db.delete(documentsFlows)
@@ -4179,7 +4179,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get GitHub repository contents
   app.get("/api/github/repo/contents", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const githubConnection = await storage.getServiceConnection("github");
@@ -4213,7 +4213,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get flow executions for documents (both active and concluded)
   app.get("/api/document-flow-executions", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const executions = await db.select({
@@ -4245,7 +4245,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Get flow executions count by document
   app.get("/api/document-flow-executions/count", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const countResults = await db
@@ -4271,7 +4271,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Update flow execution tasks
   app.put("/api/document-flow-executions/:documentId", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const { documentId } = req.params;
@@ -4347,7 +4347,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Transfer flow execution route
   app.post("/api/document-flow-executions/transfer", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const { currentDocumentId, targetFlowId, flowTasks } = req.body;
@@ -4435,7 +4435,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Document Editions API routes
   app.get("/api/document-editions", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const editions = await storage.getAllDocumentEditions();
@@ -4447,7 +4447,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/document-editions-with-objects", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const editions = await db
@@ -4472,7 +4472,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/document-editions/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const edition = await storage.getDocumentEdition(req.params.id);
@@ -4487,7 +4487,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/documents/:documentId/editions", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const editions = await storage.getDocumentEditionsByDocumentId(req.params.documentId);
@@ -4499,7 +4499,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/document-editions", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       console.log("📋 Dados recebidos para criar document_edition:", JSON.stringify(req.body, null, 2));
@@ -4546,7 +4546,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.put("/api/document-editions/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const edition = await storage.updateDocumentEdition(req.params.id, req.body);
@@ -4558,7 +4558,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.patch("/api/document-editions/:id/status", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const { status } = req.body;
@@ -4571,7 +4571,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.patch("/api/document-editions/:id/publish", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const edition = await storage.publishDocumentEdition(req.params.id);
@@ -4584,7 +4584,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Global Assets routes
   app.get("/api/global-assets", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const assets = await storage.getAllGlobalAssets();
@@ -4596,7 +4596,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/global-assets/:id", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const asset = await storage.getGlobalAsset(req.params.id);
@@ -4611,7 +4611,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/global-assets", upload.single('file'), async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const file = req.file;
@@ -4654,7 +4654,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.put("/api/global-assets/:id", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const asset = await storage.updateGlobalAsset(req.params.id, req.body);
@@ -4666,7 +4666,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.delete("/api/global-assets/:id", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       await storage.deleteGlobalAsset(req.params.id);
@@ -4678,7 +4678,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/global-assets/:id/file", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const asset = await storage.getGlobalAsset(req.params.id);
@@ -4704,7 +4704,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
   app.delete("/api/document-editions/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       await storage.deleteDocumentEdition(req.params.id);
@@ -4717,7 +4717,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Lexical Documents routes
   app.get("/api/lexical-documents", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const documents = await db.select()
@@ -4733,7 +4733,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/lexical-documents/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const [document] = await db.select()
@@ -4755,7 +4755,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/lexical-documents", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const documentData = insertLexicalDocumentSchema.parse({
@@ -4781,7 +4781,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.put("/api/lexical-documents/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const documentData = insertLexicalDocumentSchema.parse(req.body);
@@ -4815,7 +4815,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.delete("/api/lexical-documents/:id", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const [deletedDocument] = await db.delete(lexicalDocuments)
@@ -4838,7 +4838,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Document Editions in Progress route
   app.get("/api/document-editions-in-progress", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const editionsInProgress = await db.select({
@@ -4869,7 +4869,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Update document edition lex_file
   app.put("/api/document-editions/:id/lex-file", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const { lexFile } = req.body;
@@ -4896,7 +4896,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Update document edition content (lex_file, json_file, md_file)
   app.put("/api/document-editions/:id/content", async (req, res) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const { lexFile, jsonFile, mdFile } = req.body;
@@ -4933,7 +4933,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Rota para buscar artifacts de um documento específico baseado no document_editions
   app.get("/api/document-editions/:editionId/artifacts", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const edition = await storage.getDocumentEdition(req.params.editionId);
@@ -4984,7 +4984,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Rota para criar artifacts via document edition
   app.post("/api/document-editions/:editionId/artifacts", async (req: Request, res: Response) => {
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const edition = await storage.getDocumentEdition(req.params.editionId);
@@ -5010,7 +5010,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log("🔍 [API] Requisição para generic-tables:", req.params.name);
     console.log("🔍 [API] Usuário autenticado:", req.isAuthenticated());
     
-    if (!(await isAuthenticatedOrDev(req))) return res.status(401).send("Não autorizado");
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
       const { name } = req.params;
