@@ -2539,23 +2539,23 @@ html.dark [data-radix-select-item][data-highlighted] {
 }
 
 /* Delete button icon contrast for dark theme */
-.dark [data-page="fluxos"] button[title="Excluir fluxo"] svg {
-  color: #EF4444 !important;
-}
-
-.dark [data-page="fluxos"] button[title="Excluir fluxo"]:hover svg {
-  color: #FFFFFF !important;
-}
-
 .dark [data-page="fluxos"] button[title="Excluir fluxo"] {
   background-color: #DC2626 !important;
   color: #FFFFFF !important;
   border-color: #DC2626 !important;
 }
 
+.dark [data-page="fluxos"] button[title="Excluir fluxo"] svg {
+  color: #FFFFFF !important;
+}
+
 .dark [data-page="fluxos"] button[title="Excluir fluxo"]:hover {
   background-color: #B91C1C !important;
   border-color: #B91C1C !important;
+}
+
+.dark [data-page="fluxos"] button[title="Excluir fluxo"]:hover svg {
+  color: #FFFFFF !important;
 }
 
 .dark [data-page="fluxos"] [data-radix-tabs-trigger] {
