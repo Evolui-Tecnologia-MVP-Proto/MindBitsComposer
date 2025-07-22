@@ -17,6 +17,7 @@ import ReactFlow, {
 } from 'reactflow';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { NodeInspector } from './NodeInspector';
+import { FlowGrid } from './FlowGrid';
 import { Network } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -90,6 +91,8 @@ export const FlowDiagram = ({
 }: FlowDiagramProps) => {
   const hasNodes = nodes.length > 0;
   const { isDark } = useTheme();
+  
+  console.log('🔍 FlowDiagram Props:', { showGrid, isDark, hasNodes });
 
   // Componente de estado vazio
   const EmptyState = () => (
@@ -143,17 +146,7 @@ export const FlowDiagram = ({
                 connectionLineType={ConnectionLineType.SmoothStep}
               >
                 <Controls />
-                {(() => {
-                  console.log('🔍 FlowDiagram Render - showGrid:', showGrid, 'isDark:', isDark);
-                  return showGrid && (
-                    <Background 
-                      gap={16}
-                      size={1}
-                      color="#ff0000"
-                      variant={BackgroundVariant.Dots}
-                    />
-                  );
-                })()}
+                {showGrid && <FlowGrid isDark={isDark} />}
                 {showMiniMap && <MiniMap />}
               </ReactFlow>
             </div>
@@ -209,17 +202,7 @@ export const FlowDiagram = ({
             connectionLineType={ConnectionLineType.SmoothStep}
           >
             <Controls />
-            {(() => {
-              console.log('🔍 FlowDiagram Render (no inspector) - showGrid:', showGrid, 'isDark:', isDark);
-              return showGrid && (
-                <Background 
-                  gap={16}
-                  size={1}
-                  color="#ff0000"
-                  variant={BackgroundVariant.Dots}
-                />
-              );
-            })()}
+            {showGrid && <FlowGrid isDark={isDark} />}
             {showMiniMap && <MiniMap />}
           </ReactFlow>
         </div>
