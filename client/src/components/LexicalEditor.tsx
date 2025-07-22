@@ -954,8 +954,23 @@ function ImageIdAutoConvertPlugin() {
   return null;
 }
 
+// Interface para as props do LexicalEditor
+interface LexicalEditorProps {
+  content?: string;
+  onChange?: (content: string) => void;
+  onEditorStateChange?: (editorState: string) => void;
+  onContentStatusChange?: (hasContent: boolean) => void;
+  onEditorInstanceChange?: (instance: any) => void;
+  className?: string;
+  templateSections?: any[];
+  viewMode?: 'editor' | 'preview' | 'mdx';
+  initialEditorState?: string;
+  markdownContent?: string;
+  isEnabled?: boolean;
+}
+
 // Componente principal do editor Lexical completo
-export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, onEditorInstanceChange, className = '', templateSections, viewMode = 'editor', initialEditorState, markdownContent: mdxContent = '' }: LexicalEditorProps): JSX.Element {
+export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, onEditorInstanceChange, className = '', templateSections, viewMode = 'editor', initialEditorState, markdownContent: mdxContent = '', isEnabled = true }: LexicalEditorProps): JSX.Element {
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [tableRows, setTableRows] = useState(2);
   const [tableColumns, setTableColumns] = useState(3);
@@ -1129,7 +1144,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
     <div className={`lexical-editor-container w-full h-full flex flex-col ${className}`}>
       <LexicalComposer initialConfig={initialConfig}>
         <div className="w-full h-full flex flex-col min-h-0">
-          {viewMode === 'editor' && (
+          {viewMode === 'editor' && isEnabled && (
             <ToolbarPlugin 
               tableRows={tableRows}
               setTableRows={setTableRows}
@@ -1146,13 +1161,14 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
               <RichTextPlugin
                 contentEditable={
                   <ContentEditable 
-                    className="w-full outline-none resize-none text-gray-900 dark:text-[#E5E7EB] dark:bg-[#020203]"
+                    className={`w-full outline-none resize-none text-gray-900 dark:text-[#E5E7EB] dark:bg-[#020203] ${!isEnabled ? 'pointer-events-none opacity-50' : ''}`}
                     style={{ 
                       fontFamily: 'system-ui, -apple-system, sans-serif',
                       lineHeight: '1.6',
                       minHeight: '400px',
                       height: 'auto'
                     }}
+                    contentEditable={isEnabled}
                   />
                 }
                 placeholder={<Placeholder />}
