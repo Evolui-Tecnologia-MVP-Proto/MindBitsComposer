@@ -1099,6 +1099,57 @@ table:not(.lexical-editor-container table) th {
   opacity: 1 !important;
 }
 
+/* Date picker dropdown/calendar dark theme styling */
+.dark input[type="datetime-local"]::-webkit-datetime-edit,
+.dark input[type="date"]::-webkit-datetime-edit,
+.dark input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper,
+.dark input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
+
+.dark input[type="datetime-local"]::-webkit-datetime-edit-text,
+.dark input[type="date"]::-webkit-datetime-edit-text,
+.dark input[type="datetime-local"]::-webkit-datetime-edit-month-field,
+.dark input[type="date"]::-webkit-datetime-edit-month-field,
+.dark input[type="datetime-local"]::-webkit-datetime-edit-day-field,
+.dark input[type="date"]::-webkit-datetime-edit-day-field,
+.dark input[type="datetime-local"]::-webkit-datetime-edit-year-field,
+.dark input[type="date"]::-webkit-datetime-edit-year-field,
+.dark input[type="datetime-local"]::-webkit-datetime-edit-hour-field,
+.dark input[type="datetime-local"]::-webkit-datetime-edit-minute-field {
+  color: #E5E7EB !important;
+  background-color: transparent !important;
+}
+
+/* Date picker inner calendar styling */
+.dark input[type="datetime-local"]::-webkit-inner-spin-button,
+.dark input[type="date"]::-webkit-inner-spin-button {
+  filter: brightness(0) invert(1) !important;
+}
+
+/* Complete date picker theming for dark mode */
+.dark input[type="datetime-local"],
+.dark input[type="date"] {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+  border-color: #374151 !important;
+}
+
+.dark input[type="datetime-local"]:focus,
+.dark input[type="date"]:focus {
+  background-color: #0F172A !important;
+  border-color: #1E40AF !important;
+  box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2) !important;
+}
+
+/* Calendar dropdown content styling */
+.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
+.dark input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-radius: 2px !important;
+}
+
 .dark input[type="time"]::-webkit-datetime-edit-fields-wrapper {
   background: transparent !important;
   color: #E5E7EB !important;
