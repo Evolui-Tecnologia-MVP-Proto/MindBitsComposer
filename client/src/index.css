@@ -2774,22 +2774,22 @@ html.dark [data-radix-select-item][data-highlighted] {
   color: #1F2937 !important;
 }
 
-/* Canvas center icon styling */
-.dark [data-page="fluxos"] .react-flow__pane svg,
+/* Canvas center icon styling - prevent distortion */
+.dark [data-page="fluxos"] .react-flow__pane svg {
+  color: #6B7280 !important;
+}
+
 .dark [data-page="fluxos"] .text-center svg {
-  color: #1F2937 !important;
-  fill: #1F2937 !important;
+  color: #6B7280 !important;
 }
 
 /* Additional targeting for canvas center content */
-.dark [data-page="fluxos"] .absolute.inset-0.flex.items-center.justify-center,
-.dark [data-page="fluxos"] .absolute.inset-0.flex.items-center.justify-center * {
+.dark [data-page="fluxos"] .absolute.inset-0.flex.items-center.justify-center {
   color: #1F2937 !important;
 }
 
 .dark [data-page="fluxos"] .absolute.inset-0.flex.items-center.justify-center svg {
-  color: #1F2937 !important;
-  fill: #1F2937 !important;
+  color: #6B7280 !important;
 }
 
 /* Canvas container border styling - more specific selectors */
