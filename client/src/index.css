@@ -63,6 +63,46 @@
   max-height: 100%;
 }
 
+/* Collapsible container dark mode styling */
+.dark .Collapsible__content,
+.dark details .Collapsible__content,
+.dark .lexical-canvas .Collapsible__content,
+body.dark .Collapsible__content {
+  background-color: #020203 !important;
+  background: #020203 !important;
+  border-color: #374151 !important;
+}
+
+.dark .Collapsible__container,
+.dark details.Collapsible__container,
+.dark .lexical-canvas .Collapsible__container,
+body.dark .Collapsible__container {
+  background-color: #111827 !important;
+  background: #111827 !important;
+  border-color: #374151 !important;
+}
+
+.dark .Collapsible__title,
+.dark summary.Collapsible__title,
+.dark .lexical-canvas .Collapsible__title,
+body.dark .Collapsible__title {
+  color: #E5E7EB !important;
+}
+
+.dark .Collapsible__title:hover,
+.dark summary.Collapsible__title:hover,
+body.dark .Collapsible__title:hover {
+  color: #60A5FA !important;
+}
+
+/* Additional specificity for collapsible content in editor */
+.lexical-editor-container .dark .Collapsible__content,
+.composer-editor-card .dark .Collapsible__content,
+[data-lexical-editor] .dark .Collapsible__content {
+  background-color: #020203 !important;
+  background: #020203 !important;
+}
+
 .composer-library-panel * {
   max-width: 100% !important;
 }
