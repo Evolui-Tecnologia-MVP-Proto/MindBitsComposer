@@ -147,6 +147,52 @@ body.dark .Collapsible__title:hover {
   stroke: #FFFFFF !important;
 }
 
+/* Lexical Editor Tables Dark Mode */
+.dark .lexical-editor-container table,
+.dark [data-lexical-editor] table,
+.dark .ContentEditable__root table {
+  background-color: #020203 !important;
+  background: #020203 !important;
+}
+
+.dark .lexical-editor-container table th,
+.dark .lexical-editor-container table td,
+.dark [data-lexical-editor] table th,
+.dark [data-lexical-editor] table td,
+.dark .ContentEditable__root table th,
+.dark .ContentEditable__root table td {
+  background-color: #020203 !important;
+  background: #020203 !important;
+  color: #FFFFFF !important;
+  border-color: #FFFFFF !important;
+  border: 1px solid #FFFFFF !important;
+}
+
+.dark .lexical-editor-container .TableNode__tableCell,
+.dark [data-lexical-editor] .TableNode__tableCell,
+.dark .ContentEditable__root .TableNode__tableCell {
+  background-color: #020203 !important;
+  background: #020203 !important;
+  color: #FFFFFF !important;
+  border-color: #FFFFFF !important;
+  border: 1px solid #FFFFFF !important;
+}
+
+.dark .lexical-editor-container .TableNode__tableRow,
+.dark [data-lexical-editor] .TableNode__tableRow,
+.dark .ContentEditable__root .TableNode__tableRow {
+  background-color: #020203 !important;
+  background: #020203 !important;
+}
+
+.dark .lexical-editor-container .TableNode__table,
+.dark [data-lexical-editor] .TableNode__table,
+.dark .ContentEditable__root .TableNode__table {
+  background-color: #020203 !important;
+  background: #020203 !important;
+  border-color: #FFFFFF !important;
+}
+
 .composer-library-panel * {
   max-width: 100% !important;
 }
