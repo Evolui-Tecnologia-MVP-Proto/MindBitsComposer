@@ -1150,6 +1150,85 @@ table:not(.lexical-editor-container table) th {
   border-radius: 2px !important;
 }
 
+/* Force dark theme on calendar popup - Webkit specific */
+.dark input[type="datetime-local"]::-webkit-datetime-edit-ampm-field,
+.dark input[type="date"]::-webkit-datetime-edit-ampm-field {
+  color: #E5E7EB !important;
+  background-color: transparent !important;
+}
+
+/* Calendar popup styling - more aggressive approach */
+.dark {
+  color-scheme: dark !important;
+}
+
+html.dark {
+  color-scheme: dark !important;
+}
+
+/* Target calendar popup elements */
+.dark *::-webkit-calendar-picker-indicator {
+  filter: invert(1) !important;
+}
+
+/* Force calendar widget dark theme */
+body.dark,
+html.dark {
+  color-scheme: dark !important;
+}
+
+/* Additional calendar theming */
+.dark input[type="datetime-local"],
+.dark input[type="date"] {
+  color-scheme: dark !important;
+  filter: none !important;
+}
+
+/* Specific calendar theming for admin page */
+.dark [data-page="admin"] input[type="datetime-local"],
+.dark [data-page="admin"] input[type="date"] {
+  color-scheme: dark !important;
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+  border-color: #374151 !important;
+}
+
+.dark [data-page="admin"] input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.dark [data-page="admin"] input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: brightness(0) invert(1) !important;
+  background-color: transparent !important;
+}
+
+.dark [data-page="admin"] input[type="datetime-local"]::-webkit-datetime-edit,
+.dark [data-page="admin"] input[type="date"]::-webkit-datetime-edit {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
+
+/* Force global dark theme for all calendar widgets when dark mode is active */
+html.dark,
+body.dark,
+.dark {
+  color-scheme: dark !important;
+}
+
+/* Override browser default calendar styling */
+:root.dark {
+  color-scheme: dark !important;
+}
+
+/* Force calendar popup to respect dark theme */
+.dark input[type="datetime-local"]:focus,
+.dark input[type="date"]:focus {
+  color-scheme: dark !important;
+}
+
+/* Additional targeting for calendar popup elements */
+html[class*="dark"] input[type="datetime-local"],
+html[class*="dark"] input[type="date"] {
+  color-scheme: dark !important;
+}
+
 .dark input[type="time"]::-webkit-datetime-edit-fields-wrapper {
   background: transparent !important;
   color: #E5E7EB !important;
