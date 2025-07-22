@@ -240,6 +240,41 @@ body.dark .Collapsible__title:hover {
   border: 3px solid #60A5FA !important;
 }
 
+/* Table hover for better click indication in dark mode */
+.dark .lexical-editor-container table:hover,
+.dark [data-lexical-editor] table:hover,
+.dark .ContentEditable__root table:hover,
+.dark .lexical-editor-container .TableNode__table:hover,
+.dark [data-lexical-editor] .TableNode__table:hover,
+.dark .ContentEditable__root .TableNode__table:hover {
+  outline: 2px solid #93C5FD !important;
+  outline-offset: 1px !important;
+  cursor: pointer !important;
+}
+
+/* Click/active state for tables in dark mode */
+.dark .lexical-editor-container table:active,
+.dark [data-lexical-editor] table:active,
+.dark .ContentEditable__root table:active,
+.dark .lexical-editor-container .TableNode__table:active,
+.dark [data-lexical-editor] .TableNode__table:active,
+.dark .ContentEditable__root .TableNode__table:active {
+  outline: 3px solid #60A5FA !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3) !important;
+  border: 3px solid #60A5FA !important;
+}
+
+/* Selected table states */
+.dark .lexical-editor-container table[data-lexical-table-selection],
+.dark [data-lexical-editor] table[data-lexical-table-selection],
+.dark .ContentEditable__root table[data-lexical-table-selection] {
+  outline: 3px solid #60A5FA !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3) !important;
+  border: 3px solid #60A5FA !important;
+}
+
 
 
 /* Active table cell selection in dark mode */
