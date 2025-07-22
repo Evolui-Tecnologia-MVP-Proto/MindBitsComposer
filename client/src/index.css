@@ -2713,37 +2713,37 @@ html.dark [data-radix-select-item][data-highlighted] {
   color: #FFFFFF !important;
 }
 
-/* ReactFlow MiniMap styling for dark theme - high contrast */
+/* ReactFlow MiniMap styling for dark theme - custom colors */
 .dark [data-page="fluxos"] .react-flow__minimap {
-  background-color: #000000 !important;
+  background-color: #383B42 !important;
   border: 1px solid #374151 !important;
 }
 
 .dark [data-page="fluxos"] .react-flow__minimap-mask {
-  fill: rgba(59, 130, 246, 0.4) !important;
-  stroke: #3B82F6 !important;
+  fill: #292C33 !important;
+  stroke: #292C33 !important;
   stroke-width: 2px !important;
 }
 
 .dark [data-page="fluxos"] .react-flow__minimap-node {
-  fill: #60A5FA !important;
-  stroke: #FFFFFF !important;
+  fill: #191B20 !important;
+  stroke: #191B20 !important;
   stroke-width: 1px !important;
 }
 
 .dark [data-page="fluxos"] .react-flow__minimap-node[data-type="startNode"] {
-  fill: #10B981 !important;
-  stroke: #FFFFFF !important;
+  fill: #191B20 !important;
+  stroke: #191B20 !important;
 }
 
 .dark [data-page="fluxos"] .react-flow__minimap-node[data-type="endNode"] {
-  fill: #EF4444 !important;
-  stroke: #FFFFFF !important;
+  fill: #191B20 !important;
+  stroke: #191B20 !important;
 }
 
 .dark [data-page="fluxos"] .react-flow__minimap-node[data-type="processNode"] {
-  fill: #F59E0B !important;
-  stroke: #FFFFFF !important;
+  fill: #191B20 !important;
+  stroke: #191B20 !important;
 }
 
 /* ReactFlow Background pattern for dark theme */
