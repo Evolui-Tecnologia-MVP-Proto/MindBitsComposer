@@ -2853,6 +2853,11 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   overflow-y: auto;
 }
 
+/* Library panel - rounded top-left corner */
+.composer-library-panel {
+  border-top-left-radius: 8px !important;
+}
+
 /* Library panel header - rounded top-left corner */
 .composer-library-panel > div:first-child {
   border-top-left-radius: 8px !important;
