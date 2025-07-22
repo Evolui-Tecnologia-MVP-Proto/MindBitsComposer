@@ -2513,7 +2513,7 @@ html.dark [data-radix-select-item][data-highlighted] {
 
 .dark [data-page="fluxos"] .flex.justify-between.items-center {
   background-color: #0F172A !important;
-  margin-bottom: 20px !important;
+  /* Remove forced margin that could affect height calculation */
 }
 
 .dark [data-page="fluxos"] .grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3.gap-6 {
@@ -2558,16 +2558,28 @@ html.dark [data-radix-select-item][data-highlighted] {
   color: #FFFFFF !important;
 }
 
-/* FlowToolbar container styling for dark theme */
+/* FlowToolbar container styling for dark theme - preserve exact dimensions */
 .dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 {
   background-color: #0F172A !important;
-  border: 1px solid #374151 !important;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+  border-color: #374151 !important;
+  /* Preserve all original sizing properties from light mode */
+  margin-bottom: inherit !important;
+  padding: inherit !important;
+  border-radius: inherit !important;
+  height: auto !important;
+  min-height: inherit !important;
+  max-height: inherit !important;
 }
 
-/* FlowToolbar individual toolbar divs */
+/* FlowToolbar individual toolbar divs - preserve exact spacing */
 .dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 > .flex.justify-between.items-center {
   background-color: transparent !important;
+  /* Preserve all original sizing and spacing properties */
+  height: inherit !important;
+  min-height: inherit !important;
+  padding: inherit !important;
+  margin: inherit !important;
+  gap: inherit !important;
 }
 
 /* NodeInspector panel styling for dark theme */
