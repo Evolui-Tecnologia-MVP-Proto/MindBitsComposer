@@ -222,12 +222,12 @@
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] table thead tr {
   background-color: #0F172A !important;
-  border-color: #374151 !important;
+  border-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] table tbody tr {
   background-color: #0F172A !important;
-  border-color: #374151 !important;
+  border-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] table tbody tr:hover {
@@ -237,7 +237,8 @@
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] table th,
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] table td {
   color: #E5E7EB !important;
-  border-color: #374151 !important;
+  border-color: #0F172A !important;
+  background-color: #0F172A !important;
 }
 
 /* Template Modal - Select triggers inside accordions */
@@ -270,6 +271,21 @@
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] .py-2,
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] td {
   background-color: #0F172A !important;
+}
+
+/* Force #0F172A where #374151 appears in the accordion table area */
+.dark [data-radix-dialog-content] [data-radix-collapsible-content] div.p-4 {
+  background-color: #0F172A !important;
+}
+
+.dark [data-radix-dialog-content] [data-radix-collapsible-content] .border.rounded-b-lg {
+  background-color: #0F172A !important;
+}
+
+/* Specific targeting for the table container area that shows #374151 */
+.dark [data-radix-dialog-content] [data-radix-tabs-content] [data-radix-collapsible-content] {
+  background-color: #0F172A !important;
+  border-color: #0F172A !important;
 }
 
 /* All mapping tab content background */
