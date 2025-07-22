@@ -2795,6 +2795,8 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 /* Ensures all panels (library, editor, attachments) have matching bottom alignment */
 .composer-layout-container {
   height: calc(100vh - 140px); /* Full height minus header space */
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 .composer-side-panel,
@@ -2809,9 +2811,9 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   margin: 0 !important;
 }
 
-/* Ensures editor canvas matches panel heights precisely - add 5px to compensate for container padding */
+/* Ensures editor canvas matches panel heights precisely */
 .composer-editor-card {
-  height: calc(100% + 5px) !important;
+  height: 100% !important;
   margin: 0 !important;
 }
 
@@ -2827,17 +2829,29 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   height: 100% !important;
 }
 
-/* Align panel headers with editor toolbar - same padding as toolbar (p-3 = 12px) */
+/* Match panel headers exactly with editor toolbar height */
 .composer-side-panel > div:first-child {
-  padding: 12px 16px !important; /* Match toolbar's p-3 vertically, keep p-4 horizontally */
+  height: 56px !important; /* Exact height of toolbar (p-3 = 12px * 2 + content) */
+  padding: 12px 16px !important;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
 }
 
-/* Library panel specific height matching */
+/* Ensure h3 titles in headers don't add extra height */
+.composer-side-panel h3 {
+  margin: 0 !important;
+  line-height: 1.5 !important;
+}
+
+/* Library panel specific - content area below header */
 .composer-library-panel .flex-1 {
-  max-height: calc(100% - 60px); /* Adjusted for smaller header padding */
+  height: calc(100% - 56px) !important; /* Subtract exact header height */
+  max-height: calc(100% - 56px) !important;
 }
 
-/* Attachments panel specific height matching */
+/* Attachments panel specific - content area below header */
 .composer-attachments-panel .flex-1 {
-  max-height: calc(100% - 60px); /* Adjusted for smaller header padding */
+  height: calc(100% - 56px) !important; /* Subtract exact header height */
+  max-height: calc(100% - 56px) !important;
 }
