@@ -2805,21 +2805,26 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 
 /* Remove padding from editor container to match side panels exactly */
 .composer-editor-container > div {
-  padding-right: 0 !important;
-  padding-bottom: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
-/* Ensures editor canvas matches panel heights precisely */
+/* Ensures editor canvas matches panel heights precisely - add 5px to compensate for container padding */
 .composer-editor-card {
-  height: 100% !important;
-  margin-bottom: 0 !important;
+  height: calc(100% + 5px) !important;
+  margin: 0 !important;
 }
 
 /* Remove any extra margins from card content */
 .composer-editor-card .card-content,
 .composer-editor-card [data-radix-card-content] {
-  margin-bottom: 0 !important;
-  padding-bottom: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Ensure the editor card extends to match panel bottoms exactly */
+.composer-editor-card > div {
+  height: 100% !important;
 }
 
 /* Align panel headers with editor toolbar - same padding as toolbar (p-3 = 12px) */
