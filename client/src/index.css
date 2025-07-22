@@ -32,11 +32,11 @@
   }
 
   .dark {
-    --background: 221 48% 11%; /* #1F2937 converted to HSL */
+    --background: 221 48% 11%; /* #0F172A converted to HSL */
     --foreground: 210 40% 98%;
     --card: 217 32% 17%; /* #1E293B converted to HSL - main cards */
     --card-foreground: 210 40% 98%;
-    --popover: 221 48% 11%; /* #1F2937 converted to HSL */
+    --popover: 221 48% 11%; /* #0F172A converted to HSL */
     --popover-foreground: 210 40% 98%;
     --primary: 217.2 91.2% 59.8%;
     --primary-foreground: 222.2 84% 4.9%;
@@ -58,7 +58,7 @@
     --chart-5: 340 75% 55%;
     
     /* Modal specific variables */
-    --modal-bg: #1F2937;
+    --modal-bg: #0F172A;
     --modal-text: #F9FAFB;
   }
 }
@@ -104,7 +104,7 @@
 /* Individual/nested cards - darker */
 .dark .card .card,
 .dark [data-radix-card] [data-radix-card] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Card titles and descriptions */
@@ -141,28 +141,28 @@
 /* Template cards specific styling */
 .dark .template-card,
 .dark .document-card {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border: 1px solid #374151 !important;
 }
 
 /* Grid cards styling */
 .dark .grid .card,
 .dark .grid [data-radix-card] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border: 1px solid #374151 !important;
 }
 
 /* Modal cards */
 .dark [data-radix-dialog-content] .card,
 .dark [data-radix-dialog-content] [data-radix-card] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border: 1px solid #374151 !important;
 }
 
 /* Template Form Modal - Button container */
 .dark [data-radix-dialog-content] .border-t.pt-4.mt-4,
 .dark [data-radix-dialog-content] div[class*="border-t pt-4 mt-4"] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
 }
 
@@ -192,7 +192,7 @@
 
 /* Specific fix for template modal button container */
 .dark .bg-white.dark\\:bg-slate-800 {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark .dark\\:border-gray-600 {
@@ -203,7 +203,7 @@
 .dark [data-radix-dialog-content] [data-radix-collapsible-trigger] {
   background-color: #1E293B !important;
   color: #E5E7EB !important;
-  border-color: #1F2937 !important;
+  border-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-trigger]:hover {
@@ -211,55 +211,55 @@
 }
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] {
-  background-color: #1F2937 !important;
-  border-color: #1F2937 !important;
+  background-color: #0F172A !important;
+  border-color: #0F172A !important;
 }
 
 /* Template Modal - Accordion tables */
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] table {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] table thead tr {
-  background-color: #1F2937 !important;
-  border-color: #1F2937 !important;
+  background-color: #0F172A !important;
+  border-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] table tbody tr {
-  background-color: #1F2937 !important;
-  border-color: #1F2937 !important;
+  background-color: #0F172A !important;
+  border-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] table tbody tr:hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] table th,
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] table td {
   color: #E5E7EB !important;
-  border-color: #1F2937 !important;
-  background-color: #1F2937 !important;
+  border-color: #0F172A !important;
+  background-color: #0F172A !important;
 }
 
 /* Template Modal - Select triggers inside accordions */
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] [data-radix-select-trigger] {
-  background-color: #1F2937 !important;
-  border-color: #1F2937 !important;
+  background-color: #0F172A !important;
+  border-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] [data-radix-select-content] {
-  background-color: #1F2937 !important;
-  border-color: #1F2937 !important;
+  background-color: #0F172A !important;
+  border-color: #0F172A !important;
 }
 
 /* Template Modal - Campo and Mapeamento backgrounds */
 .dark [data-radix-dialog-content] [data-radix-tabs-content][value="mapeamento"] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] [data-radix-tabs-content][value="mapeamento"] .space-y-4 {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Campo (field) areas */
@@ -270,31 +270,31 @@
 /* Mapeamento select areas */
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] .py-2,
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] td {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
-/* Force #1F2937 where #374151 appears in the accordion table area */
+/* Force #0F172A where #374151 appears in the accordion table area */
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] div.p-4 {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] .border.rounded-b-lg {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Specific targeting for the table container area that shows #374151 */
 .dark [data-radix-dialog-content] [data-radix-tabs-content] [data-radix-collapsible-content] {
-  background-color: #1F2937 !important;
-  border-color: #1F2937 !important;
+  background-color: #0F172A !important;
+  border-color: #0F172A !important;
 }
 
 /* All mapping tab content background */
 .dark [data-radix-dialog-content] [value="mapeamento"] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] [value="mapeamento"] > div {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Force override any #374151 colors in the template modal */
@@ -303,60 +303,60 @@
 }
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] {
-  background-color: #1F2937 !important;
-  border-color: #1F2937 !important;
+  background-color: #0F172A !important;
+  border-color: #0F172A !important;
 }
 
 /* Specific override for any remaining #374151 in accordion areas */
 .dark [data-radix-dialog-content] .bg-gray-50 {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] .border-gray-200 {
-  border-color: #1F2937 !important;
+  border-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] .border-gray-300 {
-  border-color: #1F2937 !important;
+  border-color: #0F172A !important;
 }
 
 /* Nuclear option - override any computed #374151 styles */
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] [style*="#374151"] {
-  background-color: #1F2937 !important;
-  border-color: #1F2937 !important;
+  background-color: #0F172A !important;
+  border-color: #0F172A !important;
 }
 
 /* Additional targeted overrides for template modal table areas */
 .dark [data-radix-dialog-content] .border-gray-600 {
-  border-color: #1F2937 !important;
+  border-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] .dark\\:border-gray-600 {
-  border-color: #1F2937 !important;
+  border-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] table tr {
-  border-color: #1F2937 !important;
+  border-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] table td,
 .dark [data-radix-dialog-content] table th {
-  border-color: #1F2937 !important;
+  border-color: #0F172A !important;
 }
 
 /* Override any remaining Tailwind classes that might generate #374151 */
 .dark [data-radix-dialog-content] .border {
-  border-color: #1F2937 !important;
+  border-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] .border-t-0 {
-  border-color: #1F2937 !important;
+  border-color: #0F172A !important;
 }
 
-/* Force all CollapsibleContent borders to be #1F2937 */
+/* Force all CollapsibleContent borders to be #0F172A */
 .dark [data-radix-dialog-content] [data-radix-collapsible-content].border {
-  border-color: #1F2937 !important;
-  background-color: #1F2937 !important;
+  border-color: #0F172A !important;
+  background-color: #0F172A !important;
 }
 
 /* Ultimate nuclear approach - override ANY occurrence of #374151 anywhere in the modal */
@@ -364,15 +364,15 @@
 .dark [data-radix-dialog-content] *,
 .dark [data-radix-dialog-content] *::before,
 .dark [data-radix-dialog-content] *::after {
-  border-color: #1F2937 !important;
+  border-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] [data-radix-tabs-content="mapeamento"],
 .dark [data-radix-dialog-content] [data-radix-tabs-content="mapeamento"] *,
 .dark [data-radix-dialog-content] [data-radix-tabs-content="mapeamento"] *::before,
 .dark [data-radix-dialog-content] [data-radix-tabs-content="mapeamento"] *::after {
-  border-color: #1F2937 !important;
-  background-color: #1F2937 !important;
+  border-color: #0F172A !important;
+  background-color: #0F172A !important;
 }
 
 /* Override computed styles that might have #374151 */
@@ -382,21 +382,21 @@
 
 /* Target specific gray-600 color that maps to #374151 */
 .dark [data-radix-dialog-content] * {
-  --color-gray-600: #1F2937 !important;
+  --color-gray-600: #0F172A !important;
 }
 
 /* Force override for all elements that might inherit gray-600 */
 .dark [data-radix-dialog-content] .border-gray-600,
 .dark [data-radix-dialog-content] [class*="border-gray"],
 .dark [data-radix-dialog-content] [class*="dark:border-gray"] {
-  border-color: #1F2937 !important;
+  border-color: #0F172A !important;
 }
 
 /* Override CSS variables that generate #374151 (gray-600) */
 .dark [data-radix-dialog-content] {
   --tw-border-opacity: 1 !important;
-  --gray-600: #1F2937 !important;
-  --border-color: #1F2937 !important;
+  --gray-600: #0F172A !important;
+  --border-color: #0F172A !important;
 }
 
 /* Target Radix UI specific data attributes that might use gray-600 */
@@ -404,24 +404,24 @@
 .dark [data-radix-dialog-content] [data-radix-collapsible-trigger],
 .dark [data-radix-dialog-content] [data-radix-collapsible-content],
 .dark [data-radix-dialog-content] [data-radix-tabs-content] {
-  border-color: #1F2937 !important;
-  --border-color: #1F2937 !important;
+  border-color: #0F172A !important;
+  --border-color: #0F172A !important;
 }
 
 /* Override any computed border colors */
 .dark [data-radix-dialog-content] * {
-  --computed-border-color: #1F2937 !important;
+  --computed-border-color: #0F172A !important;
 }
 
-/* Final nuclear option - replace #374151 with #1F2937 everywhere */
+/* Final nuclear option - replace #374151 with #0F172A everywhere */
 .dark [data-radix-dialog-content] *[style*="374151"] {
-  border-color: #1F2937 !important;
-  background-color: #1F2937 !important;
+  border-color: #0F172A !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] *[style*="rgb(55, 65, 81)"] {
-  border-color: #1F2937 !important;
-  background-color: #1F2937 !important;
+  border-color: #0F172A !important;
+  background-color: #0F172A !important;
 }
 
 /* MAXIMUM SPECIFICITY: Global tabs active state styling for dark mode */
@@ -459,8 +459,8 @@ html.dark .modal-0f172a,
 .dark [data-radix-dialog-content],
 .dark [data-radix-alert-dialog-content],
 .dark .modal-0f172a {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
   color: #F9FAFB !important;
 }
 
@@ -469,8 +469,8 @@ html.dark div[data-radix-dialog-content],
 html.dark div[data-radix-alert-dialog-content],
 .dark div[data-radix-dialog-content],
 .dark div[data-radix-alert-dialog-content] {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
   color: #F9FAFB !important;
 }
 
@@ -479,8 +479,8 @@ html.dark [data-radix-dialog-content].bg-background,
 .dark [data-radix-dialog-content].bg-background,
 html.dark [data-radix-alert-dialog-content].bg-background,
 .dark [data-radix-alert-dialog-content].bg-background {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
 /* ULTRA HIGH PRIORITY: Force all possible modal selectors in dark mode */
@@ -490,8 +490,8 @@ html body.dark [data-radix-dialog-content],
 html body.dark [data-radix-alert-dialog-content],
 .dark[data-theme="dark"] [data-radix-dialog-content],
 .dark[data-theme="dark"] [data-radix-alert-dialog-content] {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
   color: #F9FAFB !important;
 }
 
@@ -500,30 +500,30 @@ html body.dark [data-radix-alert-dialog-content],
 .dark [data-radix-alert-dialog-content][class*="bg-"],
 html.dark [data-radix-dialog-content][class*="bg-"],
 html.dark [data-radix-alert-dialog-content][class*="bg-"] {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
 /* ULTIMATE OVERRIDE: Target any dialog elements with CSS variables in dark mode */
 .dark [data-radix-dialog-content] {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(15 23 42 / var(--tw-bg-opacity)) !important;
-  background: #1F2937 !important;
+  background: #0F172A !important;
   color: #F9FAFB !important;
 }
 
 .dark [data-radix-alert-dialog-content] {
   --tw-bg-opacity: 1 !important;
   background-color: rgb(15 23 42 / var(--tw-bg-opacity)) !important;
-  background: #1F2937 !important;
+  background: #0F172A !important;
   color: #F9FAFB !important;
 }
 
 /* FINAL OVERRIDE: Direct attribute targeting with maximum specificity */
 body.dark [data-radix-dialog-content]:not([style*="background"]),
 body.dark [data-radix-alert-dialog-content]:not([style*="background"]) {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
 /* Modal text elements in DARK MODE */
@@ -543,7 +543,7 @@ body.dark [data-radix-alert-dialog-content]:not([style*="background"]) {
 .dark [data-radix-dialog-content] textarea,
 .dark [data-radix-alert-dialog-content] input,
 .dark [data-radix-alert-dialog-content] textarea {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
   color: #F9FAFB !important;
 }
@@ -579,7 +579,7 @@ body.dark [data-radix-alert-dialog-content]:not([style*="background"]) {
 .dark [data-radix-dialog-content] [data-radix-checkbox-root],
 .dark [data-radix-alert-dialog-content] [data-radix-radio-group-item],
 .dark [data-radix-alert-dialog-content] [data-radix-checkbox-root] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
   color: #F9FAFB !important;
 }
@@ -597,81 +597,81 @@ body.dark [data-radix-alert-dialog-content]:not([style*="background"]) {
 /* MODAL SELECT COMPONENTS - DARK MODE ONLY */
 .dark [data-radix-dialog-content] [data-radix-select-trigger],
 .dark [data-radix-alert-dialog-content] [data-radix-select-trigger] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
   color: #F9FAFB !important;
 }
 
 /* Select Content - targets dropdown list */
 .dark [data-radix-select-content] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
 }
 
 /* Select Items - individual options */
 .dark [data-radix-select-item] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #F9FAFB !important;
 }
 
 .dark [data-radix-select-item]:hover,
 .dark [data-radix-select-item][data-highlighted] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #F9FAFB !important;
 }
 
 /* Additional targeting for modal selects with stronger specificity */
 .dark div[data-radix-dialog-content] [data-radix-select-content] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
 }
 
 .dark div[data-radix-dialog-content] [data-radix-select-item] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #F9FAFB !important;
 }
 
 .dark div[data-radix-dialog-content] [data-radix-select-item]:hover,
 .dark div[data-radix-dialog-content] [data-radix-select-item][data-highlighted] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #F9FAFB !important;
 }
 
-/* Force all select dropdowns in dark mode to use #1F2937 */
+/* Force all select dropdowns in dark mode to use #0F172A */
 .dark [data-radix-select-content][data-side] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
 }
 
 .dark [data-radix-select-item][data-radix-collection-item] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #F9FAFB !important;
 }
 
 .dark [data-radix-select-item][data-radix-collection-item]:hover,
 .dark [data-radix-select-item][data-radix-collection-item][data-highlighted] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #F9FAFB !important;
 }
 
 /* Global override for all Radix Select components in dark mode */
 .dark [data-radix-select-content] {
-  background: #1F2937 !important;
-  background-color: #1F2937 !important;
+  background: #0F172A !important;
+  background-color: #0F172A !important;
   border: 1px solid #374151 !important;
 }
 
 .dark [data-radix-select-item] {
-  background: #1F2937 !important;
-  background-color: #1F2937 !important;
+  background: #0F172A !important;
+  background-color: #0F172A !important;
   color: #F9FAFB !important;
 }
 
 .dark [data-radix-select-item]:hover,
 .dark [data-radix-select-item][data-highlighted],
 .dark [data-radix-select-item][data-state="checked"] {
-  background: #1F2937 !important;
-  background-color: #1F2937 !important;
+  background: #0F172A !important;
+  background-color: #0F172A !important;
   color: #F9FAFB !important;
 }
 
@@ -1104,7 +1104,7 @@ table:not(.lexical-editor-container table) th {
   }
 
   .dark .sidebar-active {
-    background-color: #1F2937 !important;
+    background-color: #0F172A !important;
   }
 
   .sidebar-item-container {
@@ -1351,33 +1351,33 @@ table:not(.lexical-editor-container table) th {
 /* FORCE TABLE COLORS - SPECIFIC TO ADMIN PAGE ONLY */
 .dark [data-page="admin"] table,
 .dark [data-page="admin"] .table {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-page="admin"] thead,
 .dark [data-page="admin"] .table-header {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-page="admin"] tbody,
 .dark [data-page="admin"] .table-body {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-page="admin"] tbody tr,
 .dark [data-page="admin"] .table-row {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-page="admin"] tbody td,
 .dark [data-page="admin"] .table-cell {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* FORCE MODAL TABLE COLORS - SAME PATTERN AS ADMIN TABLES */
 .dark [data-radix-dialog-content] table,
 .dark [data-radix-dialog-content] .table {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] thead,
@@ -1387,34 +1387,34 @@ table:not(.lexical-editor-container table) th {
 .dark [data-radix-dialog-content] table thead tr th,
 .dark [data-radix-dialog-content] [data-table="header"],
 .dark [data-radix-dialog-content] th[class*="TableHead"] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] tbody,
 .dark [data-radix-dialog-content] .table-body {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] tbody tr,
 .dark [data-radix-dialog-content] .table-row {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 .dark [data-radix-dialog-content] tbody td,
 .dark [data-radix-dialog-content] .table-cell,
 .dark [data-radix-dialog-content] td {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Override Tailwind classes only in admin page - DARK MODE ONLY */
 .dark [data-page="admin"] .bg-white {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-page="admin"] .bg-gray-50 {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Ensure light mode preserves original colors */
@@ -1432,26 +1432,26 @@ table:not(.lexical-editor-container table) th {
 .dark [data-radix-dialog-content] .sticky.top-0,
 .dark [data-radix-dialog-content] .sticky.bg-background,
 .dark [data-radix-dialog-content] .sticky.bg-white {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] .bg-white:not(td):not(.table-cell) {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Force override for any remaining table header elements */
 .dark [data-radix-dialog-content] table > thead > tr > th {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] .border.rounded-md table thead th,
 .dark [data-radix-dialog-content] .overflow-y-auto table thead th {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Select dropdown options styling for dark mode in modals */
 .dark [data-radix-dialog-content] select option {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
@@ -1488,7 +1488,7 @@ table:not(.lexical-editor-container table) th {
 .dark input[type="date"]::-webkit-datetime-edit,
 .dark input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper,
 .dark input[type="date"]::-webkit-datetime-edit-fields-wrapper {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
@@ -1515,14 +1515,14 @@ table:not(.lexical-editor-container table) th {
 /* Complete date picker theming for dark mode */
 .dark input[type="datetime-local"],
 .dark input[type="date"] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
   border-color: #374151 !important;
 }
 
 .dark input[type="datetime-local"]:focus,
 .dark input[type="date"]:focus {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #1E40AF !important;
   box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2) !important;
 }
@@ -1572,7 +1572,7 @@ html.dark {
 .dark [data-page="admin"] input[type="datetime-local"],
 .dark [data-page="admin"] input[type="date"] {
   color-scheme: dark !important;
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
   border-color: #374151 !important;
 }
@@ -1585,7 +1585,7 @@ html.dark {
 
 .dark [data-page="admin"] input[type="datetime-local"]::-webkit-datetime-edit,
 .dark [data-page="admin"] input[type="date"]::-webkit-datetime-edit {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
@@ -1618,20 +1618,20 @@ html[class*="dark"] input[type="date"] {
 .dark [role="combobox"]:hover,
 .dark .select-trigger:hover,
 .dark button[role="combobox"]:hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Specific targeting for SelectTrigger components */
 .dark [data-page="admin"] [data-radix-select-trigger]:hover,
 .dark [data-page="admin"] [role="combobox"]:hover,
 .dark [data-page="admin"] button[role="combobox"]:hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Additional SelectTrigger hover states */
-.dark .dark\:hover\:bg-\[#1F2937\]:hover,
+.dark .dark\:hover\:bg-\[#0F172A\]:hover,
 .dark [class*="SelectTrigger"]:hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Force SelectTrigger hover for all contexts */
@@ -1640,7 +1640,7 @@ html[class*="dark"] input[type="date"] {
 .dark [data-radix-dialog-content] [data-radix-select-trigger]:hover,
 .dark [data-radix-dialog-content] [role="combobox"]:hover,
 .dark [data-radix-dialog-content] button[role="combobox"]:hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
 }
 
@@ -1654,25 +1654,25 @@ html[class*="dark"] input[type="date"] {
 .dark select:hover,
 .dark .select:hover,
 .dark [aria-haspopup="listbox"]:hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Native select elements hover for admin page */
 .dark [data-page="admin"] select:hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
 }
 
 /* Force native select styling in dark mode */
 .dark select.bg-background:hover,
 .dark [data-page="admin"] select.bg-background:hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Target specific select classes used in logs filters */
 .dark select.border-input:hover,
 .dark [data-page="admin"] select.border-input:hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
 }
 
@@ -1680,7 +1680,7 @@ html[class*="dark"] input[type="date"] {
 .dark [data-page="admin"] .grid select:hover,
 .dark [data-page="admin"] .space-y-2 select:hover,
 html.dark [data-page="admin"] select:hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
 }
 
@@ -1689,7 +1689,7 @@ html.dark [data-page="admin"] select:hover {
 .dark [data-page="admin"] select.h-9:hover,
 .dark [data-page="admin"] select.px-3:hover,
 .dark [data-page="admin"] select.rounded-md:hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Ultimate force for ALL interactive elements in admin page */
@@ -1700,7 +1700,7 @@ html.dark [data-page="admin"] select:hover {
 .dark [data-page="admin"] .bg-background:hover,
 html.dark [data-page="admin"] select:hover,
 html.dark [data-page="admin"] [role="combobox"]:hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
 }
 
@@ -1708,7 +1708,7 @@ html.dark [data-page="admin"] [role="combobox"]:hover {
 .dark [data-page="admin"] *[class*="border-input"]:hover,
 .dark [data-page="admin"] *[class*="bg-white"]:hover select,
 .dark [data-page="admin"] *[class*="bg-background"]:hover select {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Dropdown list hover styling for admin page */
@@ -1716,14 +1716,14 @@ html.dark [data-page="admin"] [role="combobox"]:hover {
 .dark [data-page="admin"] [role="option"]:hover,
 .dark [data-page="admin"] [data-radix-select-item]:hover,
 .dark [data-radix-dialog-content] [data-radix-select-content] [data-radix-select-item]:hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
 /* SelectContent background styling */
 .dark [data-page="admin"] [data-radix-select-content],
 .dark [data-radix-dialog-content] [data-radix-select-content] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
 }
 
@@ -1731,7 +1731,7 @@ html.dark [data-page="admin"] [role="combobox"]:hover {
 .dark [data-page="admin"] select option:hover,
 .dark [data-page="admin"] select option:checked,
 .dark [data-page="admin"] select option:focus {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
@@ -1739,29 +1739,29 @@ html.dark [data-page="admin"] [role="combobox"]:hover {
 .dark [data-radix-select-item]:hover,
 .dark [data-radix-popper-content] [data-radix-select-item]:hover,
 .dark [data-radix-select-content] [data-radix-select-item]:hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
 /* Force dropdown content background */
 .dark [data-radix-select-content],
 .dark [data-radix-popper-content] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
 }
 
 /* Additional targeting for SelectItem components */
 .dark [class*="SelectItem"]:hover,
 .dark [role="option"]:hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
-/* Override any existing hover colors - Force #1F2937 */
+/* Override any existing hover colors - Force #0F172A */
 .dark [data-radix-select-item]:hover,
 .dark [data-radix-select-item][data-highlighted],
 .dark [data-radix-select-item][data-state="checked"]:hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
@@ -1769,14 +1769,14 @@ html.dark [data-page="admin"] [role="combobox"]:hover {
 html.dark [data-radix-select-content] [data-radix-select-item]:hover,
 html.dark [data-radix-select-item][data-highlighted],
 html.dark [data-radix-select-item][aria-selected="true"]:hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
 /* Force override any blue hover states */
 .dark [data-radix-select-item]:not([data-disabled]):hover,
 .dark [data-radix-select-item]:not([data-disabled])[data-highlighted] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
@@ -1787,7 +1787,7 @@ html.dark [data-radix-select-item][aria-selected="true"]:hover {
 
 .dark [data-radix-select-item]:hover,
 .dark [data-radix-select-item][data-highlighted] {
-  background: #1F2937 !important;
+  background: #0F172A !important;
   background-color: rgb(31, 41, 55) !important;
   color: rgb(229, 231, 235) !important;
 }
@@ -1796,27 +1796,27 @@ html.dark [data-radix-select-item][aria-selected="true"]:hover {
 html.dark body [data-radix-select-item]:hover,
 html.dark body [data-radix-select-item][data-highlighted],
 html.dark body [data-radix-select-item][data-state="checked"] {
-  background: #1F2937 !important;
-  background-color: #1F2937 !important;
+  background: #0F172A !important;
+  background-color: #0F172A !important;
 }
 
 /* Override any Tailwind hover classes */
 .dark [data-radix-select-item]:hover:not(.hover\:bg-blue-100):not(.hover\:bg-blue-200) {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Ultimate nuclear option - Override focus:bg-accent */
 .dark [data-radix-select-item]:focus,
 .dark [data-radix-select-item]:focus-visible,
 .dark [data-radix-select-item][data-highlighted] {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
   --tw-bg-opacity: 1 !important;
 }
 
 /* Override CSS custom properties that might be causing blue color */
 .dark [data-radix-select-item] {
-  --accent: #1F2937 !important;
+  --accent: #0F172A !important;
   --accent-foreground: #E5E7EB !important;
 }
 
@@ -1839,68 +1839,68 @@ html.dark {
 .dark [data-radix-select-item][data-radix-select-item]:hover,
 .dark [data-radix-select-item][data-radix-select-item]:focus,
 .dark [data-radix-select-item][data-radix-select-item][data-highlighted] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   background: rgb(31, 41, 55) !important;
 }
 
 /* Force background specifically, not text color */
 .dark [data-radix-select-item]:hover {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
 .dark [data-radix-select-item][data-highlighted] {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
 /* Override any blue background specifically */
 .dark [data-radix-select-item]:not([data-disabled]):hover {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-radix-select-item]:not([data-disabled])[data-highlighted] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Ultimate override for any background styling */
 .dark [data-radix-select-viewport] [data-radix-select-item]:hover,
 .dark [data-radix-select-viewport] [data-radix-select-item][data-highlighted] {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
 /* Target ONLY the hover state of dropdown items, not selected items */
 .dark [data-radix-select-content] [data-radix-select-item]:hover {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
 /* Target the data-highlighted state which is the mouse hover */
 .dark [data-radix-select-content] [data-radix-select-item][data-highlighted] {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
 /* Specific to dropdown list items on mouse over */
 .dark [role="listbox"] [role="option"]:hover,
 .dark [role="listbox"] [role="option"][data-highlighted] {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
 /* Override any .focus:bg-accent classes */
 .dark .focus\\:bg-accent:focus,
 .dark [data-radix-select-item].focus\\:bg-accent:focus {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* FINAL OVERRIDE - Maximum specificity for dropdown hover */
 .dark [data-radix-select-portal] [data-radix-select-content] [data-radix-select-item]:hover,
 .dark [data-radix-select-portal] [data-radix-select-content] [data-radix-select-item][data-highlighted],
 .dark [data-radix-select-portal] [data-radix-select-content] [data-radix-select-item][data-state="checked"]:hover {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
 /* Force override any computed or inline styles */
@@ -1910,45 +1910,45 @@ html.dark {
 
 .dark [data-radix-select-item]:hover,
 .dark [data-radix-select-item][data-highlighted] {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
 /* SIMPLE FINAL SOLUTION - Force dropdown hover color */
 .dark [data-radix-select-item]:hover,
 .dark [data-radix-select-item][data-highlighted] {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
 /* Override any computed styles causing blue color */
 html.dark [data-radix-select-item]:hover,
 html.dark [data-radix-select-item][data-highlighted] {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
 /* Force dropdown colors with absolute specificity */
 .dark [data-radix-select-item]:hover,
 .dark [data-radix-select-item][data-highlighted] {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
   color: #E5E7EB !important;
 }
 
 /* TEMPLATES PAGE DARK MODE STYLING - Same pattern as admin page */
 .dark [data-page="templates"] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Main container and content areas */
 .dark [data-page="templates"] .fade-in {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Cards and containers */
 .dark [data-page="templates"] .bg-background {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Card components */
@@ -1973,12 +1973,12 @@ html.dark [data-radix-select-item][data-highlighted] {
 
 /* Tabs styling - Same as admin page */
 .dark [data-page="templates"] [data-radix-tabs-list] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
 }
 
 .dark [data-page="templates"] [data-radix-tabs-trigger] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #9CA3AF !important;
   border: 1px solid #374151 !important;
 }
@@ -1990,7 +1990,7 @@ html.dark [data-radix-select-item][data-highlighted] {
 }
 
 .dark [data-page="templates"] [data-radix-tabs-trigger]:hover:not([data-state="active"]) {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
@@ -2031,7 +2031,7 @@ html.dark [data-radix-select-item][data-highlighted] {
 /* Individual template cards */
 .dark [data-page="templates"] .grid .card,
 .dark [data-page="templates"] .grid [data-radix-card] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
 }
 
@@ -2055,13 +2055,13 @@ html.dark [data-radix-select-item][data-highlighted] {
 /* Select and form elements in templates page */
 .dark [data-page="templates"] select,
 .dark [data-page="templates"] [data-radix-select-trigger] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
   color: #E5E7EB !important;
 }
 
 .dark [data-page="templates"] [data-radix-select-content] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
 }
 
@@ -2073,6 +2073,15 @@ html.dark [data-radix-select-item][data-highlighted] {
 /* Skeleton loading components */
 .dark [data-page="templates"] [data-radix-skeleton] {
   background-color: #374151 !important;
+}
+
+/* Templates page specific div containers - use #1F2937 for better hierarchy */
+.dark [data-page="templates"] .container,
+.dark [data-page="templates"] .space-y-6 > div:first-child,
+.dark [data-page="templates"] .space-y-4 > .card,
+.dark [data-page="templates"] [data-radix-dialog-content],
+.dark [data-page="templates"] [data-radix-collapsible-content] {
+  background-color: #1F2937 !important;
 }
 
 /* Button variants */
@@ -2297,18 +2306,18 @@ html.dark [data-radix-select-item][data-highlighted] {
 /* Select triggers in modal "Editar Mapeamento" */
 .dark [data-radix-dialog-content] .SelectTrigger,
 .dark [data-radix-dialog-content] select {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
 
 .dark [data-radix-dialog-content] .SelectContent {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 .dark [data-radix-dialog-content] .SelectItem {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
@@ -2319,51 +2328,51 @@ html.dark [data-radix-select-item][data-highlighted] {
 
 /* Native select elements in modal */
 .dark [data-radix-dialog-content] select option {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
 /* Select in assets-map and agendamento tabs specifically */
 .dark [data-radix-tabs-content="assets-map"] select,
 .dark [data-radix-tabs-content="agendamento"] select {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
 
 .dark [data-radix-tabs-content="assets-map"] select option,
 .dark [data-radix-tabs-content="agendamento"] select option {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
 /* Radix SelectTrigger components in modal */
 .dark [data-radix-dialog-content] [role="combobox"] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
 
 .dark [data-radix-dialog-content] [data-state="open"] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Select trigger for GitHub repositories */
 .dark [data-radix-dialog-content] button[role="combobox"] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
 
 /* SelectContent dropdown for modal */
 .dark [data-radix-popper-content-wrapper] [role="listbox"] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 .dark [data-radix-popper-content-wrapper] [role="option"] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
@@ -2376,7 +2385,7 @@ html.dark [data-radix-select-item][data-highlighted] {
 /* All button elements with combobox role in dark modal */
 .dark [data-radix-dialog-content] button[role="combobox"],
 .dark [data-radix-dialog-content] div[role="combobox"] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
@@ -2389,18 +2398,18 @@ html.dark [data-radix-select-item][data-highlighted] {
 
 /* Additional CSS for shadcn/ui Select components */
 .dark [data-radix-dialog-content] [data-radix-select-trigger] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
 
 .dark [data-radix-dialog-content] [data-radix-select-content] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 .dark [data-radix-dialog-content] [data-radix-select-item] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
@@ -2414,7 +2423,7 @@ html.dark [data-radix-select-item][data-highlighted] {
 .dark [data-radix-dialog-content] select[data-field="mondayColumnId"],
 .dark [data-radix-dialog-content] select[data-field="cpxField"],
 .dark [data-radix-dialog-content] form select {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
@@ -2422,53 +2431,53 @@ html.dark [data-radix-select-item][data-highlighted] {
 .dark [data-radix-dialog-content] select[data-field="mondayColumnId"] option,
 .dark [data-radix-dialog-content] select[data-field="cpxField"] option,
 .dark [data-radix-dialog-content] form select option {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
 /* Force override for any incorrectly styled selects in modal */
 .dark [data-radix-dialog-content] select {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
 
 .dark [data-radix-dialog-content] select option {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
 /* Extra specificity for form selects */
 .dark [data-radix-dialog-content] form[id] select,
 .dark [data-radix-dialog-content] .space-y-4 select {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
 
 /* Maximum specificity override for problematic selects with #09090B color */
 html.dark [data-radix-dialog-content] select:not([data-placeholder]) {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
 
 html.dark [data-radix-dialog-content] form select:not([data-placeholder]) {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
 
 /* Override any inherited styles causing #09090B background */
 html.dark [data-radix-dialog-content] div[data-radix-form-item] select {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
 
 /* Force correct styling for all form control selects in modal */
 html.dark [data-radix-dialog-content] [data-radix-form-control] select {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
@@ -2477,16 +2486,16 @@ html.dark [data-radix-dialog-content] [data-radix-form-control] select {
 html.dark body div[data-radix-dialog-content] form select,
 html.dark body div[data-radix-dialog-content] div[data-radix-form-item] select,
 html.dark body div[data-radix-dialog-content] select.flex.h-10 {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
 
 /* Force override any inherited dark colors */
 html.dark div[data-radix-dialog-content] select {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
@@ -2494,8 +2503,8 @@ html.dark div[data-radix-dialog-content] select {
 /* Target the specific select elements that are still wrong */
 html.dark div[data-radix-dialog-content] form[id="columnForm"] select,
 html.dark div[data-radix-dialog-content] form[id="mappingForm"] select {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
@@ -2503,16 +2512,16 @@ html.dark div[data-radix-dialog-content] form[id="mappingForm"] select {
 /* Nuclear option - override everything with maximum specificity */
 html.dark body div[role="dialog"] div[data-radix-dialog-content] form div[data-radix-form-item] div[data-radix-form-control] select,
 html.dark body div[role="dialog"] div[data-radix-dialog-content] select {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
 
 /* One more specific override for the problematic selects */
 html.dark [data-radix-portal] [data-radix-dialog-content] select:not([data-radix-select-trigger]) {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
@@ -2520,23 +2529,23 @@ html.dark [data-radix-portal] [data-radix-dialog-content] select:not([data-radix
 /* GLOBAL OVERRIDE: ALL select elements in dark mode follow same pattern */
 html.dark select,
 .dark select {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
   border-color: rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
 
 html.dark select option,
 .dark select option {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
 /* Ensure all forms select elements follow pattern */
 html.dark form select,
 .dark form select {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   color: #E5E7EB !important;
 }
@@ -2544,8 +2553,8 @@ html.dark form select,
 /* Override any utility class that might interfere */
 html.dark .bg-background select,
 .dark .bg-background select {
-  background-color: #1F2937 !important;
-  background: #1F2937 !important;
+  background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
 /* GLOBAL FIX: Prevent any element from using #09090B in dark mode */
@@ -2564,24 +2573,24 @@ html.dark .bg-background select,
 /* Additional safeguards for computed styles */
 .dark [data-radix-dialog-content] .bg-background,
 .dark [data-page="admin"] .bg-background {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Fix logs table container div in dark mode */
 .dark [data-page="admin"] div[class*="max-h-"][class*="overflow-y-auto"][class*="border"][class*="rounded-md"] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Alternative more specific selector for logs table container */
 .dark [data-page="admin"] [value="logs"] ~ div div[class*="overflow-y-auto"],
 .dark [data-page="admin"] div[data-state="active"][data-orientation="horizontal"] div[class*="overflow-y-auto"] {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Specific targeting for logs tab content */
 .dark [data-page="admin"] div[data-radix-tabs-content][data-state="active"] div.border.rounded-md,
 .dark [data-page="admin"] div[data-radix-tabs-content] div.border.rounded-md {
-  background-color: #1F2937 !important;
+  background-color: #0F172A !important;
 }
 
 /* Fix next level divs that might be using #09090B */
@@ -2666,7 +2675,7 @@ html.dark .bg-background select,
 /* Force entire time picker popup to dark */
 :root .dark input[type="time"] {
   --webkit-datalist-text-color: #E5E7EB !important;
-  --webkit-datalist-background-color: #1F2937 !important;
+  --webkit-datalist-background-color: #0F172A !important;
 }
 
 /* Global override for time picker */
