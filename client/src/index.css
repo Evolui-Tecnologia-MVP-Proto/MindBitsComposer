@@ -2708,40 +2708,24 @@ html.dark [data-radix-select-item][data-highlighted] {
   background-color: #0F172A !important;
 }
 
-/* ReactFlow attribution/logo styling for dark theme - comprehensive targeting */
+/* Hide ReactFlow logo/attribution completely */
 .dark [data-page="fluxos"] .react-flow__attribution,
 .dark [data-page="fluxos"] .react-flow__panel.react-flow__attribution,
 .dark [data-page="fluxos"] .react-flow__panel-bottom,
-.dark [data-page="fluxos"] .react-flow__panel-bottomright {
-  background-color: #0F172A !important;
-  color: #9CA3AF !important;
-  border-color: #374151 !important;
-}
-
-.dark [data-page="fluxos"] .react-flow__attribution a,
-.dark [data-page="fluxos"] .react-flow__panel.react-flow__attribution a,
-.dark [data-page="fluxos"] .react-flow__panel-bottom a,
-.dark [data-page="fluxos"] .react-flow__panel-bottomright a {
-  color: #9CA3AF !important;
-}
-
-.dark [data-page="fluxos"] .react-flow__attribution a:hover,
-.dark [data-page="fluxos"] .react-flow__panel.react-flow__attribution a:hover,
-.dark [data-page="fluxos"] .react-flow__panel-bottom a:hover,
-.dark [data-page="fluxos"] .react-flow__panel-bottomright a:hover {
-  color: #E5E7EB !important;
-}
-
-/* Additional targeting for ReactFlow attribution elements */
+.dark [data-page="fluxos"] .react-flow__panel-bottomright,
 .dark [data-page="fluxos"] [class*="react-flow__attribution"],
 .dark [data-page="fluxos"] [class*="attribution"] {
-  background-color: #0F172A !important;
-  color: #9CA3AF !important;
+  display: none !important;
 }
 
-.dark [data-page="fluxos"] [class*="react-flow__attribution"] a,
-.dark [data-page="fluxos"] [class*="attribution"] a {
-  color: #9CA3AF !important;
+/* Also hide in light mode for consistency */
+[data-page="fluxos"] .react-flow__attribution,
+[data-page="fluxos"] .react-flow__panel.react-flow__attribution,
+[data-page="fluxos"] .react-flow__panel-bottom,
+[data-page="fluxos"] .react-flow__panel-bottomright,
+[data-page="fluxos"] [class*="react-flow__attribution"],
+[data-page="fluxos"] [class*="attribution"] {
+  display: none !important;
 }
 
 .dark [data-page="fluxos"] .react-flow__background {
