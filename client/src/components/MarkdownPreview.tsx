@@ -73,13 +73,13 @@ const mdxComponents = {
     }
     // Block code
     return (
-      <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg mb-4 overflow-x-auto">
+      <pre className="bg-gray-900 dark:bg-[#111827] text-gray-100 dark:text-gray-300 p-4 rounded-lg mb-4 overflow-x-auto">
         <code className="text-sm font-mono" {...props} />
       </pre>
     );
   },
   pre: (props: any) => (
-    <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg mb-4 overflow-x-auto" {...props} />
+    <pre className="bg-gray-900 dark:bg-[#111827] text-gray-100 dark:text-gray-300 p-4 rounded-lg mb-4 overflow-x-auto" {...props} />
   ),
   table: (props: any) => (
     <div className="overflow-x-auto mb-4">
@@ -257,7 +257,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
         elements.push(<MermaidDiagram key={elements.length} chart={content} />);
       } else {
         elements.push(
-          <pre key={elements.length} className="bg-gray-900 text-gray-100 p-4 rounded-lg mb-4 overflow-x-auto">
+          <pre key={elements.length} className="bg-gray-900 dark:bg-[#111827] text-gray-100 dark:text-gray-300 p-4 rounded-lg mb-4 overflow-x-auto">
             <code className="text-sm font-mono">{content}</code>
           </pre>
         );

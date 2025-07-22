@@ -84,8 +84,15 @@ Preferred communication style: Simple, everyday language.
   - Applied #111827 to filter area background (bg-gray-50 dark:bg-[#111827])
   - Corrected table container background to #111827
   - Fixed table header sticky background to #111827
-  - Updated parameters preview pre element to use #111827 background
+  - Updated parameters preview pre element to use #111827 background  
   - Applied comprehensive CSS rules for logs tab consistency in dark mode
+✓ Applied global fix for ALL divs with color #09090B in dark mode:
+  - Fixed MarkdownPreview component pre elements (bg-gray-900 to dark:bg-[#111827])
+  - Added comprehensive CSS rules to prevent #09090B from appearing anywhere
+  - Applied global override for any element using #09090B or rgb(9,9,11) colors
+  - Fixed potential Tailwind classes (bg-gray-900, bg-slate-900, bg-zinc-900, bg-neutral-900)
+  - Added safeguards for computed styles and inline style attributes
+  - Applied maximum specificity overrides for all modal and admin page elements
 
 ## System Architecture
 
