@@ -2489,6 +2489,17 @@ html.dark [data-radix-select-item][data-highlighted] {
   border-color: #374151 !important;
 }
 
+.dark [data-page="fluxos"] .grid.w-full.grid-cols-2.flex-shrink-0 {
+  background-color: #0F172A !important;
+}
+
+/* Force TabsList background for fluxos page */
+.dark [data-page="fluxos"] [role="tablist"],
+.dark [data-page="fluxos"] .grid.w-full.grid-cols-2,
+.dark [data-page="fluxos"] .inline-flex.h-10.items-center.justify-center {
+  background-color: #0F172A !important;
+}
+
 .dark [data-page="fluxos"] [data-radix-tabs-trigger] {
   background-color: #0F172A !important;
   color: #9CA3AF !important;
