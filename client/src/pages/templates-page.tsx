@@ -325,7 +325,7 @@ export default function TemplatesPage() {
         
         <TabsContent value="struct" className="space-y-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-row items-center justify-between rounded-t-lg">
               <div>
                 <CardTitle>Struct Templates</CardTitle>
                 <CardDescription>
@@ -361,7 +361,7 @@ export default function TemplatesPage() {
         
         <TabsContent value="output" className="space-y-4">
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-row items-center justify-between rounded-t-lg">
               <div>
                 <CardTitle>Out Templates</CardTitle>
                 <CardDescription>
