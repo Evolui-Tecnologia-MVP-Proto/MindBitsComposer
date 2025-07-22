@@ -2792,6 +2792,52 @@ html.dark [data-radix-select-item][data-highlighted] {
   color: #1F2937 !important;
 }
 
+/* ReactFlow canvas toolbar styling for dark theme */
+.dark [data-page="fluxos"] .react-flow__controls,
+.dark [data-page="fluxos"] .react-flow__panel,
+.dark [data-page="fluxos"] .react-flow__panel-top,
+.dark [data-page="fluxos"] .react-flow__panel-topleft,
+.dark [data-page="fluxos"] .react-flow__panel-topright {
+  background-color: #0F172A !important;
+  border: 1px solid #FFFFFF !important;
+  border-radius: 6px !important;
+}
+
+.dark [data-page="fluxos"] .react-flow__controls-button,
+.dark [data-page="fluxos"] .react-flow__panel button {
+  background-color: #0F172A !important;
+  border: 1px solid #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
+.dark [data-page="fluxos"] .react-flow__controls-button:hover,
+.dark [data-page="fluxos"] .react-flow__panel button:hover {
+  background-color: #1F2937 !important;
+  border-color: #FFFFFF !important;
+}
+
+.dark [data-page="fluxos"] .react-flow__controls-button svg,
+.dark [data-page="fluxos"] .react-flow__panel button svg {
+  color: #FFFFFF !important;
+  fill: #FFFFFF !important;
+}
+
+/* ReactFlow minimap styling for dark theme */
+.dark [data-page="fluxos"] .react-flow__minimap {
+  background-color: #0F172A !important;
+  border: 1px solid #FFFFFF !important;
+}
+
+/* ReactFlow zoom controls specific styling */
+.dark [data-page="fluxos"] .react-flow__controls-zoomin,
+.dark [data-page="fluxos"] .react-flow__controls-zoomout,
+.dark [data-page="fluxos"] .react-flow__controls-fitview,
+.dark [data-page="fluxos"] .react-flow__controls-interactive {
+  background-color: #0F172A !important;
+  border: 1px solid #FFFFFF !important;
+  color: #FFFFFF !important;
+}
+
 /* Canvas container border styling - more specific selectors */
 .dark [data-page="fluxos"] [data-radix-tabs-content] {
   border-color: #111827 !important;
