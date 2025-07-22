@@ -1989,10 +1989,19 @@ html.dark [data-radix-select-item][data-highlighted] {
   border-bottom: 1px solid #374151 !important;
 }
 
-/* Card content */
+/* Card content - Use #0F172A for cards container */
 .dark [data-page="templates"] [data-radix-card-content],
 .dark [data-page="templates"] .card-content {
-  background-color: #1E293B !important;
+  background-color: #0F172A !important;
+}
+
+/* Grid container where cards are inserted */
+.dark [data-page="templates"] .grid.grid-cols-1 {
+  background-color: #0F172A !important;
+}
+
+.dark [data-page="templates"] div[class*="grid"][class*="grid-cols"] {
+  background-color: #0F172A !important;
 }
 
 /* Tabs styling - Same as admin page */
