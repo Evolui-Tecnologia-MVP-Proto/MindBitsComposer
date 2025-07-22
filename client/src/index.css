@@ -2956,3 +2956,59 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 .editor-left-rounded .lexical-canvas * {
   border-bottom-left-radius: inherit !important;
 }
+
+/* === RIGHT PANEL CONDITIONAL ROUNDING === */
+/* Conditional rounded corners for editor when right panel is retracted */
+.editor-right-rounded .lexical-editor-container .border-b.bg-gray-50.dark\:bg-\[\#111827\] {
+  border-top-right-radius: 12px !important;
+}
+
+.editor-right-rounded .composer-editor-card {
+  border-bottom-right-radius: 12px !important;
+}
+
+.editor-right-rounded .composer-editor-card [data-testid="rich-text-plugin"] {
+  border-bottom-right-radius: 12px !important;
+}
+
+.editor-right-rounded .composer-editor-card .ContentEditable__root {
+  border-bottom-right-radius: 12px !important;
+}
+
+.editor-right-rounded .composer-editor-card [contenteditable="true"] {
+  border-bottom-right-radius: 12px !important;
+}
+
+.editor-right-rounded .composer-editor-card .flex-1.p-4.dark\\:bg-\\[\\#020203\\] {
+  border-bottom-right-radius: 12px !important;
+}
+
+.editor-right-rounded .dark\\:bg-\\[\\#020203\\] {
+  border-bottom-right-radius: 12px !important;
+}
+
+/* Direct targeting of the canvas container in Lexical for right side */
+.editor-right-rounded .lexical-editor-container > div > div > div.flex-1 {
+  border-bottom-right-radius: 12px !important;
+}
+
+/* More specific targeting for the canvas area on right side */
+.editor-right-rounded .lexical-editor-container .flex-1[style*="background-color"] {
+  border-bottom-right-radius: 12px !important;
+}
+
+/* Target any dark background element in the editor when right panel is retracted */
+.editor-right-rounded [style*="#020203"] {
+  border-bottom-right-radius: 12px !important;
+}
+
+/* Specific class targeting for Lexical canvas on right side */
+.editor-right-rounded .lexical-canvas {
+  border-bottom-right-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* Force all child elements in canvas to respect the rounded corners on right side */
+.editor-right-rounded .lexical-canvas * {
+  border-bottom-right-radius: inherit !important;
+}
