@@ -76,17 +76,38 @@ body.dark .Collapsible__content {
 /* ReactFlow Background Grid Fixes */
 .react-flow__background {
   z-index: 0 !important;
+  pointer-events: none !important;
 }
 
 .react-flow__background svg {
   opacity: 1 !important;
   visibility: visible !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.react-flow__background pattern {
+  opacity: 1 !important;
 }
 
 /* Force ReactFlow background patterns to be visible */
 .react-flow__background pattern circle {
   opacity: 1 !important;
   fill-opacity: 1 !important;
+  fill: #ff0000 !important;
+}
+
+/* Debug background visibility */
+.react-flow__renderer {
+  position: relative !important;
+}
+
+.react-flow__background {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .dark .Collapsible__container,
