@@ -1618,7 +1618,10 @@ export default function LexicalPage() {
           <div className="w-80 border-r bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col composer-side-panel composer-library-panel rounded-tl-xl">
             {/* Header fixo */}
             <div className="p-4 border-b bg-white dark:bg-[#111827] border-gray-200 dark:border-[#374151] rounded-tl-xl">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">Biblioteca</h3>
+              <div className="flex items-center gap-2">
+                <FolderOpen className="w-5 h-5" />
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">Biblioteca</h3>
+              </div>
             </div>
             
             {/* Área com scroll */}
