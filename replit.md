@@ -146,6 +146,13 @@ Preferred communication style: Simple, everyday language.
   - Select triggers: #0F172A background with proper contrast
   - Icons: adjusted chevron colors for dark theme visibility
   - Campo and Mapeamento areas: #0F172A background for complete dark theme consistency
+✓ Updated container colors: changed #0F172A to #1F2937 for main divs and containers (January 22, 2025):
+  - UserTable main containers and search areas
+  - AvatarMenu dropdown background
+  - TemplateFormModal accordion content areas
+  - Dialog/modal main backgrounds
+  - Template page card containers
+  - Better visual hierarchy with #1F2937 (containers) vs #0F172A (form elements)
 
 ## System Architecture
 

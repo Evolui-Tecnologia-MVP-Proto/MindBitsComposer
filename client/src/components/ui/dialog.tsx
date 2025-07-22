@@ -43,7 +43,7 @@ const DialogContent = React.forwardRef<
         className
       )}
       style={{
-        backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined,
+        backgroundColor: document.documentElement.classList.contains('dark') ? '#1F2937' : undefined,
         color: document.documentElement.classList.contains('dark') ? '#F9FAFB' : undefined
       }}
       {...props}
