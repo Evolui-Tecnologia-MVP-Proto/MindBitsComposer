@@ -613,7 +613,7 @@ export default function TemplateFormModal({
             </Tabs>
           </div>
           
-          <div className="border-t pt-4 mt-4 bg-white">
+          <div className="border-t pt-4 mt-4 bg-white dark:bg-slate-800 dark:border-gray-600">
             <div className="flex justify-end space-x-2">
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancelar

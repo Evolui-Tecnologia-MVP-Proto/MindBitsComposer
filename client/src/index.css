@@ -159,6 +159,46 @@
   border: 1px solid #374151 !important;
 }
 
+/* Template Form Modal - Button container */
+.dark [data-radix-dialog-content] .border-t.pt-4.mt-4,
+.dark [data-radix-dialog-content] div[class*="border-t pt-4 mt-4"] {
+  background-color: #1E293B !important;
+  border-color: #374151 !important;
+}
+
+/* Template Form Modal - Buttons in footer */
+.dark [data-radix-dialog-content] .border-t button[type="button"],
+.dark [data-radix-dialog-content] .border-t button[type="submit"] {
+  background-color: #1E40AF !important;
+  border-color: #1E40AF !important;
+  color: #FFFFFF !important;
+}
+
+.dark [data-radix-dialog-content] .border-t button[variant="outline"],
+.dark [data-radix-dialog-content] .border-t button[type="button"]:not([type="submit"]) {
+  background-color: transparent !important;
+  border-color: #6B7280 !important;
+  color: #9CA3AF !important;
+}
+
+.dark [data-radix-dialog-content] .border-t button:hover {
+  background-color: #1D4ED8 !important;
+}
+
+.dark [data-radix-dialog-content] .border-t button[variant="outline"]:hover {
+  background-color: #374151 !important;
+  color: #E5E7EB !important;
+}
+
+/* Specific fix for template modal button container */
+.dark .bg-white.dark\\:bg-slate-800 {
+  background-color: #1E293B !important;
+}
+
+.dark .dark\\:border-gray-600 {
+  border-color: #374151 !important;
+}
+
 /* MAXIMUM SPECIFICITY: Global tabs active state styling for dark mode */
 html.dark [data-radix-tabs-trigger][data-state="active"],
 body.dark [data-radix-tabs-trigger][data-state="active"],
