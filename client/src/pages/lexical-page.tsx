@@ -1758,7 +1758,7 @@ export default function LexicalPage() {
         )}
 
         {/* Editor principal */}
-        <div className={`flex-1 flex flex-col composer-editor-container ${!showDocumentList ? 'editor-left-rounded' : ''} ${!showAttachments || (selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) ? 'editor-right-rounded' : ''}`}>
+        <div className={`flex flex-col composer-editor-container ${!showDocumentList ? 'editor-left-rounded' : ''} ${!showAttachments || (selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) ? 'editor-right-rounded' : ''}`} style={{ height: 'calc(100vh - 140px)' }}>
           {/* Barra de ferramentas do editor integrada */}
           <div className="flex-1 pl-0 pr-0 pt-0 pb-0">
             <Card className="h-full composer-editor-card">
