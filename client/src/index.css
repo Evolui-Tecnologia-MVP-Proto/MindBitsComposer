@@ -2720,7 +2720,7 @@ html.dark [data-radix-select-item][data-highlighted] {
 }
 
 .dark [data-page="fluxos"] .react-flow__minimap-mask {
-  fill: #292C33 !important;
+  fill: rgba(41, 44, 51, 0.8) !important;
   stroke: #292C33 !important;
   stroke-width: 2px !important;
 }
@@ -2748,7 +2748,7 @@ html.dark [data-radix-select-item][data-highlighted] {
 
 /* ReactFlow Background pattern for dark theme */
 .dark [data-page="fluxos"] .react-flow__background {
-  background-color: #020203 !important;
+  background-color: #191B20 !important;
 }
 
 .dark [data-page="fluxos"] .react-flow__background circle,
