@@ -3134,7 +3134,7 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 /* Specific class targeting for Lexical canvas */
 .editor-left-rounded .lexical-canvas {
   border-bottom-left-radius: 12px !important;
-  overflow: hidden !important;
+  overflow: auto !important;
 }
 
 /* Force all child elements in canvas to respect the rounded corners */
@@ -3190,7 +3190,7 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 /* Specific class targeting for Lexical canvas on right side */
 .editor-right-rounded .lexical-canvas {
   border-bottom-right-radius: 12px !important;
-  overflow: hidden !important;
+  overflow: auto !important;
 }
 
 /* Force all child elements in canvas to respect the rounded corners on right side */
