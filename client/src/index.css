@@ -73,6 +73,22 @@ body.dark .Collapsible__content {
   border-color: #374151 !important;
 }
 
+/* ReactFlow Background Grid Fixes */
+.react-flow__background {
+  z-index: 0 !important;
+}
+
+.react-flow__background svg {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Force ReactFlow background patterns to be visible */
+.react-flow__background pattern circle {
+  opacity: 1 !important;
+  fill-opacity: 1 !important;
+}
+
 .dark .Collapsible__container,
 .dark details.Collapsible__container,
 .dark .lexical-canvas .Collapsible__container,

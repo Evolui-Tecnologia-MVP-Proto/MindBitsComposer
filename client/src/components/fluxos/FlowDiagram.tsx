@@ -146,9 +146,9 @@ export const FlowDiagram = ({
                 {showGrid && (
                   <Background 
                     variant={BackgroundVariant.Dots}
-                    color={isDark ? "#ffffff" : "#6b7280"} 
-                    gap={12} 
-                    size={1} 
+                    color={isDark ? "#ffffff" : "#333333"} 
+                    gap={20} 
+                    size={3} 
                   />
                 )}
                 {showMiniMap && <MiniMap />}
@@ -209,9 +209,9 @@ export const FlowDiagram = ({
             {showGrid && (
               <Background 
                 variant={BackgroundVariant.Dots}
-                color={isDark ? "#ffffff" : "#6b7280"} 
-                gap={12} 
-                size={1} 
+                color={isDark ? "#ffffff" : "#333333"} 
+                gap={20} 
+                size={3} 
               />
             )}
             {showMiniMap && <MiniMap />}
