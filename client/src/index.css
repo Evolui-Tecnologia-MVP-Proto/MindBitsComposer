@@ -68,16 +68,32 @@
   color: #6B7280 !important;
 }
 
-/* Global tabs active state styling for dark mode */
-.dark [data-radix-tabs-trigger][data-state="active"] {
+/* MAXIMUM SPECIFICITY: Global tabs active state styling for dark mode */
+html.dark [data-radix-tabs-trigger][data-state="active"],
+body.dark [data-radix-tabs-trigger][data-state="active"],
+.dark button[data-radix-tabs-trigger][data-state="active"],
+.dark div[data-radix-tabs-trigger][data-state="active"] {
   background-color: #1E40AF !important;
+  background: #1E40AF !important;
   color: #FFFFFF !important;
   border-color: #1E40AF !important;
 }
 
-.dark [data-radix-tabs-trigger][data-state="active"]:hover {
+html.dark [data-radix-tabs-trigger][data-state="active"]:hover,
+body.dark [data-radix-tabs-trigger][data-state="active"]:hover,
+.dark button[data-radix-tabs-trigger][data-state="active"]:hover,
+.dark div[data-radix-tabs-trigger][data-state="active"]:hover {
   background-color: #1E40AF !important;
+  background: #1E40AF !important;
   color: #FFFFFF !important;
+}
+
+/* OVERRIDE ANY bg-gray-900 or similar on active tabs */
+.dark [data-radix-tabs-trigger][data-state="active"].bg-gray-900,
+.dark [data-radix-tabs-trigger][data-state="active"][style*="background"],
+.dark [data-radix-tabs-trigger][data-state="active"][class*="bg-"] {
+  background-color: #1E40AF !important;
+  background: #1E40AF !important;
 }
 
 /* HIGH PRIORITY: Force modal background color ONLY for modals in DARK MODE */
@@ -2305,4 +2321,32 @@ html.dark input[type="time"] {
 html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   filter: brightness(0) invert(1) !important;
   opacity: 1 !important;
+}
+
+/* FINAL OVERRIDE: Ensure all active tabs use #1E40AF in dark mode */
+/* This rule has maximum specificity and comes last to override all other rules */
+.dark [data-radix-tabs-trigger][data-state="active"],
+.dark button[role="tab"][data-state="active"],
+.dark button[role="tab"][aria-selected="true"],
+.dark [role="tab"][data-state="active"],
+.dark [role="tab"][aria-selected="true"] {
+  background-color: #1E40AF !important;
+  background: #1E40AF !important;
+  color: #FFFFFF !important;
+  border-color: #1E40AF !important;
+}
+
+/* Remove any #09090B backgrounds on tabs */
+.dark [data-radix-tabs-trigger],
+.dark button[role="tab"],
+.dark [role="tab"] {
+  background-color: transparent !important;
+}
+
+.dark [data-radix-tabs-trigger]:not([data-state="active"]),
+.dark button[role="tab"]:not([data-state="active"]),
+.dark [role="tab"]:not([data-state="active"]) {
+  background-color: transparent !important;
+  background: transparent !important;
+  color: #9CA3AF !important;
 }
