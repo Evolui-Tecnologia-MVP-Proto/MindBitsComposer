@@ -2500,6 +2500,37 @@ html.dark [data-radix-select-item][data-highlighted] {
   background-color: #0F172A !important;
 }
 
+/* Fluxos page cards and content styling */
+.dark [data-page="fluxos"] .space-y-6 {
+  background-color: #0F172A !important;
+}
+
+.dark [data-page="fluxos"] .flex.justify-between.items-center {
+  background-color: #0F172A !important;
+}
+
+.dark [data-page="fluxos"] .grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3.gap-6 {
+  background-color: #0F172A !important;
+}
+
+/* Individual flow cards */
+.dark [data-page="fluxos"] [data-radix-card],
+.dark [data-page="fluxos"] .card {
+  background-color: #1E293B !important;
+  border-color: #374151 !important;
+}
+
+.dark [data-page="fluxos"] [data-radix-card]:hover,
+.dark [data-page="fluxos"] .card:hover {
+  border-color: #1E40AF !important;
+}
+
+/* Flow card headers and content */
+.dark [data-page="fluxos"] [data-radix-card-header],
+.dark [data-page="fluxos"] [data-radix-card-content] {
+  background-color: transparent !important;
+}
+
 .dark [data-page="fluxos"] [data-radix-tabs-trigger] {
   background-color: #0F172A !important;
   color: #9CA3AF !important;
