@@ -2705,7 +2705,7 @@ html.dark [data-radix-select-item][data-highlighted] {
 
 /* ReactFlow canvas styling for dark theme */
 .dark [data-page="fluxos"] .react-flow {
-  background-color: #1B2028 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-page="fluxos"] .react-flow__background {
