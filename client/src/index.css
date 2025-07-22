@@ -1448,6 +1448,33 @@ html.dark body [data-radix-select-item][data-state="checked"] {
   background: rgb(31, 41, 55) !important;
 }
 
+/* Force background specifically, not text color */
+.dark [data-radix-select-item]:hover {
+  background-color: #1F2937 !important;
+  background: #1F2937 !important;
+}
+
+.dark [data-radix-select-item][data-highlighted] {
+  background-color: #1F2937 !important;
+  background: #1F2937 !important;
+}
+
+/* Override any blue background specifically */
+.dark [data-radix-select-item]:not([data-disabled]):hover {
+  background-color: #1F2937 !important;
+}
+
+.dark [data-radix-select-item]:not([data-disabled])[data-highlighted] {
+  background-color: #1F2937 !important;
+}
+
+/* Ultimate override for any background styling */
+.dark [data-radix-select-viewport] [data-radix-select-item]:hover,
+.dark [data-radix-select-viewport] [data-radix-select-item][data-highlighted] {
+  background-color: #1F2937 !important;
+  background: #1F2937 !important;
+}
+
 .dark input[type="time"]::-webkit-datetime-edit-fields-wrapper {
   background: transparent !important;
   color: #E5E7EB !important;
