@@ -132,6 +132,7 @@ Preferred communication style: Simple, everyday language.
   - Text colors: #E5E7EB (primary), #9CA3AF (secondary), blue accent adjusted for dark mode
   - Select triggers: #0F172A background with proper contrast
   - Icons: adjusted chevron colors for dark theme visibility
+  - Campo and Mapeamento areas: #0F172A background for complete dark theme consistency
 
 ## System Architecture
 
