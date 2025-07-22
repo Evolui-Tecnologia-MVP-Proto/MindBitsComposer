@@ -1159,25 +1159,25 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                 ErrorBoundary={LexicalErrorBoundary}
               />
             ) : viewMode === 'preview' ? (
-              <div className="w-full h-full p-6 overflow-auto bg-slate-100">
+              <div className="w-full h-full p-6 overflow-auto bg-slate-100 dark:bg-[#020203]">
                 <div className="max-w-4xl mx-auto">
-                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div className="mb-4 pb-3 border-b border-gray-200">
-                      <h3 className="text-lg font-semibold text-gray-800">Visualização Markdown</h3>
-                      <p className="text-sm text-gray-600 mt-1">Representação em markdown do conteúdo do editor</p>
+                  <div className="bg-white dark:bg-[#1E293B] rounded-lg shadow-sm border border-gray-200 dark:border-[#374151] p-6">
+                    <div className="mb-4 pb-3 border-b border-gray-200 dark:border-[#374151]">
+                      <h3 className="text-lg font-semibold text-gray-800 dark:text-[#E5E7EB]">Visualização Markdown</h3>
+                      <p className="text-sm text-gray-600 dark:text-[#9CA3AF] mt-1">Representação em markdown do conteúdo do editor</p>
                     </div>
-                    <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed text-gray-900 bg-gray-50 p-4 rounded-md border border-gray-300 overflow-x-auto">
+                    <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed text-gray-900 dark:text-[#E5E7EB] bg-gray-50 dark:bg-[#111827] p-4 rounded-md border border-gray-300 dark:border-[#374151] overflow-x-auto">
                       {currentMarkdown || '// Nenhum conteúdo para visualizar\n// Adicione texto no editor para ver a conversão markdown'}
                     </pre>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="w-full h-full p-6 overflow-auto bg-slate-100">
+              <div className="w-full h-full p-6 overflow-auto bg-slate-100 dark:bg-[#020203]">
                 <div className="max-w-4xl mx-auto">
-                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <div className="mb-4 pb-3 border-b border-gray-200">
-                      <h3 className="text-lg font-semibold text-gray-800">Preview MDX</h3>
+                  <div className="bg-white dark:bg-[#1E293B] rounded-lg shadow-sm border border-gray-200 dark:border-[#374151] p-6">
+                    <div className="mb-4 pb-3 border-b border-gray-200 dark:border-[#374151]">
+                      <h3 className="text-lg font-semibold text-gray-800 dark:text-[#E5E7EB]">Preview MDX</h3>
                       <p className="text-sm text-gray-600 mt-1">Visualização renderizada do conteúdo markdown</p>
                     </div>
                     <MarkdownPreview 

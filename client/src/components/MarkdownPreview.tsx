@@ -53,23 +53,23 @@ function MermaidDiagram({ chart }: { chart: string }) {
 
 // Custom components for MDX rendering
 const mdxComponents = {
-  h1: (props: any) => <h1 className="text-3xl font-bold mb-6 text-gray-900 border-b border-gray-200 pb-3" {...props} />,
-  h2: (props: any) => <h2 className="text-2xl font-semibold mb-4 text-gray-800 mt-8" {...props} />,
-  h3: (props: any) => <h3 className="text-xl font-medium mb-3 text-gray-700 mt-6" {...props} />,
-  h4: (props: any) => <h4 className="text-lg font-medium mb-2 text-gray-700 mt-4" {...props} />,
-  h5: (props: any) => <h5 className="text-base font-medium mb-2 text-gray-600 mt-3" {...props} />,
-  h6: (props: any) => <h6 className="text-sm font-medium mb-2 text-gray-600 mt-2" {...props} />,
-  p: (props: any) => <p className="mb-4 leading-relaxed text-gray-700" {...props} />,
+  h1: (props: any) => <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-[#E5E7EB] border-b border-gray-200 dark:border-[#374151] pb-3" {...props} />,
+  h2: (props: any) => <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-[#E5E7EB] mt-8" {...props} />,
+  h3: (props: any) => <h3 className="text-xl font-medium mb-3 text-gray-700 dark:text-[#D1D5DB] mt-6" {...props} />,
+  h4: (props: any) => <h4 className="text-lg font-medium mb-2 text-gray-700 dark:text-[#D1D5DB] mt-4" {...props} />,
+  h5: (props: any) => <h5 className="text-base font-medium mb-2 text-gray-600 dark:text-[#9CA3AF] mt-3" {...props} />,
+  h6: (props: any) => <h6 className="text-sm font-medium mb-2 text-gray-600 dark:text-[#9CA3AF] mt-2" {...props} />,
+  p: (props: any) => <p className="mb-4 leading-relaxed text-gray-700 dark:text-[#D1D5DB]" {...props} />,
   ul: (props: any) => <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />,
   ol: (props: any) => <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />,
-  li: (props: any) => <li className="text-gray-700" {...props} />,
+  li: (props: any) => <li className="text-gray-700 dark:text-[#D1D5DB]" {...props} />,
   blockquote: (props: any) => (
-    <blockquote className="border-l-4 border-blue-500 pl-4 py-2 mb-4 bg-gray-50 italic text-gray-600" {...props} />
+    <blockquote className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 py-2 mb-4 bg-gray-50 dark:bg-[#1E293B] italic text-gray-600 dark:text-[#9CA3AF]" {...props} />
   ),
   code: (props: any) => {
     // Inline code
     if (!props.className) {
-      return <code className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm font-mono" {...props} />;
+      return <code className="bg-gray-100 dark:bg-[#1E293B] text-gray-800 dark:text-[#E5E7EB] px-2 py-1 rounded text-sm font-mono" {...props} />;
     }
     // Block code
     return (
@@ -83,21 +83,21 @@ const mdxComponents = {
   ),
   table: (props: any) => (
     <div className="overflow-x-auto mb-4">
-      <table className="min-w-full border border-gray-300 rounded-lg" {...props} />
+      <table className="min-w-full border border-gray-300 dark:border-[#374151] rounded-lg" {...props} />
     </div>
   ),
-  thead: (props: any) => <thead className="bg-gray-50" {...props} />,
-  tbody: (props: any) => <tbody className="divide-y divide-gray-200" {...props} />,
-  tr: (props: any) => <tr className="hover:bg-gray-50" {...props} />,
+  thead: (props: any) => <thead className="bg-gray-50 dark:bg-[#111827]" {...props} />,
+  tbody: (props: any) => <tbody className="divide-y divide-gray-200 dark:divide-[#374151]" {...props} />,
+  tr: (props: any) => <tr className="hover:bg-gray-50 dark:hover:bg-[#1E293B]" {...props} />,
   th: (props: any) => (
-    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300" {...props} />
+    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-[#9CA3AF] uppercase tracking-wider border-b border-gray-300 dark:border-[#374151]" {...props} />
   ),
-  td: (props: any) => <td className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200" {...props} />,
-  a: (props: any) => <a className="text-blue-600 hover:text-blue-800 underline" {...props} />,
+  td: (props: any) => <td className="px-4 py-3 text-sm text-gray-700 dark:text-[#D1D5DB] border-b border-gray-200 dark:border-[#374151]" {...props} />,
+  a: (props: any) => <a className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline" {...props} />,
   img: (props: any) => <img className="max-w-full h-auto rounded-lg shadow-sm mb-4" {...props} />,
-  hr: (props: any) => <hr className="my-8 border-gray-300" {...props} />,
-  strong: (props: any) => <strong className="font-semibold text-gray-900" {...props} />,
-  em: (props: any) => <em className="italic text-gray-700" {...props} />,
+  hr: (props: any) => <hr className="my-8 border-gray-300 dark:border-[#374151]" {...props} />,
+  strong: (props: any) => <strong className="font-semibold text-gray-900 dark:text-[#E5E7EB]" {...props} />,
+  em: (props: any) => <em className="italic text-gray-700 dark:text-[#D1D5DB]" {...props} />,
 };
 
 // Process inline formatting like bold, italic, links, and inline images
@@ -137,7 +137,7 @@ function processInlineFormatting(text: string): React.ReactNode {
       }
       const [, linkText, linkUrl] = linkMatch;
       parts.push(
-        <a key={key++} href={linkUrl} className="text-blue-600 hover:text-blue-800 underline">
+        <a key={key++} href={linkUrl} className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline">
           {linkText}
         </a>
       );
@@ -153,7 +153,7 @@ function processInlineFormatting(text: string): React.ReactNode {
         parts.push(beforeBold);
       }
       parts.push(
-        <strong key={key++} className="font-semibold text-gray-900">
+        <strong key={key++} className="font-semibold text-gray-900 dark:text-[#E5E7EB]">
           {boldMatch[1]}
         </strong>
       );
@@ -169,7 +169,7 @@ function processInlineFormatting(text: string): React.ReactNode {
         parts.push(beforeItalic);
       }
       parts.push(
-        <em key={key++} className="italic text-gray-700">
+        <em key={key++} className="italic text-gray-700 dark:text-[#D1D5DB]">
           {italicMatch[1]}
         </em>
       );
@@ -185,7 +185,7 @@ function processInlineFormatting(text: string): React.ReactNode {
         parts.push(beforeCode);
       }
       parts.push(
-        <code key={key++} className="bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm font-mono">
+        <code key={key++} className="bg-gray-100 dark:bg-[#1E293B] text-gray-800 dark:text-[#E5E7EB] px-2 py-1 rounded text-sm font-mono">
           {codeMatch[1]}
         </code>
       );
@@ -506,7 +506,7 @@ export default function MarkdownPreview({ content, className = '' }: MarkdownPre
 
   return (
     <MDXProvider components={mdxComponents}>
-      <div className={`markdown-preview prose prose-gray max-w-none ${className}`}>
+      <div className={`markdown-preview prose prose-gray dark:prose-invert max-w-none ${className}`}>
         <style dangerouslySetInnerHTML={{
           __html: `
             .markdown-preview table td {
