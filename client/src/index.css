@@ -1078,6 +1078,27 @@ table:not(.lexical-editor-container table) th {
   opacity: 1 !important;
 }
 
+/* Date picker icon styling for dark mode */
+.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: brightness(0) invert(1) !important;
+  cursor: pointer;
+  opacity: 1 !important;
+}
+
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: brightness(0) invert(1) !important;
+  cursor: pointer;
+  opacity: 1 !important;
+}
+
+/* Specific targeting for admin page date pickers */
+.dark [data-page="admin"] input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.dark [data-page="admin"] input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: brightness(0) invert(1) !important;
+  cursor: pointer;
+  opacity: 1 !important;
+}
+
 .dark input[type="time"]::-webkit-datetime-edit-fields-wrapper {
   background: transparent !important;
   color: #E5E7EB !important;
