@@ -1617,10 +1617,14 @@ export default function LexicalPage() {
         <div className="flex h-full">
           {/* Sidebar de documentos (condicional) */}
         {showDocumentList && (
-          <div className="w-80 border-r bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] p-4 overflow-y-auto" style={{ marginTop: '16px' }}>
-            <div className="space-y-6">
+          <div className="w-80 border-r bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col" style={{ marginTop: '16px' }}>
+            {/* Header fixo */}
+            <div className="p-4 border-b bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151]">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">Biblioteca</h3>
-              
+            </div>
+            
+            {/* Área com scroll */}
+            <div className="flex-1 p-4 overflow-y-auto">
               <Accordion type="multiple" defaultValue={[]} className="w-full">
                 {/* Grupo 1: Templates Estruturais */}
                 <AccordionItem value="templates">
