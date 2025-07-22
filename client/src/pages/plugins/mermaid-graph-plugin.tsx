@@ -242,6 +242,10 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
         mainBkg: '#1B2028',
         secondBkg: '#1E293B',
         tertiaryBkg: '#374151',
+        edgeLabelBackground: '#1B2028',
+        labelBackground: '#1B2028',
+        labelTextColor: '#FFFFFF',
+        edgeLabelColor: '#FFFFFF',
       } : {}
     });
   }, []);
