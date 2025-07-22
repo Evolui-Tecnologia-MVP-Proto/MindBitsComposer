@@ -1470,7 +1470,7 @@ export default function AdminPage() {
         </div>
         
         <Tabs defaultValue="usuarios" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-[#1E293B]">
+          <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-[#0F172A]">
             <TabsTrigger value="usuarios" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
               <Users className="h-4 w-4 mr-2" />
               Usuários
@@ -1923,7 +1923,7 @@ export default function AdminPage() {
           <Form {...mappingForm}>
             <form id="mappingForm" onSubmit={mappingForm.handleSubmit(onSubmitMapping)} className="space-y-4">
               <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-6 bg-gray-100 dark:bg-[#1E293B]">
+                <TabsList className="grid w-full grid-cols-6 bg-gray-100 dark:bg-[#0F172A]">
                   <TabsTrigger value="quadro" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Quadro</TabsTrigger>
                   <TabsTrigger value="colunas" disabled={!selectedMapping} className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Colunas</TabsTrigger>
                   <TabsTrigger value="defaults" disabled={!selectedMapping} className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Defaults</TabsTrigger>
