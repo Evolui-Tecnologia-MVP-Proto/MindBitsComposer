@@ -1469,7 +1469,9 @@ export default function LexicalPage() {
   return (
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header com navegação */}
-      <div className="flex-shrink-0 p-6 pb-4">
+      <div className="flex-shrink-0 p-6 pb-4" style={{ 
+        marginRight: showAttachments && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) ? '320px' : '0px' 
+      }}>
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-4">
             <div>
