@@ -324,7 +324,7 @@ export default function TemplatesPage() {
           </TabsList>
         
         <TabsContent value="struct" className="space-y-4">
-          <Card>
+          <Card className="mt-2">
             <CardHeader className="flex flex-row items-center justify-between rounded-t-lg">
               <div>
                 <CardTitle>Struct Templates</CardTitle>
@@ -360,7 +360,7 @@ export default function TemplatesPage() {
         </TabsContent>
         
         <TabsContent value="output" className="space-y-4">
-          <Card>
+          <Card className="mt-2">
             <CardHeader className="flex flex-row items-center justify-between rounded-t-lg">
               <div>
                 <CardTitle>Out Templates</CardTitle>
