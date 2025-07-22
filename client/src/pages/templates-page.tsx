@@ -323,7 +323,7 @@ export default function TemplatesPage() {
             <TabsTrigger value="output">Out Templates</TabsTrigger>
           </TabsList>
         
-        <TabsContent value="struct" className="space-y-4">
+        <TabsContent value="struct" className="space-y-4 dark:bg-[#0F172A]">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
@@ -359,7 +359,7 @@ export default function TemplatesPage() {
           </Card>
         </TabsContent>
         
-        <TabsContent value="output" className="space-y-4">
+        <TabsContent value="output" className="space-y-4 dark:bg-[#0F172A]">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>

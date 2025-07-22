@@ -2042,12 +2042,18 @@ html.dark [data-radix-select-item][data-highlighted] {
   background-color: transparent !important;
 }
 
-/* TabsContent with space-y-4 class (div containing the Card) */
-.dark [data-page="templates"] [data-radix-tabs-content].space-y-4 {
+/* TabsContent with space-y-4 class (div containing the Card) - Force with highest specificity */
+.dark [data-page="templates"] [data-radix-tabs-content].space-y-4,
+.dark [data-page="templates"] div[data-radix-tabs-content].space-y-4 {
   background-color: #0F172A !important;
 }
 
 .dark [data-page="templates"] .space-y-4 {
+  background-color: #0F172A !important;
+}
+
+/* Additional nuclear approach for TabsContent */
+.dark [data-page="templates"] [data-state="active"][data-radix-tabs-content] {
   background-color: #0F172A !important;
 }
 
