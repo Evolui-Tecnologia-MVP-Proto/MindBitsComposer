@@ -73,10 +73,13 @@ body.dark .Collapsible__content {
   border-color: #374151 !important;
 }
 
-/* ReactFlow Background Grid Fixes */
+/* ReactFlow Background Grid Fixes - Force visibility */
 .react-flow__background {
-  z-index: 0 !important;
+  z-index: 1 !important;
   pointer-events: none !important;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .react-flow__background svg {
@@ -84,30 +87,36 @@ body.dark .Collapsible__content {
   visibility: visible !important;
   width: 100% !important;
   height: 100% !important;
+  display: block !important;
 }
 
 .react-flow__background pattern {
   opacity: 1 !important;
+  visibility: visible !important;
 }
 
-/* Force ReactFlow background patterns to be visible */
 .react-flow__background pattern circle {
   opacity: 1 !important;
   fill-opacity: 1 !important;
-  fill: #ff0000 !important;
+  visibility: visible !important;
 }
 
-/* Debug background visibility */
-.react-flow__renderer {
-  position: relative !important;
+.react-flow__background pattern path {
+  opacity: 1 !important;
+  stroke-opacity: 1 !important;
+  visibility: visible !important;
 }
 
+/* Force all ReactFlow background elements to be visible */
+.react-flow__background * {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* Debug: Add visible border to background container */
 .react-flow__background {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
+  border: 2px solid #ff0000 !important;
+  background: rgba(255, 0, 0, 0.1) !important;
 }
 
 .dark .Collapsible__container,
