@@ -215,6 +215,51 @@ body.dark .Collapsible__title:hover {
   border-spacing: 0 !important;
 }
 
+/* Lexical Editor Table Selection Highlighting - Dark Mode */
+.dark .lexical-editor-container table.selected-table,
+.dark [data-lexical-editor] table.selected-table,
+.dark .ContentEditable__root table.selected-table,
+.dark .lexical-editor-container .TableNode__table.selected-table,
+.dark [data-lexical-editor] .TableNode__table.selected-table,
+.dark .ContentEditable__root .TableNode__table.selected-table {
+  outline: 3px solid #60A5FA !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3) !important;
+  border: 3px solid #60A5FA !important;
+}
+
+.dark .lexical-editor-container table:focus,
+.dark [data-lexical-editor] table:focus,
+.dark .ContentEditable__root table:focus,
+.dark .lexical-editor-container .TableNode__table:focus,
+.dark [data-lexical-editor] .TableNode__table:focus,
+.dark .ContentEditable__root .TableNode__table:focus {
+  outline: 3px solid #60A5FA !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3) !important;
+  border: 3px solid #60A5FA !important;
+}
+
+.dark .lexical-editor-container table:hover,
+.dark [data-lexical-editor] table:hover,
+.dark .ContentEditable__root table:hover,
+.dark .lexical-editor-container .TableNode__table:hover,
+.dark [data-lexical-editor] .TableNode__table:hover,
+.dark .ContentEditable__root .TableNode__table:hover {
+  outline: 2px solid #93C5FD !important;
+  outline-offset: 1px !important;
+  box-shadow: 0 0 0 2px rgba(147, 197, 253, 0.2) !important;
+}
+
+/* Active table cell selection in dark mode */
+.dark .lexical-editor-container .TableNode__tableCell:focus,
+.dark [data-lexical-editor] .TableNode__tableCell:focus,
+.dark .ContentEditable__root .TableNode__tableCell:focus {
+  outline: 2px solid #60A5FA !important;
+  outline-offset: 1px !important;
+  box-shadow: inset 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+}
+
 .composer-library-panel * {
   max-width: 100% !important;
 }
