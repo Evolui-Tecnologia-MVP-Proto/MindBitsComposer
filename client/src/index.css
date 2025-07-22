@@ -2851,11 +2851,13 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  border-bottom-left-radius: 12px !important;
 }
 
-/* Library panel - rounded top-left corner */
+/* Library panel - rounded left corners */
 .composer-library-panel {
   border-top-left-radius: 12px !important;
+  border-bottom-left-radius: 12px !important;
 }
 
 /* Library panel header - rounded top-left corner */

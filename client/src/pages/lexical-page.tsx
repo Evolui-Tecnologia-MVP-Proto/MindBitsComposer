@@ -1624,7 +1624,7 @@ export default function LexicalPage() {
             </div>
             
             {/* Área com scroll */}
-            <div className="flex-1 p-4 overflow-y-auto">
+            <div className="flex-1 p-4 overflow-y-auto rounded-bl-xl">
               <Accordion type="multiple" defaultValue={[]} className="w-full">
                 {/* Grupo 1: Templates Estruturais */}
                 <AccordionItem value="templates">
