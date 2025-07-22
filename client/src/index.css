@@ -2030,13 +2030,17 @@ html.dark [data-radix-select-item][data-highlighted] {
 
 /* Individual template cards */
 .dark [data-page="templates"] .grid .card,
-.dark [data-page="templates"] .grid [data-radix-card] {
-  background-color: #0F172A !important;
+.dark [data-page="templates"] .grid [data-radix-card],
+.dark [data-page="templates"] .card,
+.dark [data-page="templates"] [data-radix-card] {
+  background-color: #1F2937 !important;
   border-color: #374151 !important;
 }
 
 .dark [data-page="templates"] .grid .card:hover,
-.dark [data-page="templates"] .grid [data-radix-card]:hover {
+.dark [data-page="templates"] .grid [data-radix-card]:hover,
+.dark [data-page="templates"] .card:hover,
+.dark [data-page="templates"] [data-radix-card]:hover {
   border-color: #1E40AF !important;
 }
 
@@ -2048,7 +2052,7 @@ html.dark [data-radix-select-item][data-highlighted] {
 
 /* Modal components */
 .dark [data-page="templates"] [data-radix-dialog-content] {
-  background-color: #0F1729 !important;
+  background-color: #1F2937 !important;
   border-color: #374151 !important;
 }
 
@@ -2080,7 +2084,10 @@ html.dark [data-radix-select-item][data-highlighted] {
 .dark [data-page="templates"] .space-y-6 > div:first-child,
 .dark [data-page="templates"] .space-y-4 > .card,
 .dark [data-page="templates"] [data-radix-dialog-content],
-.dark [data-page="templates"] [data-radix-collapsible-content] {
+.dark [data-page="templates"] [data-radix-collapsible-content],
+.dark [data-page="templates"] .grid > .card,
+.dark [data-page="templates"] [data-radix-card],
+.dark [data-page="templates"] .card {
   background-color: #1F2937 !important;
 }
 
