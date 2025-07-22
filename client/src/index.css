@@ -359,6 +359,71 @@
   background-color: #0F172A !important;
 }
 
+/* Ultimate nuclear approach - override ANY occurrence of #374151 anywhere in the modal */
+.dark [data-radix-dialog-content],
+.dark [data-radix-dialog-content] *,
+.dark [data-radix-dialog-content] *::before,
+.dark [data-radix-dialog-content] *::after {
+  border-color: #0F172A !important;
+}
+
+.dark [data-radix-dialog-content] [data-radix-tabs-content="mapeamento"],
+.dark [data-radix-dialog-content] [data-radix-tabs-content="mapeamento"] *,
+.dark [data-radix-dialog-content] [data-radix-tabs-content="mapeamento"] *::before,
+.dark [data-radix-dialog-content] [data-radix-tabs-content="mapeamento"] *::after {
+  border-color: #0F172A !important;
+  background-color: #0F172A !important;
+}
+
+/* Override computed styles that might have #374151 */
+.dark [data-radix-dialog-content] * {
+  --tw-border-opacity: 1 !important;
+}
+
+/* Target specific gray-600 color that maps to #374151 */
+.dark [data-radix-dialog-content] * {
+  --color-gray-600: #0F172A !important;
+}
+
+/* Force override for all elements that might inherit gray-600 */
+.dark [data-radix-dialog-content] .border-gray-600,
+.dark [data-radix-dialog-content] [class*="border-gray"],
+.dark [data-radix-dialog-content] [class*="dark:border-gray"] {
+  border-color: #0F172A !important;
+}
+
+/* Override CSS variables that generate #374151 (gray-600) */
+.dark [data-radix-dialog-content] {
+  --tw-border-opacity: 1 !important;
+  --gray-600: #0F172A !important;
+  --border-color: #0F172A !important;
+}
+
+/* Target Radix UI specific data attributes that might use gray-600 */
+.dark [data-radix-dialog-content] [data-state],
+.dark [data-radix-dialog-content] [data-radix-collapsible-trigger],
+.dark [data-radix-dialog-content] [data-radix-collapsible-content],
+.dark [data-radix-dialog-content] [data-radix-tabs-content] {
+  border-color: #0F172A !important;
+  --border-color: #0F172A !important;
+}
+
+/* Override any computed border colors */
+.dark [data-radix-dialog-content] * {
+  --computed-border-color: #0F172A !important;
+}
+
+/* Final nuclear option - replace #374151 with #0F172A everywhere */
+.dark [data-radix-dialog-content] *[style*="374151"] {
+  border-color: #0F172A !important;
+  background-color: #0F172A !important;
+}
+
+.dark [data-radix-dialog-content] *[style*="rgb(55, 65, 81)"] {
+  border-color: #0F172A !important;
+  background-color: #0F172A !important;
+}
+
 /* MAXIMUM SPECIFICITY: Global tabs active state styling for dark mode */
 html.dark [data-radix-tabs-trigger][data-state="active"],
 body.dark [data-radix-tabs-trigger][data-state="active"],

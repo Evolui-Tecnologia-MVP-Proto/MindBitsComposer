@@ -132,6 +132,9 @@ Preferred communication style: Simple, everyday language.
   - Fixed JSX classes: replaced dark:hover:bg-[#374151] with dark:hover:bg-[#1E293B] in CollapsibleTrigger components
   - Fixed JSX border classes: replaced dark:border-gray-600 with dark:border-[#0F172A] in all Collapsible components
   - Added comprehensive CSS overrides for any remaining #374151 border colors
+  - Applied nuclear CSS approach: override ALL border colors in modal with #0F172A
+  - Targeted CSS variables and computed styles that might generate #374151 (gray-600)
+  - Added inline style overrides for any hardcoded #374151 or rgb(55, 65, 81) values
   - Text colors: #E5E7EB (primary), #9CA3AF (secondary), blue accent adjusted for dark mode
   - Select triggers: #0F172A background with proper contrast
   - Icons: adjusted chevron colors for dark theme visibility
