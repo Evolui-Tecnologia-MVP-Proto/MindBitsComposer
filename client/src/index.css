@@ -2907,6 +2907,26 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   border-top-left-radius: 12px !important;
 }
 
-.editor-left-rounded .lexical-editor-container .bg-\[\#020203\] {
+.editor-left-rounded .composer-editor-card {
+  border-bottom-left-radius: 12px !important;
+}
+
+.editor-left-rounded .composer-editor-card [data-testid="rich-text-plugin"] {
+  border-bottom-left-radius: 12px !important;
+}
+
+.editor-left-rounded .composer-editor-card .ContentEditable__root {
+  border-bottom-left-radius: 12px !important;
+}
+
+.editor-left-rounded .composer-editor-card [contenteditable="true"] {
+  border-bottom-left-radius: 12px !important;
+}
+
+.editor-left-rounded .composer-editor-card .flex-1.p-4.dark\\:bg-\\[\\#020203\\] {
+  border-bottom-left-radius: 12px !important;
+}
+
+.editor-left-rounded .dark\\:bg-\\[\\#020203\\] {
   border-bottom-left-radius: 12px !important;
 }
