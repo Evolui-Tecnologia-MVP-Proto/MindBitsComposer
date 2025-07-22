@@ -1525,6 +1525,7 @@ export default function AdminPage() {
                     <Button
                       variant="outline"
                       onClick={openNewModal}
+                      className="bg-[#1E40AF] text-white border-[#1E40AF] hover:bg-[#1D4ED8] hover:border-[#1D4ED8] dark:bg-[#1E40AF] dark:text-white dark:border-[#1E40AF] dark:hover:bg-[#1D4ED8] dark:hover:border-[#1D4ED8]"
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       Novo Mapeamento
