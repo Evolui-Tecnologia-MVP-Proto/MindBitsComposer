@@ -80,6 +80,12 @@ Preferred communication style: Simple, everyday language.
   - Corrected GitHub icon colors (purple-600 dark:purple-400, bg-purple-100 dark:bg-purple-900/30)
   - Updated OpenAI Lightbulb icon (green-600 dark:green-400, bg-green-100 dark:bg-green-900/30)
   - Enhanced Play button icon for execution (green-600 dark:green-400)
+✓ Fixed logs system tab colors to use #111827 instead of #09090B:
+  - Applied #111827 to filter area background (bg-gray-50 dark:bg-[#111827])
+  - Corrected table container background to #111827
+  - Fixed table header sticky background to #111827
+  - Updated parameters preview pre element to use #111827 background
+  - Applied comprehensive CSS rules for logs tab consistency in dark mode
 
 ## System Architecture
 

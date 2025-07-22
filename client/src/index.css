@@ -1396,6 +1396,8 @@ html.dark .bg-background select,
   background: #0F172A !important;
 }
 
+
+
 /* More specific targeting for time picker dropdown */
 .dark input[type="time"]::-webkit-list-menu-button:hover {
   background-color: #1A1A1A !important;
