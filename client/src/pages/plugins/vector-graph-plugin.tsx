@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef } from 'react';
+import React, { useCallback, useState, useRef, useEffect } from 'react';
 import { Tldraw, TldrawProps, loadSnapshot, getSnapshot } from 'tldraw';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -82,8 +82,32 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [fileName, setFileName] = useState('vector-graph');
   const [description, setDescription] = useState('');
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Detectar tema escuro
+  useEffect(() => {
+    const checkDarkMode = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setIsDarkMode(isDark);
+    };
+
+    // Verificar inicialmente
+    checkDarkMode();
+
+    // Observar mudanças no tema
+    const observer = new MutationObserver(() => {
+      checkDarkMode();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   console.log('🔥 COMPONENT RENDER - description state:', description);
 
@@ -1073,24 +1097,24 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
   }, [editorInstance]);
 
   return (
-    <div className="w-full h-full flex flex-col bg-white">
+    <div className="w-full h-full flex flex-col bg-white dark:bg-[#1E293B]">
       {/* Header com controles */}
-      <div className="flex items-center justify-between p-3 border-b bg-gray-50">
+      <div className="flex items-center justify-between p-3 border-b bg-gray-50 dark:bg-[#111827] dark:border-[#374151]">
         <div className="flex items-center gap-3">
           <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-          <h3 className="font-medium text-sm">Vector Graph Editor</h3>
+          <h3 className="font-medium text-sm text-gray-900 dark:text-[#E5E7EB]">Vector Graph Editor</h3>
           <div className="flex items-center gap-2 ml-4">
-            <span className="text-xs text-gray-600">Nome:</span>
+            <span className="text-xs text-gray-600 dark:text-[#9CA3AF]">Nome:</span>
             <Input
               type="text"
               value={fileName}
               onChange={(e) => setFileName(e.target.value)}
               placeholder="vector-graph"
-              className="h-7 w-32 text-xs"
+              className="h-7 w-32 text-xs dark:bg-[#0F172A] dark:border-[#374151] dark:text-[#E5E7EB]"
             />
           </div>
           <div className="flex items-center gap-2 ml-4">
-            <span className="text-xs text-gray-600">Descrição:</span>
+            <span className="text-xs text-gray-600 dark:text-[#9CA3AF]">Descrição:</span>
             <Input
               type="text"
               value={description}
@@ -1099,7 +1123,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
                 setDescription(e.target.value);
               }}
               placeholder="Descrição do arquivo"
-              className="h-7 w-40 text-xs"
+              className="h-7 w-40 text-xs dark:bg-[#0F172A] dark:border-[#374151] dark:text-[#E5E7EB]"
             />
           </div>
         </div>
@@ -1146,6 +1170,7 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         <Tldraw
           onMount={handleMount}
           autoFocus
+          theme={isDarkMode ? 'dark' : 'light'}
         />
       </div>
 
