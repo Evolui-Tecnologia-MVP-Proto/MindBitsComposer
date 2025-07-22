@@ -1634,7 +1634,7 @@ export default function LexicalPage() {
                       ) : (
                         <>
                           {!structTemplates || (Array.isArray(structTemplates) && structTemplates.length === 0) ? (
-                            <div className="text-center py-4 text-gray-500">
+                            <div className="text-center py-4 text-gray-500 dark:text-[#6B7280]">
                               <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
                               <p className="text-xs">Nenhum template encontrado</p>
                             </div>
@@ -1642,7 +1642,7 @@ export default function LexicalPage() {
                             Array.isArray(structTemplates) && structTemplates.map((template: Template) => (
                               <div
                                 key={template.id}
-                                className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 border-green-200 hover:border-green-300"
+                                className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E293B] border-green-200 dark:border-[#374151] hover:border-green-300 dark:hover:border-[#4B5563] dark:bg-[#111827]"
                                 onClick={() => {
                                   // Verificar se há conteúdo não salvo no editor
                                   if (hasEditorContent && !currentDocumentId) {
@@ -1672,11 +1672,11 @@ export default function LexicalPage() {
                                 }}
                               >
                                 <div className="flex-1">
-                                  <h5 className="font-medium text-sm text-green-700">{template.code} - {template.name}</h5>
-                                  <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                                  <h5 className="font-medium text-sm text-green-700 dark:text-green-400">{template.code} - {template.name}</h5>
+                                  <p className="text-xs text-gray-500 dark:text-[#9CA3AF] mt-1 line-clamp-2">
                                     {template.description}
                                   </p>
-                                  <p className="text-xs text-gray-400 mt-2">
+                                  <p className="text-xs text-gray-400 dark:text-[#6B7280] mt-2">
                                     Template • {new Date(template.updatedAt).toLocaleDateString()}
                                   </p>
                                 </div>
@@ -1701,7 +1701,7 @@ export default function LexicalPage() {
                       ) : (
                         <>
                           {!documentEditions || (Array.isArray(documentEditions) && documentEditions.length === 0) ? (
-                            <div className="text-center py-4 text-gray-500">
+                            <div className="text-center py-4 text-gray-500 dark:text-[#6B7280]">
                               <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
                               <p className="text-xs">Nenhum documento em progresso encontrado</p>
                             </div>
@@ -1709,8 +1709,8 @@ export default function LexicalPage() {
                             Array.isArray(documentEditions) && documentEditions.map((edition: any) => (
                               <div
                                 key={edition.id}
-                                className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 relative ${
-                                  selectedEdition?.id === edition.id ? 'border-blue-500 bg-blue-50' : ''
+                                className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E293B] dark:bg-[#111827] dark:border-[#374151] relative ${
+                                  selectedEdition?.id === edition.id ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/30' : ''
                                 }`}
                                 onClick={() => handleSelectEdition(edition)}
                               >
@@ -1723,14 +1723,14 @@ export default function LexicalPage() {
                                 )}
                                 <div className="flex justify-between items-start">
                                   <div className="flex-1 pr-8">
-                                    <h5 className="font-medium text-sm text-blue-600">
+                                    <h5 className="font-medium text-sm text-blue-600 dark:text-blue-400">
                                       {edition.templateCode}
                                     </h5>
                                     <div className="mt-1 space-y-1">
-                                      <p className="text-xs text-gray-600">
+                                      <p className="text-xs text-gray-600 dark:text-[#9CA3AF]">
                                         <span className="font-medium">Origem:</span> {edition.origem || 'N/A'}
                                       </p>
-                                      <p className="text-xs text-gray-600">
+                                      <p className="text-xs text-gray-600 dark:text-[#9CA3AF]">
                                         <span className="font-medium">Objeto:</span> {edition.objeto || 'N/A'}
                                       </p>
                                     </div>
