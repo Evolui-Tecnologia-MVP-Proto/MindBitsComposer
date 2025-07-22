@@ -1415,6 +1415,23 @@ html.dark .bg-background select,
   background-color: #0F172A !important;
 }
 
+/* Fix logs table container div in dark mode */
+.dark [data-page="admin"] div[class*="max-h-"][class*="overflow-y-auto"][class*="border"][class*="rounded-md"] {
+  background-color: #0F172A !important;
+}
+
+/* Alternative more specific selector for logs table container */
+.dark [data-page="admin"] [value="logs"] ~ div div[class*="overflow-y-auto"],
+.dark [data-page="admin"] div[data-state="active"][data-orientation="horizontal"] div[class*="overflow-y-auto"] {
+  background-color: #0F172A !important;
+}
+
+/* Specific targeting for logs tab content */
+.dark [data-page="admin"] div[data-radix-tabs-content][data-state="active"] div.border.rounded-md,
+.dark [data-page="admin"] div[data-radix-tabs-content] div.border.rounded-md {
+  background-color: #0F172A !important;
+}
+
 
 
 /* More specific targeting for time picker dropdown */
