@@ -49,10 +49,16 @@
 
 /* Lexical canvas scroll optimization */
 .lexical-canvas {
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
+  overflow: auto !important;
+  position: relative !important;
   scrollbar-width: thin;
   scrollbar-color: #374151 transparent;
+}
+
+/* Prevent content editable from expanding */
+.lexical-canvas [contenteditable="true"] {
+  overflow: auto !important;
+  height: calc(100vh - 340px) !important;
 }
 
 .lexical-canvas::-webkit-scrollbar {
