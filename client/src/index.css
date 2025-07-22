@@ -2507,8 +2507,7 @@ html.dark [data-radix-select-item][data-highlighted] {
 
 .dark [data-page="fluxos"] .biblioteca-content-container {
   background-color: #0F172A !important;
-  padding: 20px !important;
-  border-radius: 8px !important;
+  /* Remove forced padding override */
 }
 
 .dark [data-page="fluxos"] .flex.justify-between.items-center {
@@ -2562,24 +2561,13 @@ html.dark [data-radix-select-item][data-highlighted] {
 .dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 {
   background-color: #0F172A !important;
   border-color: #374151 !important;
-  /* Preserve all original sizing properties from light mode */
-  margin-bottom: inherit !important;
-  padding: inherit !important;
-  border-radius: inherit !important;
-  height: auto !important;
-  min-height: inherit !important;
-  max-height: inherit !important;
+  /* Only override colors, preserve all spacing exactly as light mode */
 }
 
 /* FlowToolbar individual toolbar divs - preserve exact spacing */
 .dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 > .flex.justify-between.items-center {
   background-color: transparent !important;
-  /* Preserve all original sizing and spacing properties */
-  height: inherit !important;
-  min-height: inherit !important;
-  padding: inherit !important;
-  margin: inherit !important;
-  gap: inherit !important;
+  /* No spacing overrides - inherit everything from light mode */
 }
 
 /* NodeInspector panel styling for dark theme */
