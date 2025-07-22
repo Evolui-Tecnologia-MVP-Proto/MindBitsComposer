@@ -1396,6 +1396,25 @@ html.dark .bg-background select,
   background: #0F172A !important;
 }
 
+/* GLOBAL FIX: Prevent any element from using #09090B in dark mode */
+/* Fix any bg-gray-900 that might resolve to #09090B */
+.dark .bg-gray-900 {
+  background-color: #111827 !important;
+}
+
+/* Fix any potential Tailwind classes that resolve to #09090B */
+.dark .bg-slate-900,
+.dark .bg-zinc-900,
+.dark .bg-neutral-900 {
+  background-color: #111827 !important;
+}
+
+/* Additional safeguards for computed styles */
+.dark [data-radix-dialog-content] .bg-background,
+.dark [data-page="admin"] .bg-background {
+  background-color: #0F172A !important;
+}
+
 
 
 /* More specific targeting for time picker dropdown */
