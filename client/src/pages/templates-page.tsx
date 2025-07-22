@@ -306,7 +306,7 @@ export default function TemplatesPage() {
   return (
     <div className="container mx-auto py-6 bg-background dark:bg-[#1F2937] text-foreground" data-page="templates">
       <div className="space-y-6 bg-[#F9FAFB] dark:bg-[#1F2937]">
-        <div className="flex items-center justify-between p-6 rounded-lg bg-gray-50 dark:bg-[#1F2937]">
+        <div className="flex items-center justify-between p-6 rounded-lg bg-gray-50 dark:bg-[#0F172A]">
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-[#6B7280] flex items-center gap-3">
             <FileCode className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             Templates

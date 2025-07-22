@@ -2047,6 +2047,11 @@ html.dark [data-radix-select-item][data-highlighted] {
   font-size: 1.5rem !important;
 }
 
+/* Title container - Use #0F172A */
+.dark [data-page="templates"] .flex.items-center.justify-between.p-6.rounded-lg {
+  background-color: #0F172A !important;
+}
+
 /* Template cards grid containers */
 .dark [data-page="templates"] .grid {
   background-color: transparent !important;
