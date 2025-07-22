@@ -2646,6 +2646,15 @@ html.dark [data-radix-select-item][data-highlighted] {
   border-color: #111827 !important;
 }
 
+/* Empty state styling for dark theme */
+.dark [data-page="fluxos"] .text-gray-300 {
+  color: #111214 !important;
+}
+
+.dark [data-page="fluxos"] .text-gray-500 {
+  color: #111214 !important;
+}
+
 .dark [data-page="fluxos"] [data-radix-tabs-trigger] {
   background-color: #0F172A !important;
   color: #9CA3AF !important;
