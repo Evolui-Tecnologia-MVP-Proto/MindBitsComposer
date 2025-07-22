@@ -2892,3 +2892,12 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   height: 56px !important;
   flex-shrink: 0;
 }
+
+/* Toolbar positioning - align with right panel when visible */
+.composer-header-toolbar {
+  transition: margin-right 0.2s ease-in-out;
+}
+
+.composer-header-toolbar.with-right-panel {
+  margin-right: 0 !important;
+}
