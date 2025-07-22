@@ -2713,19 +2713,37 @@ html.dark [data-radix-select-item][data-highlighted] {
   color: #FFFFFF !important;
 }
 
-/* ReactFlow MiniMap styling for dark theme */
+/* ReactFlow MiniMap styling for dark theme - high contrast */
 .dark [data-page="fluxos"] .react-flow__minimap {
-  background-color: #0F172A !important;
+  background-color: #000000 !important;
   border: 1px solid #374151 !important;
 }
 
 .dark [data-page="fluxos"] .react-flow__minimap-mask {
-  fill: rgba(15, 23, 42, 0.7) !important;
+  fill: rgba(59, 130, 246, 0.4) !important;
+  stroke: #3B82F6 !important;
+  stroke-width: 2px !important;
 }
 
 .dark [data-page="fluxos"] .react-flow__minimap-node {
-  fill: #1E293B !important;
-  stroke: #374151 !important;
+  fill: #60A5FA !important;
+  stroke: #FFFFFF !important;
+  stroke-width: 1px !important;
+}
+
+.dark [data-page="fluxos"] .react-flow__minimap-node[data-type="startNode"] {
+  fill: #10B981 !important;
+  stroke: #FFFFFF !important;
+}
+
+.dark [data-page="fluxos"] .react-flow__minimap-node[data-type="endNode"] {
+  fill: #EF4444 !important;
+  stroke: #FFFFFF !important;
+}
+
+.dark [data-page="fluxos"] .react-flow__minimap-node[data-type="processNode"] {
+  fill: #F59E0B !important;
+  stroke: #FFFFFF !important;
 }
 
 /* ReactFlow Background pattern for dark theme */
