@@ -1740,7 +1740,12 @@ export default function AdminPage() {
           </TabsContent>
           
           <TabsContent value="logs" className="slide-in">
-            <Card>
+            <Card 
+              className="bg-white dark:bg-[#1E293B]" 
+              style={{
+                backgroundColor: document.documentElement.classList.contains('dark') ? '#1E293B' : undefined
+              }}
+            >
               <CardHeader className="space-y-4 pb-4">
                 <div className="flex flex-row items-center justify-between">
                   <div>
@@ -1821,7 +1826,11 @@ export default function AdminPage() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent>
+              <CardContent 
+                style={{
+                  backgroundColor: document.documentElement.classList.contains('dark') ? '#1E293B' : undefined
+                }}
+              >
                 {logsLoading ? (
                   <div className="flex items-center justify-center py-8">
                     <Loader2 className="h-8 w-8 animate-spin text-border" />
@@ -1915,7 +1924,12 @@ export default function AdminPage() {
                     </Table>
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
+                  <div 
+                    className="text-center py-8 text-gray-500"
+                    style={{
+                      backgroundColor: document.documentElement.classList.contains('dark') ? '#1E293B' : undefined
+                    }}
+                  >
                     <Database className="h-12 w-12 mx-auto mb-3 text-gray-300" />
                     <p>Nenhum log encontrado</p>
                     <p className="text-sm mt-1">

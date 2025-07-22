@@ -80,12 +80,16 @@ Preferred communication style: Simple, everyday language.
   - Corrected GitHub icon colors (purple-600 dark:purple-400, bg-purple-100 dark:bg-purple-900/30)
   - Updated OpenAI Lightbulb icon (green-600 dark:green-400, bg-green-100 dark:bg-green-900/30)
   - Enhanced Play button icon for execution (green-600 dark:green-400)
-✓ Fixed logs system tab colors to use #111827 instead of #09090B:
-  - Applied #111827 to filter area background (bg-gray-50 dark:bg-[#111827])
+✓ Fixed ALL logs system tab colors to use #111827 instead of #09090B:
+  - Applied #111827 to filter area background with inline conditional styles
   - Corrected table container background to #111827
-  - Fixed table header sticky background to #111827
+  - Fixed table header sticky background to #111827 (TableHeader, TableRow, all TableHead elements)
   - Updated parameters preview pre element to use #111827 background
-  - Applied comprehensive CSS rules for logs tab consistency in dark mode
+  - Applied #1E293B to Card and CardContent containers in logs tab
+  - Fixed empty state container with #1E293B background
+  - Applied comprehensive inline conditional styles for maximum compatibility
+  - Completely eliminated all #09090B color occurrences from logs tab
+  - Used document.documentElement.classList.contains('dark') for reliable dark mode detection
 
 ## System Architecture
 
