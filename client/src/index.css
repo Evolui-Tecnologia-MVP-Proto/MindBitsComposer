@@ -1373,6 +1373,54 @@ html.dark [data-page="admin"] [role="combobox"]:hover {
   color: #E5E7EB !important;
 }
 
+/* Override any existing hover colors - Force #1F2937 */
+.dark [data-radix-select-item]:hover,
+.dark [data-radix-select-item][data-highlighted],
+.dark [data-radix-select-item][data-state="checked"]:hover {
+  background-color: #1F2937 !important;
+  color: #E5E7EB !important;
+}
+
+/* Maximum specificity override for dropdown items */
+html.dark [data-radix-select-content] [data-radix-select-item]:hover,
+html.dark [data-radix-select-item][data-highlighted],
+html.dark [data-radix-select-item][aria-selected="true"]:hover {
+  background-color: #1F2937 !important;
+  color: #E5E7EB !important;
+}
+
+/* Force override any blue hover states */
+.dark [data-radix-select-item]:not([data-disabled]):hover,
+.dark [data-radix-select-item]:not([data-disabled])[data-highlighted] {
+  background-color: #1F2937 !important;
+  color: #E5E7EB !important;
+}
+
+/* Nuclear option - Override ALL possible blue hover states */
+.dark [data-radix-select-item] {
+  --tw-bg-opacity: 1 !important;
+}
+
+.dark [data-radix-select-item]:hover,
+.dark [data-radix-select-item][data-highlighted] {
+  background: #1F2937 !important;
+  background-color: rgb(31, 41, 55) !important;
+  color: rgb(229, 231, 235) !important;
+}
+
+/* Maximum specificity - Target by ID or inline styles if needed */
+html.dark body [data-radix-select-item]:hover,
+html.dark body [data-radix-select-item][data-highlighted],
+html.dark body [data-radix-select-item][data-state="checked"] {
+  background: #1F2937 !important;
+  background-color: #1F2937 !important;
+}
+
+/* Override any Tailwind hover classes */
+.dark [data-radix-select-item]:hover:not(.hover\:bg-blue-100):not(.hover\:bg-blue-200) {
+  background-color: #1F2937 !important;
+}
+
 .dark input[type="time"]::-webkit-datetime-edit-fields-wrapper {
   background: transparent !important;
   color: #E5E7EB !important;
