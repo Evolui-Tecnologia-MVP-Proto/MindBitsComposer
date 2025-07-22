@@ -135,6 +135,8 @@ Preferred communication style: Simple, everyday language.
   - Applied nuclear CSS approach: override ALL border colors in modal with #0F172A
   - Targeted CSS variables and computed styles that might generate #374151 (gray-600)
   - Added inline style overrides for any hardcoded #374151 or rgb(55, 65, 81) values
+  - Implemented JavaScript force override: scans computed styles for rgb(55, 65, 81) and replaces with #0F172A
+  - Added modalRef and useEffect to run color override after render and accordion state changes
   - Text colors: #E5E7EB (primary), #9CA3AF (secondary), blue accent adjusted for dark mode
   - Select triggers: #0F172A background with proper contrast
   - Icons: adjusted chevron colors for dark theme visibility

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -70,6 +70,7 @@ export default function TemplateFormModal({
   const [structureError, setStructureError] = useState("");
   const [fieldMappings, setFieldMappings] = useState<Record<string, string>>({});
   const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>({});
+  const modalRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
   // Query para obter colunas da tabela documentos
@@ -120,6 +121,55 @@ export default function TemplateFormModal({
       setOpenAccordions({});
     }
   }, [isOpen]);
+
+  // Force override #374151 colors with JavaScript after render
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      const forceColorOverride = () => {
+        const modal = modalRef.current;
+        if (!modal) return;
+
+        // Find all elements with #374151 or gray-600 border
+        const allElements = modal.querySelectorAll('*');
+        allElements.forEach((element: Element) => {
+          const htmlElement = element as HTMLElement;
+          const computedStyle = window.getComputedStyle(htmlElement);
+          
+          // Check border colors
+          if (
+            computedStyle.borderColor === 'rgb(55, 65, 81)' ||
+            computedStyle.borderTopColor === 'rgb(55, 65, 81)' ||
+            computedStyle.borderBottomColor === 'rgb(55, 65, 81)' ||
+            computedStyle.borderLeftColor === 'rgb(55, 65, 81)' ||
+            computedStyle.borderRightColor === 'rgb(55, 65, 81)'
+          ) {
+            htmlElement.style.setProperty('border-color', '#0F172A', 'important');
+            htmlElement.style.setProperty('border-top-color', '#0F172A', 'important');
+            htmlElement.style.setProperty('border-bottom-color', '#0F172A', 'important');
+            htmlElement.style.setProperty('border-left-color', '#0F172A', 'important');
+            htmlElement.style.setProperty('border-right-color', '#0F172A', 'important');
+          }
+
+          // Check background colors
+          if (computedStyle.backgroundColor === 'rgb(55, 65, 81)') {
+            htmlElement.style.setProperty('background-color', '#0F172A', 'important');
+          }
+        });
+      };
+
+      // Run immediately and after small delays
+      forceColorOverride();
+      const timeout1 = setTimeout(forceColorOverride, 100);
+      const timeout2 = setTimeout(forceColorOverride, 500);
+      const timeout3 = setTimeout(forceColorOverride, 1000);
+
+      return () => {
+        clearTimeout(timeout1);
+        clearTimeout(timeout2);
+        clearTimeout(timeout3);
+      };
+    }
+  }, [isOpen, openAccordions]);
 
   // Atualiza os mapeamentos quando a estrutura muda ou template é carregado
   useEffect(() => {
@@ -358,7 +408,7 @@ export default function TemplateFormModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[780px] max-h-[80vh] flex flex-col">
+      <DialogContent ref={modalRef} className="sm:max-w-[780px] max-h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>
             {mode === "create" ? "Novo Template" : "Editar Template"}
