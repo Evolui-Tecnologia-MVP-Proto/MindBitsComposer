@@ -1842,8 +1842,7 @@ export default function LexicalPage() {
                   <AccordionContent className="px-4 pb-4">
                     <div className="space-y-2">
                       <Button 
-                        className="w-full"
-                        variant="outline"
+                        className="w-full bg-[#1E40AF] hover:bg-[#1E3A8A] text-white dark:bg-[#1E40AF] dark:hover:bg-[#1E3A8A]"
                         size="sm"
                         onClick={handleGlobalFileUpload}
                         disabled={uploadGlobalAssetMutation.isPending}
@@ -1968,8 +1967,7 @@ export default function LexicalPage() {
                     <AccordionContent className="px-4 pb-4">
                       <div className="space-y-2">
                         <Button 
-                          className="w-full"
-                          variant="outline"
+                          className="w-full bg-[#1E40AF] hover:bg-[#1E3A8A] text-white dark:bg-[#1E40AF] dark:hover:bg-[#1E3A8A]"
                           size="sm"
                           onClick={handleFileUpload}
                           disabled={uploadFileMutation.isPending || !selectedEdition}
