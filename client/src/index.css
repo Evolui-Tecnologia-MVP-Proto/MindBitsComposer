@@ -2091,6 +2091,27 @@ html.dark [data-radix-select-item][data-highlighted] {
   background-color: #1F2937 !important;
 }
 
+/* NUCLEAR CSS Override: Force #1F2937 on ALL possible elements in templates page */
+.dark [data-page="templates"] *[style*="#0F172A"],
+.dark [data-page="templates"] *[style*="rgb(15, 23, 42)"],
+.dark [data-page="templates"] div,
+.dark [data-page="templates"] section,
+.dark [data-page="templates"] article,
+.dark [data-page="templates"] .bg-\[#0F172A\],
+.dark [data-page="templates"] [class*="bg-gray-900"],
+.dark [data-page="templates"] [class*="bg-slate-900"],
+.dark [data-page="templates"] [class*="bg-zinc-900"] {
+  background-color: #1F2937 !important;
+  background: #1F2937 !important;
+}
+
+/* Force override computed styles */
+.dark [data-page="templates"] * {
+  --card: #1F2937 !important;
+  --card-foreground: #E5E7EB !important;
+  --background: #1F2937 !important;
+}
+
 /* Button variants */
 .dark [data-page="templates"] button[data-variant="ghost"] {
   background-color: transparent !important;
@@ -2722,3 +2743,5 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   background: transparent !important;
   color: #9CA3AF !important;
 }
+
+

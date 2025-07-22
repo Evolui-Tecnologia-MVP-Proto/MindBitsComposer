@@ -152,6 +152,8 @@ Preferred communication style: Simple, everyday language.
   - Container hierarchy: .container, .space-y-6 > div:first-child, .space-y-4 > .card
   - Modal and accordion containers in Templates page
   - Better visual hierarchy within Templates page only
+  - Added nuclear CSS overrides to force #1F2937 on ALL elements in templates page
+  - JavaScript DOM manipulation to override computed styles from #0F172A to #1F2937
 
 ## System Architecture
 

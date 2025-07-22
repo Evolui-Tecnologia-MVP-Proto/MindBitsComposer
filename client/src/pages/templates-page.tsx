@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { overrideTemplateColors } from "@/utils/templateColorOverride";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function TemplatesPage() {
   const [activeTab, setActiveTab] = useState<string>("struct");
+  
+  // Force color override for templates page
+  useEffect(() => {
+    overrideTemplateColors();
+    const interval = setInterval(overrideTemplateColors, 200);
+    return () => clearInterval(interval);
+  }, [activeTab]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
