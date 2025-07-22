@@ -2570,19 +2570,27 @@ html.dark [data-radix-select-item][data-highlighted] {
   /* No spacing overrides - inherit everything from light mode */
 }
 
-/* FlowToolbar selects styling for dark theme */
+/* FlowToolbar selects and inputs styling for dark theme */
 .dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 select,
-.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 [data-radix-select-trigger] {
+.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 input,
+.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 [data-radix-select-trigger],
+.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 button[role="combobox"] {
   background-color: #0F172A !important;
   border: 1px solid #6B7280 !important;
   color: #E5E7EB !important;
 }
 
-.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 [data-radix-select-trigger]:hover {
+.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 select:hover,
+.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 input:hover,
+.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 [data-radix-select-trigger]:hover,
+.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 button[role="combobox"]:hover {
   border-color: #9CA3AF !important;
 }
 
-.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 [data-radix-select-trigger]:focus {
+.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 select:focus,
+.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 input:focus,
+.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 [data-radix-select-trigger]:focus,
+.dark [data-page="fluxos"] .mb-4.bg-white.p-4.rounded-lg.shadow-sm.space-y-3 button[role="combobox"]:focus {
   border-color: #1E40AF !important;
   outline: none !important;
   box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2) !important;
