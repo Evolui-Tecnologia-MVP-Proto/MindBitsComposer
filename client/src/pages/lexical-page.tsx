@@ -1615,7 +1615,7 @@ export default function LexicalPage() {
         <div className="flex h-full">
           {/* Sidebar de documentos (condicional) */}
         {showDocumentList && (
-          <div className="w-80 border-r bg-white p-4 overflow-y-auto" style={{ marginTop: '18px' }}>
+          <div className="w-80 border-r bg-white p-4 overflow-y-auto" style={{ marginTop: '16px' }}>
             <div className="space-y-6">
               <h3 className="text-lg font-semibold">Biblioteca</h3>
               
