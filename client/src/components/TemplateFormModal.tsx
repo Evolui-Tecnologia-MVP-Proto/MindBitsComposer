@@ -534,7 +534,7 @@ export default function TemplateFormModal({
                                 </span>
                               </div>
                             </CollapsibleTrigger>
-                            <CollapsibleContent className="border border-t-0 border-gray-200 dark:border-[#0F172A] rounded-b-lg dark:bg-[#1F2937]">
+                            <CollapsibleContent className="border border-t-0 border-gray-200 dark:border-[#0F172A] rounded-b-lg dark:bg-[#0F172A]">
                               <div className="p-4">
                                 {isNested ? (
                                   // Renderizar seções aninhadas
@@ -663,7 +663,7 @@ export default function TemplateFormModal({
             </Tabs>
           </div>
           
-          <div className="border-t pt-4 mt-4 bg-white dark:bg-[#1F2937] dark:border-gray-600">
+          <div className="border-t pt-4 mt-4 bg-white dark:bg-[#0F172A] dark:border-gray-600">
             <div className="flex justify-end space-x-2">
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancelar
