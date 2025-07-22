@@ -304,20 +304,24 @@ export default function TemplatesPage() {
   };
 
   return (
-    <div className="fade-in bg-background text-foreground" data-page="templates">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-foreground">Templates</h1>
-      </div>
-      
-      <Tabs 
-        defaultValue="struct" 
-        onValueChange={(value) => setActiveTab(value)}
-        className="w-full"
-      >
-        <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="struct">Struct Templates</TabsTrigger>
-          <TabsTrigger value="output">Out Templates</TabsTrigger>
-        </TabsList>
+    <div className="container mx-auto py-6 bg-background dark:bg-[#1F2937] text-foreground" data-page="templates">
+      <div className="space-y-6 bg-[#F9FAFB] dark:bg-[#1F2937]">
+        <div className="flex items-center justify-between p-6 rounded-lg bg-gray-50 dark:bg-[#1F2937]">
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-[#6B7280] flex items-center gap-3">
+            <FileCode className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            Templates
+          </h1>
+        </div>
+        
+        <Tabs 
+          defaultValue="struct" 
+          onValueChange={(value) => setActiveTab(value)}
+          className="w-full"
+        >
+          <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-[#1E293B] mb-6">
+            <TabsTrigger value="struct">Struct Templates</TabsTrigger>
+            <TabsTrigger value="output">Out Templates</TabsTrigger>
+          </TabsList>
         
         <TabsContent value="struct" className="space-y-4">
           <Card>
@@ -390,7 +394,8 @@ export default function TemplatesPage() {
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
+        </Tabs>
+      </div>
 
       {/* Modal para criação de template */}
       {isCreateModalOpen && (
