@@ -9,8 +9,8 @@ export const FlowGrid: React.FC<FlowGridProps> = ({ isDark }) => {
   return (
     <Background 
       gap={16}
-      size={1}
-      color={isDark ? "#ffffff" : "#cccccc"}
+      size={2}
+      color={isDark ? "#ffffff" : "#000000"}
       variant={BackgroundVariant.Dots}
     />
   );

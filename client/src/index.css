@@ -2725,9 +2725,13 @@ html.dark [data-radix-select-item][data-highlighted] {
   box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2) !important;
 }
 
-/* ReactFlow canvas styling for dark theme */
+/* ReactFlow canvas styling */
 .dark [data-page="fluxos"] .react-flow {
   background-color: #0F172A !important;
+}
+
+[data-page="fluxos"] .react-flow {
+  background-color: #ffffff !important;
 }
 
 /* Hide ReactFlow logo/attribution ONLY - not background */
