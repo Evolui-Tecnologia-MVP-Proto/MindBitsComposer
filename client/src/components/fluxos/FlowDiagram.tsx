@@ -90,7 +90,8 @@ export const FlowDiagram = ({
   showGrid = true
 }: FlowDiagramProps) => {
   const hasNodes = nodes.length > 0;
-  const { isDark } = useTheme();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   
 
 
