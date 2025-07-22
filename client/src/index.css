@@ -2792,76 +2792,52 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 
 
 /* === COMPOSER PAGE LAYOUT ALIGNMENT === */
-/* Perfect alignment between side panels and editor canvas */
-
-/* Main container for the composer layout */
+/* Ensures all panels (library, editor, attachments) have matching bottom alignment */
 .composer-layout-container {
-  height: calc(100vh - 140px);
-  padding-left: 24px !important; /* px-6 = 24px */
-  padding-right: 24px !important;
-  padding-bottom: 0 !important;
+  height: calc(100vh - 140px); /* Full height minus header space */
 }
 
-/* Base styling for all layout elements */
 .composer-side-panel,
 .composer-editor-container {
+  min-height: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
 }
 
-/* Force identical bottom positioning */
-.composer-side-panel,
-.composer-editor-container,
-.composer-editor-card {
-  margin-bottom: 0 !important;
-  padding-bottom: 0 !important;
-}
-
-/* Editor container - remove all extra spacing */
+/* Remove padding from editor container to match side panels exactly */
 .composer-editor-container > div {
-  flex: 1;
   padding: 0 !important;
   margin: 0 !important;
-  height: 100% !important;
 }
 
-/* Editor card - force exact height match */
+/* Ensures editor canvas matches panel heights precisely - add 5px to compensate for container padding */
 .composer-editor-card {
-  height: 100% !important;
+  height: calc(100% + 5px) !important;
   margin: 0 !important;
-  padding: 0 !important;
-  border-radius: 8px;
 }
 
-/* Card content - eliminate any internal spacing */
+/* Remove any extra margins from card content */
+.composer-editor-card .card-content,
 .composer-editor-card [data-radix-card-content] {
+  margin: 0 !important;
   padding: 0 !important;
-  margin: 0 !important;
+}
+
+/* Ensure the editor card extends to match panel bottoms exactly */
+.composer-editor-card > div {
   height: 100% !important;
 }
 
-/* Side panel headers - align with editor toolbar */
+/* Align panel headers with editor toolbar - same padding as toolbar (p-3 = 12px) */
 .composer-side-panel > div:first-child {
-  padding: 12px 16px !important;
-  margin: 0 !important;
-  flex-shrink: 0;
+  padding: 12px 16px !important; /* Match toolbar's p-3 vertically, keep p-4 horizontally */
 }
 
-/* Side panel content areas */
-.composer-library-panel .flex-1,
+/* Library panel specific height matching */
+.composer-library-panel .flex-1 {
+  max-height: calc(100% - 60px); /* Adjusted for smaller header padding */
+}
+
+/* Attachments panel specific height matching */
 .composer-attachments-panel .flex-1 {
-  flex: 1;
-  overflow-y: auto;
-  margin: 0 !important;
-  padding: 16px !important;
-}
-
-/* Force exact same bottom edge for all elements */
-.composer-layout-container > div {
-  height: 100% !important;
-}
-
-.composer-layout-container .flex {
-  height: 100% !important;
+  max-height: calc(100% - 60px); /* Adjusted for smaller header padding */
 }

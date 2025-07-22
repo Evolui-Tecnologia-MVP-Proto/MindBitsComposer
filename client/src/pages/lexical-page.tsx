@@ -1613,7 +1613,7 @@ export default function LexicalPage() {
         </div>
       </div>
       {/* Área do editor - ocupa todo o espaço restante */}
-      <div className="flex-1 min-h-0 composer-layout-container">
+      <div className="flex-1 px-6 pb-0 min-h-0 composer-layout-container">
         <div className="flex h-full">
           {/* Sidebar de documentos (condicional) */}
         {showDocumentList && (
@@ -1756,7 +1756,7 @@ export default function LexicalPage() {
         {/* Editor principal */}
         <div className="flex-1 flex flex-col composer-editor-container">
           {/* Barra de ferramentas do editor integrada */}
-          <div className="flex-1">
+          <div className="flex-1 pl-0 pr-0 pt-0 pb-0">
             <Card className="h-full composer-editor-card">
               <CardContent className="p-0 h-full relative overflow-hidden">
                 {/* Placeholder quando não há conteúdo nem template selecionado */}
