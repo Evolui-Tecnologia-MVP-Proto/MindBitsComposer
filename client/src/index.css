@@ -2856,6 +2856,7 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 /* Library panel header - rounded top-left corner */
 .composer-library-panel > div:first-child {
   border-top-left-radius: 8px !important;
+  border-radius: 8px 0 0 0 !important;
 }
 
 /* Attachments panel specific - content area below header */

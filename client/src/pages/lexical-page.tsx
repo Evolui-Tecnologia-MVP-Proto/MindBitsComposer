@@ -1619,7 +1619,7 @@ export default function LexicalPage() {
         {showDocumentList && (
           <div className="w-80 border-r bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col composer-side-panel composer-library-panel">
             {/* Header fixo */}
-            <div className="p-4 border-b bg-white dark:bg-[#111827] border-gray-200 dark:border-[#374151]">
+            <div className="p-4 border-b bg-white dark:bg-[#111827] border-gray-200 dark:border-[#374151] rounded-tl-lg">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">Biblioteca</h3>
             </div>
             
