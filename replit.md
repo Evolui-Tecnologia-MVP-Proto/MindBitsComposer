@@ -103,6 +103,11 @@ Preferred communication style: Simple, everyday language.
   - Text colors: #E5E7EB (primary), #9CA3AF (secondary), #6B7280 (titles)
   - Icon colors: adjusted for dark theme (#60A5FA blue, #A78BFA purple, #F87171 red)
   - Consistent with administration page styling pattern
+✓ Applied global #1E40AF standard for all active tabs in dark mode:
+  - Created global CSS rule for [data-radix-tabs-trigger][data-state="active"]
+  - Ensured consistent #1E40AF background across entire application
+  - Applied white text color for proper contrast
+  - Standardized hover states for active tabs
 
 ## System Architecture
 

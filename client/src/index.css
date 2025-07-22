@@ -68,6 +68,18 @@
   color: #6B7280 !important;
 }
 
+/* Global tabs active state styling for dark mode */
+.dark [data-radix-tabs-trigger][data-state="active"] {
+  background-color: #1E40AF !important;
+  color: #FFFFFF !important;
+  border-color: #1E40AF !important;
+}
+
+.dark [data-radix-tabs-trigger][data-state="active"]:hover {
+  background-color: #1E40AF !important;
+  color: #FFFFFF !important;
+}
+
 /* HIGH PRIORITY: Force modal background color ONLY for modals in DARK MODE */
 html.dark [data-radix-dialog-content],
 html.dark [data-radix-alert-dialog-content],
