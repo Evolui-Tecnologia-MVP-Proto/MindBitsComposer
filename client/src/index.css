@@ -2751,13 +2751,45 @@ html.dark [data-radix-select-item][data-highlighted] {
   border-color: #111827 !important;
 }
 
-/* Empty state styling for dark theme */
+/* Empty state styling for dark theme - center canvas text and icon */
 .dark [data-page="fluxos"] .text-gray-300 {
-  color: #111214 !important;
+  color: #1F2937 !important;
 }
 
 .dark [data-page="fluxos"] .text-gray-500 {
-  color: #111214 !important;
+  color: #1F2937 !important;
+}
+
+.dark [data-page="fluxos"] .text-center.text-gray-500 {
+  color: #1F2937 !important;
+}
+
+.dark [data-page="fluxos"] .text-center.text-gray-300 {
+  color: #1F2937 !important;
+}
+
+/* Canvas center empty state styling */
+.dark [data-page="fluxos"] .react-flow__pane .text-gray-500,
+.dark [data-page="fluxos"] .react-flow__pane .text-gray-300 {
+  color: #1F2937 !important;
+}
+
+/* Canvas center icon styling */
+.dark [data-page="fluxos"] .react-flow__pane svg,
+.dark [data-page="fluxos"] .text-center svg {
+  color: #1F2937 !important;
+  fill: #1F2937 !important;
+}
+
+/* Additional targeting for canvas center content */
+.dark [data-page="fluxos"] .absolute.inset-0.flex.items-center.justify-center,
+.dark [data-page="fluxos"] .absolute.inset-0.flex.items-center.justify-center * {
+  color: #1F2937 !important;
+}
+
+.dark [data-page="fluxos"] .absolute.inset-0.flex.items-center.justify-center svg {
+  color: #1F2937 !important;
+  fill: #1F2937 !important;
 }
 
 /* Canvas container border styling - more specific selectors */
