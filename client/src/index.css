@@ -2688,6 +2688,56 @@ html.dark [data-radix-select-item][data-highlighted] {
   border-color: #111827 !important;
 }
 
+/* ReactFlow Controls (toolbar) styling for dark theme */
+.dark [data-page="fluxos"] .react-flow__controls {
+  background-color: #0F172A !important;
+  border: 1px solid #374151 !important;
+}
+
+.dark [data-page="fluxos"] .react-flow__controls-button {
+  background-color: #1E293B !important;
+  border-color: #374151 !important;
+  color: #E5E7EB !important;
+}
+
+.dark [data-page="fluxos"] .react-flow__controls-button:hover {
+  background-color: #374151 !important;
+  color: #FFFFFF !important;
+}
+
+.dark [data-page="fluxos"] .react-flow__controls-button svg {
+  color: #E5E7EB !important;
+}
+
+.dark [data-page="fluxos"] .react-flow__controls-button:hover svg {
+  color: #FFFFFF !important;
+}
+
+/* ReactFlow MiniMap styling for dark theme */
+.dark [data-page="fluxos"] .react-flow__minimap {
+  background-color: #0F172A !important;
+  border: 1px solid #374151 !important;
+}
+
+.dark [data-page="fluxos"] .react-flow__minimap-mask {
+  fill: rgba(15, 23, 42, 0.7) !important;
+}
+
+.dark [data-page="fluxos"] .react-flow__minimap-node {
+  fill: #1E293B !important;
+  stroke: #374151 !important;
+}
+
+/* ReactFlow Background pattern for dark theme */
+.dark [data-page="fluxos"] .react-flow__background {
+  background-color: #020203 !important;
+}
+
+.dark [data-page="fluxos"] .react-flow__background circle,
+.dark [data-page="fluxos"] .react-flow__background line {
+  stroke: #374151 !important;
+}
+
 .dark [data-page="fluxos"] [data-radix-tabs-trigger] {
   background-color: #0F172A !important;
   color: #9CA3AF !important;
