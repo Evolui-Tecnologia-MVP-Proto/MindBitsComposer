@@ -2655,7 +2655,11 @@ html.dark [data-radix-select-item][data-highlighted] {
   color: #111214 !important;
 }
 
-/* Canvas container border styling */
+/* Canvas container border styling - more specific selectors */
+.dark [data-page="fluxos"] [data-radix-tabs-content] {
+  border-color: #111827 !important;
+}
+
 .dark [data-page="fluxos"] [data-radix-tabs-content] > div {
   border-color: #111827 !important;
 }
@@ -2665,6 +2669,22 @@ html.dark [data-radix-select-item][data-highlighted] {
 }
 
 .dark [data-page="fluxos"] .flow-canvas-container {
+  border-color: #111827 !important;
+}
+
+/* Force override any border colors in editor tab */
+.dark [data-page="fluxos"] [value="editor"] ~ [data-radix-tabs-content] {
+  border-color: #111827 !important;
+}
+
+.dark [data-page="fluxos"] [value="editor"] ~ [data-radix-tabs-content] * {
+  border-color: #111827 !important;
+}
+
+/* Override any light border colors specifically */
+.dark [data-page="fluxos"] .border-gray-200,
+.dark [data-page="fluxos"] .border-gray-300,
+.dark [data-page="fluxos"] .border {
   border-color: #111827 !important;
 }
 
