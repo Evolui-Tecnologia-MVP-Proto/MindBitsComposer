@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -18,36 +18,6 @@ export default function TemplatesPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const { toast } = useToast();
-  const structTabRef = useRef<HTMLDivElement>(null);
-  const outputTabRef = useRef<HTMLDivElement>(null);
-
-  // Force background color application
-  useEffect(() => {
-    const applyBackgroundColor = () => {
-      const isDark = document.documentElement.classList.contains('dark');
-      if (isDark) {
-        if (structTabRef.current) {
-          structTabRef.current.style.backgroundColor = '#0F172A';
-          structTabRef.current.style.background = '#0F172A';
-        }
-        if (outputTabRef.current) {
-          outputTabRef.current.style.backgroundColor = '#0F172A';
-          outputTabRef.current.style.background = '#0F172A';
-        }
-      }
-    };
-
-    applyBackgroundColor();
-    
-    // Observer for theme changes
-    const observer = new MutationObserver(applyBackgroundColor);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class']
-    });
-
-    return () => observer.disconnect();
-  }, [activeTab]);
 
   // Consulta templates por tipo (struct ou output)
   const { data: templates, isLoading } = useQuery<Template[]>({
@@ -335,7 +305,7 @@ export default function TemplatesPage() {
 
   return (
     <div className="container mx-auto py-6 bg-background dark:bg-[#1F2937] text-foreground" data-page="templates">
-      <div className="space-y-6 bg-[#F9FAFB] dark:bg-[#0F172A]">
+      <div className="space-y-6 bg-[#F9FAFB] dark:bg-[#1F2937]">
         <div className="flex items-center justify-between p-6 rounded-lg bg-gray-50 dark:bg-[#0F172A]">
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-[#6B7280] flex items-center gap-3">
             <FileCode className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -346,15 +316,14 @@ export default function TemplatesPage() {
         <Tabs 
           defaultValue="struct" 
           onValueChange={(value) => setActiveTab(value)}
-          className="w-full dark:bg-[#0F172A]"
-          style={{ backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : undefined }}
+          className="w-full"
         >
           <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-[#1E293B] mb-6">
             <TabsTrigger value="struct">Struct Templates</TabsTrigger>
             <TabsTrigger value="output">Out Templates</TabsTrigger>
           </TabsList>
         
-        <TabsContent value="struct" className="space-y-4 dark:bg-[#0F172A]" ref={structTabRef}>
+        <TabsContent value="struct" className="space-y-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
@@ -368,7 +337,7 @@ export default function TemplatesPage() {
                 Novo Template
               </Button>
             </CardHeader>
-            <CardContent>
+            <CardContent className="dark:bg-[#0F172A]">
               {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[1, 2, 3, 4].map((i) => (
@@ -390,7 +359,7 @@ export default function TemplatesPage() {
           </Card>
         </TabsContent>
         
-        <TabsContent value="output" className="space-y-4 dark:bg-[#0F172A]" ref={outputTabRef}>
+        <TabsContent value="output" className="space-y-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
@@ -404,7 +373,7 @@ export default function TemplatesPage() {
                 Novo Template
               </Button>
             </CardHeader>
-            <CardContent>
+            <CardContent className="dark:bg-[#0F172A]">
               {isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[1, 2, 3, 4].map((i) => (
