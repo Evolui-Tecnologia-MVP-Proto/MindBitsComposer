@@ -6,18 +6,16 @@ interface FlowGridProps {
 }
 
 export const FlowGrid: React.FC<FlowGridProps> = ({ isDark }) => {
-  console.log('🔍 FlowGrid - isDark:', isDark, 'document has dark class:', document.documentElement.classList.contains('dark'));
-  
-  // Force color based on document class to bypass any hook issues
+  // Use document class for reliable theme detection
   const documentIsDark = document.documentElement.classList.contains('dark');
   const gridColor = documentIsDark ? "#ffffff" : "#000000";
   
-  console.log('🎨 Grid color will be:', gridColor);
+  console.log('🔧 Final test - documentIsDark:', documentIsDark, 'gridColor:', gridColor);
   
   return (
     <Background 
-      gap={16}
-      size={1}
+      gap={20}
+      size={2}
       color={gridColor}
       variant={BackgroundVariant.Dots}
     />

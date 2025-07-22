@@ -78,21 +78,27 @@ body.dark .Collapsible__content {
   display: none !important;
 }
 
-/* ReactFlow Background Grid - Clean Implementation */
+/* ReactFlow Background Grid - Force Visibility */
 .react-flow__background {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
   z-index: 0 !important;
   pointer-events: none !important;
 }
 
 .react-flow__background svg {
-  opacity: 1 !important;
+  display: block !important;
   visibility: visible !important;
+  opacity: 1 !important;
 }
 
+.react-flow__background pattern,
 .react-flow__background pattern circle,
 .react-flow__background pattern path {
-  opacity: 1 !important;
+  display: block !important;
   visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .dark .Collapsible__container,
@@ -2725,13 +2731,13 @@ html.dark [data-radix-select-item][data-highlighted] {
   box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.2) !important;
 }
 
-/* ReactFlow canvas styling */
-.dark [data-page="fluxos"] .react-flow {
-  background-color: #0F172A !important;
-}
-
+/* Clean ReactFlow canvas styling */
 [data-page="fluxos"] .react-flow {
   background-color: #ffffff !important;
+}
+
+.dark [data-page="fluxos"] .react-flow {
+  background-color: #0F172A !important;
 }
 
 /* Hide ReactFlow logo/attribution ONLY - not background */
@@ -2925,7 +2931,7 @@ html.dark [data-radix-select-item][data-highlighted] {
   stroke: #1B2028 !important;
 }
 
-/* Removed - was hiding background grid */
+/* Removed - was interfering with background visibility */
 
 /* ReactFlow attribution/logo styling for dark theme */
 .dark [data-page="fluxos"] .react-flow__attribution {
