@@ -2042,6 +2042,15 @@ html.dark [data-radix-select-item][data-highlighted] {
   background-color: transparent !important;
 }
 
+/* TabsContent with space-y-4 class (div containing the Card) */
+.dark [data-page="templates"] [data-radix-tabs-content].space-y-4 {
+  background-color: #0F172A !important;
+}
+
+.dark [data-page="templates"] .space-y-4 {
+  background-color: #0F172A !important;
+}
+
 /* Buttons - Same as admin page */
 .dark [data-page="templates"] .btn-primary,
 .dark [data-page="templates"] button[data-variant="default"] {
