@@ -1470,7 +1470,7 @@ export default function LexicalPage() {
     <div className="flex flex-col h-full overflow-hidden">
       {/* Header com navegação */}
       <div className="flex-shrink-0 p-6 pb-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between">
           <div className="flex items-center space-x-4">
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Composer Editor</h1>
@@ -1478,7 +1478,7 @@ export default function LexicalPage() {
             </div>
           </div>
           
-          <div className="flex items-center space-x-2">
+          <div className="flex items-start space-x-2 mt-1">
             <div className="flex flex-col space-y-1">
               {selectedEdition && (
                 <Badge variant="default" className="text-xs bg-blue-100 text-blue-800">
@@ -1615,7 +1615,7 @@ export default function LexicalPage() {
         <div className="flex h-full">
           {/* Sidebar de documentos (condicional) */}
         {showDocumentList && (
-          <div className="w-80 border-r bg-white p-4 overflow-y-auto">
+          <div className="w-80 border-r bg-white p-4 overflow-y-auto" style={{ marginTop: '-4px' }}>
             <div className="space-y-6">
               <h3 className="text-lg font-semibold">Biblioteca</h3>
               
@@ -1782,7 +1782,7 @@ export default function LexicalPage() {
 
         {/* Painel de Anexos - desabilitado apenas quando há template struct sem documento composer */}
         {showAttachments && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) && (
-          <div className="w-80 border-l bg-gray-50 flex flex-col">
+          <div className="w-80 border-l bg-gray-50 flex flex-col" style={{ marginTop: '-4px' }}>
             {/* Header fixo */}
             <div className="p-4 border-b bg-gray-50">
               <div className="flex items-center justify-between">
