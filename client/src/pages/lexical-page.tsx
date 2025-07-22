@@ -1473,7 +1473,10 @@ export default function LexicalPage() {
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-4">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-[#E5E7EB]">Composer Editor</h1>
+              <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-[#6B7280] flex items-center gap-3">
+                <Edit className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                Composer Editor
+              </h1>
               <p className="text-muted-foreground dark:text-[#9CA3AF]">Edição avançada e integrada de documentação técnica de processos</p>
             </div>
           </div>
