@@ -2866,11 +2866,24 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   border-radius: 12px 0 0 0 !important;
 }
 
+/* Attachments panel - rounded right corners */
+.composer-attachments-panel {
+  border-top-right-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+}
+
+/* Attachments panel header - rounded top-right corner */
+.composer-attachments-panel > div:first-child {
+  border-top-right-radius: 12px !important;
+  border-radius: 0 12px 0 0 !important;
+}
+
 /* Attachments panel specific - content area below header */
 .composer-attachments-panel .flex-1 {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  border-bottom-right-radius: 12px !important;
 }
 
 /* Ensure toolbar has consistent height */
