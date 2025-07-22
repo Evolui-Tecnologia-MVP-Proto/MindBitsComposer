@@ -1650,7 +1650,7 @@ export default function LexicalPage() {
                             Array.isArray(structTemplates) && structTemplates.map((template: Template) => (
                               <div
                                 key={template.id}
-                                className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E293B] border-green-200 dark:border-[#374151] hover:border-green-300 dark:hover:border-[#4B5563] dark:bg-[#111827]"
+                                className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E293B] border-green-200 dark:border-[#374151] hover:border-green-300 dark:hover:border-[#4B5563] bg-white dark:bg-[#0F172A]"
                                 onClick={() => {
                                   // Verificar se há conteúdo não salvo no editor
                                   if (hasEditorContent && !currentDocumentId) {
@@ -1866,7 +1866,7 @@ export default function LexicalPage() {
                           {globalAssets.map((asset: GlobalAsset) => (
                             <div 
                               key={asset.id}
-                              className="p-3 bg-gray-50 dark:bg-[#1E293B] rounded-lg border border-gray-200 dark:border-[#374151]"
+                              className="p-3 bg-white dark:bg-[#0F172A] rounded-lg border border-gray-200 dark:border-[#374151]"
                             >
                               {/* Botões de ação no topo */}
                               <div className="flex justify-between mb-3">
@@ -2005,7 +2005,7 @@ export default function LexicalPage() {
                               .map((artifact: DocumentArtifact) => (
                                 <div 
                                   key={artifact.id}
-                                  className="p-3 bg-gray-50 dark:bg-[#1E293B] rounded-lg border border-gray-200 dark:border-[#374151]"
+                                  className="p-3 bg-white dark:bg-[#0F172A] rounded-lg border border-gray-200 dark:border-[#374151]"
                                 >
                                   {/* Botões de ação no topo */}
                                   <div className="flex justify-between mb-3">
@@ -2141,7 +2141,7 @@ export default function LexicalPage() {
                               return (
                                 <div 
                                   key={artifact.id}
-                                  className="p-3 bg-gray-50 dark:bg-[#1E293B] rounded-lg border border-gray-200 dark:border-[#374151]"
+                                  className="p-3 bg-white dark:bg-[#0F172A] rounded-lg border border-gray-200 dark:border-[#374151]"
                                 >
                                 {/* Botões de ação no topo */}
                                 <div className="flex justify-between mb-3">
