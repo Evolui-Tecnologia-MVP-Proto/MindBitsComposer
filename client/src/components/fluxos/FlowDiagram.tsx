@@ -2,7 +2,6 @@ import React, { RefObject } from 'react';
 import ReactFlow, {
   Controls,
   Background,
-  BackgroundVariant,
   MiniMap,
   MarkerType,
   ConnectionLineType,
@@ -145,10 +144,10 @@ export const FlowDiagram = ({
                 <Controls />
                 {showGrid && (
                   <Background 
-                    variant={BackgroundVariant.Dots}
-                    color={isDark ? "#ffffff" : "#333333"} 
-                    gap={20} 
-                    size={3} 
+                    gap={16}
+                    size={1}
+                    color={isDark ? "#ffffff" : "#ccc"}
+                    variant="dots"
                   />
                 )}
                 {showMiniMap && <MiniMap />}
@@ -208,10 +207,10 @@ export const FlowDiagram = ({
             <Controls />
             {showGrid && (
               <Background 
-                variant={BackgroundVariant.Dots}
-                color={isDark ? "#ffffff" : "#333333"} 
-                gap={20} 
-                size={3} 
+                gap={16}
+                size={1}
+                color={isDark ? "#ffffff" : "#ccc"}
+                variant="dots"
               />
             )}
             {showMiniMap && <MiniMap />}
