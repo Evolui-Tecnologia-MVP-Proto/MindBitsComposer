@@ -1421,6 +1421,33 @@ html.dark body [data-radix-select-item][data-state="checked"] {
   background-color: #1F2937 !important;
 }
 
+/* Ultimate nuclear option - Override focus:bg-accent */
+.dark [data-radix-select-item]:focus,
+.dark [data-radix-select-item]:focus-visible,
+.dark [data-radix-select-item][data-highlighted] {
+  background-color: #1F2937 !important;
+  background: #1F2937 !important;
+  --tw-bg-opacity: 1 !important;
+}
+
+/* Override CSS custom properties that might be causing blue color */
+.dark [data-radix-select-item] {
+  --accent: #1F2937 !important;
+  --accent-foreground: #E5E7EB !important;
+}
+
+/* Force styles with CSS specificity hack */
+.dark [data-radix-select-item][data-radix-select-item] {
+  background-color: transparent !important;
+}
+
+.dark [data-radix-select-item][data-radix-select-item]:hover,
+.dark [data-radix-select-item][data-radix-select-item]:focus,
+.dark [data-radix-select-item][data-radix-select-item][data-highlighted] {
+  background-color: #1F2937 !important;
+  background: rgb(31, 41, 55) !important;
+}
+
 .dark input[type="time"]::-webkit-datetime-edit-fields-wrapper {
   background: transparent !important;
   color: #E5E7EB !important;
