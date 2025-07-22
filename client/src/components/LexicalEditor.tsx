@@ -975,6 +975,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
   const [tableRows, setTableRows] = useState(2);
   const [tableColumns, setTableColumns] = useState(3);
   const [selectedTableKey, setSelectedTableKey] = useState<string | null>(null);
+  const [selectedTableElement, setSelectedTableElement] = useState<HTMLTableElement | null>(null);
 
   // Função para excluir tabela selecionada
   const deleteSelectedTable = useCallback(() => {
@@ -1059,6 +1060,58 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
   
   // State para controlar o markdown atual
   const [currentMarkdown, setCurrentMarkdown] = useState('');
+
+  // Effect para adicionar event listeners de clique nas tabelas
+  React.useEffect(() => {
+    if (!editorInstance) return;
+
+    const handleTableClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const tableElement = target.closest('table');
+      
+      if (tableElement) {
+        // Remover seleção de todas as outras tabelas
+        document.querySelectorAll('table.lexical-table-selected').forEach(table => {
+          table.classList.remove('lexical-table-selected');
+        });
+        
+        // Adicionar classe de seleção à tabela clicada
+        tableElement.classList.add('lexical-table-selected');
+        setSelectedTableElement(tableElement as HTMLTableElement);
+        
+        // Prevenir propagação para não desselecionar imediatamente
+        event.stopPropagation();
+      }
+    };
+
+    const handleDocumentClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      const tableElement = target.closest('table');
+      
+      // Se clicou fora de qualquer tabela, desselecionar todas
+      if (!tableElement) {
+        document.querySelectorAll('table.lexical-table-selected').forEach(table => {
+          table.classList.remove('lexical-table-selected');
+        });
+        setSelectedTableElement(null);
+      }
+    };
+
+    // Adicionar listeners
+    const editorContainer = editorInstance.getRootElement()?.parentElement;
+    if (editorContainer) {
+      editorContainer.addEventListener('click', handleTableClick);
+      document.addEventListener('click', handleDocumentClick);
+    }
+
+    // Cleanup
+    return () => {
+      if (editorContainer) {
+        editorContainer.removeEventListener('click', handleTableClick);
+        document.removeEventListener('click', handleDocumentClick);
+      }
+    };
+  }, [editorInstance]);
   
   // Hook para capturar markdown quando mudar para preview
   React.useEffect(() => {

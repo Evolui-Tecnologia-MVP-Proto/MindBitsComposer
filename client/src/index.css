@@ -266,13 +266,23 @@ body.dark .Collapsible__title:hover {
 }
 
 /* Selected table states */
-.dark .lexical-editor-container table[data-lexical-table-selection],
-.dark [data-lexical-editor] table[data-lexical-table-selection],
-.dark .ContentEditable__root table[data-lexical-table-selection] {
+.dark .lexical-editor-container table.lexical-table-selected,
+.dark [data-lexical-editor] table.lexical-table-selected,
+.dark .ContentEditable__root table.lexical-table-selected {
   outline: 3px solid #60A5FA !important;
   outline-offset: 2px !important;
   box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.3) !important;
   border: 3px solid #60A5FA !important;
+}
+
+/* Light mode selected table states */
+.lexical-editor-container table.lexical-table-selected,
+[data-lexical-editor] table.lexical-table-selected,
+.ContentEditable__root table.lexical-table-selected {
+  outline: 3px solid #2563EB !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3) !important;
+  border: 3px solid #2563EB !important;
 }
 
 
