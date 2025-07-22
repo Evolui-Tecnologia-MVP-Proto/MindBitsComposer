@@ -58,7 +58,7 @@
 /* Prevent content editable from expanding */
 .lexical-canvas [contenteditable="true"] {
   overflow: auto !important;
-  height: calc(100vh - 260px) !important;
+  height: calc(100vh - 280px) !important;
 }
 
 .lexical-canvas::-webkit-scrollbar {
