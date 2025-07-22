@@ -179,12 +179,12 @@ export default function LexicalPage() {
         <img 
           src={imageSrc} 
           alt={artifact.name}
-          className="w-12 h-12 object-cover rounded border"
+          className="w-12 h-12 object-cover rounded border border-gray-200 dark:border-[#374151]"
         />
       );
     }
     return (
-      <div className="w-12 h-12 bg-gray-100 rounded border flex items-center justify-center">
+      <div className="w-12 h-12 bg-gray-100 dark:bg-[#111827] rounded border border-gray-200 dark:border-[#374151] flex items-center justify-center">
         {getFileIcon(artifact.mimeType, artifact.isImage)}
       </div>
     );
@@ -1834,7 +1834,7 @@ export default function LexicalPage() {
                         <Globe className="w-4 h-4" />
                         <span className="font-medium">Global</span>
                       </div>
-                      <Badge variant="secondary">
+                      <Badge variant="secondary" className="dark:bg-[#374151] dark:text-[#9CA3AF] dark:border-[#374151]">
                         {globalAssets.length}
                       </Badge>
                     </div>
@@ -1912,10 +1912,10 @@ export default function LexicalPage() {
                                   <img 
                                     src={`data:${asset.mimeType};base64,${asset.fileData}`} 
                                     alt={asset.name}
-                                    className="w-12 h-12 object-cover rounded border"
+                                    className="w-12 h-12 object-cover rounded border dark:border-[#374151]"
                                   />
                                 ) : (
-                                  <div className="w-12 h-12 bg-gray-100 dark:bg-[#374151] rounded border border-gray-200 dark:border-[#374151] flex items-center justify-center">
+                                  <div className="w-12 h-12 bg-gray-100 dark:bg-[#111827] rounded border border-gray-200 dark:border-[#374151] flex items-center justify-center">
                                     {getFileIcon(asset.mimeType, asset.isImage)}
                                   </div>
                                 )}
@@ -1926,7 +1926,7 @@ export default function LexicalPage() {
                                     {asset.description || asset.name}
                                   </p>
                                   <div className="flex items-center gap-2 mt-2">
-                                    <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                                    <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800">
                                       {asset.editor || asset.type || 'Global'}
                                     </Badge>
                                     {asset.fileSize && (
@@ -1954,7 +1954,7 @@ export default function LexicalPage() {
                           <FileOutput className="w-4 h-4" />
                           <span className="font-medium">My Assets</span>
                         </div>
-                        <Badge variant="secondary">
+                        <Badge variant="secondary" className="dark:bg-[#374151] dark:text-[#9CA3AF] dark:border-[#374151]">
                           {documentArtifacts.filter(artifact => 
                             artifact.originAssetId === "Uploaded" || 
                             artifact.originAssetId === "Mermaid" ||
@@ -2055,7 +2055,7 @@ export default function LexicalPage() {
                                         {artifact.name}
                                       </p>
                                       <div className="flex items-center gap-2 mt-2">
-                                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                                        <Badge variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800">
                                           {artifact.originAssetId === "Uploaded" ? "Uploaded" : 
                                            artifact.originAssetId === "Mermaid" ? "Mermaid" : 
                                            artifact.originAssetId === "Graph_TLD" ? "Graph_TLD" :
@@ -2098,7 +2098,7 @@ export default function LexicalPage() {
                           <FileInput className="w-4 h-4" />
                           <span className="font-medium">Origin Assets</span>
                         </div>
-                        <Badge variant="secondary">
+                        <Badge variant="secondary" className="dark:bg-[#374151] dark:text-[#9CA3AF] dark:border-[#374151]">
                           {documentArtifacts.filter(artifact => 
                             artifact.originAssetId && 
                             artifact.originAssetId.trim() !== "" && 
@@ -2184,7 +2184,7 @@ export default function LexicalPage() {
                                       {artifact.name}
                                     </p>
                                     <div className="flex items-center gap-2 mt-2">
-                                      <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                                      <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800">
                                         {artifact.type === 'vnd.openxmlformats-officedocument.wordprocessingml.document' ? 'word.docx' : (artifact.type || 'unknown')}
                                       </Badge>
                                       {artifact.fileSize && (
