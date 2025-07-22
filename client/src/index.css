@@ -49,7 +49,6 @@
 
 /* Lexical canvas scroll optimization */
 .lexical-canvas {
-  max-height: calc(100vh - 200px) !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
   scrollbar-width: thin;
