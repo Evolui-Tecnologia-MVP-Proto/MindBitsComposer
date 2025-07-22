@@ -2037,9 +2037,9 @@ html.dark [data-radix-select-item][data-highlighted] {
   background-color: transparent !important;
 }
 
-/* Tab content areas */
+/* Tab content areas - Force #0F172A */
 .dark [data-page="templates"] [data-radix-tabs-content] {
-  background-color: transparent !important;
+  background-color: #0F172A !important;
 }
 
 /* TabsContent with space-y-4 class (div containing the Card) - Force with highest specificity */
@@ -2055,6 +2055,17 @@ html.dark [data-radix-select-item][data-highlighted] {
 /* Additional nuclear approach for TabsContent */
 .dark [data-page="templates"] [data-state="active"][data-radix-tabs-content] {
   background-color: #0F172A !important;
+}
+
+/* Force ALL background elements in templates page to use correct colors */
+.dark [data-page="templates"] * {
+  --background: #0F172A !important;
+}
+
+/* Ultra specific TabsContent targeting */
+.dark div[data-page="templates"] div[data-radix-tabs-content] {
+  background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
 /* Buttons - Same as admin page */
