@@ -82,32 +82,8 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [fileName, setFileName] = useState('vector-graph');
   const [description, setDescription] = useState('');
-  const [isDarkMode, setIsDarkMode] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-
-  // Detectar tema escuro
-  useEffect(() => {
-    const checkDarkMode = () => {
-      const isDark = document.documentElement.classList.contains('dark');
-      setIsDarkMode(isDark);
-    };
-
-    // Verificar inicialmente
-    checkDarkMode();
-
-    // Observar mudanças no tema
-    const observer = new MutationObserver(() => {
-      checkDarkMode();
-    });
-
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class']
-    });
-
-    return () => observer.disconnect();
-  }, []);
 
   console.log('🔥 COMPONENT RENDER - description state:', description);
 
@@ -730,6 +706,42 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     // Store editor instance globally for access
     (window as any).tldrawEditor = editor;
     setEditorInstance(editor);
+
+    // Configurar tema baseado no sistema automaticamente
+    const updateTheme = () => {
+      const isDarkMode = document.documentElement.classList.contains('dark');
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      // Usar tema escuro se o sistema estiver configurado para modo escuro
+      // ou se a página estiver com classe 'dark'
+      const shouldUseDark = isDarkMode || systemPrefersDark;
+      
+      // Aplicar tema diretamente no editor TLdraw
+      editor.user.updateUserPreferences({
+        colorScheme: shouldUseDark ? 'dark' : 'light'
+      });
+    };
+
+    // Aplicar tema inicial
+    updateTheme();
+
+    // Observar mudanças no tema da página
+    const observer = new MutationObserver(() => {
+      updateTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    // Observar mudanças no tema do sistema
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = () => {
+      updateTheme();
+    };
+    
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
     
     // Override the default image insertion behavior by listening to asset creation
     const originalCreateAssets = editor.createAssets;
@@ -766,6 +778,8 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
     // Cleanup function
     return () => {
       document.removeEventListener('paste', handlePaste);
+      observer.disconnect();
+      mediaQuery.removeEventListener('change', handleSystemThemeChange);
     };
   }, []);
 
@@ -1170,7 +1184,6 @@ const VectorGraphPlugin: React.FC<VectorGraphPluginProps> = ({ onDataExchange, g
         <Tldraw
           onMount={handleMount}
           autoFocus
-          theme={isDarkMode ? 'dark' : 'light'}
         />
       </div>
 
