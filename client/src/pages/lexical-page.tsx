@@ -1478,7 +1478,7 @@ export default function LexicalPage() {
             </div>
           </div>
           
-          <div className="flex items-start space-x-2 mt-1">
+          <div className="flex items-start space-x-2 mt-1" style={{ width: 'calc(100vw - 320px - 48px)', justifyContent: 'flex-end' }}>
             <div className="flex flex-col space-y-1">
               {selectedEdition && (
                 <Badge variant="default" className="text-xs bg-blue-100 text-blue-800">
@@ -1564,7 +1564,7 @@ export default function LexicalPage() {
               </div>
             </div>
             
-            <div className="absolute right-6 flex flex-col items-center space-y-1 border border-gray-300 rounded-lg p-3 pl-[12px] pr-[12px]">
+            <div className="flex flex-col items-center space-y-1 border border-gray-300 rounded-lg p-3 pl-[12px] pr-[12px]">
               <span className="text-xs text-gray-500 font-medium">Ações</span>
               <div className="flex items-center space-x-2">
                 <Button
