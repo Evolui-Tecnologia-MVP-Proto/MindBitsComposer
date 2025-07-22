@@ -17,6 +17,7 @@ import ReactFlow, {
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { NodeInspector } from './NodeInspector';
 import { Network } from 'lucide-react';
+import { useTheme } from '@/hooks/use-theme';
 
 interface FlowDiagramProps {
   // Flow state
@@ -87,6 +88,7 @@ export const FlowDiagram = ({
   showGrid = true
 }: FlowDiagramProps) => {
   const hasNodes = nodes.length > 0;
+  const { isDark } = useTheme();
 
   // Componente de estado vazio
   const EmptyState = () => (
@@ -140,7 +142,7 @@ export const FlowDiagram = ({
                 connectionLineType={ConnectionLineType.SmoothStep}
               >
                 <Controls />
-                {showGrid && <Background color="#6b7280" gap={12} size={1} />}
+                {showGrid && <Background color={isDark ? "#ffffff" : "#6b7280"} gap={12} size={1} />}
                 {showMiniMap && <MiniMap />}
               </ReactFlow>
             </div>
@@ -196,7 +198,7 @@ export const FlowDiagram = ({
             connectionLineType={ConnectionLineType.SmoothStep}
           >
             <Controls />
-            {showGrid && <Background color="#6b7280" gap={12} size={1} />}
+            {showGrid && <Background color={isDark ? "#ffffff" : "#6b7280"} gap={12} size={1} />}
             {showMiniMap && <MiniMap />}
           </ReactFlow>
         </div>
