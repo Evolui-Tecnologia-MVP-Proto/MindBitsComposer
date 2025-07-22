@@ -1141,7 +1141,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
               deleteSelectedTable={deleteSelectedTable}
             />
           )}
-          <div className="flex-1 p-4 dark:bg-[#020203] lexical-canvas" style={{ height: '100%', maxHeight: 'calc(100vh - 200px)', overflowY: 'scroll' }}>
+          <div className="flex-1 p-4 dark:bg-[#020203] lexical-canvas" style={{ height: 'calc(100vh - 200px)', overflowY: 'auto' }}>
             {viewMode === 'editor' ? (
               <RichTextPlugin
                 contentEditable={
@@ -1150,7 +1150,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                     style={{ 
                       fontFamily: 'system-ui, -apple-system, sans-serif',
                       lineHeight: '1.6',
-                      minHeight: '400px',
+                      minHeight: '100%',
                       height: 'auto'
                     }}
                   />

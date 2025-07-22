@@ -1762,7 +1762,7 @@ export default function LexicalPage() {
           {/* Barra de ferramentas do editor integrada */}
           <div className="flex-1 pl-0 pr-0 pt-0 pb-0">
             <Card className="h-full composer-editor-card">
-              <CardContent className="p-0 h-full relative">
+              <CardContent className="p-0 h-full relative flex flex-col">
                 {/* Placeholder quando não há conteúdo nem template selecionado */}
                 {!hasEditorContent && (!content || content.trim() === '') && !selectedTemplate && !currentDocumentId && viewMode === 'editor' && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
