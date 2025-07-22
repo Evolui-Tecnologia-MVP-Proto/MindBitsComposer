@@ -1552,6 +1552,232 @@ html.dark [data-radix-select-item][data-highlighted] {
   color: #E5E7EB !important;
 }
 
+/* TEMPLATES PAGE DARK MODE STYLING - Same pattern as admin page */
+.dark [data-page="templates"] {
+  background-color: #0F172A !important;
+}
+
+/* Main container and content areas */
+.dark [data-page="templates"] .fade-in {
+  background-color: #1F2937 !important;
+}
+
+/* Cards and containers */
+.dark [data-page="templates"] .bg-background {
+  background-color: #1F2937 !important;
+}
+
+/* Card components */
+.dark [data-page="templates"] [data-radix-card],
+.dark [data-page="templates"] .card {
+  background-color: #1E293B !important;
+  border-color: #374151 !important;
+}
+
+/* Card headers */
+.dark [data-page="templates"] [data-radix-card-header],
+.dark [data-page="templates"] .card-header {
+  background-color: #111827 !important;
+  border-bottom: 1px solid #374151 !important;
+}
+
+/* Card content */
+.dark [data-page="templates"] [data-radix-card-content],
+.dark [data-page="templates"] .card-content {
+  background-color: #1E293B !important;
+}
+
+/* Tabs styling */
+.dark [data-page="templates"] [data-radix-tabs-list] {
+  background-color: #1E293B !important;
+  border-color: #374151 !important;
+}
+
+.dark [data-page="templates"] [data-radix-tabs-trigger] {
+  background-color: transparent !important;
+  color: #9CA3AF !important;
+}
+
+.dark [data-page="templates"] [data-radix-tabs-trigger][data-state="active"] {
+  background-color: #1E40AF !important;
+  color: #FFFFFF !important;
+}
+
+/* Buttons */
+.dark [data-page="templates"] .btn-primary,
+.dark [data-page="templates"] button[data-variant="default"] {
+  background-color: #1E40AF !important;
+  border-color: #1E40AF !important;
+  color: #FFFFFF !important;
+}
+
+.dark [data-page="templates"] .btn-primary:hover,
+.dark [data-page="templates"] button[data-variant="default"]:hover {
+  background-color: #1D4ED8 !important;
+}
+
+/* Page title */
+.dark [data-page="templates"] h1 {
+  color: #6B7280 !important;
+  font-size: 1.5rem !important;
+}
+
+/* Template cards grid containers */
+.dark [data-page="templates"] .grid {
+  background-color: transparent !important;
+}
+
+/* Individual template cards */
+.dark [data-page="templates"] .grid .card,
+.dark [data-page="templates"] .grid [data-radix-card] {
+  background-color: #0F172A !important;
+  border-color: #374151 !important;
+}
+
+.dark [data-page="templates"] .grid .card:hover,
+.dark [data-page="templates"] .grid [data-radix-card]:hover {
+  border-color: #1E40AF !important;
+}
+
+/* Card badges and labels */
+.dark [data-page="templates"] .bg-gray-100 {
+  background-color: #374151 !important;
+  color: #E5E7EB !important;
+}
+
+/* Modal components */
+.dark [data-page="templates"] [data-radix-dialog-content] {
+  background-color: #0F1729 !important;
+  border-color: #374151 !important;
+}
+
+/* Select and form elements in templates page */
+.dark [data-page="templates"] select,
+.dark [data-page="templates"] [data-radix-select-trigger] {
+  background-color: #0F172A !important;
+  border-color: #374151 !important;
+  color: #E5E7EB !important;
+}
+
+.dark [data-page="templates"] [data-radix-select-content] {
+  background-color: #0F172A !important;
+  border-color: #374151 !important;
+}
+
+/* Additional templates page styling for consistency */
+.dark [data-page="templates"] .space-y-4 > * {
+  background-color: inherit !important;
+}
+
+/* Skeleton loading components */
+.dark [data-page="templates"] [data-radix-skeleton] {
+  background-color: #374151 !important;
+}
+
+/* Button variants */
+.dark [data-page="templates"] button[data-variant="ghost"] {
+  background-color: transparent !important;
+  color: #9CA3AF !important;
+}
+
+.dark [data-page="templates"] button[data-variant="ghost"]:hover {
+  background-color: #374151 !important;
+  color: #E5E7EB !important;
+}
+
+.dark [data-page="templates"] button[data-variant="outline"] {
+  background-color: transparent !important;
+  border-color: #374151 !important;
+  color: #E5E7EB !important;
+}
+
+.dark [data-page="templates"] button[data-variant="outline"]:hover {
+  background-color: #1E293B !important;
+}
+
+/* Icon colors for template cards */
+.dark [data-page="templates"] .text-blue-500 {
+  color: #60A5FA !important;
+}
+
+.dark [data-page="templates"] .text-purple-500 {
+  color: #A78BFA !important;
+}
+
+.dark [data-page="templates"] .text-red-500 {
+  color: #F87171 !important;
+}
+
+.dark [data-page="templates"] .text-gray-500 {
+  color: #9CA3AF !important;
+}
+
+.dark [data-page="templates"] .text-gray-600 {
+  color: #6B7280 !important;
+}
+
+/* Hover states for colored buttons */
+.dark [data-page="templates"] .hover\\:bg-blue-50:hover {
+  background-color: #1E3A8A !important;
+}
+
+.dark [data-page="templates"] .hover\\:bg-red-50:hover {
+  background-color: #7F1D1D !important;
+}
+
+.dark [data-page="templates"] .hover\\:text-blue-700:hover {
+  color: #3B82F6 !important;
+}
+
+.dark [data-page="templates"] .hover\\:text-red-700:hover {
+  color: #DC2626 !important;
+}
+
+/* Alert dialog styling */
+.dark [data-page="templates"] [data-radix-alert-dialog-content] {
+  background-color: #0F1729 !important;
+  border-color: #374151 !important;
+  color: #E5E7EB !important;
+}
+
+.dark [data-page="templates"] [data-radix-alert-dialog-title] {
+  color: #FFFFFF !important;
+}
+
+.dark [data-page="templates"] [data-radix-alert-dialog-description] {
+  color: #9CA3AF !important;
+}
+
+/* Alert dialog buttons */
+.dark [data-page="templates"] .bg-red-500 {
+  background-color: #EF4444 !important;
+}
+
+.dark [data-page="templates"] .hover\\:bg-red-600:hover {
+  background-color: #DC2626 !important;
+}
+
+/* Card content text colors */
+.dark [data-page="templates"] .font-medium {
+  color: #E5E7EB !important;
+}
+
+.dark [data-page="templates"] .text-foreground {
+  color: #E5E7EB !important;
+}
+
+/* Empty state styling */
+.dark [data-page="templates"] .border-dashed {
+  border-color: #374151 !important;
+  background-color: #1E293B !important;
+}
+
+/* Template type badges */
+.dark [data-page="templates"] .rounded-full {
+  background-color: #374151 !important;
+  color: #E5E7EB !important;
+}
+
 .dark input[type="time"]::-webkit-datetime-edit-fields-wrapper {
   background: transparent !important;
   color: #E5E7EB !important;

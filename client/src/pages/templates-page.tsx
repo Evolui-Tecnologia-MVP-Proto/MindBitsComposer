@@ -304,7 +304,7 @@ export default function TemplatesPage() {
   };
 
   return (
-    <div className="fade-in bg-background text-foreground">
+    <div className="fade-in bg-background text-foreground" data-page="templates">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-foreground">Templates</h1>
       </div>
