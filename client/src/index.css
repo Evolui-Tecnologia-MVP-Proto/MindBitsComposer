@@ -1438,12 +1438,12 @@ html.dark body [data-radix-select-item][data-state="checked"] {
 
 /* Override the root CSS variables for dark mode globally */
 html.dark {
-  --accent: 240 3.7% 15.9% !important;
+  --accent: 220 26% 21% !important;
   --accent-foreground: 0 0% 98% !important;
 }
 
 .dark {
-  --accent: 240 3.7% 15.9% !important;
+  --accent: 220 26% 21% !important;
   --accent-foreground: 0 0% 98% !important;
 }
 
@@ -1530,9 +1530,26 @@ html.dark {
   background: #1F2937 !important;
 }
 
-/* Nuclear option - style attribute override */
-.dark [data-radix-select-item][style*="background"] {
+/* SIMPLE FINAL SOLUTION - Force dropdown hover color */
+.dark [data-radix-select-item]:hover,
+.dark [data-radix-select-item][data-highlighted] {
   background-color: #1F2937 !important;
+  background: #1F2937 !important;
+}
+
+/* Override any computed styles causing blue color */
+html.dark [data-radix-select-item]:hover,
+html.dark [data-radix-select-item][data-highlighted] {
+  background-color: #1F2937 !important;
+  background: #1F2937 !important;
+}
+
+/* Force dropdown colors with absolute specificity */
+.dark [data-radix-select-item]:hover,
+.dark [data-radix-select-item][data-highlighted] {
+  background-color: #1F2937 !important;
+  background: #1F2937 !important;
+  color: #E5E7EB !important;
 }
 
 .dark input[type="time"]::-webkit-datetime-edit-fields-wrapper {
