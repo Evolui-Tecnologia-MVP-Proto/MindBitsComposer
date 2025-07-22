@@ -464,21 +464,7 @@ export const insertLexicalDocumentSchema = createInsertSchema(lexicalDocuments).
 export type InsertLexicalDocument = z.infer<typeof insertLexicalDocumentSchema>;
 export type LexicalDocument = typeof lexicalDocuments.$inferSelect;
 
-// Relations
-export const repoStructureRelations = {
-  parent: {
-    relationName: "parent",
-    referencedTable: repoStructure,
-    referencedColumns: [repoStructure.uid],
-    columns: [repoStructure.linkedTo],
-  },
-  children: {
-    relationName: "children", 
-    referencedTable: repoStructure,
-    referencedColumns: [repoStructure.linkedTo],
-    columns: [repoStructure.uid],
-  },
-};
+
 
 // Generic Tables
 export const genericTables = pgTable("generic_tables", {

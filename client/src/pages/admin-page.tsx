@@ -75,6 +75,8 @@ type BoardMapping = {
   description: string;
   mappingFilter: string;
   defaultValues?: Record<string, string>;
+  assetsMappings?: Array<{id: string, columnId: string, columnTitle: string}>;
+  schedulesParams?: {enabled: boolean, frequency: string, time: string, days: string[]};
   lastSync: string | null;
   columnCount?: number;
 };
@@ -1761,12 +1763,7 @@ export default function AdminPage() {
                 </div>
                 
                 {/* Filtros para logs */}
-                <div 
-                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg"
-                  style={{
-                    backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : undefined
-                  }}
-                >
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-gray-700">Tipo de Evento</label>
                     <select
@@ -1827,48 +1824,14 @@ export default function AdminPage() {
                     <Loader2 className="h-8 w-8 animate-spin text-border" />
                   </div>
                 ) : systemLogs.length > 0 ? (
-                  <div 
-                    className="max-h-[calc(100vh-450px)] overflow-y-auto border rounded-md"
-                    style={{
-                      backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : undefined
-                    }}
-                  >
+                  <div className="max-h-[calc(100vh-450px)] overflow-y-auto border rounded-md">
                     <Table>
-                      <TableHeader 
-                        className="sticky top-0 bg-background z-10"
-                        style={{
-                          backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : undefined
-                        }}
-                      >
-                        <TableRow 
-                          style={{
-                            backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : undefined
-                          }}
-                        >
-                          <TableHead 
-                            className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                            style={{
-                              backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : undefined
-                            }}
-                          >TIMESTAMP</TableHead>
-                          <TableHead 
-                            className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                            style={{
-                              backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : undefined
-                            }}
-                          >TIPO DE EVENTO</TableHead>
-                          <TableHead 
-                            className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                            style={{
-                              backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : undefined
-                            }}
-                          >MENSAGEM</TableHead>
-                          <TableHead 
-                            className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-                            style={{
-                              backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : undefined
-                            }}
-                          >USUÁRIO</TableHead>
+                      <TableHeader className="sticky top-0 bg-background z-10">
+                        <TableRow>
+                          <TableHead className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">TIMESTAMP</TableHead>
+                          <TableHead className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">TIPO DE EVENTO</TableHead>
+                          <TableHead className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">MENSAGEM</TableHead>
+                          <TableHead className="text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">USUÁRIO</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>

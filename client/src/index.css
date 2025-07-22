@@ -1060,8 +1060,8 @@ table:not(.lexical-editor-container table) th {
   background-color: #1F2937 !important;
 }
 
-.dark [data-radix-dialog-content] .border.rounded-md.max-h-96 table thead th,
-.dark [data-radix-dialog-content] .max-h-[300px] table thead th {
+.dark [data-radix-dialog-content] .border.rounded-md table thead th,
+.dark [data-radix-dialog-content] .overflow-y-auto table thead th {
   background-color: #1F2937 !important;
 }
 
