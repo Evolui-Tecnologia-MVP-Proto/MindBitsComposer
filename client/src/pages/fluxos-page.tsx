@@ -105,6 +105,7 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
   const [selectedEdgeId, setSelectedEdgeId] = useState<string | null>(null);
   const [showInspector, setShowInspector] = useState<boolean>(false);
   const [showMiniMap, setShowMiniMap] = useState<boolean>(false);
+  const [showGrid, setShowGrid] = useState<boolean>(true);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
   const [showExitConfirmModal, setShowExitConfirmModal] = useState<boolean>(false);
   const hasUnsavedChangesRef = useRef<boolean>(false);
@@ -1313,6 +1314,8 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
         onToggleInspector={() => setShowInspector(!showInspector)}
         showMiniMap={showMiniMap}
         onToggleMiniMap={() => setShowMiniMap(!showMiniMap)}
+        showGrid={showGrid}
+        onToggleGrid={() => setShowGrid(!showGrid)}
         isFlowLocked={savedFlows?.find(flow => flow.id === currentFlowId)?.isLocked || false}
         hasUnsavedChanges={hasUnsavedChanges}
         isNewFlowModalOpen={isNewFlowModalOpen}
@@ -1376,6 +1379,7 @@ const FlowCanvas = forwardRef<FlowCanvasRef, FlowCanvasProps>(({ onFlowInfoChang
         onNodeChange={handleNodePropertyChange}
         isFlowLocked={savedFlows?.find(flow => flow.id === currentFlowId)?.isLocked || false}
         showMiniMap={showMiniMap}
+        showGrid={showGrid}
       />
     </div>
   );

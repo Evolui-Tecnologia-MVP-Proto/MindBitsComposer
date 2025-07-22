@@ -17,7 +17,8 @@ import {
   Undo2, 
   Redo2, 
   RotateCcw,
-  Map
+  Map,
+  Grid3X3
 } from "lucide-react";
 import { FlowMetadataModal } from "./FlowMetadataModal";
 import { NewFlowModal } from "./NewFlowModal";
@@ -38,6 +39,10 @@ interface FlowToolbarProps {
   // MiniMap
   showMiniMap: boolean;
   onToggleMiniMap: () => void;
+  
+  // Grid
+  showGrid: boolean;
+  onToggleGrid: () => void;
   
   // Flow state
   isFlowLocked?: boolean;
@@ -103,6 +108,8 @@ export const FlowToolbar = ({
   onToggleInspector,
   showMiniMap,
   onToggleMiniMap,
+  showGrid,
+  onToggleGrid,
   isFlowLocked = false,
   hasUnsavedChanges = false,
   isNewFlowModalOpen,
@@ -330,6 +337,15 @@ export const FlowToolbar = ({
             title="Mostrar/ocultar mini mapa"
           >
             <Map className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={showGrid ? "default" : "outline"}
+            size="sm"
+            onClick={onToggleGrid}
+            disabled={!currentFlowId}
+            title="Mostrar/ocultar grid do canvas"
+          >
+            <Grid3X3 className="h-4 w-4" />
           </Button>
           <Button 
             onClick={onAutoAlign} 

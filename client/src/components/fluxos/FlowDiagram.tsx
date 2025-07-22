@@ -54,6 +54,9 @@ interface FlowDiagramProps {
   
   // MiniMap
   showMiniMap?: boolean;
+  
+  // Grid
+  showGrid?: boolean;
 }
 
 export const FlowDiagram = ({
@@ -80,7 +83,8 @@ export const FlowDiagram = ({
   applyInspectorChanges,
   onNodeChange,
   isFlowLocked = false,
-  showMiniMap = false
+  showMiniMap = false,
+  showGrid = true
 }: FlowDiagramProps) => {
   const hasNodes = nodes.length > 0;
 
@@ -136,7 +140,7 @@ export const FlowDiagram = ({
                 connectionLineType={ConnectionLineType.SmoothStep}
               >
                 <Controls />
-                <Background color="#f0f0f0" gap={12} size={1} />
+                {showGrid && <Background color="#f0f0f0" gap={12} size={1} />}
                 {showMiniMap && <MiniMap />}
               </ReactFlow>
             </div>
@@ -192,7 +196,7 @@ export const FlowDiagram = ({
             connectionLineType={ConnectionLineType.SmoothStep}
           >
             <Controls />
-            <Background color="#f0f0f0" gap={12} size={1} />
+            {showGrid && <Background color="#f0f0f0" gap={12} size={1} />}
             {showMiniMap && <MiniMap />}
           </ReactFlow>
         </div>
