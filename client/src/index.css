@@ -2901,3 +2901,12 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 .composer-header-toolbar.with-right-panel {
   margin-right: 0 !important;
 }
+
+/* Conditional rounded corners for editor when left panel is retracted */
+.editor-left-rounded .lexical-editor-container .border-b.bg-gray-50.dark\:bg-\[\#111827\] {
+  border-top-left-radius: 12px !important;
+}
+
+.editor-left-rounded .lexical-editor-container .bg-\[\#020203\] {
+  border-bottom-left-radius: 12px !important;
+}
