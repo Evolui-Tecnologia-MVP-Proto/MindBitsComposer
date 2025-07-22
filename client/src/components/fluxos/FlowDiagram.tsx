@@ -146,10 +146,11 @@ export const FlowDiagram = ({
                   <Background 
                     gap={16}
                     size={1}
-                    color={isDark ? "#ffffff" : "#ccc"}
+                    color="#ff0000"
                     variant="dots"
                   />
                 )}
+                {console.log('FlowDiagram - showGrid:', showGrid, 'isDark:', isDark)}
                 {showMiniMap && <MiniMap />}
               </ReactFlow>
             </div>
@@ -209,7 +210,7 @@ export const FlowDiagram = ({
               <Background 
                 gap={16}
                 size={1}
-                color={isDark ? "#ffffff" : "#ccc"}
+                color="#ff0000"
                 variant="dots"
               />
             )}
