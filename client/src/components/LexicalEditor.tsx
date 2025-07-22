@@ -1126,9 +1126,9 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
   };
 
   return (
-    <div className={`lexical-editor-container w-full h-full flex flex-col ${className}`}>
+    <div className={`lexical-editor-container w-full flex flex-col ${className}`} style={{ height: 'calc(100vh - 140px)' }}>
       <LexicalComposer initialConfig={initialConfig}>
-        <div className="w-full h-full flex flex-col min-h-0">
+        <div className="w-full flex flex-col" style={{ height: 'calc(100vh - 140px)' }}>
           {viewMode === 'editor' && (
             <ToolbarPlugin 
               tableRows={tableRows}
