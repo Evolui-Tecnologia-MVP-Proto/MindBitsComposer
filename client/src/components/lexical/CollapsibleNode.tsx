@@ -57,9 +57,11 @@ export class CollapsibleContainerNode extends ElementNode {
       'p-4',
       'border',
       'border-gray-200',
+      'dark:border-[#374151]',
       'rounded-lg',
       'my-2',
-      'bg-gray-50'
+      'bg-gray-50',
+      'dark:bg-[#111827]'
     );
     dom.open = this.__open;
 

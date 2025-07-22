@@ -29,6 +29,24 @@
   max-width: 100% !important;
 }
 
+/* Collapsible container dark mode enhancements */
+.dark .Collapsible__container summary::marker {
+  display: none;
+}
+
+.dark .Collapsible__title {
+  color: #E5E7EB !important;
+}
+
+.dark .Collapsible__title:hover {
+  color: #60A5FA !important;
+}
+
+.dark .Collapsible__content {
+  background-color: #0F172A !important;
+  border-color: #374151 !important;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

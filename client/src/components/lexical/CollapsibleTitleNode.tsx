@@ -72,8 +72,10 @@ export class CollapsibleTitleNode extends TextNode {
       'Collapsible__title',
       'font-semibold',
       'text-gray-800',
+      'dark:text-[#E5E7EB]',
       'cursor-pointer',
       'hover:text-blue-600',
+      'dark:hover:text-blue-400',
       'flex',
       'items-center',
       'p-2'
