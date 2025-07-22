@@ -1995,6 +1995,11 @@ html.dark [data-radix-select-item][data-highlighted] {
   background-color: #0F172A !important;
 }
 
+/* CardContent div containing the grid */
+.dark [data-page="templates"] [data-radix-card-content] {
+  background-color: #0F172A !important;
+}
+
 /* Grid container where cards are inserted */
 .dark [data-page="templates"] .grid.grid-cols-1 {
   background-color: #0F172A !important;
