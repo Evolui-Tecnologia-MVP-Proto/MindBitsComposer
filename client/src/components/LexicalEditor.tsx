@@ -1175,10 +1175,10 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
             ) : (
               <div className="w-full h-full p-6 overflow-auto bg-slate-100 dark:bg-[#020203]">
                 <div className="max-w-4xl mx-auto">
-                  <div className="bg-white dark:bg-[#1E293B] rounded-lg shadow-sm border border-gray-200 dark:border-[#374151] p-6">
+                  <div className="bg-white dark:bg-[#1B2028] rounded-lg shadow-sm border border-gray-200 dark:border-[#374151] p-6">
                     <div className="mb-4 pb-3 border-b border-gray-200 dark:border-[#374151]">
                       <h3 className="text-lg font-semibold text-gray-800 dark:text-[#E5E7EB]">Preview MDX</h3>
-                      <p className="text-sm text-gray-600 mt-1">Visualização renderizada do conteúdo markdown</p>
+                      <p className="text-sm text-gray-600 dark:text-[#9CA3AF] mt-1">Visualização renderizada do conteúdo markdown</p>
                     </div>
                     <MarkdownPreview 
                       content={currentMarkdown} 
