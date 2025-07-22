@@ -124,6 +124,14 @@ Preferred communication style: Simple, everyday language.
   - Applied #374151 border color to top border
   - Enhanced button colors: #1E40AF (primary), transparent outline with #6B7280 borders
   - Updated JSX classes and CSS overrides for maximum specificity
+✓ Applied dark theme to accordion cards in template mapping tab:
+  - Main accordion triggers: #1E293B background with #374151 borders
+  - Nested section triggers: consistent #1E293B background 
+  - Accordion content areas: #0F172A background for hierarchy
+  - Tables: #111827 headers, #0F172A rows, #374151 borders
+  - Text colors: #E5E7EB (primary), #9CA3AF (secondary), blue accent adjusted for dark mode
+  - Select triggers: #0F172A background with proper contrast
+  - Icons: adjusted chevron colors for dark theme visibility
 
 ## System Architecture
 
