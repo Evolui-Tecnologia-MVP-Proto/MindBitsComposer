@@ -1760,9 +1760,9 @@ export default function LexicalPage() {
         {/* Editor principal */}
         <div className={`flex-1 flex flex-col composer-editor-container ${!showDocumentList ? 'editor-left-rounded' : ''} ${!showAttachments || (selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) ? 'editor-right-rounded' : ''}`}>
           {/* Barra de ferramentas do editor integrada */}
-          <div className="flex-1 pl-0 pr-0 pt-0 pb-0">
-            <Card className="h-full composer-editor-card">
-              <CardContent className="p-0 h-full relative overflow-hidden">
+          <div className="flex-1 pl-0 pr-0 pt-0 pb-0 min-h-0 overflow-hidden">
+            <Card className="h-full composer-editor-card flex flex-col">
+              <CardContent className="p-0 flex-1 relative overflow-hidden min-h-0">
                 {/* Placeholder quando não há conteúdo nem template selecionado */}
                 {!hasEditorContent && (!content || content.trim() === '') && !selectedTemplate && !currentDocumentId && viewMode === 'editor' && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
