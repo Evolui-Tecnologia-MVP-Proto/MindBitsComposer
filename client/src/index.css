@@ -2776,11 +2776,11 @@ html.dark [data-radix-select-item][data-highlighted] {
 
 /* Canvas center icon styling - prevent distortion */
 .dark [data-page="fluxos"] .react-flow__pane svg {
-  color: #6B7280 !important;
+  color: #1F2937 !important;
 }
 
 .dark [data-page="fluxos"] .text-center svg {
-  color: #6B7280 !important;
+  color: #1F2937 !important;
 }
 
 /* Additional targeting for canvas center content */
@@ -2789,7 +2789,7 @@ html.dark [data-radix-select-item][data-highlighted] {
 }
 
 .dark [data-page="fluxos"] .absolute.inset-0.flex.items-center.justify-center svg {
-  color: #6B7280 !important;
+  color: #1F2937 !important;
 }
 
 /* Canvas container border styling - more specific selectors */
