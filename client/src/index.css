@@ -2483,6 +2483,39 @@ html.dark [data-radix-select-item][data-highlighted] {
   background-color: #374151 !important;
 }
 
+/* Fluxos page tabs styling - Same as templates page */
+.dark [data-page="fluxos"] [data-radix-tabs-list] {
+  background-color: #0F172A !important;
+  border-color: #374151 !important;
+}
+
+.dark [data-page="fluxos"] [data-radix-tabs-trigger] {
+  background-color: #0F172A !important;
+  color: #9CA3AF !important;
+  border: 1px solid #374151 !important;
+}
+
+.dark [data-page="fluxos"] [data-radix-tabs-trigger][data-state="active"] {
+  background-color: #1E40AF !important;
+  color: #FFFFFF !important;
+  border-color: #1E40AF !important;
+}
+
+.dark [data-page="fluxos"] [data-radix-tabs-trigger]:hover:not([data-state="active"]) {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+}
+
+/* Main tabs container for fluxos */
+.dark [data-page="fluxos"] [data-radix-tabs-root] {
+  background-color: transparent !important;
+}
+
+/* Tab content areas for fluxos */
+.dark [data-page="fluxos"] [data-radix-tabs-content] {
+  background-color: transparent !important;
+}
+
 /* Templates page specific div containers - use #1F2937 for better hierarchy */
 .dark [data-page="templates"] .container,
 .dark [data-page="templates"] .space-y-6 > div:first-child,

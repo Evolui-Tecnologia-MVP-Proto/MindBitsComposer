@@ -1438,7 +1438,7 @@ export default function FluxosPage() {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden" data-page="fluxos">
       {/* Área do título e descrição */}
       <div className="flex-shrink-0 p-6 pb-4">
         <h1 className="text-3xl font-bold tracking-tight">
