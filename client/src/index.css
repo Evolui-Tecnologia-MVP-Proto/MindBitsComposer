@@ -1229,6 +1229,50 @@ html[class*="dark"] input[type="date"] {
   color-scheme: dark !important;
 }
 
+/* SelectTrigger hover styling for dark mode */
+.dark [data-radix-select-trigger]:hover,
+.dark [role="combobox"]:hover,
+.dark .select-trigger:hover,
+.dark button[role="combobox"]:hover {
+  background-color: #1F2937 !important;
+}
+
+/* Specific targeting for SelectTrigger components */
+.dark [data-page="admin"] [data-radix-select-trigger]:hover,
+.dark [data-page="admin"] [role="combobox"]:hover,
+.dark [data-page="admin"] button[role="combobox"]:hover {
+  background-color: #1F2937 !important;
+}
+
+/* Additional SelectTrigger hover states */
+.dark .dark\:hover\:bg-\[#1F2937\]:hover,
+.dark [class*="SelectTrigger"]:hover {
+  background-color: #1F2937 !important;
+}
+
+/* Force SelectTrigger hover for all contexts */
+.dark [data-radix-select-trigger]:hover,
+.dark [data-radix-popper-content-wrapper] [role="combobox"]:hover,
+.dark [data-radix-dialog-content] [data-radix-select-trigger]:hover,
+.dark [data-radix-dialog-content] [role="combobox"]:hover,
+.dark [data-radix-dialog-content] button[role="combobox"]:hover {
+  background-color: #1F2937 !important;
+  border-color: #374151 !important;
+}
+
+/* SelectValue and SelectContent styling for consistency */
+.dark [data-radix-select-value]:hover,
+.dark [data-radix-select-trigger]:hover [data-radix-select-value] {
+  background-color: transparent !important;
+}
+
+/* Global SelectTrigger hover override */
+.dark select:hover,
+.dark .select:hover,
+.dark [aria-haspopup="listbox"]:hover {
+  background-color: #1F2937 !important;
+}
+
 .dark input[type="time"]::-webkit-datetime-edit-fields-wrapper {
   background: transparent !important;
   color: #E5E7EB !important;
