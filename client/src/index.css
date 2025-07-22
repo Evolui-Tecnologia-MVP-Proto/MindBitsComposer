@@ -2603,6 +2603,7 @@ html.dark [data-radix-select-item][data-highlighted] {
 .dark [data-page="fluxos"] .border.border-gray-200.rounded-lg.overflow-hidden td {
   border-color: #374151 !important;
   color: #E5E7EB !important;
+  background-color: #1E293B !important;
 }
 
 .dark [data-page="fluxos"] .border.border-gray-200.rounded-lg.overflow-hidden .text-gray-700 {
