@@ -221,7 +221,7 @@
 }
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] table thead tr {
-  background-color: #111827 !important;
+  background-color: #0F172A !important;
   border-color: #374151 !important;
 }
 
@@ -231,7 +231,7 @@
 }
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] table tbody tr:hover {
-  background-color: #1E293B !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] table th,
