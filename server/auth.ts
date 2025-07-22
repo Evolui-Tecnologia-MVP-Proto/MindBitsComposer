@@ -65,6 +65,30 @@ const changePasswordSchema = z.object({
   newPassword: z.string().min(6),
 });
 
+// TEMPORARY: Helper function for development auth bypass
+// TODO: Remove this when login is re-enabled
+async function isAuthenticatedOrDev(req: any): Promise<boolean> {
+  // In development, always allow access
+  if (process.env.NODE_ENV === "development") {
+    // Simulate authenticated user for development
+    if (!req.user) {
+      try {
+        const adminUser = await storage.getUserByEmail("admin@evoluitecnologia.com.br");
+        if (adminUser) {
+          req.user = adminUser;
+        }
+      } catch (error) {
+        console.log("Could not set dev user");
+      }
+    }
+    return true;
+  }
+  
+  return req.isAuthenticated();
+}
+
+export { isAuthenticatedOrDev };
+
 export function setupAuth(app: Express) {
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "evo-mindbits-composer-secret",
@@ -195,7 +219,20 @@ export function setupAuth(app: Express) {
   });
 
   // Get current user
-  app.get("/api/user", (req, res) => {
+  app.get("/api/user", async (req, res) => {
+    // TEMPORARY: Auto-login as admin for development
+    // TODO: Remove this when login is re-enabled
+    if (process.env.NODE_ENV === "development") {
+      try {
+        const adminUser = await storage.getUserByEmail("admin@evoluitecnologia.com.br");
+        if (adminUser) {
+          return res.json(adminUser);
+        }
+      } catch (error) {
+        console.log("Admin user not found, falling back to normal auth");
+      }
+    }
+    
     if (!req.isAuthenticated()) return res.sendStatus(401);
     res.json(req.user);
   });
