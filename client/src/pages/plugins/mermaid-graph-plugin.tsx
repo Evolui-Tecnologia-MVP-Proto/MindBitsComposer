@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X, Save } from "lucide-react";
@@ -219,16 +219,60 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
     }
   };
 
-  // Inicializar Mermaid
-  useEffect(() => {
+  // Função para configurar tema do Mermaid baseado no sistema
+  const configureMermaidTheme = useCallback(() => {
+    const isDarkMode = document.documentElement.classList.contains('dark');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldUseDark = isDarkMode || systemPrefersDark;
+    
     mermaid.initialize({
       startOnLoad: true,
-      theme: 'default',
+      theme: shouldUseDark ? 'dark' : 'default',
       securityLevel: 'loose',
-      fontFamily: 'monospace',
+      fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
       fontSize: 14,
+      themeVariables: shouldUseDark ? {
+        primaryColor: '#1E293B',
+        primaryTextColor: '#E5E7EB',
+        primaryBorderColor: '#374151',
+        lineColor: '#60A5FA',
+        secondaryColor: '#0F172A',
+        tertiaryColor: '#1F2937',
+        background: '#111827',
+        mainBkg: '#1E293B',
+        secondBkg: '#0F172A',
+        tertiaryBkg: '#1F2937',
+      } : {}
     });
   }, []);
+
+  // Inicializar Mermaid com tema
+  useEffect(() => {
+    configureMermaidTheme();
+
+    // Observar mudanças no tema da página
+    const observer = new MutationObserver(() => {
+      configureMermaidTheme();
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    // Observar mudanças no tema do sistema
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemThemeChange = () => {
+      configureMermaidTheme();
+    };
+    
+    mediaQuery.addEventListener('change', handleSystemThemeChange);
+
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeEventListener('change', handleSystemThemeChange);
+    };
+  }, [configureMermaidTheme]);
 
   // Observer para redimensionamento do canvas
   useEffect(() => {
@@ -256,7 +300,7 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
     const renderMermaid = async () => {
       if (!mermaidCode.trim()) {
         if (canvasRef.current) {
-          canvasRef.current.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500">Digite código Mermaid no editor</div>';
+          canvasRef.current.innerHTML = '<div class="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">Digite código Mermaid no editor</div>';
         }
         return;
       }
@@ -292,7 +336,7 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
         
         if (canvasRef.current) {
           canvasRef.current.innerHTML = `
-            <div class="flex flex-col items-center justify-center h-full text-red-500 p-4">
+            <div class="flex flex-col items-center justify-center h-full text-red-500 dark:text-red-400 p-4">
               <div class="text-lg font-semibold mb-2">Erro na sintaxe</div>
               <div class="text-sm text-center">${error instanceof Error ? error.message : 'Erro desconhecido'}</div>
             </div>
@@ -315,13 +359,13 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-white">
+    <div className="w-full h-full flex flex-col bg-white dark:bg-[#1E293B]">
       {/* Header */}
-      <div className="p-4 pb-3 border-b">
+      <div className="p-4 pb-3 border-b border-gray-200 dark:border-[#374151] dark:bg-[#111827]">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-lg font-semibold">Mermaid Graph Plugin</h1>
-            <p className="text-xs text-gray-600 mt-1">
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">Mermaid Graph Plugin</h1>
+            <p className="text-xs text-gray-600 dark:text-[#9CA3AF] mt-1">
               Editor e visualizador de diagramas Mermaid em tempo real
             </p>
           </div>
@@ -333,7 +377,7 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
               placeholder="Nome do diagrama..."
               value={diagramName}
               onChange={(e) => setDiagramName(e.target.value)}
-              className="w-48 h-8 text-sm"
+              className="w-48 h-8 text-sm dark:bg-[#0F172A] dark:border-[#374151] dark:text-[#E5E7EB] dark:placeholder-[#6B7280]"
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && diagramName.trim()) {
                   handleSaveDiagram();
@@ -362,16 +406,16 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
       {/* Conteúdo principal */}
       <div className="flex flex-1">
         {/* Painel Esquerdo - Editor de Código */}
-        <div className="w-1/2 border-r flex flex-col">
-          <div className="p-3 border-b bg-gray-50">
-            <h3 className="font-medium text-sm text-gray-700">Editor Mermaid</h3>
-            <p className="text-xs text-gray-500 mt-1">Digite ou cole seu código Mermaid aqui</p>
+        <div className="w-1/2 border-r border-gray-200 dark:border-[#374151] flex flex-col">
+          <div className="p-3 border-b border-gray-200 dark:border-[#374151] bg-gray-50 dark:bg-[#111827]">
+            <h3 className="font-medium text-sm text-gray-700 dark:text-[#E5E7EB]">Editor Mermaid</h3>
+            <p className="text-xs text-gray-500 dark:text-[#9CA3AF] mt-1">Digite ou cole seu código Mermaid aqui</p>
           </div>
-          <div className="flex-1 p-3">
+          <div className="flex-1 p-3 bg-white dark:bg-[#1E293B]">
             <textarea
               value={mermaidCode}
               onChange={(e) => setMermaidCode(e.target.value)}
-              className="w-full h-full resize-none border rounded-lg p-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full h-full resize-none border border-gray-300 dark:border-[#374151] rounded-lg p-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-[#0F172A] text-gray-900 dark:text-[#E5E7EB] dark:placeholder-[#6B7280]"
               placeholder="Digite seu código Mermaid aqui..."
               spellCheck={false}
             />
@@ -380,26 +424,26 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
         
         {/* Painel Direito - Canvas Renderizador */}
         <div className="w-1/2 flex flex-col">
-          <div className="p-3 border-b bg-gray-50">
+          <div className="p-3 border-b border-gray-200 dark:border-[#374151] bg-gray-50 dark:bg-[#111827]">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium text-sm text-gray-700">Visualização</h3>
-                <p className="text-xs text-gray-500 mt-1">Pré-visualização do diagrama em tempo real</p>
+                <h3 className="font-medium text-sm text-gray-700 dark:text-[#E5E7EB]">Visualização</h3>
+                <p className="text-xs text-gray-500 dark:text-[#9CA3AF] mt-1">Pré-visualização do diagrama em tempo real</p>
               </div>
               {isRendering && (
-                <div className="text-xs text-blue-600 font-medium">Renderizando...</div>
+                <div className="text-xs text-blue-600 dark:text-blue-400 font-medium">Renderizando...</div>
               )}
               {renderError && (
-                <div className="text-xs text-red-600 font-medium">Erro na sintaxe</div>
+                <div className="text-xs text-red-600 dark:text-red-400 font-medium">Erro na sintaxe</div>
               )}
             </div>
           </div>
-          <div className="flex-1 p-3 overflow-auto bg-white">
+          <div className="flex-1 p-3 overflow-auto bg-white dark:bg-[#1E293B]">
             <div 
               ref={canvasRef}
-              className="w-full h-full flex items-center justify-center border-2 border-dashed border-gray-200 rounded-lg"
+              className="w-full h-full flex items-center justify-center border-2 border-dashed border-gray-200 dark:border-[#374151] rounded-lg bg-white dark:bg-[#0F172A]"
             >
-              <div className="text-gray-500 text-sm">
+              <div className="text-gray-500 dark:text-[#9CA3AF] text-sm">
                 {isRendering ? 'Renderizando gráfico...' : 'Aguardando código...'}
               </div>
             </div>
