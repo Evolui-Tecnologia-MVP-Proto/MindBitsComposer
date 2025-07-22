@@ -203,16 +203,16 @@
 .dark [data-radix-dialog-content] [data-radix-collapsible-trigger] {
   background-color: #1E293B !important;
   color: #E5E7EB !important;
-  border-color: #374151 !important;
+  border-color: #0F172A !important;
 }
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-trigger]:hover {
-  background-color: #374151 !important;
+  background-color: #1E293B !important;
 }
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] {
   background-color: #0F172A !important;
-  border-color: #374151 !important;
+  border-color: #0F172A !important;
 }
 
 /* Template Modal - Accordion tables */
@@ -244,13 +244,13 @@
 /* Template Modal - Select triggers inside accordions */
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] [data-radix-select-trigger] {
   background-color: #0F172A !important;
-  border-color: #374151 !important;
+  border-color: #0F172A !important;
   color: #E5E7EB !important;
 }
 
 .dark [data-radix-dialog-content] [data-radix-collapsible-content] [data-radix-select-content] {
   background-color: #0F172A !important;
-  border-color: #374151 !important;
+  border-color: #0F172A !important;
 }
 
 /* Template Modal - Campo and Mapeamento backgrounds */
@@ -295,6 +295,35 @@
 
 .dark [data-radix-dialog-content] [value="mapeamento"] > div {
   background-color: #0F172A !important;
+}
+
+/* Force override any #374151 colors in the template modal */
+.dark [data-radix-dialog-content] * {
+  border-color: #0F172A !important;
+}
+
+.dark [data-radix-dialog-content] [data-radix-collapsible-content] * {
+  background-color: #0F172A !important;
+  border-color: #0F172A !important;
+}
+
+/* Specific override for any remaining #374151 in accordion areas */
+.dark [data-radix-dialog-content] .bg-gray-50 {
+  background-color: #0F172A !important;
+}
+
+.dark [data-radix-dialog-content] .border-gray-200 {
+  border-color: #0F172A !important;
+}
+
+.dark [data-radix-dialog-content] .border-gray-300 {
+  border-color: #0F172A !important;
+}
+
+/* Nuclear option - override any computed #374151 styles */
+.dark [data-radix-dialog-content] [data-radix-collapsible-content] [style*="#374151"] {
+  background-color: #0F172A !important;
+  border-color: #0F172A !important;
 }
 
 /* MAXIMUM SPECIFICITY: Global tabs active state styling for dark mode */
