@@ -468,7 +468,7 @@ export default function TemplateFormModal({
                             open={openAccordions[groupKey] ?? false}
                             onOpenChange={() => toggleAccordion(groupKey)}
                           >
-                            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 text-left bg-gray-50 dark:bg-[#1E293B] hover:bg-gray-100 dark:hover:bg-[#1E293B] rounded-lg border dark:border-gray-600 transition-colors">
+                            <CollapsibleTrigger className="flex items-center justify-between w-full p-3 text-left bg-gray-50 dark:bg-[#1E293B] hover:bg-gray-100 dark:hover:bg-[#1E293B] rounded-lg border dark:border-[#0F172A] transition-colors">
                               <div className="flex items-center gap-2">
                                 {openAccordions[groupKey] ?? false ? (
                                   <ChevronDown className="h-4 w-4 text-gray-500 dark:text-gray-300" />
@@ -484,7 +484,7 @@ export default function TemplateFormModal({
                                 </span>
                               </div>
                             </CollapsibleTrigger>
-                            <CollapsibleContent className="border border-t-0 border-gray-200 dark:border-gray-600 rounded-b-lg dark:bg-[#0F172A]">
+                            <CollapsibleContent className="border border-t-0 border-gray-200 dark:border-[#0F172A] rounded-b-lg dark:bg-[#0F172A]">
                               <div className="p-4">
                                 {isNested ? (
                                   // Renderizar seções aninhadas
@@ -495,7 +495,7 @@ export default function TemplateFormModal({
                                         open={openAccordions[`${groupKey}-${sectionKey}`] ?? false}
                                         onOpenChange={() => toggleAccordion(`${groupKey}-${sectionKey}`)}
                                       >
-                                        <CollapsibleTrigger className="flex items-center justify-between w-full p-2 text-left bg-blue-50 dark:bg-[#1E293B] hover:bg-blue-100 dark:hover:bg-[#1E293B] rounded border border-blue-200 dark:border-gray-600 transition-colors">
+                                        <CollapsibleTrigger className="flex items-center justify-between w-full p-2 text-left bg-blue-50 dark:bg-[#1E293B] hover:bg-blue-100 dark:hover:bg-[#1E293B] rounded border border-blue-200 dark:border-[#0F172A] transition-colors">
                                           <div className="flex items-center gap-2">
                                             {openAccordions[`${groupKey}-${sectionKey}`] ?? false ? (
                                               <ChevronDown className="h-3 w-3 text-blue-500 dark:text-blue-300" />

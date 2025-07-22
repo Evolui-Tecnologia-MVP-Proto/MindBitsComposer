@@ -326,6 +326,39 @@
   border-color: #0F172A !important;
 }
 
+/* Additional targeted overrides for template modal table areas */
+.dark [data-radix-dialog-content] .border-gray-600 {
+  border-color: #0F172A !important;
+}
+
+.dark [data-radix-dialog-content] .dark\\:border-gray-600 {
+  border-color: #0F172A !important;
+}
+
+.dark [data-radix-dialog-content] table tr {
+  border-color: #0F172A !important;
+}
+
+.dark [data-radix-dialog-content] table td,
+.dark [data-radix-dialog-content] table th {
+  border-color: #0F172A !important;
+}
+
+/* Override any remaining Tailwind classes that might generate #374151 */
+.dark [data-radix-dialog-content] .border {
+  border-color: #0F172A !important;
+}
+
+.dark [data-radix-dialog-content] .border-t-0 {
+  border-color: #0F172A !important;
+}
+
+/* Force all CollapsibleContent borders to be #0F172A */
+.dark [data-radix-dialog-content] [data-radix-collapsible-content].border {
+  border-color: #0F172A !important;
+  background-color: #0F172A !important;
+}
+
 /* MAXIMUM SPECIFICITY: Global tabs active state styling for dark mode */
 html.dark [data-radix-tabs-trigger][data-state="active"],
 body.dark [data-radix-tabs-trigger][data-state="active"],

@@ -130,6 +130,8 @@ Preferred communication style: Simple, everyday language.
   - Accordion content areas: #0F172A background for hierarchy
   - Tables: #0F172A headers, rows, and borders (replaced #374151 completely)
   - Fixed JSX classes: replaced dark:hover:bg-[#374151] with dark:hover:bg-[#1E293B] in CollapsibleTrigger components
+  - Fixed JSX border classes: replaced dark:border-gray-600 with dark:border-[#0F172A] in all Collapsible components
+  - Added comprehensive CSS overrides for any remaining #374151 border colors
   - Text colors: #E5E7EB (primary), #9CA3AF (secondary), blue accent adjusted for dark mode
   - Select triggers: #0F172A background with proper contrast
   - Icons: adjusted chevron colors for dark theme visibility
