@@ -1613,11 +1613,11 @@ export default function LexicalPage() {
         </div>
       </div>
       {/* Área do editor - ocupa todo o espaço restante */}
-      <div className="flex-1 px-6 pb-[5px] min-h-0">
+      <div className="flex-1 px-6 pb-[5px] min-h-0 composer-layout-container">
         <div className="flex h-full">
           {/* Sidebar de documentos (condicional) */}
         {showDocumentList && (
-          <div className="w-80 border-r bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col" style={{ marginTop: '16px' }}>
+          <div className="w-80 border-r bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col composer-side-panel composer-library-panel" style={{ marginTop: '16px' }}>
             {/* Header fixo */}
             <div className="p-4 border-b bg-white dark:bg-[#111827] border-gray-200 dark:border-[#374151]">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">Biblioteca</h3>
@@ -1754,10 +1754,10 @@ export default function LexicalPage() {
         )}
 
         {/* Editor principal */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col composer-editor-container" style={{ marginTop: '16px' }}>
           {/* Barra de ferramentas do editor integrada */}
-          <div className="flex-1 pl-0 pr-4 pt-4 pb-0">
-            <Card className="h-full">
+          <div className="flex-1 pl-0 pr-4 pt-0 pb-0">
+            <Card className="h-full composer-editor-card">
               <CardContent className="p-0 h-full relative overflow-hidden">
                 {/* Placeholder quando não há conteúdo nem template selecionado */}
                 {!hasEditorContent && (!content || content.trim() === '') && !selectedTemplate && !currentDocumentId && viewMode === 'editor' && (
@@ -1788,7 +1788,7 @@ export default function LexicalPage() {
 
         {/* Painel de Anexos - desabilitado apenas quando há template struct sem documento composer */}
         {showAttachments && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) && (
-          <div className="w-80 border-l bg-gray-50 dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col" style={{ marginTop: '16px' }}>
+          <div className="w-80 border-l bg-gray-50 dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col composer-side-panel composer-attachments-panel" style={{ marginTop: '16px' }}>
             {/* Header fixo */}
             <div className="p-4 border-b bg-gray-50 dark:bg-[#111827] border-gray-200 dark:border-[#374151]">
               <div className="flex items-center justify-between">
