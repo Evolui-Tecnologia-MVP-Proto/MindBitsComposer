@@ -1789,14 +1789,14 @@ export default function LexicalPage() {
           <div className="w-80 border-l bg-gray-50 dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col composer-side-panel composer-attachments-panel rounded-tr-xl rounded-br-xl">
             {/* Header fixo */}
             <div className="p-4 border-b bg-gray-50 dark:bg-[#111827] border-gray-200 dark:border-[#374151] rounded-tr-xl">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2">
                   <Paperclip className="w-5 h-5" />
                   <h3 className="font-semibold text-gray-900 dark:text-[#E5E7EB]">Anexos</h3>
                 </div>
                 {/* Combo de Plugins - desabilitado apenas quando há template struct sem documento composer */}
                 {activePlugins.length > 0 && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) && (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 ml-auto">
                     <Select value={pluginSelectValue} onValueChange={handleOpenPlugin}>
                       <SelectTrigger className="w-32 h-8 text-xs">
                         <SelectValue placeholder="Plugins" />
