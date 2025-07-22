@@ -856,9 +856,7 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
             root.append(container);
           });
           
-          // Adicionar parágrafo final para permitir edição após os containers
-          const finalParagraph = $createParagraphNode();
-          root.append(finalParagraph);
+          // Não adicionar parágrafo final - edição restrita aos containers
         });
       }, 50);
       
@@ -950,6 +948,104 @@ function ImageIdAutoConvertPlugin() {
       COMMAND_PRIORITY_LOW
     );
   }, [editor]);
+
+  return null;
+}
+
+// Plugin para restringir edição apenas aos collapsible containers
+function RestrictEditingPlugin({ hasTemplate }: { hasTemplate: boolean }) {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    if (!hasTemplate) return;
+
+    const removeClickListener = editor.registerCommand(
+      'click',
+      (event: MouseEvent) => {
+        editor.update(() => {
+          const selection = $getSelection();
+          if (!$isRangeSelection(selection)) return;
+
+          const anchorNode = selection.anchor.getNode();
+          
+          // Verificar se o cursor está dentro de um CollapsibleContentNode
+          let currentNode = anchorNode;
+          let isInsideContent = false;
+          
+          while (currentNode) {
+            if (currentNode.getType() === 'collapsible-content') {
+              isInsideContent = true;
+              break;
+            }
+            currentNode = currentNode.getParent();
+          }
+          
+          // Se não estiver dentro de um content, mover para o primeiro content disponível
+          if (!isInsideContent) {
+            const root = $getRoot();
+            const children = root.getChildren();
+            
+            for (const child of children) {
+              if (child.getType() === 'collapsible-container') {
+                const containerChildren = child.getChildren();
+                for (const containerChild of containerChildren) {
+                  if (containerChild.getType() === 'collapsible-content') {
+                    const contentChildren = containerChild.getChildren();
+                    if (contentChildren.length > 0) {
+                      const firstParagraph = contentChildren[0];
+                      if (firstParagraph.getType() === 'paragraph') {
+                        firstParagraph.selectStart();
+                        return;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        });
+        return false;
+      },
+      COMMAND_PRIORITY_LOW
+    );
+
+    const removeKeyDownListener = editor.registerCommand(
+      'keydown',
+      (event: KeyboardEvent) => {
+        editor.update(() => {
+          const selection = $getSelection();
+          if (!$isRangeSelection(selection)) return;
+
+          const anchorNode = selection.anchor.getNode();
+          
+          // Verificar se o cursor está dentro de um CollapsibleContentNode
+          let currentNode = anchorNode;
+          let isInsideContent = false;
+          
+          while (currentNode) {
+            if (currentNode.getType() === 'collapsible-content') {
+              isInsideContent = true;
+              break;
+            }
+            currentNode = currentNode.getParent();
+          }
+          
+          // Se não estiver dentro de um content, bloquear a tecla
+          if (!isInsideContent && !event.ctrlKey && !event.metaKey) {
+            event.preventDefault();
+            return true;
+          }
+        });
+        return false;
+      },
+      COMMAND_PRIORITY_HIGH
+    );
+
+    return () => {
+      removeClickListener();
+      removeKeyDownListener();
+    };
+  }, [editor, hasTemplate]);
 
   return null;
 }
@@ -1222,6 +1318,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <ImageEventListenerPlugin />
           <ImageIdAutoConvertPlugin />
           <TemplateSectionsPlugin sections={templateSections} />
+          <RestrictEditingPlugin hasTemplate={!!templateSections && templateSections.length > 0} />
           <EditorInstancePlugin setEditorInstance={(editor) => {
             setEditorInstance(editor);
             if (onEditorInstanceChange) {
