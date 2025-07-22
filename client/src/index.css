@@ -2709,20 +2709,20 @@ html.dark [data-radix-select-item][data-highlighted] {
 }
 
 .dark [data-page="fluxos"] .react-flow__background {
-  background-color: #1B2028 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-page="fluxos"] .react-flow__pane {
-  background-color: #1B2028 !important;
+  background-color: #0F172A !important;
 }
 
 /* Canvas container styling */
 .dark [data-page="fluxos"] .react-flow__viewport {
-  background-color: #1B2028 !important;
+  background-color: #0F172A !important;
 }
 
 .dark [data-page="fluxos"] .react-flow__container {
-  background-color: #1B2028 !important;
+  background-color: #0F172A !important;
   border-color: #111827 !important;
 }
 
