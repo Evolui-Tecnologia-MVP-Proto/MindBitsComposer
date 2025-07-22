@@ -6,8 +6,6 @@ interface FlowGridProps {
 }
 
 export const FlowGrid: React.FC<FlowGridProps> = ({ isDark }) => {
-  console.log('🟣 FlowGrid rendering - isDark:', isDark);
-  
   return (
     <Background 
       gap={16}

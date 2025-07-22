@@ -92,7 +92,7 @@ export const FlowDiagram = ({
   const hasNodes = nodes.length > 0;
   const { isDark } = useTheme();
   
-  console.log('🔍 FlowDiagram Props:', { showGrid, isDark, hasNodes });
+
 
   // Componente de estado vazio
   const EmptyState = () => (
