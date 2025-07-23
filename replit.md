@@ -178,7 +178,7 @@ Preferred communication style: Simple, everyday language.
   - Created dedicated header div within IncluirDocumentosTab component with #0F172A background
   - Moved "Atualizar" and "Incluir Documento" buttons from main page header to tab header
   - Applied consistent button styling with dark mode colors (#1E40AF for primary button)
-  - Header includes "Documentos Incluídos" title with proper dark mode text colors
+  - Header focused on button functionality with proper spacing and alignment
   - Buttons maintain full functionality with proper toast notifications and modal triggers
 
 ## System Architecture

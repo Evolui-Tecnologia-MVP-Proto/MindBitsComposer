@@ -43,10 +43,7 @@ export function IncluirDocumentosTab({
   return (
     <TabsContent value="incluidos" className="slide-in">
       {/* Cabeçalho com botões */}
-      <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-[#0F172A] mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">
-          Documentos Incluídos
-        </h2>
+      <div className="flex items-center justify-end p-4 rounded-lg bg-gray-50 dark:bg-[#0F172A] mb-6">
         <div className="flex items-center gap-3">
           <Button
             onClick={onRefresh}
