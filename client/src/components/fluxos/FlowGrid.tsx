@@ -6,25 +6,15 @@ interface FlowGridProps {
 }
 
 export const FlowGrid: React.FC<FlowGridProps> = ({ isDark }) => {
-  // Multiple checks for theme detection
   const documentIsDark = document.documentElement.classList.contains('dark');
-  const htmlClasses = document.documentElement.className;
-  const bodyClasses = document.body.className;
+  const gridColor = documentIsDark ? "#ffffff" : "#000000";
   
-  console.log('🔍 COMPLETE THEME DEBUG:');
-  console.log('  - isDark prop:', isDark);
-  console.log('  - documentIsDark:', documentIsDark);
-  console.log('  - html classes:', htmlClasses);
-  console.log('  - body classes:', bodyClasses);
-  console.log('  - localStorage theme:', localStorage.getItem('theme'));
-  
-  const gridColor = documentIsDark ? "#ffffff" : "#ff0000";
-  console.log('  - final gridColor:', gridColor);
-  
+  // Force re-render by using theme as key
   return (
     <Background 
-      gap={20}
-      size={2}
+      key={documentIsDark ? 'dark' : 'light'}
+      gap={16}
+      size={1}
       color={gridColor}
       variant={BackgroundVariant.Dots}
     />
