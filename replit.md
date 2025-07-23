@@ -274,6 +274,9 @@ Preferred communication style: Simple, everyday language.
   - Applied specific CSS rules for table headers (#111827) and table rows (#0F172A) in dark mode only
   - Used highly specific selectors to ensure changes apply only to ViewDocumentModal anexos tab
   - Protected light theme from any interference with dark mode specific styling
+  - Added JavaScript-based color application via useEffect for maximum compatibility
+  - Fixed React hooks error by moving useEffect before early return condition
+  - Maintained hook order consistency across component renders
 
 ## System Architecture
 

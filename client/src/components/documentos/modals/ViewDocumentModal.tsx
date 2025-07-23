@@ -186,14 +186,13 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
     return columnTitles[columnId] || `Coluna ${columnId}`;
   };
 
-  if (!selectedDocument) return null;
-
-  const showAnexosTab = hasMondayItemValues(selectedDocument);
+  // Calculate showAnexosTab before early return to maintain hook consistency
+  const showAnexosTab = selectedDocument ? hasMondayItemValues(selectedDocument) : false;
   const gridCols = showAnexosTab ? "grid-cols-3" : "grid-cols-2";
 
-  // useEffect para aplicar cores específicas às tabelas da aba anexos
+  // useEffect deve ser executado sempre para manter a ordem dos hooks
   useEffect(() => {
-    if (!isOpen || !showAnexosTab) return;
+    if (!isOpen || !showAnexosTab || !selectedDocument) return;
 
     const applyAnexosTableColors = () => {
       const isDarkMode = document.documentElement.classList.contains('dark');
@@ -233,7 +232,9 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
       });
     });
 
-  }, [isOpen, showAnexosTab]);
+  }, [isOpen, showAnexosTab, selectedDocument]);
+
+  if (!selectedDocument) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
