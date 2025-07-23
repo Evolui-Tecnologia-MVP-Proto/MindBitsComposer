@@ -232,7 +232,8 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     const processedItems: FileItem[] = [];
     const processedNames = new Set<string>();
     
-    console.log("Estruturas do repositório:", repoStructures);
+    console.log("🔍 DEBUG: Estruturas do repositório:", repoStructures);
+    console.log("🔍 DEBUG: Data GitHub recebida:", data);
 
     // Primeiro, processar APENAS pastas do GitHub (filtrar arquivos)
     data.filter(item => item.type === 'folder').forEach((item) => {
@@ -309,7 +310,9 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
       }
     });
 
-    return [...processedItems, ...localOnlyFolders];
+    const result = [...processedItems, ...localOnlyFolders];
+    console.log("🔍 DEBUG: Estrutura unificada final:", result);
+    return result;
   };
 
   const unifiedData = buildUnifiedStructure();
@@ -413,6 +416,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
             </Button>
             <Folder className={`h-4 w-4 ${getStatusColor(item.syncStatus)}`} />
             <span className="text-sm text-gray-700 font-mono">{item.name}</span>
+            {console.log(`🔍 DEBUG: Pasta ${item.name} - syncStatus: ${item.syncStatus}`)}
             {getStatusBadge(item.syncStatus)}
           </div>
           
