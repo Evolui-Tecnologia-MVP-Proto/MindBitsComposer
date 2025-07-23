@@ -173,6 +173,7 @@ Preferred communication style: Simple, everyday language.
   - Unified visual hierarchy and dark mode color scheme
   - Applied same tab styling pattern with grid layout and #1E40AF active states
   - Consistent data-page attributes for CSS targeting
+  - Applied #0F172A to tabs container in Documentos page for dark mode consistency
 
 ## System Architecture
 
