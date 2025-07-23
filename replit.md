@@ -218,6 +218,11 @@ Preferred communication style: Simple, everyday language.
   - Applied exact same colors as integrado badges: dark:bg-green-800/30, dark:bg-red-800/30, dark:bg-yellow-900/30
   - Consistent text colors: dark:text-green-300, dark:text-red-300, dark:text-yellow-400
   - Standardized border colors: dark:border-green-600, dark:border-red-600, dark:border-yellow-600
+✓ Fixed sync badges to match exact Monday/origem badge pattern (January 23, 2025):
+  - Applied precise Monday badge colors: bg-green-100 dark:bg-green-900/30, bg-red-100 dark:bg-red-900/30, bg-yellow-100 dark:bg-yellow-900/30
+  - Matched exact text pattern: text-green-800 dark:text-green-400, text-red-800 dark:text-red-400, text-yellow-800 dark:text-yellow-400
+  - Consistent border styling: border-green-300 dark:border-green-600, border-red-300 dark:border-red-600, border-yellow-300 dark:border-yellow-600
+  - Forced workflow restart to ensure changes are applied
 
 ## System Architecture
 
