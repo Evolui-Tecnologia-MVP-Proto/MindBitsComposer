@@ -204,6 +204,10 @@ Preferred communication style: Simple, everyday language.
   - Ensured cells inherit the row background colors for consistency
   - Added double protection to prevent interference with dark mode theming
   - Used [data-page="documentos"] selector to limit scope to documentos page only
+✓ Applied dark theme to sync badges in FileExplorer component (January 23, 2025):
+  - Added dark background colors to sync status badges: bg-green-50 dark:bg-green-900/30, bg-red-50 dark:bg-red-900/30, bg-yellow-50 dark:bg-yellow-900/30
+  - Enhanced all sync status badges (synced, unsynced, github-only, local-only) with proper dark mode backgrounds
+  - Maintained existing text and border colors while adding background support for better visibility
 
 ## System Architecture
 
