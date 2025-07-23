@@ -65,6 +65,14 @@ Preferred communication style: Simple, everyday language.
   - Applied darker dropdown colors (#000000, #1A1A1A for hover)
   - White internal icon using filter: brightness(0) invert(1)
   - Consistent dark theme across all time picker states
+✓ Applied dark theme to execution form in flow modal (January 23, 2025):
+  - Updated FlowInspector panel with #0F172A background and blue borders
+  - Applied dark mode colors to all form elements (inputs, selects, textarea)  
+  - Enhanced title, labels, and text colors with gray-200/gray-300 scheme
+  - Updated approval system buttons with proper dark mode states
+  - Applied dark theme to integration result notifications
+  - Applied dark theme to approval alert boxes with orange color scheme
+  - Updated main container with #0F172A background for complete dark mode consistency
 ✓ Corrected "Editar Mapeamento" modal select triggers from incorrect #09090B to standard #0F172A:
   - Fixed "Coluna Monday" and "Campo na aplicação" select colors
   - Applied maximum CSS specificity to override problematic inherited styles

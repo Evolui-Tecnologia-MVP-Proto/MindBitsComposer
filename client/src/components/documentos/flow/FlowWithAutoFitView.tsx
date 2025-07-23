@@ -182,13 +182,13 @@ export function FlowWithAutoFitView({
   };
 
   return (
-    <div className="bg-white rounded-lg border p-6">
+    <div className="bg-white dark:bg-[#0F172A] rounded-lg border dark:border-[#374151] p-6">
       {/* Resultado da integração */}
       {integrationResult.status && (
         <div className={`mb-4 p-3 rounded-lg border ${
           integrationResult.status === 'success' 
-            ? 'bg-green-50 border-green-200 text-green-700'
-            : 'bg-red-50 border-red-200 text-red-700'
+            ? 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-600 text-green-700 dark:text-green-400'
+            : 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-600 text-red-700 dark:text-red-400'
         }`}>
           <div className="flex items-center space-x-2">
             {integrationResult.status === 'success' ? (
@@ -205,36 +205,36 @@ export function FlowWithAutoFitView({
 
       {/* Painel do FlowInspector */}
       {showFlowInspector && selectedFlowNode && (
-        <div className={`mb-6 bg-gray-50 rounded-lg p-4 border-l-4 border-blue-500 ${isPinned ? 'relative' : 'absolute top-4 right-4 z-50 w-80 shadow-lg'}`}>
+        <div className={`mb-6 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-4 border-l-4 border-blue-500 dark:border-blue-400 ${isPinned ? 'relative' : 'absolute top-4 right-4 z-50 w-80 shadow-lg'}`}>
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gray-900">
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-200">
               Inspetor de Nó: {selectedFlowNode.data.label}
             </h3>
             <button
               onClick={() => setShowFlowInspector(false)}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              className="text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
           <div className="space-y-3">
-            <div className="text-xs text-gray-600">
+            <div className="text-xs text-gray-600 dark:text-gray-300">
               <strong>ID:</strong> {selectedFlowNode.id}
             </div>
-            <div className="text-xs text-gray-600">
+            <div className="text-xs text-gray-600 dark:text-gray-300">
               <strong>Tipo:</strong> {selectedFlowNode.type}
             </div>
             
             {selectedFlowNode.data.description && (
-              <div className="text-xs text-gray-600">
+              <div className="text-xs text-gray-600 dark:text-gray-300">
                 <strong>Descrição:</strong> {selectedFlowNode.data.description}
               </div>
             )}
 
             {/* Badge de status de aprovação */}
             <div className="flex items-center space-x-2">
-              <span className="text-xs font-medium text-gray-600">Status:</span>
+              <span className="text-xs font-medium text-gray-600 dark:text-gray-300">Status:</span>
               <Badge 
                 variant={
                   selectedFlowNode.data.isAproved === 'YES' ? 'default' : 
@@ -252,12 +252,12 @@ export function FlowWithAutoFitView({
             {/* Campos do formulário */}
             {selectedFlowNode.data.fields && (
               <div className="space-y-3">
-                <h4 className="text-xs font-semibold text-gray-700 border-b pb-1">
+                <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-200 border-b dark:border-gray-600 pb-1">
                   Campos do Formulário
                 </h4>
                 {selectedFlowNode.data.fields.map((field: any) => (
                   <div key={field.id} className="space-y-1">
-                    <label className="text-xs font-medium text-gray-600 flex items-center">
+                    <label className="text-xs font-medium text-gray-600 dark:text-gray-300 flex items-center">
                       {field.label}
                       {field.required && <span className="text-red-500 ml-1">*</span>}
                     </label>
@@ -268,7 +268,7 @@ export function FlowWithAutoFitView({
                           ...prev,
                           [field.id]: e.target.value
                         }))}
-                        className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 dark:bg-[#0F172A] dark:text-gray-200 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       >
                         <option value="">Selecione...</option>
                         {field.options?.map((option: any) => (
@@ -285,7 +285,7 @@ export function FlowWithAutoFitView({
                           [field.id]: e.target.value
                         }))}
                         placeholder={field.placeholder}
-                        className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 dark:bg-[#0F172A] dark:text-gray-200 dark:placeholder-gray-400 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                         rows={3}
                       />
                     ) : (
@@ -297,7 +297,7 @@ export function FlowWithAutoFitView({
                           [field.id]: e.target.value
                         }))}
                         placeholder={field.placeholder}
-                        className="w-full px-2 py-1 text-xs border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 dark:bg-[#0F172A] dark:text-gray-200 dark:placeholder-gray-400 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                       />
                     )}
                   </div>
@@ -307,7 +307,7 @@ export function FlowWithAutoFitView({
 
             {/* Botão de execução para nós de integração */}
             {selectedFlowNode.type === 'integration' && (
-              <div className="pt-3 border-t">
+              <div className="pt-3 border-t dark:border-gray-600">
                 <Button
                   onClick={executeIntegration}
                   disabled={!areAllFieldsFilled() || executeIntegrationMutation.isPending}
@@ -331,8 +331,8 @@ export function FlowWithAutoFitView({
 
             {/* Sistema de aprovação para nós de aprovação */}
             {selectedFlowNode.type === 'approval' && (
-              <div className="pt-3 border-t space-y-3">
-                <h4 className="text-xs font-semibold text-gray-700">
+              <div className="pt-3 border-t dark:border-gray-600 space-y-3">
+                <h4 className="text-xs font-semibold text-gray-700 dark:text-gray-200">
                   Sistema de Aprovação
                 </h4>
                 
@@ -349,7 +349,7 @@ export function FlowWithAutoFitView({
                     className={`flex-1 flex items-center justify-center space-x-1 py-2 px-3 rounded text-xs font-medium transition-colors ${
                       areAllFieldsFilled()
                         ? 'bg-green-600 hover:bg-green-700 text-white'
-                        : 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-gray-50 dark:bg-[#1F2937] border border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                     }`}
                   >
                     <Check className="w-4 h-4" />
@@ -368,7 +368,7 @@ export function FlowWithAutoFitView({
                     className={`flex-1 flex items-center justify-center space-x-1 py-2 px-3 rounded text-xs font-medium transition-colors ${
                       areAllFieldsFilled()
                         ? 'bg-red-600 hover:bg-red-700 text-white'
-                        : 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-gray-50 dark:bg-[#1F2937] border border-gray-200 dark:border-gray-600 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                     }`}
                   >
                     <X className="w-4 h-4" />
@@ -378,7 +378,7 @@ export function FlowWithAutoFitView({
                 
                 {/* Caixa de alerta para confirmação */}
                 {showApprovalAlert && selectedFlowNode.data.isAproved !== 'UNDEF' && (
-                  <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                  <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-600 rounded-lg">
                     <div className="flex items-start space-x-2">
                       <div className="flex-shrink-0">
                         <svg className="w-5 h-5 text-orange-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -386,8 +386,8 @@ export function FlowWithAutoFitView({
                         </svg>
                       </div>
                       <div className="flex-1">
-                        <h4 className="text-sm font-medium text-orange-800 mb-1">ATENÇÃO</h4>
-                        <p className="text-xs text-orange-700 mb-3">
+                        <h4 className="text-sm font-medium text-orange-800 dark:text-orange-400 mb-1">ATENÇÃO</h4>
+                        <p className="text-xs text-orange-700 dark:text-orange-300 mb-3">
                           Ao executar esta ação o fluxo passará automaticamente para o próximo estágio definido conforme o diagrama, esta ação pode ser irreversível caso ações posteriores no workflow sejam executadas.
                         </p>
                         <div className="flex space-x-2">
