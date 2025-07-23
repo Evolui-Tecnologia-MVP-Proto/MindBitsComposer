@@ -34,7 +34,7 @@ export function GitHubTab({
 }: GitHubTabProps) {
   const queryClient = useQueryClient();
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 bg-white dark:bg-[#0F172A] p-6 rounded-lg">
       <div className="bg-white dark:bg-[#1E293B] rounded-lg border dark:border-[#374151] p-6">
         <div className="flex items-center justify-between mb-6 flex-shrink-0">
           <div>

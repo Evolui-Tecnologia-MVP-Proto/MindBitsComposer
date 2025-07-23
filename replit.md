@@ -296,6 +296,7 @@ Preferred communication style: Simple, everyday language.
   - Enhanced text colors: #E5E7EB (titles), #9CA3AF (secondary text)
   - Updated loading states, file display cards, and empty state messages
   - Applied dark theme to code elements and badges
+  - Applied #0F172A to main div container background for repositório tab
   - Ensured consistent color scheme matching administration page pattern
 
 ## System Architecture
