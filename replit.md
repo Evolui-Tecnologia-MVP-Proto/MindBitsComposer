@@ -301,6 +301,8 @@ Preferred communication style: Simple, everyday language.
   - Applied #0F172A to header container with buttons
   - Applied #1F2937 to "Estrutura do Repositório" and "Arquivos em:" section divs
   - Applied #111827 to internal cards and elements within repository structure and files sections
+  - Applied #1F2937 to FileExplorer main container and content area for folder items with "Sincronizada" status
+  - Enhanced hover states and text colors in dark mode for repository structure elements
   - Ensured consistent visual hierarchy with proper background colors
   - Ensured consistent color scheme matching administration page pattern
 

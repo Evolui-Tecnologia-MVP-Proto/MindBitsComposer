@@ -156,7 +156,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
       return (
         <div key={item.id} className="select-none">
           <div
-            className={`flex items-center py-1 px-2 hover:bg-gray-100 rounded cursor-pointer transition-colors ${
+            className={`flex items-center py-1 px-2 hover:bg-gray-100 dark:hover:bg-[#111827] rounded cursor-pointer transition-colors ${
               item.type === 'file' ? 'hover:bg-blue-50 dark:hover:bg-blue-900/20' : ''
             }`}
             style={{ paddingLeft }}
@@ -192,7 +192,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
               {getFileIcon(item.name, item.type)}
             </div>
             
-            <span className="text-sm flex-1 truncate">{item.name}</span>
+            <span className="text-sm flex-1 truncate dark:text-gray-300">{item.name}</span>
             
             {item.type === 'file' && item.size && (
               <span className="text-xs text-gray-500 ml-2">{item.size}</span>
@@ -394,7 +394,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     return (
       <div key={item.id}>
         <div
-          className={`flex items-center py-1 px-2 hover:bg-gray-50 rounded cursor-pointer group relative`}
+          className={`flex items-center py-1 px-2 hover:bg-gray-50 dark:hover:bg-[#111827] rounded cursor-pointer group relative`}
           style={{ paddingLeft }}
           onClick={() => toggleFolder(item.id, item)}
         >
@@ -415,7 +415,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
               )}
             </Button>
             <Folder className={`h-4 w-4 ${getStatusColor(item.syncStatus)}`} />
-            <span className="text-sm text-gray-700 font-mono">{item.name}</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300 font-mono">{item.name}</span>
             {getStatusBadge(item.syncStatus)}
           </div>
           
@@ -450,8 +450,8 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   };
 
   return (
-    <div className="border rounded-lg bg-white">
-      <div className="p-3 border-b bg-gray-50 flex items-center justify-between">
+    <div className="border rounded-lg bg-white dark:bg-[#1F2937] dark:border-[#374151]">
+      <div className="p-3 border-b bg-gray-50 dark:bg-[#111827] dark:border-[#374151] flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Button
             size="sm"
@@ -483,7 +483,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
         </Button>
       </div>
       
-      <div className="p-2 max-h-96 overflow-y-auto">
+      <div className="p-2 max-h-96 overflow-y-auto bg-white dark:bg-[#1F2937]">
         {/* Renderizar estrutura unificada com cores de status */}
         {unifiedData.map((item) => 
           item.type === 'folder' 
