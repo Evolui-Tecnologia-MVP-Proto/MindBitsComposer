@@ -2814,8 +2814,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               <div className="space-y-3">
                 {/* Status Exec./Tipo apenas para ActionNode */}
                 {selectedFlowNode.type === 'actionNode' && (
-                  <div className="grid grid-cols-3 gap-2 text-center">
-                    <div>
+                  <div className="grid grid-cols-3 gap-0 text-center border border-gray-300 dark:border-white rounded-lg overflow-hidden">
+                    <div className="border-r border-gray-300 dark:border-white px-2 py-3">
                       <p className="text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Status Exec.</p>
                       <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
                         selectedFlowNode.data.isExecuted === 'TRUE' 
@@ -2831,7 +2831,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           : 'N.Exec.'}
                       </div>
                     </div>
-                    <div>
+                    <div className="border-r border-gray-300 dark:border-white px-2 py-3">
                       <p className="text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Tipo Ação</p>
                       {selectedFlowNode.data.actionType && (
                         <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400">
@@ -2839,7 +2839,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         </div>
                       )}
                     </div>
-                    <div>
+                    <div className="px-2 py-3">
                       <p className="text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Aprovação</p>
                       {selectedFlowNode.data.isAproved && (
                         <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
