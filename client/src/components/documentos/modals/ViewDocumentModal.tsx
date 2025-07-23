@@ -537,30 +537,44 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                                     <Table className="table-fixed min-w-full text-sm">
                                       <TableHeader>
                                         <TableRow 
-                                          className="h-8 dark:bg-[#111827]"
-                                          style={{ backgroundColor: 'var(--theme) === "dark" ? "#111827" : "transparent"' }}
+                                          className="h-8"
+                                          style={{ 
+                                            backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : 'transparent'
+                                          }}
                                         >
                                           <TableHead
                                             className="w-40 px-2 py-1 font-medium dark:text-gray-200"
-                                            style={{ fontSize: "14px" }}
+                                            style={{ 
+                                              fontSize: "14px",
+                                              backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : 'transparent'
+                                            }}
                                           >
                                             Arquivo
                                           </TableHead>
                                           <TableHead
                                             className="w-40 px-2 py-1 font-medium dark:text-gray-200"
-                                            style={{ fontSize: "14px" }}
+                                            style={{ 
+                                              fontSize: "14px",
+                                              backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : 'transparent'
+                                            }}
                                           >
                                             Asset ID
                                           </TableHead>
                                           <TableHead
                                             className="w-20 px-2 py-1 font-medium dark:text-gray-200"
-                                            style={{ fontSize: "14px" }}
+                                            style={{ 
+                                              fontSize: "14px",
+                                              backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : 'transparent'
+                                            }}
                                           >
                                             Tipo
                                           </TableHead>
                                           <TableHead
                                             className="w-20 px-2 py-1 font-medium text-center dark:text-gray-200"
-                                            style={{ fontSize: "14px" }}
+                                            style={{ 
+                                              fontSize: "14px",
+                                              backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : 'transparent'
+                                            }}
                                           >
                                             Ações
                                           </TableHead>
@@ -571,8 +585,10 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                                           (file: any, fileIndex: number) => (
                                             <TableRow
                                               key={fileIndex}
-                                              className="h-8 dark:border-[#374151] dark:bg-[#0F172A]"
-                                              style={{ backgroundColor: 'var(--theme) === "dark" ? "#0F172A" : "transparent"' }}
+                                              className="h-8 dark:border-[#374151]"
+                                              style={{ 
+                                                backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : 'transparent'
+                                              }}
                                             >
                                               <TableCell className="font-medium w-40 px-2 py-1 dark:text-gray-300">
                                                 <div className="flex items-center gap-1 min-w-0">

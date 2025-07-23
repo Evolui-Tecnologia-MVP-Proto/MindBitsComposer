@@ -3889,50 +3889,19 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   border-bottom-right-radius: inherit !important;
 }
 
-/* ViewDocumentModal - Anexos tab ONLY - Ultra-specific table styling for dark theme */
-/* Maximum specificity approach - targeting ONLY ViewDocumentModal anexos tab in dark mode */
-
-/* Table Headers - Apply #111827 background */
-html.dark [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table.table-fixed thead tr,
-html.dark [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table.table-fixed thead th,
-html.dark [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] .table-fixed thead tr,
-html.dark [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] .table-fixed thead th {
-  background-color: #111827 !important;
-  background: #111827 !important;
-}
-
-/* Table Body Rows and Cells - Apply #0F172A background */
-html.dark [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table.table-fixed tbody tr,
-html.dark [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table.table-fixed tbody td,
-html.dark [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] .table-fixed tbody tr,
-html.dark [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] .table-fixed tbody td {
-  background-color: #0F172A !important;
-  background: #0F172A !important;
-}
-
-/* Additional coverage for any table elements */
-html.dark [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table thead,
-html.dark [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] .table-fixed thead {
+/* ViewDocumentModal - Anexos tab table colors for dark theme only */
+html.dark div[data-radix-tabs-content][value="anexos"] table.table-fixed thead tr {
   background-color: #111827 !important;
 }
 
-html.dark [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table tbody,
-html.dark [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] .table-fixed tbody {
+html.dark div[data-radix-tabs-content][value="anexos"] table.table-fixed thead th {
+  background-color: #111827 !important;
+}
+
+html.dark div[data-radix-tabs-content][value="anexos"] table.table-fixed tbody tr {
   background-color: #0F172A !important;
 }
 
-/* Override any Tailwind or component-specific backgrounds */
-html.dark [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] [class*="bg-"],
-html.dark [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table [class*="bg-"] {
-  /* Let the table-specific rules above take precedence */
-}
-
-/* Ensure light mode is completely protected - explicit override prevention */
-html:not(.dark) [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table thead tr,
-html:not(.dark) [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table thead th,
-html:not(.dark) [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table tbody tr,
-html:not(.dark) [data-radix-dialog-overlay] [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table tbody td {
-  /* Explicitly prevent dark mode styles from affecting light mode */
-  background-color: initial !important;
-  background: initial !important;
+html.dark div[data-radix-tabs-content][value="anexos"] table.table-fixed tbody td {
+  background-color: #0F172A !important;
 }
