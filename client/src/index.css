@@ -3888,3 +3888,44 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 .editor-right-rounded .lexical-canvas * {
   border-bottom-right-radius: inherit !important;
 }
+
+/* ViewDocumentModal - Anexos tab - Table styling for dark theme only */
+/* Very specific selectors to apply only to ViewDocumentModal anexos tab */
+.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table thead tr {
+  background-color: #111827 !important;
+}
+
+.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table thead th {
+  background-color: #111827 !important;
+}
+
+.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table tbody tr {
+  background-color: #0F172A !important;
+}
+
+.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table tbody td {
+  background-color: #0F172A !important;
+}
+
+/* Additional specificity for TableHeader and TableRow components */
+.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] [data-radix-table-header] {
+  background-color: #111827 !important;
+}
+
+.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] [data-radix-table-row] {
+  background-color: #0F172A !important;
+}
+
+/* Ensure cells inherit the correct background */
+.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] [data-radix-table-cell] {
+  background-color: inherit !important;
+}
+
+/* Apply to Table components specifically */
+.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] .table-fixed thead tr {
+  background-color: #111827 !important;
+}
+
+.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] .table-fixed tbody tr {
+  background-color: #0F172A !important;
+}

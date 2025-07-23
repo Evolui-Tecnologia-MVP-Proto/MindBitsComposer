@@ -271,6 +271,9 @@ Preferred communication style: Simple, everyday language.
   - Enhanced type indicators (Imagem: green-400, Arquivo: gray-400) for dark mode
   - Updated error state containers with red-900/30 background and red-400 text
   - Applied dark:border-[#374151] to table rows for consistent theming
+  - Applied specific CSS rules for table headers (#111827) and table rows (#0F172A) in dark mode only
+  - Used highly specific selectors to ensure changes apply only to ViewDocumentModal anexos tab
+  - Protected light theme from any interference with dark mode specific styling
 
 ## System Architecture
 
