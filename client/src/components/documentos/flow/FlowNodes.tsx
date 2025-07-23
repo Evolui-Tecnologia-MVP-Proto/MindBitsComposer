@@ -15,20 +15,12 @@ export const StartNodeComponent = (props: any) => {
   const isSelected = props.selected;
   
   const getBackgroundColor = () => {
-    if (props.data.FromType === 'Init') {
-      return 'bg-[#22c55e]'; // Verde para início direto
-    } else if (props.data.FromType) {
-      return 'bg-[#3b82f6]'; // Azul para outros tipos
-    }
     if (props.data.isExecuted === 'TRUE') return 'bg-[#21639a]';
     if (props.data.isPendingConnected) return 'bg-yellow-200';
-    return 'bg-white'; // Estado padrão: fundo branco
+    return 'bg-white';
   };
 
   const getTextColor = () => {
-    if (props.data.FromType === 'Init' || props.data.FromType) {
-      return 'text-white'; // Texto branco para fundos coloridos
-    }
     return props.data.isExecuted === 'TRUE' ? 'text-white' : 'text-black';
   };
   
@@ -53,9 +45,7 @@ export const StartNodeComponent = (props: any) => {
       {props.data.configured && props.data.showLabel === false && (
         <div className="text-xs font-medium font-mono">
           {props.data.FromType && (
-            <div className={`px-2 py-1 rounded font-mono ${
-              props.data.FromType === 'Init' ? 'bg-[#22c55e] text-white' : 'bg-[#3b82f6] text-white'
-            }`}>
+            <div className={`px-2 py-1 rounded font-mono ${getTextColor()}`}>
               {props.data.FromType === 'Init' ? 'Início Direto' : 
                props.data.FromType === 'flow_init' ? 'Transferência de Fluxo' : props.data.FromType}
             </div>
@@ -77,20 +67,12 @@ export const EndNodeComponent = (props: any) => {
   const isSelected = props.selected;
   
   const getBackgroundColor = () => {
-    if (props.data.To_Type === 'Direct_finish') {
-      return 'bg-[#ef4444]'; // Vermelho para encerramento direto
-    } else if (props.data.To_Type) {
-      return 'bg-[#3b82f6]'; // Azul para outros tipos
-    }
     if (props.data.isExecuted === 'TRUE') return 'bg-[#21639a]';
     if (props.data.isPendingConnected) return 'bg-yellow-200';
-    return 'bg-white'; // Estado padrão: fundo branco
+    return 'bg-white';
   };
 
   const getTextColor = () => {
-    if (props.data.To_Type === 'Direct_finish' || props.data.To_Type) {
-      return 'text-white'; // Texto branco para fundos coloridos
-    }
     return props.data.isExecuted === 'TRUE' ? 'text-white' : 'text-black';
   };
   
