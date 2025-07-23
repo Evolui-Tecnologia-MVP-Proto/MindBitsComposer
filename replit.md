@@ -208,6 +208,11 @@ Preferred communication style: Simple, everyday language.
   - Added dark background colors to sync status badges: bg-green-50 dark:bg-green-900/30, bg-red-50 dark:bg-red-900/30, bg-yellow-50 dark:bg-yellow-900/30
   - Enhanced all sync status badges (synced, unsynced, github-only, local-only) with proper dark mode backgrounds
   - Maintained existing text and border colors while adding background support for better visibility
+✓ Improved contrast for sync badges in dark mode (January 23, 2025):
+  - Enhanced dark mode colors for better visibility: bg-green-100 dark:bg-green-800/50, bg-red-100 dark:bg-red-800/50, bg-yellow-100 dark:bg-yellow-800/50
+  - Strengthened text colors: text-green-700 dark:text-green-300, text-red-700 dark:text-red-300, text-yellow-700 dark:text-yellow-300
+  - Improved border colors: border-green-300 dark:border-green-600, border-red-300 dark:border-red-600, border-yellow-300 dark:border-yellow-600
+  - Applied /50 opacity instead of /30 for more prominent background visibility in dark mode
 
 ## System Architecture
 

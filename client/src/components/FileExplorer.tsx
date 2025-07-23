@@ -355,26 +355,26 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     switch (syncStatus) {
       case 'synced':
         return (
-          <Badge variant="outline" className="text-xs text-green-600 dark:text-green-400 border-green-200 dark:border-green-700 bg-green-50 dark:bg-green-900/30">
+          <Badge variant="outline" className="text-xs text-green-700 dark:text-green-300 border-green-300 dark:border-green-600 bg-green-100 dark:bg-green-800/50">
             ✓ Sincronizada
           </Badge>
         );
       case 'unsynced':
         return (
-          <Badge variant="outline" className="text-xs text-red-600 dark:text-red-400 border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/30">
+          <Badge variant="outline" className="text-xs text-red-700 dark:text-red-300 border-red-300 dark:border-red-600 bg-red-100 dark:bg-red-800/50">
             <AlertCircle className="h-3 w-3 mr-1" />
             Não sincronizada
           </Badge>
         );
       case 'github-only':
         return (
-          <Badge variant="outline" className="text-xs text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/30">
+          <Badge variant="outline" className="text-xs text-yellow-700 dark:text-yellow-300 border-yellow-300 dark:border-yellow-600 bg-yellow-100 dark:bg-yellow-800/50">
             ⚠ Apenas no GitHub
           </Badge>
         );
       case 'local-only':
         return (
-          <Badge variant="outline" className="text-xs text-red-600 dark:text-red-400 border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/30">
+          <Badge variant="outline" className="text-xs text-red-700 dark:text-red-300 border-red-300 dark:border-red-600 bg-red-100 dark:bg-red-800/50">
             <AlertCircle className="h-3 w-3 mr-1" />
             Somente Local
           </Badge>
