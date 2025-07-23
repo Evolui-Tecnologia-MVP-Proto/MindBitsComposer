@@ -182,7 +182,7 @@ export function GitHubTab({
                     }}
                   />
                 ) : !isLoadingRepo ? (
-                  <div className="border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#0F172A] p-6 text-center">
+                  <div className="border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#111827] p-6 text-center">
                     <div className="text-gray-500 dark:text-[#9CA3AF] mb-2">
                       <svg
                         className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
@@ -214,7 +214,7 @@ export function GitHubTab({
                     </Button>
                   </div>
                 ) : (
-                  <div className="border dark:border-[#374151] rounded-lg bg-white dark:bg-[#0F172A] p-6">
+                  <div className="border dark:border-[#374151] rounded-lg bg-white dark:bg-[#111827] p-6">
                     <div className="animate-pulse space-y-3">
                       <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-3/4"></div>
                       <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-1/2"></div>
@@ -251,7 +251,7 @@ export function GitHubTab({
                     (file: any, index: number) => (
                       <div
                         key={index}
-                        className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#0F172A] rounded-lg border dark:border-[#374151]"
+                        className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#111827] rounded-lg border dark:border-[#374151]"
                       >
                         <div className="flex items-center space-x-3">
                           <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
