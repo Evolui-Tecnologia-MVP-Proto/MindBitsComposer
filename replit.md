@@ -250,6 +250,12 @@ Preferred communication style: Simple, everyday language.
   - Applied #1E40AF button colors to match application standards
   - Fixed document details card with #1E293B background and #374151 borders
   - Updated document info text colors: gray-100 (title), gray-300 (details), gray-200 (labels)
+✓ Applied dark mode to ViewDocumentModal "Descrição" field (January 23, 2025):
+  - Fixed description field background to #1E293B in dark mode
+  - Added #374151 borders for consistency with application standards
+  - Updated description text to gray-300 for proper contrast
+  - Applied #0F1729 background to DialogContent for complete dark mode consistency
+  - Enhanced label text color to gray-400 in dark mode
 
 ## System Architecture
 

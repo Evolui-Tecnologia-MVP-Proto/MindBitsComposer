@@ -191,7 +191,7 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto dark:bg-[#0F1729]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <File className="h-5 w-5 text-blue-500" />
@@ -288,10 +288,10 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
               </div>
 
               <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
                   Descrição
                 </p>
-                <p className="text-sm bg-gray-50 p-3 rounded-md text-gray-700 min-h-[80px]">
+                <p className="text-sm bg-gray-50 dark:bg-[#1E293B] p-3 rounded-md text-gray-700 dark:text-gray-300 border dark:border-[#374151] min-h-[80px]">
                   {selectedDocument.descricao}
                 </p>
               </div>
