@@ -326,19 +326,54 @@ export function DocumentosTable({
 
   return (
     <>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Origem</TableHead>
-            <TableHead>Nome</TableHead>
-            <TableHead>Incluído</TableHead>
-            <TableHead>Iniciado</TableHead>
-            {activeTab === "em-processo" && <TableHead>Fluxo Atual</TableHead>}
-            <TableHead>Status</TableHead>
-            {activeTab === "em-processo" && <TableHead className="w-[120px]">Tsk.Status</TableHead>}
-            <TableHead className="text-right">Ações</TableHead>
-          </TableRow>
-        </TableHeader>
+      <div className={activeTab === "em-processo" ? "border rounded-lg dark:border-[#374151] dark:bg-[#111827]" : ""}>
+        <Table>
+          <TableHeader 
+            className={activeTab === "em-processo" ? "sticky top-0 bg-white dark:bg-[#111827] z-10 shadow-sm" : ""}
+          >
+            <TableRow>
+              <TableHead 
+                className={activeTab === "em-processo" ? "bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200" : ""}
+              >
+                Origem
+              </TableHead>
+              <TableHead 
+                className={activeTab === "em-processo" ? "bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200" : ""}
+              >
+                Nome
+              </TableHead>
+              <TableHead 
+                className={activeTab === "em-processo" ? "bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200" : ""}
+              >
+                Incluído
+              </TableHead>
+              <TableHead 
+                className={activeTab === "em-processo" ? "bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200" : ""}
+              >
+                Iniciado
+              </TableHead>
+              {activeTab === "em-processo" && (
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
+                  Fluxo Atual
+                </TableHead>
+              )}
+              <TableHead 
+                className={activeTab === "em-processo" ? "bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200" : ""}
+              >
+                Status
+              </TableHead>
+              {activeTab === "em-processo" && (
+                <TableHead className="w-[120px] bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
+                  Tsk.Status
+                </TableHead>
+              )}
+              <TableHead 
+                className={`text-right ${activeTab === "em-processo" ? "bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200" : ""}`}
+              >
+                Ações
+              </TableHead>
+            </TableRow>
+          </TableHeader>
         <TableBody>
           {documentos.map((documento) => (
             <TableRow key={documento.id}>
@@ -497,6 +532,7 @@ export function DocumentosTable({
         )}
         </TableBody>
       </Table>
+      </div>
 
       {/* Dropdown de fluxos na posição do mouse */}
       {dropdown.isOpen && (
