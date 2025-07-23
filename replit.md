@@ -290,6 +290,11 @@ Preferred communication style: Simple, everyday language.
   - Added conditional styling for table containers with dark:bg-[#111827]
   - Applied sticky header styling with proper borders and text colors
   - Ensured consistent dark mode theming across process, completed, and included document tabs
+✓ Moved empty state content inside table div for Incluidos tab (January 23, 2025):
+  - Removed empty state that was displayed below table container
+  - Added empty state within TableBody using TableRow with colSpan={7}
+  - Applied dark mode colors to empty state text and icon (gray-200, gray-400, gray-500)
+  - Empty state now appears within table structure when no "Incluido" documents exist
 ✓ Applied comprehensive dark theme to GitHubTab repositório page (January 23, 2025):
   - Updated all main containers and cards with #0F172A background and #374151 borders
   - Applied #0F172A to individual file cards and loading containers
