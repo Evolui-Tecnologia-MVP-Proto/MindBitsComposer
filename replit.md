@@ -228,6 +228,10 @@ Preferred communication style: Simple, everyday language.
   - Applied exact same classes: bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 px-2 py-1 rounded text-xs font-medium
   - Ensured consistent visual appearance with Monday origin badges
   - Force touched file to trigger rebuild and cache refresh
+✓ Added test badge to debug visibility issue (January 23, 2025):
+  - Added hardcoded green badge "TESTE" to FileExplorer
+  - Testing if badges are visible in the Repositório tab
+  - Debugging sync badge display issue
 
 ## System Architecture
 
