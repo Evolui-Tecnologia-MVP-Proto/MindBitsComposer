@@ -223,6 +223,11 @@ Preferred communication style: Simple, everyday language.
   - Matched exact text pattern: text-green-800 dark:text-green-400, text-red-800 dark:text-red-400, text-yellow-800 dark:text-yellow-400
   - Consistent border styling: border-green-300 dark:border-green-600, border-red-300 dark:border-red-600, border-yellow-300 dark:border-yellow-600
   - Forced workflow restart to ensure changes are applied
+✓ Applied direct div styling matching Monday badges exactly (January 23, 2025):
+  - Removed Badge component and used direct div with Monday badge styling
+  - Applied exact same classes: bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 px-2 py-1 rounded text-xs font-medium
+  - Ensured consistent visual appearance with Monday origin badges
+  - Force touched file to trigger rebuild and cache refresh
 
 ## System Architecture
 

@@ -355,29 +355,29 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     switch (syncStatus) {
       case 'synced':
         return (
-          <Badge variant="outline" className="text-xs text-green-800 dark:text-green-400 border-green-300 dark:border-green-600 bg-green-100 dark:bg-green-900/30">
+          <div className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 px-2 py-1 rounded text-xs font-medium">
             ✓ Sincronizada
-          </Badge>
+          </div>
         );
       case 'unsynced':
         return (
-          <Badge variant="outline" className="text-xs text-red-800 dark:text-red-400 border-red-300 dark:border-red-600 bg-red-100 dark:bg-red-900/30">
-            <AlertCircle className="h-3 w-3 mr-1" />
+          <div className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+            <AlertCircle className="h-3 w-3" />
             Não sincronizada
-          </Badge>
+          </div>
         );
       case 'github-only':
         return (
-          <Badge variant="outline" className="text-xs text-yellow-800 dark:text-yellow-400 border-yellow-300 dark:border-yellow-600 bg-yellow-100 dark:bg-yellow-900/30">
+          <div className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 px-2 py-1 rounded text-xs font-medium">
             ⚠ Apenas no GitHub
-          </Badge>
+          </div>
         );
       case 'local-only':
         return (
-          <Badge variant="outline" className="text-xs text-red-800 dark:text-red-400 border-red-300 dark:border-red-600 bg-red-100 dark:bg-red-900/30">
-            <AlertCircle className="h-3 w-3 mr-1" />
+          <div className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
+            <AlertCircle className="h-3 w-3" />
             Somente Local
-          </Badge>
+          </div>
         );
       default:
         return null;
