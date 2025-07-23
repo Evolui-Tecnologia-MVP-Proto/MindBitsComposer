@@ -22,7 +22,8 @@ import {
   Loader2,
   BookOpen,
   Zap,
-  RefreshCw
+  RefreshCw,
+  FileText
 } from "lucide-react";
 
 import {
@@ -1626,10 +1627,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   }
 
   return (
-    <div>
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-3xl font-bold tracking-tight">Documentos</h2>
+    <div className="container mx-auto py-6 bg-background dark:bg-[#1F2937] text-foreground" data-page="documentos">
+      <div className="space-y-6 bg-[#F9FAFB] dark:bg-[#1F2937]">
+        <div className="flex items-center justify-between p-6 rounded-lg bg-gray-50 dark:bg-[#1F2937]">
+          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-[#6B7280] flex items-center gap-3">
+            <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            Documentos
+          </h1>
           <div className="flex items-center gap-3">
             <Button
               onClick={() => {
@@ -1665,12 +1669,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           onValueChange={setActiveTab}
           className="w-full"
         >
-          <TabsList className="mb-6">
-            <TabsTrigger value="incluidos">Incluídos</TabsTrigger>
-            <TabsTrigger value="integrados">Integrados</TabsTrigger>
-            <TabsTrigger value="em-processo">Em Processo</TabsTrigger>
-            <TabsTrigger value="concluidos">Concluídos</TabsTrigger>
-            <TabsTrigger value="repositorio">Repositório</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-[#1E293B] mb-6">
+            <TabsTrigger value="incluidos" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Incluídos</TabsTrigger>
+            <TabsTrigger value="integrados" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Integrados</TabsTrigger>
+            <TabsTrigger value="em-processo" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Em Processo</TabsTrigger>
+            <TabsTrigger value="concluidos" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Concluídos</TabsTrigger>
+            <TabsTrigger value="repositorio" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Repositório</TabsTrigger>
           </TabsList>
 
           <IncluirDocumentosTab
