@@ -156,7 +156,7 @@ export function FlowDiagramModal({
           </ReactFlowProvider>
         </div>
         
-        <div className="flex-shrink-0 border-t bg-white p-4 mt-4">
+        <div className="flex-shrink-0 border-t bg-white dark:bg-[#111827] dark:border-[#374151] p-4 mt-4">
           <div className="flex justify-end">
             <Button 
               onClick={() => {

@@ -300,6 +300,7 @@ Preferred communication style: Simple, everyday language.
   - Applied dark mode colors to DialogTitle (gray-200) and Network icon (blue-400)
   - Updated DialogDescription with dark:text-gray-300 for document information
   - Applied dark:bg-[#0F172A] to flow diagram container area
+  - Applied dark:bg-[#111827] to close button container div with dark:border-[#374151]
   - Enhanced modal visual consistency with application dark theme standards
 ✓ Applied same origin column formatting from integrados tab to em-processo tab (January 23, 2025):
   - Added dark mode colors to origin badges in em-processo, concluidos, and incluidos tabs
