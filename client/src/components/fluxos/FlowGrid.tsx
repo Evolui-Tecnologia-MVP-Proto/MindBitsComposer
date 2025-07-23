@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Background, BackgroundVariant } from 'reactflow';
 
 interface FlowGridProps {
@@ -6,13 +6,36 @@ interface FlowGridProps {
 }
 
 export const FlowGrid: React.FC<FlowGridProps> = ({ isDark }) => {
-  const documentIsDark = document.documentElement.classList.contains('dark');
-  const gridColor = documentIsDark ? "#ffffff" : "#000000";
+  const [currentTheme, setCurrentTheme] = useState(
+    document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+  );
   
-  // Force re-render by using theme as key
+  useEffect(() => {
+    const checkTheme = () => {
+      const newTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+      if (newTheme !== currentTheme) {
+        setCurrentTheme(newTheme);
+      }
+    };
+    
+    // Check immediately
+    checkTheme();
+    
+    // Watch for class changes
+    const observer = new MutationObserver(checkTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+    
+    return () => observer.disconnect();
+  }, [currentTheme]);
+  
+  const gridColor = currentTheme === 'dark' ? "#ffffff" : "#000000";
+  
   return (
     <Background 
-      key={documentIsDark ? 'dark' : 'light'}
+      key={`${currentTheme}-${gridColor}`}
       gap={16}
       size={1}
       color={gridColor}
