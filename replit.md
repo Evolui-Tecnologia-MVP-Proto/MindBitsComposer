@@ -193,6 +193,11 @@ Preferred communication style: Simple, everyday language.
   - Applied to dark mode only with [data-page="documentos"] selector
   - Ensured cells inherit the row background colors for consistency
   - Used !important flags to override default styling
+✓ Applied black color to table headers in light mode for documentos page (January 23, 2025):
+  - Created specific CSS rules for light mode only using :not(.dark *) selectors
+  - Applied color: #000000 to thead th, .table-header, and th elements
+  - Used [data-page="documentos"] selector to limit scope to documentos page only
+  - Added double specificity protection with html:not(.dark) to prevent dark mode interference
 
 ## System Architecture
 

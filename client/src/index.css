@@ -1846,6 +1846,20 @@ table:not(.lexical-editor-container table) th {
   background-color: #1F2937 !important;
 }
 
+/* Table titles/headers black color for light mode ONLY in documentos page */
+[data-page="documentos"]:not(.dark *) thead th,
+[data-page="documentos"]:not(.dark *) .table-header,
+[data-page="documentos"]:not(.dark *) th {
+  color: #000000 !important;
+}
+
+/* Additional specificity for table headers in light mode only */
+html:not(.dark) [data-page="documentos"] thead th,
+html:not(.dark) [data-page="documentos"] .table-header,
+html:not(.dark) [data-page="documentos"] th {
+  color: #000000 !important;
+}
+
 /* Date picker dropdown/calendar dark theme styling */
 .dark input[type="datetime-local"]::-webkit-datetime-edit,
 .dark input[type="date"]::-webkit-datetime-edit,
