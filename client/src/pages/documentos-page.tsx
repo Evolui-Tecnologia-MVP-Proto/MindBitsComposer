@@ -3673,24 +3673,24 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 {/* Layout tabular 3x2 para SwitchNode */}
                 {selectedFlowNode.type === 'switchNode' && (
                   <div>
-                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="border border-gray-200 dark:border-white rounded-lg overflow-hidden">
                       <table className="w-full text-xs">
                         <thead>
-                          <tr className="bg-gray-50">
-                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Status Exec.</th>
-                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 border-r border-gray-200 text-xs">Campo Switch</th>
-                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 text-xs">Input Switch</th>
+                          <tr className="bg-gray-50 dark:bg-[#0F172A]">
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 dark:text-gray-200 border-r border-gray-200 dark:border-white text-xs">Status Exec.</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 dark:text-gray-200 border-r border-gray-200 dark:border-white text-xs">Campo Switch</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 dark:text-gray-200 text-xs">Input Switch</th>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr className="bg-white">
-                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                          <tr className="bg-white dark:bg-[#1F2937]">
+                            <td className="px-2 py-1.5 border-r border-gray-200 dark:border-white text-center">
                               <div className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${
                                 selectedFlowNode.data.isExecuted === 'TRUE' 
-                                  ? 'bg-blue-100 text-blue-800' 
+                                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' 
                                   : selectedFlowNode.data.isPendingConnected
-                                  ? 'bg-yellow-100 text-yellow-800'
-                                  : 'bg-gray-100 text-gray-800'
+                                  ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400'
+                                  : 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-200'
                               }`}>
                                 {selectedFlowNode.data.isExecuted === 'TRUE' 
                                   ? 'Executado' 
@@ -3699,22 +3699,22 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   : 'N.Exec.'}
                               </div>
                             </td>
-                            <td className="px-2 py-1.5 border-r border-gray-200 text-center">
+                            <td className="px-2 py-1.5 border-r border-gray-200 dark:border-white text-center">
                               {selectedFlowNode.data.switchField ? (
-                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400">
                                   {selectedFlowNode.data.switchField}
                                 </div>
                               ) : (
-                                <span className="text-gray-400 text-xs">-</span>
+                                <span className="text-gray-400 dark:text-gray-300 text-xs">-</span>
                               )}
                             </td>
                             <td className="px-2 py-1.5 text-center">
                               {selectedFlowNode.data.inputSwitch ? (
-                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 text-cyan-800">
+                                <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-cyan-100 dark:bg-cyan-900/30 text-cyan-800 dark:text-cyan-400">
                                   {selectedFlowNode.data.inputSwitch}
                                 </div>
                               ) : (
-                                <span className="text-gray-400 text-xs">-</span>
+                                <span className="text-gray-400 dark:text-gray-300 text-xs">-</span>
                               )}
                             </td>
                           </tr>
