@@ -1860,6 +1860,41 @@ html:not(.dark) [data-page="documentos"] th {
   color: #000000 !important;
 }
 
+/* Table row alternating colors for LIGHT mode in documentos page */
+html:not(.dark) [data-page="documentos"] tbody tr:nth-child(odd) {
+  background-color: #FFFFFF !important;
+}
+
+html:not(.dark) [data-page="documentos"] tbody tr:nth-child(even) {
+  background-color: #F9FAFB !important;
+}
+
+/* Ensure cells inherit the row background color in light mode */
+html:not(.dark) [data-page="documentos"] tbody tr:nth-child(odd) td {
+  background-color: #FFFFFF !important;
+}
+
+html:not(.dark) [data-page="documentos"] tbody tr:nth-child(even) td {
+  background-color: #F9FAFB !important;
+}
+
+/* Additional protection to ensure light mode rules don't affect dark mode */
+[data-page="documentos"]:not(.dark *) tbody tr:nth-child(odd) {
+  background-color: #FFFFFF !important;
+}
+
+[data-page="documentos"]:not(.dark *) tbody tr:nth-child(even) {
+  background-color: #F9FAFB !important;
+}
+
+[data-page="documentos"]:not(.dark *) tbody tr:nth-child(odd) td {
+  background-color: #FFFFFF !important;
+}
+
+[data-page="documentos"]:not(.dark *) tbody tr:nth-child(even) td {
+  background-color: #F9FAFB !important;
+}
+
 /* Date picker dropdown/calendar dark theme styling */
 .dark input[type="datetime-local"]::-webkit-datetime-edit,
 .dark input[type="date"]::-webkit-datetime-edit,
