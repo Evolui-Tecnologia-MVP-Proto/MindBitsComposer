@@ -358,7 +358,7 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
             <TabsContent value="anexos" className="mt-6">
               <div className="space-y-4">
                 <div className="flex justify-between items-center mb-4">
-                  <h4 className="text-md font-medium flex items-center gap-2">
+                  <h4 className="text-md font-medium flex items-center gap-2 dark:text-gray-200">
                     <Database className="h-4 w-4 text-blue-500" />
                     Anexos (Assets) na Origem
                   </h4>
@@ -423,9 +423,9 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                       mondayData.length === 0
                     ) {
                       return (
-                        <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed">
-                          <Database className="h-6 w-6 text-gray-400 mx-auto mb-2" />
-                          <p className="text-sm text-gray-500">
+                        <div className="text-center py-6 bg-gray-50 dark:bg-[#1E293B] rounded-lg border dark:border-[#374151] border-dashed">
+                          <Database className="h-6 w-6 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             Nenhum dado do Monday.com encontrado
                           </p>
                         </div>
@@ -452,9 +452,9 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                               return (
                                 <div
                                   key={columnIndex}
-                                  className="bg-white border rounded-lg p-4"
+                                  className="bg-white dark:bg-[#1E293B] border dark:border-[#374151] rounded-lg p-4"
                                 >
-                                  <h5 className="text-sm font-medium mb-3 flex items-center gap-2 text-gray-700">
+                                  <h5 className="text-sm font-medium mb-3 flex items-center gap-2 text-gray-700 dark:text-gray-200">
                                     <Paperclip className="h-4 w-4 text-blue-500" />
                                     {getColumnTitle(column.columnid)}
                                   </h5>
@@ -462,27 +462,27 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                                   <div className="w-full overflow-x-auto">
                                     <Table className="table-fixed min-w-full text-sm">
                                       <TableHeader>
-                                        <TableRow className="h-8">
+                                        <TableRow className="h-8 dark:bg-[#111827]">
                                           <TableHead
-                                            className="w-40 px-2 py-1 font-medium"
+                                            className="w-40 px-2 py-1 font-medium dark:text-gray-200"
                                             style={{ fontSize: "14px" }}
                                           >
                                             Arquivo
                                           </TableHead>
                                           <TableHead
-                                            className="w-40 px-2 py-1 font-medium"
+                                            className="w-40 px-2 py-1 font-medium dark:text-gray-200"
                                             style={{ fontSize: "14px" }}
                                           >
                                             Asset ID
                                           </TableHead>
                                           <TableHead
-                                            className="w-20 px-2 py-1 font-medium"
+                                            className="w-20 px-2 py-1 font-medium dark:text-gray-200"
                                             style={{ fontSize: "14px" }}
                                           >
                                             Tipo
                                           </TableHead>
                                           <TableHead
-                                            className="w-20 px-2 py-1 font-medium text-center"
+                                            className="w-20 px-2 py-1 font-medium text-center dark:text-gray-200"
                                             style={{ fontSize: "14px" }}
                                           >
                                             Ações
@@ -494,9 +494,9 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                                           (file: any, fileIndex: number) => (
                                             <TableRow
                                               key={fileIndex}
-                                              className="h-8"
+                                              className="h-8 dark:border-[#374151]"
                                             >
-                                              <TableCell className="font-medium w-40 px-2 py-1">
+                                              <TableCell className="font-medium w-40 px-2 py-1 dark:text-gray-300">
                                                 <div className="flex items-center gap-1 min-w-0">
                                                   {file.isImage === "true" ||
                                                   file.isImage === true ? (
@@ -513,7 +513,7 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                                                 </div>
                                               </TableCell>
                                               <TableCell
-                                                className="font-mono text-xs w-40 px-2 py-1"
+                                                className="font-mono text-xs w-40 px-2 py-1 dark:text-gray-300"
                                                 title={
                                                   file.assetId
                                                     ? String(file.assetId)
@@ -524,7 +524,7 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                                                   ? String(file.assetId)
                                                   : "N/A"}
                                               </TableCell>
-                                              <TableCell className="w-28 px-2 py-1">
+                                              <TableCell className="w-28 px-2 py-1 dark:text-gray-300">
                                                 <div className="flex items-center justify-center space-x-1">
                                                   {file.isImage === "true" ||
                                                   file.isImage === true ? (
@@ -532,7 +532,7 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                                                       <span className="text-sm">
                                                         📷
                                                       </span>
-                                                      <span className="text-xs text-green-600">
+                                                      <span className="text-xs text-green-600 dark:text-green-400">
                                                         Imagem
                                                       </span>
                                                     </>
@@ -541,14 +541,14 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                                                       <span className="text-sm">
                                                         📄
                                                       </span>
-                                                      <span className="text-xs text-gray-600">
+                                                      <span className="text-xs text-gray-600 dark:text-gray-400">
                                                         Arquivo
                                                       </span>
                                                     </>
                                                   )}
                                                 </div>
                                               </TableCell>
-                                              <TableCell className="w-20 px-2 py-1">
+                                              <TableCell className="w-20 px-2 py-1 dark:text-gray-300">
                                                 <div className="flex justify-center">
                                                   {file.assetId &&
                                                     artifacts?.find(
@@ -645,9 +645,9 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                               return (
                                 <div
                                   key={columnIndex}
-                                  className="bg-red-50 border border-red-200 rounded-lg p-4"
+                                  className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-600 rounded-lg p-4"
                                 >
-                                  <p className="text-sm text-red-600">
+                                  <p className="text-sm text-red-600 dark:text-red-400">
                                     Erro ao processar coluna {columnIndex + 1}
                                   </p>
                                 </div>
@@ -667,9 +667,9 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                             return false;
                           }
                         }).length === 0 && (
-                          <div className="text-center py-6 bg-gray-50 rounded-lg border border-dashed">
-                            <Database className="h-6 w-6 text-gray-400 mx-auto mb-2" />
-                            <p className="text-sm text-gray-500">
+                          <div className="text-center py-6 bg-gray-50 dark:bg-[#1E293B] rounded-lg border dark:border-[#374151] border-dashed">
+                            <Database className="h-6 w-6 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
                               Nenhum arquivo encontrado nos dados do
                               Monday.com
                             </p>

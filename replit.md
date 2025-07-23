@@ -263,6 +263,14 @@ Preferred communication style: Simple, everyday language.
   - Fixed "Campos Gerais" title to gray-200 in dark mode
   - Updated Badge with dark theme colors (#374151 background, #6B7280 border)
   - Applied dark mode to empty state container with proper contrast
+✓ Applied dark theme to Anexos tab div and table in ViewDocumentModal (January 23, 2025):
+  - Updated "Anexos (Assets) na Origem" title to gray-200 in dark mode
+  - Applied #1E293B background and #374151 borders to all containers and empty states
+  - Updated table headers with #111827 background and gray-200 text
+  - Applied gray-300 text to all table cells for proper contrast
+  - Enhanced type indicators (Imagem: green-400, Arquivo: gray-400) for dark mode
+  - Updated error state containers with red-900/30 background and red-400 text
+  - Applied dark:border-[#374151] to table rows for consistent theming
 
 ## System Architecture
 
