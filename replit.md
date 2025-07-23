@@ -297,7 +297,7 @@ Preferred communication style: Simple, everyday language.
   - Updated loading states, file display cards, and empty state messages
   - Applied dark theme to code elements and badges
   - Applied #0F172A to main div container background for repositório tab
-  - Applied #1E293B to 1st level internal divs within repositório tab
+  - Applied #0F172A to 1st level internal divs within repositório tab
   - Ensured consistent visual hierarchy with proper background colors
   - Ensured consistent color scheme matching administration page pattern
 

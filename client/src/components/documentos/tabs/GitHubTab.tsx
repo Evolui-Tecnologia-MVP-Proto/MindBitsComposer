@@ -112,9 +112,9 @@ export function GitHubTab({
           </div>
         </div>
 
-        <div className="border-t dark:border-[#374151] pt-6 bg-white dark:bg-[#1E293B] p-4 rounded-lg">
+        <div className="border-t dark:border-[#374151] pt-6 bg-white dark:bg-[#0F172A] p-4 rounded-lg">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="space-y-4 bg-white dark:bg-[#1E293B] p-4 rounded-lg">
+            <div className="space-y-4 bg-white dark:bg-[#0F172A] p-4 rounded-lg">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="font-medium text-gray-900 dark:text-[#E5E7EB]">
                   Estrutura do Repositório
@@ -225,7 +225,7 @@ export function GitHubTab({
               </div>
             </div>
 
-            <div className="space-y-4 bg-white dark:bg-[#1E293B] p-4 rounded-lg">
+            <div className="space-y-4 bg-white dark:bg-[#0F172A] p-4 rounded-lg">
               <h4 className="font-medium text-gray-900 dark:text-[#E5E7EB]">
                 {selectedFolderPath ? (
                   <span>
