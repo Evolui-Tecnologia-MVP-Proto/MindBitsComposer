@@ -3890,42 +3890,70 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* ViewDocumentModal - Anexos tab - Table styling for dark theme only */
-/* Very specific selectors to apply only to ViewDocumentModal anexos tab */
-.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table thead tr {
+/* Nuclear approach - maximum specificity to override all other styles */
+html.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table thead tr,
+.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table thead tr,
+body.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table thead tr {
   background-color: #111827 !important;
+  background: #111827 !important;
 }
 
-.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table thead th {
+html.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table thead th,
+.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table thead th,
+body.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table thead th {
   background-color: #111827 !important;
+  background: #111827 !important;
 }
 
-.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table tbody tr {
+html.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table tbody tr,
+.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table tbody tr,
+body.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table tbody tr {
   background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
-.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table tbody td {
+html.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table tbody td,
+.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table tbody td,
+body.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] table tbody td {
   background-color: #0F172A !important;
+  background: #0F172A !important;
 }
 
-/* Additional specificity for TableHeader and TableRow components */
-.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] [data-radix-table-header] {
-  background-color: #111827 !important;
-}
-
-.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] [data-radix-table-row] {
-  background-color: #0F172A !important;
-}
-
-/* Ensure cells inherit the correct background */
-.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] [data-radix-table-cell] {
-  background-color: inherit !important;
-}
-
-/* Apply to Table components specifically */
+/* Target specific Tailwind-generated table classes */
+html.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] .table-fixed thead tr,
 .dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] .table-fixed thead tr {
   background-color: #111827 !important;
+  background: #111827 !important;
 }
 
+html.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] .table-fixed tbody tr,
 .dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] .table-fixed tbody tr {
   background-color: #0F172A !important;
+  background: #0F172A !important;
+}
+
+/* Force override any computed styles */
+html.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] tr[style*="background"],
+.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] tr[style*="background"] {
+  background-color: #0F172A !important;
+  background: #0F172A !important;
+}
+
+html.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] thead tr[style*="background"],
+.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] thead tr[style*="background"] {
+  background-color: #111827 !important;
+  background: #111827 !important;
+}
+
+/* Apply to any div or element that might be acting as table cells/rows */
+html.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] [role="row"]:first-child,
+.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] [role="row"]:first-child {
+  background-color: #111827 !important;
+  background: #111827 !important;
+}
+
+html.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] [role="row"]:not(:first-child),
+.dark [data-radix-dialog-content] [data-radix-tabs-content][value="anexos"] [role="row"]:not(:first-child) {
+  background-color: #0F172A !important;
+  background: #0F172A !important;
 }

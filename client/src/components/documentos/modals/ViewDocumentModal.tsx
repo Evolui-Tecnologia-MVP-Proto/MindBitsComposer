@@ -35,6 +35,7 @@ import {
   CircleX,
 } from "lucide-react";
 import { type Documento, type DocumentArtifact } from "@shared/schema";
+import { useEffect, useRef } from "react";
 
 interface ViewDocumentModalProps {
   isOpen: boolean;
@@ -45,6 +46,7 @@ interface ViewDocumentModalProps {
 export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDocumentModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const modalRef = useRef<HTMLDivElement>(null);
 
   // Query para buscar artifacts do documento
   const { data: artifacts } = useQuery({
@@ -189,9 +191,53 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
   const showAnexosTab = hasMondayItemValues(selectedDocument);
   const gridCols = showAnexosTab ? "grid-cols-3" : "grid-cols-2";
 
+  // useEffect para aplicar cores específicas às tabelas da aba anexos
+  useEffect(() => {
+    if (!isOpen || !showAnexosTab) return;
+
+    const applyAnexosTableColors = () => {
+      const isDarkMode = document.documentElement.classList.contains('dark');
+      if (!isDarkMode) return;
+
+      // Aguardar um pouco para garantir que a aba foi renderizada
+      setTimeout(() => {
+        // Buscar tabelas na aba anexos
+        const anexosTabContent = document.querySelector('[data-radix-tabs-content][value="anexos"]');
+        if (!anexosTabContent) return;
+
+        // Aplicar cor ao cabeçalho da tabela
+        const tableHeaders = anexosTabContent.querySelectorAll('table thead tr, table thead th');
+        tableHeaders.forEach((header: Element) => {
+          const htmlHeader = header as HTMLElement;
+          htmlHeader.style.setProperty('background-color', '#111827', 'important');
+          htmlHeader.style.setProperty('background', '#111827', 'important');
+        });
+
+        // Aplicar cor às linhas da tabela
+        const tableRows = anexosTabContent.querySelectorAll('table tbody tr, table tbody td');
+        tableRows.forEach((row: Element) => {
+          const htmlRow = row as HTMLElement;
+          htmlRow.style.setProperty('background-color', '#0F172A', 'important');
+          htmlRow.style.setProperty('background', '#0F172A', 'important');
+        });
+      }, 100);
+    };
+
+    applyAnexosTableColors();
+
+    // Aplicar novamente quando a aba mudar
+    const tabTriggers = document.querySelectorAll('[data-radix-tabs-trigger]');
+    tabTriggers.forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        setTimeout(applyAnexosTableColors, 200);
+      });
+    });
+
+  }, [isOpen, showAnexosTab]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto dark:bg-[#0F1729]">
+      <DialogContent ref={modalRef} className="sm:max-w-4xl max-h-[90vh] overflow-y-auto dark:bg-[#0F1729]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <File className="h-5 w-5 text-blue-500" />
@@ -462,7 +508,10 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                                   <div className="w-full overflow-x-auto">
                                     <Table className="table-fixed min-w-full text-sm">
                                       <TableHeader>
-                                        <TableRow className="h-8 dark:bg-[#111827]">
+                                        <TableRow 
+                                          className="h-8 dark:bg-[#111827]"
+                                          style={{ backgroundColor: 'var(--theme) === "dark" ? "#111827" : "transparent"' }}
+                                        >
                                           <TableHead
                                             className="w-40 px-2 py-1 font-medium dark:text-gray-200"
                                             style={{ fontSize: "14px" }}
@@ -494,7 +543,8 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                                           (file: any, fileIndex: number) => (
                                             <TableRow
                                               key={fileIndex}
-                                              className="h-8 dark:border-[#374151]"
+                                              className="h-8 dark:border-[#374151] dark:bg-[#0F172A]"
+                                              style={{ backgroundColor: 'var(--theme) === "dark" ? "#0F172A" : "transparent"' }}
                                             >
                                               <TableCell className="font-medium w-40 px-2 py-1 dark:text-gray-300">
                                                 <div className="flex items-center gap-1 min-w-0">
