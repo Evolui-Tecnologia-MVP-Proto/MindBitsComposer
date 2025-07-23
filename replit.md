@@ -277,6 +277,14 @@ Preferred communication style: Simple, everyday language.
   - Added JavaScript-based color application via useEffect for maximum compatibility
   - Fixed React hooks error by moving useEffect before early return condition
   - Maintained hook order consistency across component renders
+✓ Applied ultra-specific table colors for ViewDocumentModal anexos tab (January 23, 2025):
+  - Table headers: #111827 background (dark mode only)
+  - Table cells: #0F172A background (dark mode only)
+  - Maximum CSS specificity using [data-radix-dialog-overlay] selectors
+  - Enhanced JavaScript application with modal-specific targeting
+  - Complete light theme protection with explicit :not(.dark) rules
+  - Component isolation - no propagation to other system components
+  - Enhanced element targeting including .table-fixed class coverage
 
 ## System Architecture
 

@@ -190,7 +190,7 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
   const showAnexosTab = selectedDocument ? hasMondayItemValues(selectedDocument) : false;
   const gridCols = showAnexosTab ? "grid-cols-3" : "grid-cols-2";
 
-  // useEffect deve ser executado sempre para manter a ordem dos hooks
+  // useEffect para aplicar cores específicas às tabelas da aba anexos
   useEffect(() => {
     if (!isOpen || !showAnexosTab || !selectedDocument) return;
 
@@ -198,39 +198,66 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
       const isDarkMode = document.documentElement.classList.contains('dark');
       if (!isDarkMode) return;
 
-      // Aguardar um pouco para garantir que a aba foi renderizada
+      // Aguardar renderização completa da modal e aba
       setTimeout(() => {
-        // Buscar tabelas na aba anexos
-        const anexosTabContent = document.querySelector('[data-radix-tabs-content][value="anexos"]');
+        // Buscar especificamente a aba anexos dentro da modal de visualização
+        const modalDialog = document.querySelector('[data-radix-dialog-overlay] [data-radix-dialog-content]');
+        if (!modalDialog) return;
+
+        const anexosTabContent = modalDialog.querySelector('[data-radix-tabs-content][value="anexos"]');
         if (!anexosTabContent) return;
 
-        // Aplicar cor ao cabeçalho da tabela
-        const tableHeaders = anexosTabContent.querySelectorAll('table thead tr, table thead th');
+        // Aplicar cores aos cabeçalhos das tabelas (#111827)
+        const tableHeaders = anexosTabContent.querySelectorAll('table.table-fixed thead tr, table.table-fixed thead th, .table-fixed thead tr, .table-fixed thead th');
         tableHeaders.forEach((header: Element) => {
           const htmlHeader = header as HTMLElement;
           htmlHeader.style.setProperty('background-color', '#111827', 'important');
           htmlHeader.style.setProperty('background', '#111827', 'important');
         });
 
-        // Aplicar cor às linhas da tabela
-        const tableRows = anexosTabContent.querySelectorAll('table tbody tr, table tbody td');
-        tableRows.forEach((row: Element) => {
-          const htmlRow = row as HTMLElement;
-          htmlRow.style.setProperty('background-color', '#0F172A', 'important');
-          htmlRow.style.setProperty('background', '#0F172A', 'important');
+        // Aplicar cores às células das tabelas (#0F172A)
+        const tableCells = anexosTabContent.querySelectorAll('table.table-fixed tbody tr, table.table-fixed tbody td, .table-fixed tbody tr, .table-fixed tbody td');
+        tableCells.forEach((cell: Element) => {
+          const htmlCell = cell as HTMLElement;
+          htmlCell.style.setProperty('background-color', '#0F172A', 'important');
+          htmlCell.style.setProperty('background', '#0F172A', 'important');
         });
-      }, 100);
+
+        // Forçar aplicação em qualquer elemento com classe table-fixed
+        const allTableElements = anexosTabContent.querySelectorAll('.table-fixed *');
+        allTableElements.forEach((element: Element) => {
+          const htmlElement = element as HTMLElement;
+          const tagName = htmlElement.tagName.toLowerCase();
+          
+          if (['thead', 'th'].includes(tagName) || htmlElement.closest('thead')) {
+            htmlElement.style.setProperty('background-color', '#111827', 'important');
+          } else if (['tbody', 'tr', 'td'].includes(tagName) && !htmlElement.closest('thead')) {
+            htmlElement.style.setProperty('background-color', '#0F172A', 'important');
+          }
+        });
+
+      }, 150);
     };
 
+    // Aplicar cores imediatamente
     applyAnexosTableColors();
 
-    // Aplicar novamente quando a aba mudar
-    const tabTriggers = document.querySelectorAll('[data-radix-tabs-trigger]');
-    tabTriggers.forEach(trigger => {
-      trigger.addEventListener('click', () => {
-        setTimeout(applyAnexosTableColors, 200);
-      });
-    });
+    // Reaplicar quando a aba anexos for clicada
+    const handleTabChange = () => {
+      setTimeout(applyAnexosTableColors, 100);
+    };
+
+    const anexosTabTrigger = document.querySelector('[data-radix-tabs-trigger][value="anexos"]');
+    if (anexosTabTrigger) {
+      anexosTabTrigger.addEventListener('click', handleTabChange);
+    }
+
+    // Cleanup
+    return () => {
+      if (anexosTabTrigger) {
+        anexosTabTrigger.removeEventListener('click', handleTabChange);
+      }
+    };
 
   }, [isOpen, showAnexosTab, selectedDocument]);
 
