@@ -590,7 +590,12 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                                                 backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : 'transparent'
                                               }}
                                             >
-                                              <TableCell className="font-medium w-40 px-2 py-1 dark:text-gray-300">
+                                              <TableCell 
+                                                className="font-medium w-40 px-2 py-1 dark:text-gray-300" 
+                                                style={{ 
+                                                  backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : 'transparent'
+                                                }}
+                                              >
                                                 <div className="flex items-center gap-1 min-w-0">
                                                   {file.isImage === "true" ||
                                                   file.isImage === true ? (
@@ -608,6 +613,9 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                                               </TableCell>
                                               <TableCell
                                                 className="font-mono text-xs w-40 px-2 py-1 dark:text-gray-300"
+                                                style={{ 
+                                                  backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : 'transparent'
+                                                }}
                                                 title={
                                                   file.assetId
                                                     ? String(file.assetId)
@@ -618,7 +626,12 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                                                   ? String(file.assetId)
                                                   : "N/A"}
                                               </TableCell>
-                                              <TableCell className="w-28 px-2 py-1 dark:text-gray-300">
+                                              <TableCell 
+                                                className="w-28 px-2 py-1 dark:text-gray-300"
+                                                style={{ 
+                                                  backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : 'transparent'
+                                                }}
+                                              >
                                                 <div className="flex items-center justify-center space-x-1">
                                                   {file.isImage === "true" ||
                                                   file.isImage === true ? (
@@ -642,7 +655,12 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                                                   )}
                                                 </div>
                                               </TableCell>
-                                              <TableCell className="w-20 px-2 py-1 dark:text-gray-300">
+                                              <TableCell 
+                                                className="w-20 px-2 py-1 dark:text-gray-300"
+                                                style={{ 
+                                                  backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : 'transparent'
+                                                }}
+                                              >
                                                 <div className="flex justify-center">
                                                   {file.assetId &&
                                                     artifacts?.find(
