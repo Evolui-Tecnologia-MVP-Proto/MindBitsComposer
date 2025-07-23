@@ -2814,49 +2814,59 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               <div className="space-y-3">
                 {/* Status Exec./Tipo apenas para ActionNode */}
                 {selectedFlowNode.type === 'actionNode' && (
-                  <div className="grid grid-cols-3 gap-0 text-center border border-gray-300 dark:border-white rounded-lg overflow-hidden">
-                    <div className="border-r border-gray-300 dark:border-white px-2 py-3">
-                      <p className="text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Status Exec.</p>
-                      <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                        selectedFlowNode.data.isExecuted === 'TRUE' 
-                          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' 
-                          : selectedFlowNode.data.isPendingConnected
-                          ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400'
-                          : 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-200'
-                      }`}>
-                        {selectedFlowNode.data.isExecuted === 'TRUE' 
-                          ? 'Executado' 
-                          : selectedFlowNode.data.isPendingConnected
-                          ? 'Pendente'
-                          : 'N.Exec.'}
-                      </div>
-                    </div>
-                    <div className="border-r border-gray-300 dark:border-white px-2 py-3">
-                      <p className="text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Tipo Ação</p>
-                      {selectedFlowNode.data.actionType && (
-                        <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400">
-                          {selectedFlowNode.data.actionType}
-                        </div>
-                      )}
-                    </div>
-                    <div className="px-2 py-3">
-                      <p className="text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Aprovação</p>
-                      {selectedFlowNode.data.isAproved && (
-                        <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                          selectedFlowNode.data.isAproved === 'TRUE' 
-                            ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
-                            : selectedFlowNode.data.isAproved === 'FALSE'
-                            ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400'
-                            : 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-200'
-                        }`}>
-                          {selectedFlowNode.data.isAproved === 'TRUE' 
-                            ? 'SIM' 
-                            : selectedFlowNode.data.isAproved === 'FALSE'
-                            ? 'NÃO'
-                            : 'UNDEF'}
-                        </div>
-                      )}
-                    </div>
+                  <div className="border border-gray-200 dark:border-white rounded-lg overflow-hidden">
+                    <table className="w-full text-xs execution-form-table">
+                      <thead>
+                        <tr>
+                          <th className="px-2 py-1.5 text-center font-medium text-xs">Status Exec.</th>
+                          <th className="px-2 py-1.5 text-center font-medium text-xs">Tipo Ação</th>
+                          <th className="px-2 py-1.5 text-center font-medium text-xs">Aprovação</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="px-2 py-1.5 text-center">
+                            <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                              selectedFlowNode.data.isExecuted === 'TRUE' 
+                                ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' 
+                                : selectedFlowNode.data.isPendingConnected
+                                ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400'
+                                : 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-200'
+                            }`}>
+                              {selectedFlowNode.data.isExecuted === 'TRUE' 
+                                ? 'Executado' 
+                                : selectedFlowNode.data.isPendingConnected
+                                ? 'Pendente'
+                                : 'N.Exec.'}
+                            </div>
+                          </td>
+                          <td className="px-2 py-1.5 text-center">
+                            {selectedFlowNode.data.actionType && (
+                              <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400">
+                                {selectedFlowNode.data.actionType}
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-2 py-1.5 text-center">
+                            {selectedFlowNode.data.isAproved && (
+                              <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                                selectedFlowNode.data.isAproved === 'TRUE' 
+                                  ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
+                                  : selectedFlowNode.data.isAproved === 'FALSE'
+                                  ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400'
+                                  : 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-200'
+                              }`}>
+                                {selectedFlowNode.data.isAproved === 'TRUE' 
+                                  ? 'SIM' 
+                                  : selectedFlowNode.data.isAproved === 'FALSE'
+                                  ? 'NÃO'
+                                  : 'UNDEF'}
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 )}
 
@@ -3674,17 +3684,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 {selectedFlowNode.type === 'switchNode' && (
                   <div>
                     <div className="border border-gray-200 dark:border-white rounded-lg overflow-hidden">
-                      <table className="w-full text-xs">
+                      <table className="w-full text-xs execution-form-table">
                         <thead>
-                          <tr className="bg-gray-50 dark:bg-[#0F172A]">
-                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 dark:text-gray-200 border-r border-gray-200 dark:border-white text-xs">Status Exec.</th>
-                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 dark:text-gray-200 border-r border-gray-200 dark:border-white text-xs">Campo Switch</th>
-                            <th className="px-2 py-1.5 text-center font-medium text-gray-700 dark:text-gray-200 text-xs">Input Switch</th>
+                          <tr>
+                            <th className="px-2 py-1.5 text-center font-medium text-xs">Status Exec.</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-xs">Campo Switch</th>
+                            <th className="px-2 py-1.5 text-center font-medium text-xs">Input Switch</th>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr className="bg-white dark:bg-[#1F2937]">
-                            <td className="px-2 py-1.5 border-r border-gray-200 dark:border-white text-center">
+                          <tr>
+                            <td className="px-2 py-1.5 text-center">
                               <div className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${
                                 selectedFlowNode.data.isExecuted === 'TRUE' 
                                   ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' 
@@ -3699,7 +3709,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                   : 'N.Exec.'}
                               </div>
                             </td>
-                            <td className="px-2 py-1.5 border-r border-gray-200 dark:border-white text-center">
+                            <td className="px-2 py-1.5 text-center">
                               {selectedFlowNode.data.switchField ? (
                                 <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400">
                                   {selectedFlowNode.data.switchField}

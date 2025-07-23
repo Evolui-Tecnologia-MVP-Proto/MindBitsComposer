@@ -218,6 +218,32 @@ body.dark .Collapsible__title:hover {
   border-color: #FFFFFF !important;
 }
 
+/* Execution form tables white borders in dark mode */
+.dark .execution-form-table {
+  border: 1px solid #FFFFFF !important;
+}
+
+.dark .execution-form-table th {
+  background-color: #0F172A !important;
+  color: #E5E7EB !important;
+  border-right: 1px solid #FFFFFF !important;
+  border-bottom: 1px solid #FFFFFF !important;
+}
+
+.dark .execution-form-table td {
+  background-color: #1F2937 !important;
+  border-right: 1px solid #FFFFFF !important;
+  border-bottom: 1px solid #FFFFFF !important;
+}
+
+.dark .execution-form-table th:last-child {
+  border-right: none !important;
+}
+
+.dark .execution-form-table td:last-child {
+  border-right: none !important;
+}
+
 .dark .lexical-editor-container .TableNode__table table,
 .dark [data-lexical-editor] .TableNode__table table,
 .dark .ContentEditable__root .TableNode__table table {
