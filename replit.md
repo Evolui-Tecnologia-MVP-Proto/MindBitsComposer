@@ -237,10 +237,10 @@ Preferred communication style: Simple, everyday language.
   - Converted Badge component to direct div with Monday badge styling pattern
   - Applied exact same classes: bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 px-2 py-1 rounded text-xs font-medium
   - Badge appears in Anexos column of integrados tab when assets are synced
-✓ Applied #0F1729 background to integrados table container in dark mode (January 23, 2025):
-  - Added dark:bg-[#0F1729] to table container div for consistent dark theme
+✓ Applied #111827 background to integrados table container in dark mode (January 23, 2025):
+  - Added dark:bg-[#111827] to table container div for consistent dark theme
   - Applied to DocumentosTable.tsx for integrados tab specifically
-  - Ensures table container matches dark mode color scheme
+  - Ensures table container matches dark mode color scheme (updated from #0F1729)
 
 ## System Architecture
 
