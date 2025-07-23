@@ -451,7 +451,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
 
   return (
     <div className="border rounded-lg bg-white dark:bg-[#1F2937] dark:border-[#374151]">
-      <div className="p-3 border-b bg-gray-50 dark:bg-[#111827] dark:border-[#374151] flex items-center justify-between">
+      <div className="p-3 border-b bg-gray-50 dark:bg-[#111827] dark:border-[#374151] flex items-center justify-between rounded-tl-lg rounded-tr-lg">
         <div className="flex items-center gap-2">
           <Button
             size="sm"

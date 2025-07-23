@@ -304,6 +304,7 @@ Preferred communication style: Simple, everyday language.
   - Applied #1F2937 to FileExplorer main container and content area for folder items with "Sincronizada" status
   - Enhanced hover states and text colors in dark mode for repository structure elements
   - Applied blue primary colors (#1E40AF) to "Criar Pasta" button in repository structure
+  - Applied rounded corners (top-left and top-right) to FileExplorer header containing "Criar Pasta" button
   - Ensured consistent visual hierarchy with proper background colors
   - Ensured consistent color scheme matching administration page pattern
 
