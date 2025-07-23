@@ -474,9 +474,9 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
         </div>
         <Button
           size="sm"
-          variant="outline"
+          variant="default"
           onClick={() => setShowCreateModal(true)}
-          className="text-xs"
+          className="text-xs bg-blue-600 hover:bg-blue-700 dark:bg-[#1E40AF] dark:hover:bg-blue-700 text-white"
         >
           <FolderPlus className="h-3 w-3 mr-1" />
           Criar Pasta
