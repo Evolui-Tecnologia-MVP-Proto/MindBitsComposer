@@ -3728,7 +3728,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
                 {selectedFlowNode.type === 'actionNode' && selectedFlowNode.data.actionType === 'Intern_Aprove' && selectedFlowNode.data.isAproved !== undefined && (
                   <div>
-                    <p className="text-sm font-medium text-gray-700 mb-2">Status de Aprovação</p>
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Status de Aprovação</p>
                     <div className="flex space-x-2 mb-2">
                       <button
                         onClick={() => {
@@ -3739,10 +3739,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         disabled={!selectedFlowNode.data.isPendingConnected}
                         className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all flex-1 justify-center ${
                           selectedFlowNode.data.isAproved === 'TRUE'
-                            ? 'bg-green-100 border-green-300 text-green-800'
+                            ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-600 text-green-800 dark:text-green-400'
                             : selectedFlowNode.data.isPendingConnected
-                            ? 'bg-white border-gray-300 text-gray-600 hover:bg-green-50 hover:border-green-300 cursor-pointer'
-                            : 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
+                            ? 'bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151] text-gray-600 dark:text-gray-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:border-green-300 dark:hover:border-green-600 cursor-pointer'
+                            : 'bg-gray-50 dark:bg-[#1F2937] border-gray-200 dark:border-[#374151] text-gray-400 dark:text-gray-500 cursor-not-allowed'
                         }`}
                       >
                         <CircleCheck className="w-4 h-4" />
@@ -3758,10 +3758,10 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         disabled={!selectedFlowNode.data.isPendingConnected}
                         className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all flex-1 justify-center ${
                           selectedFlowNode.data.isAproved === 'FALSE'
-                            ? 'bg-red-100 border-red-300 text-red-800'
+                            ? 'bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-600 text-red-800 dark:text-red-400'
                             : selectedFlowNode.data.isPendingConnected
-                            ? 'bg-white border-gray-300 text-gray-600 hover:bg-red-50 hover:border-red-300 cursor-pointer'
-                            : 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
+                            ? 'bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151] text-gray-600 dark:text-gray-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-300 dark:hover:border-red-600 cursor-pointer'
+                            : 'bg-gray-50 dark:bg-[#1F2937] border-gray-200 dark:border-[#374151] text-gray-400 dark:text-gray-500 cursor-not-allowed'
                         }`}
                       >
                         <X className="w-4 h-4" />
@@ -3771,16 +3771,16 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     
                     {/* Caixa de alerta para confirmação */}
                     {showApprovalAlert && selectedFlowNode.data.isAproved !== 'UNDEF' && (
-                      <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                      <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-600 rounded-lg">
                         <div className="flex items-start space-x-2">
                           <div className="flex-shrink-0">
-                            <svg className="w-5 h-5 text-orange-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-5 h-5 text-orange-500 dark:text-orange-400 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                             </svg>
                           </div>
                           <div className="flex-1">
-                            <h4 className="text-sm font-medium text-orange-800 mb-1">ATENÇÃO</h4>
-                            <p className="text-xs text-orange-700 mb-3">
+                            <h4 className="text-sm font-medium text-orange-800 dark:text-orange-300 mb-1">ATENÇÃO</h4>
+                            <p className="text-xs text-orange-700 dark:text-orange-400 mb-3">
                               Ao executar esta ação o fluxo passará automaticamente para o próximo estágio definido conforme o diagrama, esta ação pode ser irreversível caso ações posteriores no workflow sejam executadas.
                             </p>
                             <div className="flex space-x-2">
@@ -3789,8 +3789,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                 disabled={!areAllFieldsFilled()}
                                 className={`px-3 py-1.5 text-white text-xs font-medium rounded transition-colors ${
                                   areAllFieldsFilled()
-                                    ? 'bg-orange-600 hover:bg-orange-700'
-                                    : 'bg-gray-400 cursor-not-allowed'
+                                    ? 'bg-orange-600 dark:bg-[#1E40AF] hover:bg-orange-700 dark:hover:bg-[#1E3A8A]'
+                                    : 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
                                 }`}
                               >
                                 Salvar Alterações
@@ -3801,7 +3801,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       </div>
                     )}
                     
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
                       Status atual: {selectedFlowNode.data.isAproved || 'UNDEF'}
                     </div>
                   </div>
