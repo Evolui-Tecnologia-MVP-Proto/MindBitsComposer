@@ -66,18 +66,19 @@ export function IncluirDocumentosTab({
       {isLoading ? (
         <div className="text-center py-6">Carregando documentos...</div>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Origem</TableHead>
-              <TableHead>Objeto</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Status Origem</TableHead>
-              <TableHead>Anexos</TableHead>
-              <TableHead>Criado em</TableHead>
-              <TableHead>Ações</TableHead>
-            </TableRow>
-          </TableHeader>
+        <div className="border rounded-lg dark:border-[#374151] dark:bg-[#111827]">
+          <Table>
+            <TableHeader className="sticky top-0 bg-white dark:bg-[#111827] z-10 shadow-sm">
+              <TableRow>
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Origem</TableHead>
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Objeto</TableHead>
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Status</TableHead>
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Status Origem</TableHead>
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Anexos</TableHead>
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Criado em</TableHead>
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
           <TableBody>
             {documentos
               ?.filter((doc) => doc.status === "Incluido")
@@ -154,7 +155,8 @@ export function IncluirDocumentosTab({
                 </TableRow>
               ))}
           </TableBody>
-        </Table>
+          </Table>
+        </div>
       )}
 
       {documentos?.filter((doc) => doc.status === "Incluido").length ===
