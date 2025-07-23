@@ -1443,14 +1443,15 @@ export default function FluxosPage() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden" data-page="fluxos">
-      {/* Header com título padrão */}
+      {/* Área do título e descrição */}
       <div className="flex-shrink-0 p-6 pb-4">
-        <div className="flex items-center justify-between p-6 rounded-lg bg-gray-50 dark:bg-[#0F172A] mb-6">
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-[#6B7280] flex items-center gap-3">
-            <Workflow className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-            Fluxos de Documentos
-          </h1>
-        </div>
+        <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-[#6B7280] flex items-center gap-3">
+          <Workflow className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+          Fluxos de Documentos
+        </h1>
+        <p className="text-muted-foreground">
+          Defina e gerencie fluxos de trabalho para seus documentos
+        </p>
       </div>
       
       {/* Área das abas - ocupa todo o espaço restante */}
