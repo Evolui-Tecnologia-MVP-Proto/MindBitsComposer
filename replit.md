@@ -232,6 +232,11 @@ Preferred communication style: Simple, everyday language.
   - Added hardcoded green badge "TESTE" to FileExplorer
   - Testing if badges are visible in the Repositório tab
   - Debugging sync badge display issue
+✓ Fixed sync badge in DocumentosTable for Integrados tab (January 23, 2025):
+  - Located sync badge in DocumentosTable.tsx line 252-260 that shows when documento.assetsSynced is true
+  - Converted Badge component to direct div with Monday badge styling pattern
+  - Applied exact same classes: bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 px-2 py-1 rounded text-xs font-medium
+  - Badge appears in Anexos column of integrados tab when assets are synced
 
 ## System Architecture
 

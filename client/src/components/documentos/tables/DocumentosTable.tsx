@@ -251,12 +251,9 @@ export function DocumentosTable({
 
                       {/* Badge sync verde quando assets_synced é true */}
                       {documento.assetsSynced && (
-                        <Badge
-                          variant="outline"
-                          className="bg-green-100 text-green-700 border-green-300"
-                        >
+                        <div className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 px-2 py-1 rounded text-xs font-medium">
                           sync
-                        </Badge>
+                        </div>
                       )}
                     </div>
                   </TableCell>

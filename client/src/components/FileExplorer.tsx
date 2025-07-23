@@ -416,10 +416,6 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
             </Button>
             <Folder className={`h-4 w-4 ${getStatusColor(item.syncStatus)}`} />
             <span className="text-sm text-gray-700 font-mono">{item.name}</span>
-            {/* Teste forçado de badge */}
-            <div className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 px-2 py-1 rounded text-xs font-medium">
-              ✓ TESTE
-            </div>
             {getStatusBadge(item.syncStatus)}
           </div>
           
