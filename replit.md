@@ -285,6 +285,11 @@ Preferred communication style: Simple, everyday language.
   - Complete light theme protection with explicit :not(.dark) rules
   - Component isolation - no propagation to other system components
   - Enhanced element targeting including .table-fixed class coverage
+✓ Applied #111827 colors to "em-processo" and "concluidos" tabs table headers and containers (January 23, 2025):
+  - Updated DocumentosTable.tsx to apply #111827 to both "em-processo" and "concluidos" tabs
+  - Added conditional styling for table containers with dark:bg-[#111827]
+  - Applied sticky header styling with proper borders and text colors
+  - Ensured consistent dark mode theming across process and completed document tabs
 
 ## System Architecture
 
