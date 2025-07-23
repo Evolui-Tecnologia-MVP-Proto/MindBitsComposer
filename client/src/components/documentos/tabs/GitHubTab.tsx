@@ -35,13 +35,13 @@ export function GitHubTab({
   const queryClient = useQueryClient();
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg border p-6">
+      <div className="bg-white dark:bg-[#1E293B] rounded-lg border dark:border-[#374151] p-6">
         <div className="flex items-center justify-between mb-6 flex-shrink-0">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">
               Integração com Repositório GitHub
             </h3>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-600 dark:text-[#9CA3AF] mt-1">
               Gerencie documentos sincronizados com o repositório
               configurado
             </p>
@@ -112,15 +112,15 @@ export function GitHubTab({
           </div>
         </div>
 
-        <div className="border-t pt-6">
+        <div className="border-t dark:border-[#374151] pt-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-4">
-                <h4 className="font-medium text-gray-900">
+                <h4 className="font-medium text-gray-900 dark:text-[#E5E7EB]">
                   Estrutura do Repositório
                 </h4>
                 {isLoadingRepo && (
-                  <div className="flex items-center text-sm text-gray-500">
+                  <div className="flex items-center text-sm text-gray-500 dark:text-[#9CA3AF]">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2"></div>
                     Carregando...
                   </div>
@@ -182,10 +182,10 @@ export function GitHubTab({
                     }}
                   />
                 ) : !isLoadingRepo ? (
-                  <div className="border rounded-lg bg-gray-50 p-6 text-center">
-                    <div className="text-gray-500 mb-2">
+                  <div className="border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#0F172A] p-6 text-center">
+                    <div className="text-gray-500 dark:text-[#9CA3AF] mb-2">
                       <svg
-                        className="mx-auto h-12 w-12 text-gray-400"
+                        className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -198,10 +198,10 @@ export function GitHubTab({
                         />
                       </svg>
                     </div>
-                    <h3 className="text-sm font-medium text-gray-900 mb-1">
+                    <h3 className="text-sm font-medium text-gray-900 dark:text-[#E5E7EB] mb-1">
                       Nenhum repositório conectado
                     </h3>
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm text-gray-500 dark:text-[#9CA3AF] mb-4">
                       Configure uma conexão GitHub nas configurações
                       para ver a estrutura do repositório aqui.
                     </p>
@@ -214,11 +214,11 @@ export function GitHubTab({
                     </Button>
                   </div>
                 ) : (
-                  <div className="border rounded-lg bg-white p-6">
+                  <div className="border dark:border-[#374151] rounded-lg bg-white dark:bg-[#0F172A] p-6">
                     <div className="animate-pulse space-y-3">
-                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                      <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                      <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-3/4"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-1/2"></div>
+                      <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-5/6"></div>
                     </div>
                   </div>
                 )}
@@ -226,11 +226,11 @@ export function GitHubTab({
             </div>
 
             <div className="space-y-4">
-              <h4 className="font-medium text-gray-900">
+              <h4 className="font-medium text-gray-900 dark:text-[#E5E7EB]">
                 {selectedFolderPath ? (
                   <span>
                     Arquivos em:{" "}
-                    <code className="bg-gray-100 px-2 py-1 rounded text-sm font-mono">
+                    <code className="bg-gray-100 dark:bg-[#374151] px-2 py-1 rounded text-sm font-mono text-gray-800 dark:text-gray-200">
                       {selectedFolderPath}
                     </code>
                   </span>
@@ -242,7 +242,7 @@ export function GitHubTab({
                 {isLoadingFolderFiles ? (
                   <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                    <span className="ml-2 text-sm text-gray-500">
+                    <span className="ml-2 text-sm text-gray-500 dark:text-[#9CA3AF]">
                       Carregando arquivos...
                     </span>
                   </div>
@@ -251,15 +251,15 @@ export function GitHubTab({
                     (file: any, index: number) => (
                       <div
                         key={index}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                        className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#0F172A] rounded-lg border dark:border-[#374151]"
                       >
                         <div className="flex items-center space-x-3">
                           <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                           <div>
-                            <div className="font-medium text-sm">
+                            <div className="font-medium text-sm text-gray-900 dark:text-[#E5E7EB]">
                               {file.name}
                             </div>
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-500 dark:text-[#9CA3AF]">
                               Tamanho: {(file.size / 1024).toFixed(1)}KB
                             </div>
                           </div>
@@ -272,7 +272,7 @@ export function GitHubTab({
                   )
                 ) : selectedFolderPath ? (
                   <div className="text-center py-8">
-                    <div className="text-gray-500 text-sm">
+                    <div className="text-gray-500 dark:text-[#9CA3AF] text-sm">
                       📁 Pasta vazia
                       <br />
                       <span className="text-xs">
@@ -283,7 +283,7 @@ export function GitHubTab({
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <div className="text-gray-500 text-sm">
+                    <div className="text-gray-500 dark:text-[#9CA3AF] text-sm">
                       Clique em uma pasta para ver seus arquivos
                     </div>
                   </div>
