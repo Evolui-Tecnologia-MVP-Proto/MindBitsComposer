@@ -152,45 +152,45 @@ export function DocumentosTable({
 
   if (activeTab === "integrados") {
     return (
-      <div className="border rounded-lg">
+      <div className="border rounded-lg dark:border-[#374151]">
         <div className="max-h-[calc(100vh-450px)] overflow-y-auto">
           <Table>
-            <TableHeader className="sticky top-0 bg-white z-10 shadow-sm">
+            <TableHeader className="sticky top-0 bg-white dark:bg-[#111827] z-10 shadow-sm">
               <TableRow>
-                <TableHead className="bg-gray-50 border-b w-[130px]">
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] w-[130px] dark:text-gray-200">
                   Origem
                 </TableHead>
-                <TableHead className="bg-gray-50 border-b">Nome</TableHead>
-                <TableHead className="bg-gray-50 border-b">Status</TableHead>
-                <TableHead className="bg-gray-50 border-b w-[155px]">
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Nome</TableHead>
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Status</TableHead>
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] w-[155px] dark:text-gray-200">
                   Data Integração
                 </TableHead>
-                <TableHead className="bg-gray-50 border-b">
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
                   Status Origem
                 </TableHead>
-                <TableHead className="bg-gray-50 border-b">Anexos</TableHead>
-                <TableHead className="bg-gray-50 border-b text-right">
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Anexos</TableHead>
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] text-right dark:text-gray-200">
                   Ações
                 </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody className="table-compact">
               {documentos.map((documento) => (
-                <TableRow key={documento.id}>
-                  <TableCell>
+                <TableRow key={documento.id} className="dark:border-[#374151]">
+                  <TableCell className="dark:text-gray-200">
                     <div className="flex items-center">
                       {documento.origem === "Monday" ? (
-                        <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                        <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded text-xs font-medium">
                           Monday
                         </div>
                       ) : (
-                        <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-medium">
+                        <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400 px-2 py-1 rounded text-xs font-medium">
                           {documento.origem}
                         </div>
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium dark:text-gray-200">
                     {documento.objeto}
                   </TableCell>
                   <TableCell>
@@ -202,7 +202,7 @@ export function DocumentosTable({
                       {documento.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-xs text-gray-500">
+                  <TableCell className="text-xs text-gray-500 dark:text-gray-400">
                     {formatDate(documento.updatedAt)}
                   </TableCell>
                   <TableCell>
@@ -231,7 +231,7 @@ export function DocumentosTable({
                           return (
                             <Badge
                               variant="outline"
-                              className="bg-gray-100 text-gray-500 border-gray-300"
+                              className="bg-gray-100 dark:bg-gray-800/50 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600"
                             >
                               none
                             </Badge>
@@ -241,7 +241,7 @@ export function DocumentosTable({
                           return (
                             <Badge
                               variant="outline"
-                              className="bg-yellow-100 text-yellow-700 border-yellow-300"
+                              className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-600"
                             >
                               files
                             </Badge>
@@ -311,10 +311,10 @@ export function DocumentosTable({
                 </TableRow>
               ))}
               {documentos.length === 0 && (
-                <TableRow>
+                <TableRow className="dark:border-[#374151]">
                   <TableCell
                     colSpan={8}
-                    className="text-center py-6 text-gray-500"
+                    className="text-center py-6 text-gray-500 dark:text-gray-400"
                   >
                     Nenhum documento encontrado nesta categoria.
                   </TableCell>

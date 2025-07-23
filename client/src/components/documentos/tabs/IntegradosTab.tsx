@@ -51,7 +51,7 @@ export function IntegradosTab({
   return (
     <TabsContent value="integrados" className="slide-in">
       {/* Filtros */}
-      <div className="mb-6 p-4 bg-gray-50 rounded-lg border">
+      <div className="mb-6 p-4 bg-gray-50 dark:bg-[#0F172A] rounded-lg border dark:border-[#374151]">
         <div className="flex items-center justify-end mb-3">
           <Button
             variant="outline"
@@ -66,7 +66,7 @@ export function IntegradosTab({
                 nome: "",
               })
             }
-            className="text-xs"
+            className="text-xs dark:border-gray-600 dark:hover:bg-[#1F2937] dark:text-gray-200"
           >
             Limpar filtros
           </Button>
@@ -74,7 +74,7 @@ export function IntegradosTab({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {/* Filtro por Nome */}
           <div>
-            <Label htmlFor="filtro-nome" className="text-xs">
+            <Label htmlFor="filtro-nome" className="text-xs dark:text-gray-200">
               Nome
             </Label>
             <Input
@@ -84,13 +84,13 @@ export function IntegradosTab({
               onChange={(e) =>
                 setFiltros((prev) => ({ ...prev, nome: e.target.value }))
               }
-              className="h-8 text-sm"
+              className="h-8 text-sm dark:bg-[#0F172A] dark:border-[#374151] dark:text-gray-200"
             />
           </div>
 
           {/* Filtro por Responsável */}
           <div>
-            <Label htmlFor="filtro-responsavel" className="text-xs">
+            <Label htmlFor="filtro-responsavel" className="text-xs dark:text-gray-200">
               Responsável
             </Label>
             <Select
@@ -99,10 +99,10 @@ export function IntegradosTab({
                 setFiltros((prev) => ({ ...prev, responsavel: value }))
               }
             >
-              <SelectTrigger className="h-8 text-sm">
+              <SelectTrigger className="h-8 text-sm dark:bg-[#0F172A] dark:border-[#374151] dark:text-gray-200">
                 <SelectValue placeholder="Todos" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="dark:bg-[#0F172A] dark:border-[#374151]">
                 <SelectItem value="__todos__">Todos</SelectItem>
                 {responsaveisUnicos.map((responsavel) => (
                   <SelectItem key={responsavel} value={responsavel}>
@@ -115,7 +115,7 @@ export function IntegradosTab({
 
           {/* Filtro por Módulo */}
           <div>
-            <Label htmlFor="filtro-modulo" className="text-xs">
+            <Label htmlFor="filtro-modulo" className="text-xs dark:text-gray-200">
               Módulo
             </Label>
             <Select
@@ -124,10 +124,10 @@ export function IntegradosTab({
                 setFiltros((prev) => ({ ...prev, modulo: value }))
               }
             >
-              <SelectTrigger className="h-8 text-sm">
+              <SelectTrigger className="h-8 text-sm dark:bg-[#0F172A] dark:border-[#374151] dark:text-gray-200">
                 <SelectValue placeholder="Todos" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="dark:bg-[#0F172A] dark:border-[#374151]">
                 <SelectItem value="__todos__">Todos</SelectItem>
                 {modulosUnicos.map((modulo) => (
                   <SelectItem key={modulo} value={modulo}>
@@ -140,7 +140,7 @@ export function IntegradosTab({
 
           {/* Filtro por Cliente */}
           <div>
-            <Label htmlFor="filtro-cliente" className="text-xs">
+            <Label htmlFor="filtro-cliente" className="text-xs dark:text-gray-200">
               Cliente
             </Label>
             <Select
@@ -149,10 +149,10 @@ export function IntegradosTab({
                 setFiltros((prev) => ({ ...prev, cliente: value }))
               }
             >
-              <SelectTrigger className="h-8 text-sm">
+              <SelectTrigger className="h-8 text-sm dark:bg-[#0F172A] dark:border-[#374151] dark:text-gray-200">
                 <SelectValue placeholder="Todos" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="dark:bg-[#0F172A] dark:border-[#374151]">
                 <SelectItem value="__todos__">Todos</SelectItem>
                 {clientesUnicos.map((cliente) => (
                   <SelectItem key={cliente} value={cliente}>
@@ -165,7 +165,7 @@ export function IntegradosTab({
 
           {/* Filtro por Status Origem */}
           <div>
-            <Label htmlFor="filtro-status-origem" className="text-xs">
+            <Label htmlFor="filtro-status-origem" className="text-xs dark:text-gray-200">
               Status Origem
             </Label>
             <Select
@@ -174,10 +174,10 @@ export function IntegradosTab({
                 setFiltros((prev) => ({ ...prev, statusOrigem: value }))
               }
             >
-              <SelectTrigger className="h-8 text-sm">
+              <SelectTrigger className="h-8 text-sm dark:bg-[#0F172A] dark:border-[#374151] dark:text-gray-200">
                 <SelectValue placeholder="Todos" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="dark:bg-[#0F172A] dark:border-[#374151]">
                 <SelectItem value="__todos__">Todos</SelectItem>
                 {statusOrigensUnicos.map((status) => (
                   <SelectItem key={status} value={status}>
@@ -190,7 +190,7 @@ export function IntegradosTab({
 
           {/* Filtro por Arquivos */}
           <div>
-            <Label htmlFor="filtro-arquivos" className="text-xs">
+            <Label htmlFor="filtro-arquivos" className="text-xs dark:text-gray-200">
               Arquivos
             </Label>
             <Select
@@ -199,10 +199,10 @@ export function IntegradosTab({
                 setFiltros((prev) => ({ ...prev, arquivos: value }))
               }
             >
-              <SelectTrigger className="h-8 text-sm">
+              <SelectTrigger className="h-8 text-sm dark:bg-[#0F172A] dark:border-[#374151] dark:text-gray-200">
                 <SelectValue placeholder="Todos" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="dark:bg-[#0F172A] dark:border-[#374151]">
                 <SelectItem value="__todos__">Todos</SelectItem>
                 <SelectItem value="sem-arquivos">Sem arquivos</SelectItem>
                 <SelectItem value="a-sincronizar">
@@ -218,7 +218,7 @@ export function IntegradosTab({
       </div>
 
       {isLoading ? (
-        <div className="text-center py-6">Carregando documentos...</div>
+        <div className="text-center py-6 dark:text-gray-200">Carregando documentos...</div>
       ) : (
         renderDocumentosTable(documentosIntegrados)
       )}

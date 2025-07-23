@@ -180,6 +180,14 @@ Preferred communication style: Simple, everyday language.
   - Applied consistent button styling with dark mode colors (#1E40AF for primary button)
   - Header focused on button functionality with proper spacing and alignment
   - Buttons maintain full functionality with proper toast notifications and modal triggers
+✓ Applied dark theme to Integrados tab filters and tables (January 22, 2025):
+  - Updated filters container with #0F172A background and #374151 borders
+  - Applied dark mode colors to all select triggers and content (#0F172A, #374151)
+  - Updated label text colors to gray-200 for proper contrast
+  - Applied #111827 to table headers with gray-200 text
+  - Enhanced table cells with dark mode borders and text colors
+  - Updated badge colors for origin tags (Monday: blue-900/30, others: purple-900/30)
+  - Applied dark theme to loading text and empty state messages
 
 ## System Architecture
 
