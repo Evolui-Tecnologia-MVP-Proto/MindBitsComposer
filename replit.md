@@ -174,6 +174,12 @@ Preferred communication style: Simple, everyday language.
   - Applied same tab styling pattern with grid layout and #1E40AF active states
   - Consistent data-page attributes for CSS targeting
   - Applied #0F172A to tabs container and title header in Documentos page for dark mode consistency
+✓ Added header div with buttons in Incluidos tab (January 22, 2025):
+  - Created dedicated header div within IncluirDocumentosTab component with #0F172A background
+  - Moved "Atualizar" and "Incluir Documento" buttons from main page header to tab header
+  - Applied consistent button styling with dark mode colors (#1E40AF for primary button)
+  - Header includes "Documentos Incluídos" title with proper dark mode text colors
+  - Buttons maintain full functionality with proper toast notifications and modal triggers
 
 ## System Architecture
 

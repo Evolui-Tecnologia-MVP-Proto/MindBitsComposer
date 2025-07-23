@@ -14,6 +14,8 @@ import {
   Pencil,
   Trash2,
   File,
+  RefreshCw,
+  Plus,
 } from "lucide-react";
 import { type Documento } from "@shared/schema";
 
@@ -24,6 +26,8 @@ interface IncluirDocumentosTabProps {
   openViewModal: (documento: Documento) => void;
   openEditModal: (documento: Documento) => void;
   handleDeleteDocument: (documento: Documento) => void;
+  onRefresh: () => void;
+  onCreateDocument: () => void;
 }
 
 export function IncluirDocumentosTab({
@@ -33,9 +37,35 @@ export function IncluirDocumentosTab({
   openViewModal,
   openEditModal,
   handleDeleteDocument,
+  onRefresh,
+  onCreateDocument,
 }: IncluirDocumentosTabProps) {
   return (
     <TabsContent value="incluidos" className="slide-in">
+      {/* Cabeçalho com botões */}
+      <div className="flex items-center justify-between p-4 rounded-lg bg-gray-50 dark:bg-[#0F172A] mb-6">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">
+          Documentos Incluídos
+        </h2>
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={onRefresh}
+            variant="outline"
+            className="border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-[#1F2937] dark:text-gray-200"
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Atualizar
+          </Button>
+          <Button
+            onClick={onCreateDocument}
+            className="bg-blue-600 hover:bg-blue-700 dark:bg-[#1E40AF] dark:hover:bg-[#1E40AF]/90"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Incluir Documento
+          </Button>
+        </div>
+      </div>
+
       {isLoading ? (
         <div className="text-center py-6">Carregando documentos...</div>
       ) : (
