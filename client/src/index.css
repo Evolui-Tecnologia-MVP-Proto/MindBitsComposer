@@ -219,6 +219,11 @@ body.dark .Collapsible__title:hover {
 }
 
 /* Execution form tables white borders in dark mode */
+.execution-form-table {
+  margin: 0 auto !important;
+  max-width: 100% !important;
+}
+
 .dark .execution-form-table {
   border: 1px solid #FFFFFF !important;
 }
@@ -241,6 +246,28 @@ body.dark .Collapsible__title:hover {
 }
 
 .dark .execution-form-table td:last-child {
+  border-right: none !important;
+}
+
+/* Light mode styling for execution form tables */
+.execution-form-table th {
+  background-color: #F9FAFB !important;
+  color: #374151 !important;
+  border-right: 1px solid #E5E7EB !important;
+  border-bottom: 1px solid #E5E7EB !important;
+}
+
+.execution-form-table td {
+  background-color: #FFFFFF !important;
+  border-right: 1px solid #E5E7EB !important;
+  border-bottom: 1px solid #E5E7EB !important;
+}
+
+.execution-form-table th:last-child {
+  border-right: none !important;
+}
+
+.execution-form-table td:last-child {
   border-right: none !important;
 }
 
