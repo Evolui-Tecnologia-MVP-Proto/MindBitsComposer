@@ -2779,11 +2779,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           </ReactFlow>
         </div>
         {showFlowInspector && selectedFlowNode && (
-          <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto relative">
+          <div className="w-80 bg-white dark:bg-[#0F172A] border-l border-gray-200 dark:border-[#374151] p-4 overflow-y-auto relative">
             <div className="space-y-4">
-              <div className="border-b pb-2 relative">
-                <h3 className="text-lg font-semibold">Execution Form</h3>
-                <p className="text-sm text-gray-600 font-mono">
+              <div className="border-b dark:border-[#374151] pb-2 relative">
+                <h3 className="text-lg font-semibold dark:text-gray-200">Execution Form</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 font-mono">
                   {(() => {
                     const typeMap: { [key: string]: string } = {
                       'startNode': 'Início',
@@ -2800,8 +2800,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                   onClick={() => setIsFlowInspectorPinned(!isFlowInspectorPinned)}
                   className={`absolute top-0 right-0 p-1 rounded transition-colors ${
                     isFlowInspectorPinned 
-                      ? 'text-blue-600 bg-blue-100 hover:bg-blue-200' 
-                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                      ? 'text-blue-600 bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-800/30' 
+                      : 'text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-[#1F2937]'
                   }`}
                   title={isFlowInspectorPinned ? "Desafixar painel" : "Fixar painel"}
                 >
@@ -2816,13 +2816,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                 {selectedFlowNode.type === 'actionNode' && (
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div>
-                      <p className="text-xs font-medium text-gray-700 mb-1">Status Exec.</p>
+                      <p className="text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Status Exec.</p>
                       <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
                         selectedFlowNode.data.isExecuted === 'TRUE' 
-                          ? 'bg-blue-100 text-blue-800' 
+                          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' 
                           : selectedFlowNode.data.isPendingConnected
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-gray-100 text-gray-800'
+                          ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400'
+                          : 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-200'
                       }`}>
                         {selectedFlowNode.data.isExecuted === 'TRUE' 
                           ? 'Executado' 
@@ -2832,22 +2832,22 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                       </div>
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-700 mb-1">Tipo Ação</p>
+                      <p className="text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Tipo Ação</p>
                       {selectedFlowNode.data.actionType && (
-                        <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                        <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400">
                           {selectedFlowNode.data.actionType}
                         </div>
                       )}
                     </div>
                     <div>
-                      <p className="text-xs font-medium text-gray-700 mb-1">Aprovação</p>
+                      <p className="text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Aprovação</p>
                       {selectedFlowNode.data.isAproved && (
                         <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
                           selectedFlowNode.data.isAproved === 'TRUE' 
-                            ? 'bg-green-100 text-green-800'
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
                             : selectedFlowNode.data.isAproved === 'FALSE'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-gray-100 text-gray-800'
+                            ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400'
+                            : 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-200'
                         }`}>
                           {selectedFlowNode.data.isAproved === 'TRUE' 
                             ? 'SIM' 
@@ -2862,8 +2862,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
                 {selectedFlowNode.data.description && (
                   <div>
-                    <p className="text-sm font-medium text-gray-700">Descrição</p>
-                    <p className="text-xs text-gray-900 bg-gray-50 p-2 rounded border font-mono">
+                    <p className="text-sm font-medium text-gray-700 dark:text-gray-200">Descrição</p>
+                    <p className="text-xs text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-[#1F2937] p-2 rounded border dark:border-[#374151] font-mono">
                       {selectedFlowNode.data.description}
                     </p>
                   </div>
@@ -2939,7 +2939,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           console.log('🟡 Dados do formulário processados:', fieldsData);
                           
                           return (
-                            <div className="bg-gray-50 p-4 rounded border space-y-4">
+                            <div className="bg-gray-50 dark:bg-[#1F2937] p-4 rounded border dark:border-[#374151] space-y-4">
                               {Object.entries(fieldsData).map(([fieldName, fieldValue]) => {
                               // Verifica se é um array de configuração com default e type
                               if (Array.isArray(fieldValue) && fieldValue.length === 2 && 
@@ -2951,12 +2951,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                                 const isReadonly = !selectedFlowNode.data.isPendingConnected;
                                 const baseClasses = "w-full px-3 py-2 border rounded-md text-xs font-mono";
                                 const readonlyClasses = isReadonly 
-                                  ? "bg-gray-50 border-gray-200 text-gray-600 cursor-not-allowed" 
-                                  : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+                                  ? "bg-gray-50 dark:bg-[#1F2937] border-gray-200 dark:border-[#374151] text-gray-600 dark:text-gray-300 cursor-not-allowed" 
+                                  : "border-gray-300 dark:border-[#374151] dark:bg-[#0F172A] dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
                                 
                                 return (
                                   <div key={fieldName} className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700">{fieldName}</label>
+                                    <label className="text-sm font-medium text-gray-700 dark:text-gray-200">{fieldName}</label>
                                     {fieldType === 'longText' ? (
                                       <textarea
                                         rows={4}
@@ -3014,12 +3014,12 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                               const isReadonly = !selectedFlowNode.data.isPendingConnected;
                               const baseClasses = "w-full px-3 py-2 border rounded-md text-xs font-mono";
                               const readonlyClasses = isReadonly 
-                                ? "bg-gray-50 border-gray-200 text-gray-600 cursor-not-allowed" 
-                                : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+                                ? "bg-gray-50 dark:bg-[#1F2937] border-gray-200 dark:border-[#374151] text-gray-600 dark:text-gray-300 cursor-not-allowed" 
+                                : "border-gray-300 dark:border-[#374151] dark:bg-[#0F172A] dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
                               
                               return (
                                 <div key={fieldName} className="space-y-2">
-                                  <label className="text-sm font-medium text-gray-700">{fieldName}</label>
+                                  <label className="text-sm font-medium text-gray-700 dark:text-gray-200">{fieldName}</label>
                                   {Array.isArray(fieldValue) ? (
                                     <select 
                                       disabled={isReadonly}
@@ -3051,17 +3051,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         
                         // Comportamento legado para formulários sem condição
                         return (
-                          <div className="bg-gray-50 p-4 rounded border space-y-4">
+                          <div className="bg-gray-50 dark:bg-[#1F2937] p-4 rounded border dark:border-[#374151] space-y-4">
                             {Object.entries(formData).map(([fieldName, fieldValue]) => {
                               const isReadonly = !selectedFlowNode.data.isPendingConnected;
                               const baseClasses = "w-full px-3 py-2 border rounded-md text-xs font-mono";
                               const readonlyClasses = isReadonly 
-                                ? "bg-gray-50 border-gray-200 text-gray-600 cursor-not-allowed" 
-                                : "border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
+                                ? "bg-gray-50 dark:bg-[#1F2937] border-gray-200 dark:border-[#374151] text-gray-600 dark:text-gray-300 cursor-not-allowed" 
+                                : "border-gray-300 dark:border-[#374151] dark:bg-[#0F172A] dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500";
                               
                               return (
                                 <div key={fieldName} className="space-y-2">
-                                  <label className="text-sm font-medium text-gray-700">{fieldName}</label>
+                                  <label className="text-sm font-medium text-gray-700 dark:text-gray-200">{fieldName}</label>
                                   {Array.isArray(fieldValue) ? (
                                     <select 
                                       disabled={isReadonly}
