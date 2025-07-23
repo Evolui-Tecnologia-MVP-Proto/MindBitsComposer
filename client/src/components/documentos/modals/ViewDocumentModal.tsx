@@ -301,8 +301,8 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
           <TabsContent value="general-fields" className="mt-6">
             <div className="space-y-4">
               <div className="flex items-center gap-2 mb-4">
-                <h3 className="text-lg font-medium">Campos Gerais</h3>
-                <Badge variant="outline" className="text-xs">
+                <h3 className="text-lg font-medium dark:text-gray-200">Campos Gerais</h3>
+                <Badge variant="outline" className="text-xs dark:bg-[#374151] dark:border-[#6B7280] dark:text-gray-300">
                   {selectedDocument.generalColumns ? "JSON" : "Vazio"}
                 </Badge>
               </div>
@@ -316,20 +316,20 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                         key={key}
                         className="grid grid-cols-3 gap-4 items-center"
                       >
-                        <div className="bg-gray-50 p-2 rounded border">
-                          <p className="text-xs font-medium text-gray-500 mb-1">
+                        <div className="bg-gray-50 dark:bg-[#1E293B] p-2 rounded border dark:border-[#374151]">
+                          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                             Campo
                           </p>
-                          <p className="text-sm font-mono text-gray-800">
+                          <p className="text-sm font-mono text-gray-800 dark:text-gray-200">
                             {key}
                           </p>
                         </div>
                         <div className="col-span-2">
-                          <p className="text-xs font-medium text-gray-500 mb-1">
+                          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                             Valor
                           </p>
-                          <div className="bg-white border rounded p-2 min-h-[40px] flex items-center">
-                            <p className="text-sm text-gray-700 break-words">
+                          <div className="bg-white dark:bg-[#0F172A] border dark:border-[#374151] rounded p-2 min-h-[40px] flex items-center">
+                            <p className="text-sm text-gray-700 dark:text-gray-300 break-words">
                               {typeof value === "object"
                                 ? JSON.stringify(value, null, 2)
                                 : String(value)}
@@ -341,12 +341,12 @@ export function ViewDocumentModal({ isOpen, onClose, selectedDocument }: ViewDoc
                   )}
                 </div>
               ) : (
-                <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed">
-                  <Database className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500">
+                <div className="text-center py-8 bg-gray-50 dark:bg-[#1E293B] rounded-lg border dark:border-[#374151] border-dashed">
+                  <Database className="h-8 w-8 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     Nenhum campo geral encontrado
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                     Os campos gerais são armazenados no formato JSON
                   </p>
                 </div>

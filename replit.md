@@ -256,6 +256,13 @@ Preferred communication style: Simple, everyday language.
   - Updated description text to gray-300 for proper contrast
   - Applied #0F1729 background to DialogContent for complete dark mode consistency
   - Enhanced label text color to gray-400 in dark mode
+✓ Applied dark mode to General Fields tab in ViewDocumentModal (January 23, 2025):
+  - Updated field cards with #1E293B background and #374151 borders
+  - Applied #0F172A to value containers for better hierarchy
+  - Enhanced text colors: gray-200 (field names), gray-300 (values), gray-400 (labels)
+  - Fixed "Campos Gerais" title to gray-200 in dark mode
+  - Updated Badge with dark theme colors (#374151 background, #6B7280 border)
+  - Applied dark mode to empty state container with proper contrast
 
 ## System Architecture
 
