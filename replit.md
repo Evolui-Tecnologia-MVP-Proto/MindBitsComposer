@@ -295,6 +295,12 @@ Preferred communication style: Simple, everyday language.
   - Added empty state within TableBody using TableRow with colSpan={7}
   - Applied dark mode colors to empty state text and icon (gray-200, gray-400, gray-500)
   - Empty state now appears within table structure when no "Incluido" documents exist
+✓ Applied #111827 color to flow modal in documentos page for dark mode (January 23, 2025):
+  - Updated DialogContent with dark:bg-[#111827] and dark:border-[#374151]
+  - Applied dark mode colors to DialogTitle (gray-200) and Network icon (blue-400)
+  - Updated DialogDescription with dark:text-gray-300 for document information
+  - Applied dark:bg-[#0F172A] to flow diagram container area
+  - Enhanced modal visual consistency with application dark theme standards
 ✓ Applied same origin column formatting from integrados tab to em-processo tab (January 23, 2025):
   - Added dark mode colors to origin badges in em-processo, concluidos, and incluidos tabs
   - Monday badges: bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400

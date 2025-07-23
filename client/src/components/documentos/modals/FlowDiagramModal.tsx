@@ -126,22 +126,22 @@ export function FlowDiagramModal({
         }
       }}
     >
-      <DialogContent className="max-w-[90vw] max-h-[90vh] w-[90vw] h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-[90vw] max-h-[90vh] w-[90vw] h-[90vh] overflow-hidden flex flex-col dark:bg-[#111827] dark:border-[#374151]">
         <DialogHeader className="flex-shrink-0">
-          <DialogTitle className="flex items-center gap-2">
-            <Network className="h-5 w-5" />
+          <DialogTitle className="flex items-center gap-2 dark:text-gray-200">
+            <Network className="h-5 w-5 dark:text-blue-400" />
             Diagrama do Fluxo - {flowDiagramModal.documentTitle}
           </DialogTitle>
           <DialogDescription>
             {flowDiagramModal.documentObject && (
-              <div className="text-sm font-medium text-gray-700">
+              <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Documento: {flowDiagramModal.documentObject}
               </div>
             )}
           </DialogDescription>
         </DialogHeader>
         
-        <div className="flex-1 w-full border rounded-lg overflow-hidden">
+        <div className="flex-1 w-full border rounded-lg overflow-hidden dark:border-[#374151] dark:bg-[#0F172A]">
           <ReactFlowProvider>
             <FlowWithAutoFitView 
               flowData={flowDiagramModal.flowData}
