@@ -3763,7 +3763,7 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 /* Ensure toolbar has consistent height */
-.lexical-editor-container .border-b.bg-gray-50.dark\\:bg-\\[\\#111827\\] {
+.lexical-editor-container .border-b.bg-gray-50.dark\:bg-\[\#111827\] {
   min-height: 56px !important;
   height: 56px !important;
   flex-shrink: 0;
@@ -3799,11 +3799,11 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   border-bottom-left-radius: 12px !important;
 }
 
-.editor-left-rounded .composer-editor-card .flex-1.p-4.dark\\:bg-\\[\\#020203\\] {
+.editor-left-rounded .composer-editor-card .flex-1.p-4.dark\:bg-\[\#020203\] {
   border-bottom-left-radius: 12px !important;
 }
 
-.editor-left-rounded .dark\\:bg-\\[\\#020203\\] {
+.editor-left-rounded .dark\:bg-\[\#020203\] {
   border-bottom-left-radius: 12px !important;
 }
 
@@ -3855,11 +3855,11 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   border-bottom-right-radius: 12px !important;
 }
 
-.editor-right-rounded .composer-editor-card .flex-1.p-4.dark\\:bg-\\[\\#020203\\] {
+.editor-right-rounded .composer-editor-card .flex-1.p-4.dark\:bg-\[\#020203\] {
   border-bottom-right-radius: 12px !important;
 }
 
-.editor-right-rounded .dark\\:bg-\\[\\#020203\\] {
+.editor-right-rounded .dark\:bg-\[\#020203\] {
   border-bottom-right-radius: 12px !important;
 }
 

@@ -126,7 +126,12 @@ export function FlowDiagramModal({
         }
       }}
     >
-      <DialogContent className="max-w-[90vw] max-h-[90vh] w-[90vw] h-[90vh] overflow-hidden flex flex-col dark:bg-[#111827] dark:border-[#374151]">
+      <DialogContent 
+        className="max-w-[90vw] max-h-[90vh] w-[90vw] h-[90vh] overflow-hidden flex flex-col dark:bg-[#111827] dark:border-[#374151]"
+        style={{
+          backgroundColor: document.documentElement.classList.contains('dark') ? '#111827' : undefined
+        }}
+      >
         <DialogHeader className="flex-shrink-0">
           <DialogTitle className="flex items-center gap-2 dark:text-gray-200">
             <Network className="h-5 w-5 dark:text-blue-400" />

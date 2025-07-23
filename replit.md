@@ -301,6 +301,8 @@ Preferred communication style: Simple, everyday language.
   - Updated DialogDescription with dark:text-gray-300 for document information
   - Applied dark:bg-[#0F172A] to flow diagram container area
   - Applied dark:bg-[#111827] to close button container div with dark:border-[#374151]
+  - Added inline style for guaranteed #111827 background color enforcement
+  - Fixed CSS escaping errors in index.css that were causing LSP diagnostic issues
   - Enhanced modal visual consistency with application dark theme standards
 ✓ Applied same origin column formatting from integrados tab to em-processo tab (January 23, 2025):
   - Added dark mode colors to origin badges in em-processo, concluidos, and incluidos tabs
