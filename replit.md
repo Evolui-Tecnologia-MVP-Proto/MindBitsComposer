@@ -295,6 +295,11 @@ Preferred communication style: Simple, everyday language.
   - Added empty state within TableBody using TableRow with colSpan={7}
   - Applied dark mode colors to empty state text and icon (gray-200, gray-400, gray-500)
   - Empty state now appears within table structure when no "Incluido" documents exist
+✓ Applied same origin column formatting from integrados tab to em-processo tab (January 23, 2025):
+  - Added dark mode colors to origin badges in em-processo, concluidos, and incluidos tabs
+  - Monday badges: bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400
+  - Other origin badges: bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400
+  - Consistent formatting across all tabs with proper dark mode support
 ✓ Applied comprehensive dark theme to GitHubTab repositório page (January 23, 2025):
   - Updated all main containers and cards with #0F172A background and #374151 borders
   - Applied #0F172A to individual file cards and loading containers

@@ -380,11 +380,11 @@ export function DocumentosTable({
             <TableCell>
               <div className="flex items-center">
                 {documento.origem === "Monday" ? (
-                  <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                  <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded text-xs font-medium">
                     Monday
                   </div>
                 ) : (
-                  <div className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs font-medium">
+                  <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400 px-2 py-1 rounded text-xs font-medium">
                     {documento.origem}
                   </div>
                 )}
