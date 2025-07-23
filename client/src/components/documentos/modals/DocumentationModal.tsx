@@ -101,7 +101,7 @@ export function DocumentationModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg dark:bg-[#0F1729]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <BookOpen className="h-5 w-5 text-blue-600" />
@@ -159,7 +159,7 @@ export function DocumentationModal({
             
             if (hasUnsyncedAttachments) {
               return (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-600 rounded-lg p-4">
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0">
                       <svg className="h-5 w-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
@@ -167,10 +167,10 @@ export function DocumentationModal({
                       </svg>
                     </div>
                     <div className="flex-1">
-                      <h4 className="text-sm font-medium text-amber-800 mb-2">
+                      <h4 className="text-sm font-medium text-amber-800 dark:text-amber-400 mb-2">
                         Anexos não sincronizados
                       </h4>
-                      <p className="text-sm text-amber-700 mb-4">
+                      <p className="text-sm text-amber-700 dark:text-amber-300 mb-4">
                         O item tem anexos que não foram sincronizados. Estes anexos podem ser úteis para o processo de análise e geração da documentação.
                       </p>
                       <Button
@@ -199,13 +199,13 @@ export function DocumentationModal({
             
             if (hasSyncedAttachments) {
               return (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-600 rounded-lg p-4">
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0">
                       <Check className="h-5 w-5 text-green-500" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="text-sm font-medium text-green-800">
+                      <h4 className="text-sm font-medium text-green-800 dark:text-green-400">
                         Anexos do item já sincronizados
                       </h4>
                     </div>
@@ -219,14 +219,14 @@ export function DocumentationModal({
 
           {/* Seleção de Fluxo */}
           <div className="space-y-3">
-            <Label htmlFor="flow-select" className="text-sm font-medium">
+            <Label htmlFor="flow-select" className="text-sm font-medium dark:text-gray-200">
               Selecionar Fluxo de Documentação
             </Label>
             <Select value={selectedFlowId} onValueChange={setSelectedFlowId}>
-              <SelectTrigger id="flow-select" className="font-mono text-xs">
+              <SelectTrigger id="flow-select" className="font-mono text-xs dark:bg-[#0F172A] dark:border-[#374151] dark:text-gray-200">
                 <SelectValue placeholder="Escolha um fluxo para a documentação" />
               </SelectTrigger>
-              <SelectContent className="font-mono text-xs">
+              <SelectContent className="font-mono text-xs dark:bg-[#0F172A] dark:border-[#374151]">
                 {documentsFlows
                   .filter((flow: any) => flow.isEnabled === true)
                   .map((flow: any) => (
@@ -242,14 +242,14 @@ export function DocumentationModal({
               </SelectContent>
             </Select>
             {selectedFlowId && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-600 rounded-lg p-3">
                 <div className="flex items-center gap-2">
                   <BookOpen className="h-4 w-4 text-blue-600" />
-                  <span className="text-sm font-medium text-blue-800">
+                  <span className="text-sm font-medium text-blue-800 dark:text-blue-400">
                     Fluxo selecionado
                   </span>
                 </div>
-                <p className="text-xs text-blue-700 mt-1">
+                <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
                   {documentsFlows.find((flow: any) => flow.id === selectedFlowId)?.description}
                 </p>
               </div>
@@ -263,7 +263,7 @@ export function DocumentationModal({
           </Button>
           <Button
             onClick={handleStartDocumentation}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 dark:bg-[#1E40AF] dark:hover:bg-[#1E3A8A]"
             disabled={!selectedFlowId || startDocumentationMutation.isPending}
           >
             {startDocumentationMutation.isPending ? (

@@ -241,6 +241,13 @@ Preferred communication style: Simple, everyday language.
   - Added dark:bg-[#111827] to table container div for consistent dark theme
   - Applied to DocumentosTable.tsx for integrados tab specifically
   - Ensures table container matches dark mode color scheme (updated from #0F1729)
+✓ Applied dark mode to "Iniciar Documentação" modal (January 23, 2025):
+  - Applied #0F1729 background to DialogContent in dark mode
+  - Updated Labels with dark:text-gray-200 for proper contrast
+  - Applied #0F172A to SelectTrigger and SelectContent with #374151 borders
+  - Updated card backgrounds: amber-900/30, green-900/30, blue-900/30 for alert cards
+  - Enhanced text colors with dark theme variants (amber-400, green-400, blue-400)
+  - Applied #1E40AF button colors to match application standards
 
 ## System Architecture
 
