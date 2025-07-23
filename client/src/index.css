@@ -78,38 +78,10 @@ body.dark .Collapsible__content {
   display: none !important;
 }
 
-/* ReactFlow Background Grid - Maximum Visibility */
+/* ReactFlow Background Grid - Clean Implementation */
 .react-flow__background {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
   z-index: 0 !important;
   pointer-events: none !important;
-}
-
-.react-flow__background svg {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-.react-flow__background pattern,
-.react-flow__background pattern circle,
-.react-flow__background pattern path {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-/* Force grid dots visibility in light mode */
-.react-flow__background pattern circle {
-  fill: currentColor !important;
-  opacity: 1 !important;
-}
-
-.react-flow__background pattern path {
-  stroke: currentColor !important;
-  opacity: 1 !important;
 }
 
 .dark .Collapsible__container,
