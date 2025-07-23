@@ -291,13 +291,14 @@ Preferred communication style: Simple, everyday language.
   - Applied sticky header styling with proper borders and text colors
   - Ensured consistent dark mode theming across process, completed, and included document tabs
 ✓ Applied comprehensive dark theme to GitHubTab repositório page (January 23, 2025):
-  - Updated main container and cards with #1E293B background and #374151 borders
+  - Updated all main containers and cards with #0F172A background and #374151 borders
   - Applied #0F172A to individual file cards and loading containers
   - Enhanced text colors: #E5E7EB (titles), #9CA3AF (secondary text)
   - Updated loading states, file display cards, and empty state messages
   - Applied dark theme to code elements and badges
   - Applied #0F172A to main div container background for repositório tab
   - Applied #0F172A to 1st level internal divs within repositório tab
+  - Applied #0F172A to header container with buttons
   - Ensured consistent visual hierarchy with proper background colors
   - Ensured consistent color scheme matching administration page pattern
 
