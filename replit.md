@@ -248,6 +248,8 @@ Preferred communication style: Simple, everyday language.
   - Updated card backgrounds: amber-900/30, green-900/30, blue-900/30 for alert cards
   - Enhanced text colors with dark theme variants (amber-400, green-400, blue-400)
   - Applied #1E40AF button colors to match application standards
+  - Fixed document details card with #1E293B background and #374151 borders
+  - Updated document info text colors: gray-100 (title), gray-300 (details), gray-200 (labels)
 
 ## System Architecture
 

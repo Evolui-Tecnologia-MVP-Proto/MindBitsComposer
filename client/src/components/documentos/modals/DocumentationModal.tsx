@@ -116,28 +116,28 @@ export function DocumentationModal({
         <div className="space-y-6 py-4">
           {/* Documento selecionado */}
           {selectedDocument && (
-            <div className="bg-gray-50 p-4 rounded-lg border">
+            <div className="bg-gray-50 dark:bg-[#1E293B] p-4 rounded-lg border dark:border-[#374151]">
               <div className="flex items-start gap-3">
                 <File className="h-5 w-5 text-blue-500 mt-0.5" />
                 <div className="flex-1">
-                  <p className="font-medium text-sm text-gray-900">
+                  <p className="font-medium text-sm text-gray-900 dark:text-gray-100">
                     {selectedDocument.objeto}
                   </p>
-                  <div className="mt-2 grid grid-cols-2 gap-3 text-xs text-gray-600">
+                  <div className="mt-2 grid grid-cols-2 gap-3 text-xs text-gray-600 dark:text-gray-300">
                     <div>
-                      <span className="font-medium">Cliente:</span>{" "}
+                      <span className="font-medium dark:text-gray-200">Cliente:</span>{" "}
                       {selectedDocument.cliente}
                     </div>
                     <div>
-                      <span className="font-medium">Responsável:</span>{" "}
+                      <span className="font-medium dark:text-gray-200">Responsável:</span>{" "}
                       {selectedDocument.responsavel}
                     </div>
                     <div>
-                      <span className="font-medium">Sistema:</span>{" "}
+                      <span className="font-medium dark:text-gray-200">Sistema:</span>{" "}
                       {selectedDocument.sistema}
                     </div>
                     <div>
-                      <span className="font-medium">Módulo:</span>{" "}
+                      <span className="font-medium dark:text-gray-200">Módulo:</span>{" "}
                       {selectedDocument.modulo}
                     </div>
                   </div>
