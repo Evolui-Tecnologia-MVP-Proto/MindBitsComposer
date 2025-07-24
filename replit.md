@@ -163,6 +163,12 @@ Preferred communication style: Simple, everyday language.
   - Ensured complete isolation from light theme - no impact on light mode appearance
   - Added CSS rules for text containers with #292C33 background in dark mode
   - Component-specific implementation prevents propagation to other system elements
+✓ Applied #474A52 color to cards within ActionNode components for dark mode ONLY (January 25, 2025):
+  - Updated description cards in ActionNodeComponent with bg-gray-100 dark:bg-[#474A52]
+  - Applied dark theme text colors (dark:text-gray-200) and borders (dark:border-gray-600)
+  - Added CSS rules for ActionNode-specific cards in dark mode only
+  - Ensured complete theme isolation - no impact on light theme ActionNode cards
+  - Enhanced visual hierarchy within ActionNode elements for dark mode consistency
 ✓ Applied #1F2937 specifically to Templates page containers (January 22, 2025):
   - Reverted global changes to preserve other pages' design
   - Applied #1F2937 only to Templates page via [data-page="templates"] selectors

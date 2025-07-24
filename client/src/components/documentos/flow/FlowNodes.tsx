@@ -241,7 +241,7 @@ export const ActionNodeComponent = (props: any) => {
           {props.data.actionType && <div className="font-mono">{getActionTypeText(props.data.actionType)}</div>}
           {!props.data.actionType && <div className="font-mono">✓ Ação</div>}
           {props.data.description && (
-            <div className="mt-2 p-2 bg-gray-100 rounded text-xs text-gray-700 border max-w-[200px]">
+            <div className="mt-2 p-2 bg-gray-100 dark:bg-[#474A52] rounded text-xs text-gray-700 dark:text-gray-200 border dark:border-gray-600 max-w-[200px]">
               <div className="whitespace-pre-wrap break-words">{props.data.description}</div>
             </div>
           )}

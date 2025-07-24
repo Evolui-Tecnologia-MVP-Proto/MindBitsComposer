@@ -4006,3 +4006,21 @@ html:not(.dark) .node-info-text-bg {
   background-color: #292C33 !important;
   color: #ffffff !important;
 }
+
+/* ===== #474A52 THEME - ACTIONNODE CARDS (DARK MODE ONLY) ===== */
+/* Cards within ActionNode components - dark mode only */
+.dark .action-node-card,
+.dark .actionnode-description-card,
+.dark .flow-action-card {
+  background-color: #474A52 !important;
+  color: #e5e7eb !important;
+  border-color: #6b7280 !important;
+}
+
+/* Specific targeting for ActionNode description cards in dark mode */
+.dark [data-node-type="actionNode"] .bg-gray-100,
+.dark .action-node-container .bg-gray-100 {
+  background-color: #474A52 !important;
+  color: #e5e7eb !important;
+  border-color: #6b7280 !important;
+}
