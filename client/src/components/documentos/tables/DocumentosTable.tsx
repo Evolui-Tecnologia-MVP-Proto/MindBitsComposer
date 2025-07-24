@@ -153,44 +153,44 @@ export function DocumentosTable({
   if (activeTab === "integrados") {
     return (
       <div className="border rounded-lg dark:border-[#374151] dark:bg-[#111827]">
-        <Table>
+        <Table className="table-fixed">
           <TableHeader className="bg-white dark:bg-[#111827] border-b dark:border-[#374151]">
             <TableRow>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[130px] dark:text-gray-200">
+              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[130px] dark:text-gray-200 px-4 py-3 text-left">
                 Origem
               </TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[250px] dark:text-gray-200">Nome</TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[140px] dark:text-gray-200">Status</TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[155px] dark:text-gray-200">
+              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[250px] dark:text-gray-200 px-4 py-3 text-left">Nome</TableHead>
+              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[140px] dark:text-gray-200 px-4 py-3 text-left">Status</TableHead>
+              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[155px] dark:text-gray-200 px-4 py-3 text-left">
                 Data Integração
               </TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[140px] dark:text-gray-200">
+              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[140px] dark:text-gray-200 px-4 py-3 text-left">
                 Status Origem
               </TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[100px] dark:text-gray-200">Anexos</TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[120px] text-right dark:text-gray-200">
+              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[100px] dark:text-gray-200 px-4 py-3 text-left">Anexos</TableHead>
+              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[120px] text-right dark:text-gray-200 px-4 py-3">
                 Ações
               </TableHead>
             </TableRow>
           </TableHeader>
         </Table>
         <div className="max-h-[calc(100vh-590px)] overflow-y-auto">
-          <Table>
+          <Table className="table-fixed">
             <TableHeader className="sr-only">
               <TableRow>
-                <TableHead className="w-[130px]">Origem</TableHead>
-                <TableHead className="w-[250px]">Nome</TableHead>
-                <TableHead className="w-[140px]">Status</TableHead>
-                <TableHead className="w-[155px]">Data Integração</TableHead>
-                <TableHead className="w-[140px]">Status Origem</TableHead>
-                <TableHead className="w-[100px]">Anexos</TableHead>
-                <TableHead className="w-[120px] text-right">Ações</TableHead>
+                <TableHead className="w-[130px] px-4 py-3">Origem</TableHead>
+                <TableHead className="w-[250px] px-4 py-3">Nome</TableHead>
+                <TableHead className="w-[140px] px-4 py-3">Status</TableHead>
+                <TableHead className="w-[155px] px-4 py-3">Data Integração</TableHead>
+                <TableHead className="w-[140px] px-4 py-3">Status Origem</TableHead>
+                <TableHead className="w-[100px] px-4 py-3">Anexos</TableHead>
+                <TableHead className="w-[120px] text-right px-4 py-3">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {documentos.map((documento) => (
                 <TableRow key={documento.id} className="dark:border-[#374151]">
-                  <TableCell className="dark:text-gray-200">
+                  <TableCell className="dark:text-gray-200 px-4 py-3 w-[130px]">
                     <div className="flex items-center">
                       {documento.origem === "Monday" ? (
                         <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded text-xs font-medium">
@@ -203,10 +203,10 @@ export function DocumentosTable({
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="font-medium dark:text-gray-200">
+                  <TableCell className="font-medium dark:text-gray-200 px-4 py-3 w-[250px]">
                     {documento.objeto}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="px-4 py-3 w-[140px]">
                     <Badge
                       variant={getStatusBadgeVariant(documento.status) as any}
                       className="flex items-center gap-1 whitespace-nowrap"
@@ -215,10 +215,10 @@ export function DocumentosTable({
                       {documento.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-xs text-gray-500 dark:text-gray-400">
+                  <TableCell className="text-xs text-gray-500 dark:text-gray-400 px-4 py-3 w-[155px]">
                     {formatDate(documento.updatedAt)}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="px-4 py-3 w-[140px]">
                     <Badge
                       variant={
                         getStatusOrigemBadgeVariant(
@@ -230,7 +230,7 @@ export function DocumentosTable({
                       {documento.statusOrigem}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="px-4 py-3 w-[100px]">
                     <div className="flex items-center gap-2">
                       {(() => {
                         // Verificar se monday_item_values tem conteúdo
@@ -270,7 +270,7 @@ export function DocumentosTable({
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right px-4 py-3 w-[120px]">
                     <div className="flex justify-end space-x-2">
                       {activeTab === "integrados" && (
                         <>
