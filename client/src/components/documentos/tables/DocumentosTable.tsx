@@ -154,21 +154,21 @@ export function DocumentosTable({
     return (
       <div className="border rounded-lg dark:border-[#374151] dark:bg-[#111827]">
         <Table>
-          <TableHeader className="bg-white dark:bg-[#111827] border-b dark:border-[#374151]">
+          <TableHeader className="bg-white dark:bg-[#111827] border-b border-white dark:border-white">
             <TableRow>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] w-[130px] dark:text-gray-200">
+              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[130px] dark:text-gray-200">
                 Origem
               </TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Nome</TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Status</TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] w-[155px] dark:text-gray-200">
+              <TableHead className="bg-gray-50 dark:bg-[#111827] dark:text-gray-200">Nome</TableHead>
+              <TableHead className="bg-gray-50 dark:bg-[#111827] dark:text-gray-200">Status</TableHead>
+              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[155px] dark:text-gray-200">
                 Data Integração
               </TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
+              <TableHead className="bg-gray-50 dark:bg-[#111827] dark:text-gray-200">
                 Status Origem
               </TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Anexos</TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] text-right dark:text-gray-200">
+              <TableHead className="bg-gray-50 dark:bg-[#111827] dark:text-gray-200">Anexos</TableHead>
+              <TableHead className="bg-gray-50 dark:bg-[#111827] text-right dark:text-gray-200">
                 Ações
               </TableHead>
             </TableRow>
