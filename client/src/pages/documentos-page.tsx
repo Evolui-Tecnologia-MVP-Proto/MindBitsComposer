@@ -23,7 +23,9 @@ import {
   BookOpen,
   Zap,
   RefreshCw,
-  FileText
+  FileText,
+  Filter,
+  FilterX
 } from "lucide-react";
 
 import {
@@ -98,6 +100,9 @@ export default function DocumentosPage() {
   const [isPessoasExpanded, setIsPessoasExpanded] = useState(false);
   const [createModalActiveTab, setCreateModalActiveTab] =
     useState("dados-gerais");
+  
+  // Estado para controlar visibilidade dos painéis de filtragem
+  const [showFilters, setShowFilters] = useState(true);
   
   const [isLoadingMondayAttachments, setIsLoadingMondayAttachments] =
     useState(false);
@@ -1634,6 +1639,19 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             Documentos
           </h1>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowFilters(!showFilters)}
+            className="h-9 w-9 p-0 rounded-full bg-white dark:bg-[#1E293B] border-gray-300 dark:border-[#374151] hover:bg-gray-50 dark:hover:bg-[#374151]"
+            title={showFilters ? "Ocultar filtros" : "Mostrar filtros"}
+          >
+            {showFilters ? (
+              <FilterX className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+            ) : (
+              <Filter className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+            )}
+          </Button>
         </div>
 
         <Tabs
@@ -1681,6 +1699,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             statusOrigensUnicos={statusOrigensUnicos}
             renderDocumentosTable={renderDocumentosTable}
             documentosIntegrados={documentosIntegrados}
+            showFilters={showFilters}
           />
 
           <TabsContent value="em-processo" className="slide-in">

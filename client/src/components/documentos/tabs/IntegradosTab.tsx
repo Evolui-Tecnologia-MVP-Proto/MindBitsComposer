@@ -35,6 +35,7 @@ interface IntegradosTabProps {
   statusOrigensUnicos: string[];
   renderDocumentosTable: (documentos: Documento[]) => JSX.Element;
   documentosIntegrados: Documento[];
+  showFilters?: boolean;
 }
 
 export function IntegradosTab({
@@ -47,11 +48,13 @@ export function IntegradosTab({
   statusOrigensUnicos,
   renderDocumentosTable,
   documentosIntegrados,
+  showFilters = true,
 }: IntegradosTabProps) {
   return (
     <TabsContent value="integrados" className="slide-in">
       {/* Filtros */}
-      <div className="mb-6 p-4 bg-gray-50 dark:bg-[#0F172A] rounded-lg border dark:border-[#374151]">
+      {showFilters && (
+        <div className="mb-6 p-4 bg-gray-50 dark:bg-[#0F172A] rounded-lg border dark:border-[#374151]">
         <div className="flex items-center justify-end mb-3">
           <Button
             variant="outline"
@@ -215,7 +218,8 @@ export function IntegradosTab({
             </Select>
           </div>
         </div>
-      </div>
+        </div>
+      )}
 
       {isLoading ? (
         <div className="text-center py-6 dark:text-gray-200">Carregando documentos...</div>
