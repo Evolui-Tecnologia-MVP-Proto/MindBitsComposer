@@ -66,7 +66,7 @@ export default function AvatarMenu() {
       </button>
 
       {isOpen && (
-        <div className="origin-top-right absolute right-0 mt-2 w-64 rounded-lg shadow-lg bg-white dark:bg-[#1F2937] border border-gray-200 dark:border-gray-600 focus:outline-none z-50">
+        <div className="origin-top-right absolute right-0 mt-2 w-64 rounded-lg shadow-lg bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-gray-600 focus:outline-none z-50">
           {/* Cabeçalho com informações do usuário */}
           <div className="px-4 py-4 border-b border-gray-200 dark:border-gray-600">
             <div className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -81,13 +81,13 @@ export default function AvatarMenu() {
           <div className="py-1" role="none">
             <button
               onClick={handlePreferences}
-              className="flex items-center w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className="flex items-center w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-[#1F2937] transition-colors"
             >
               <User className="h-4 w-4 mr-3 text-gray-500 dark:text-gray-300" />
               Perfil
             </button>
             
-            <div className="flex items-center justify-between px-4 py-3 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+            <div className="flex items-center justify-between px-4 py-3 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-[#1F2937] transition-colors">
               <div className="flex items-center">
                 <Moon className="h-4 w-4 mr-3 text-gray-500 dark:text-gray-300" />
                 Modo escuro
@@ -101,7 +101,7 @@ export default function AvatarMenu() {
             
             <button
               onClick={handleLogout}
-              className="flex items-center w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+              className="flex items-center w-full text-left px-4 py-3 text-sm text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-[#1F2937] transition-colors"
             >
               <LogOut className="h-4 w-4 mr-3 text-gray-500 dark:text-gray-300" />
               Sair
