@@ -152,9 +152,9 @@ export function DocumentosTable({
 
   if (activeTab === "integrados") {
     return (
-      <div className="border rounded-lg dark:border-[#374151] dark:bg-[#111827] max-h-[calc(100vh-450px)] overflow-y-auto">
+      <div className="border rounded-lg dark:border-[#374151] dark:bg-[#111827]">
         <Table>
-          <TableHeader className="sticky top-0 bg-white dark:bg-[#111827] border-b dark:border-[#374151] z-10">
+          <TableHeader className="bg-white dark:bg-[#111827] border-b dark:border-[#374151]">
             <TableRow>
               <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] w-[130px] dark:text-gray-200">
                 Origem
@@ -173,6 +173,20 @@ export function DocumentosTable({
               </TableHead>
             </TableRow>
           </TableHeader>
+        </Table>
+        <div className="max-h-[calc(100vh-450px)] overflow-y-auto">
+          <Table>
+            <TableHeader className="sr-only">
+              <TableRow>
+                <TableHead className="w-[130px]">Origem</TableHead>
+                <TableHead>Nome</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="w-[155px]">Data Integração</TableHead>
+                <TableHead>Status Origem</TableHead>
+                <TableHead>Anexos</TableHead>
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
             <TableBody className="table-compact">
               {documentos.map((documento) => (
                 <TableRow key={documento.id} className="dark:border-[#374151]">
@@ -317,7 +331,8 @@ export function DocumentosTable({
                 </TableRow>
               )}
             </TableBody>
-        </Table>
+          </Table>
+        </div>
       </div>
     );
   }
