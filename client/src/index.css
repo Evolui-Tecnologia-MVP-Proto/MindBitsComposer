@@ -4086,3 +4086,156 @@ html:not(.dark) .react-flow__panel {
   border-color: #d1d5db !important;
   color: #374151 !important;
 }
+
+/* ===== PLUGINS PAGE STYLING (JANUARY 25, 2025) ===== */
+/* Applying same pattern as admin, templates, documentos pages */
+[data-page="plugins"] {
+  /* Main container background */
+  .container {
+    background-color: #1F2937 !important;
+  }
+  
+  /* Space-y-6 div background */
+  .space-y-6 {
+    background-color: #1F2937 !important;
+  }
+  
+  /* Header background */
+  .rounded-lg.p-6 {
+    background-color: #0F172A !important;
+  }
+  
+  /* Cards background */
+  .card,
+  [class*="card"] {
+    background-color: #1E293B !important;
+    border-color: #374151 !important;
+  }
+  
+  /* Table headers */
+  .table th,
+  thead th,
+  [class*="table-head"] {
+    background-color: #111827 !important;
+    color: #E5E7EB !important;
+    border-color: #374151 !important;
+  }
+  
+  /* Table rows */
+  .table tr,
+  tbody tr {
+    border-color: #374151 !important;
+  }
+  
+  /* Table cells */
+  .table td,
+  tbody td {
+    color: #E5E7EB !important;
+  }
+  
+  /* Dialog/Modal styling */
+  [role="dialog"],
+  .dialog-content {
+    background-color: #0F1729 !important;
+    border-color: #374151 !important;
+  }
+  
+  /* Form elements */
+  select,
+  input,
+  textarea,
+  [class*="select-trigger"] {
+    background-color: #0F172A !important;
+    border-color: #374151 !important;
+    color: #E5E7EB !important;
+  }
+  
+  /* Primary buttons */
+  .btn-primary,
+  button[class*="bg-[#1E40AF]"] {
+    background-color: #1E40AF !important;
+    color: white !important;
+  }
+  
+  /* Status badges - dark mode specific colors */
+  .badge {
+    border-color: #374151 !important;
+  }
+  
+  /* Type badges (purple theme) */
+  .badge[class*="outline"] {
+    background-color: rgba(147, 51, 234, 0.3) !important;
+    color: #A855F7 !important;
+    border-color: #9333EA !important;
+  }
+  
+  /* Active status badge (green) */
+  .badge[class*="green"] {
+    background-color: rgba(34, 197, 94, 0.3) !important;
+    color: #4ADE80 !important;
+    border-color: #16A34A !important;
+  }
+  
+  /* Inactive status badge (gray) */
+  .badge[class*="gray"] {
+    background-color: rgba(107, 114, 128, 0.3) !important;
+    color: #9CA3AF !important;
+    border-color: #6B7280 !important;
+  }
+  
+  /* Development status badge (yellow) */
+  .badge[class*="yellow"] {
+    background-color: rgba(234, 179, 8, 0.3) !important;
+    color: #FACC15 !important;
+    border-color: #EAB308 !important;
+  }
+  
+  /* Tab styling */
+  [data-radix-tabs-trigger][data-state="active"] {
+    background-color: #1E40AF !important;
+    color: white !important;
+  }
+  
+  /* Tab list */
+  [role="tablist"] {
+    background-color: #1E293B !important;
+    border-color: #374151 !important;
+  }
+}
+
+/* Dark mode specific rules for plugins page */
+.dark [data-page="plugins"] {
+  /* Main container */
+  .container {
+    background-color: #1F2937 !important;
+  }
+  
+  /* Header text color override */
+  h1 {
+    color: #6B7280 !important;
+  }
+  
+  /* Card content areas */
+  .card-content {
+    background-color: #1E293B !important;
+  }
+  
+  /* Text colors */
+  .text-muted-foreground {
+    color: #9CA3AF !important;
+  }
+  
+  /* Icons */
+  .lucide {
+    color: #60A5FA !important;
+  }
+  
+  /* Table alternating rows */
+  tbody tr:nth-child(odd) {
+    background-color: #0F172A !important;
+  }
+  
+  tbody tr:nth-child(even) {
+    background-color: #1F2937 !important;
+  }
+}

@@ -414,7 +414,7 @@ export default function PluginsPage() {
       } catch (error) {
         toast({
           title: "Erro no JSON",
-          description: "Configuração JSON inválida: " + error.message,
+          description: "Configuração JSON inválida: " + (error as Error).message,
           variant: "destructive",
         });
         return;
@@ -429,32 +429,34 @@ export default function PluginsPage() {
 
     if (selectedPlugin) {
       // Para edição, usar updatePluginMutation se existir, senão createPluginMutation
-      createPluginMutation.mutate({ id: selectedPlugin.id, ...pluginData });
+      createPluginMutation.mutate(pluginData);
     } else {
       createPluginMutation.mutate(pluginData);
     }
   };
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Gerenciamento de Plugins</h1>
-          <p className="text-muted-foreground">
-            Configure e gerencie os plugins do sistema
-          </p>
+    <div className="container mx-auto py-6" data-page="plugins">
+      <div className="space-y-6">
+        {/* Header com título */}
+        <div className="rounded-lg p-6 bg-gray-50 dark:bg-[#0F172A]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Puzzle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-[#6B7280]">
+                Gerenciamento de Plugins
+              </h1>
+            </div>
+            <Button onClick={openCreateModal} className="bg-[#1E40AF] hover:bg-[#1D4ED8] text-white dark:bg-[#1E40AF] dark:text-white">
+              <Plus className="mr-2 h-4 w-4" />
+              Novo Plugin
+            </Button>
+          </div>
         </div>
-        <Button onClick={openCreateModal}>
-          <Plus className="mr-2 h-4 w-4" />
-          Novo Plugin
-        </Button>
-      </div>
 
-
-
-      {/* Tabela de plugins */}
-      <Card>
-        <CardContent className="pt-6">
+        {/* Tabela de plugins */}
+        <Card className="dark:bg-[#1E293B] dark:border-[#374151]">
+          <CardContent className="pt-6">
           {isLoading ? (
             <div className="text-center py-4">Carregando plugins...</div>
           ) : plugins.length === 0 ? (
@@ -465,24 +467,24 @@ export default function PluginsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Versão</TableHead>
-                  <TableHead>Autor</TableHead>
-                  <TableHead className="w-[150px]">Ações</TableHead>
+                  <TableHead className="bg-gray-50 dark:bg-[#111827] dark:text-gray-200">Nome</TableHead>
+                  <TableHead className="bg-gray-50 dark:bg-[#111827] dark:text-gray-200">Tipo</TableHead>
+                  <TableHead className="bg-gray-50 dark:bg-[#111827] dark:text-gray-200">Status</TableHead>
+                  <TableHead className="bg-gray-50 dark:bg-[#111827] dark:text-gray-200">Versão</TableHead>
+                  <TableHead className="bg-gray-50 dark:bg-[#111827] dark:text-gray-200">Autor</TableHead>
+                  <TableHead className="w-[150px] bg-gray-50 dark:bg-[#111827] dark:text-gray-200">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {plugins.map((plugin) => (
-                  <TableRow key={plugin.id}>
-                    <TableCell>
+                  <TableRow key={plugin.id} className="dark:border-[#374151]">
+                    <TableCell className="dark:text-gray-300">
                       <div className="flex items-center gap-3">
                         {/* Ícone do plugin */}
                         <div className="flex-shrink-0">
                           {plugin.icon && availableIcons[plugin.icon as keyof typeof availableIcons] ? (
                             React.createElement(availableIcons[plugin.icon as keyof typeof availableIcons], { 
-                              className: "h-6 w-6 text-blue-600" 
+                              className: "h-6 w-6 text-blue-600 dark:text-blue-400" 
                             })
                           ) : plugin.icon && plugin.icon.startsWith('/uploads/') ? (
                             <img 
@@ -497,25 +499,32 @@ export default function PluginsPage() {
                         
                         {/* Nome e descrição */}
                         <div>
-                          <div className="font-medium">{plugin.name}</div>
+                          <div className="font-medium dark:text-gray-200">{plugin.name}</div>
                           <div className="text-sm text-muted-foreground">
                             {plugin.description}
                           </div>
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">
+                    <TableCell className="dark:text-gray-300">
+                      <Badge variant="outline" className="dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-600">
                         {getPluginTypeLabel(plugin.type)}
                       </Badge>
                     </TableCell>
-                    <TableCell>
-                      <Badge variant={getStatusBadgeVariant(plugin.status)}>
+                    <TableCell className="dark:text-gray-300">
+                      <Badge 
+                        variant={getStatusBadgeVariant(plugin.status)} 
+                        className={`${
+                          plugin.status === "active" ? "dark:bg-green-900/30 dark:text-green-400 dark:border-green-600" :
+                          plugin.status === "inactive" ? "dark:bg-gray-900/30 dark:text-gray-400 dark:border-gray-600" :
+                          "dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-600"
+                        }`}
+                      >
                         {getPluginStatusLabel(plugin.status)}
                       </Badge>
                     </TableCell>
-                    <TableCell>{plugin.version}</TableCell>
-                    <TableCell>{plugin.author || "-"}</TableCell>
+                    <TableCell className="dark:text-gray-300">{plugin.version}</TableCell>
+                    <TableCell className="dark:text-gray-300">{plugin.author || "-"}</TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
                         <Button
@@ -561,22 +570,23 @@ export default function PluginsPage() {
           )}
         </CardContent>
       </Card>
+      </div>
 
       {/* Modal para criar/editar plugin */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto dark:bg-[#0F1729] dark:border-[#374151]">
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className="dark:text-gray-200">
               {selectedPlugin ? "Editar Plugin" : "Novo Plugin"}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="dark:text-gray-300">
               {selectedPlugin 
                 ? "Edite as informações do plugin" 
                 : "Crie um novo plugin para o sistema"}
             </DialogDescription>
           </DialogHeader>
           
-          <Tabs value={activePluginTab} onValueChange={setActivePluginTab} className="w-full">
+          <Tabs value={activePluginTab} onValueChange={(value) => setActivePluginTab(value as 'geral' | 'config')} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="geral">Geral</TabsTrigger>
               <TabsTrigger value="config">Config.</TabsTrigger>
@@ -836,7 +846,7 @@ export default function PluginsPage() {
                                 JSON.parse(configurationJson);
                                 alert("JSON válido!");
                               } catch (error) {
-                                alert("JSON inválido: " + error.message);
+                                alert("JSON inválido: " + (error as Error).message);
                               }
                             }}
                           >
