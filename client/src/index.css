@@ -3959,3 +3959,50 @@ html.dark div[data-radix-tabs-content][value="anexos"] table.table-fixed tbody t
 html.dark div[data-radix-tabs-content][value="anexos"] table.table-fixed tbody td {
   background-color: #0F172A !important;
 }
+
+/* ===== #292C33 THEME - TEXT CONTAINERS AND NODE FILLS (DARK MODE ONLY) ===== */
+/* ReactFlow node text containers and specific UI elements - dark mode only */
+.dark .flow-node-text-container,
+.dark .node-text-bg,
+.dark .flow-text-content {
+  background-color: #292C33 !important;
+  color: #ffffff !important;
+}
+
+/* Specific containers for node information panels in dark mode */
+.dark .flow-inspector-text,
+.dark .node-details-container,
+.dark .flow-panel-text-bg {
+  background-color: #292C33 !important;
+  color: #ffffff !important;
+}
+
+/* Text container backgrounds for ReactFlow components in dark mode */
+.dark .react-flow-node-text,
+.dark .flow-diagram-text-container,
+.dark .node-info-text-bg {
+  background-color: #292C33 !important;
+  color: #ffffff !important;
+}
+
+/* Ensure no impact on light theme - explicit light mode overrides */
+html:not(.dark) .flow-node-text-container,
+html:not(.dark) .node-text-bg,
+html:not(.dark) .flow-text-content,
+html:not(.dark) .flow-inspector-text,
+html:not(.dark) .node-details-container,
+html:not(.dark) .flow-panel-text-bg,
+html:not(.dark) .react-flow-node-text,
+html:not(.dark) .flow-diagram-text-container,
+html:not(.dark) .node-info-text-bg {
+  background-color: white !important;
+  color: #000000 !important;
+}
+
+/* Component isolation - apply only to specific flow components */
+.dark [data-component="flow-nodes"] .text-container,
+.dark [data-component="flow-inspector"] .text-bg,
+.dark [data-flow-panel="true"] .text-container {
+  background-color: #292C33 !important;
+  color: #ffffff !important;
+}

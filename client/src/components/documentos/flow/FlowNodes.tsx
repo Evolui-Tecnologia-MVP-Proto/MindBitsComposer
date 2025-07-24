@@ -17,11 +17,11 @@ export const StartNodeComponent = (props: any) => {
   const getBackgroundColor = () => {
     if (props.data.isExecuted === 'TRUE') return 'bg-[#21639a]';
     if (props.data.isPendingConnected) return 'bg-yellow-200';
-    return 'bg-white';
+    return 'bg-white dark:bg-[#292C33]';
   };
 
   const getTextColor = () => {
-    return props.data.isExecuted === 'TRUE' ? 'text-white' : 'text-black';
+    return props.data.isExecuted === 'TRUE' ? 'text-white' : 'text-black dark:text-white';
   };
   
   // Classes para realce do nó selecionado
@@ -69,11 +69,11 @@ export const EndNodeComponent = (props: any) => {
   const getBackgroundColor = () => {
     if (props.data.isExecuted === 'TRUE') return 'bg-[#21639a]';
     if (props.data.isPendingConnected) return 'bg-yellow-200';
-    return 'bg-white';
+    return 'bg-white dark:bg-[#292C33]';
   };
 
   const getTextColor = () => {
-    return props.data.isExecuted === 'TRUE' ? 'text-white' : 'text-black';
+    return props.data.isExecuted === 'TRUE' ? 'text-white' : 'text-black dark:text-white';
   };
   
   // Classes para realce do nó selecionado
@@ -148,11 +148,11 @@ export const ActionNodeComponent = (props: any) => {
   const isSelected = props.selected;
   const { getNodes, setNodes } = useReactFlow();
   
-  let backgroundClass = 'bg-white';
+  let backgroundClass = 'bg-white dark:bg-[#292C33]';
   if (isExecuted) backgroundClass = 'bg-[#21639a]';
   else if (isPendingConnected) backgroundClass = 'bg-yellow-200';
   
-  const textClass = isExecuted ? 'text-white' : 'text-black';
+  const textClass = isExecuted ? 'text-white' : 'text-black dark:text-white';
   
   // Classes para realce do nó selecionado
   const selectionStyle = isSelected 
@@ -264,11 +264,14 @@ export const DocumentNodeComponent = (props: any) => {
   const isPendingConnected = props.data.isPendingConnected;
   const isSelected = props.selected;
   
-  let fillColor = 'white';
+  // Detectar modo escuro e aplicar cor adequada
+  const isDarkMode = document.documentElement.classList.contains('dark');
+  
+  let fillColor = isDarkMode ? '#292C33' : 'white';
   if (isExecuted) fillColor = '#21639a';
   else if (isPendingConnected) fillColor = '#fef3cd'; // amarelo claro
   
-  const textClass = isExecuted ? 'text-white' : 'text-black';
+  const textClass = isExecuted ? 'text-white' : isDarkMode ? 'text-white' : 'text-black';
   
   // Configurações para realce do nó selecionado
   const strokeColor = isSelected ? '#f97316' : 'black'; // laranja quando selecionado
@@ -389,11 +392,14 @@ export const IntegrationNodeComponent = (props: any) => {
   const isPendingConnected = props.data.isPendingConnected;
   const isSelected = props.selected;
   
-  let fillColor = 'white';
+  // Detectar modo escuro e aplicar cor adequada
+  const isDarkMode = document.documentElement.classList.contains('dark');
+  
+  let fillColor = isDarkMode ? '#292C33' : 'white';
   if (isExecuted) fillColor = '#21639a';
   else if (isPendingConnected) fillColor = '#fef3cd'; // amarelo claro
   
-  const textClass = isExecuted ? 'text-white' : 'text-black';
+  const textClass = isExecuted ? 'text-white' : isDarkMode ? 'text-white' : 'text-black';
   
   // Configurações para realce do nó selecionado
   const strokeColor = isSelected ? '#f97316' : 'black'; // laranja quando selecionado
@@ -487,11 +493,14 @@ export const SwitchNodeComponent = (props: any) => {
   const isPendingConnected = props.data.isPendingConnected;
   const isSelected = props.selected;
   
-  let backgroundColor = 'white';
+  // Detectar modo escuro e aplicar cor adequada
+  const isDarkMode = document.documentElement.classList.contains('dark');
+  
+  let backgroundColor = isDarkMode ? '#292C33' : 'white';
   if (isExecuted) backgroundColor = '#21639a';
   else if (isPendingConnected) backgroundColor = '#fef3cd'; // amarelo claro
   
-  const textClass = isExecuted ? 'text-white' : 'text-black';
+  const textClass = isExecuted ? 'text-white' : isDarkMode ? 'text-white' : 'text-black';
   
   // Configurações para realce do nó selecionado
   const borderStyle = isSelected ? '4px solid #f97316' : '2px solid black';
