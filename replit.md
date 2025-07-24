@@ -202,7 +202,8 @@ Preferred communication style: Simple, everyday language.
   - Header remains fixed while only table rows scroll within max-height container
   - Improved UX with sticky header always visible during data browsing
   - Maintained dark mode styling consistency across header and body sections
-  - Applied max-h-[calc(100vh-450px)] overflow-y-auto only to TableBody container
+  - Applied max-h-[calc(100vh-140px)] overflow-y-auto for 140px bottom margin
+  - Unified table structure with single overflow container wrapping entire table
 ✓ Applied #1F2937 specifically to Templates page containers (January 22, 2025):
   - Reverted global changes to preserve other pages' design
   - Applied #1F2937 only to Templates page via [data-page="templates"] selectors

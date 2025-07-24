@@ -152,27 +152,28 @@ export function DocumentosTable({
 
   if (activeTab === "integrados") {
     return (
-      <div className="border rounded-lg dark:border-[#374151] dark:bg-[#111827] max-h-[calc(100vh-140px)] overflow-y-auto">
-        <Table>
-          <TableHeader className="sticky top-0 bg-white dark:bg-[#111827] border-b dark:border-[#374151] z-10">
-            <TableRow>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] w-[130px] dark:text-gray-200">
-                Origem
-              </TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Nome</TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Status</TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] w-[155px] dark:text-gray-200">
-                Data Integração
-              </TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
-                Status Origem
-              </TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Anexos</TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] text-right dark:text-gray-200">
-                Ações
-              </TableHead>
-            </TableRow>
-          </TableHeader>
+      <div className="border rounded-lg dark:border-[#374151] dark:bg-[#111827]">
+        <div className="max-h-[calc(100vh-140px)] overflow-y-auto">
+          <Table>
+            <TableHeader className="sticky top-0 bg-white dark:bg-[#111827] border-b dark:border-[#374151] z-10">
+              <TableRow>
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] w-[130px] dark:text-gray-200">
+                  Origem
+                </TableHead>
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Nome</TableHead>
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Status</TableHead>
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] w-[155px] dark:text-gray-200">
+                  Data Integração
+                </TableHead>
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
+                  Status Origem
+                </TableHead>
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">Anexos</TableHead>
+                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] text-right dark:text-gray-200">
+                  Ações
+                </TableHead>
+              </TableRow>
+            </TableHeader>
             <TableBody className="table-compact">
               {documentos.map((documento) => (
                 <TableRow key={documento.id} className="dark:border-[#374151]">
@@ -317,7 +318,8 @@ export function DocumentosTable({
                 </TableRow>
               )}
             </TableBody>
-        </Table>
+          </Table>
+        </div>
       </div>
     );
   }
