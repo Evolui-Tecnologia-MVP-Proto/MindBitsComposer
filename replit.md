@@ -197,6 +197,12 @@ Preferred communication style: Simple, everyday language.
   - Default: gray background (bg-gray-100 dark:bg-gray-900/30, text-gray-800 dark:text-gray-400)
   - Added dark mode borders for all status badges with consistent color scheme
   - Enhanced visual hierarchy for task status identification in both light and dark themes
+✓ Restructured integrados table layout with fixed header and scrollable body (January 25, 2025):
+  - Separated table structure: fixed header outside overflow container, scrollable body inside
+  - Header remains fixed while only table rows scroll within max-height container
+  - Improved UX with sticky header always visible during data browsing
+  - Maintained dark mode styling consistency across header and body sections
+  - Applied max-h-[calc(100vh-450px)] overflow-y-auto only to TableBody container
 ✓ Applied #1F2937 specifically to Templates page containers (January 22, 2025):
   - Reverted global changes to preserve other pages' design
   - Applied #1F2937 only to Templates page via [data-page="templates"] selectors
