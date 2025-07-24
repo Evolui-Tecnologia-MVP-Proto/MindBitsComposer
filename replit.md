@@ -169,6 +169,15 @@ Preferred communication style: Simple, everyday language.
   - Added CSS rules for ActionNode-specific cards in dark mode only
   - Ensured complete theme isolation - no impact on light theme ActionNode cards
   - Enhanced visual hierarchy within ActionNode elements for dark mode consistency
+✓ Applied #0F172A color to ReactFlow toolbar and canvas controls for dark mode ONLY (January 25, 2025):
+  - Updated .react-flow__controls background and borders with #0F172A
+  - Applied #0F172A to .react-flow__controls-button background with #374151 borders
+  - Updated button text and icons colors (#9CA3AF normal, #E5E7EB hover)
+  - Applied #0F172A to .react-flow__minimap and .react-flow__panel components
+  - Added hover states with #1F2937 background for better interaction feedback
+  - Applied selection rectangle styling with rgba(15, 23, 42, 0.3) transparency
+  - Ensured complete light theme protection with explicit overrides
+  - Enhanced toolbar visual consistency with application dark theme standards
 ✓ Applied #1F2937 specifically to Templates page containers (January 22, 2025):
   - Reverted global changes to preserve other pages' design
   - Applied #1F2937 only to Templates page via [data-page="templates"] selectors

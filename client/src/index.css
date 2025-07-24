@@ -4024,3 +4024,65 @@ html:not(.dark) .node-info-text-bg {
   color: #e5e7eb !important;
   border-color: #6b7280 !important;
 }
+
+/* ===== #0F172A THEME - REACTFLOW TOOLBAR (DARK MODE ONLY) ===== */
+/* ReactFlow Controls toolbar styling for dark mode */
+.dark .react-flow__controls {
+  background-color: #0F172A !important;
+  border: 1px solid #0F172A !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ReactFlow Controls buttons in dark mode */
+.dark .react-flow__controls-button {
+  background-color: #0F172A !important;
+  border: 1px solid #374151 !important;
+  color: #9CA3AF !important;
+  fill: #9CA3AF !important;
+}
+
+.dark .react-flow__controls-button:hover {
+  background-color: #1F2937 !important;
+  color: #E5E7EB !important;
+  fill: #E5E7EB !important;
+}
+
+.dark .react-flow__controls-button svg {
+  fill: #9CA3AF !important;
+}
+
+.dark .react-flow__controls-button:hover svg {
+  fill: #E5E7EB !important;
+}
+
+/* ReactFlow MiniMap styling for dark mode */
+.dark .react-flow__minimap {
+  background-color: #0F172A !important;
+  border: 1px solid #374151 !important;
+}
+
+.dark .react-flow__minimap-mask {
+  fill: rgba(15, 23, 42, 0.8) !important;
+}
+
+/* ReactFlow Panel styling for dark mode */
+.dark .react-flow__panel {
+  background-color: #0F172A !important;
+  border: 1px solid #374151 !important;
+}
+
+/* ReactFlow Selection rectangle for dark mode */
+.dark .react-flow__selection {
+  background-color: rgba(15, 23, 42, 0.3) !important;
+  border: 1px solid #0F172A !important;
+}
+
+/* Light mode protection - explicit light mode overrides */
+html:not(.dark) .react-flow__controls,
+html:not(.dark) .react-flow__controls-button,
+html:not(.dark) .react-flow__minimap,
+html:not(.dark) .react-flow__panel {
+  background-color: white !important;
+  border-color: #d1d5db !important;
+  color: #374151 !important;
+}
