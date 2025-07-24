@@ -537,7 +537,7 @@ export function DocumentosTable({
       {/* Dropdown de fluxos na posição do mouse */}
       {dropdown.isOpen && (
         <div
-          className="fixed bg-white border border-gray-200 rounded-lg shadow-xl min-w-[250px] max-w-[400px]"
+          className="fixed bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-[#374151] rounded-lg shadow-xl min-w-[250px] max-w-[400px]"
           style={{
             left: Math.max(10, dropdown.position.x),
             top: dropdown.position.y + 10,
@@ -557,7 +557,7 @@ export function DocumentosTable({
               return (
                 <div
                   key={index}
-                  className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-50 last:border-b-0"
+                  className="p-3 hover:bg-gray-50 dark:hover:bg-[#1F2937] cursor-pointer border-b border-gray-50 dark:border-[#374151] last:border-b-0"
                   onClick={() => {
                     openFlowDiagramModal(flow);
                     setDropdown(prev => ({ ...prev, isOpen: false }));
@@ -565,19 +565,19 @@ export function DocumentosTable({
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <div className="font-medium text-sm text-gray-900 mb-1">
+                      <div className="font-medium text-sm text-gray-900 dark:text-gray-200 mb-1">
                         {executionData.flowName || flow.flowName || flow.name || "Fluxo sem nome"}
                       </div>
 
                       <div className="flex items-center space-x-2">
                         <span className={`text-xs px-2 py-1 rounded-full ${
                           flow.status === "concluded" 
-                            ? "bg-green-100 text-green-700" 
+                            ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400" 
                             : flow.status === "initiated"
-                            ? "bg-blue-100 text-blue-700"
+                            ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
                             : flow.status === "transfered"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-gray-100 text-gray-700"
+                            ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
+                            : "bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-400"
                         }`}>
                           {flow.status === "concluded" ? "Concluído" : 
                            flow.status === "initiated" ? "Em andamento" :
@@ -585,13 +585,13 @@ export function DocumentosTable({
                            flow.status}
                         </span>
                         {flow.createdAt && (
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-gray-400 dark:text-gray-500">
                             {new Date(flow.createdAt).toLocaleDateString('pt-BR')}
                           </span>
                         )}
                       </div>
                     </div>
-                    <Network className="h-4 w-4 text-purple-500" />
+                    <Network className="h-4 w-4 text-purple-500 dark:text-purple-400" />
                   </div>
                 </div>
               );

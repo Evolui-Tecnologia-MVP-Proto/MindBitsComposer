@@ -178,6 +178,15 @@ Preferred communication style: Simple, everyday language.
   - Applied selection rectangle styling with rgba(15, 23, 42, 0.3) transparency
   - Ensured complete light theme protection with explicit overrides
   - Enhanced toolbar visual consistency with application dark theme standards
+✓ Applied dark theme to flow selection dropdown panel (January 25, 2025):
+  - Updated main container with bg-white dark:bg-[#0F172A] and dark:border-[#374151]
+  - Applied dark:hover:bg-[#1F2937] to dropdown items for better interaction
+  - Updated borders to dark:border-[#374151] for consistent visual hierarchy
+  - Enhanced text colors: dark:text-gray-200 (main), dark:text-gray-500 (secondary)
+  - Applied dark theme to status badges: dark:bg-green-900/30, dark:bg-blue-900/30, etc.
+  - Updated badge text colors: dark:text-green-400, dark:text-blue-400, dark:text-yellow-400
+  - Enhanced Network icon with dark:text-purple-400 for better contrast
+  - Complete dark mode integration for multi-flow document selection interface
 ✓ Applied #1F2937 specifically to Templates page containers (January 22, 2025):
   - Reverted global changes to preserve other pages' design
   - Applied #1F2937 only to Templates page via [data-page="templates"] selectors
