@@ -293,6 +293,16 @@ Preferred communication style: Simple, everyday language.
   - Complete light theme protection with explicit :not(.dark) rules
   - Component isolation - no propagation to other system components
   - Enhanced element targeting including .table-fixed class coverage
+✓ Applied comprehensive dark theme to flow diagram node cards/containers (January 25, 2025):
+  - DocumentNode: Applied dark theme to "Iniciar Documentação" and "Documentação em Progresso" cards
+  - IntegrationNode: Applied dark theme to automatic and manual execution cards with proper colors
+  - EndNode: Applied dark theme to flow destination cards, transfer forms, and direct conclusion forms
+  - Updated all card backgrounds: blue-50 → dark:bg-blue-900/30, red-50 → dark:bg-red-900/30, yellow-50 → dark:bg-yellow-900/30
+  - Enhanced border colors with dark variants: blue-200 → dark:border-blue-600, red-200 → dark:border-red-600
+  - Applied dark theme to text colors: blue-800 → dark:text-blue-300/400, red-800 → dark:text-red-300
+  - Updated internal span backgrounds and text colors for proper contrast
+  - Applied dark backgrounds to code/monospace elements: bg-white → dark:bg-[#0F172A]
+  - Complete dark mode integration for all node types in flow diagram side panel
 ✓ Applied #111827 colors to "em-processo", "concluidos", and "incluidos" tabs table headers and containers (January 23, 2025):
   - Updated DocumentosTable.tsx to apply #111827 to "em-processo", "concluidos", and "incluidos" tabs
   - Added conditional styling for table containers with dark:bg-[#111827]

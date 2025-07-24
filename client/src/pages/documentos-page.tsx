@@ -3151,14 +3151,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
                     {/* Mensagem e botão para iniciar edição quando isExecuted = FALSE e isInProcess = FALSE */}
                     {selectedFlowNode.data.isExecuted === 'FALSE' && selectedFlowNode.data.isInProcess === 'FALSE' && (
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-600 rounded-lg p-4">
                         <div className="flex items-start space-x-3">
-                          <BookOpen className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                          <BookOpen className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
                           <div className="flex-1">
-                            <h4 className="text-sm font-medium text-blue-800 mb-2">
+                            <h4 className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">
                               Iniciar Documentação
                             </h4>
-                            <p className="text-xs text-blue-700 mb-3 leading-relaxed">
+                            <p className="text-xs text-blue-700 dark:text-blue-400 mb-3 leading-relaxed">
                               Selecione o botão de iniciar edição para enviar este documento para início de documentação no editor. 
                               Ao selecionar este elemento do fluxo indicará modo "In Progress", acesse o editor e selecione o documento 
                               para dar prosseguimento ao processo de edição da documentação. O documento a ser editado será o{' '}
@@ -3321,14 +3321,14 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
                     {/* Mensagem informativa quando está em processo */}
                     {selectedFlowNode.data.isInProcess === 'TRUE' && selectedFlowNode.data.isExecuted === 'FALSE' && (
-                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                      <div className="bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-600 rounded-lg p-4">
                         <div className="flex items-start space-x-3">
-                          <Zap className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                          <Zap className="h-5 w-5 text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0" />
                           <div className="flex-1">
-                            <h4 className="text-sm font-medium text-purple-800 mb-2">
+                            <h4 className="text-sm font-medium text-purple-800 dark:text-purple-300 mb-2">
                               Documentação em Progresso
                             </h4>
-                            <p className="text-xs text-purple-700">
+                            <p className="text-xs text-purple-700 dark:text-purple-400">
                               Este documento está sendo editado no editor. Acesse a página de fluxos para continuar o processo de documentação do{' '}
                               <span className="font-mono font-medium text-xs">
                                 {(() => {
@@ -3403,27 +3403,27 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
                 {selectedFlowNode.data.service && (
                   <div>
-                    <p className="text-sm text-gray-600">
-                      <span className="font-medium text-gray-700">Serviço:</span> {selectedFlowNode.data.service}
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      <span className="font-medium text-gray-700 dark:text-gray-200">Serviço:</span> {selectedFlowNode.data.service}
                     </p>
                   </div>
                 )}
 
                 {(selectedFlowNode.data.callType?.toLowerCase() === 'automatico' || selectedFlowNode.data.callType?.toLowerCase() === 'automático') && (
-                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-xs text-blue-800">
+                  <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-600 rounded-lg">
+                    <p className="text-xs text-blue-800 dark:text-blue-300">
                       Esta integração é feita automaticamente por um processo agendado, o ID deste processo é:
                     </p>
-                    <p className="text-xs text-blue-800 font-mono mt-1">
+                    <p className="text-xs text-blue-800 dark:text-blue-400 font-mono mt-1">
                       {selectedFlowNode.data.jobId || 'N/A'}
                     </p>
                   </div>
                 )}
 
                 {selectedFlowNode.data.callType?.toLowerCase() === 'manual' && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
-                  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-600 rounded-lg">
                     <div className="mb-3">
-                      <p className="text-xs text-yellow-800 mb-2">
+                      <p className="text-xs text-yellow-800 dark:text-yellow-300 mb-2">
                         {(() => {
                           // Extrair informações do jobId
                           let functionCaption = selectedFlowNode.data.callType || 'callJob';
@@ -3447,7 +3447,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                           return (
                             <>
                               Ao clicar no botão você executará a função{' '}
-                              <span className="font-mono font-semibold bg-yellow-100 px-1 py-0.5 rounded text-yellow-900">
+                              <span className="font-mono font-semibold bg-yellow-100 dark:bg-yellow-800/50 px-1 py-0.5 rounded text-yellow-900 dark:text-yellow-200">
                                 {displayName}
                               </span>
                               {' '}que {selectedFlowNode.data.integrType || 'Atualiza Dados'} com o serviço {selectedFlowNode.data.service || 'externo'}. Pressione para continuar.
@@ -3460,13 +3460,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     {integrationResult.status && (
                       <div className={`mb-3 p-3 rounded-md ${
                         integrationResult.status === 'success' 
-                          ? 'bg-green-50 border border-green-200' 
-                          : 'bg-red-50 border border-red-200'
+                          ? 'bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-600' 
+                          : 'bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-600'
                       }`}>
                         <p className={`text-sm ${
                           integrationResult.status === 'success' 
-                            ? 'text-green-800' 
-                            : 'text-red-800'
+                            ? 'text-green-800 dark:text-green-300' 
+                            : 'text-red-800 dark:text-red-300'
                         }`}>
                           {integrationResult.message}
                         </p>
@@ -3567,17 +3567,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                     {/* Exibição do fluxo destino para EndNode de Transferência */}
                     {selectedFlowNode.data.FromType === 'flow_init' && selectedFlowNode.data.To_Flow_id && (
                       <div className="mt-4">
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-600 rounded-lg p-3">
                           <div className="mb-2">
-                            <p className="text-xs font-medium text-blue-800 mb-1">Fluxo Destino:</p>
-                            <p className="text-xs text-blue-700 font-mono bg-white px-2 py-1 rounded border">
+                            <p className="text-xs font-medium text-blue-800 dark:text-blue-300 mb-1">Fluxo Destino:</p>
+                            <p className="text-xs text-blue-700 dark:text-blue-400 font-mono bg-white dark:bg-[#0F172A] px-2 py-1 rounded border dark:border-[#374151]">
                               {selectedFlowNode.data.To_Flow_id}
                             </p>
                           </div>
                           {(selectedFlowNode.data.To_Flow_code || selectedFlowNode.data.To_Flow_name) && (
                             <div>
-                              <p className="text-xs font-medium text-blue-800 mb-1">Detalhes:</p>
-                              <p className="text-xs text-blue-700 font-mono bg-white px-2 py-1 rounded border">
+                              <p className="text-xs font-medium text-blue-800 dark:text-blue-300 mb-1">Detalhes:</p>
+                              <p className="text-xs text-blue-700 dark:text-blue-400 font-mono bg-white dark:bg-[#0F172A] px-2 py-1 rounded border dark:border-[#374151]">
                                 [{selectedFlowNode.data.To_Flow_code}] - {selectedFlowNode.data.To_Flow_name}
                               </p>
                             </div>
@@ -3588,9 +3588,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
                     {/* Manual execution form para EndNode de Transferência para Fluxo */}
                     {selectedFlowNode.data.FromType === 'flow_init' && selectedFlowNode.data.To_Flow_id && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
-                      <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-600 rounded-lg">
                         <div className="mb-3">
-                          <p className="text-xs text-blue-800 mb-2">
+                          <p className="text-xs text-blue-800 dark:text-blue-300 mb-2">
                             Ao pressionar o botão você confirma o encerramento deste fluxo e a abertura do novo fluxo vinculado. Ao confirmar, o sistema: 1- Encerra o fluxo corrente, 2- Cria uma nova instância com o fluxo indicado vinculado ao presente documento, 3- Inicia o fluxo no novo documento. Confirma estas ações?
                           </p>
                         </div>
@@ -3598,13 +3598,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         {integrationResult.status && (
                           <div className={`mb-3 p-3 rounded-md ${
                             integrationResult.status === 'success' 
-                              ? 'bg-green-50 border border-green-200' 
-                              : 'bg-red-50 border border-red-200'
+                              ? 'bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-600' 
+                              : 'bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-600'
                           }`}>
                             <p className={`text-sm ${
                               integrationResult.status === 'success' 
-                                ? 'text-green-800' 
-                                : 'text-red-800'
+                                ? 'text-green-800 dark:text-green-300' 
+                                : 'text-red-800 dark:text-red-300'
                             }`}>
                               {integrationResult.message}
                             </p>
@@ -3627,9 +3627,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
 
                     {/* Manual execution form para EndNode de Encerramento Direto */}
                     {selectedFlowNode.data.FromType === 'Init' && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
-                      <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                      <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-600 rounded-lg">
                         <div className="mb-3">
-                          <p className="text-xs text-red-800 mb-2">
+                          <p className="text-xs text-red-800 dark:text-red-300 mb-2">
                             Ao pressionar o botão você encerrará este fluxo vinculado ao documento, bem como marcará o documento como encerrado e o enviará para a tab [Concluídos] da página [Documentos]. Pressione para continuar.
                           </p>
                         </div>
@@ -3637,13 +3637,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
                         {integrationResult.status && (
                           <div className={`mb-3 p-3 rounded-md ${
                             integrationResult.status === 'success' 
-                              ? 'bg-green-50 border border-green-200' 
-                              : 'bg-red-50 border border-red-200'
+                              ? 'bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-600' 
+                              : 'bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-600'
                           }`}>
                             <p className={`text-sm ${
                               integrationResult.status === 'success' 
-                                ? 'text-green-800' 
-                                : 'text-red-800'
+                                ? 'text-green-800 dark:text-green-300' 
+                                : 'text-red-800 dark:text-red-300'
                             }`}>
                               {integrationResult.message}
                             </p>
