@@ -178,6 +178,14 @@ Preferred communication style: Simple, everyday language.
   - Applied selection rectangle styling with rgba(15, 23, 42, 0.3) transparency
   - Ensured complete light theme protection with explicit overrides
   - Enhanced toolbar visual consistency with application dark theme standards
+✓ Redesigned user dropdown menu following uploaded design pattern (January 25, 2025):
+  - Restructured AvatarMenu component with clean header section showing user name and email
+  - Added proper icons for each menu item (User for Perfil, Moon for Modo escuro, LogOut for Sair)
+  - Applied #1F2937 background for dark mode with proper border styling
+  - Enhanced typography with semibold user name and subtle email styling
+  - Improved spacing and hover states for better user interaction
+  - Maintained theme toggle functionality with improved visual hierarchy
+  - Increased menu width to 64 (w-64) for better content presentation
 ✓ Applied dark theme to flow selection dropdown panel (January 25, 2025):
   - Updated main container with bg-white dark:bg-[#0F172A] and dark:border-[#374151]
   - Applied dark:hover:bg-[#1F2937] to dropdown items for better interaction
