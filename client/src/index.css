@@ -4112,6 +4112,13 @@ html:not(.dark) .react-flow__panel {
     border-color: #374151 !important;
   }
   
+  /* Table container */
+  .table,
+  [class*="table"],
+  table {
+    background-color: #0F172A !important;
+  }
+  
   /* Table headers */
   .table th,
   thead th,
@@ -4130,6 +4137,7 @@ html:not(.dark) .react-flow__panel {
   /* Table cells */
   .table td,
   tbody td {
+    background-color: #0F172A !important;
     color: #E5E7EB !important;
   }
   
@@ -4231,11 +4239,20 @@ html:not(.dark) .react-flow__panel {
   }
   
   /* Table alternating rows */
-  tbody tr:nth-child(odd) {
+  tbody tr:nth-child(odd),
+  tbody tr:nth-child(odd) td {
     background-color: #0F172A !important;
   }
   
-  tbody tr:nth-child(even) {
-    background-color: #1F2937 !important;
+  tbody tr:nth-child(even),
+  tbody tr:nth-child(even) td {
+    background-color: #0F172A !important;
+  }
+  
+  /* Table container wrapper */
+  .card-content table,
+  .card table,
+  [class*="card"] table {
+    background-color: #0F172A !important;
   }
 }
