@@ -152,7 +152,7 @@ export function DocumentosTable({
 
   if (activeTab === "integrados") {
     return (
-      <div className="border rounded-lg dark:border-[#374151] dark:bg-[#111827]">
+      <div className="border rounded-lg dark:border-[#374151] dark:bg-[#111827] max-h-[calc(100vh-450px)] overflow-y-auto">
         <Table>
           <TableHeader className="sticky top-0 bg-white dark:bg-[#111827] z-10 shadow-sm">
             <TableRow>

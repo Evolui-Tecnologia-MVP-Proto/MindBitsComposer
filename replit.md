@@ -204,6 +204,8 @@ Preferred communication style: Simple, everyday language.
   - Maintained dark mode styling consistency across header and body sections
   - Applied max-h-[calc(100vh-450px)] overflow-y-auto only to TableBody container
   - Restored two-table structure: fixed header table + scrollable body table for optimal UX
+  - Applied same div structure as em-processo tab with sticky header and container overflow
+  - Unified structure: single div container with max-height and overflow for table scrolling
 ✓ Applied #1F2937 specifically to Templates page containers (January 22, 2025):
   - Reverted global changes to preserve other pages' design
   - Applied #1F2937 only to Templates page via [data-page="templates"] selectors
