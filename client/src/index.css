@@ -4108,7 +4108,7 @@ html:not(.dark) .react-flow__panel {
   /* Cards background */
   .card,
   [class*="card"] {
-    background-color: #1E293B !important;
+    background-color: #0F172A !important;
     border-color: #374151 !important;
   }
   
@@ -4206,7 +4206,7 @@ html:not(.dark) .react-flow__panel {
   
   /* Tab list */
   [role="tablist"] {
-    background-color: #1E293B !important;
+    background-color: #0F172A !important;
     border-color: #374151 !important;
   }
 }
@@ -4225,7 +4225,7 @@ html:not(.dark) .react-flow__panel {
   
   /* Card content areas */
   .card-content {
-    background-color: #1E293B !important;
+    background-color: #0F172A !important;
   }
   
   /* Text colors */

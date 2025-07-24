@@ -214,7 +214,7 @@ Preferred communication style: Simple, everyday language.
   - Restructured layout with dedicated header div matching admin/templates/documentos pattern
   - Applied data-page="plugins" attribute for CSS targeting
   - Header: #0F172A background with Puzzle icon and #6B7280 title color
-  - Main cards: #1E293B with #374151 borders
+  - Main cards: #0F172A with #374151 borders
   - Table headers: #111827 with #E5E7EB text
   - Table rows: #374151 borders with alternating #0F172A/#1F2937 backgrounds
   - Modal dialogs: #0F1729 background with dark theme form elements
@@ -224,6 +224,8 @@ Preferred communication style: Simple, everyday language.
   - Complete dark mode integration following established color hierarchy
   - Fixed LSP TypeScript errors (error type assertions, tabs type safety)
   - Applied same visual consistency as other administrative pages
+  - Updated all #1E293B backgrounds to #0F172A for consistent dark theme
+  - Applied #0F172A to table containers and cells for unified background
 
 ✓ ReactFlow grid implementation COMPLETED successfully (January 22, 2025):
   - Successfully implemented grid toggle button with Grid3X3 icon and state management
