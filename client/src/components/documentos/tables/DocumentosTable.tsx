@@ -174,7 +174,7 @@ export function DocumentosTable({
             </TableRow>
           </TableHeader>
         </Table>
-        <div className="max-h-[calc(100vh-560px)] overflow-y-auto">
+        <div className="max-h-[calc(100vh-600px)] overflow-y-auto">
           <Table>
             <TableHeader className="sr-only">
               <TableRow>
