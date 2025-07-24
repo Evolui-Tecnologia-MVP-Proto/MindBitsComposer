@@ -156,7 +156,7 @@ export function DocumentosTable({
         <Table className="table-fixed">
           <TableHeader className="bg-white dark:bg-[#111827] border-b dark:border-[#374151]">
             <TableRow>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[130px] dark:text-gray-200 px-4 py-3 text-left">
+              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[100px] dark:text-gray-200 px-4 py-3 text-left">
                 Origem
               </TableHead>
               <TableHead className="bg-gray-50 dark:bg-[#111827] w-[250px] dark:text-gray-200 px-4 py-3 text-left">Nome</TableHead>
@@ -178,7 +178,7 @@ export function DocumentosTable({
           <Table className="table-fixed">
             <TableHeader className="sr-only">
               <TableRow>
-                <TableHead className="w-[130px] px-4 py-3">Origem</TableHead>
+                <TableHead className="w-[100px] px-4 py-3">Origem</TableHead>
                 <TableHead className="w-[250px] px-4 py-3">Nome</TableHead>
                 <TableHead className="w-[140px] px-4 py-3">Status</TableHead>
                 <TableHead className="w-[155px] px-4 py-3">Data Integração</TableHead>
@@ -190,7 +190,7 @@ export function DocumentosTable({
             <TableBody>
               {documentos.map((documento) => (
                 <TableRow key={documento.id} className="dark:border-[#374151]">
-                  <TableCell className="dark:text-gray-200 px-4 py-3 w-[130px]">
+                  <TableCell className="dark:text-gray-200 px-4 py-3 w-[100px]">
                     <div className="flex items-center">
                       {documento.origem === "Monday" ? (
                         <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded text-xs font-medium">
