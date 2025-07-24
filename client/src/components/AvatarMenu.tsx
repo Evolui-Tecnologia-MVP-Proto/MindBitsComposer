@@ -5,11 +5,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { Sun, Moon, User, LogOut } from "lucide-react";
 import { useLocation } from "wouter";
+import UserProfileModal from "./UserProfileModal";
 
 export default function AvatarMenu() {
   const { user, logoutMutation } = useAuth();
   const { theme, toggleTheme, isDark } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [, navigate] = useLocation();
 
@@ -29,7 +31,7 @@ export default function AvatarMenu() {
 
   const handlePreferences = () => {
     setIsOpen(false);
-    navigate("/preferences");
+    setIsProfileModalOpen(true);
   };
 
   const handleLogout = () => {
@@ -107,6 +109,11 @@ export default function AvatarMenu() {
           </div>
         </div>
       )}
+
+      <UserProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+      />
     </div>
   );
 }
