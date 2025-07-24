@@ -154,6 +154,15 @@ Preferred communication style: Simple, everyday language.
   - Select triggers: #0F172A background with proper contrast
   - Icons: adjusted chevron colors for dark theme visibility
   - Campo and Mapeamento areas: #0F172A background for complete dark theme consistency
+✓ Applied #292C33 color for ReactFlow node fills and text containers in dark mode ONLY (January 25, 2025):
+  - Updated all six node components: StartNode, EndNode, ActionNode, DocumentNode, IntegrationNode, SwitchNode
+  - Applied #292C33 as default background color for nodes in dark mode (replaces white)
+  - Maintained existing logic for executed (#21639a) and pending (#fef3cd) states
+  - Added dynamic dark mode detection using document.documentElement.classList.contains('dark')
+  - Applied specific text color rules: white for executed, black for pending (any theme), white for normal in dark mode
+  - Ensured complete isolation from light theme - no impact on light mode appearance
+  - Added CSS rules for text containers with #292C33 background in dark mode
+  - Component-specific implementation prevents propagation to other system elements
 ✓ Applied #1F2937 specifically to Templates page containers (January 22, 2025):
   - Reverted global changes to preserve other pages' design
   - Applied #1F2937 only to Templates page via [data-page="templates"] selectors

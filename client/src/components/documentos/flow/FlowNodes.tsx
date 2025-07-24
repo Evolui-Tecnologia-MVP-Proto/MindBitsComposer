@@ -21,7 +21,9 @@ export const StartNodeComponent = (props: any) => {
   };
 
   const getTextColor = () => {
-    return props.data.isExecuted === 'TRUE' ? 'text-white' : 'text-black dark:text-white';
+    if (props.data.isExecuted === 'TRUE') return 'text-white';
+    if (props.data.isPendingConnected) return 'text-black'; // Preto para pendente em qualquer tema
+    return 'text-black dark:text-white';
   };
   
   // Classes para realce do nó selecionado
@@ -73,7 +75,9 @@ export const EndNodeComponent = (props: any) => {
   };
 
   const getTextColor = () => {
-    return props.data.isExecuted === 'TRUE' ? 'text-white' : 'text-black dark:text-white';
+    if (props.data.isExecuted === 'TRUE') return 'text-white';
+    if (props.data.isPendingConnected) return 'text-black'; // Preto para pendente em qualquer tema
+    return 'text-black dark:text-white';
   };
   
   // Classes para realce do nó selecionado
@@ -152,7 +156,7 @@ export const ActionNodeComponent = (props: any) => {
   if (isExecuted) backgroundClass = 'bg-[#21639a]';
   else if (isPendingConnected) backgroundClass = 'bg-yellow-200';
   
-  const textClass = isExecuted ? 'text-white' : 'text-black dark:text-white';
+  const textClass = isExecuted ? 'text-white' : isPendingConnected ? 'text-black' : 'text-black dark:text-white';
   
   // Classes para realce do nó selecionado
   const selectionStyle = isSelected 
@@ -271,7 +275,7 @@ export const DocumentNodeComponent = (props: any) => {
   if (isExecuted) fillColor = '#21639a';
   else if (isPendingConnected) fillColor = '#fef3cd'; // amarelo claro
   
-  const textClass = isExecuted ? 'text-white' : isDarkMode ? 'text-white' : 'text-black';
+  const textClass = isExecuted ? 'text-white' : isPendingConnected ? 'text-black' : isDarkMode ? 'text-white' : 'text-black';
   
   // Configurações para realce do nó selecionado
   const strokeColor = isSelected ? '#f97316' : 'black'; // laranja quando selecionado
@@ -399,7 +403,7 @@ export const IntegrationNodeComponent = (props: any) => {
   if (isExecuted) fillColor = '#21639a';
   else if (isPendingConnected) fillColor = '#fef3cd'; // amarelo claro
   
-  const textClass = isExecuted ? 'text-white' : isDarkMode ? 'text-white' : 'text-black';
+  const textClass = isExecuted ? 'text-white' : isPendingConnected ? 'text-black' : isDarkMode ? 'text-white' : 'text-black';
   
   // Configurações para realce do nó selecionado
   const strokeColor = isSelected ? '#f97316' : 'black'; // laranja quando selecionado
@@ -500,7 +504,7 @@ export const SwitchNodeComponent = (props: any) => {
   if (isExecuted) backgroundColor = '#21639a';
   else if (isPendingConnected) backgroundColor = '#fef3cd'; // amarelo claro
   
-  const textClass = isExecuted ? 'text-white' : isDarkMode ? 'text-white' : 'text-black';
+  const textClass = isExecuted ? 'text-white' : isPendingConnected ? 'text-black' : isDarkMode ? 'text-white' : 'text-black';
   
   // Configurações para realce do nó selecionado
   const borderStyle = isSelected ? '4px solid #f97316' : '2px solid black';
