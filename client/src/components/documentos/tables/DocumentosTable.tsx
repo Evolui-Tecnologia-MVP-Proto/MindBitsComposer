@@ -159,16 +159,16 @@ export function DocumentosTable({
               <TableHead className="bg-gray-50 dark:bg-[#111827] w-[130px] dark:text-gray-200">
                 Origem
               </TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] dark:text-gray-200">Nome</TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] dark:text-gray-200">Status</TableHead>
+              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[250px] dark:text-gray-200">Nome</TableHead>
+              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[140px] dark:text-gray-200">Status</TableHead>
               <TableHead className="bg-gray-50 dark:bg-[#111827] w-[155px] dark:text-gray-200">
                 Data Integração
               </TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] dark:text-gray-200">
+              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[140px] dark:text-gray-200">
                 Status Origem
               </TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] dark:text-gray-200">Anexos</TableHead>
-              <TableHead className="bg-gray-50 dark:bg-[#111827] text-right dark:text-gray-200">
+              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[100px] dark:text-gray-200">Anexos</TableHead>
+              <TableHead className="bg-gray-50 dark:bg-[#111827] w-[120px] text-right dark:text-gray-200">
                 Ações
               </TableHead>
             </TableRow>
@@ -179,12 +179,12 @@ export function DocumentosTable({
             <TableHeader className="sr-only">
               <TableRow>
                 <TableHead className="w-[130px]">Origem</TableHead>
-                <TableHead>Nome</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead className="w-[250px]">Nome</TableHead>
+                <TableHead className="w-[140px]">Status</TableHead>
                 <TableHead className="w-[155px]">Data Integração</TableHead>
-                <TableHead>Status Origem</TableHead>
-                <TableHead>Anexos</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
+                <TableHead className="w-[140px]">Status Origem</TableHead>
+                <TableHead className="w-[100px]">Anexos</TableHead>
+                <TableHead className="w-[120px] text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
