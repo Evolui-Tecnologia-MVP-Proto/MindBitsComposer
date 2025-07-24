@@ -187,6 +187,16 @@ Preferred communication style: Simple, everyday language.
   - Updated badge text colors: dark:text-green-400, dark:text-blue-400, dark:text-yellow-400
   - Enhanced Network icon with dark:text-purple-400 for better contrast
   - Complete dark mode integration for multi-flow document selection interface
+✓ Applied differentiated colors for Tsk.Status column in em-processo tab (January 25, 2025):
+  - Ação Pendente: yellow background (bg-yellow-100 dark:bg-yellow-900/30, text-yellow-800 dark:text-yellow-400)
+  - Documentando: purple background (bg-purple-100 dark:bg-purple-900/30, text-purple-800 dark:text-purple-400)
+  - Em aprovação: green background (bg-green-100 dark:bg-green-900/30, text-green-800 dark:text-green-400)
+  - Concluído: blue background (bg-blue-100 dark:bg-blue-900/30, text-blue-800 dark:text-blue-400)
+  - Bloqueado: red background (bg-red-100 dark:bg-red-900/30, text-red-800 dark:text-red-400)
+  - Em revisão: orange background (bg-orange-100 dark:bg-orange-900/30, text-orange-800 dark:text-orange-400)
+  - Default: gray background (bg-gray-100 dark:bg-gray-900/30, text-gray-800 dark:text-gray-400)
+  - Added dark mode borders for all status badges with consistent color scheme
+  - Enhanced visual hierarchy for task status identification in both light and dark themes
 ✓ Applied #1F2937 specifically to Templates page containers (January 22, 2025):
   - Reverted global changes to preserve other pages' design
   - Applied #1F2937 only to Templates page via [data-page="templates"] selectors
