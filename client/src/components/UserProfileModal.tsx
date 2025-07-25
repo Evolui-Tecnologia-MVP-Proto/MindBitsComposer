@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Camera, X } from "lucide-react";
+import { Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface UserProfileModalProps {
@@ -123,19 +123,9 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[480px] bg-white dark:bg-[#1F2937] border-gray-200 dark:border-gray-600 p-0">
         <DialogHeader className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-white">
-              Perfil do Usuário
-            </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-              className="h-6 w-6 p-0 hover:bg-gray-100 dark:hover:bg-gray-700"
-            >
-              <X className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-            </Button>
-          </div>
+          <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+            Perfil do Usuário
+          </DialogTitle>
         </DialogHeader>
 
         <div className="px-6 py-6">
