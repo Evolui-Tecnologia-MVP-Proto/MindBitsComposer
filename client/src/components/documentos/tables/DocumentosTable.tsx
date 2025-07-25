@@ -44,6 +44,7 @@ interface DocumentosTableProps {
   getConcludedFlow: (documentId: string) => any;
   openFlowDiagramModal: (execution: any) => void;
   flowExecutions?: any[];
+  showFilters?: boolean;
 }
 
 export function DocumentosTable({
@@ -65,6 +66,7 @@ export function DocumentosTable({
   getConcludedFlow,
   openFlowDiagramModal,
   flowExecutions = [],
+  showFilters = true,
 }: DocumentosTableProps) {
   const [dropdown, setDropdown] = useState<{
     isOpen: boolean;
@@ -153,7 +155,7 @@ export function DocumentosTable({
   if (activeTab === "integrados") {
     return (
       <div className="border rounded-lg dark:border-[#374151] dark:bg-[#111827]">
-        <div className="max-h-[calc(100vh-510px)] overflow-y-auto">
+        <div className={`overflow-y-auto ${showFilters ? 'max-h-[calc(100vh-510px)]' : 'max-h-[calc(100vh-350px)]'}`}>
           <Table>
             <TableHeader className="sticky top-0 bg-white dark:bg-[#111827] border-b dark:border-[#374151] z-10">
               <TableRow>

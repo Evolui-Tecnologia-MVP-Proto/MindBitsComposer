@@ -1469,7 +1469,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     return "outros";
   };
 
-  const renderDocumentosTable = (documentos: Documento[]) => {
+  const renderDocumentosTable = (documentos: Documento[], showFilters: boolean = true) => {
     return (
       <DocumentosTable
         documentos={documentos}
@@ -1490,6 +1490,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         getConcludedFlow={getConcludedFlow}
         openFlowDiagramModal={openFlowDiagramModal}
         flowExecutions={flowExecutions}
+        showFilters={showFilters}
       />
     );
   };

@@ -33,7 +33,7 @@ interface IntegradosTabProps {
   modulosUnicos: string[];
   clientesUnicos: string[];
   statusOrigensUnicos: string[];
-  renderDocumentosTable: (documentos: Documento[]) => JSX.Element;
+  renderDocumentosTable: (documentos: Documento[], showFilters?: boolean) => JSX.Element;
   documentosIntegrados: Documento[];
   showFilters?: boolean;
 }
@@ -224,7 +224,7 @@ export function IntegradosTab({
       {isLoading ? (
         <div className="text-center py-6 dark:text-gray-200">Carregando documentos...</div>
       ) : (
-        renderDocumentosTable(documentosIntegrados)
+        renderDocumentosTable(documentosIntegrados, showFilters)
       )}
     </TabsContent>
   );
