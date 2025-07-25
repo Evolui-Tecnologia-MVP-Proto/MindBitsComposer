@@ -8,7 +8,13 @@ EVO-MindBits Composer is an integrated technical and business documentation plat
 
 Preferred communication style: Simple, everyday language.
 
-## Recent Updates (January 21, 2025)
+## Recent Updates (January 25, 2025)
+
+✓ Removed NOT NULL constraint from started_by column in document_editions table (January 25, 2025)
+✓ Applied dynamic table height adjustment based on filter visibility state
+✓ Fixed table layout to maintain position when filters are hidden - container stretches to occupy filter space
+
+## Previous Updates (January 21, 2025)
 
 ✓ Complete design system color scheme implementation
 ✓ Applied authentic color specifications from documentation
