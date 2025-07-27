@@ -3870,6 +3870,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         code: documentsFlows.code,
         flowTypeId: documentsFlows.flowTypeId,
         flowData: documentsFlows.flowData,
+        applicationFilter: documentsFlows.applicationFilter,
         userId: documentsFlows.userId,
         createdBy: documentsFlows.createdBy,
         updatedBy: documentsFlows.updatedBy,

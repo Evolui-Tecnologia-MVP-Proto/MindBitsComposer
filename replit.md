@@ -47,6 +47,7 @@ Preferred communication style: Simple, everyday language.
   - Enhanced error handling for invalid JSON format with user-friendly alerts
   - Completed database migration resolving null values constraint issues
   - Added comprehensive JSON placeholder example showing table, and/or operators, field conditions structure
+  - Fixed GET endpoint to return applicationFilter field ensuring proper data loading in frontend
 ✓ Updated home page "Documentos a revisar" counter to show MindBits_CT + Integrado status
 ✓ Removed dashboard header and system overview sections from home page
 ✓ Removed all user access control restrictions from flow endpoints - all authenticated users can now manage any flow regardless of creator
