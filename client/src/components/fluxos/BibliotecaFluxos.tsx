@@ -472,7 +472,7 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="biblioteca-content-container rounded-b-lg overflow-hidden">
+      <div className="biblioteca-content-container">
         <div className="flex justify-between items-center p-2.5">
           <div>
             <h2 className="text-xl font-semibold">Biblioteca de Fluxos</h2>

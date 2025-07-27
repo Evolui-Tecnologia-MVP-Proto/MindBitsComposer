@@ -2646,11 +2646,15 @@ html.dark [data-radix-select-item][data-highlighted] {
 
 .dark [data-page="fluxos"] .flex.justify-between.items-center {
   background-color: #0F172A !important;
+  border-top-left-radius: 0.5rem !important;
+  border-top-right-radius: 0.5rem !important;
   /* Remove forced margin that could affect height calculation */
 }
 
 .dark [data-page="fluxos"] .grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3.gap-6 {
   background-color: #0F172A !important;
+  border-bottom-left-radius: 0.5rem !important;
+  border-bottom-right-radius: 0.5rem !important;
 }
 
 /* Individual flow cards */
