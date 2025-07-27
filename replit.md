@@ -30,6 +30,9 @@ Preferred communication style: Simple, everyday language.
 ✓ Enhanced BasicTextEditor toolbar dark mode consistency:
   - Applied #111827 background and #374151 borders to both Rich Text and Lexical toolbars
   - Improved visual integration with application dark theme standards
+✓ Fixed black container issue on home page during card updates:
+  - Replaced undefined bg-background classes with specific bg-gray-50 dark:bg-[#1F2937] colors
+  - Resolved dark theme loading state display problems in homepage cards
 ✓ Maintained comprehensive error handling in flow deletion with specific 404 error messages
 ✓ Updated home page "Documentos a revisar" counter to show MindBits_CT + Integrado status
 ✓ Removed dashboard header and system overview sections from home page

@@ -34,7 +34,7 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <div className="fade-in p-6 bg-background text-foreground">
+      <div className="fade-in p-6 bg-gray-50 dark:bg-[#1F2937]">
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -46,7 +46,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="fade-in p-6 bg-background dark:bg-[#1F2937] text-foreground">
+    <div className="fade-in p-6 bg-gray-50 dark:bg-[#1F2937]">
       <div className="space-y-8">
         {/* Base de conhecimento OC */}
         <div className="space-y-4">
