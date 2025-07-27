@@ -4115,15 +4115,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
+      // Verificar se é administrador
+      const isAdmin = req.user.email === 'admin@exemplo.com';
+      
+      // Se for admin, pode editar qualquer fluxo; senão, só seus próprios fluxos
+      const condition = isAdmin 
+        ? eq(documentsFlows.id, req.params.id)
+        : and(
+            eq(documentsFlows.id, req.params.id),
+            eq(documentsFlows.userId, req.user.id)
+          );
+      
       // First get the current status
       const currentFlow = await db.select({
         isEnabled: documentsFlows.isEnabled
       })
         .from(documentsFlows)
-        .where(and(
-          eq(documentsFlows.id, req.params.id),
-          eq(documentsFlows.userId, req.user.id)
-        ))
+        .where(condition)
         .limit(1);
       
       if (currentFlow.length === 0) {
@@ -4137,10 +4145,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           updatedBy: req.user.id,
           updatedAt: new Date()
         })
-        .where(and(
-          eq(documentsFlows.id, req.params.id),
-          eq(documentsFlows.userId, req.user.id)
-        ))
+        .where(condition)
         .returning();
       
       res.json(updatedFlow[0]);
@@ -4155,11 +4160,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
+      // Verificar se é administrador
+      const isAdmin = req.user.email === 'admin@exemplo.com';
+      
+      // Se for admin, pode excluir qualquer fluxo; senão, só seus próprios fluxos
+      const deleteCondition = isAdmin 
+        ? eq(documentsFlows.id, req.params.id)
+        : and(
+            eq(documentsFlows.id, req.params.id),
+            eq(documentsFlows.userId, req.user.id)
+          );
+      
       const deletedFlow = await db.delete(documentsFlows)
-        .where(and(
-          eq(documentsFlows.id, req.params.id),
-          eq(documentsFlows.userId, req.user.id)
-        ))
+        .where(deleteCondition)
         .returning();
       
       if (deletedFlow.length === 0) {
