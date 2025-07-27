@@ -23,7 +23,7 @@ export default function CadastrosGeraisPage() {
 
           {/* Tabs */}
           <Tabs defaultValue="empresas" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-5 dark:bg-[#0F172A]">
               <TabsTrigger value="empresas">Empresas</TabsTrigger>
               <TabsTrigger value="clientes">Clientes</TabsTrigger>
               <TabsTrigger value="categorias">Categorias</TabsTrigger>
