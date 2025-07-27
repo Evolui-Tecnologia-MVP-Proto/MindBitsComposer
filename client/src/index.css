@@ -2639,6 +2639,8 @@ html.dark [data-radix-select-item][data-highlighted] {
 
 .dark [data-page="fluxos"] .biblioteca-content-container {
   background-color: #0F172A !important;
+  border-bottom-left-radius: 0.5rem !important;
+  border-bottom-right-radius: 0.5rem !important;
   /* Remove forced padding override */
 }
 
