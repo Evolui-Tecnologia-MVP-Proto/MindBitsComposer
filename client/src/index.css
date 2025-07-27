@@ -2637,21 +2637,39 @@ html.dark [data-radix-select-item][data-highlighted] {
   background-color: #0F172A !important;
 }
 
+/* Biblioteca de Fluxos - Container principal com cantos arredondados */
+[data-page="fluxos"] .biblioteca-content-container {
+  border-radius: 0.5rem !important;
+  overflow: hidden !important;
+}
+
 .dark [data-page="fluxos"] .biblioteca-content-container {
   background-color: #0F172A !important;
-  border-bottom-left-radius: 0.5rem !important;
-  border-bottom-right-radius: 0.5rem !important;
+  border-radius: 0.5rem !important;
+  overflow: hidden !important;
   /* Remove forced padding override */
 }
 
-.dark [data-page="fluxos"] .flex.justify-between.items-center {
+/* Header com botão "Novo Fluxo" - cantos superiores arredondados */
+[data-page="fluxos"] .biblioteca-content-container > .flex.justify-between.items-center:first-child {
+  border-top-left-radius: 0.5rem !important;
+  border-top-right-radius: 0.5rem !important;
+}
+
+.dark [data-page="fluxos"] .biblioteca-content-container > .flex.justify-between.items-center:first-child {
   background-color: #0F172A !important;
   border-top-left-radius: 0.5rem !important;
   border-top-right-radius: 0.5rem !important;
   /* Remove forced margin that could affect height calculation */
 }
 
-.dark [data-page="fluxos"] .grid.grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3.gap-6 {
+/* Grid de cards - cantos inferiores arredondados */
+[data-page="fluxos"] .biblioteca-content-container > .grid.grid-cols-1:last-child {
+  border-bottom-left-radius: 0.5rem !important;
+  border-bottom-right-radius: 0.5rem !important;
+}
+
+.dark [data-page="fluxos"] .biblioteca-content-container > .grid.grid-cols-1:last-child {
   background-color: #0F172A !important;
   border-bottom-left-radius: 0.5rem !important;
   border-bottom-right-radius: 0.5rem !important;

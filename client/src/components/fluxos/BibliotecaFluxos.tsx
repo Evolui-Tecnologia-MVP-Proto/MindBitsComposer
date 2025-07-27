@@ -506,10 +506,14 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
                     </CardTitle>
                     {/* Indicadores de status */}
                     {flow.isLocked && (
-                      <Lock className="h-4 w-4 text-red-500" title="Fluxo bloqueado" />
+                      <span title="Fluxo bloqueado">
+                        <Lock className="h-4 w-4 text-red-500" />
+                      </span>
                     )}
                     {!flow.isEnabled && (
-                      <EyeOff className="h-4 w-4 text-gray-500" title="Fluxo desabilitado" />
+                      <span title="Fluxo desabilitado">
+                        <EyeOff className="h-4 w-4 text-gray-500" />
+                      </span>
                     )}
                   </div>
                   <CardDescription className="text-muted-foreground mt-1 text-[12px]">
