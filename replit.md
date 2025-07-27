@@ -10,7 +10,9 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 27, 2025)
 
-✓ Fixed critical duplication issue in "cadastros gerais" page by correcting Layout component usage (January 27, 2025)
+✓ Fixed critical duplication issue in "cadastros gerais" page by removing redundant Layout wrapper (January 27, 2025)
+  - Removed Layout wrapper from CadastrosGeraisPage since ProtectedRoute already applies Layout automatically
+  - Resolved application-in-application display issue that was showing duplicate headers and sidebars
 ✓ Created functional "cadastros gerais" page with 5 structured tabs (Empresas, Clientes, Categorias, Localizações, Contatos)
 ✓ Applied consistent dark mode theming following established design system patterns
 ✓ Resolved all LSP TypeScript diagnostics in admin-page.tsx:

@@ -1,12 +1,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Database, Building, Users, Tags, MapPin, Phone } from "lucide-react";
-import Layout from "@/components/Layout";
 
 export default function CadastrosGeraisPage() {
   return (
-    <Layout>
-      <div className="container mx-auto px-6 py-8" data-page="cadastros-gerais">
+    <div className="container mx-auto px-6 py-8" data-page="cadastros-gerais">
         <div className="space-y-6">
           {/* Header */}
           <div className="rounded-lg bg-gray-50 dark:bg-[#0F172A] p-6 border border-gray-200 dark:border-[#374151]">
@@ -145,6 +143,5 @@ export default function CadastrosGeraisPage() {
           </Tabs>
         </div>
       </div>
-    </Layout>
   );
 }
