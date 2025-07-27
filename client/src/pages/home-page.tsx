@@ -5,8 +5,7 @@ import {
   BookOpen, 
   Clock, 
   CheckCircle2, 
-  AlertCircle,
-  TrendingUp
+  AlertCircle
 } from "lucide-react";
 import { type Documento } from "@shared/schema";
 
@@ -49,22 +48,6 @@ export default function HomePage() {
   return (
     <div className="fade-in p-6 bg-background dark:bg-[#1F2937] text-foreground">
       <div className="space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
-              Dashboard
-            </h1>
-            <p className="text-muted-foreground mt-2">
-              Bem-vindo de volta, {user?.name}
-            </p>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <TrendingUp className="h-4 w-4" />
-            <span>Última atualização: {new Date().toLocaleTimeString()}</span>
-          </div>
-        </div>
-
         {/* Base de conhecimento OC */}
         <div className="space-y-4">
           <div className="flex items-center gap-2">
