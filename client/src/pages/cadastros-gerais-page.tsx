@@ -1,8 +1,7 @@
-import { useState } from "react";
-import Layout from "@/components/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Database, Building, Users, Tags, MapPin, Phone } from "lucide-react";
+import Layout from "@/components/Layout";
 
 export default function CadastrosGeraisPage() {
   return (
