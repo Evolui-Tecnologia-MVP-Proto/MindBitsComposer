@@ -1119,18 +1119,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     },
   });
 
-  // Filtrar documentos por status
+  // Filtrar documentos por status aplicando os filtros
   const documentosIntegrados = useMemo(
-    () => documentos.filter((doc) => doc.status === "Integrado"),
-    [documentos],
+    () => filteredAndSortedDocumentos.filter((doc) => doc.status === "Integrado"),
+    [filteredAndSortedDocumentos],
   );
   const documentosProcessando = useMemo(
-    () => documentos.filter((doc) => doc.status === "Em Processo"),
-    [documentos],
+    () => filteredAndSortedDocumentos.filter((doc) => doc.status === "Em Processo"),
+    [filteredAndSortedDocumentos],
   );
   const documentosConcluidos = useMemo(
-    () => documentos.filter((doc) => doc.status === "Concluido"),
-    [documentos],
+    () => filteredAndSortedDocumentos.filter((doc) => doc.status === "Concluido"),
+    [filteredAndSortedDocumentos],
   );
 
   const handleCreateDocument = () => {
