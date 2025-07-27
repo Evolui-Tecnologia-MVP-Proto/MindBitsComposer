@@ -489,7 +489,7 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
           </Button>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-2.5 rounded-b-lg">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-2.5 rounded-b-lg bg-gray-50 dark:bg-[#0F172A]">
         {savedFlows.map((flow) => {
           const flowType = flowTypes?.find(type => 
             type.id === (flow.flowTypeId || flow.flow_type_id)
