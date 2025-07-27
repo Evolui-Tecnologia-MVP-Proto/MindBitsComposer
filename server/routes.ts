@@ -3979,12 +3979,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      const { name, description } = req.body;
+      const { name, description, applicationFilter } = req.body;
       
       const updatedFlow = await db.update(documentsFlows)
         .set({
           name,
           description: description || "",
+          applicationFilter: applicationFilter || {},
           updatedBy: req.user.id,
           updatedAt: new Date()
         })

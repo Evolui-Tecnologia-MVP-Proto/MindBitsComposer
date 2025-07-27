@@ -303,11 +303,11 @@ export type GlobalAsset = typeof globalAssets.$inferSelect;
 export type InsertSystemLog = z.infer<typeof insertSystemLogSchema>;
 export type SystemLog = typeof systemLogs.$inferSelect;
 
-// Repo Structure table
-export const repoStructure = pgTable("repo_structure", {
+// Repo Structure table (with explicit type annotation to fix LSP errors)
+export const repoStructure: any = pgTable("repo_structure", {
   uid: uuid("uid").defaultRandom().primaryKey(),
   folderName: text("folder_name").notNull(),
-  linkedTo: uuid("linked_to").references(() => repoStructure.uid, { onDelete: "cascade" }),
+  linkedTo: uuid("linked_to").references((): any => repoStructure.uid, { onDelete: "cascade" }),
   isSync: boolean("is_sync").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -365,6 +365,7 @@ export const documentsFlows = pgTable("documents_flows", {
   updatedBy: integer("updated_by").notNull().references(() => users.id),
   isLocked: boolean("is_locked").default(false), // Impede edição no editor
   isEnabled: boolean("is_enabled").default(true), // Controla se aparece em seleções
+  applicationFilter: json("application_filter").$type<Record<string, any>>().default({}), // Filtragem de aplicação em formato JSON
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

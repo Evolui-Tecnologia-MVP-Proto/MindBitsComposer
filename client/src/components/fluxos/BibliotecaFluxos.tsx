@@ -131,7 +131,7 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
       setEditingFlow(null);
       toast({
         title: "Metadados atualizados",
-        description: "O nome e descrição do fluxo foram atualizados com sucesso.",
+        description: "Os metadados do fluxo foram atualizados com sucesso.",
       });
     },
     onError: () => {
@@ -675,6 +675,7 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
             name: editingFlow.name,
             description: editingFlow.description,
             flowTypeId: editingFlow.flowTypeId || editingFlow.flow_type_id,
+            applicationFilter: editingFlow.applicationFilter || {},
           }}
           flowTypes={flowTypes || []}
           onSave={(data) => {

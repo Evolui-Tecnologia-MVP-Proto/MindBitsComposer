@@ -37,6 +37,15 @@ Preferred communication style: Simple, everyday language.
   - Enhanced dark mode consistency in tabs navigation area
   - Improved visual integration with application design standards
 ✓ Maintained comprehensive error handling in flow deletion with specific 404 error messages
+✓ Implemented tabbed flow metadata editing with application filtering capabilities:
+  - Added application_filter column to documents_flows table with JSON type for flexible filtering criteria
+  - Created tabbed interface in FlowMetadataModal with [Detalhes] and [Aplicação] tabs
+  - Moved existing name/description fields to Detalhes tab with enhanced dark mode styling
+  - Added JSON field for "Filtragem de aplicação" in Aplicação tab with syntax validation
+  - Updated backend PUT /api/documents-flows/:id/metadata endpoint to persist applicationFilter
+  - Applied consistent #0F172A/#0F1729 dark theme colors to modal and form elements
+  - Enhanced error handling for invalid JSON format with user-friendly alerts
+  - Completed database migration resolving null values constraint issues
 ✓ Updated home page "Documentos a revisar" counter to show MindBits_CT + Integrado status
 ✓ Removed dashboard header and system overview sections from home page
 ✓ Removed all user access control restrictions from flow endpoints - all authenticated users can now manage any flow regardless of creator
