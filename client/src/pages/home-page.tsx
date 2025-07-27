@@ -19,7 +19,7 @@ export default function HomePage() {
 
   // Calcular contadores para Base de conhecimento OC
   const documentosARevisar = documentos.filter(doc => 
-    doc.status === "Incluido" || doc.status === "Em Processo"
+    doc.origem === "MindBits_CT" && doc.status === "Integrado"
   ).length;
 
   const documentosEmRevisao = documentos.filter(doc => 
