@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 import {
   BookOpen,
   File,
@@ -73,6 +74,64 @@ export function DocumentationModal({
   integrateAttachmentsMutation,
 }: DocumentationModalProps) {
   const { toast } = useToast();
+
+  // Declarar funções como const antes de usá-las para evitar problemas de hoisting
+  const evaluateCondition = (document: Documento, condition: any): boolean => {
+    const field = condition.field;
+    const operator = condition.operator;
+    const value = condition.value;
+    const documentValue = document[field];
+    
+    switch (operator) {
+      case '=':
+      case '==':
+        return documentValue === value;
+      case '!=':
+      case '<>':
+        return documentValue !== value;
+      case '>':
+        return documentValue > value;
+      case '>=':
+        return documentValue >= value;
+      case '<':
+        return documentValue < value;
+      case '<=':
+        return documentValue <= value;
+      case 'contains':
+      case 'like':
+        return documentValue && documentValue.toString().toLowerCase().includes(value.toString().toLowerCase());
+      default:
+        console.warn(`Operador desconhecido: ${operator}`);
+        return true;
+    }
+  };
+
+  // Declarar as funções auxiliares antes da função principal
+  const evaluateAndConditions = (document: Documento, conditions: any[]): boolean => {
+    return conditions.every((condition: any) => {
+      if (condition.field && condition.operator && condition.value !== undefined) {
+        return evaluateCondition(document, condition);
+      } else if (condition.or) {
+        return evaluateOrConditions(document, condition.or);
+      } else if (condition.and) {
+        return evaluateAndConditions(document, condition.and);
+      }
+      return true;
+    });
+  };
+
+  const evaluateOrConditions = (document: Documento, conditions: any[]): boolean => {
+    return conditions.some((condition: any) => {
+      if (condition.field && condition.operator && condition.value !== undefined) {
+        return evaluateCondition(document, condition);
+      } else if (condition.or) {
+        return evaluateOrConditions(document, condition.or);
+      } else if (condition.and) {
+        return evaluateAndConditions(document, condition.and);
+      }
+      return false;
+    });
+  };
 
   // Função para verificar se o documento atende aos critérios do application_filter
   const documentMatchesFlowFilter = (document: Documento, flow: any): boolean => {
@@ -135,64 +194,20 @@ export function DocumentationModal({
     }
   };
 
-  // Função auxiliar para avaliar condições AND
-  const evaluateAndConditions = (document: Documento, conditions: any[]): boolean => {
-    return conditions.every(condition => {
-      if (condition.field && condition.operator && condition.value !== undefined) {
-        return evaluateCondition(document, condition);
-      } else if (condition.or) {
-        return evaluateOrConditions(document, condition.or);
-      } else if (condition.and) {
-        return evaluateAndConditions(document, condition.and);
+  // Efeito para selecionar automaticamente o fluxo quando houver apenas um disponível
+  useEffect(() => {
+    if (isOpen && selectedDocument && documentsFlows) {
+      // Filtrar fluxos disponíveis
+      const availableFlows = documentsFlows.filter(
+        (flow: any) => flow.isEnabled === true && documentMatchesFlowFilter(selectedDocument, flow)
+      );
+      
+      // Se houver apenas um fluxo disponível, selecioná-lo automaticamente
+      if (availableFlows.length === 1 && !selectedFlowId) {
+        setSelectedFlowId(availableFlows[0].id);
       }
-      return true;
-    });
-  };
-
-  // Função auxiliar para avaliar condições OR
-  const evaluateOrConditions = (document: Documento, conditions: any[]): boolean => {
-    return conditions.some(condition => {
-      if (condition.field && condition.operator && condition.value !== undefined) {
-        return evaluateCondition(document, condition);
-      } else if (condition.or) {
-        return evaluateOrConditions(document, condition.or);
-      } else if (condition.and) {
-        return evaluateAndConditions(document, condition.and);
-      }
-      return false;
-    });
-  };
-
-  // Função auxiliar para avaliar uma condição individual
-  const evaluateCondition = (document: Documento, condition: any): boolean => {
-    const field = condition.field;
-    const operator = condition.operator;
-    const value = condition.value;
-    const documentValue = document[field];
-    
-    switch (operator) {
-      case '=':
-      case '==':
-        return documentValue === value;
-      case '!=':
-      case '<>':
-        return documentValue !== value;
-      case '>':
-        return documentValue > value;
-      case '>=':
-        return documentValue >= value;
-      case '<':
-        return documentValue < value;
-      case '<=':
-        return documentValue <= value;
-      case 'contains':
-      case 'like':
-        return documentValue && documentValue.toString().toLowerCase().includes(value.toString().toLowerCase());
-      default:
-        console.warn(`Operador desconhecido: ${operator}`);
-        return true;
     }
-  };
+  }, [isOpen, selectedDocument, documentsFlows, selectedFlowId]);
 
   const handleStartDocumentation = () => {
     console.log("Iniciar documentação para:", selectedDocument);

@@ -58,6 +58,7 @@ Preferred communication style: Simple, everyday language.
   - Supports nested AND/OR logical conditions for complex filtering
   - Modal only displays flows that match document's field values against filter criteria
   - Example: flow with origem="MindBits_CT" filter only appears for documents with origem="MindBits_CT"
+  - Auto-selects flow when only one flow is available after filtering
 
 ## Previous Updates (January 25, 2025)
 
