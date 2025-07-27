@@ -2706,6 +2706,20 @@ html.dark [data-radix-select-item][data-highlighted] {
 .biblioteca-rounded-container.biblioteca-content-container {
   border-radius: 0.5rem !important;
   overflow: hidden !important;
+  border: 1px solid transparent !important;
+}
+
+/* Force rounded corners for biblioteca container in light mode */
+.biblioteca-content-container {
+  border-radius: 0.5rem !important;
+  overflow: hidden !important;
+}
+
+/* Additional specificity for grid container */
+[data-page="fluxos"] .biblioteca-content-container .biblioteca-grid-rounded {
+  border-bottom-left-radius: 0.5rem !important;
+  border-bottom-right-radius: 0.5rem !important;
+  margin: 0 !important;
 }
 
 /* Header com botão "Novo Fluxo" - cantos superiores arredondados */

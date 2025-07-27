@@ -10,9 +10,25 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 27, 2025)
 
-✓ Fixed runtime error in documentos page caused by variable initialization order (January 27, 2025)
-✓ Corrected filteredAndSortedDocumentos variable declaration order before usage
-✓ Improved error handling in flow deletion with specific 404 error messages
+✓ Fixed critical duplication issue in "cadastros gerais" page by correcting Layout component usage (January 27, 2025)
+✓ Created functional "cadastros gerais" page with 5 structured tabs (Empresas, Clientes, Categorias, Localizações, Contatos)
+✓ Applied consistent dark mode theming following established design system patterns
+✓ Resolved all LSP TypeScript diagnostics in admin-page.tsx:
+  - Fixed relationshipId missing property error in attachmentMappings type
+  - Resolved syncWeekends/notifyErrors property access on schedule configuration
+  - Enhanced type safety across administration interface
+✓ Applied comprehensive dark mode theming to NewFlowModal component:
+  - Updated all form elements (inputs, selects, textarea) with #0F172A backgrounds
+  - Enhanced label text colors with gray-200 for proper contrast
+  - Applied #374151 borders and proper button styling (#1E40AF primary)
+  - Complete modal consistency with application dark theme standards
+✓ Optimized Layout component overflow handling for better user experience:
+  - Changed main content overflow from overflow-hidden to overflow-auto
+  - Improved navigation and scrolling behavior across application
+✓ Enhanced BasicTextEditor toolbar dark mode consistency:
+  - Applied #111827 background and #374151 borders to both Rich Text and Lexical toolbars
+  - Improved visual integration with application dark theme standards
+✓ Maintained comprehensive error handling in flow deletion with specific 404 error messages
 ✓ Updated home page "Documentos a revisar" counter to show MindBits_CT + Integrado status
 ✓ Removed dashboard header and system overview sections from home page
 ✓ Removed all user access control restrictions from flow endpoints - all authenticated users can now manage any flow regardless of creator

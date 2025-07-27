@@ -748,7 +748,7 @@ export default function BasicTextEditor() {
         <TabsContent value="richtext" className="m-0 p-0 flex-1 flex flex-col">
           <div className="w-full h-full flex flex-col">
             {/* Toolbar */}
-            <div className="flex items-center justify-between gap-2 p-2 border-b bg-gray-50 shrink-0">
+            <div className="flex items-center justify-between gap-2 p-2 border-b bg-gray-50 dark:bg-[#111827] dark:border-[#374151] shrink-0">
         {/* Lado esquerdo - Plugins e ferramentas */}
         <div className="flex items-center gap-2">
           {/* Botões dinâmicos para plugins ativos */}
@@ -1305,7 +1305,7 @@ export default function BasicTextEditor() {
         <TabsContent value="lexical" className="m-0 p-0 flex-1 flex flex-col">
           <div className="w-full h-full flex flex-col">
             {/* Toolbar do Lexical - integrada */}
-            <div className="flex items-center justify-between gap-2 p-2 border-b bg-gray-50 shrink-0">
+            <div className="flex items-center justify-between gap-2 p-2 border-b bg-gray-50 dark:bg-[#111827] dark:border-[#374151] shrink-0">
               <div className="flex items-center gap-2">
                 {/* Formatação de texto */}
                 <div className="flex items-center gap-1 mr-3">

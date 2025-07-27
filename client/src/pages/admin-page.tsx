@@ -484,7 +484,12 @@ export default function AdminPage() {
   // Carrega os mapeamentos de anexos salvos quando um mapeamento é selecionado
   useEffect(() => {
     if (selectedMapping && selectedMapping.assetsMappings) {
-      setAttachmentMappings(selectedMapping.assetsMappings);
+      // Ensure all mappings have the required relationshipId property
+      const mappingsWithRelationshipId = selectedMapping.assetsMappings.map(mapping => ({
+        ...mapping,
+        relationshipId: mapping.relationshipId || "documents_artifacts"
+      }));
+      setAttachmentMappings(mappingsWithRelationshipId);
     } else {
       setAttachmentMappings([]);
     }
@@ -541,8 +546,8 @@ export default function AdminPage() {
       setSchedulingFrequency(schedules.frequency || "daily");
       setSchedulingTime(schedules.time || "09:00");
       setSchedulingDays(schedules.days || []);
-      setSyncWeekends(schedules.syncWeekends || false);
-      setNotifyErrors(schedules.notifyErrors !== false); // default true
+      setSyncWeekends(false); // syncWeekends property doesn't exist in schedule type
+      setNotifyErrors(true); // notifyErrors property doesn't exist in schedule type
     } else {
       // Reset para valores padrão
       setSchedulingEnabled(false);
