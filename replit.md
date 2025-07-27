@@ -52,6 +52,12 @@ Preferred communication style: Simple, everyday language.
 ✓ Removed dashboard header and system overview sections from home page
 ✓ Removed all user access control restrictions from flow endpoints - all authenticated users can now manage any flow regardless of creator
 ✓ Updated DELETE, PATCH toggle-enabled, PUT metadata, PUT complete update, and PATCH toggle-lock endpoints
+✓ Implemented dynamic flow filtering in documentation modal based on application_filter JSON criteria:
+  - Added comprehensive filter evaluation logic supporting simple and complex conditions
+  - Supports operators: =, !=, >, >=, <, <=, contains/like
+  - Supports nested AND/OR logical conditions for complex filtering
+  - Modal only displays flows that match document's field values against filter criteria
+  - Example: flow with origem="MindBits_CT" filter only appears for documents with origem="MindBits_CT"
 
 ## Previous Updates (January 25, 2025)
 

@@ -32,6 +32,8 @@ interface Documento {
   sistema: string;
   modulo: string;
   assetsSynced?: boolean;
+  origem?: string;
+  [key: string]: any; // Para permitir acesso dinâmico a campos
 }
 
 interface DocumentationModalProps {
@@ -71,6 +73,126 @@ export function DocumentationModal({
   integrateAttachmentsMutation,
 }: DocumentationModalProps) {
   const { toast } = useToast();
+
+  // Função para verificar se o documento atende aos critérios do application_filter
+  const documentMatchesFlowFilter = (document: Documento, flow: any): boolean => {
+    // Se o fluxo não tem application_filter, sempre mostrar
+    if (!flow.applicationFilter || Object.keys(flow.applicationFilter).length === 0) {
+      return true;
+    }
+
+    try {
+      const filter = flow.applicationFilter;
+      
+      // Verificar se tem estrutura aplication.filter
+      if (filter.aplication && filter.aplication.filter) {
+        const filterConfig = filter.aplication.filter;
+        const field = filterConfig.field;
+        const operator = filterConfig.operator;
+        const value = filterConfig.value;
+        
+        // Obter o valor do campo no documento
+        const documentValue = document[field];
+        
+        // Aplicar operador
+        switch (operator) {
+          case '=':
+          case '==':
+            return documentValue === value;
+          case '!=':
+          case '<>':
+            return documentValue !== value;
+          case '>':
+            return documentValue > value;
+          case '>=':
+            return documentValue >= value;
+          case '<':
+            return documentValue < value;
+          case '<=':
+            return documentValue <= value;
+          case 'contains':
+          case 'like':
+            return documentValue && documentValue.toString().toLowerCase().includes(value.toString().toLowerCase());
+          default:
+            console.warn(`Operador desconhecido: ${operator}`);
+            return true;
+        }
+      }
+      
+      // Verificar estrutura com and/or
+      if (filter.aplication && filter.aplication.and) {
+        return evaluateAndConditions(document, filter.aplication.and);
+      }
+      
+      if (filter.aplication && filter.aplication.or) {
+        return evaluateOrConditions(document, filter.aplication.or);
+      }
+      
+      return true; // Se não reconhecer a estrutura, mostrar o fluxo
+    } catch (error) {
+      console.error('Erro ao avaliar application_filter:', error);
+      return true; // Em caso de erro, mostrar o fluxo
+    }
+  };
+
+  // Função auxiliar para avaliar condições AND
+  const evaluateAndConditions = (document: Documento, conditions: any[]): boolean => {
+    return conditions.every(condition => {
+      if (condition.field && condition.operator && condition.value !== undefined) {
+        return evaluateCondition(document, condition);
+      } else if (condition.or) {
+        return evaluateOrConditions(document, condition.or);
+      } else if (condition.and) {
+        return evaluateAndConditions(document, condition.and);
+      }
+      return true;
+    });
+  };
+
+  // Função auxiliar para avaliar condições OR
+  const evaluateOrConditions = (document: Documento, conditions: any[]): boolean => {
+    return conditions.some(condition => {
+      if (condition.field && condition.operator && condition.value !== undefined) {
+        return evaluateCondition(document, condition);
+      } else if (condition.or) {
+        return evaluateOrConditions(document, condition.or);
+      } else if (condition.and) {
+        return evaluateAndConditions(document, condition.and);
+      }
+      return false;
+    });
+  };
+
+  // Função auxiliar para avaliar uma condição individual
+  const evaluateCondition = (document: Documento, condition: any): boolean => {
+    const field = condition.field;
+    const operator = condition.operator;
+    const value = condition.value;
+    const documentValue = document[field];
+    
+    switch (operator) {
+      case '=':
+      case '==':
+        return documentValue === value;
+      case '!=':
+      case '<>':
+        return documentValue !== value;
+      case '>':
+        return documentValue > value;
+      case '>=':
+        return documentValue >= value;
+      case '<':
+        return documentValue < value;
+      case '<=':
+        return documentValue <= value;
+      case 'contains':
+      case 'like':
+        return documentValue && documentValue.toString().toLowerCase().includes(value.toString().toLowerCase());
+      default:
+        console.warn(`Operador desconhecido: ${operator}`);
+        return true;
+    }
+  };
 
   const handleStartDocumentation = () => {
     console.log("Iniciar documentação para:", selectedDocument);
@@ -228,7 +350,7 @@ export function DocumentationModal({
               </SelectTrigger>
               <SelectContent className="font-mono text-xs dark:bg-[#0F172A] dark:border-[#374151]">
                 {documentsFlows
-                  .filter((flow: any) => flow.isEnabled === true)
+                  .filter((flow: any) => flow.isEnabled === true && (!selectedDocument || documentMatchesFlowFilter(selectedDocument, flow)))
                   .map((flow: any) => (
                   <SelectItem key={flow.id} value={flow.id} className="font-mono text-xs">
                     <span className="font-mono text-xs">
