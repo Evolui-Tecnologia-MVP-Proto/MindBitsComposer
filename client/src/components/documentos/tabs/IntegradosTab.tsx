@@ -17,22 +17,20 @@ interface IntegradosTabProps {
     responsavel: string;
     modulo: string;
     cliente: string;
-    statusOrigem: string;
-    arquivos: string;
+    origem: string;
     nome: string;
   };
   setFiltros: React.Dispatch<React.SetStateAction<{
     responsavel: string;
     modulo: string;
     cliente: string;
-    statusOrigem: string;
-    arquivos: string;
+    origem: string;
     nome: string;
   }>>;
   responsaveisUnicos: string[];
   modulosUnicos: string[];
   clientesUnicos: string[];
-  statusOrigensUnicos: string[];
+  origensUnicas: string[];
   renderDocumentosTable: (documentos: Documento[], showFilters?: boolean) => JSX.Element;
   documentosIntegrados: Documento[];
   showFilters?: boolean;
@@ -45,7 +43,7 @@ export function IntegradosTab({
   responsaveisUnicos,
   modulosUnicos,
   clientesUnicos,
-  statusOrigensUnicos,
+  origensUnicas,
   renderDocumentosTable,
   documentosIntegrados,
   showFilters = true,
@@ -64,8 +62,7 @@ export function IntegradosTab({
                 responsavel: "",
                 modulo: "",
                 cliente: "",
-                statusOrigem: "",
-                arquivos: "",
+                origem: "",
                 nome: "",
               })
             }
@@ -166,15 +163,15 @@ export function IntegradosTab({
             </Select>
           </div>
 
-          {/* Filtro por Status Origem */}
+          {/* Filtro por Origem */}
           <div>
-            <Label htmlFor="filtro-status-origem" className="text-xs dark:text-gray-200">
-              Status Origem
+            <Label htmlFor="filtro-origem" className="text-xs dark:text-gray-200">
+              Origem
             </Label>
             <Select
-              value={filtros.statusOrigem}
+              value={filtros.origem}
               onValueChange={(value) =>
-                setFiltros((prev) => ({ ...prev, statusOrigem: value }))
+                setFiltros((prev) => ({ ...prev, origem: value }))
               }
             >
               <SelectTrigger className="h-8 text-sm dark:bg-[#0F172A] dark:border-[#374151] dark:text-gray-200">
@@ -182,38 +179,11 @@ export function IntegradosTab({
               </SelectTrigger>
               <SelectContent className="dark:bg-[#0F172A] dark:border-[#374151]">
                 <SelectItem value="__todos__">Todos</SelectItem>
-                {statusOrigensUnicos.map((status) => (
-                  <SelectItem key={status} value={status}>
-                    {status}
+                {origensUnicas.map((origem) => (
+                  <SelectItem key={origem} value={origem}>
+                    {origem}
                   </SelectItem>
                 ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Filtro por Arquivos */}
-          <div>
-            <Label htmlFor="filtro-arquivos" className="text-xs dark:text-gray-200">
-              Arquivos
-            </Label>
-            <Select
-              value={filtros.arquivos}
-              onValueChange={(value) =>
-                setFiltros((prev) => ({ ...prev, arquivos: value }))
-              }
-            >
-              <SelectTrigger className="h-8 text-sm dark:bg-[#0F172A] dark:border-[#374151] dark:text-gray-200">
-                <SelectValue placeholder="Todos" />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-[#0F172A] dark:border-[#374151]">
-                <SelectItem value="__todos__">Todos</SelectItem>
-                <SelectItem value="sem-arquivos">Sem arquivos</SelectItem>
-                <SelectItem value="a-sincronizar">
-                  A sincronizar
-                </SelectItem>
-                <SelectItem value="sincronizados">
-                  Sincronizados
-                </SelectItem>
               </SelectContent>
             </Select>
           </div>

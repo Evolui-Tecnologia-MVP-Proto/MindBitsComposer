@@ -237,8 +237,7 @@ export default function DocumentosPage() {
     responsavel: "__todos__",
     modulo: "__todos__",
     cliente: "__todos__",
-    statusOrigem: "__todos__",
-    arquivos: "__todos__", // "sem-arquivos", "a-sincronizar", "sincronizados"
+    origem: "__todos__",
     nome: "",
   });
 
@@ -1546,11 +1545,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         return false;
       }
 
-      // Filtro por status origem
+      // Filtro por origem
       if (
-        filtros.statusOrigem !== "__todos__" &&
-        filtros.statusOrigem &&
-        doc.statusOrigem !== filtros.statusOrigem
+        filtros.origem !== "__todos__" &&
+        filtros.origem &&
+        doc.origem !== filtros.origem
       ) {
         return false;
       }
@@ -1561,26 +1560,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         !doc.objeto?.toLowerCase().includes(filtros.nome.toLowerCase())
       ) {
         return false;
-      }
-
-      // Filtro por arquivos
-      if (filtros.arquivos !== "__todos__" && filtros.arquivos) {
-        const artifactCount = artifactCounts[doc.id] || 0;
-        const hasMondayData = hasMondayItemValues(doc);
-
-        switch (filtros.arquivos) {
-          case "sem-arquivos":
-            // Badge "none" - documentos sem dados do Monday e sem arquivos
-            return !hasMondayData && artifactCount === 0;
-          case "a-sincronizar":
-            // Badge "files" apenas - documentos com dados do Monday mas sem arquivos sincronizados
-            return hasMondayData && artifactCount === 0;
-          case "sincronizados":
-            // Badge "files" + "sync" - documentos com arquivos sincronizados
-            return artifactCount > 0;
-          default:
-            break;
-        }
       }
 
       return true;
@@ -1614,11 +1593,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     return [...new Set(clientes)].sort();
   }, [documentos]);
 
-  const statusOrigensUnicos = useMemo(() => {
-    const statusOrigens = documentos
-      .map((doc) => doc.statusOrigem)
+  const origensUnicas = useMemo(() => {
+    const origens = documentos
+      .map((doc) => doc.origem)
       .filter(Boolean);
-    return [...new Set(statusOrigens)].sort();
+    return [...new Set(origens)].sort();
   }, [documentos]);
 
    if (isLoading) {
@@ -1697,7 +1676,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             responsaveisUnicos={responsaveisUnicos}
             modulosUnicos={modulosUnicos}
             clientesUnicos={clientesUnicos}
-            statusOrigensUnicos={statusOrigensUnicos}
+            origensUnicas={origensUnicas}
             renderDocumentosTable={renderDocumentosTable}
             documentosIntegrados={documentosIntegrados}
             showFilters={showFilters}
