@@ -3977,10 +3977,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           updatedBy: req.user.id,
           updatedAt: new Date()
         })
-        .where(and(
-          eq(documentsFlows.id, req.params.id),
-          eq(documentsFlows.userId, req.user.id)
-        ))
+        .where(eq(documentsFlows.id, req.params.id))
         .returning();
       
       if (updatedFlow.length === 0) {
@@ -4040,8 +4037,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           .from(documentsFlows)
           .where(and(
             eq(documentsFlows.code, code),
-            ne(documentsFlows.id, req.params.id),
-            eq(documentsFlows.userId, req.user.id)
+            ne(documentsFlows.id, req.params.id)
           ));
           
         if (existingFlow.length > 0) {
@@ -4053,10 +4049,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const updatedFlow = await db.update(documentsFlows)
         .set(updateData)
-        .where(and(
-          eq(documentsFlows.id, req.params.id),
-          eq(documentsFlows.userId, req.user.id)
-        ))
+        .where(eq(documentsFlows.id, req.params.id))
         .returning();
       
       if (updatedFlow.length === 0) {
@@ -4080,10 +4073,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isLocked: documentsFlows.isLocked
       })
         .from(documentsFlows)
-        .where(and(
-          eq(documentsFlows.id, req.params.id),
-          eq(documentsFlows.userId, req.user.id)
-        ))
+        .where(eq(documentsFlows.id, req.params.id))
         .limit(1);
       
       if (currentFlow.length === 0) {
@@ -4097,10 +4087,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           updatedBy: req.user.id,
           updatedAt: new Date()
         })
-        .where(and(
-          eq(documentsFlows.id, req.params.id),
-          eq(documentsFlows.userId, req.user.id)
-        ))
+        .where(eq(documentsFlows.id, req.params.id))
         .returning();
       
       res.json(updatedFlow[0]);
@@ -4115,23 +4102,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      // Verificar se é administrador
-      const isAdmin = req.user.email === 'admin@exemplo.com';
-      
-      // Se for admin, pode editar qualquer fluxo; senão, só seus próprios fluxos
-      const condition = isAdmin 
-        ? eq(documentsFlows.id, req.params.id)
-        : and(
-            eq(documentsFlows.id, req.params.id),
-            eq(documentsFlows.userId, req.user.id)
-          );
-      
       // First get the current status
       const currentFlow = await db.select({
         isEnabled: documentsFlows.isEnabled
       })
         .from(documentsFlows)
-        .where(condition)
+        .where(eq(documentsFlows.id, req.params.id))
         .limit(1);
       
       if (currentFlow.length === 0) {
@@ -4145,7 +4121,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           updatedBy: req.user.id,
           updatedAt: new Date()
         })
-        .where(condition)
+        .where(eq(documentsFlows.id, req.params.id))
         .returning();
       
       res.json(updatedFlow[0]);
@@ -4160,19 +4136,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      // Verificar se é administrador
-      const isAdmin = req.user.email === 'admin@exemplo.com';
-      
-      // Se for admin, pode excluir qualquer fluxo; senão, só seus próprios fluxos
-      const deleteCondition = isAdmin 
-        ? eq(documentsFlows.id, req.params.id)
-        : and(
-            eq(documentsFlows.id, req.params.id),
-            eq(documentsFlows.userId, req.user.id)
-          );
-      
       const deletedFlow = await db.delete(documentsFlows)
-        .where(deleteCondition)
+        .where(eq(documentsFlows.id, req.params.id))
         .returning();
       
       if (deletedFlow.length === 0) {
@@ -4312,10 +4277,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const execution = await db.select()
         .from(documentFlowExecutions)
         .innerJoin(documentsFlows, eq(documentFlowExecutions.flowId, documentsFlows.id))
-        .where(and(
-          eq(documentFlowExecutions.documentId, documentId),
-          eq(documentsFlows.userId, req.user.id)
-        ))
+        .where(eq(documentFlowExecutions.documentId, documentId))
         .limit(1);
       
       if (execution.length === 0) {

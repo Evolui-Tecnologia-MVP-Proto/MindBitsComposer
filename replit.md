@@ -15,6 +15,8 @@ Preferred communication style: Simple, everyday language.
 ✓ Improved error handling in flow deletion with specific 404 error messages
 ✓ Updated home page "Documentos a revisar" counter to show MindBits_CT + Integrado status
 ✓ Removed dashboard header and system overview sections from home page
+✓ Removed all user access control restrictions from flow endpoints - all authenticated users can now manage any flow regardless of creator
+✓ Updated DELETE, PATCH toggle-enabled, PUT metadata, PUT complete update, and PATCH toggle-lock endpoints
 
 ## Previous Updates (January 25, 2025)
 
