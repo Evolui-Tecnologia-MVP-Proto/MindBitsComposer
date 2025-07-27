@@ -46,6 +46,7 @@ Preferred communication style: Simple, everyday language.
   - Applied consistent #0F172A/#0F1729 dark theme colors to modal and form elements
   - Enhanced error handling for invalid JSON format with user-friendly alerts
   - Completed database migration resolving null values constraint issues
+  - Added comprehensive JSON placeholder example showing table, and/or operators, field conditions structure
 ✓ Updated home page "Documentos a revisar" counter to show MindBits_CT + Integrado status
 ✓ Removed dashboard header and system overview sections from home page
 ✓ Removed all user access control restrictions from flow endpoints - all authenticated users can now manage any flow regardless of creator

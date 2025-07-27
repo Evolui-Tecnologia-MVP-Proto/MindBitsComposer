@@ -117,8 +117,22 @@ export function FlowMetadataModal({
                 id="edit-application-filter"
                 value={editApplicationFilter}
                 onChange={(e) => setEditApplicationFilter(e.target.value)}
-                placeholder='{"ambiente": "producao", "versao": "1.0"}'
-                rows={8}
+                placeholder={`{
+  "aplication": {
+    "table": "tabela01",
+    "and": [
+      { "field": "campo1", "operator": "=", "value": "x" },
+      { "field": "campo2", "operator": "=", "value": "y" },
+      {
+        "or": [
+          { "field": "campo3", "operator": "=", "value": "z" },
+          { "field": "campo3", "operator": "=", "value": "w" }
+        ]
+      }
+    ]
+  }
+}`}
+                rows={12}
                 className="w-full resize-none font-mono text-sm dark:bg-[#0F172A] dark:border-[#374151]"
               />
               <p className="text-xs text-gray-500 dark:text-gray-400">
