@@ -1825,6 +1825,59 @@ table:not(.lexical-editor-container table) th {
   background-color: rgb(249 250 251) !important;
 }
 
+/* CADASTROS GERAIS PAGE SPECIFIC DARK MODE THEMING */
+.dark [data-page="cadastros-gerais"] .container {
+  background-color: #1F2937 !important;
+}
+
+.dark [data-page="cadastros-gerais"] .space-y-6 > div:first-child {
+  background-color: #0F172A !important;
+}
+
+.dark [data-page="cadastros-gerais"] .card {
+  background-color: #1E293B !important;
+  border-color: #374151 !important;
+}
+
+.dark [data-page="cadastros-gerais"] .bg-gray-50 {
+  background-color: #0F172A !important;
+}
+
+.dark [data-page="cadastros-gerais"] [data-radix-tabs-trigger][data-state="active"] {
+  background-color: #1E40AF !important;
+  color: white !important;
+}
+
+.dark [data-page="cadastros-gerais"] .text-gray-900 {
+  color: #6B7280 !important;
+}
+
+/* FORCE TABLE COLORS - SPECIFIC TO CADASTROS GERAIS PAGE ONLY */
+.dark [data-page="cadastros-gerais"] table,
+.dark [data-page="cadastros-gerais"] .table {
+  background-color: #0F172A !important;
+}
+
+.dark [data-page="cadastros-gerais"] thead,
+.dark [data-page="cadastros-gerais"] .table-header {
+  background-color: #111827 !important;
+}
+
+.dark [data-page="cadastros-gerais"] tbody,
+.dark [data-page="cadastros-gerais"] .table-body {
+  background-color: #0F172A !important;
+}
+
+.dark [data-page="cadastros-gerais"] tbody tr,
+.dark [data-page="cadastros-gerais"] .table-row {
+  background-color: #0F172A !important;
+}
+
+.dark [data-page="cadastros-gerais"] tbody td,
+.dark [data-page="cadastros-gerais"] .table-cell {
+  background-color: #0F172A !important;
+}
+
 /* Additional enforced overrides for modal tables */
 .dark [data-radix-dialog-content] [data-table-header],
 .dark [data-radix-dialog-content] .bg-background.sticky,

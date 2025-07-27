@@ -15,6 +15,7 @@ import LexicalPage from "@/pages/lexical-page";
 import FluxosPage from "@/pages/fluxos-page";
 import DocumentosPage from "@/pages/documentos-page";
 import PluginsPage from "@/pages/plugins-page";
+import CadastrosGeraisPage from "@/pages/cadastros-gerais-page";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "./lib/protected-route";
 import { NavigationGuardProvider } from "@/hooks/use-navigation-guard";
@@ -27,6 +28,7 @@ function Router() {
       <ProtectedRoute path="/admin" component={AdminPage} />
       <ProtectedRoute path="/preferences" component={PreferencesPage} />
       <ProtectedRoute path="/templates" component={TemplatesPage} />
+      <ProtectedRoute path="/cadastros-gerais" component={CadastrosGeraisPage} />
       <ProtectedRoute path="/editor" component={EditorPage} />
       <ProtectedRoute path="/lexical" component={LexicalPage} />
       <ProtectedRoute path="/fluxos" component={FluxosPage} />
