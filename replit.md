@@ -8,7 +8,15 @@ EVO-MindBits Composer is an integrated technical and business documentation plat
 
 Preferred communication style: Simple, everyday language.
 
-## Recent Updates (January 25, 2025)
+## Recent Updates (January 27, 2025)
+
+✓ Fixed runtime error in documentos page caused by variable initialization order (January 27, 2025)
+✓ Corrected filteredAndSortedDocumentos variable declaration order before usage
+✓ Improved error handling in flow deletion with specific 404 error messages
+✓ Updated home page "Documentos a revisar" counter to show MindBits_CT + Integrado status
+✓ Removed dashboard header and system overview sections from home page
+
+## Previous Updates (January 25, 2025)
 
 ✓ Removed NOT NULL constraint from started_by column in document_editions table (January 25, 2025)
 ✓ Applied dynamic table height adjustment based on filter visibility state

@@ -87,7 +87,11 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
         method: "DELETE",
       });
       if (!response.ok) {
-        throw new Error("Erro ao excluir fluxo");
+        const errorData = await response.json().catch(() => ({}));
+        if (response.status === 404) {
+          throw new Error("O fluxo não foi encontrado ou já foi excluído.");
+        }
+        throw new Error(errorData.error || "Erro ao excluir fluxo");
       }
       return response.json();
     },
@@ -98,10 +102,10 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
         description: "O fluxo foi excluído com sucesso.",
       });
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: "Erro",
-        description: "Não foi possível excluir o fluxo.",
+        description: error.message || "Não foi possível excluir o fluxo.",
         variant: "destructive",
       });
     },
