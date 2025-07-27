@@ -1575,8 +1575,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   };
 
-  // Obter listas únicas para os filtros
-  const responsaveisUnicos = useMemo(() => {
+
     const responsaveis = documentos
       .map((doc) => doc.responsavel)
       .filter(Boolean);
