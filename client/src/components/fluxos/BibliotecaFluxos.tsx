@@ -269,8 +269,8 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
       });
       
       if (!response.ok) {
-        const errorData = await response.text();
-        throw new Error(errorData || 'Erro ao criar fluxo');
+        const errorData = await response.json();
+        throw new Error(errorData.error, { cause: errorData });
       }
       
       return response.json();
@@ -289,11 +289,22 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
       setNewFlowDescription('');
     },
     onError: (error: any) => {
-      toast({
-        title: "Erro",
-        description: error.message || "Erro ao criar fluxo",
-        variant: "destructive",
-      });
+      const errorCause = error.cause as any;
+      
+      // Check if it's a duplicate code error
+      if (errorCause?.errorType === 'DUPLICATE_CODE') {
+        toast({
+          title: "Código já existe",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro",
+          description: error.message || "Erro ao criar fluxo",
+          variant: "destructive",
+        });
+      }
     },
   });
 

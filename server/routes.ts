@@ -3951,8 +3951,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .returning();
       
       res.status(201).json(newFlow[0]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao criar fluxo:", error);
+      
+      // Check for duplicate code constraint violation
+      if (error.code === '23505' && error.constraint === 'documents_flows_code_unique') {
+        const codeMatch = error.detail?.match(/Key \(code\)=\(([^)]+)\)/);
+        const duplicateCode = codeMatch ? codeMatch[1] : code;
+        return res.status(400).json({ 
+          error: `O código "${duplicateCode}" já está em uso. Por favor, escolha um código diferente.`,
+          errorType: 'DUPLICATE_CODE'
+        });
+      }
+      
       res.status(500).json({ error: "Erro ao criar fluxo" });
     }
   });
