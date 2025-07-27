@@ -472,7 +472,7 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
 
   return (
     <div className="space-y-6">
-      <div className="biblioteca-content-container">
+      <div className="biblioteca-content-container rounded-b-lg overflow-hidden">
         <div className="flex justify-between items-center p-2.5">
           <div>
             <h2 className="text-xl font-semibold">Biblioteca de Fluxos</h2>
@@ -489,7 +489,7 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
           </Button>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-2.5 rounded-b-lg bg-gray-50 dark:bg-[#0F172A]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-2.5 bg-gray-50 dark:bg-[#0F172A]">
         {savedFlows.map((flow) => {
           const flowType = flowTypes?.find(type => 
             type.id === (flow.flowTypeId || flow.flow_type_id)
