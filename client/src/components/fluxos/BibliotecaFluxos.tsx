@@ -539,6 +539,13 @@ export const BibliotecaFluxos = ({ onEditFlow }: BibliotecaFluxosProps) => {
                   <CardDescription className="text-muted-foreground mt-1 text-[12px]">
                     {flow.description || "Sem descrição"}
                   </CardDescription>
+                  {flowType && (
+                    <div className="mt-2">
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                        {flowType.name}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </CardHeader>
               <CardContent>
