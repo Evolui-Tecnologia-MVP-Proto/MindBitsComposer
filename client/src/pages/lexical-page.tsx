@@ -1781,6 +1781,7 @@ export default function LexicalPage() {
                   onEditorInstanceChange={setEditorInstance}
                   className="h-full"
                   templateSections={selectedTemplate ? extractTemplateSections(selectedTemplate) : undefined}
+                  templateStructure={selectedTemplate?.structure}
                   viewMode={viewMode}
                   initialEditorState={initialEditorState}
                   markdownContent={markdownContent}

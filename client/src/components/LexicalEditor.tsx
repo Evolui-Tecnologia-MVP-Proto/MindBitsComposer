@@ -954,6 +954,12 @@ function ImageIdAutoConvertPlugin() {
   return null;
 }
 
+// Interface para campos do header
+interface HeaderField {
+  key: string;
+  value: string;
+}
+
 // Interface para as props do LexicalEditor
 interface LexicalEditorProps {
   content?: string;
@@ -962,7 +968,8 @@ interface LexicalEditorProps {
   onContentStatusChange?: (hasContent: boolean) => void;
   onEditorInstanceChange?: (instance: any) => void;
   className?: string;
-  templateSections?: any[];
+  templateSections?: string[];
+  templateStructure?: any; // Adicionar para processar header
   viewMode?: 'editor' | 'preview' | 'mdx';
   initialEditorState?: string;
   markdownContent?: string;
@@ -971,14 +978,41 @@ interface LexicalEditorProps {
 }
 
 // Componente principal do editor Lexical completo
-export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, onEditorInstanceChange, className = '', templateSections, viewMode = 'editor', initialEditorState, markdownContent: mdxContent = '', mdFileOld = '', isEnabled = true }: LexicalEditorProps): JSX.Element {
+export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, onEditorInstanceChange, className = '', templateSections, templateStructure, viewMode = 'editor', initialEditorState, markdownContent: mdxContent = '', mdFileOld = '', isEnabled = true }: LexicalEditorProps): JSX.Element {
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [tableRows, setTableRows] = useState(2);
   const [tableColumns, setTableColumns] = useState(3);
   const [selectedTableKey, setSelectedTableKey] = useState<string | null>(null);
   const [selectedTableElement, setSelectedTableElement] = useState<HTMLTableElement | null>(null);
   const [markdownViewMode, setMarkdownViewMode] = useState<'current' | 'old'>('current');
+  const [headerFields, setHeaderFields] = useState<HeaderField[]>([]);
 
+  // Processar template structure para extrair campos do header
+  useEffect(() => {
+    if (templateStructure && typeof templateStructure === 'object') {
+      const structure = templateStructure;
+      
+      // Processar campos do header se existirem
+      if (structure.header && typeof structure.header === 'object') {
+        const newHeaderFields: HeaderField[] = Object.keys(structure.header).map(key => ({
+          key: key,
+          value: structure.header[key] || ''
+        }));
+        setHeaderFields(newHeaderFields);
+      } else {
+        setHeaderFields([]);
+      }
+    } else {
+      setHeaderFields([]);
+    }
+  }, [templateStructure]);
+
+  // Função para atualizar campo do header
+  const updateHeaderField = (index: number, value: string) => {
+    const updatedFields = [...headerFields];
+    updatedFields[index].value = value;
+    setHeaderFields(updatedFields);
+  };
 
 
   // Função para excluir tabela selecionada
@@ -1201,6 +1235,34 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
     <div className={`lexical-editor-container w-full h-full flex flex-col ${className}`}>
       <LexicalComposer initialConfig={initialConfig}>
         <div className="w-full h-full flex flex-col min-h-0">
+          {/* Campos do Header do Template (apenas no modo editor) */}
+          {viewMode === 'editor' && headerFields.length > 0 && (
+            <div className="border-b border-gray-200 dark:border-[#374151] bg-gray-50 dark:bg-[#111827] p-4">
+              <div className="mb-2">
+                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Campos do Template</h3>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {headerFields.map((field, index) => (
+                  <div key={field.key} className="flex flex-col">
+                    <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      {field.key}
+                    </label>
+                    <input
+                      type="text"
+                      value={field.value}
+                      onChange={(e) => updateHeaderField(index, e.target.value)}
+                      className="px-3 py-2 text-sm border border-gray-300 dark:border-[#374151] rounded-md 
+                                 bg-white dark:bg-[#0F172A] text-gray-900 dark:text-gray-200
+                                 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                                 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                      placeholder={`Digite ${field.key.toLowerCase()}...`}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
           {viewMode === 'editor' && isEnabled && (
             <ToolbarPlugin 
               tableRows={tableRows}
