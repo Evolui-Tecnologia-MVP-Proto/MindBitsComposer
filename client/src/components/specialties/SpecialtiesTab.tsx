@@ -81,16 +81,7 @@ export function SpecialtiesTab() {
     <>
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <GraduationCap className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              <div>
-                <CardTitle>Áreas de Especialidade</CardTitle>
-                <CardDescription>
-                  Cadastro e gerenciamento de áreas de especialidade
-                </CardDescription>
-              </div>
-            </div>
+          <div className="flex items-center justify-end">
             <Button onClick={handleCreate}>
               <Plus className="h-4 w-4 mr-2" />
               Nova Especialidade
