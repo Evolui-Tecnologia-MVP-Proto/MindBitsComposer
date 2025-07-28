@@ -926,7 +926,31 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
       
       // Se temos uma lista numerada ativa, tratar bullets como sub-itens
       if (currentList && listType === 'number') {
-        // Bullet dentro de lista numerada - ignorar e manter lista ativa
+        // Criar sub-lista bullet dentro do último item da lista numerada
+        const lastItem = currentList.getLastChild();
+        if (lastItem) {
+          // Verificar se já existe uma sub-lista no último item
+          let subList = null;
+          const children = lastItem.getChildren();
+          for (const child of children) {
+            if (child.getType() === 'list' && child.getListType() === 'bullet') {
+              subList = child;
+              break;
+            }
+          }
+          
+          // Se não existe sub-lista, criar uma
+          if (!subList) {
+            subList = $createListNode('bullet');
+            lastItem.append(subList);
+          }
+          
+          // Adicionar item à sub-lista
+          const subListItem = $createListItemNode();
+          const textNodes = processInlineFormatting(itemText);
+          textNodes.forEach(node => subListItem.append(node));
+          subList.append(subListItem);
+        }
         continue;
       }
       

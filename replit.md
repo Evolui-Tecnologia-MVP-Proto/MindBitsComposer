@@ -28,6 +28,7 @@ Preferred communication style: Simple, everyday language.
   - Inline formatting preserved within list items (- Item with **bold** text)
   - Fixed numbered list continuity issue - lists now maintain sequential numbering (1. 2. 3.) even with empty lines between items
   - Enhanced list processing to ignore empty lines between list items while preserving list structure
+  - Added support for nested sub-lists: bullets appearing after numbered items are created as nested sub-lists within the parent numbered item
   - System processes markdown sequentially to avoid conflicts between similar markers
   - Fixed Lexical-to-Markdown conversion with processTextNode and processChildrenWithFormatting functions
   - Enhanced MarkdownPreview with complete formatting support: bold, italic, strikethrough, underline, code, links, images
