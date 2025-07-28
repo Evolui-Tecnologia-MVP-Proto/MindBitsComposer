@@ -837,12 +837,24 @@ function parseMdFileOldSections(mdFileOld: string): Map<string, string> {
   return sectionsMap;
 }
 
+// Função para remover numeração do início das seções (ex: "2. RESPOSTA / DESCRIÇÃO" -> "RESPOSTA / DESCRIÇÃO")
+function removeNumberingFromSection(sectionName: string): string {
+  // Remove padrão "número. " do início
+  return sectionName.replace(/^\d+\.\s*/, '').trim();
+}
+
 // Função para mapear nome da seção do Lexical para possíveis nomes no md_file_old
 function findMatchingSectionContent(lexicalSectionName: string, mdSections: Map<string, string>): string | null {
-  // Caso especial para "1. FAQ - PERGUNTA"
-  if (lexicalSectionName === "1. FAQ - PERGUNTA") {
+  // Remover numeração da seção do Lexical para mapeamento
+  const cleanLexicalName = removeNumberingFromSection(lexicalSectionName);
+  
+  console.log(`🔍 MD_FILE_OLD: Mapeando "${lexicalSectionName}" -> "${cleanLexicalName}"`);
+  
+  // Caso especial para FAQ - PERGUNTA (mesmo após limpeza de numeração)
+  if (cleanLexicalName === "FAQ - PERGUNTA") {
     // Procurar por "PERGUNTA" exata
     if (mdSections.has("PERGUNTA")) {
+      console.log(`🔍 MD_FILE_OLD: Encontrado match exato "PERGUNTA" para "${lexicalSectionName}"`);
       return mdSections.get("PERGUNTA") || null;
     }
     
@@ -850,25 +862,29 @@ function findMatchingSectionContent(lexicalSectionName: string, mdSections: Map<
     for (const sectionEntry of Array.from(mdSections.entries())) {
       const [sectionName, content] = sectionEntry;
       if (/^\[\d+\]\s*PERGUNTA$/.test(sectionName)) {
+        console.log(`🔍 MD_FILE_OLD: Encontrado match pattern "${sectionName}" para "${lexicalSectionName}"`);
         return content;
       }
     }
   }
   
-  // Mapeamento direto por nome
-  if (mdSections.has(lexicalSectionName)) {
-    return mdSections.get(lexicalSectionName) || null;
+  // Mapeamento direto por nome limpo
+  if (mdSections.has(cleanLexicalName)) {
+    console.log(`🔍 MD_FILE_OLD: Encontrado match direto "${cleanLexicalName}" para "${lexicalSectionName}"`);
+    return mdSections.get(cleanLexicalName) || null;
   }
   
-  // Procurar por match parcial (sem case sensitivity)
-  const normalizedTarget = lexicalSectionName.toLowerCase().trim();
+  // Procurar por match parcial (sem case sensitivity) usando nome limpo
+  const normalizedTarget = cleanLexicalName.toLowerCase().trim();
   for (const sectionEntry of Array.from(mdSections.entries())) {
     const [sectionName, content] = sectionEntry;
     if (sectionName.toLowerCase().trim() === normalizedTarget) {
+      console.log(`🔍 MD_FILE_OLD: Encontrado match insensitive "${sectionName}" para "${lexicalSectionName}"`);
       return content;
     }
   }
   
+  console.log(`🔍 MD_FILE_OLD: Nenhum match encontrado para "${lexicalSectionName}" (limpo: "${cleanLexicalName}")`);
   return null;
 }
 
