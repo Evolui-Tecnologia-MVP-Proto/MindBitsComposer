@@ -160,7 +160,7 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
   return (
     <div className="flex items-center mb-3 border border-gray-300 dark:border-[#374151] rounded-md overflow-hidden">
       <div 
-        className="px-4 py-2 text-sm font-medium text-white min-w-[120px] flex-shrink-0"
+        className="px-4 py-2 text-sm font-medium text-white min-w-[120px] flex-shrink-0 border-r border-white"
         style={{ backgroundColor: '#111827' }}
       >
         {node.getLabel()}
