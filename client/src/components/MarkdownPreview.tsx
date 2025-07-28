@@ -325,21 +325,21 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
       if (headers.length > 0) {
         elements.push(
           <div key={elements.length} className="overflow-x-auto mb-4">
-            <table className="min-w-full border border-gray-300 rounded-lg">
-              <thead className="bg-gray-50">
+            <table className="min-w-full border border-gray-300 dark:border-[#374151] rounded-lg">
+              <thead className="bg-gray-50 dark:bg-[#111827]">
                 <tr>
                   {headers.map((header: string, i: number) => (
-                    <th key={i} className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-300">
+                    <th key={i} className="px-4 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider border-b border-gray-300 dark:border-[#374151] bg-gray-50 dark:bg-[#1B2028]">
                       {processInlineFormatting(header)}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-200 dark:divide-[#374151]">
                 {rows.map((row: string[], i: number) => (
-                  <tr key={i} className="hover:bg-gray-50">
+                  <tr key={i} className="hover:bg-gray-50 dark:hover:bg-[#1E293B]">
                     {row.map((cell: string, j: number) => (
-                      <td key={j} className="px-4 py-3 text-sm text-gray-700 border-b border-gray-200" style={{ verticalAlign: 'top' }}>
+                      <td key={j} className="px-4 py-3 text-sm text-black dark:text-white border-b border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1B2028]" style={{ verticalAlign: 'top' }}>
                         {processInlineFormatting(cell)}
                       </td>
                     ))}
