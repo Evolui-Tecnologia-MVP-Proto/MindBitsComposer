@@ -839,7 +839,7 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
               const title = childNodes[0];
               if ($isCollapsibleTitleNode(title)) {
                 const titleText = title.getTextContent();
-                if (titleText.includes('Campos') || titleText.includes('Template')) {
+                if (titleText.includes('Document Header') || titleText.includes('Campos') || titleText.includes('Template')) {
                   headerFieldsContainer = child;
                 }
               }
@@ -1056,7 +1056,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                   const title = childNodes[0];
                   if ($isCollapsibleTitleNode(title)) {
                     const titleText = title.getTextContent();
-                    if (titleText.includes('Campos') || titleText.includes('Template')) {
+                    if (titleText.includes('Document Header') || titleText.includes('Campos') || titleText.includes('Template')) {
                       hasHeaderContainer = true;
                     }
                   }
@@ -1067,7 +1067,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                 console.log('🔍 DEBUG: Criando container de campos...');
                 
                 // Criar título do container
-                const title = $createCollapsibleTitleNode('📝 Campos do Template');
+                const title = $createCollapsibleTitleNode('Document Header');
                 
                 // Criar conteúdo do container
                 const content = $createCollapsibleContentNode();
