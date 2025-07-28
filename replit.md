@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
+✓ COMPLETED: Markdown Table Generation for Simple Text Tables (January 28, 2025)
+  - Implemented detection of simple text-only tables in markdown-converter.ts
+  - Added isSimpleTextTable check to identify tables without images, code blocks, or nested tables
+  - Simple text tables now generate clean markdown syntax: | col1 | col2 | with separator row
+  - Complex tables (with images, Mermaid, code blocks) continue to use HTML format
+  - First row automatically treated as header when table has 2+ rows
+  - Maintains all inline text formatting (bold, italic, etc.) within table cells
+  - Cleaner, more readable markdown output for documentation-style tables
+
 ✓ COMPLETED: Fixed Lexical-to-Markdown Conversion for Inline Formatting (January 28, 2025)
   - Fixed critical issue where bold, italic, strikethrough, and inline code formatting were not being generated in markdown/MDX output
   - Implemented processTextNode function in markdown-converter.ts to detect and convert TextNode formatting

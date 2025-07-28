@@ -147,25 +147,91 @@ export function createMarkdownConverter() {
         markdown += `![${img.imageId}](${img.url})\n\n`;
       });
     } else if (node.getType() === 'table') {
-      // Check if this is a Mermaid table by looking for code blocks with Mermaid content
       const rows = node.getChildren();
+      
+      // Check if table contains only text (no images, code blocks, or complex content)
+      let isSimpleTextTable = true;
       let isMermaidTable = false;
       
-      // Check if any cell contains Mermaid code (graph TD, flowchart, etc.)
       rows.forEach((row: any) => {
         const cells = row.getChildren();
         cells.forEach((cell: any) => {
           const cellText = cell.getTextContent() || '';
+          
+          // Check for Mermaid content
           if (cellText.includes('graph TD') || cellText.includes('flowchart') || 
               cellText.includes('sequenceDiagram') || cellText.includes('classDiagram') ||
               cellText.includes('stateDiagram') || cellText.includes('erDiagram') ||
               cellText.includes('journey') || cellText.includes('gantt')) {
             isMermaidTable = true;
+            isSimpleTextTable = false;
+          }
+          
+          // Check for complex content in cell
+          if (cell.getChildren) {
+            const children = cell.getChildren();
+            children.forEach((child: any) => {
+              const childType = child.getType();
+              // If cell contains anything other than paragraphs or text nodes, it's not simple
+              if (childType !== 'paragraph' && childType !== 'text') {
+                isSimpleTextTable = false;
+              }
+              // Check for images in paragraphs
+              if (childType === 'paragraph' && child.getChildren) {
+                const paragraphChildren = child.getChildren();
+                paragraphChildren.forEach((pChild: any) => {
+                  if (pChild.getType() === 'image' || pChild.getType() === 'image-with-metadata' || 
+                      pChild.getType() === 'code' || pChild.getType() === 'table') {
+                    isSimpleTextTable = false;
+                  }
+                });
+              }
+            });
           }
         });
       });
       
-      if (isMermaidTable && rows.length > 0) {
+      // Generate simple markdown table if it contains only text
+      if (isSimpleTextTable && rows.length > 0) {
+        // Create array to store table data
+        const tableData: string[][] = [];
+        
+        rows.forEach((row: any) => {
+          const rowData: string[] = [];
+          const cells = row.getChildren();
+          cells.forEach((cell: any) => {
+            // Get formatted text content from cell
+            const cellContent = processChildrenWithFormatting(cell).trim();
+            rowData.push(cellContent);
+          });
+          tableData.push(rowData);
+        });
+        
+        // Generate markdown table
+        if (tableData.length > 0 && tableData[0].length > 0) {
+          const columnCount = tableData[0].length;
+          
+          // If table has at least 2 rows, treat first as header
+          if (tableData.length >= 2) {
+            // Header row
+            markdown += '| ' + tableData[0].join(' | ') + ' |\n';
+            
+            // Separator row
+            markdown += '|' + ' --- |'.repeat(columnCount) + '\n';
+            
+            // Data rows
+            for (let i = 1; i < tableData.length; i++) {
+              markdown += '| ' + tableData[i].join(' | ') + ' |\n';
+            }
+          } else {
+            // Single row table - no header
+            markdown += '| ' + tableData[0].join(' | ') + ' |\n';
+            markdown += '|' + ' --- |'.repeat(columnCount) + '\n';
+          }
+          
+          markdown += '\n';
+        }
+      } else if (isMermaidTable && rows.length > 0) {
         // Generate HTML table for Mermaid content
         markdown += '<table>\n';
         
