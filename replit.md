@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
+✓ COMPLETED: Intelligent Document Content Population System from md_file_old Sections (January 28, 2025)
+  - Implemented automatic content population from md_file_old sections (##) into respective Lexical containers when loading documents
+  - Created parseMdFileOldSections function to extract sections from markdown files based on ## headers
+  - Developed findMatchingSectionContent function for intelligent section mapping by name
+  - Added special case handling for "1. FAQ - PERGUNTA" in Lexical that maps to "PERGUNTA" or "[n] PERGUNTA" in md_file_old
+  - Enhanced TemplateSectionsPlugin to accept mdFileOld parameter and populate sections automatically
+  - Implemented line-by-line content conversion from markdown to Lexical paragraph nodes
+  - Added comprehensive logging for content population tracking and debugging
+  - Preserves existing container content while enabling automatic population for new sections
+  - Fixed TypeScript compilation errors related to Map iteration and type safety
+  - System now automatically maps and populates document sections when loading documents with backup content
+
 ✓ COMPLETED: Enhanced "Iniciar Edição" Process with ready_to_revise Record Update Logic (January 28, 2025)
   - Modified POST /api/document-editions endpoint to check for existing ready_to_revise records before creating new ones
   - Added "ready_to_revise" status to document_editions table enum

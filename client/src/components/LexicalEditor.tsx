@@ -798,13 +798,87 @@ function cleanMarkdownContent(markdown: string): string {
     .trim();
 }
 
-// Plugin para inserir seções de template automaticamente
-function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Element | null {
+// Função para parsear o md_file_old e extrair seções
+function parseMdFileOldSections(mdFileOld: string): Map<string, string> {
+  const sectionsMap = new Map<string, string>();
+  
+  if (!mdFileOld || mdFileOld.trim() === '') {
+    return sectionsMap;
+  }
+  
+  // Dividir o conteúdo pelas seções (## seguido de texto)
+  const lines = mdFileOld.split('\n');
+  let currentSection = '';
+  let currentContent: string[] = [];
+  
+  for (const line of lines) {
+    if (line.startsWith('## ')) {
+      // Se havia uma seção anterior, salvar
+      if (currentSection && currentContent.length > 0) {
+        sectionsMap.set(currentSection, currentContent.join('\n').trim());
+      }
+      
+      // Começar nova seção
+      currentSection = line.substring(3).trim(); // Remove "## "
+      currentContent = [];
+    } else if (currentSection) {
+      // Adicionar linha ao conteúdo da seção atual
+      currentContent.push(line);
+    }
+  }
+  
+  // Adicionar a última seção se existir
+  if (currentSection && currentContent.length > 0) {
+    sectionsMap.set(currentSection, currentContent.join('\n').trim());
+  }
+  
+  console.log('🔍 MD_FILE_OLD: Seções extraídas:', Array.from(sectionsMap.keys()));
+  
+  return sectionsMap;
+}
+
+// Função para mapear nome da seção do Lexical para possíveis nomes no md_file_old
+function findMatchingSectionContent(lexicalSectionName: string, mdSections: Map<string, string>): string | null {
+  // Caso especial para "1. FAQ - PERGUNTA"
+  if (lexicalSectionName === "1. FAQ - PERGUNTA") {
+    // Procurar por "PERGUNTA" exata
+    if (mdSections.has("PERGUNTA")) {
+      return mdSections.get("PERGUNTA") || null;
+    }
+    
+    // Procurar por padrão "[n] PERGUNTA" onde n é um número
+    for (const sectionEntry of Array.from(mdSections.entries())) {
+      const [sectionName, content] = sectionEntry;
+      if (/^\[\d+\]\s*PERGUNTA$/.test(sectionName)) {
+        return content;
+      }
+    }
+  }
+  
+  // Mapeamento direto por nome
+  if (mdSections.has(lexicalSectionName)) {
+    return mdSections.get(lexicalSectionName) || null;
+  }
+  
+  // Procurar por match parcial (sem case sensitivity)
+  const normalizedTarget = lexicalSectionName.toLowerCase().trim();
+  for (const sectionEntry of Array.from(mdSections.entries())) {
+    const [sectionName, content] = sectionEntry;
+    if (sectionName.toLowerCase().trim() === normalizedTarget) {
+      return content;
+    }
+  }
+  
+  return null;
+}
+
+// Plugin para inserir seções de template automaticamente e popular com md_file_old
+function TemplateSectionsPlugin({ sections, mdFileOld }: { sections?: string[], mdFileOld?: string }): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
   const sectionsRef = React.useRef<string[] | null>(null);
 
   React.useEffect(() => {
-    console.log('🔥 TemplateSectionsPlugin - useEffect executado', { sections, sectionsLength: sections?.length });
+    console.log('🔥 TemplateSectionsPlugin - useEffect executado', { sections, sectionsLength: sections?.length, hasMdFileOld: !!mdFileOld });
     
     // Aplicar seções sempre que elas existirem
     if (sections && sections.length > 0) {
@@ -828,6 +902,9 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
           const root = $getRoot();
           
           console.log('🔥 TemplateSectionsPlugin - Verificando conteúdo existente');
+          
+          // Parse do md_file_old para extrair seções
+          const mdSections = parseMdFileOldSections(mdFileOld || '');
           
           // Mapear containers existentes para preservar conteúdo
           const children = root.getChildren();
@@ -881,9 +958,43 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
               const title = $createCollapsibleTitleNode(sectionName);
               const content = $createCollapsibleContentNode();
               
-              // Adicionar parágrafo editável dentro do conteúdo
-              const paragraph = $createParagraphNode();
-              content.append(paragraph);
+              // Tentar encontrar conteúdo correspondente no md_file_old
+              const matchingContent = findMatchingSectionContent(sectionName, mdSections);
+              
+              if (matchingContent && matchingContent.trim() !== '') {
+                console.log(`🔍 MD_FILE_OLD: Conteúdo encontrado para seção "${sectionName}"`);
+                
+                // Converter markdown para Lexical nodes
+                try {
+                  // Dividir o conteúdo em linhas e criar parágrafos
+                  const contentLines = matchingContent.split('\n');
+                  
+                  for (const line of contentLines) {
+                    if (line.trim() === '') {
+                      // Linha vazia - criar parágrafo vazio
+                      const emptyParagraph = $createParagraphNode();
+                      content.append(emptyParagraph);
+                    } else {
+                      // Linha com conteúdo - criar parágrafo com texto
+                      const paragraph = $createParagraphNode();
+                      paragraph.append($createTextNode(line));
+                      content.append(paragraph);
+                    }
+                  }
+                  
+                  console.log(`✅ MD_FILE_OLD: Conteúdo inserido na seção "${sectionName}"`);
+                } catch (error) {
+                  console.error(`❌ MD_FILE_OLD: Erro ao inserir conteúdo na seção "${sectionName}":`, error);
+                  // Fallback: criar parágrafo vazio
+                  const paragraph = $createParagraphNode();
+                  content.append(paragraph);
+                }
+              } else {
+                // Nenhum conteúdo encontrado - criar parágrafo vazio editável
+                const paragraph = $createParagraphNode();
+                content.append(paragraph);
+                console.log(`🔍 MD_FILE_OLD: Nenhum conteúdo encontrado para seção "${sectionName}"`);
+              }
 
               const container = $createCollapsibleContainerNode(false);
               container.append(title, content);
@@ -901,7 +1012,7 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
       
       return () => clearTimeout(timeoutId);
     }
-  }, [editor, sections]);
+  }, [editor, sections, mdFileOld]);
 
   return null;
 }
@@ -1046,11 +1157,11 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       };
       
       // Usar campos do template se existirem, senão usar campos de teste
-      let fieldsToUse = testFields;
+      let fieldsToUse: Record<string, string> = testFields;
       
       if (templateStructure && typeof templateStructure === 'object' && templateStructure.header) {
         console.log('🔍 DEBUG: Template tem header:', templateStructure.header);
-        fieldsToUse = templateStructure.header;
+        fieldsToUse = templateStructure.header as Record<string, string>;
       } else {
         console.log('🔍 DEBUG: Usando campos de teste');
       }
@@ -1490,7 +1601,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <ImagePlugin />
           <ImageEventListenerPlugin />
           <ImageIdAutoConvertPlugin />
-          <TemplateSectionsPlugin sections={templateSections} />
+          <TemplateSectionsPlugin sections={templateSections} mdFileOld={mdFileOld} />
           <EditorInstancePlugin setEditorInstance={(editor) => {
             setEditorInstance(editor);
             if (onEditorInstanceChange) {
