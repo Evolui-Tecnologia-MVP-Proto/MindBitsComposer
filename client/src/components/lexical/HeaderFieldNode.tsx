@@ -169,10 +169,11 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
         type="text"
         value={value}
         onChange={(e) => handleChange(e.target.value)}
-        className="flex-1 px-3 py-2 text-sm border-0 outline-none rounded-br-md
+        className="flex-1 px-3 py-2 text-sm border-0 outline-none
                    bg-white dark:bg-[#0F172A] text-gray-900 dark:text-gray-200
                    focus:ring-0 focus:border-0
                    lexical-header-field"
+        style={{ borderBottomRightRadius: '6px' }}
         placeholder={node.__placeholder}
       />
     </div>
