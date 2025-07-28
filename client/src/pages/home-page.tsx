@@ -205,20 +205,14 @@ export default function HomePage() {
                     <CheckCircle2 className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0" />
                   </CardHeader>
                   <CardContent className="relative">
-                    <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                      {quantidade}
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {quantidade === 1 ? "documento integrado" : "documentos integrados"}
-                    </p>
-                    {documentosEmProcessoPorMimPorResponsavel[responsavel] && (
-                      <div className="mt-2 flex items-center gap-1 mb-4">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
-                        <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
-                          {documentosEmProcessoPorMimPorResponsavel[responsavel]} em processo por mim
+                    <div className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3">
+                      {quantidade} {quantidade === 1 ? "Integrado" : "Integrados"}
+                      {documentosEmProcessoPorMimPorResponsavel[responsavel] && (
+                        <span className="text-blue-600 dark:text-blue-400">
+                          {" e "}{documentosEmProcessoPorMimPorResponsavel[responsavel]} em processo por mim
                         </span>
-                      </div>
-                    )}
+                      )}
+                    </div>
                     <div className="absolute bottom-2 right-2">
                       <Button
                         size="sm"
