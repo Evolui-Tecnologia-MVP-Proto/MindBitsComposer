@@ -376,25 +376,25 @@ export function SpecialtyModal({ isOpen, onClose, specialty }: SpecialtyModalPro
                         <div className="rounded-md border dark:bg-[#111827] dark:border-[#374151]">
                           <Table>
                             <TableHeader>
-                              <TableRow>
-                                <TableHead>Nome</TableHead>
-                                <TableHead>Email</TableHead>
-                                <TableHead>Função</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead className="w-[100px]">Ação</TableHead>
+                              <TableRow className="dark:bg-[#111827]">
+                                <TableHead className="dark:bg-[#111827]">Nome</TableHead>
+                                <TableHead className="dark:bg-[#111827]">Email</TableHead>
+                                <TableHead className="dark:bg-[#111827]">Função</TableHead>
+                                <TableHead className="dark:bg-[#111827]">Status</TableHead>
+                                <TableHead className="w-[100px] dark:bg-[#111827]">Ação</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
                               {specialtyUsers.map(({ user }) => (
-                                <TableRow key={user.id}>
-                                  <TableCell className="font-medium">{user.name}</TableCell>
-                                  <TableCell>{user.email}</TableCell>
-                                  <TableCell>
+                                <TableRow key={user.id} className="dark:bg-[#111827]">
+                                  <TableCell className="font-medium dark:bg-[#111827]">{user.name}</TableCell>
+                                  <TableCell className="dark:bg-[#111827]">{user.email}</TableCell>
+                                  <TableCell className="dark:bg-[#111827]">
                                     <Badge variant="outline" className="font-mono">
                                       {user.role}
                                     </Badge>
                                   </TableCell>
-                                  <TableCell>
+                                  <TableCell className="dark:bg-[#111827]">
                                     <Badge 
                                       variant={user.status === "ACTIVE" ? "default" : "secondary"}
                                       className={
@@ -406,7 +406,7 @@ export function SpecialtyModal({ isOpen, onClose, specialty }: SpecialtyModalPro
                                       {user.status === "ACTIVE" ? "Ativo" : "Inativo"}
                                     </Badge>
                                   </TableCell>
-                                  <TableCell>
+                                  <TableCell className="dark:bg-[#111827]">
                                     <Button
                                       variant="ghost"
                                       size="sm"
