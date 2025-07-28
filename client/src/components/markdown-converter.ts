@@ -61,33 +61,21 @@ export function createMarkdownConverter() {
     }
     
     let text = node.getTextContent();
-    console.log(`🔄 Processando TextNode: "${text}"`);
     
     // Verificar formatação aplicada ao TextNode
     if (node.hasFormat) {
-      const formats: string[] = [];
       if (node.hasFormat('bold')) {
         text = `**${text}**`;
-        formats.push('bold');
       }
       if (node.hasFormat('italic')) {
         text = `*${text}*`;
-        formats.push('italic');
       }
       if (node.hasFormat('strikethrough')) {
         text = `~~${text}~~`;
-        formats.push('strikethrough');
       }
       if (node.hasFormat('code')) {
         text = `\`${text}\``;
-        formats.push('code');
       }
-      
-      if (formats.length > 0) {
-        console.log(`✅ Formatação detectada: ${formats.join(', ')} - Resultado: "${text}"`);
-      }
-    } else {
-      console.log(`⚠️ Node não tem método hasFormat`);
     }
     
     return text;

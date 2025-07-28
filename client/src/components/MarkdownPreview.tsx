@@ -120,7 +120,7 @@ const mdxComponents = {
   ),
 };
 
-// Process inline formatting like bold, italic, links, and inline images
+// Process inline formatting like bold, italic, strikethrough, code, links, and inline images
 function processInlineFormatting(text: string): React.ReactNode {
   const parts: React.ReactNode[] = [];
   let remaining = text;
@@ -165,7 +165,23 @@ function processInlineFormatting(text: string): React.ReactNode {
       continue;
     }
 
-    // Check for bold
+    // Check for inline code first (most specific)
+    const codeMatch = remaining.match(/`([^`]+)`/);
+    if (codeMatch) {
+      const beforeCode = remaining.substring(0, codeMatch.index);
+      if (beforeCode) {
+        parts.push(beforeCode);
+      }
+      parts.push(
+        <code key={key++} className="bg-gray-100 dark:bg-[#1E293B] text-black dark:text-white px-2 py-1 rounded text-sm font-mono">
+          {codeMatch[1]}
+        </code>
+      );
+      remaining = remaining.substring((codeMatch.index || 0) + codeMatch[0].length);
+      continue;
+    }
+
+    // Check for bold (before italic to avoid conflicts)
     const boldMatch = remaining.match(/\*\*(.*?)\*\*/);
     if (boldMatch) {
       const beforeBold = remaining.substring(0, boldMatch.index);
@@ -181,7 +197,23 @@ function processInlineFormatting(text: string): React.ReactNode {
       continue;
     }
 
-    // Check for italic
+    // Check for strikethrough
+    const strikethroughMatch = remaining.match(/~~(.*?)~~/);
+    if (strikethroughMatch) {
+      const beforeStrike = remaining.substring(0, strikethroughMatch.index);
+      if (beforeStrike) {
+        parts.push(beforeStrike);
+      }
+      parts.push(
+        <span key={key++} className="line-through text-black dark:text-white">
+          {strikethroughMatch[1]}
+        </span>
+      );
+      remaining = remaining.substring((strikethroughMatch.index || 0) + strikethroughMatch[0].length);
+      continue;
+    }
+
+    // Check for italic (after bold to avoid conflicts)
     const italicMatch = remaining.match(/\*(.*?)\*/);
     if (italicMatch) {
       const beforeItalic = remaining.substring(0, italicMatch.index);
@@ -194,22 +226,6 @@ function processInlineFormatting(text: string): React.ReactNode {
         </em>
       );
       remaining = remaining.substring((italicMatch.index || 0) + italicMatch[0].length);
-      continue;
-    }
-
-    // Check for inline code
-    const codeMatch = remaining.match(/`([^`]+)`/);
-    if (codeMatch) {
-      const beforeCode = remaining.substring(0, codeMatch.index);
-      if (beforeCode) {
-        parts.push(beforeCode);
-      }
-      parts.push(
-        <code key={key++} className="bg-gray-100 dark:bg-[#1E293B] text-black dark:text-white px-2 py-1 rounded text-sm font-mono">
-          {codeMatch[1]}
-        </code>
-      );
-      remaining = remaining.substring((codeMatch.index || 0) + codeMatch[0].length);
       continue;
     }
 

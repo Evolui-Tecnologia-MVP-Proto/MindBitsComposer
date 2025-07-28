@@ -10,7 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
-✓ COMPLETED: Advanced Markdown-to-Lexical Conversion System with Complete Formatting and List Support (January 28, 2025)
+✓ COMPLETED: Complete Bidirectional Markdown-Lexical Conversion with Full Formatting Support (January 28, 2025)
   - Enhanced automatic content population from md_file_old sections with complete markdown formatting preservation
   - Implemented processInlineFormatting function for inline formatting: **bold**, *italic*, ~~strikethrough~~, `code`
   - Created convertMarkdownToLexicalNodes function for complete markdown processing including headers, code blocks, paragraphs, and lists
@@ -26,10 +26,14 @@ Preferred communication style: Simple, everyday language.
   - Numbered lists (1. item) convert to ListNode('number') with ListItemNode children in Lexical editor
   - Inline formatting preserved within list items (- Item with **bold** text)
   - System processes markdown sequentially to avoid conflicts between similar markers
+  - Fixed Lexical-to-Markdown conversion with processTextNode and processChildrenWithFormatting functions
+  - Enhanced MarkdownPreview with complete formatting support: bold, italic, strikethrough, code, links, images
+  - Optimized formatting processing order to prevent conflicts between ** and * markers
   - Resolved all TypeScript compilation errors with proper type annotations
   - Integration maintains all existing functionality: section mapping, logging, error handling
   - Preserves existing container content while enabling automatic formatted population for new sections
   - Documents now load with full visual formatting including proper list bullet points instead of raw markdown text
+  - MDX preview now correctly renders all markdown formatting including strikethrough (~~) and proper visual hierarchy
 
 ✓ COMPLETED: Enhanced "Iniciar Edição" Process with ready_to_revise Record Update Logic (January 28, 2025)
   - Modified POST /api/document-editions endpoint to check for existing ready_to_revise records before creating new ones

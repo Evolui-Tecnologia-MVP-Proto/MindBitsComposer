@@ -861,7 +861,6 @@ function processInlineFormatting(text: string): any[] {
     // Criar node formatado
     const formattedNode = $createTextNode(match.text);
     formattedNode.setFormat(match.format as any);
-    console.log(`🔧 Aplicando formatação: "${match.format}" ao texto: "${match.text}"`);
     result.push(formattedNode);
     
     lastEnd = match.end;
