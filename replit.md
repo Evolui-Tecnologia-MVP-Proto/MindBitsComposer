@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
+✓ COMPLETED: User Association for Documents - Added user_id Column (January 28, 2025)
+  - Added optional user_id column to documentos table as integer foreign key to users table
+  - Column allows NULL values for optional association between documents and users
+  - Updated shared/schema.ts with new field: userId: integer("user_id").references(() => users.id)
+  - Database migration applied successfully using direct SQL to avoid backup table conflicts
+  - Column verified in database: nullable integer type with proper foreign key constraint
+  - Ready for future implementation of document ownership or assignment features
+
 ✓ COMPLETED: Database Cleanup - Document Descriptions Standardization (January 28, 2025)
   - Created backup table `documentos_backup` with all 70 original records before modifications
   - Identified 56 documents with " - Parte 1" suffix that had no additional parts (2, 3, 4, etc.)
