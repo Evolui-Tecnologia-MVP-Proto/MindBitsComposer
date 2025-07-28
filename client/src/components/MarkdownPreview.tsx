@@ -111,6 +111,13 @@ const mdxComponents = {
   hr: (props: any) => <hr className="my-8 border-gray-300 dark:border-[#374151]" {...props} />,
   strong: (props: any) => <strong className="font-semibold text-gray-900 dark:text-[#E5E7EB]" {...props} />,
   em: (props: any) => <em className="italic text-gray-700 dark:text-[#D1D5DB]" {...props} />,
+  // Collapsible containers (details/summary elements)
+  details: (props: any) => (
+    <details className="mb-4 border border-gray-300 dark:border-[#374151] rounded-lg bg-white dark:bg-[#020203] overflow-hidden" {...props} />
+  ),
+  summary: (props: any) => (
+    <summary className="px-4 py-3 bg-gray-50 dark:bg-[#1E293B] border-b border-gray-300 dark:border-[#374151] cursor-pointer hover:bg-gray-100 dark:hover:bg-[#374151] font-medium text-gray-900 dark:text-[#FFFFFF] select-none" {...props} />
+  ),
 };
 
 // Process inline formatting like bold, italic, links, and inline images
@@ -533,6 +540,28 @@ export default function MarkdownPreview({ content, className = '' }: MarkdownPre
             }
             .markdown-preview table tbody td {
               vertical-align: top !important;
+            }
+            /* Force white text for all content inside details elements in dark mode */
+            .dark .markdown-preview details,
+            .dark .markdown-preview details *,
+            .dark .markdown-preview details p,
+            .dark .markdown-preview details span,
+            .dark .markdown-preview details div,
+            .dark .markdown-preview details li,
+            .dark .markdown-preview details strong,
+            .dark .markdown-preview details em {
+              color: #FFFFFF !important;
+            }
+            /* Ensure summary text is white in dark mode */
+            .dark .markdown-preview summary,
+            .dark .markdown-preview summary * {
+              color: #FFFFFF !important;
+            }
+            /* Content inside details should have proper background and padding */
+            .dark .markdown-preview details > *:not(summary) {
+              padding: 16px !important;
+              background-color: #020203 !important;
+              color: #FFFFFF !important;
             }
           `
         }} />

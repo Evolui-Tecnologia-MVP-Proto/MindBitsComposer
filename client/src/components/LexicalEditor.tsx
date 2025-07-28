@@ -1618,7 +1618,6 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <ImageEventListenerPlugin />
           <ImageIdAutoConvertPlugin />
           <TemplateSectionsPlugin sections={templateSections} mdFileOld={mdFileOld} />
-          <DarkModeTextForcePlugin />
           <EditorInstancePlugin setEditorInstance={(editor) => {
             setEditorInstance(editor);
             if (onEditorInstanceChange) {
