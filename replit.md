@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
+✓ COMPLETED: Nested Table Support in Markdown Generation (January 28, 2025)
+  - Implemented recursive table processing to handle tables within table cells
+  - Added detection for nested tables in processCellContent function
+  - Nested tables generate proper HTML with inline styles (border-collapse, padding)
+  - Supports nested tables in both regular HTML tables and Mermaid diagram tables
+  - Nested tables use consistent styling: 100% width, 8px margin, 1px solid borders
+  - Preserves content formatting within nested table cells
+  - Full support for complex document structures with multi-level table nesting
+
 ✓ COMPLETED: Markdown Table Generation for Simple Text Tables (January 28, 2025)
   - Implemented detection of simple text-only tables in markdown-converter.ts
   - Added isSimpleTextTable check to identify tables without images, code blocks, or nested tables
