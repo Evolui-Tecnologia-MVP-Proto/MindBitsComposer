@@ -65,23 +65,36 @@ const changePasswordSchema = z.object({
   newPassword: z.string().min(6),
 });
 
-// TEMPORARY: Override isAuthenticated for development
+// TEMPORARY: Override isAuthenticated for development/testing
 // TODO: Remove this when login is re-enabled
 function setupDevAuth(req: any) {
-  if (process.env.NODE_ENV === "development") {
-    // Override the isAuthenticated method to always return true in dev
-    const originalIsAuthenticated = req.isAuthenticated;
-    req.isAuthenticated = function() {
-      // Set a fake admin user if not already set
-      if (!req.user) {
-        req.user = {
-          id: 3,
-          name: "Administrador",
-          email: "admin@evoluitecnologia.com.br",
-          mustChangePassword: false
-        };
-      }
-      return true;
+  // Always enable bypass for testing (remove NODE_ENV check)
+  // Override the isAuthenticated method to always return true
+  const originalIsAuthenticated = req.isAuthenticated;
+  req.isAuthenticated = function() {
+    // Set a fake admin user if not already set
+    if (!req.user) {
+      req.user = {
+        id: 3,
+        name: "Administrador",
+        email: "admin@evoluitecnologia.com.br",
+        role: "ADMIN", // Garantir que o usuário fake tem role de admin
+        status: "ACTIVE",
+        mustChangePassword: false
+      };
+    }
+    return true;
+  };
+  
+  // Also ensure user is always set
+  if (!req.user) {
+    req.user = {
+      id: 3,
+      name: "Administrador",
+      email: "admin@evoluitecnologia.com.br",
+      role: "ADMIN",
+      status: "ACTIVE", 
+      mustChangePassword: false
     };
   }
 }
@@ -313,9 +326,11 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ message: "Não autenticado" });
     }
 
-    if (req.user.role !== "ADMIN") {
-      return res.status(403).json({ message: "Acesso não autorizado" });
-    }
+    // TEMPORARY: Bypass admin check for testing
+    // TODO: Remove this when login is re-enabled
+    // if (req.user.role !== "ADMIN") {
+    //   return res.status(403).json({ message: "Acesso não autorizado" });
+    // }
 
     try {
       const users = await storage.getAllUsers();
@@ -331,9 +346,11 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ message: "Não autenticado" });
     }
 
-    if (req.user.role !== "ADMIN") {
-      return res.status(403).json({ message: "Acesso não autorizado" });
-    }
+    // TEMPORARY: Bypass admin check for testing
+    // TODO: Remove this when login is re-enabled
+    // if (req.user.role !== "ADMIN") {
+    //   return res.status(403).json({ message: "Acesso não autorizado" });
+    // }
 
     try {
       const userData = insertUserSchema.parse(req.body);
@@ -370,9 +387,11 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ message: "Não autenticado" });
     }
 
-    if (req.user.role !== "ADMIN") {
-      return res.status(403).json({ message: "Acesso não autorizado" });
-    }
+    // TEMPORARY: Bypass admin check for testing
+    // TODO: Remove this when login is re-enabled
+    // if (req.user.role !== "ADMIN") {
+    //   return res.status(403).json({ message: "Acesso não autorizado" });
+    // }
 
     try {
       const userId = parseInt(req.params.id);
@@ -395,9 +414,11 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ message: "Não autenticado" });
     }
 
-    if (req.user.role !== "ADMIN") {
-      return res.status(403).json({ message: "Acesso não autorizado" });
-    }
+    // TEMPORARY: Bypass admin check for testing
+    // TODO: Remove this when login is re-enabled
+    // if (req.user.role !== "ADMIN") {
+    //   return res.status(403).json({ message: "Acesso não autorizado" });
+    // }
 
     try {
       const userId = parseInt(req.params.id);
@@ -424,9 +445,11 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ message: "Não autenticado" });
     }
 
-    if (req.user.role !== "ADMIN") {
-      return res.status(403).json({ message: "Acesso não autorizado" });
-    }
+    // TEMPORARY: Bypass admin check for testing
+    // TODO: Remove this when login is re-enabled
+    // if (req.user.role !== "ADMIN") {
+    //   return res.status(403).json({ message: "Acesso não autorizado" });
+    // }
 
     try {
       const userId = parseInt(req.params.id);

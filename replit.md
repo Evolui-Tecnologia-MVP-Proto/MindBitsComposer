@@ -8,7 +8,17 @@ EVO-MindBits Composer is an integrated technical and business documentation plat
 
 Preferred communication style: Simple, everyday language.
 
-## Recent Updates (January 27, 2025)
+## Recent Updates (January 28, 2025)
+
+✓ Temporarily disabled authentication requirements for easier application testing (January 28, 2025)
+  - Activated comprehensive authentication bypass for development/testing
+  - Removed NODE_ENV dependency for bypass activation
+  - Commented all admin role verifications in user management endpoints
+  - Created automatic fake admin user (id: 3, role: ADMIN) for seamless access
+  - All application features now accessible without login requirement
+  - Applied to endpoints: GET/POST/PATCH/DELETE /api/users and related admin functions
+
+## Previous Updates (January 27, 2025)
 
 ✓ Fixed critical duplication issue in "cadastros gerais" page by removing redundant Layout wrapper (January 27, 2025)
   - Removed Layout wrapper from CadastrosGeraisPage since ProtectedRoute already applies Layout automatically
