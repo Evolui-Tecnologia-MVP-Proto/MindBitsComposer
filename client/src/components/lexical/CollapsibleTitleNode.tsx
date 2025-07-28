@@ -67,7 +67,7 @@ export class CollapsibleTitleNode extends TextNode {
   }
 
   createDOM(config: EditorConfig): HTMLElement {
-    const dom = document.createElement('summary');
+    const dom = document.createElement('div');
     dom.classList.add(
       'Collapsible__title',
       'font-semibold',
@@ -78,16 +78,15 @@ export class CollapsibleTitleNode extends TextNode {
       'dark:hover:text-blue-400',
       'flex',
       'items-center',
-      'p-2'
+      'p-2',
+      'border-b',
+      'border-gray-200',
+      'dark:border-gray-600'
     );
     
-    // Tornar título não editável mas permitir interação
+    // Tornar título não editável
     dom.contentEditable = 'false';
     dom.setAttribute('data-lexical-editor', 'false');
-    
-    // Prevenir propagação de eventos que possam interferir com a edição do conteúdo
-    dom.addEventListener('click', (e) => e.stopPropagation());
-    dom.addEventListener('mousedown', (e) => e.stopPropagation());
     
     // Adicionar ícone de expansão/contração
     const icon = document.createElement('span');
@@ -99,6 +98,11 @@ export class CollapsibleTitleNode extends TextNode {
     const textSpan = document.createElement('span');
     textSpan.textContent = this.getTextContent();
     dom.appendChild(textSpan);
+
+    // Debug logs simplificados
+    dom.addEventListener('click', (e) => {
+      console.log('🔍 TITLE: Click no título (div)');
+    });
 
     return dom;
   }
@@ -113,10 +117,15 @@ export class CollapsibleTitleNode extends TextNode {
 
   static importDOM(): DOMConversionMap | null {
     return {
-      summary: () => ({
-        conversion: $convertCollapsibleTitleElement,
-        priority: 1,
-      }),
+      div: (domNode: HTMLElement) => {
+        if (domNode.classList.contains('Collapsible__title')) {
+          return {
+            conversion: $convertCollapsibleTitleElement,
+            priority: 1,
+          };
+        }
+        return null;
+      },
     };
   }
 
@@ -133,7 +142,7 @@ export class CollapsibleTitleNode extends TextNode {
   }
 
   exportDOM(): DOMExportOutput {
-    const element = document.createElement('summary');
+    const element = document.createElement('div');
     element.classList.add('Collapsible__title');
     element.textContent = this.getTextContent();
     return { element };

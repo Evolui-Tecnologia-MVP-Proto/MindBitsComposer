@@ -57,17 +57,17 @@ export class CollapsibleContentNode extends ElementNode {
       'dark:text-white'
     );
     
-    // Garantir que seja editável
-    dom.contentEditable = 'true';
+    // Tornar editável mas não diretamente - o Lexical vai gerenciar
+    dom.removeAttribute('contenteditable');
     dom.setAttribute('data-lexical-content', 'true');
     
     // Debug logs
-    dom.addEventListener('click', () => {
-      console.log('🔍 EDIT: Click no CollapsibleContent');
+    dom.addEventListener('click', (e) => {
+      console.log('🔍 EDIT: Click no CollapsibleContent', e.target);
     });
     
-    dom.addEventListener('focus', () => {
-      console.log('🔍 EDIT: Focus no CollapsibleContent');
+    dom.addEventListener('mousedown', (e) => {
+      console.log('🔍 EDIT: MouseDown no CollapsibleContent');
     });
     
     return dom;

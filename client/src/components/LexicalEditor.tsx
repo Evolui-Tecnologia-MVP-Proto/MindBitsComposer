@@ -1281,7 +1281,13 @@ function TemplateSectionsPlugin({ sections, mdFileOld }: { sections?: string[], 
                   // Adicionar todos os nodes convertidos ao container
                   lexicalNodes.forEach(node => content.append(node));
                   
-                  console.log(`✅ MD_FILE_OLD: Conteúdo com formatação inserido na seção "${sectionName}" (${lexicalNodes.length} nodes)`);
+                  // Adicionar parágrafo de teste para verificar edição
+                  const testParagraph = $createParagraphNode();
+                  const testText = $createTextNode('[TESTE EDIÇÃO - CLIQUE AQUI]');
+                  testParagraph.append(testText);
+                  content.append(testParagraph);
+                  
+                  console.log(`✅ MD_FILE_OLD: Conteúdo com formatação inserido na seção "${sectionName}" (${lexicalNodes.length} nodes) + parágrafo teste`);
                 } catch (error) {
                   console.error(`❌ MD_FILE_OLD: Erro ao converter markdown na seção "${sectionName}":`, error);
                   // Fallback: criar parágrafo vazio
@@ -1289,10 +1295,12 @@ function TemplateSectionsPlugin({ sections, mdFileOld }: { sections?: string[], 
                   content.append(paragraph);
                 }
               } else {
-                // Nenhum conteúdo encontrado - criar parágrafo vazio editável
+                // Nenhum conteúdo encontrado - criar parágrafo vazio editável  
                 const paragraph = $createParagraphNode();
+                const placeholderText = $createTextNode('Clique aqui para editar...');
+                paragraph.append(placeholderText);
                 content.append(paragraph);
-                console.log(`🔍 MD_FILE_OLD: Nenhum conteúdo encontrado para seção "${sectionName}"`);
+                console.log(`🔍 MD_FILE_OLD: Nenhum conteúdo encontrado para seção "${sectionName}" - adicionado placeholder`);
               }
 
               const container = $createCollapsibleContainerNode(false);
