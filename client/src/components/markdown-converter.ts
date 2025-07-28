@@ -261,7 +261,21 @@ export function createMarkdownConverter() {
       containerChildren.forEach((child: any) => {
         if (child.getType() === 'collapsible-title') {
           const titleText = child.getTextContent();
-          markdown += `# ${titleText}\n\n`;
+          
+          // Determine if this is a header section or regular section
+          // Header sections contain template fields like "RAG Index", "Titulo", "Data", etc.
+          const isHeaderSection = titleText.includes('Header') || 
+                                 titleText.includes('HEADER') ||
+                                 titleText.includes('Cabeçalho') ||
+                                 titleText.includes('CABEÇALHO') ||
+                                 // Check for common header field patterns
+                                 /^(RAG Index|Titulo|Data|Sistema|Módulo|Caminho)$/i.test(titleText) ||
+                                 // Check if title contains header-like content
+                                 titleText.includes('Campo') || titleText.includes('Metadados');
+          
+          // Use # for header sections, ## for other sections
+          const headerLevel = isHeaderSection ? '#' : '##';
+          markdown += `${headerLevel} ${titleText}\n\n`;
         } else if (child.getType() === 'collapsible-content') {
           // Process content recursively
           const contentChildren = child.getChildren();
