@@ -1,12 +1,14 @@
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { 
   BookOpen, 
   Clock, 
   CheckCircle2, 
   AlertCircle,
-  User
+  User,
+  Play
 } from "lucide-react";
 import { type Documento, type Specialty } from "@shared/schema";
 
@@ -36,12 +38,35 @@ export default function HomePage() {
     doc.origem === "MindBits_CT" && doc.status === "Integrado"
   );
 
+  // Buscar especialidades do usuário logado
+  const { data: userSpecialtyAssociations = [] } = useQuery({
+    queryKey: ["/api/user-specialties", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      
+      const res = await fetch(`/api/users/${user.id}/specialties`);
+      if (res.ok) {
+        return res.json();
+      }
+      return [];
+    },
+    enabled: !!user?.id
+  });
+
+  // Extrair apenas as especialidades das associações
+  const userSpecialties = userSpecialtyAssociations.map((assoc: any) => assoc.specialty as Specialty);
+
   // Agrupar por responsável
   const documentosPorEspecialidade = documentosMindBitsIntegrados.reduce((acc, doc) => {
     const responsavel = doc.responsavel || "Sem responsável";
     acc[responsavel] = (acc[responsavel] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
+
+  // Verificar se o responsável corresponde a um código de especialidade do usuário
+  const isUserResponsibleForSpecialty = (responsavel: string) => {
+    return userSpecialties.some((specialty: Specialty) => specialty.code === responsavel);
+  };
 
 
 
@@ -145,13 +170,34 @@ export default function HomePage() {
                     </CardTitle>
                     <CheckCircle2 className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0" />
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="relative">
                     <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                       {quantidade}
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground mb-3">
                       {quantidade === 1 ? "documento integrado" : "documentos integrados"}
                     </p>
+                    <div className="absolute bottom-2 right-2">
+                      <Button
+                        size="sm"
+                        variant={isUserResponsibleForSpecialty(responsavel) ? "default" : "secondary"}
+                        disabled={!isUserResponsibleForSpecialty(responsavel)}
+                        className={`h-7 px-2 text-xs ${
+                          isUserResponsibleForSpecialty(responsavel) 
+                            ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                            : "opacity-50 cursor-not-allowed"
+                        }`}
+                        onClick={() => {
+                          if (isUserResponsibleForSpecialty(responsavel)) {
+                            console.log(`Iniciando revisão para: ${responsavel}`);
+                            // TODO: Implementar lógica de iniciar revisão
+                          }
+                        }}
+                      >
+                        <Play className="h-3 w-3 mr-1" />
+                        Iniciar Revisão
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}

@@ -19,6 +19,10 @@ Preferred communication style: Simple, everyday language.
   - Dynamic text with proper singular/plural formatting
   - Positioned below existing "Base de conhecimento OC" section
   - Section title displays as "Documentos MindBits_CT - Integrados por Especialidade" for clarity
+  - Added "Iniciar Revisão" button in bottom-right corner of each box with Play icon
+  - Button enabled only when box responsible person matches specialty code where logged user is associated
+  - Fetches user's specialties via /api/users/{id}/specialties endpoint automatically
+  - Visual feedback: blue button when enabled, gray when disabled with cursor-not-allowed
 
 ✓ COMPLETED: Specialty-User Association System with Tabbed Modal Interface (January 28, 2025)
   - Successfully implemented complete specialty-user association system with PostgreSQL specialty_users table
