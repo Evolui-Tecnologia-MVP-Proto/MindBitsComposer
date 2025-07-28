@@ -288,16 +288,12 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
 
   const flushTable = () => {
     if (tableRows.length > 0) {
-      console.log('🔧 FlushTable chamada com', tableRows.length, 'linhas:', tableRows);
       // Filter out empty rows and separator rows
       const validRows = tableRows.filter((row: string) => 
         row.trim() !== '' && !row.match(/^\s*\|\s*[-:]+\s*\|\s*[-:]*\s*\|/)
       );
       
-      console.log('✅ Linhas válidas após filtrar:', validRows.length, validRows);
-      
       if (validRows.length === 0) {
-        console.log('❌ Nenhuma linha válida encontrada');
         tableRows = [];
         return;
       }
@@ -305,7 +301,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
       const [headerRow, ...bodyRows] = validRows;
       const headers = headerRow.split('|')
         .map((h: string) => h.trim())
-        .filter((h: string) => h !== '');
+        .slice(1, -1); // Remove first and last empty elements from pipe split
       
       const rows = bodyRows.map((row: string) => {
         const cells = row.split('|')
@@ -316,7 +312,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
               .replace(/\s+/g, ' ') // Normalize whitespace to single spaces
               .trim();
           })
-          .filter((cell: string) => cell !== '');
+          .slice(1, -1); // Remove first and last empty elements from pipe split
         
         // Ensure row has same number of cells as header
         while (cells.length < headers.length) {
@@ -484,7 +480,6 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
       if (!inTable) {
         flushParagraph();
         inTable = true;
-        console.log('🏁 Iniciando nova tabela markdown');
       }
       // Clean up table row - normalize spaces and ensure proper pipe formatting
       const cleanRow = line.trim()
@@ -492,11 +487,9 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
         .replace(/\|\s*\|\s*\|/g, '| |') // Fix empty cells with multiple pipes
         .replace(/^\s*\|/, '|') // Ensure starts with pipe
         .replace(/\|\s*$/, '|'); // Ensure ends with pipe
-      console.log('📝 Linha de tabela adicionada:', cleanRow);
       tableRows.push(cleanRow);
       return;
     } else if (inTable && line.trim() !== '') {
-      console.log('🔚 Finalizando tabela markdown, linhas:', tableRows.length);
       flushTable();
       inTable = false;
     } else if (inTable && line.trim() === '') {
