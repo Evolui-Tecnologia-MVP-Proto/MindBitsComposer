@@ -1285,7 +1285,9 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                     <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed text-gray-900 dark:text-[#E5E7EB] bg-gray-50 dark:bg-[#1B2028] p-4 rounded-md border border-gray-300 dark:border-[#374151] overflow-x-auto">
                       {markdownViewMode === 'current' 
                         ? (currentMarkdown || '// Nenhum conteúdo para visualizar\n// Adicione texto no editor para ver a conversão markdown')
-                        : (mdFileOld || '// Nenhuma versão anterior disponível')}
+                        : (mdFileOld && mdFileOld.trim() !== '' 
+                           ? mdFileOld 
+                           : `// Nenhuma versão anterior disponível\n// Debug: mdFileOld = "${mdFileOld}"\n// Length = ${mdFileOld?.length || 0}`)}
                     </pre>
                   </div>
                 </div>

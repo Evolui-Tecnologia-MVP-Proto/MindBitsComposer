@@ -1785,6 +1785,8 @@ export default function LexicalPage() {
                   initialEditorState={initialEditorState}
                   markdownContent={markdownContent}
                   mdFileOld={selectedEdition?.mdFileOld || ''}
+                  // Debug do selectedEdition
+                  {...(console.log('🔥 LEXICAL PAGE selectedEdition:', selectedEdition) || {})}
                   isEnabled={!!(currentDocumentId || selectedTemplate || selectedEdition || loadedFileName)}
                 />
               </CardContent>
