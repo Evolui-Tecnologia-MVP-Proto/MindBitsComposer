@@ -96,7 +96,7 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
     const field = condition.field;
     const operator = condition.operator;
     const value = condition.value;
-    const documentValue = document[field];
+    const documentValue = (document as any)[field];
     
     switch (operator) {
       case '=':
@@ -161,7 +161,7 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
         const field = filterConfig.field;
         const operator = filterConfig.operator;
         const value = filterConfig.value;
-        const documentValue = document[field];
+        const documentValue = (document as any)[field];
         
         switch (operator) {
           case '=':
@@ -204,7 +204,7 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
 
   // Função para obter fluxos disponíveis para um documento
   const getAvailableFlows = (document: Documento) => {
-    return documentsFlows.filter(
+    return (documentsFlows as any[]).filter(
       (flow: any) => flow.isEnabled === true && documentMatchesFlowFilter(document, flow)
     );
   };
@@ -223,6 +223,33 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
       setSelectedFlows({});
     }
   }, [isOpen]);
+
+  // Seleção automática de fluxos quando há apenas um disponível para cada documento
+  useEffect(() => {
+    if (isOpen && documentosLimitados.length > 0 && documentsFlows) {
+      const newSelectedFlows = { ...selectedFlows };
+      let hasChanges = false;
+
+      documentosLimitados.forEach((documento) => {
+        // Se já tem fluxo selecionado para este documento, pular
+        if (selectedFlows[documento.id]) {
+          return;
+        }
+
+        const availableFlows = getAvailableFlows(documento);
+        
+        // Se há apenas um fluxo disponível, selecioná-lo automaticamente
+        if (availableFlows.length === 1) {
+          newSelectedFlows[documento.id] = availableFlows[0].id;
+          hasChanges = true;
+        }
+      });
+
+      if (hasChanges) {
+        setSelectedFlows(newSelectedFlows);
+      }
+    }
+  }, [isOpen, documentosLimitados, documentsFlows, selectedFlows]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
