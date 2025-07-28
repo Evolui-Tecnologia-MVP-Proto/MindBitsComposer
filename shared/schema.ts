@@ -427,6 +427,7 @@ export const documentEditions = pgTable("document_editions", {
   lexFile: text("lex_file"), // Texto base64 para armazenar arquivo LEX
   jsonFile: json("json_file").$type<Record<string, any>>().default({}), // JSON estruturado
   mdFile: text("md_file"), // Longtext para arquivo Markdown
+  mdFileOld: text("md_file_old"), // Versão anterior do arquivo Markdown
   init: timestamp("init"), // Data/hora de início
   publish: timestamp("publish"), // Data/hora de publicação
   createdAt: timestamp("created_at").defaultNow(),

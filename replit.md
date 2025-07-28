@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
+✓ COMPLETED: Document Editions Versioning - Added md_file_old Column (January 28, 2025)
+  - Added md_file_old column to document_editions table for storing previous versions of markdown files
+  - Column type: TEXT (nullable) to store long markdown content
+  - Updated shared/schema.ts with new field: mdFileOld: text("md_file_old")
+  - Database migration applied successfully using direct SQL
+  - Ready for implementing version history or backup functionality for document editions
+
 ✓ COMPLETED: User Association for Documents - Added user_id Column (January 28, 2025)
   - Added optional user_id column to documentos table as integer foreign key to users table
   - Column allows NULL values for optional association between documents and users
