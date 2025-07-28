@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, templates, lexicalDocuments, insertLexicalDocumentSchema, specialties, insertSpecialtySchema } from "@shared/schema";
+import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, templates, lexicalDocuments, insertLexicalDocumentSchema, specialties, insertSpecialtySchema, systemParams, insertSystemParamSchema } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc, and, gte, lte, isNull, or, ne } from "drizzle-orm";
@@ -921,6 +921,114 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("❌ [API] Erro ao buscar especialidades do usuário:", error);
       res.status(500).send("Erro ao buscar especialidades do usuário");
+    }
+  });
+
+  // System Parameters routes
+  // Get all system parameters
+  app.get("/api/system-params", async (req, res) => {
+    // if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      console.log("🔍 [API] Buscando todos os parâmetros do sistema...");
+      const systemParams = await storage.getAllSystemParams();
+      console.log("✅ [API] Parâmetros encontrados:", systemParams.length);
+      res.json(systemParams);
+    } catch (error: any) {
+      console.error("❌ [API] Erro ao buscar parâmetros do sistema:", error);
+      res.status(500).send("Erro ao buscar parâmetros do sistema");
+    }
+  });
+
+  // Get system parameter by name
+  app.get("/api/system-params/:paramName", async (req, res) => {
+    // if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { paramName } = req.params;
+    
+    try {
+      const systemParam = await storage.getSystemParam(paramName);
+      if (!systemParam) {
+        return res.status(404).send("Parâmetro do sistema não encontrado");
+      }
+      res.json(systemParam);
+    } catch (error: any) {
+      console.error("❌ [API] Erro ao buscar parâmetro do sistema:", error);
+      res.status(500).send("Erro ao buscar parâmetro do sistema");
+    }
+  });
+
+  // Create system parameter
+  app.post("/api/system-params", async (req, res) => {
+    // if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      console.log("🔍 [API] Criando novo parâmetro do sistema:", req.body);
+      const paramData = insertSystemParamSchema.parse(req.body);
+      
+      // Verificar se já existe parâmetro com o mesmo nome
+      const existingParam = await storage.getSystemParam(paramData.paramName);
+      if (existingParam) {
+        return res.status(400).send("Já existe um parâmetro com este nome");
+      }
+      
+      const newParam = await storage.createSystemParam(paramData);
+      console.log("✅ [API] Parâmetro criado:", newParam);
+      res.status(201).json(newParam);
+    } catch (error: any) {
+      if (error instanceof ZodError) {
+        console.error("❌ [API] Erro de validação:", error.errors);
+        return res.status(400).json({ 
+          message: "Dados inválidos", 
+          errors: error.errors 
+        });
+      }
+      console.error("❌ [API] Erro ao criar parâmetro do sistema:", error);
+      res.status(500).send("Erro ao criar parâmetro do sistema");
+    }
+  });
+
+  // Update system parameter
+  app.patch("/api/system-params/:paramName", async (req, res) => {
+    // if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { paramName } = req.params;
+    
+    try {
+      // Verificar se o parâmetro existe
+      const existingParam = await storage.getSystemParam(paramName);
+      if (!existingParam) {
+        return res.status(404).send("Parâmetro não encontrado");
+      }
+      
+      const updatedParam = await storage.updateSystemParam(paramName, req.body);
+      console.log("✅ [API] Parâmetro atualizado:", updatedParam);
+      res.json(updatedParam);
+    } catch (error: any) {
+      console.error("❌ [API] Erro ao atualizar parâmetro:", error);
+      res.status(500).send("Erro ao atualizar parâmetro");
+    }
+  });
+
+  // Delete system parameter
+  app.delete("/api/system-params/:paramName", async (req, res) => {
+    // if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { paramName } = req.params;
+    
+    try {
+      // Verificar se o parâmetro existe
+      const existingParam = await storage.getSystemParam(paramName);
+      if (!existingParam) {
+        return res.status(404).send("Parâmetro não encontrado");
+      }
+      
+      await storage.deleteSystemParam(paramName);
+      console.log("✅ [API] Parâmetro excluído:", paramName);
+      res.status(204).send();
+    } catch (error: any) {
+      console.error("❌ [API] Erro ao excluir parâmetro:", error);
+      res.status(500).send("Erro ao excluir parâmetro");
     }
   });
 

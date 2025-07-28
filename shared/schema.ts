@@ -524,3 +524,24 @@ export type InsertSpecialty = z.infer<typeof insertSpecialtySchema>;
 export type Specialty = typeof specialties.$inferSelect;
 export type InsertSpecialtyUser = z.infer<typeof insertSpecialtyUserSchema>;
 export type SpecialtyUser = typeof specialtyUsers.$inferSelect;
+
+// System Parameters table
+export const systemParams = pgTable("system_params", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  paramName: text("param_name").notNull().unique(),
+  paramDescription: text("param_description"),
+  paramType: text("param_type").notNull(),
+  paramValue: text("param_value"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// System Parameters schema
+export const insertSystemParamSchema = createInsertSchema(systemParams).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertSystemParam = z.infer<typeof insertSystemParamSchema>;
+export type SystemParam = typeof systemParams.$inferSelect;

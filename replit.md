@@ -10,6 +10,16 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
+✓ COMPLETED: System Parameters Management Table (January 28, 2025)
+  - Created PostgreSQL system_params table with UUID primary key and unique param_name constraint
+  - Fields: param_name (text), param_description (text), param_type (text), param_value (text)
+  - Added to shared/schema.ts with TypeScript types and Zod validation schemas
+  - Implemented full CRUD operations in IStorage interface and DatabaseStorage class
+  - Created comprehensive API endpoints: GET, GET by name, POST, PATCH, DELETE /api/system-params
+  - All endpoints include validation, error handling, and authentication bypass for development
+  - Database migration executed successfully via npm run db:push
+  - System ready for configuration parameter management
+
 ✓ COMPLETED: MindBits_CT Document Totalization Boxes by Responsible Person (January 28, 2025)
   - Added dynamic totalization boxes on main page for origem="MindBits_CT" and status="Integrado" documents
   - Implemented automatic grouping by "responsavel" field with individual counter boxes for each responsible person

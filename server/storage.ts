@@ -1,4 +1,4 @@
-import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos, documentsArtifacts, globalAssets, repoStructure, systemLogs, documentEditions, genericTables, specialties, specialtyUsers,
+import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos, documentsArtifacts, globalAssets, repoStructure, systemLogs, documentEditions, genericTables, specialties, specialtyUsers, systemParams,
   type User, type InsertUser, type Template, type InsertTemplate, 
   type MondayMapping, type InsertMondayMapping, type MondayColumn, type InsertMondayColumn, 
   type MappingColumn, type InsertMappingColumn, type ServiceConnection, type InsertServiceConnection,
@@ -7,7 +7,7 @@ import { users, templates, mondayMappings, mondayColumns, mappingColumns, servic
   type RepoStructure, type InsertRepoStructure,
   type SystemLog, type InsertSystemLog, type DocumentEdition, type InsertDocumentEdition,
   type GenericTable, type InsertGenericTable, type Specialty, type InsertSpecialty,
-  type SpecialtyUser, type InsertSpecialtyUser,
+  type SpecialtyUser, type InsertSpecialtyUser, type SystemParam, type InsertSystemParam,
   UserStatus, UserRole, TemplateType, PluginStatus, PluginType } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, isNull, sql } from "drizzle-orm";
@@ -155,6 +155,13 @@ export interface IStorage {
   addUserToSpecialty(specialtyId: string, userId: number): Promise<SpecialtyUser>;
   removeUserFromSpecialty(specialtyId: string, userId: number): Promise<void>;
   getUserSpecialties(userId: number): Promise<(SpecialtyUser & {specialty: Specialty})[]>;
+  
+  // System Parameters operations
+  getSystemParam(paramName: string): Promise<SystemParam | undefined>;
+  getAllSystemParams(): Promise<SystemParam[]>;
+  createSystemParam(param: InsertSystemParam): Promise<SystemParam>;
+  updateSystemParam(paramName: string, data: Partial<SystemParam>): Promise<SystemParam>;
+  deleteSystemParam(paramName: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1143,6 +1150,37 @@ export class DatabaseStorage implements IStorage {
       .from(specialtyUsers)
       .innerJoin(specialties, eq(specialtyUsers.specialtyId, specialties.id))
       .where(eq(specialtyUsers.userId, userId));
+  }
+
+  // System Parameters operations
+  async getSystemParam(paramName: string): Promise<SystemParam | undefined> {
+    const [param] = await db.select().from(systemParams).where(eq(systemParams.paramName, paramName));
+    return param || undefined;
+  }
+
+  async getAllSystemParams(): Promise<SystemParam[]> {
+    return await db.select().from(systemParams).orderBy(systemParams.paramName);
+  }
+
+  async createSystemParam(paramData: InsertSystemParam): Promise<SystemParam> {
+    const [param] = await db
+      .insert(systemParams)
+      .values(paramData)
+      .returning();
+    return param;
+  }
+
+  async updateSystemParam(paramName: string, data: Partial<SystemParam>): Promise<SystemParam> {
+    const [param] = await db
+      .update(systemParams)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(systemParams.paramName, paramName))
+      .returning();
+    return param;
+  }
+
+  async deleteSystemParam(paramName: string): Promise<void> {
+    await db.delete(systemParams).where(eq(systemParams.paramName, paramName));
   }
 }
 
