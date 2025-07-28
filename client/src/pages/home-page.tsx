@@ -87,7 +87,7 @@ export default function HomePage() {
     if (doc.userId === user?.id) return true;
     
     // Verificar se há edições ativas iniciadas pelo usuário logado
-    const userEditions = documentEditions.filter((edition: any) => 
+    const userEditions = (documentEditions as any[]).filter((edition: any) => 
       edition.documentId === doc.id && 
       edition.startedBy === user?.id &&
       (edition.status === "in_progress" || edition.status === "draft" || edition.status === "ready_to_revise")
@@ -204,8 +204,8 @@ export default function HomePage() {
                     </CardTitle>
                     <CheckCircle2 className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0" />
                   </CardHeader>
-                  <CardContent className="relative">
-                    <div className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-3">
+                  <CardContent className="relative min-h-[80px] pb-12">
+                    <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
                       {quantidade} {quantidade === 1 ? "Integrado" : "Integrados"}
                       {documentosEmProcessoPorMimPorResponsavel[responsavel] && (
                         <span className="text-blue-600 dark:text-blue-400">
