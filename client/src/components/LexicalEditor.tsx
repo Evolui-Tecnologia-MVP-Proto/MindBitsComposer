@@ -887,11 +887,8 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
   let currentList: any = null;
   let listType: 'bullet' | 'number' | null = null;
   
-  console.log('📄 Processando markdown com', lines.length, 'linhas');
-  
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    console.log(`Linha ${i + 1}:`, line);
     
     // Processar blocos de código
     if (line.trim().startsWith('```')) {
@@ -977,11 +974,10 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
       continue;
     }
     
-    // Processar items de lista numerada
-    const numberedListMatch = line.match(/^(\s*)\d+\.\s+(.*)/);
-    if (numberedListMatch) {
-      console.log('🔢 Lista numerada detectada:', line);
-      const itemText = numberedListMatch[2];
+    // Processar items de lista numerada - regex mais robusta para diferentes formatos
+    const numberedListMatch = line.match(/^(\s*)(\d+)\.?\s+(.*)/);
+    if (numberedListMatch && numberedListMatch[2]) {
+      const itemText = numberedListMatch[3];
       
       // Se não temos lista atual ou é diferente do tipo number, criar nova
       if (!currentList || listType !== 'number') {
@@ -993,7 +989,6 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
         // Criar nova lista numerada
         currentList = $createListNode('number');
         listType = 'number';
-        console.log('✅ Lista numerada criada');
       }
       
       // Criar item da lista
@@ -1001,7 +996,6 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
       const textNodes = processInlineFormatting(itemText);
       textNodes.forEach(node => listItem.append(node));
       currentList.append(listItem);
-      console.log('➕ Item adicionado à lista:', itemText);
       continue;
     }
     
@@ -1266,6 +1260,7 @@ function TemplateSectionsPlugin({ sections, mdFileOld }: { sections?: string[], 
                 
                 // Converter markdown para Lexical nodes com formatação completa
                 try {
+                  console.log(`🔍 MARKDOWN RAW para "${sectionName}":`, JSON.stringify(matchingContent));
                   const lexicalNodes = convertMarkdownToLexicalNodes(matchingContent);
                   
                   // Adicionar todos os nodes convertidos ao container
