@@ -113,7 +113,7 @@ export function SpecialtiesTab() {
                     <TableHead>Nome</TableHead>
                     <TableHead>Descrição</TableHead>
                     <TableHead>Data de Criação</TableHead>
-                    <TableHead className="w-[150px]">Ações</TableHead>
+                    <TableHead className="w-[100px]">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -137,19 +137,19 @@ export function SpecialtiesTab() {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleEdit(specialty)}
-                            className="h-8 px-2"
+                            className="h-8 w-8 p-0"
+                            title="Editar"
                           >
-                            <Edit className="h-4 w-4 mr-1" />
-                            Editar
+                            <Edit className="h-4 w-4" />
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleDelete(specialty)}
-                            className="h-8 px-2 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
+                            className="h-8 w-8 p-0 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
+                            title="Excluir"
                           >
-                            <Trash2 className="h-4 w-4 mr-1" />
-                            Excluir
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
                       </TableCell>
