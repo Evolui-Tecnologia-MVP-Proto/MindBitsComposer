@@ -79,8 +79,8 @@ export function SpecialtiesTab() {
 
   return (
     <>
-      <Card className="dark:bg-[#0F172A] rounded-b-lg">
-        <CardHeader className="dark:bg-[#0F172A] rounded-t-lg">
+      <Card className="dark:bg-[#111827] rounded-b-lg">
+        <CardHeader className="dark:bg-[#111827] rounded-t-lg">
           <div className="flex items-center justify-end">
             <Button onClick={handleCreate}>
               <Plus className="h-4 w-4 mr-2" />
@@ -88,7 +88,7 @@ export function SpecialtiesTab() {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="dark:bg-[#0F172A]">
+        <CardContent className="dark:bg-[#111827]">
           {isLoading ? (
             <div className="text-center py-8">
               <p className="text-gray-500 dark:text-gray-400">Carregando especialidades...</p>
