@@ -312,12 +312,6 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
                             
                             {/* Select de Fluxo */}
                             <div className="mt-3">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Workflow className="h-3 w-3 text-blue-600 dark:text-blue-400" />
-                                <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                                  Fluxo de Documentação
-                                </span>
-                              </div>
                               <Select 
                                 value={selectedFlowId} 
                                 onValueChange={(flowId) => handleFlowChange(documento.id, flowId)}
@@ -344,18 +338,6 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
                                   )}
                                 </SelectContent>
                               </Select>
-                              
-                              {/* Informação do fluxo selecionado */}
-                              {selectedFlowId && (
-                                <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-600 rounded text-xs">
-                                  <div className="flex items-center gap-1">
-                                    <Workflow className="h-3 w-3 text-blue-600 dark:text-blue-400" />
-                                    <span className="font-medium text-blue-800 dark:text-blue-300">
-                                      {documentsFlows.find((flow: any) => flow.id === selectedFlowId)?.name}
-                                    </span>
-                                  </div>
-                                </div>
-                              )}
                             </div>
                           </div>
                           <div className="flex items-center gap-2 ml-4">
