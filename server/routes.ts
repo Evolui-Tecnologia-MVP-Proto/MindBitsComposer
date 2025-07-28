@@ -5211,6 +5211,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         createdAt: documentEditions.createdAt,
         updatedAt: documentEditions.updatedAt,
         lexFile: documentEditions.lexFile,
+        mdFileOld: documentEditions.mdFileOld,
         origem: documentos.origem,
         objeto: documentos.objeto,
         templateCode: templates.code,

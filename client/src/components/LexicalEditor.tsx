@@ -979,14 +979,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
   const [selectedTableElement, setSelectedTableElement] = useState<HTMLTableElement | null>(null);
   const [markdownViewMode, setMarkdownViewMode] = useState<'current' | 'old'>('current');
 
-  // Debug do mdFileOld
-  console.log('==========================================');
-  console.log('🔥 LEXICAL EDITOR DEBUG:');
-  console.log('🔥 viewMode:', viewMode);
-  console.log('🔥 mdFileOld recebido:', mdFileOld);
-  console.log('🔥 mdFileOld length:', mdFileOld?.length || 0);
-  console.log('🔥 Condition mdFileOld && mdFileOld.trim():', !!(mdFileOld && mdFileOld.trim() !== ''));
-  console.log('==========================================');
+
 
   // Função para excluir tabela selecionada
   const deleteSelectedTable = useCallback(() => {
@@ -1253,8 +1246,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                               : 'Versão anterior do documento (backup)'}
                           </p>
                         </div>
-                        {/* Temporariamente sempre mostrar os botões para debug */}
-                        {true && (
+                        {mdFileOld && mdFileOld.trim() !== '' && (
                           <div className="flex items-center space-x-2">
                             <Button
                               onClick={() => setMarkdownViewMode('current')}
@@ -1285,9 +1277,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                     <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed text-gray-900 dark:text-[#E5E7EB] bg-gray-50 dark:bg-[#1B2028] p-4 rounded-md border border-gray-300 dark:border-[#374151] overflow-x-auto">
                       {markdownViewMode === 'current' 
                         ? (currentMarkdown || '// Nenhum conteúdo para visualizar\n// Adicione texto no editor para ver a conversão markdown')
-                        : (mdFileOld && mdFileOld.trim() !== '' 
-                           ? mdFileOld 
-                           : `// Nenhuma versão anterior disponível\n// Debug: mdFileOld = "${mdFileOld}"\n// Length = ${mdFileOld?.length || 0}`)}
+                        : (mdFileOld || '// Nenhuma versão anterior disponível')}
                     </pre>
                   </div>
                 </div>
