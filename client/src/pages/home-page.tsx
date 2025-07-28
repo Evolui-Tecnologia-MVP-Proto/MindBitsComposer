@@ -204,8 +204,8 @@ export default function HomePage() {
                     </CardTitle>
                     <CheckCircle2 className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0" />
                   </CardHeader>
-                  <CardContent className="relative min-h-[80px] pb-12">
-                    <div className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                  <CardContent className="relative h-[80px]">
+                    <div className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-tight">
                       {quantidade} {quantidade === 1 ? "Integrado" : "Integrados"}
                       {documentosEmProcessoPorMimPorResponsavel[responsavel] && (
                         <span className="text-blue-600 dark:text-blue-400">
