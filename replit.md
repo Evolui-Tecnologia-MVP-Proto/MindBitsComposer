@@ -10,17 +10,21 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
-✓ COMPLETED: Intelligent Document Content Population System from md_file_old Sections (January 28, 2025)
-  - Implemented automatic content population from md_file_old sections (##) into respective Lexical containers when loading documents
-  - Created parseMdFileOldSections function to extract sections from markdown files based on ## headers
-  - Developed findMatchingSectionContent function for intelligent section mapping by name
-  - Added special case handling for "1. FAQ - PERGUNTA" in Lexical that maps to "PERGUNTA" or "[n] PERGUNTA" in md_file_old
-  - Enhanced TemplateSectionsPlugin to accept mdFileOld parameter and populate sections automatically
-  - Implemented line-by-line content conversion from markdown to Lexical paragraph nodes
-  - Added comprehensive logging for content population tracking and debugging
-  - Preserves existing container content while enabling automatic population for new sections
-  - Fixed TypeScript compilation errors related to Map iteration and type safety
-  - System now automatically maps and populates document sections when loading documents with backup content
+✓ COMPLETED: Advanced Markdown-to-Lexical Conversion System with Full Formatting Support (January 28, 2025)
+  - Enhanced automatic content population from md_file_old sections with complete markdown formatting preservation
+  - Implemented createFormattedTextNodes function for inline formatting: **bold**, *italic*, ~~strikethrough~~, `code`
+  - Created convertMarkdownToLexicalNodes function for complete markdown processing including headers, code blocks, and paragraphs
+  - Replaced simple line-by-line text conversion with sophisticated markdown-to-Lexical node transformation
+  - Bold (**text**) converts to TextNode with bold format applied in Lexical editor
+  - Italic (*text*) converts to TextNode with italic format applied in Lexical editor  
+  - Strikethrough (~~text~~) converts to TextNode with strikethrough format applied in Lexical editor
+  - Inline code (`code`) converts to TextNode with code format applied in Lexical editor
+  - Code blocks (```code```) convert to dedicated CodeNode in Lexical editor
+  - Headers (# ## ###) convert to HeadingNode (h1-h6) in Lexical editor
+  - System processes markdown sequentially to avoid conflicts between similar markers
+  - Integration maintains all existing functionality: section mapping, logging, error handling
+  - Preserves existing container content while enabling automatic formatted population for new sections
+  - Documents now load with full visual formatting instead of raw markdown text
 
 ✓ COMPLETED: Enhanced "Iniciar Edição" Process with ready_to_revise Record Update Logic (January 28, 2025)
   - Modified POST /api/document-editions endpoint to check for existing ready_to_revise records before creating new ones

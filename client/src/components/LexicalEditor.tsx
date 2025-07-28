@@ -798,6 +798,160 @@ function cleanMarkdownContent(markdown: string): string {
     .trim();
 }
 
+// Função para converter texto markdown em nodes Lexical com formatação
+function createFormattedTextNodes(text: string): any[] {
+  const nodes: any[] = [];
+  let remaining = text;
+  
+  while (remaining.length > 0) {
+    // Procurar por código inline primeiro (para evitar conflitos com outros marcadores)
+    const codeMatch = remaining.match(/`([^`]+)`/);
+    if (codeMatch && (codeMatch.index === 0 || remaining.indexOf(codeMatch[0]) < remaining.search(/(\*\*|\*|~~)/))) {
+      // Adicionar texto antes do código
+      if (codeMatch.index && codeMatch.index > 0) {
+        const beforeCode = remaining.substring(0, codeMatch.index);
+        nodes.push(...createFormattedTextNodes(beforeCode));
+      }
+      
+      // Criar node de código
+      const codeNode = $createTextNode(codeMatch[1]);
+      codeNode.setFormat('code');
+      nodes.push(codeNode);
+      
+      remaining = remaining.substring((codeMatch.index || 0) + codeMatch[0].length);
+      continue;
+    }
+    
+    // Procurar por negrito
+    const boldMatch = remaining.match(/\*\*(.*?)\*\*/);
+    if (boldMatch && (boldMatch.index === 0 || remaining.indexOf(boldMatch[0]) < remaining.search(/(\*|~~)/))) {
+      // Adicionar texto antes do negrito
+      if (boldMatch.index && boldMatch.index > 0) {
+        const beforeBold = remaining.substring(0, boldMatch.index);
+        nodes.push(...createFormattedTextNodes(beforeBold));
+      }
+      
+      // Criar node de negrito
+      const boldNode = $createTextNode(boldMatch[1]);
+      boldNode.setFormat('bold');
+      nodes.push(boldNode);
+      
+      remaining = remaining.substring((boldMatch.index || 0) + boldMatch[0].length);
+      continue;
+    }
+    
+    // Procurar por tachado
+    const strikeMatch = remaining.match(/~~(.*?)~~/);
+    if (strikeMatch && (strikeMatch.index === 0 || remaining.indexOf(strikeMatch[0]) < remaining.search(/\*/))) {
+      // Adicionar texto antes do tachado
+      if (strikeMatch.index && strikeMatch.index > 0) {
+        const beforeStrike = remaining.substring(0, strikeMatch.index);
+        nodes.push(...createFormattedTextNodes(beforeStrike));
+      }
+      
+      // Criar node de tachado
+      const strikeNode = $createTextNode(strikeMatch[1]);
+      strikeNode.setFormat('strikethrough');
+      nodes.push(strikeNode);
+      
+      remaining = remaining.substring((strikeMatch.index || 0) + strikeMatch[0].length);
+      continue;
+    }
+    
+    // Procurar por itálico (após negrito para evitar conflitos)
+    const italicMatch = remaining.match(/\*(.*?)\*/);
+    if (italicMatch) {
+      // Adicionar texto antes do itálico
+      if (italicMatch.index && italicMatch.index > 0) {
+        const beforeItalic = remaining.substring(0, italicMatch.index);
+        nodes.push($createTextNode(beforeItalic));
+      }
+      
+      // Criar node de itálico
+      const italicNode = $createTextNode(italicMatch[1]);
+      italicNode.setFormat('italic');
+      nodes.push(italicNode);
+      
+      remaining = remaining.substring((italicMatch.index || 0) + italicMatch[0].length);
+      continue;
+    }
+    
+    // Nenhum marcador encontrado, adicionar texto restante
+    nodes.push($createTextNode(remaining));
+    break;
+  }
+  
+  return nodes;
+}
+
+// Função para converter conteúdo markdown em nodes Lexical completos
+function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
+  const lines = markdownContent.split('\n');
+  const nodes: any[] = [];
+  let isInCodeBlock = false;
+  let codeBlockContent: string[] = [];
+  let codeBlockLanguage = '';
+  
+  for (const line of lines) {
+    // Processar blocos de código
+    if (line.trim().startsWith('```')) {
+      if (isInCodeBlock) {
+        // Finalizar bloco de código
+        const codeContent = codeBlockContent.join('\n');
+        const codeBlock = $createCodeNode(codeContent);
+        nodes.push(codeBlock);
+        codeBlockContent = [];
+        isInCodeBlock = false;
+        codeBlockLanguage = '';
+      } else {
+        // Iniciar bloco de código
+        isInCodeBlock = true;
+        const match = line.match(/^```\s*(\w+)?/);
+        codeBlockLanguage = match?.[1] || '';
+      }
+      continue;
+    }
+    
+    if (isInCodeBlock) {
+      codeBlockContent.push(line);
+      continue;
+    }
+    
+    // Processar linha vazia
+    if (line.trim() === '') {
+      const emptyParagraph = $createParagraphNode();
+      nodes.push(emptyParagraph);
+      continue;
+    }
+    
+    // Processar cabeçalhos
+    if (line.startsWith('#')) {
+      const level = line.match(/^#+/)?.[0].length || 1;
+      const text = line.replace(/^#+\s*/, '');
+      const heading = $createHeadingNode(`h${Math.min(level, 6)}` as any);
+      const textNodes = createFormattedTextNodes(text);
+      textNodes.forEach(node => heading.append(node));
+      nodes.push(heading);
+      continue;
+    }
+    
+    // Processar linha normal com formatação
+    const paragraph = $createParagraphNode();
+    const textNodes = createFormattedTextNodes(line);
+    textNodes.forEach(node => paragraph.append(node));
+    nodes.push(paragraph);
+  }
+  
+  // Finalizar bloco de código se ainda estiver aberto
+  if (isInCodeBlock && codeBlockContent.length > 0) {
+    const codeContent = codeBlockContent.join('\n');
+    const codeBlock = $createCodeNode(codeContent);
+    nodes.push(codeBlock);
+  }
+  
+  return nodes;
+}
+
 // Função para parsear o md_file_old e extrair seções
 function parseMdFileOldSections(mdFileOld: string): Map<string, string> {
   const sectionsMap = new Map<string, string>();
@@ -980,27 +1134,16 @@ function TemplateSectionsPlugin({ sections, mdFileOld }: { sections?: string[], 
               if (matchingContent && matchingContent.trim() !== '') {
                 console.log(`🔍 MD_FILE_OLD: Conteúdo encontrado para seção "${sectionName}"`);
                 
-                // Converter markdown para Lexical nodes
+                // Converter markdown para Lexical nodes com formatação completa
                 try {
-                  // Dividir o conteúdo em linhas e criar parágrafos
-                  const contentLines = matchingContent.split('\n');
+                  const lexicalNodes = convertMarkdownToLexicalNodes(matchingContent);
                   
-                  for (const line of contentLines) {
-                    if (line.trim() === '') {
-                      // Linha vazia - criar parágrafo vazio
-                      const emptyParagraph = $createParagraphNode();
-                      content.append(emptyParagraph);
-                    } else {
-                      // Linha com conteúdo - criar parágrafo com texto
-                      const paragraph = $createParagraphNode();
-                      paragraph.append($createTextNode(line));
-                      content.append(paragraph);
-                    }
-                  }
+                  // Adicionar todos os nodes convertidos ao container
+                  lexicalNodes.forEach(node => content.append(node));
                   
-                  console.log(`✅ MD_FILE_OLD: Conteúdo inserido na seção "${sectionName}"`);
+                  console.log(`✅ MD_FILE_OLD: Conteúdo com formatação inserido na seção "${sectionName}" (${lexicalNodes.length} nodes)`);
                 } catch (error) {
-                  console.error(`❌ MD_FILE_OLD: Erro ao inserir conteúdo na seção "${sectionName}":`, error);
+                  console.error(`❌ MD_FILE_OLD: Erro ao converter markdown na seção "${sectionName}":`, error);
                   // Fallback: criar parágrafo vazio
                   const paragraph = $createParagraphNode();
                   content.append(paragraph);
