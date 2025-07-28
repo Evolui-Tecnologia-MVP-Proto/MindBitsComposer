@@ -79,7 +79,7 @@ export function SpecialtiesTab() {
 
   return (
     <>
-      <Card className="dark:bg-[#0F172A]">
+      <Card className="dark:bg-[#0F172A] rounded-b-lg">
         <CardHeader className="dark:bg-[#0F172A] rounded-t-lg">
           <div className="flex items-center justify-end">
             <Button onClick={handleCreate}>
@@ -105,7 +105,7 @@ export function SpecialtiesTab() {
               </Button>
             </div>
           ) : (
-            <div className="rounded-md border dark:bg-[#0F172A] rounded-b-lg">
+            <div className="rounded-md border dark:bg-[#0F172A]">
               <Table>
                 <TableHeader>
                   <TableRow>
