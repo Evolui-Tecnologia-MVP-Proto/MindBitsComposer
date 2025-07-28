@@ -1034,6 +1034,45 @@ export class DatabaseStorage implements IStorage {
   async deleteDocumentEdition(id: string): Promise<void> {
     await db.delete(documentEditions).where(eq(documentEditions.id, id));
   }
+
+  // Generic Table operations
+  async getGenericTableByName(name: string): Promise<GenericTable | undefined> {
+    const [table] = await db.select().from(genericTables).where(eq(genericTables.name, name));
+    return table;
+  }
+
+  // Specialty operations
+  async getSpecialty(id: string): Promise<Specialty | undefined> {
+    const [specialty] = await db.select().from(specialties).where(eq(specialties.id, id));
+    return specialty;
+  }
+
+  async getSpecialtyByCode(code: string): Promise<Specialty | undefined> {
+    const [specialty] = await db.select().from(specialties).where(eq(specialties.code, code));
+    return specialty;
+  }
+
+  async createSpecialty(specialtyData: InsertSpecialty): Promise<Specialty> {
+    const [specialty] = await db.insert(specialties).values(specialtyData).returning();
+    return specialty;
+  }
+
+  async getAllSpecialties(): Promise<Specialty[]> {
+    return await db.select().from(specialties).orderBy(specialties.name);
+  }
+
+  async updateSpecialty(id: string, data: Partial<Specialty>): Promise<Specialty> {
+    const [specialty] = await db
+      .update(specialties)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(specialties.id, id))
+      .returning();
+    return specialty;
+  }
+
+  async deleteSpecialty(id: string): Promise<void> {
+    await db.delete(specialties).where(eq(specialties.id, id));
+  }
 }
 
 export class MemStorage implements IStorage {

@@ -726,14 +726,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Specialty routes
   // Get all specialties
   app.get("/api/specialties", async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    // if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      const specialties = await storage.getAllSpecialties();
-      res.json(specialties);
+      console.log("🔍 [API] Buscando todas as especialidades via DB direto...");
+      
+      // Tentar buscar diretamente do banco
+      const specialtiesFromDb = await db.select().from(specialties);
+      console.log("✅ [API] Especialidades encontradas no DB:", specialtiesFromDb.length);
+      console.log("📋 [API] Dados:", specialtiesFromDb);
+      
+      res.json(specialtiesFromDb);
     } catch (error) {
-      console.error("Erro ao buscar especialidades:", error);
-      res.status(500).send("Erro ao buscar especialidades");
+      console.error("❌ [API] Erro ao buscar especialidades:", error);
+      res.status(500).json({ error: error.message });
     }
   });
   
@@ -757,9 +763,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Create specialty
   app.post("/api/specialties", async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    // if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
+      console.log("🔍 [API] Criando nova especialidade:", req.body);
       const specialtyData = insertSpecialtySchema.parse(req.body);
       
       // Verificar se já existe especialidade com o mesmo código
@@ -769,15 +776,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const newSpecialty = await storage.createSpecialty(specialtyData);
+      console.log("✅ [API] Especialidade criada:", newSpecialty);
       res.status(201).json(newSpecialty);
     } catch (error: any) {
       if (error instanceof ZodError) {
+        console.error("❌ [API] Erro de validação:", error.errors);
         return res.status(400).json({ 
           message: "Dados inválidos", 
           errors: error.errors 
         });
       }
-      console.error("Erro ao criar especialidade:", error);
+      console.error("❌ [API] Erro ao criar especialidade:", error);
       res.status(500).send("Erro ao criar especialidade");
     }
   });
