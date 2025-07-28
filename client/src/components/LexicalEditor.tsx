@@ -979,6 +979,15 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
   const [selectedTableElement, setSelectedTableElement] = useState<HTMLTableElement | null>(null);
   const [markdownViewMode, setMarkdownViewMode] = useState<'current' | 'old'>('current');
 
+  // Debug do mdFileOld
+  console.log('==========================================');
+  console.log('🔥 LEXICAL EDITOR DEBUG:');
+  console.log('🔥 viewMode:', viewMode);
+  console.log('🔥 mdFileOld recebido:', mdFileOld);
+  console.log('🔥 mdFileOld length:', mdFileOld?.length || 0);
+  console.log('🔥 Condition mdFileOld && mdFileOld.trim():', !!(mdFileOld && mdFileOld.trim() !== ''));
+  console.log('==========================================');
+
   // Função para excluir tabela selecionada
   const deleteSelectedTable = useCallback(() => {
     if (!selectedTableKey || !editorInstance) return;
@@ -1244,7 +1253,8 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                               : 'Versão anterior do documento (backup)'}
                           </p>
                         </div>
-                        {mdFileOld && mdFileOld.trim() !== '' && (
+                        {/* Temporariamente sempre mostrar os botões para debug */}
+                        {true && (
                           <div className="flex items-center space-x-2">
                             <Button
                               onClick={() => setMarkdownViewMode('current')}
