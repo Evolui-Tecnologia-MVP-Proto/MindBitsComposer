@@ -275,29 +275,23 @@ export function createMarkdownConverter() {
                         content += '        ```\n' + codeText + '\n```\n';
                       }
                     } else if (child.getType() === 'table') {
-                      // Process nested table in Mermaid table cells
+                      // Process nested table in Mermaid table cells - generate compact HTML
                       const nestedRows = child.getChildren();
-                      content += '        <table style="width: 100%; margin: 8px 0; border-collapse: collapse;">\n';
-                      content += '          <tbody>\n';
+                      content += '        <table style="width: 100%; margin: 8px 0; border-collapse: collapse;">';
+                      content += '<tbody>';
                       
                       nestedRows.forEach((nestedRow: any) => {
-                        content += '            <tr>\n';
+                        content += '<tr>';
                         const nestedCells = nestedRow.getChildren();
                         nestedCells.forEach((nestedCell: any) => {
-                          content += '              <td style="border: 1px solid #ccc; padding: 8px;">\n';
-                          
-                          const nestedCellText = processChildrenWithFormatting(nestedCell);
-                          if (nestedCellText.trim()) {
-                            content += '                ' + nestedCellText + '\n';
-                          }
-                          
-                          content += '              </td>\n';
+                          const nestedCellText = processChildrenWithFormatting(nestedCell).trim();
+                          content += '<td style="border: 1px solid #ccc; padding: 8px;">' + nestedCellText + '</td>';
                         });
-                        content += '            </tr>\n';
+                        content += '</tr>';
                       });
                       
-                      content += '          </tbody>\n';
-                      content += '        </table>\n';
+                      content += '</tbody>';
+                      content += '</table>\n';
                     } else if (child.getType() === 'paragraph') {
                       const paragraphContent = processChildrenWithFormatting(child);
                       if (paragraphContent.trim()) {
@@ -407,30 +401,24 @@ export function createMarkdownConverter() {
                     const children = cell.getChildren();
                     children.forEach((child: any) => {
                       if (child.getType() === 'table') {
-                        // Process nested table - generate HTML for it
+                        // Process nested table - generate compact HTML
                         const nestedRows = child.getChildren();
-                        content += '        <table style="width: 100%; margin: 8px 0; border-collapse: collapse;">\n';
-                        content += '          <tbody>\n';
+                        content += '        <table style="width: 100%; margin: 8px 0; border-collapse: collapse;">';
+                        content += '<tbody>';
                         
                         nestedRows.forEach((nestedRow: any) => {
-                          content += '            <tr>\n';
+                          content += '<tr>';
                           const nestedCells = nestedRow.getChildren();
                           nestedCells.forEach((nestedCell: any) => {
-                            content += '              <td style="border: 1px solid #ccc; padding: 8px;">\n';
-                            
                             // Get nested cell content
-                            const nestedCellText = processChildrenWithFormatting(nestedCell);
-                            if (nestedCellText.trim()) {
-                              content += '                ' + nestedCellText + '\n';
-                            }
-                            
-                            content += '              </td>\n';
+                            const nestedCellText = processChildrenWithFormatting(nestedCell).trim();
+                            content += '<td style="border: 1px solid #ccc; padding: 8px;">' + nestedCellText + '</td>';
                           });
-                          content += '            </tr>\n';
+                          content += '</tr>';
                         });
                         
-                        content += '          </tbody>\n';
-                        content += '        </table>\n';
+                        content += '</tbody>';
+                        content += '</table>\n';
                       } else if (child.getType() === 'code') {
                         // Preserve code blocks with backticks
                         const codeText = child.getTextContent();
