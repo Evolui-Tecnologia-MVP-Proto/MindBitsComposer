@@ -1227,7 +1227,8 @@ function TemplateSectionsPlugin({ sections, mdFileOld }: { sections?: string[], 
           const missingSeções = sections.filter(sectionName => !existingSections.has(sectionName));
           const hasAllSections = missingSeções.length === 0;
           
-          if (hasAllSections && headerFieldsContainer) {
+          // Se template já aplicado mas temos md_file_old, reprocessar conteúdo
+          if (hasAllSections && headerFieldsContainer && (!mdSections || mdSections.length === 0)) {
             console.log('🔥 TemplateSectionsPlugin - Template já aplicado, preservando conteúdo');
             return; // Não fazer nada, template já está aplicado
           }
@@ -1242,18 +1243,15 @@ function TemplateSectionsPlugin({ sections, mdFileOld }: { sections?: string[], 
           }
           
           sections.forEach((sectionName) => {
-            // Usar container existente se disponível, senão criar novo
-            if (existingSections.has(sectionName)) {
-              const existingContainer = existingSections.get(sectionName);
-              root.append(existingContainer);
-              console.log(`🔥 TemplateSectionsPlugin - Seção "${sectionName}" preservada com conteúdo`);
-            } else {
-              // Criar novo container apenas se não existir
+            // Verificar se temos conteúdo do md_file_old para esta seção
+            const matchingContent = findMatchingSectionContent(sectionName, mdSections);
+            const hasNewContent = matchingContent && matchingContent.trim() !== '';
+            
+            // Se há conteúdo novo do md_file_old ou seção não existe, recriar
+            if (hasNewContent || !existingSections.has(sectionName)) {
+              // Criar novo container (substituindo existente se necessário)
               const title = $createCollapsibleTitleNode(sectionName);
               const content = $createCollapsibleContentNode();
-              
-              // Tentar encontrar conteúdo correspondente no md_file_old
-              const matchingContent = findMatchingSectionContent(sectionName, mdSections);
               
               if (matchingContent && matchingContent.trim() !== '') {
                 console.log(`🔍 MD_FILE_OLD: Conteúdo encontrado para seção "${sectionName}"`);
@@ -1285,6 +1283,11 @@ function TemplateSectionsPlugin({ sections, mdFileOld }: { sections?: string[], 
               
               root.append(container);
               console.log(`🔥 TemplateSectionsPlugin - Nova seção "${sectionName}" criada`);
+            } else {
+              // Preservar seção existente sem conteúdo novo
+              const existingContainer = existingSections.get(sectionName);
+              root.append(existingContainer);
+              console.log(`🔥 TemplateSectionsPlugin - Seção "${sectionName}" preservada com conteúdo`);
             }
           });
           
