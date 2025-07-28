@@ -132,6 +132,7 @@ export interface IStorage {
   // Document Edition operations
   getDocumentEdition(id: string): Promise<DocumentEdition | undefined>;
   getDocumentEditionsByDocumentId(documentId: string): Promise<DocumentEdition[]>;
+  getDocumentEditionByDocumentIdAndStatus(documentId: string, status: string): Promise<DocumentEdition | undefined>;
   getAllDocumentEditions(): Promise<DocumentEdition[]>;
   createDocumentEdition(edition: InsertDocumentEdition): Promise<DocumentEdition>;
   updateDocumentEdition(id: string, data: Partial<DocumentEdition>): Promise<DocumentEdition>;

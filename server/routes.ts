@@ -4838,26 +4838,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "templateId é obrigatório" });
       }
       
-      // Preparar dados para inserção
-      const insertData = {
-        documentId: req.body.documentId,
-        templateId: req.body.templateId,
-        startedBy: req.user!.id, // ID do usuário logado
-        status: req.body.status || "in_progress",
-        init: new Date(),
-        lexFile: req.body.lexFile || null,
-        jsonFile: req.body.jsonFile || {},
-        mdFile: req.body.mdFile || null,
-        publish: req.body.publish || null
-      };
+      // Verificar se já existe registro com status 'ready_to_revise' para este documento
+      const existingReadyToRevise = await db
+        .select()
+        .from(documentEditions)
+        .where(and(
+          eq(documentEditions.documentId, req.body.documentId),
+          eq(documentEditions.status, 'ready_to_revise')
+        ));
       
-      console.log("📋 Dados preparados para inserção:", JSON.stringify(insertData, null, 2));
+      let edition;
       
-      const edition = await storage.createDocumentEdition(insertData);
-      console.log("✅ Document edition criada com sucesso:", edition.id);
+      if (existingReadyToRevise.length > 0) {
+        // Se existe registro ready_to_revise, atualizar ao invés de criar novo
+        const existingRecord = existingReadyToRevise[0];
+        
+        console.log("📝 Registro ready_to_revise encontrado, atualizando:", existingRecord.id);
+        
+        const [updatedEdition] = await db
+          .update(documentEditions)
+          .set({
+            status: 'in_progress',
+            mdFileOld: existingRecord.mdFile, // Backup do md_file atual para md_file_old
+            startedBy: req.user!.id, // Associar usuário atual
+            init: new Date(), // Timestamp atual
+            updatedAt: new Date()
+          })
+          .where(eq(documentEditions.id, existingRecord.id))
+          .returning();
+        
+        edition = updatedEdition;
+        console.log("✅ Registro ready_to_revise atualizado para in_progress:", edition.id);
+        
+      } else {
+        // Se não existe ready_to_revise, criar novo registro (comportamento original)
+        console.log("📝 Nenhum registro ready_to_revise encontrado, criando novo registro");
+        
+        const insertData = {
+          documentId: req.body.documentId,
+          templateId: req.body.templateId,
+          startedBy: req.user!.id, // ID do usuário logado
+          status: req.body.status || "in_progress",
+          init: new Date(),
+          lexFile: req.body.lexFile || null,
+          jsonFile: req.body.jsonFile || {},
+          mdFile: req.body.mdFile || null,
+          publish: req.body.publish || null
+        };
+        
+        console.log("📋 Dados preparados para inserção:", JSON.stringify(insertData, null, 2));
+        
+        edition = await storage.createDocumentEdition(insertData);
+        console.log("✅ Document edition criada com sucesso:", edition.id);
+      }
       
       // Atualizar o task_state do documento para "in_doc" quando uma edição é iniciada
-      await storage.updateDocumento(insertData.documentId, { taskState: "in_doc" });
+      await storage.updateDocumento(req.body.documentId, { taskState: "in_doc" });
       console.log("✅ Task state do documento atualizado para 'in_doc'");
       
       res.status(201).json(edition);

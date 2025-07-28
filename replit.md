@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
+✓ COMPLETED: Enhanced "Iniciar Edição" Process with ready_to_revise Record Update Logic (January 28, 2025)
+  - Modified POST /api/document-editions endpoint to check for existing ready_to_revise records before creating new ones
+  - Added "ready_to_revise" status to document_editions table enum
+  - If ready_to_revise record exists: updates status to in_progress, copies md_file to md_file_old, sets started_by to current user, updates init timestamp
+  - If no ready_to_revise record exists: maintains original behavior (creates new in_progress record)
+  - Implements proper version control workflow where documents can be prepared for revision and then updated when editing starts
+  - Preserves backward compatibility while enabling enhanced document lifecycle management
+
 ✓ COMPLETED: User ID Association During Documentation Process (January 28, 2025)
   - Enhanced /api/documentos/start-documentation endpoint to populate documentos.user_id field with logged user ID
   - Modified updateDocumento call to include userId: req.user.id alongside status: "Em Processo"
