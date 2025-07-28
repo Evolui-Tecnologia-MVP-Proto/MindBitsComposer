@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
+✓ COMPLETED: Fixed Session Persistence Issue - Restored Normal Authentication (January 28, 2025)
+  - Disabled development authentication bypass that was automatically logging in as "Administrador" user
+  - Removed setupDevAuth middleware that was overriding real user sessions on system restart
+  - Restored admin role verification for user management endpoints (GET/POST/PATCH/DELETE /api/users)
+  - Fixed issue where system would always default to Administrador user instead of preserving actual logged-in user
+  - Session persistence now works correctly - users stay logged in after system restarts
+  - Proper authentication and authorization now enforced throughout the application
+
 ✓ COMPLETED: Document Editions Versioning - Added md_file_old Column (January 28, 2025)
   - Added md_file_old column to document_editions table for storing previous versions of markdown files
   - Column type: TEXT (nullable) to store long markdown content

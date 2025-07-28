@@ -117,12 +117,11 @@ export function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // TEMPORARY: Setup dev auth bypass middleware
-  // TODO: Remove this when login is re-enabled
-  app.use((req, res, next) => {
-    setupDevAuth(req);
-    next();
-  });
+  // DISABLED: Dev auth bypass middleware removed to fix session persistence
+  // app.use((req, res, next) => {
+  //   setupDevAuth(req);
+  //   next();
+  // });
 
   passport.use(
     new LocalStrategy(
@@ -326,11 +325,9 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ message: "Não autenticado" });
     }
 
-    // TEMPORARY: Bypass admin check for testing
-    // TODO: Remove this when login is re-enabled
-    // if (req.user.role !== "ADMIN") {
-    //   return res.status(403).json({ message: "Acesso não autorizado" });
-    // }
+    if (req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Acesso não autorizado" });
+    }
 
     try {
       const users = await storage.getAllUsers();
@@ -346,11 +343,9 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ message: "Não autenticado" });
     }
 
-    // TEMPORARY: Bypass admin check for testing
-    // TODO: Remove this when login is re-enabled
-    // if (req.user.role !== "ADMIN") {
-    //   return res.status(403).json({ message: "Acesso não autorizado" });
-    // }
+    if (req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Acesso não autorizado" });
+    }
 
     try {
       const userData = insertUserSchema.parse(req.body);
@@ -387,11 +382,9 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ message: "Não autenticado" });
     }
 
-    // TEMPORARY: Bypass admin check for testing
-    // TODO: Remove this when login is re-enabled
-    // if (req.user.role !== "ADMIN") {
-    //   return res.status(403).json({ message: "Acesso não autorizado" });
-    // }
+    if (req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Acesso não autorizado" });
+    }
 
     try {
       const userId = parseInt(req.params.id);
@@ -414,11 +407,9 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ message: "Não autenticado" });
     }
 
-    // TEMPORARY: Bypass admin check for testing
-    // TODO: Remove this when login is re-enabled
-    // if (req.user.role !== "ADMIN") {
-    //   return res.status(403).json({ message: "Acesso não autorizado" });
-    // }
+    if (req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Acesso não autorizado" });
+    }
 
     try {
       const userId = parseInt(req.params.id);
@@ -445,11 +436,9 @@ export function setupAuth(app: Express) {
       return res.status(401).json({ message: "Não autenticado" });
     }
 
-    // TEMPORARY: Bypass admin check for testing
-    // TODO: Remove this when login is re-enabled
-    // if (req.user.role !== "ADMIN") {
-    //   return res.status(403).json({ message: "Acesso não autorizado" });
-    // }
+    if (req.user.role !== "ADMIN") {
+      return res.status(403).json({ message: "Acesso não autorizado" });
+    }
 
     try {
       const userId = parseInt(req.params.id);
