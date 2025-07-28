@@ -54,20 +54,69 @@ export function createMarkdownConverter() {
     return images;
   }
 
+  // Função para processar TextNodes com formatação
+  function processTextNode(textNode: any): string {
+    const text = textNode.getTextContent();
+    if (!text) return '';
+    
+    let formattedText = text;
+    
+    // Verificar se o TextNode tem formatação aplicada
+    if (textNode.hasFormat && typeof textNode.hasFormat === 'function') {
+      if (textNode.hasFormat('code')) {
+        formattedText = `\`${formattedText}\``;
+      } else {
+        // Aplicar formatações na ordem correta
+        if (textNode.hasFormat('bold')) {
+          formattedText = `**${formattedText}**`;
+        }
+        if (textNode.hasFormat('italic')) {
+          formattedText = `*${formattedText}*`;
+        }
+        if (textNode.hasFormat('strikethrough')) {
+          formattedText = `~~${formattedText}~~`;
+        }
+      }
+    }
+    
+    return formattedText;
+  }
+
+  // Função para processar children de um node e preservar formatação
+  function processChildrenWithFormatting(node: any): string {
+    if (!node.getChildren || typeof node.getChildren !== 'function') {
+      return node.getTextContent() || '';
+    }
+    
+    const children = node.getChildren();
+    let result = '';
+    
+    children.forEach((child: any) => {
+      if (child.getType() === 'text') {
+        result += processTextNode(child);
+      } else {
+        // Para outros tipos de nodes, processar recursivamente
+        result += processNode(child);
+      }
+    });
+    
+    return result;
+  }
+
   function processNode(node: any): string {
     let markdown = '';
 
     if (node.getType() === 'heading') {
       const level = node.getTag().replace('h', '');
-      const text = node.getTextContent();
+      const text = processChildrenWithFormatting(node);
       markdown += '#'.repeat(parseInt(level)) + ' ' + text + '\n\n';
     } else if (node.getType() === 'quote') {
-      const text = node.getTextContent();
+      const text = processChildrenWithFormatting(node);
       markdown += '> ' + text + '\n\n';
     } else if (node.getType() === 'list') {
       const items = node.getChildren();
       items.forEach((item: any, index: number) => {
-        const text = item.getTextContent();
+        const text = processChildrenWithFormatting(item);
         if (node.getListType() === 'bullet') {
           markdown += '- ' + text + '\n';
         } else {
@@ -79,7 +128,6 @@ export function createMarkdownConverter() {
       const text = node.getTextContent();
       markdown += '```\n' + text + '\n```\n\n';
     } else if (node.getType() === 'paragraph') {
-      const text = node.getTextContent();
       const paragraphImages = extractImagesRecursively(node);
       
       if (paragraphImages.length > 0) {
@@ -88,9 +136,10 @@ export function createMarkdownConverter() {
         });
       }
       
-      // Add text content if available and no images overlapping
-      if (text.trim() && paragraphImages.length === 0) {
-        markdown += text + '\n\n';
+      // Processar children para preservar formatação inline
+      const formattedText = processChildrenWithFormatting(node);
+      if (formattedText.trim() && paragraphImages.length === 0) {
+        markdown += formattedText + '\n\n';
       }
     } else if (node.getType() === 'image' || node.getType() === 'image-with-metadata') {
       const nodeImages = extractImagesRecursively(node);

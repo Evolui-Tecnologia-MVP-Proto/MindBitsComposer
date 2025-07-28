@@ -10,6 +10,19 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
+✓ COMPLETED: Fixed Lexical-to-Markdown Conversion for Inline Formatting (January 28, 2025)
+  - Fixed critical issue where bold, italic, strikethrough, and inline code formatting were not being generated in markdown/MDX output
+  - Implemented processTextNode function in markdown-converter.ts to detect and convert TextNode formatting
+  - Added processChildrenWithFormatting function to recursively process child nodes while preserving inline formatting
+  - Modified processNode function to use new formatting-aware processing for paragraphs, headings, quotes, and lists
+  - TextNodes with bold format now generate **text** in markdown
+  - TextNodes with italic format now generate *text* in markdown
+  - TextNodes with strikethrough format now generate ~~text~~ in markdown
+  - TextNodes with code format now generate `text` in markdown
+  - Fixed bidirectional markdown conversion - formatting now works both ways (markdown-to-Lexical and Lexical-to-markdown)
+  - Resolved text duplication issue where both formatted and unformatted versions appeared in editor
+  - Enhanced overlap detection in processInlineFormatting to prevent conflicts between formatting markers
+
 ✓ COMPLETED: Advanced Markdown-to-Lexical Conversion System with Full Formatting Support (January 28, 2025)
   - Enhanced automatic content population from md_file_old sections with complete markdown formatting preservation
   - Implemented createFormattedTextNodes function for inline formatting: **bold**, *italic*, ~~strikethrough~~, `code`
