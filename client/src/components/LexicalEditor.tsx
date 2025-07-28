@@ -966,16 +966,18 @@ interface LexicalEditorProps {
   viewMode?: 'editor' | 'preview' | 'mdx';
   initialEditorState?: string;
   markdownContent?: string;
+  mdFileOld?: string;
   isEnabled?: boolean;
 }
 
 // Componente principal do editor Lexical completo
-export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, onEditorInstanceChange, className = '', templateSections, viewMode = 'editor', initialEditorState, markdownContent: mdxContent = '', isEnabled = true }: LexicalEditorProps): JSX.Element {
+export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, onEditorInstanceChange, className = '', templateSections, viewMode = 'editor', initialEditorState, markdownContent: mdxContent = '', mdFileOld = '', isEnabled = true }: LexicalEditorProps): JSX.Element {
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [tableRows, setTableRows] = useState(2);
   const [tableColumns, setTableColumns] = useState(3);
   const [selectedTableKey, setSelectedTableKey] = useState<string | null>(null);
   const [selectedTableElement, setSelectedTableElement] = useState<HTMLTableElement | null>(null);
+  const [markdownViewMode, setMarkdownViewMode] = useState<'current' | 'old'>('current');
 
   // Função para excluir tabela selecionada
   const deleteSelectedTable = useCallback(() => {
@@ -1233,11 +1235,47 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                 <div className="max-w-4xl mx-auto">
                   <div className="bg-white dark:bg-[#1E293B] rounded-lg shadow-sm border border-gray-200 dark:border-[#374151] p-6">
                     <div className="mb-4 pb-3 border-b border-gray-200 dark:border-[#374151]">
-                      <h3 className="text-lg font-semibold text-gray-800 dark:text-[#E5E7EB]">Visualização Markdown</h3>
-                      <p className="text-sm text-gray-600 dark:text-[#9CA3AF] mt-1">Representação em markdown do conteúdo do editor</p>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-800 dark:text-[#E5E7EB]">Visualização Markdown</h3>
+                          <p className="text-sm text-gray-600 dark:text-[#9CA3AF] mt-1">
+                            {markdownViewMode === 'current' 
+                              ? 'Representação em markdown do conteúdo do editor'
+                              : 'Versão anterior do documento (backup)'}
+                          </p>
+                        </div>
+                        {mdFileOld && mdFileOld.trim() !== '' && (
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              onClick={() => setMarkdownViewMode('current')}
+                              variant={markdownViewMode === 'current' ? "default" : "outline"}
+                              size="sm"
+                              className={markdownViewMode === 'current' 
+                                ? "bg-blue-600 text-white hover:bg-blue-700" 
+                                : "border-gray-300 dark:border-[#374151] hover:bg-gray-50 dark:hover:bg-[#374151]"}
+                            >
+                              <Edit className="w-4 h-4 mr-1" />
+                              Atual
+                            </Button>
+                            <Button
+                              onClick={() => setMarkdownViewMode('old')}
+                              variant={markdownViewMode === 'old' ? "default" : "outline"}
+                              size="sm"
+                              className={markdownViewMode === 'old' 
+                                ? "bg-blue-600 text-white hover:bg-blue-700" 
+                                : "border-gray-300 dark:border-[#374151] hover:bg-gray-50 dark:hover:bg-[#374151]"}
+                            >
+                              <Eye className="w-4 h-4 mr-1" />
+                              Anterior
+                            </Button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed text-gray-900 dark:text-[#E5E7EB] bg-gray-50 dark:bg-[#1B2028] p-4 rounded-md border border-gray-300 dark:border-[#374151] overflow-x-auto">
-                      {currentMarkdown || '// Nenhum conteúdo para visualizar\n// Adicione texto no editor para ver a conversão markdown'}
+                      {markdownViewMode === 'current' 
+                        ? (currentMarkdown || '// Nenhum conteúdo para visualizar\n// Adicione texto no editor para ver a conversão markdown')
+                        : (mdFileOld || '// Nenhuma versão anterior disponível')}
                     </pre>
                   </div>
                 </div>

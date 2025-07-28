@@ -1784,6 +1784,7 @@ export default function LexicalPage() {
                   viewMode={viewMode}
                   initialEditorState={initialEditorState}
                   markdownContent={markdownContent}
+                  mdFileOld={selectedEdition?.mdFileOld || ''}
                   isEnabled={!!(currentDocumentId || selectedTemplate || selectedEdition || loadedFileName)}
                 />
               </CardContent>
