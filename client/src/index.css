@@ -73,6 +73,27 @@ body.dark .Collapsible__content {
   border-color: #374151 !important;
 }
 
+/* Header field input styling with rounded bottom-right corner */
+.header-field-input {
+  border-bottom-right-radius: 6px !important;
+  border-top-right-radius: 0px !important;
+  border-top-left-radius: 0px !important;
+  border-bottom-left-radius: 0px !important;
+}
+
+.header-field-container {
+  border-radius: 6px !important;
+}
+
+/* Force override for any conflicting styles */
+input.header-field-input,
+.header-field-input input {
+  border-bottom-right-radius: 6px !important;
+  border-top-right-radius: 0px !important;
+  border-top-left-radius: 0px !important;
+  border-bottom-left-radius: 0px !important;
+}
+
 /* NUCLEAR APPROACH: Remove all problematic ReactFlow CSS */
 .react-flow__attribution {
   display: none !important;
