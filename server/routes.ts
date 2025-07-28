@@ -5,7 +5,7 @@ import { storage } from "./storage";
 import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, templates, lexicalDocuments, insertLexicalDocumentSchema, specialties, insertSpecialtySchema, systemParams, insertSystemParamSchema } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
-import { eq, sql, desc, and, gte, lte, isNull, or, ne } from "drizzle-orm";
+import { eq, sql, desc, asc, and, gte, lte, isNull, or, ne } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { systemLogs } from "@shared/schema";
 import { ZodError } from "zod";
@@ -921,6 +921,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("❌ [API] Erro ao buscar especialidades do usuário:", error);
       res.status(500).send("Erro ao buscar especialidades do usuário");
+    }
+  });
+
+  // Get documents for review by responsible person
+  app.get("/api/documentos/review", async (req, res) => {
+    // if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { responsavel } = req.query;
+    
+    if (!responsavel) {
+      return res.status(400).send("Parâmetro 'responsavel' é obrigatório");
+    }
+    
+    try {
+      console.log("🔍 [API] Buscando documentos para revisão:", { responsavel });
+      
+      // Buscar documentos filtrados por responsável, origem e status
+      const documents = await db
+        .select()
+        .from(documentos)
+        .where(and(
+          eq(documentos.responsavel, responsavel as string),
+          eq(documentos.origem, "MindBits_CT"),
+          eq(documentos.status, "Integrado")
+        ))
+        .orderBy(asc(documentos.createdAt)); // Do mais antigo para o mais novo
+      
+      console.log("✅ [API] Documentos encontrados para revisão:", documents.length);
+      res.json(documents);
+    } catch (error: any) {
+      console.error("❌ [API] Erro ao buscar documentos para revisão:", error);
+      res.status(500).send("Erro ao buscar documentos para revisão");
     }
   });
 

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,9 +12,12 @@ import {
   Play
 } from "lucide-react";
 import { type Documento, type Specialty } from "@shared/schema";
+import { DocumentReviewModal } from "@/components/review/DocumentReviewModal";
 
 export default function HomePage() {
   const { user } = useAuth();
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [selectedResponsavel, setSelectedResponsavel] = useState<string>("");
 
   // Buscar todos os documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
@@ -189,8 +193,8 @@ export default function HomePage() {
                         }`}
                         onClick={() => {
                           if (isUserResponsibleForSpecialty(responsavel)) {
-                            console.log(`Iniciando revisão para: ${responsavel}`);
-                            // TODO: Implementar lógica de iniciar revisão
+                            setSelectedResponsavel(responsavel);
+                            setReviewModalOpen(true);
                           }
                         }}
                       >
@@ -206,6 +210,13 @@ export default function HomePage() {
         )}
 
       </div>
+
+      {/* Modal de Revisão */}
+      <DocumentReviewModal
+        isOpen={reviewModalOpen}
+        onClose={() => setReviewModalOpen(false)}
+        responsavel={selectedResponsavel}
+      />
     </div>
   );
 }
