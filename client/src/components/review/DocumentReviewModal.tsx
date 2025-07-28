@@ -182,16 +182,6 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
                         </div>
                       </div>
                     </CardHeader>
-                    
-                    {documento.descricao && (
-                      <CardContent className="pt-0">
-                        <div className="bg-white dark:bg-[#1E293B] rounded p-3 border border-gray-200 dark:border-[#374151]">
-                          <p className="text-sm text-gray-700 dark:text-gray-300 line-clamp-2">
-                            {documento.descricao}
-                          </p>
-                        </div>
-                      </CardContent>
-                    )}
                   </Card>
                 ))}
               </div>
