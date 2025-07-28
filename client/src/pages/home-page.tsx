@@ -5,7 +5,8 @@ import {
   BookOpen, 
   Clock, 
   CheckCircle2, 
-  AlertCircle
+  AlertCircle,
+  User
 } from "lucide-react";
 import { type Documento } from "@shared/schema";
 
@@ -29,6 +30,18 @@ export default function HomePage() {
   const documentosPublicados = documentos.filter(doc => 
     doc.status === "Concluido"
   ).length;
+
+  // Calcular documentos MindBits_CT Integrados agrupados por responsável
+  const documentosMindBitsIntegrados = documentos.filter(doc => 
+    doc.origem === "MindBits_CT" && doc.status === "Integrado"
+  );
+
+  // Agrupar por responsável
+  const documentosPorResponsavel = documentosMindBitsIntegrados.reduce((acc, doc) => {
+    const responsavel = doc.responsavel || "Sem responsável";
+    acc[responsavel] = (acc[responsavel] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
 
 
@@ -111,6 +124,40 @@ export default function HomePage() {
           </div>
         </div>
 
+        {/* Documentos MindBits_CT Integrados por Responsável */}
+        {Object.keys(documentosPorResponsavel).length > 0 && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                Documentos MindBits_CT - Integrados por Responsável
+              </h2>
+            </div>
+            
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {Object.entries(documentosPorResponsavel)
+                .sort(([, a], [, b]) => b - a) // Ordenar por quantidade (decrescente)
+                .map(([responsavel, quantidade]) => (
+                <Card key={responsavel} className="bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151]">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300 truncate">
+                      {responsavel}
+                    </CardTitle>
+                    <CheckCircle2 className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                      {quantidade}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {quantidade === 1 ? "documento integrado" : "documentos integrados"}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
       </div>
     </div>
