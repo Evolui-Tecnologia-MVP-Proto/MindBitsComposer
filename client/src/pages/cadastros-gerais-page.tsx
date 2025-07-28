@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Database, Building, Users, Tags, MapPin, Phone } from "lucide-react";
+import { Database, Building, Users, Tags, MapPin, Phone, GraduationCap } from "lucide-react";
+import { SpecialtiesTab } from "@/components/specialties/SpecialtiesTab";
 
 export default function CadastrosGeraisPage() {
   return (
@@ -22,35 +23,17 @@ export default function CadastrosGeraisPage() {
           </div>
 
           {/* Tabs */}
-          <Tabs defaultValue="empresas" className="space-y-4">
+          <Tabs defaultValue="especialidades" className="space-y-4">
             <TabsList className="grid w-full grid-cols-5 dark:bg-[#0F172A]">
-              <TabsTrigger value="empresas">Empresas</TabsTrigger>
+              <TabsTrigger value="especialidades">Áreas de Especialidade</TabsTrigger>
               <TabsTrigger value="clientes">Clientes</TabsTrigger>
               <TabsTrigger value="categorias">Categorias</TabsTrigger>
               <TabsTrigger value="localizacoes">Localizações</TabsTrigger>
               <TabsTrigger value="contatos">Contatos</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="empresas" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center gap-2">
-                    <Building className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    <CardTitle>Empresas</CardTitle>
-                  </div>
-                  <CardDescription>
-                    Cadastro e gerenciamento de empresas
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8">
-                    <Building className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 dark:text-gray-400">
-                      Funcionalidade em desenvolvimento
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+            <TabsContent value="especialidades" className="space-y-4">
+              <SpecialtiesTab />
             </TabsContent>
 
             <TabsContent value="clientes" className="space-y-4">

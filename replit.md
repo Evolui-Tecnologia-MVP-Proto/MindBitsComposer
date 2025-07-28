@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
+✓ Implemented complete "Áreas de Especialidade" (Areas of Expertise) CRUD system (January 28, 2025)
+  - Replaced "Empresas" tab with "Áreas de Especialidade" in cadastros gerais page
+  - Created specialties table in PostgreSQL with UUID primary key, unique code constraint, name, and description fields
+  - Added comprehensive CRUD operations in DatabaseStorage with proper error handling
+  - Implemented full REST API endpoints: GET, POST, PATCH, DELETE /api/specialties with authentication
+  - Created SpecialtiesTab component with complete table listing, filtering, and actions
+  - Built SpecialtyModal for create/edit operations with form validation
+  - Applied consistent dark mode theming following established design system patterns
+  - Added proper TypeScript types and Zod validation schemas
+  - Integrated with existing query client and toast notification system
+  - Includes confirmation dialogs for delete operations and comprehensive error handling
+
 ✓ Temporarily disabled authentication requirements for easier application testing (January 28, 2025)
   - Activated comprehensive authentication bypass for development/testing
   - Removed NODE_ENV dependency for bypass activation

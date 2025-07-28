@@ -1,4 +1,4 @@
-import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos, documentsArtifacts, globalAssets, repoStructure, systemLogs, documentEditions, genericTables,
+import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos, documentsArtifacts, globalAssets, repoStructure, systemLogs, documentEditions, genericTables, specialties,
   type User, type InsertUser, type Template, type InsertTemplate, 
   type MondayMapping, type InsertMondayMapping, type MondayColumn, type InsertMondayColumn, 
   type MappingColumn, type InsertMappingColumn, type ServiceConnection, type InsertServiceConnection,
@@ -6,7 +6,7 @@ import { users, templates, mondayMappings, mondayColumns, mappingColumns, servic
   type DocumentArtifact, type InsertDocumentArtifact, type GlobalAsset, type InsertGlobalAsset,
   type RepoStructure, type InsertRepoStructure,
   type SystemLog, type InsertSystemLog, type DocumentEdition, type InsertDocumentEdition,
-  type GenericTable, type InsertGenericTable,
+  type GenericTable, type InsertGenericTable, type Specialty, type InsertSpecialty,
   UserStatus, UserRole, TemplateType, PluginStatus, PluginType } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, isNull, sql } from "drizzle-orm";
@@ -140,6 +140,14 @@ export interface IStorage {
   
   // Generic Table operations
   getGenericTableByName(name: string): Promise<GenericTable | undefined>;
+  
+  // Specialty operations
+  getSpecialty(id: string): Promise<Specialty | undefined>;
+  getSpecialtyByCode(code: string): Promise<Specialty | undefined>;
+  createSpecialty(specialty: InsertSpecialty): Promise<Specialty>;
+  getAllSpecialties(): Promise<Specialty[]>;
+  updateSpecialty(id: string, data: Partial<Specialty>): Promise<Specialty>;
+  deleteSpecialty(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1876,6 +1884,52 @@ export class MemStorage implements IStorage {
       console.error("❌ [Storage] Erro ao buscar tabela genérica:", error);
       throw error;
     }
+  }
+
+  // Specialty operations
+  async getSpecialty(id: string): Promise<Specialty | undefined> {
+    const [specialty] = await db.select().from(specialties).where(eq(specialties.id, id));
+    return specialty || undefined;
+  }
+
+  async getSpecialtyByCode(code: string): Promise<Specialty | undefined> {
+    const [specialty] = await db.select().from(specialties).where(eq(specialties.code, code));
+    return specialty || undefined;
+  }
+
+  async createSpecialty(specialtyData: InsertSpecialty): Promise<Specialty> {
+    const [specialty] = await db
+      .insert(specialties)
+      .values(specialtyData)
+      .returning();
+    return specialty;
+  }
+
+  async getAllSpecialties(): Promise<Specialty[]> {
+    return await db.select().from(specialties).orderBy(specialties.name);
+  }
+
+  async updateSpecialty(id: string, data: Partial<Specialty>): Promise<Specialty> {
+    const [updatedSpecialty] = await db
+      .update(specialties)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(specialties.id, id))
+      .returning();
+    
+    if (!updatedSpecialty) {
+      throw new Error("Área de especialidade não encontrada");
+    }
+    
+    return updatedSpecialty;
+  }
+
+  async deleteSpecialty(id: string): Promise<void> {
+    await db
+      .delete(specialties)
+      .where(eq(specialties.id, id));
   }
 
 }

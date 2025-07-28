@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, templates, lexicalDocuments, insertLexicalDocumentSchema } from "@shared/schema";
+import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, templates, lexicalDocuments, insertLexicalDocumentSchema, specialties, insertSpecialtySchema } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc, and, gte, lte, isNull, or, ne } from "drizzle-orm";
@@ -720,6 +720,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erro ao excluir template:", error);
       res.status(500).send("Erro ao excluir template");
+    }
+  });
+
+  // Specialty routes
+  // Get all specialties
+  app.get("/api/specialties", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const specialties = await storage.getAllSpecialties();
+      res.json(specialties);
+    } catch (error) {
+      console.error("Erro ao buscar especialidades:", error);
+      res.status(500).send("Erro ao buscar especialidades");
+    }
+  });
+  
+  // Get specialty by ID
+  app.get("/api/specialties/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      const specialty = await storage.getSpecialty(id);
+      if (!specialty) {
+        return res.status(404).send("Especialidade não encontrada");
+      }
+      res.json(specialty);
+    } catch (error) {
+      console.error("Erro ao buscar especialidade:", error);
+      res.status(500).send("Erro ao buscar especialidade");
+    }
+  });
+  
+  // Create specialty
+  app.post("/api/specialties", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const specialtyData = insertSpecialtySchema.parse(req.body);
+      
+      // Verificar se já existe especialidade com o mesmo código
+      const existingSpecialty = await storage.getSpecialtyByCode(specialtyData.code);
+      if (existingSpecialty) {
+        return res.status(400).send("Já existe uma especialidade com este código");
+      }
+      
+      const newSpecialty = await storage.createSpecialty(specialtyData);
+      res.status(201).json(newSpecialty);
+    } catch (error: any) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({ 
+          message: "Dados inválidos", 
+          errors: error.errors 
+        });
+      }
+      console.error("Erro ao criar especialidade:", error);
+      res.status(500).send("Erro ao criar especialidade");
+    }
+  });
+  
+  // Update specialty
+  app.patch("/api/specialties/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      // Verificar se a especialidade existe
+      const existingSpecialty = await storage.getSpecialty(id);
+      if (!existingSpecialty) {
+        return res.status(404).send("Especialidade não encontrada");
+      }
+      
+      // Se o código estiver sendo alterado, verificar duplicidade
+      if (req.body.code && req.body.code !== existingSpecialty.code) {
+        const specialtyWithCode = await storage.getSpecialtyByCode(req.body.code);
+        if (specialtyWithCode && specialtyWithCode.id !== id) {
+          return res.status(400).send("Já existe uma especialidade com este código");
+        }
+      }
+      
+      const updatedSpecialty = await storage.updateSpecialty(id, req.body);
+      res.json(updatedSpecialty);
+    } catch (error) {
+      console.error("Erro ao atualizar especialidade:", error);
+      res.status(500).send("Erro ao atualizar especialidade");
+    }
+  });
+  
+  // Delete specialty
+  app.delete("/api/specialties/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      // Verificar se a especialidade existe
+      const existingSpecialty = await storage.getSpecialty(id);
+      if (!existingSpecialty) {
+        return res.status(404).send("Especialidade não encontrada");
+      }
+      
+      await storage.deleteSpecialty(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Erro ao excluir especialidade:", error);
+      res.status(500).send("Erro ao excluir especialidade");
     }
   });
 

@@ -486,3 +486,23 @@ export const insertGenericTableSchema = createInsertSchema(genericTables).omit({
 
 export type InsertGenericTable = z.infer<typeof insertGenericTableSchema>;
 export type GenericTable = typeof genericTables.$inferSelect;
+
+// Specialties table for "Áreas de Especialidade"
+export const specialties = pgTable("specialties", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  code: text("code").notNull().unique(),
+  name: text("name").notNull(),
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Specialties schema
+export const insertSpecialtySchema = createInsertSchema(specialties).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertSpecialty = z.infer<typeof insertSpecialtySchema>;
+export type Specialty = typeof specialties.$inferSelect;
