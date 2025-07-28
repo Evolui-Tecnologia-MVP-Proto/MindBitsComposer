@@ -158,7 +158,7 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
   };
 
   return (
-    <div className="flex items-center mb-3 border border-gray-300 dark:border-[#374151] rounded-md overflow-hidden">
+    <div className="flex items-center mb-3 border border-gray-300 dark:border-[#374151] rounded-md overflow-hidden" style={{ borderRadius: '6px' }}>
       <div 
         className="px-4 py-2 text-sm font-medium text-white min-w-[120px] flex-shrink-0 border-r border-white"
         style={{ backgroundColor: '#111827' }}
@@ -173,7 +173,12 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
                    bg-white dark:bg-[#0F172A] text-gray-900 dark:text-gray-200
                    focus:ring-0 focus:border-0
                    lexical-header-field"
-        style={{ borderBottomRightRadius: '6px' }}
+        style={{ 
+          borderBottomRightRadius: '6px !important',
+          borderTopRightRadius: '0px !important',
+          borderTopLeftRadius: '0px !important',
+          borderBottomLeftRadius: '0px !important'
+        }}
         placeholder={node.__placeholder}
       />
     </div>
