@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
+✓ COMPLETED: User ID Association During Documentation Process (January 28, 2025)
+  - Enhanced /api/documentos/start-documentation endpoint to populate documentos.user_id field with logged user ID
+  - Modified updateDocumento call to include userId: req.user.id alongside status: "Em Processo"
+  - Added comprehensive logging to track user association during documentation initiation
+  - Enables proper user tracking and ownership of documentation workflows
+  - Leverages existing optional user_id foreign key column in documentos table
+
 ✓ COMPLETED: Updated "Iniciar Revisão" Button to Show Selected Items Count (January 28, 2025)
   - Modified DocumentReviewModal button to display count of selected documents instead of total listed documents
   - Button now shows "Iniciar Revisão (N)" where N is the number of checked/selected documents

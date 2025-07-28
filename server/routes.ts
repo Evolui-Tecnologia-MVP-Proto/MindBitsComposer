@@ -2995,12 +2995,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
         .returning();
 
-      console.log("Atualizando status do documento para 'Em Processo'");
-      // Atualizar status do documento para "Em Processo"
+      console.log("Atualizando status do documento para 'Em Processo' e associando ao usuário");
+      // Atualizar status do documento para "Em Processo" e associar ao usuário logado
       const updatedDocument = await storage.updateDocumento(documentId, { 
-        status: "Em Processo"
+        status: "Em Processo",
+        userId: req.user.id
       });
-      console.log("Documento atualizado com sucesso");
+      console.log("Documento atualizado com sucesso - Status: Em Processo, Usuário:", req.user?.name);
 
       // Log da ação
       console.log(`Documentação iniciada para documento ${documentId} com fluxo ${flowId} pelo usuário ${req.user?.name}`);
