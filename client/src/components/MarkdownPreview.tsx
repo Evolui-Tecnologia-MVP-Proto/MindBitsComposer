@@ -421,11 +421,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
       };
       
       // Render the HTML table directly
-      elements.push(
-        <div key={elements.length} className="overflow-x-auto mb-4">
-          {processHtmlTableContent(tableHtml)}
-        </div>
-      );
+      elements.push(processHtmlTableContent(tableHtml));
       
       htmlTableContent = [];
     }
