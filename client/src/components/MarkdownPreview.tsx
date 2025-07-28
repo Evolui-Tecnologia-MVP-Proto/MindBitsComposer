@@ -66,33 +66,33 @@ function MermaidDiagram({ chart }: { chart: string }) {
 
 // Custom components for MDX rendering
 const mdxComponents = {
-  h1: (props: any) => <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-[#E5E7EB] border-b border-gray-200 dark:border-[#374151] pb-3" {...props} />,
-  h2: (props: any) => <h2 className="text-2xl font-semibold mb-4 text-gray-800 dark:text-[#E5E7EB] mt-8" {...props} />,
-  h3: (props: any) => <h3 className="text-xl font-medium mb-3 text-gray-700 dark:text-[#D1D5DB] mt-6" {...props} />,
-  h4: (props: any) => <h4 className="text-lg font-medium mb-2 text-gray-700 dark:text-[#D1D5DB] mt-4" {...props} />,
-  h5: (props: any) => <h5 className="text-base font-medium mb-2 text-gray-600 dark:text-[#9CA3AF] mt-3" {...props} />,
-  h6: (props: any) => <h6 className="text-sm font-medium mb-2 text-gray-600 dark:text-[#9CA3AF] mt-2" {...props} />,
-  p: (props: any) => <p className="mb-4 leading-relaxed text-gray-700 dark:text-[#D1D5DB]" {...props} />,
+  h1: (props: any) => <h1 className="text-3xl font-bold mb-6 text-black dark:text-white border-b border-gray-200 dark:border-[#374151] pb-3" {...props} />,
+  h2: (props: any) => <h2 className="text-2xl font-semibold mb-4 text-black dark:text-white mt-8" {...props} />,
+  h3: (props: any) => <h3 className="text-xl font-medium mb-3 text-black dark:text-white mt-6" {...props} />,
+  h4: (props: any) => <h4 className="text-lg font-medium mb-2 text-black dark:text-white mt-4" {...props} />,
+  h5: (props: any) => <h5 className="text-base font-medium mb-2 text-black dark:text-white mt-3" {...props} />,
+  h6: (props: any) => <h6 className="text-sm font-medium mb-2 text-black dark:text-white mt-2" {...props} />,
+  p: (props: any) => <p className="mb-4 leading-relaxed text-black dark:text-white" {...props} />,
   ul: (props: any) => <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />,
   ol: (props: any) => <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />,
-  li: (props: any) => <li className="text-gray-700 dark:text-[#D1D5DB]" {...props} />,
+  li: (props: any) => <li className="text-black dark:text-white" {...props} />,
   blockquote: (props: any) => (
-    <blockquote className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 py-2 mb-4 bg-gray-50 dark:bg-[#1E293B] italic text-gray-600 dark:text-[#9CA3AF]" {...props} />
+    <blockquote className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 py-2 mb-4 bg-gray-50 dark:bg-[#1E293B] italic text-black dark:text-white" {...props} />
   ),
   code: (props: any) => {
     // Inline code
     if (!props.className) {
-      return <code className="bg-gray-100 dark:bg-[#1E293B] text-gray-800 dark:text-[#E5E7EB] px-2 py-1 rounded text-sm font-mono" {...props} />;
+      return <code className="bg-gray-100 dark:bg-[#1E293B] text-black dark:text-white px-2 py-1 rounded text-sm font-mono" {...props} />;
     }
     // Block code
     return (
-      <pre className="bg-gray-900 dark:bg-[#111827] text-gray-100 dark:text-gray-300 p-4 rounded-lg mb-4 overflow-x-auto">
-        <code className="text-sm font-mono" {...props} />
+      <pre className="bg-gray-900 dark:bg-[#111827] text-white p-4 rounded-lg mb-4 overflow-x-auto">
+        <code className="text-sm font-mono text-white" {...props} />
       </pre>
     );
   },
   pre: (props: any) => (
-    <pre className="bg-gray-900 dark:bg-[#111827] text-gray-100 dark:text-gray-300 p-4 rounded-lg mb-4 overflow-x-auto" {...props} />
+    <pre className="bg-gray-900 dark:bg-[#111827] text-white p-4 rounded-lg mb-4 overflow-x-auto" {...props} />
   ),
   table: (props: any) => (
     <div className="overflow-x-auto mb-4">
@@ -103,20 +103,20 @@ const mdxComponents = {
   tbody: (props: any) => <tbody className="divide-y divide-gray-200 dark:divide-[#374151]" {...props} />,
   tr: (props: any) => <tr className="hover:bg-gray-50 dark:hover:bg-[#1E293B]" {...props} />,
   th: (props: any) => (
-    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-[#9CA3AF] uppercase tracking-wider border-b border-gray-300 dark:border-[#374151] bg-gray-50 dark:bg-[#1B2028]" {...props} />
+    <th className="px-4 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider border-b border-gray-300 dark:border-[#374151] bg-gray-50 dark:bg-[#1B2028]" {...props} />
   ),
-  td: (props: any) => <td className="px-4 py-3 text-sm text-gray-700 dark:text-[#D1D5DB] border-b border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1B2028]" {...props} />,
+  td: (props: any) => <td className="px-4 py-3 text-sm text-black dark:text-white border-b border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1B2028]" {...props} />,
   a: (props: any) => <a className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline" {...props} />,
   img: (props: any) => <img className="max-w-full h-auto rounded-lg shadow-sm mb-4" {...props} />,
   hr: (props: any) => <hr className="my-8 border-gray-300 dark:border-[#374151]" {...props} />,
-  strong: (props: any) => <strong className="font-semibold text-gray-900 dark:text-[#E5E7EB]" {...props} />,
-  em: (props: any) => <em className="italic text-gray-700 dark:text-[#D1D5DB]" {...props} />,
+  strong: (props: any) => <strong className="font-semibold text-black dark:text-white" {...props} />,
+  em: (props: any) => <em className="italic text-black dark:text-white" {...props} />,
   // Collapsible containers (details/summary elements)
   details: (props: any) => (
     <details className="mb-4 border border-gray-300 dark:border-[#374151] rounded-lg bg-white dark:bg-[#020203] overflow-hidden" {...props} />
   ),
   summary: (props: any) => (
-    <summary className="px-4 py-3 bg-gray-50 dark:bg-[#1E293B] border-b border-gray-300 dark:border-[#374151] cursor-pointer hover:bg-gray-100 dark:hover:bg-[#374151] font-medium text-gray-900 dark:text-[#FFFFFF] select-none" {...props} />
+    <summary className="px-4 py-3 bg-gray-50 dark:bg-[#1E293B] border-b border-gray-300 dark:border-[#374151] cursor-pointer hover:bg-gray-100 dark:hover:bg-[#374151] font-medium text-black dark:text-white select-none" {...props} />
   ),
 };
 
@@ -541,7 +541,26 @@ export default function MarkdownPreview({ content, className = '' }: MarkdownPre
             .markdown-preview table tbody td {
               vertical-align: top !important;
             }
-            /* Force white text for all content inside details elements in dark mode */
+            /* Force consistent text colors for all content */
+            .markdown-preview,
+            .markdown-preview *:not(img):not(svg):not(path):not(circle):not(rect) {
+              color: #000000 !important;
+            }
+            .dark .markdown-preview,
+            .dark .markdown-preview *:not(img):not(svg):not(path):not(circle):not(rect) {
+              color: #FFFFFF !important;
+            }
+            /* Force text colors for all content inside details elements */
+            .markdown-preview details,
+            .markdown-preview details *,
+            .markdown-preview details p,
+            .markdown-preview details span,
+            .markdown-preview details div,
+            .markdown-preview details li,
+            .markdown-preview details strong,
+            .markdown-preview details em {
+              color: #000000 !important;
+            }
             .dark .markdown-preview details,
             .dark .markdown-preview details *,
             .dark .markdown-preview details p,
@@ -552,12 +571,21 @@ export default function MarkdownPreview({ content, className = '' }: MarkdownPre
             .dark .markdown-preview details em {
               color: #FFFFFF !important;
             }
-            /* Ensure summary text is white in dark mode */
+            /* Ensure summary text follows the theme */
+            .markdown-preview summary,
+            .markdown-preview summary * {
+              color: #000000 !important;
+            }
             .dark .markdown-preview summary,
             .dark .markdown-preview summary * {
               color: #FFFFFF !important;
             }
             /* Content inside details should have proper background and padding */
+            .markdown-preview details > *:not(summary) {
+              padding: 16px !important;
+              background-color: white !important;
+              color: #000000 !important;
+            }
             .dark .markdown-preview details > *:not(summary) {
               padding: 16px !important;
               background-color: #020203 !important;
