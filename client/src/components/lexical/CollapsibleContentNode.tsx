@@ -56,10 +56,6 @@ export class CollapsibleContentNode extends ElementNode {
       'text-gray-900',
       'dark:text-white'
     );
-    
-    // Não adicionar nenhum event listener ou configuração específica
-    console.log('🔍 CONTENT: DOM criado para CollapsibleContent - simplificado');
-    
     return dom;
   }
 
@@ -78,29 +74,7 @@ export class CollapsibleContentNode extends ElementNode {
   }
 
   isShadowRoot(): boolean {
-    return false;
-  }
-  
-  // Garantir que seja um container editável padrão
-  isInline(): boolean {
-    return false;
-  }
-  
-  canBeEmpty(): boolean {
     return true;
-  }
-  
-  canIndent(): boolean {
-    return false;
-  }
-  
-  // Garantir que aceite seleção e foco
-  canInsertTextBefore(): boolean {
-    return false;
-  }
-  
-  canInsertTextAfter(): boolean {
-    return false;
   }
 
   exportDOM(): DOMExportOutput {

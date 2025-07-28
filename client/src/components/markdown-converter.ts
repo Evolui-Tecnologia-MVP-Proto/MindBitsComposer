@@ -54,71 +54,20 @@ export function createMarkdownConverter() {
     return images;
   }
 
-  // Função para processar TextNodes com formatação
-  function processTextNode(node: any): string {
-    if (node.getType() !== 'text') {
-      return node.getTextContent() || '';
-    }
-    
-    let text = node.getTextContent();
-    
-    // Verificar formatação aplicada ao TextNode
-    if (node.hasFormat) {
-      if (node.hasFormat('bold')) {
-        text = `**${text}**`;
-      }
-      if (node.hasFormat('italic')) {
-        text = `*${text}*`;
-      }
-      if (node.hasFormat('strikethrough')) {
-        text = `~~${text}~~`;
-      }
-      if (node.hasFormat('underline')) {
-        text = `__${text}__`;
-      }
-      if (node.hasFormat('code')) {
-        text = `\`${text}\``;
-      }
-    }
-    
-    return text;
-  }
-
-  // Função para processar children de um node e manter formatação
-  function processChildrenWithFormatting(node: any): string {
-    if (!node.getChildren) {
-      return node.getTextContent() || '';
-    }
-    
-    const children = node.getChildren();
-    let result = '';
-    
-    children.forEach((child: any) => {
-      if (child.getType() === 'text') {
-        result += processTextNode(child);
-      } else {
-        // Para outros tipos de nodes, processar recursivamente
-        result += processChildrenWithFormatting(child);
-      }
-    });
-    
-    return result;
-  }
-
   function processNode(node: any): string {
     let markdown = '';
 
     if (node.getType() === 'heading') {
       const level = node.getTag().replace('h', '');
-      const text = processChildrenWithFormatting(node);
+      const text = node.getTextContent();
       markdown += '#'.repeat(parseInt(level)) + ' ' + text + '\n\n';
     } else if (node.getType() === 'quote') {
-      const text = processChildrenWithFormatting(node);
+      const text = node.getTextContent();
       markdown += '> ' + text + '\n\n';
     } else if (node.getType() === 'list') {
       const items = node.getChildren();
       items.forEach((item: any, index: number) => {
-        const text = processChildrenWithFormatting(item);
+        const text = item.getTextContent();
         if (node.getListType() === 'bullet') {
           markdown += '- ' + text + '\n';
         } else {
@@ -130,6 +79,7 @@ export function createMarkdownConverter() {
       const text = node.getTextContent();
       markdown += '```\n' + text + '\n```\n\n';
     } else if (node.getType() === 'paragraph') {
+      const text = node.getTextContent();
       const paragraphImages = extractImagesRecursively(node);
       
       if (paragraphImages.length > 0) {
@@ -138,10 +88,9 @@ export function createMarkdownConverter() {
         });
       }
       
-      // Processar children para manter formatação
-      const formattedText = processChildrenWithFormatting(node);
-      if (formattedText.trim() && paragraphImages.length === 0) {
-        markdown += formattedText + '\n\n';
+      // Add text content if available and no images overlapping
+      if (text.trim() && paragraphImages.length === 0) {
+        markdown += text + '\n\n';
       }
     } else if (node.getType() === 'image' || node.getType() === 'image-with-metadata') {
       const nodeImages = extractImagesRecursively(node);

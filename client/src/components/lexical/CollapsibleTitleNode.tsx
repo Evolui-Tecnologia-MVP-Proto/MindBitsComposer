@@ -39,9 +39,9 @@ export class CollapsibleTitleNode extends TextNode {
     super(text, key);
   }
 
-  // Permitir funcionalidade normal mas proteger conteúdo
+  // Tornar o nó somente leitura
   isToken(): boolean {
-    return false;
+    return true;
   }
 
   canInsertTextBefore(): boolean {
@@ -53,12 +53,12 @@ export class CollapsibleTitleNode extends TextNode {
   }
 
   isTextEntity(): boolean {
-    return false;
+    return true;
   }
 
-  // Permitir seleção mas não edição direta
+  // Prevenir seleção e edição
   isSelectable(): boolean {
-    return true;
+    return false;
   }
 
   // Preservar o texto durante transformações
@@ -67,7 +67,7 @@ export class CollapsibleTitleNode extends TextNode {
   }
 
   createDOM(config: EditorConfig): HTMLElement {
-    const dom = document.createElement('div');
+    const dom = document.createElement('summary');
     dom.classList.add(
       'Collapsible__title',
       'font-semibold',
@@ -78,13 +78,10 @@ export class CollapsibleTitleNode extends TextNode {
       'dark:hover:text-blue-400',
       'flex',
       'items-center',
-      'p-2',
-      'border-b',
-      'border-gray-200',
-      'dark:border-gray-600'
+      'p-2'
     );
     
-    // Tornar título não editável
+    // Tornar não editável
     dom.contentEditable = 'false';
     dom.setAttribute('data-lexical-editor', 'false');
     
@@ -99,11 +96,6 @@ export class CollapsibleTitleNode extends TextNode {
     textSpan.textContent = this.getTextContent();
     dom.appendChild(textSpan);
 
-    // Debug logs simplificados
-    dom.addEventListener('click', (e) => {
-      console.log('🔍 TITLE: Click no título (div)');
-    });
-
     return dom;
   }
 
@@ -117,15 +109,10 @@ export class CollapsibleTitleNode extends TextNode {
 
   static importDOM(): DOMConversionMap | null {
     return {
-      div: (domNode: HTMLElement) => {
-        if (domNode.classList.contains('Collapsible__title')) {
-          return {
-            conversion: $convertCollapsibleTitleElement,
-            priority: 1,
-          };
-        }
-        return null;
-      },
+      summary: () => ({
+        conversion: $convertCollapsibleTitleElement,
+        priority: 1,
+      }),
     };
   }
 
@@ -142,7 +129,7 @@ export class CollapsibleTitleNode extends TextNode {
   }
 
   exportDOM(): DOMExportOutput {
-    const element = document.createElement('div');
+    const element = document.createElement('summary');
     element.classList.add('Collapsible__title');
     element.textContent = this.getTextContent();
     return { element };

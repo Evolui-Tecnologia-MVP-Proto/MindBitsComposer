@@ -27,7 +27,7 @@ export type SerializedCollapsibleContainerNode = Spread<
 export function $convertCollapsibleContainerElement(
   domNode: HTMLElement,
 ): DOMConversionOutput | null {
-  const isOpen = domNode.getAttribute('data-open') === 'true';
+  const isOpen = domNode.hasAttribute('open');
   const node = $createCollapsibleContainerNode(isOpen);
   return {
     node,
@@ -51,7 +51,7 @@ export class CollapsibleContainerNode extends ElementNode {
   }
 
   createDOM(config: EditorConfig): HTMLElement {
-    const dom = document.createElement('div');
+    const dom = document.createElement('details');
     dom.classList.add(
       'Collapsible__container',
       'p-4',
@@ -63,29 +63,14 @@ export class CollapsibleContainerNode extends ElementNode {
       'bg-gray-50',
       'dark:bg-[#111827]'
     );
-    
-    // Adicionar atributo para controlar estado aberto/fechado
-    if (this.__open) {
-      dom.setAttribute('data-open', 'true');
-    } else {
-      dom.setAttribute('data-open', 'false');
-    }
-
-    // Debug logs para container
-    dom.addEventListener('click', (e) => {
-      console.log('🔍 CONTAINER: Click no container div', e.target);
-    });
+    dom.open = this.__open;
 
     return dom;
   }
 
   updateDOM(prevNode: CollapsibleContainerNode, dom: HTMLElement): boolean {
     if (prevNode.__open !== this.__open) {
-      if (this.__open) {
-        dom.setAttribute('data-open', 'true');
-      } else {
-        dom.setAttribute('data-open', 'false');
-      }
+      (dom as HTMLDetailsElement).open = this.__open;
     }
 
     return false;
@@ -93,14 +78,11 @@ export class CollapsibleContainerNode extends ElementNode {
 
   static importDOM(): DOMConversionMap | null {
     return {
-      div: (domNode: HTMLElement) => {
-        if (domNode.classList.contains('Collapsible__container')) {
-          return {
-            conversion: $convertCollapsibleContainerElement,
-            priority: 1,
-          };
-        }
-        return null;
+      details: (domNode: HTMLElement) => {
+        return {
+          conversion: $convertCollapsibleContainerElement,
+          priority: 1,
+        };
       },
     };
   }

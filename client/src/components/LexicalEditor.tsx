@@ -808,7 +808,6 @@ function processInlineFormatting(text: string): any[] {
     { regex: /`([^`]+)`/g, format: 'code' },
     { regex: /\*\*(.*?)\*\*/g, format: 'bold' },
     { regex: /~~(.*?)~~/g, format: 'strikethrough' },
-    { regex: /__(.*?)__/g, format: 'underline' },
     { regex: /\*(.*?)\*/g, format: 'italic' }
   ];
   
@@ -816,15 +815,15 @@ function processInlineFormatting(text: string): any[] {
   const matches: Array<{start: number, end: number, text: string, format: string}> = [];
   
   markers.forEach(marker => {
-    let match: RegExpExecArray | null;
+    let match;
     // Reset regex para garantir que começamos do início
     marker.regex.lastIndex = 0;
     while ((match = marker.regex.exec(text)) !== null) {
       // Verificar se este match não sobrepõe com matches existentes
       const overlaps = matches.some(existingMatch => 
-        (match!.index >= existingMatch.start && match!.index < existingMatch.end) ||
-        (match!.index + match![0].length > existingMatch.start && match!.index + match![0].length <= existingMatch.end) ||
-        (match!.index <= existingMatch.start && match!.index + match![0].length >= existingMatch.end)
+        (match.index >= existingMatch.start && match.index < existingMatch.end) ||
+        (match.index + match[0].length > existingMatch.start && match.index + match[0].length <= existingMatch.end) ||
+        (match.index <= existingMatch.start && match.index + match[0].length >= existingMatch.end)
       );
       
       if (!overlaps) {
@@ -862,6 +861,7 @@ function processInlineFormatting(text: string): any[] {
     // Criar node formatado
     const formattedNode = $createTextNode(match.text);
     formattedNode.setFormat(match.format as any);
+    console.log(`🔧 Aplicando formatação: "${match.format}" ao texto: "${match.text}"`);
     result.push(formattedNode);
     
     lastEnd = match.end;
@@ -880,27 +880,14 @@ function processInlineFormatting(text: string): any[] {
 
 // Função para converter conteúdo markdown em nodes Lexical completos
 function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
-  const lines = markdownContent.split('\n').filter(line => line.trim() !== ''); // Remover linhas vazias 
+  const lines = markdownContent.split('\n');
   const nodes: any[] = [];
   let isInCodeBlock = false;
   let codeBlockContent: string[] = [];
-  let currentList: any = null;
-  let listType: 'bullet' | 'number' | null = null;
   
-  console.log(`🔍 CONVERSÃO: Iniciando com ${lines.length} linhas:`, lines);
-  
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    
+  for (const line of lines) {
     // Processar blocos de código
     if (line.trim().startsWith('```')) {
-      // Finalizar lista se existir
-      if (currentList) {
-        nodes.push(currentList);
-        currentList = null;
-        listType = null;
-      }
-      
       if (isInCodeBlock) {
         // Finalizar bloco de código
         const codeContent = codeBlockContent.join('\n');
@@ -920,133 +907,11 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
       continue;
     }
     
-    // Processar items de lista com marcador "-" ou "•"
-    const listItemMatch = line.match(/^(\s*)[-•]\s+(.*)/);
-    if (listItemMatch) {
-      console.log(`🔍 LISTA: Encontrado item de lista "${line}"`);
-      const indent = listItemMatch[1];
-      const itemText = listItemMatch[2];
-      
-      // Se temos uma lista numerada ativa, tratar bullets como sub-itens
-      if (currentList && listType === 'number') {
-        // Criar sub-lista bullet dentro do último item da lista numerada
-        const lastItem = currentList.getLastChild();
-        if (lastItem) {
-          // Verificar se já existe uma sub-lista no último item
-          let subList = null;
-          const children = lastItem.getChildren();
-          for (const child of children) {
-            if (child.getType() === 'list' && child.getListType() === 'bullet') {
-              subList = child;
-              break;
-            }
-          }
-          
-          // Se não existe sub-lista, criar uma
-          if (!subList) {
-            subList = $createListNode('bullet');
-            lastItem.append(subList);
-          }
-          
-          // Adicionar item à sub-lista
-          const subListItem = $createListItemNode();
-          const textNodes = processInlineFormatting(itemText);
-          textNodes.forEach(node => subListItem.append(node));
-          subList.append(subListItem);
-        }
-        continue;
-      }
-      
-      // Se não temos lista atual ou é diferente do tipo bullet, criar nova
-      if (!currentList || listType !== 'bullet') {
-        // Finalizar lista anterior se existir
-        if (currentList) {
-          console.log(`🔍 LISTA: Finalizando lista anterior (${listType})`);
-          nodes.push(currentList);
-        }
-        
-        console.log(`🔍 LISTA: Criando nova lista bullet`);
-        // Criar nova lista bullet
-        currentList = $createListNode('bullet');
-        listType = 'bullet';
-      }
-      
-      // Criar item da lista
-      console.log(`🔍 LISTA: Adicionando item "${itemText}"`);
-      const listItem = $createListItemNode();
-      const textNodes = processInlineFormatting(itemText);
-      textNodes.forEach(node => listItem.append(node));
-      currentList.append(listItem);
-      continue;
-    }
-    
-    // Processar items de lista numerada - regex mais robusta para diferentes formatos
-    const numberedListMatch = line.match(/^(\s*)(\d+)\.?\s+(.*)/);
-    if (numberedListMatch && numberedListMatch[2]) {
-      const itemText = numberedListMatch[3];
-      
-      // Se não temos lista atual ou é diferente do tipo number, criar nova
-      if (!currentList || listType !== 'number') {
-        // Finalizar lista anterior se existir
-        if (currentList) {
-          nodes.push(currentList);
-        }
-        
-        // Criar nova lista numerada
-        currentList = $createListNode('number');
-        listType = 'number';
-      }
-      
-      // Criar item da lista
-      const listItem = $createListItemNode();
-      const textNodes = processInlineFormatting(itemText);
-      textNodes.forEach(node => listItem.append(node));
-      currentList.append(listItem);
-      continue;
-    }
-    
-    // Linha vazia - verificar se é parte de uma lista ativa
+    // Linha vazia
     if (line.trim() === '') {
-      // Se temos uma lista ativa, verificar se há mais itens da lista à frente
-      if (currentList) {
-        let foundNextListItem = false;
-        // Verificar as próximas linhas (pulando linhas vazias) para ver se há mais itens da lista
-        for (let j = i + 1; j < lines.length; j++) {
-          const nextLine = lines[j];
-          if (nextLine.trim() === '') {
-            continue; // Pular linhas vazias
-          }
-          // Verificar se é um item da mesma lista (ignorar sub-bullets em listas numeradas)
-          if ((listType === 'bullet' && nextLine.match(/^(\s*)[-•]\s+/)) ||
-              (listType === 'number' && nextLine.match(/^(\s*)\d+\.\s+/))) {
-            foundNextListItem = true;
-          } else if (listType === 'number' && nextLine.match(/^(\s*)[-•]\s+/)) {
-            // Sub-bullet em lista numerada, continuar procurando
-            continue;
-          }
-          break; // Parar na primeira linha não vazia
-        }
-        
-        if (foundNextListItem) {
-          continue; // Pular linha vazia, mantém lista ativa
-        } else {
-          // Finalizar lista - não há mais itens
-          nodes.push(currentList);
-          currentList = null;
-          listType = null;
-        }
-      }
-      
       const emptyParagraph = $createParagraphNode();
       nodes.push(emptyParagraph);
       continue;
-    }
-    
-    // Se chegamos aqui e não é um item de lista, finalizar lista ativa
-    if (currentList) {
-      nodes.push(currentList);
-      currentList = null;
-      listType = null;
     }
     
     // Processar cabeçalhos
@@ -1067,12 +932,6 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
     nodes.push(paragraph);
   }
   
-  // Finalizar lista se ainda existir
-  if (currentList) {
-    console.log(`🔍 LISTA: Finalizando lista final (${listType})`);
-    nodes.push(currentList);
-  }
-  
   // Finalizar bloco de código se ainda estiver aberto
   if (isInCodeBlock && codeBlockContent.length > 0) {
     const codeContent = codeBlockContent.join('\n');
@@ -1080,7 +939,6 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
     nodes.push(codeBlock);
   }
   
-  console.log(`🔍 CONVERSÃO: Finalizada com ${nodes.length} nodes:`, nodes.map(n => n.getType()));
   return nodes;
 }
 
@@ -1235,8 +1093,7 @@ function TemplateSectionsPlugin({ sections, mdFileOld }: { sections?: string[], 
           const missingSeções = sections.filter(sectionName => !existingSections.has(sectionName));
           const hasAllSections = missingSeções.length === 0;
           
-          // Se template já aplicado mas temos md_file_old, reprocessar conteúdo
-          if (hasAllSections && headerFieldsContainer && (!mdSections || mdSections.size === 0)) {
+          if (hasAllSections && headerFieldsContainer) {
             console.log('🔥 TemplateSectionsPlugin - Template já aplicado, preservando conteúdo');
             return; // Não fazer nada, template já está aplicado
           }
@@ -1251,43 +1108,30 @@ function TemplateSectionsPlugin({ sections, mdFileOld }: { sections?: string[], 
           }
           
           sections.forEach((sectionName) => {
-            // Verificar se temos conteúdo do md_file_old para esta seção
-            const matchingContent = findMatchingSectionContent(sectionName, mdSections);
-            const hasNewContent = matchingContent && matchingContent.trim() !== '';
-            
-            // Se há conteúdo novo do md_file_old ou seção não existe, recriar
-            if (hasNewContent || !existingSections.has(sectionName)) {
-              // Criar novo container (substituindo existente se necessário)
+            // Usar container existente se disponível, senão criar novo
+            if (existingSections.has(sectionName)) {
+              const existingContainer = existingSections.get(sectionName);
+              root.append(existingContainer);
+              console.log(`🔥 TemplateSectionsPlugin - Seção "${sectionName}" preservada com conteúdo`);
+            } else {
+              // Criar novo container apenas se não existir
               const title = $createCollapsibleTitleNode(sectionName);
               const content = $createCollapsibleContentNode();
+              
+              // Tentar encontrar conteúdo correspondente no md_file_old
+              const matchingContent = findMatchingSectionContent(sectionName, mdSections);
               
               if (matchingContent && matchingContent.trim() !== '') {
                 console.log(`🔍 MD_FILE_OLD: Conteúdo encontrado para seção "${sectionName}"`);
                 
                 // Converter markdown para Lexical nodes com formatação completa
                 try {
-                  console.log(`🔍 MARKDOWN RAW para "${sectionName}":`, JSON.stringify(matchingContent));
-                  console.log(`📝 Linhas detectadas:`, matchingContent.split('\n').map((line, i) => `${i+1}: ${line}`));
                   const lexicalNodes = convertMarkdownToLexicalNodes(matchingContent);
-                  console.log(`🔢 Nodes criados:`, lexicalNodes.map(n => n.getType()));
-                  
-                  // Adicionar debug para conteúdo de listas
-                  lexicalNodes.forEach((node, i) => {
-                    if (node.getType() === 'list') {
-                      console.log(`🔍 LISTA ${i}: Tipo=${node.getListType()}, Items=${node.getChildrenSize()}`);
-                    }
-                  });
                   
                   // Adicionar todos os nodes convertidos ao container
                   lexicalNodes.forEach(node => content.append(node));
                   
-                  // Adicionar parágrafo de teste para verificar edição
-                  const testParagraph = $createParagraphNode();
-                  const testText = $createTextNode('[TESTE EDIÇÃO - CLIQUE AQUI]');
-                  testParagraph.append(testText);
-                  content.append(testParagraph);
-                  
-                  console.log(`✅ MD_FILE_OLD: Conteúdo com formatação inserido na seção "${sectionName}" (${lexicalNodes.length} nodes) + parágrafo teste`);
+                  console.log(`✅ MD_FILE_OLD: Conteúdo com formatação inserido na seção "${sectionName}" (${lexicalNodes.length} nodes)`);
                 } catch (error) {
                   console.error(`❌ MD_FILE_OLD: Erro ao converter markdown na seção "${sectionName}":`, error);
                   // Fallback: criar parágrafo vazio
@@ -1295,12 +1139,10 @@ function TemplateSectionsPlugin({ sections, mdFileOld }: { sections?: string[], 
                   content.append(paragraph);
                 }
               } else {
-                // Nenhum conteúdo encontrado - criar parágrafo vazio editável  
+                // Nenhum conteúdo encontrado - criar parágrafo vazio editável
                 const paragraph = $createParagraphNode();
-                const placeholderText = $createTextNode('Clique aqui para editar...');
-                paragraph.append(placeholderText);
                 content.append(paragraph);
-                console.log(`🔍 MD_FILE_OLD: Nenhum conteúdo encontrado para seção "${sectionName}" - adicionado placeholder`);
+                console.log(`🔍 MD_FILE_OLD: Nenhum conteúdo encontrado para seção "${sectionName}"`);
               }
 
               const container = $createCollapsibleContainerNode(false);
@@ -1308,11 +1150,6 @@ function TemplateSectionsPlugin({ sections, mdFileOld }: { sections?: string[], 
               
               root.append(container);
               console.log(`🔥 TemplateSectionsPlugin - Nova seção "${sectionName}" criada`);
-            } else {
-              // Preservar seção existente sem conteúdo novo
-              const existingContainer = existingSections.get(sectionName);
-              root.append(existingContainer);
-              console.log(`🔥 TemplateSectionsPlugin - Seção "${sectionName}" preservada com conteúdo`);
             }
           });
           

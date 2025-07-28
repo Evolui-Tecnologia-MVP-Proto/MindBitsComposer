@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import LexicalEditor from "@/components/LexicalEditor";
-import { TestEditableComponent } from "@/components/test-editable";
 import MarkdownPreview from "@/components/MarkdownPreview";
 import SaveFileModal from "@/components/SaveFileModal";
 import { Button } from "@/components/ui/button";
@@ -1469,11 +1468,6 @@ export default function LexicalPage() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      {/* Teste Temporário de Edição Collapsible */}
-      <div className="w-full p-2 bg-yellow-100 dark:bg-yellow-900/30 border-b text-xs">
-        <span className="font-semibold">🔍 TESTE: </span>
-        <TestEditableComponent />
-      </div>
       {/* Header com navegação */}
       <div className="flex-shrink-0 p-6 pb-4 bg-gray-50 dark:bg-[#1F2937] border-b border-gray-200 dark:border-[#374151]">
         <div className="flex items-start justify-between">
