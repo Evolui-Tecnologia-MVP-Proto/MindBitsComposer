@@ -213,6 +213,22 @@ function processInlineFormatting(text: string): React.ReactNode {
       continue;
     }
 
+    // Check for underline
+    const underlineMatch = remaining.match(/__(.*?)__/);
+    if (underlineMatch) {
+      const beforeUnderline = remaining.substring(0, underlineMatch.index);
+      if (beforeUnderline) {
+        parts.push(beforeUnderline);
+      }
+      parts.push(
+        <span key={key++} className="underline text-black dark:text-white">
+          {underlineMatch[1]}
+        </span>
+      );
+      remaining = remaining.substring((underlineMatch.index || 0) + underlineMatch[0].length);
+      continue;
+    }
+
     // Check for italic (after bold to avoid conflicts)
     const italicMatch = remaining.match(/\*(.*?)\*/);
     if (italicMatch) {

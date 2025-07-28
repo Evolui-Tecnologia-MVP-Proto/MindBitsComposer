@@ -808,6 +808,7 @@ function processInlineFormatting(text: string): any[] {
     { regex: /`([^`]+)`/g, format: 'code' },
     { regex: /\*\*(.*?)\*\*/g, format: 'bold' },
     { regex: /~~(.*?)~~/g, format: 'strikethrough' },
+    { regex: /__(.*?)__/g, format: 'underline' },
     { regex: /\*(.*?)\*/g, format: 'italic' }
   ];
   

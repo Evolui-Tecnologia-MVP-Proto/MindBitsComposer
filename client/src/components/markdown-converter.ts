@@ -73,6 +73,9 @@ export function createMarkdownConverter() {
       if (node.hasFormat('strikethrough')) {
         text = `~~${text}~~`;
       }
+      if (node.hasFormat('underline')) {
+        text = `__${text}__`;
+      }
       if (node.hasFormat('code')) {
         text = `\`${text}\``;
       }

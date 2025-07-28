@@ -12,13 +12,14 @@ Preferred communication style: Simple, everyday language.
 
 ✓ COMPLETED: Complete Bidirectional Markdown-Lexical Conversion with Full Formatting Support (January 28, 2025)
   - Enhanced automatic content population from md_file_old sections with complete markdown formatting preservation
-  - Implemented processInlineFormatting function for inline formatting: **bold**, *italic*, ~~strikethrough~~, `code`
+  - Implemented processInlineFormatting function for inline formatting: **bold**, *italic*, ~~strikethrough~~, __underline__, `code`
   - Created convertMarkdownToLexicalNodes function for complete markdown processing including headers, code blocks, paragraphs, and lists
   - Added full support for bullet lists (- item) and numbered lists (1. item) conversion to ListNode/ListItemNode
   - Fixed text duplication issues with improved overlap detection and sequential processing
   - Bold (**text**) converts to TextNode with bold format applied in Lexical editor
   - Italic (*text*) converts to TextNode with italic format applied in Lexical editor  
   - Strikethrough (~~text~~) converts to TextNode with strikethrough format applied in Lexical editor
+  - Underline (__text__) converts to TextNode with underline format applied in Lexical editor
   - Inline code (`code`) converts to TextNode with code format applied in Lexical editor
   - Code blocks (```code```) convert to dedicated CodeNode in Lexical editor
   - Headers (# ## ###) convert to HeadingNode (h1-h6) in Lexical editor
@@ -27,13 +28,14 @@ Preferred communication style: Simple, everyday language.
   - Inline formatting preserved within list items (- Item with **bold** text)
   - System processes markdown sequentially to avoid conflicts between similar markers
   - Fixed Lexical-to-Markdown conversion with processTextNode and processChildrenWithFormatting functions
-  - Enhanced MarkdownPreview with complete formatting support: bold, italic, strikethrough, code, links, images
+  - Enhanced MarkdownPreview with complete formatting support: bold, italic, strikethrough, underline, code, links, images
+  - Custom underline syntax (__text__) implemented alongside standard strikethrough (~~text~~)
   - Optimized formatting processing order to prevent conflicts between ** and * markers
   - Resolved all TypeScript compilation errors with proper type annotations
   - Integration maintains all existing functionality: section mapping, logging, error handling
   - Preserves existing container content while enabling automatic formatted population for new sections
   - Documents now load with full visual formatting including proper list bullet points instead of raw markdown text
-  - MDX preview now correctly renders all markdown formatting including strikethrough (~~) and proper visual hierarchy
+  - MDX preview now correctly renders all markdown formatting including both strikethrough (~~) and underline (__) with proper visual hierarchy
 
 ✓ COMPLETED: Enhanced "Iniciar Edição" Process with ready_to_revise Record Update Logic (January 28, 2025)
   - Modified POST /api/document-editions endpoint to check for existing ready_to_revise records before creating new ones
