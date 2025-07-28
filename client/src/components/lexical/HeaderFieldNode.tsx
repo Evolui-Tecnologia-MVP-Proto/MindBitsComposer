@@ -158,18 +158,20 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
   };
 
   return (
-    <div className="flex flex-col mb-3">
-      <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+    <div className="flex items-center mb-3 border border-gray-300 dark:border-[#374151] rounded-md overflow-hidden">
+      <div 
+        className="px-4 py-2 text-sm font-medium text-white min-w-[120px] flex-shrink-0"
+        style={{ backgroundColor: '#111827' }}
+      >
         {node.getLabel()}
-      </label>
+      </div>
       <input
         type="text"
         value={value}
         onChange={(e) => handleChange(e.target.value)}
-        className="px-3 py-2 text-sm border border-gray-300 dark:border-[#374151] rounded-md 
+        className="flex-1 px-3 py-2 text-sm border-0 outline-none
                    bg-white dark:bg-[#0F172A] text-gray-900 dark:text-gray-200
-                   focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                   dark:focus:ring-blue-400 dark:focus:border-blue-400
+                   focus:ring-0 focus:border-0
                    lexical-header-field"
         placeholder={node.__placeholder}
       />
