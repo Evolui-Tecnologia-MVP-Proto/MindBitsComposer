@@ -10,21 +10,26 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
-✓ COMPLETED: Advanced Markdown-to-Lexical Conversion System with Full Formatting Support (January 28, 2025)
+✓ COMPLETED: Advanced Markdown-to-Lexical Conversion System with Complete Formatting and List Support (January 28, 2025)
   - Enhanced automatic content population from md_file_old sections with complete markdown formatting preservation
-  - Implemented createFormattedTextNodes function for inline formatting: **bold**, *italic*, ~~strikethrough~~, `code`
-  - Created convertMarkdownToLexicalNodes function for complete markdown processing including headers, code blocks, and paragraphs
-  - Replaced simple line-by-line text conversion with sophisticated markdown-to-Lexical node transformation
+  - Implemented processInlineFormatting function for inline formatting: **bold**, *italic*, ~~strikethrough~~, `code`
+  - Created convertMarkdownToLexicalNodes function for complete markdown processing including headers, code blocks, paragraphs, and lists
+  - Added full support for bullet lists (- item) and numbered lists (1. item) conversion to ListNode/ListItemNode
+  - Fixed text duplication issues with improved overlap detection and sequential processing
   - Bold (**text**) converts to TextNode with bold format applied in Lexical editor
   - Italic (*text*) converts to TextNode with italic format applied in Lexical editor  
   - Strikethrough (~~text~~) converts to TextNode with strikethrough format applied in Lexical editor
   - Inline code (`code`) converts to TextNode with code format applied in Lexical editor
   - Code blocks (```code```) convert to dedicated CodeNode in Lexical editor
   - Headers (# ## ###) convert to HeadingNode (h1-h6) in Lexical editor
+  - Bullet lists (- item) convert to ListNode('bullet') with ListItemNode children in Lexical editor
+  - Numbered lists (1. item) convert to ListNode('number') with ListItemNode children in Lexical editor
+  - Inline formatting preserved within list items (- Item with **bold** text)
   - System processes markdown sequentially to avoid conflicts between similar markers
+  - Resolved all TypeScript compilation errors with proper type annotations
   - Integration maintains all existing functionality: section mapping, logging, error handling
   - Preserves existing container content while enabling automatic formatted population for new sections
-  - Documents now load with full visual formatting instead of raw markdown text
+  - Documents now load with full visual formatting including proper list bullet points instead of raw markdown text
 
 ✓ COMPLETED: Enhanced "Iniciar Edição" Process with ready_to_revise Record Update Logic (January 28, 2025)
   - Modified POST /api/document-editions endpoint to check for existing ready_to_revise records before creating new ones

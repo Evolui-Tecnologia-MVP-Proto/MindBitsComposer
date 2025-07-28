@@ -815,15 +815,15 @@ function processInlineFormatting(text: string): any[] {
   const matches: Array<{start: number, end: number, text: string, format: string}> = [];
   
   markers.forEach(marker => {
-    let match;
+    let match: RegExpExecArray | null;
     // Reset regex para garantir que começamos do início
     marker.regex.lastIndex = 0;
     while ((match = marker.regex.exec(text)) !== null) {
       // Verificar se este match não sobrepõe com matches existentes
       const overlaps = matches.some(existingMatch => 
-        (match.index >= existingMatch.start && match.index < existingMatch.end) ||
-        (match.index + match[0].length > existingMatch.start && match.index + match[0].length <= existingMatch.end) ||
-        (match.index <= existingMatch.start && match.index + match[0].length >= existingMatch.end)
+        (match!.index >= existingMatch.start && match!.index < existingMatch.end) ||
+        (match!.index + match![0].length > existingMatch.start && match!.index + match![0].length <= existingMatch.end) ||
+        (match!.index <= existingMatch.start && match!.index + match![0].length >= existingMatch.end)
       );
       
       if (!overlaps) {
@@ -884,10 +884,21 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
   const nodes: any[] = [];
   let isInCodeBlock = false;
   let codeBlockContent: string[] = [];
+  let currentList: any = null;
+  let listType: 'bullet' | 'number' | null = null;
   
-  for (const line of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    
     // Processar blocos de código
     if (line.trim().startsWith('```')) {
+      // Finalizar lista se existir
+      if (currentList) {
+        nodes.push(currentList);
+        currentList = null;
+        listType = null;
+      }
+      
       if (isInCodeBlock) {
         // Finalizar bloco de código
         const codeContent = codeBlockContent.join('\n');
@@ -905,6 +916,63 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
     if (isInCodeBlock) {
       codeBlockContent.push(line);
       continue;
+    }
+    
+    // Processar items de lista com marcador "-"
+    const listItemMatch = line.match(/^(\s*)-\s+(.*)/);
+    if (listItemMatch) {
+      const itemText = listItemMatch[2];
+      
+      // Se não temos lista atual ou é diferente do tipo bullet, criar nova
+      if (!currentList || listType !== 'bullet') {
+        // Finalizar lista anterior se existir
+        if (currentList) {
+          nodes.push(currentList);
+        }
+        
+        // Criar nova lista bullet
+        currentList = $createListNode('bullet');
+        listType = 'bullet';
+      }
+      
+      // Criar item da lista
+      const listItem = $createListItemNode();
+      const textNodes = processInlineFormatting(itemText);
+      textNodes.forEach(node => listItem.append(node));
+      currentList.append(listItem);
+      continue;
+    }
+    
+    // Processar items de lista numerada
+    const numberedListMatch = line.match(/^(\s*)\d+\.\s+(.*)/);
+    if (numberedListMatch) {
+      const itemText = numberedListMatch[2];
+      
+      // Se não temos lista atual ou é diferente do tipo number, criar nova
+      if (!currentList || listType !== 'number') {
+        // Finalizar lista anterior se existir
+        if (currentList) {
+          nodes.push(currentList);
+        }
+        
+        // Criar nova lista numerada
+        currentList = $createListNode('number');
+        listType = 'number';
+      }
+      
+      // Criar item da lista
+      const listItem = $createListItemNode();
+      const textNodes = processInlineFormatting(itemText);
+      textNodes.forEach(node => listItem.append(node));
+      currentList.append(listItem);
+      continue;
+    }
+    
+    // Se chegamos aqui e temos uma lista ativa, finalizá-la
+    if (currentList) {
+      nodes.push(currentList);
+      currentList = null;
+      listType = null;
     }
     
     // Linha vazia
@@ -930,6 +998,11 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
     const textNodes = processInlineFormatting(line);
     textNodes.forEach(node => paragraph.append(node));
     nodes.push(paragraph);
+  }
+  
+  // Finalizar lista se ainda existir
+  if (currentList) {
+    nodes.push(currentList);
   }
   
   // Finalizar bloco de código se ainda estiver aberto
