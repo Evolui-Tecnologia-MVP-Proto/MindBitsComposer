@@ -362,80 +362,20 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
     if (htmlTableContent.length > 0) {
       const tableHtml = htmlTableContent.join('\n');
       
-      // Process HTML table content using React components
+      // Process HTML table content using dangerouslySetInnerHTML with proper styling
       const processHtmlTableContent = (html: string): React.ReactNode => {
-        // Parse the HTML table and recreate it using React components
-        const createTableFromHtml = (htmlString: string) => {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(htmlString, 'text/html');
-          const table = doc.querySelector('table');
-          
-          if (!table) return <div>Erro na tabela</div>;
-          
-          const renderElement = (element: Element, key: number = 0): React.ReactNode => {
-            const tagName = element.tagName.toLowerCase();
-            const attrs: any = {};
-            
-            // Copy attributes
-            for (let i = 0; i < element.attributes.length; i++) {
-              const attr = element.attributes[i];
-              if (attr.name === 'style') {
-                attrs.style = parseStyle(attr.value);
-              } else if (attr.name === 'class') {
-                attrs.className = attr.value;
-              } else {
-                attrs[attr.name] = attr.value;
-              }
-            }
-            
-            // Process children
-            const children: React.ReactNode[] = [];
-            for (let i = 0; i < element.childNodes.length; i++) {
-              const child = element.childNodes[i];
-              if (child.nodeType === Node.ELEMENT_NODE) {
-                children.push(renderElement(child as Element, i));
-              } else if (child.nodeType === Node.TEXT_NODE) {
-                const text = child.textContent?.trim();
-                if (text) children.push(text);
-              }
-            }
-            
-            // Apply dark mode styling
-            if (tagName === 'table') {
-              attrs.className = 'min-w-full border border-gray-300 dark:border-[#374151] rounded-lg';
-              attrs.style = { ...attrs.style, width: '100%' };
-            } else if (tagName === 'tbody') {
-              attrs.className = 'divide-y divide-gray-200 dark:divide-[#374151]';
-            } else if (tagName === 'tr') {
-              attrs.className = 'hover:bg-gray-50 dark:hover:bg-[#1E293B]';
-            } else if (tagName === 'td') {
-              attrs.className = 'px-4 py-3 text-sm text-black dark:text-white border-b border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1B2028]';
-              attrs.style = { ...attrs.style, verticalAlign: 'top', padding: '12px' };
-            }
-            
-            return React.createElement(tagName, { key, ...attrs }, ...children);
-          };
-          
-          const parseStyle = (styleStr: string) => {
-            const style: any = {};
-            styleStr.split(';').forEach(rule => {
-              const [prop, value] = rule.split(':').map(s => s.trim());
-              if (prop && value) {
-                const camelProp = prop.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
-                style[camelProp] = value;
-              }
-            });
-            return style;
-          };
-          
-          return (
-            <div className="overflow-x-auto mb-4">
-              {renderElement(table)}
-            </div>
-          );
-        };
-        
-        return createTableFromHtml(html);
+        return (
+          <div 
+            className="overflow-x-auto mb-4 table-html-container"
+            dangerouslySetInnerHTML={{ __html: html }}
+            style={{
+              // CSS variables for nested table styling
+              '--table-border': '#374151',
+              '--table-bg': '#1B2028',
+              '--cell-padding': '12px'
+            } as React.CSSProperties}
+          />
+        );
       };
       
       // Render the HTML table directly
@@ -746,6 +686,57 @@ export default function MarkdownPreview({ content, className = '' }: MarkdownPre
             .dark .markdown-preview ol ul li,
             .dark .markdown-preview ol ol li {
               color: #FFFFFF !important;
+            }
+            /* HTML Table Styling for dangerouslySetInnerHTML tables */
+            .table-html-container table {
+              width: 100% !important;
+              border-collapse: collapse !important;
+              border: 1px solid #d1d5db !important;
+              border-radius: 8px !important;
+              overflow: hidden !important;
+            }
+            .dark .table-html-container table {
+              border: 1px solid #374151 !important;
+            }
+            .table-html-container tbody {
+              border: none !important;
+            }
+            .table-html-container tr {
+              border: none !important;
+            }
+            .table-html-container tr:hover {
+              background-color: #f9fafb !important;
+            }
+            .dark .table-html-container tr:hover {
+              background-color: #1e293b !important;
+            }
+            .table-html-container td {
+              border: 1px solid #e5e7eb !important;
+              padding: 12px !important;
+              vertical-align: top !important;
+              background-color: white !important;
+              color: #000000 !important;
+            }
+            .dark .table-html-container td {
+              border: 1px solid #374151 !important;
+              background-color: #1b2028 !important;
+              color: #ffffff !important;
+            }
+            /* Nested table styling within cells */
+            .table-html-container td table {
+              margin: 8px 0 !important;
+              border: 1px solid #ccc !important;
+              border-collapse: collapse !important;
+              width: 100% !important;
+            }
+            .table-html-container td table td {
+              border: 1px solid #ccc !important;
+              padding: 8px !important;
+              background-color: #f8f9fa !important;
+            }
+            .dark .table-html-container td table td {
+              background-color: #0f172a !important;
+              border: 1px solid #4b5563 !important;
             }
           `
         }} />
