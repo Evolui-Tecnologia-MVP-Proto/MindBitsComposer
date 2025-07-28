@@ -360,12 +360,6 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
                     Exibindo {documentosLimitados.length} de {documentos.length} documentos
                   </p>
                 </div>
-                {documentos.length > maxItems && (
-                  <Badge variant="outline" className="bg-yellow-50 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 border-yellow-300 dark:border-yellow-600">
-                    <AlertCircle className="h-3 w-3 mr-1" />
-                    Limite atingido
-                  </Badge>
-                )}
               </div>
 
               <div className="grid gap-4">
