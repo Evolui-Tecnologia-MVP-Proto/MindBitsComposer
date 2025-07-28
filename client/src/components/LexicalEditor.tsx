@@ -1027,38 +1027,52 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       if (headerKeys.length > 0) {
         console.log('🔍 DEBUG: Iniciando inserção...');
         
-        // NOVA ABORDAGEM: Inserir campos diretamente no primeiro container
-        setTimeout(() => {
-          try {
-            editorInstance.update(() => {
-              console.log('🔍 DEBUG: NOVA ABORDAGEM - Inserindo campos diretamente');
-              const root = $getRoot();
-              const children = root.getChildren();
+        // ABORDAGEM SUPER ROBUSTA: Inserir campos COM VERIFICAÇÃO CONTÍNUA
+        let insertionAttempts = 0;
+        const maxAttempts = 5;
+        
+        const attemptInsert = () => {
+          insertionAttempts++;
+          console.log(`🔄 TENTATIVA ${insertionAttempts}/${maxAttempts} de inserção`);
+          
+          editorInstance.update(() => {
+            const root = $getRoot();
+            const children = root.getChildren();
+            
+            console.log(`🔍 TENTATIVA ${insertionAttempts}: Total elementos: ${children.length}`);
+            
+            if (children.length > 0) {
+              const firstChild = children[0];
               
-              console.log('🔍 DEBUG: Total de elementos:', children.length);
-              
-              if (children.length > 0) {
-                // Pegar o primeiro container (que deve ser o de cabeçalho)
-                const firstChild = children[0];
-                console.log('🔍 DEBUG: Primeiro elemento tipo:', firstChild.getType());
+              if ($isCollapsibleContainerNode(firstChild)) {
+                const containerChildren = firstChild.getChildren();
                 
-                if ($isCollapsibleContainerNode(firstChild)) {
-                  const containerChildren = firstChild.getChildren();
-                  console.log('🔍 DEBUG: Container tem', containerChildren.length, 'filhos');
+                if (containerChildren.length > 1) {
+                  const content = containerChildren[1];
                   
-                  if (containerChildren.length > 1) {
-                    const content = containerChildren[1];
-                    console.log('🔍 DEBUG: Conteúdo tipo:', content.getType());
+                  if ($isCollapsibleContentNode(content)) {
+                    const contentChildren = content.getChildren();
                     
-                    if ($isCollapsibleContentNode(content)) {
-                      console.log('🔍 DEBUG: Encontrou conteúdo colapsível, inserindo campos...');
+                    // Verificar se já tem campos de header
+                    let hasHeaderFields = false;
+                    contentChildren.forEach((child: any) => {
+                      if ($isHeaderFieldNode && $isHeaderFieldNode(child)) {
+                        hasHeaderFields = true;
+                      }
+                    });
+                    
+                    console.log(`🔍 TENTATIVA ${insertionAttempts}: Tem campos? ${hasHeaderFields}, Filhos: ${contentChildren.length}`);
+                    
+                    if (!hasHeaderFields && contentChildren.length <= 1) {
+                      console.log(`🔍 TENTATIVA ${insertionAttempts}: INSERINDO CAMPOS...`);
                       
-                      // Limpar o conteúdo atual (apenas o parágrafo vazio)
-                      content.clear();
+                      // Limpar apenas se for um parágrafo vazio
+                      if (contentChildren.length === 1 && contentChildren[0].getTextContent().trim() === '') {
+                        content.clear();
+                      }
                       
-                      // Inserir todos os campos
+                      // Inserir campos
                       headerKeys.forEach((key, index) => {
-                        console.log(`🔍 DEBUG: Criando campo ${index + 1}: ${key}`);
                         try {
                           const fieldNode = $createHeaderFieldNode(
                             key,
@@ -1066,30 +1080,39 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                             `Digite ${key.toLowerCase()}...`
                           );
                           content.append(fieldNode);
-                          console.log(`✅ DEBUG: Campo ${key} adicionado com sucesso`);
+                          console.log(`✅ TENTATIVA ${insertionAttempts}: Campo ${key} inserido`);
                         } catch (fieldError) {
-                          console.error(`❌ DEBUG: Erro ao criar campo ${key}:`, fieldError);
+                          console.error(`❌ TENTATIVA ${insertionAttempts}: Erro campo ${key}:`, fieldError);
                         }
                       });
                       
-                      // Adicionar parágrafo para edição livre
+                      // Adicionar parágrafo editável
                       const editableParagraph = $createParagraphNode();
                       content.append(editableParagraph);
                       
-                      console.log('✅ DEBUG: TODOS OS CAMPOS INSERIDOS COM SUCESSO!');
+                      console.log(`✅ TENTATIVA ${insertionAttempts}: TODOS OS CAMPOS INSERIDOS!`);
+                      return; // Sair se inserção foi bem-sucedida
+                    } else if (hasHeaderFields) {
+                      console.log(`✅ TENTATIVA ${insertionAttempts}: Campos já existem, parando tentativas`);
+                      return; // Campos já estão lá
                     }
                   }
-                } else {
-                  console.log('❌ DEBUG: Primeiro elemento não é container colapsível');
                 }
-              } else {
-                console.log('❌ DEBUG: Nenhum elemento encontrado no root');
               }
-            });
-          } catch (error) {
-            console.error('❌ DEBUG: Erro crítico:', error);
-          }
-        }, 1200); // Timeout ainda maior para garantir que template foi aplicado
+            }
+            
+            // Se chegou aqui, não conseguiu inserir - tentar novamente
+            if (insertionAttempts < maxAttempts) {
+              console.log(`⚠️ TENTATIVA ${insertionAttempts}: Falhou, tentando novamente em 500ms`);
+              setTimeout(attemptInsert, 500);
+            } else {
+              console.log(`❌ TODAS AS ${maxAttempts} TENTATIVAS FALHARAM`);
+            }
+          });
+        };
+        
+        // Começar tentativas após template ser aplicado
+        setTimeout(attemptInsert, 1200);
         
         // Backup timeout maior
         setTimeout(() => {
