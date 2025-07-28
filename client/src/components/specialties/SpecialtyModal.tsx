@@ -386,15 +386,15 @@ export function SpecialtyModal({ isOpen, onClose, specialty }: SpecialtyModalPro
                             </TableHeader>
                             <TableBody>
                               {specialtyUsers.map(({ user }) => (
-                                <TableRow key={user.id} className="dark:bg-[#111827]">
-                                  <TableCell className="font-medium dark:bg-[#111827]">{user.name}</TableCell>
-                                  <TableCell className="dark:bg-[#111827]">{user.email}</TableCell>
-                                  <TableCell className="dark:bg-[#111827]">
+                                <TableRow key={user.id} className="dark:bg-[#0F172A]">
+                                  <TableCell className="font-medium dark:bg-[#0F172A]">{user.name}</TableCell>
+                                  <TableCell className="dark:bg-[#0F172A]">{user.email}</TableCell>
+                                  <TableCell className="dark:bg-[#0F172A]">
                                     <Badge variant="outline" className="font-mono">
                                       {user.role}
                                     </Badge>
                                   </TableCell>
-                                  <TableCell className="dark:bg-[#111827]">
+                                  <TableCell className="dark:bg-[#0F172A]">
                                     <Badge 
                                       variant={user.status === "ACTIVE" ? "default" : "secondary"}
                                       className={
@@ -406,7 +406,7 @@ export function SpecialtyModal({ isOpen, onClose, specialty }: SpecialtyModalPro
                                       {user.status === "ACTIVE" ? "Ativo" : "Inativo"}
                                     </Badge>
                                   </TableCell>
-                                  <TableCell className="dark:bg-[#111827]">
+                                  <TableCell className="dark:bg-[#0F172A]">
                                     <Button
                                       variant="ghost"
                                       size="sm"
