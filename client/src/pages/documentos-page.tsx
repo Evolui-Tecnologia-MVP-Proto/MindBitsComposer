@@ -232,6 +232,16 @@ export default function DocumentosPage() {
 
   const { toast } = useToast();
 
+  // Função para fechar modal de documentação e atualizar tabela
+  const handleCloseDocumentationModal = useCallback(() => {
+    setIsDocumentationModalOpen(false);
+    setSelectedFlowId("");
+    // Invalidar queries para atualizar tabela de documentos em processo
+    queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions/count"] });
+  }, [queryClient]);
+
   // Estados dos filtros
   const [filtros, setFiltros] = useState({
     responsavel: "__todos__",
@@ -1808,7 +1818,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       />
       <DocumentationModal
         isOpen={isDocumentationModalOpen}
-        onClose={() => setIsDocumentationModalOpen(false)}
+        onClose={handleCloseDocumentationModal}
         selectedDocument={selectedDocument}
         selectedFlowId={selectedFlowId}
         setSelectedFlowId={setSelectedFlowId}
@@ -3856,7 +3866,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
       />
       <DocumentationModal
         isOpen={isDocumentationModalOpen}
-        onClose={() => setIsDocumentationModalOpen(false)}
+        onClose={handleCloseDocumentationModal}
         selectedDocument={selectedDocument}
         selectedFlowId={selectedFlowId}
         setSelectedFlowId={setSelectedFlowId}
