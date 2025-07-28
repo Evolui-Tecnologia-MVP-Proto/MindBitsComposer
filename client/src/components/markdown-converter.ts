@@ -275,23 +275,23 @@ export function createMarkdownConverter() {
                         content += '        ```\n' + codeText + '\n```\n';
                       }
                     } else if (child.getType() === 'table') {
-                      // Process nested table in Mermaid table cells - generate compact HTML
+                      // Process nested table in Mermaid table cells - generate formatted HTML with proper indentation
                       const nestedRows = child.getChildren();
-                      content += '        <table style="width: 100%; margin: 8px 0; border-collapse: collapse;">';
-                      content += '<tbody>';
+                      content += '<table style="width: 100%; margin: 8px 0; border-collapse: collapse;">\n';
+                      content += '          <tbody>\n';
                       
                       nestedRows.forEach((nestedRow: any) => {
-                        content += '<tr>';
+                        content += '            <tr>\n';
                         const nestedCells = nestedRow.getChildren();
                         nestedCells.forEach((nestedCell: any) => {
                           const nestedCellText = processChildrenWithFormatting(nestedCell).trim();
-                          content += '<td style="border: 1px solid #ccc; padding: 8px;">' + nestedCellText + '</td>';
+                          content += '              <td style="border: 1px solid #ccc; padding: 8px;">' + nestedCellText + '</td>\n';
                         });
-                        content += '</tr>';
+                        content += '            </tr>\n';
                       });
                       
-                      content += '</tbody>';
-                      content += '</table>\n';
+                      content += '          </tbody>\n';
+                      content += '        </table>';
                     } else if (child.getType() === 'paragraph') {
                       const paragraphContent = processChildrenWithFormatting(child);
                       if (paragraphContent.trim()) {
@@ -401,24 +401,24 @@ export function createMarkdownConverter() {
                     const children = cell.getChildren();
                     children.forEach((child: any) => {
                       if (child.getType() === 'table') {
-                        // Process nested table - generate compact HTML
+                        // Process nested table - generate formatted HTML with proper indentation
                         const nestedRows = child.getChildren();
-                        content += '        <table style="width: 100%; margin: 8px 0; border-collapse: collapse;">';
-                        content += '<tbody>';
+                        content += '<table style="width: 100%; margin: 8px 0; border-collapse: collapse;">\n';
+                        content += '          <tbody>\n';
                         
                         nestedRows.forEach((nestedRow: any) => {
-                          content += '<tr>';
+                          content += '            <tr>\n';
                           const nestedCells = nestedRow.getChildren();
                           nestedCells.forEach((nestedCell: any) => {
                             // Get nested cell content
                             const nestedCellText = processChildrenWithFormatting(nestedCell).trim();
-                            content += '<td style="border: 1px solid #ccc; padding: 8px;">' + nestedCellText + '</td>';
+                            content += '              <td style="border: 1px solid #ccc; padding: 8px;">' + nestedCellText + '</td>\n';
                           });
-                          content += '</tr>';
+                          content += '            </tr>\n';
                         });
                         
-                        content += '</tbody>';
-                        content += '</table>\n';
+                        content += '          </tbody>\n';
+                        content += '        </table>';
                       } else if (child.getType() === 'code') {
                         // Preserve code blocks with backticks
                         const codeText = child.getTextContent();

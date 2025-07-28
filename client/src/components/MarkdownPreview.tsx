@@ -364,143 +364,21 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
       
       // Process HTML table content to handle code blocks
       const processHtmlTableContent = (html: string): React.ReactNode => {
-        // Create a simple parser for table cells
-        const rows: React.ReactNode[] = [];
-        const tableMatch = html.match(/<table[^>]*>([\s\S]*)<\/table>/);
-        if (!tableMatch) {
-          return <div dangerouslySetInnerHTML={{ __html: html }} />;
-        }
-        
-        const tableContent = tableMatch[1];
-        const tbodyMatch = tableContent.match(/<tbody[^>]*>([\s\S]*)<\/tbody>/);
-        if (!tbodyMatch) {
-          return <div dangerouslySetInnerHTML={{ __html: html }} />;
-        }
-        
-        const tbodyContent = tbodyMatch[1];
-        const rowMatches = Array.from(tbodyContent.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/g));
-        
-        let rowIndex = 0;
-        for (const rowMatch of rowMatches) {
-          const rowContent = rowMatch[1];
-          const cellMatches = Array.from(rowContent.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g));
-          
-          const cells: React.ReactNode[] = [];
-          let cellIndex = 0;
-          
-          for (const cellMatch of cellMatches) {
-            let cellContent = cellMatch[1].trim();
-            
-            // Check if cell contains nested table
-            if (cellContent.includes('<table')) {
-              // Recursively process nested table
-              const nestedTableMatch = cellContent.match(/<table[^>]*>([\s\S]*?)<\/table>/);
-              if (nestedTableMatch) {
-                const beforeTable = cellContent.substring(0, cellContent.indexOf(nestedTableMatch[0])).trim();
-                const afterTable = cellContent.substring(cellContent.indexOf(nestedTableMatch[0]) + nestedTableMatch[0].length).trim();
-                
-                const parts: React.ReactNode[] = [];
-                let partKey = 0;
-                
-                // Add content before table
-                if (beforeTable) {
-                  parts.push(<div key={partKey++} dangerouslySetInnerHTML={{ __html: beforeTable }} />);
-                }
-                
-                // Process nested table
-                parts.push(
-                  <div key={partKey++} className="my-2">
-                    {processHtmlTableContent(nestedTableMatch[0])}
-                  </div>
-                );
-                
-                // Add content after table
-                if (afterTable) {
-                  parts.push(<div key={partKey++} dangerouslySetInnerHTML={{ __html: afterTable }} />);
-                }
-                
-                cells.push(
-                  <td key={cellIndex++} className="px-4 py-3 text-sm text-black dark:text-white border-b border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1B2028]" style={{ verticalAlign: 'top' }}>
-                    {parts}
-                  </td>
-                );
-              } else {
-                // Fallback if table regex doesn't match
-                cells.push(
-                  <td key={cellIndex++} className="px-4 py-3 text-sm text-black dark:text-white border-b border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1B2028]" style={{ verticalAlign: 'top' }}>
-                    <div dangerouslySetInnerHTML={{ __html: cellContent }} />
-                  </td>
-                );
-              }
-            } else if (cellContent.includes('```')) {
-              // Check if cell contains code blocks with backticks
-              const parts: React.ReactNode[] = [];
-              let remaining = cellContent;
-              let partKey = 0;
-              
-              while (remaining.includes('```')) {
-                const codeStart = remaining.indexOf('```');
-                const beforeCode = remaining.substring(0, codeStart).trim();
-                
-                if (beforeCode) {
-                  // Process any content before the code block
-                  parts.push(
-                    <div key={partKey++} dangerouslySetInnerHTML={{ __html: beforeCode }} />
-                  );
-                }
-                
-                // Find the closing backticks
-                const codeEndStart = remaining.indexOf('```', codeStart + 3);
-                if (codeEndStart === -1) break;
-                
-                const codeContent = remaining.substring(codeStart + 3, codeEndStart).trim();
-                parts.push(
-                  <pre key={partKey++} className="bg-gray-900 dark:bg-[#111827] text-white p-4 rounded-lg my-2 overflow-x-auto">
-                    <code className="text-sm font-mono text-white">{codeContent}</code>
-                  </pre>
-                );
-                
-                remaining = remaining.substring(codeEndStart + 3);
-              }
-              
-              // Add any remaining content
-              if (remaining.trim()) {
-                parts.push(
-                  <div key={partKey++} dangerouslySetInnerHTML={{ __html: remaining }} />
-                );
-              }
-              
-              cells.push(
-                <td key={cellIndex++} className="px-4 py-3 text-sm text-black dark:text-white border-b border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1B2028]" style={{ verticalAlign: 'top' }}>
-                  {parts}
-                </td>
-              );
-            } else {
-              // Regular cell content without code blocks
-              cells.push(
-                <td key={cellIndex++} className="px-4 py-3 text-sm text-black dark:text-white border-b border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1B2028]" style={{ verticalAlign: 'top' }}>
-                  <div dangerouslySetInnerHTML={{ __html: cellContent }} />
-                </td>
-              );
-            }
-          }
-          
-          rows.push(
-            <tr key={rowIndex++} className="hover:bg-gray-50 dark:hover:bg-[#1E293B]">
-              {cells}
-            </tr>
-          );
-        }
-        
+        // For tables with nested structures, render directly without parsing
+        // This preserves the original HTML structure and avoids style conflicts
         return (
-          <table className="min-w-full border border-gray-300 dark:border-[#374151] rounded-lg">
-            <tbody className="divide-y divide-gray-200 dark:divide-[#374151]">
-              {rows}
-            </tbody>
-          </table>
+          <div
+            className="table-container" 
+            dangerouslySetInnerHTML={{ __html: html }} 
+            style={{
+              '--border-color': '#374151',
+              '--bg-color': '#1B2028'
+            } as React.CSSProperties}
+          />
         );
       };
       
+      // Render the HTML table directly
       elements.push(
         <div key={elements.length} className="overflow-x-auto mb-4">
           {processHtmlTableContent(tableHtml)}
