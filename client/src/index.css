@@ -64,24 +64,26 @@
 }
 
 /* Fix for ordered list numbering in MDX */
-ol {
+.markdown-content ol {
   list-style-type: decimal !important;
-  counter-reset: list-counter !important;
+  list-style-position: outside !important;
+  counter-reset: none !important;
 }
 
-ol li {
+.markdown-content ol li {
   list-style-type: decimal !important;
   display: list-item !important;
+  list-style-position: outside !important;
+  counter-increment: none !important;
 }
 
-ol li::marker {
-  content: counter(list-counter) ". " !important;
-  counter-increment: list-counter !important;
+.markdown-content ol li::marker {
+  content: "" !important;
 }
 
-/* Ensure proper counter behavior */
-ol[start] {
-  counter-reset: list-counter calc(attr(start) - 1) !important;
+/* Ensure lists continue numbering properly */
+.markdown-content ol + ol {
+  list-style-type: decimal !important;
 }
 
 /* Collapsible container dark mode styling */

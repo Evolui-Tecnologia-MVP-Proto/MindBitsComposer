@@ -256,9 +256,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
   let codeBlockLanguage = '';
   let inTable = false;
   let tableRows: string[] = [];
-  let inList = false;
-  let listItems: Array<{text: string, isOrdered: boolean}> = [];
-  let currentListType: 'ordered' | 'unordered' | null = null;
+  let orderedListCounter = 0;
 
   const flushParagraph = () => {
     if (currentParagraph.length > 0) {
@@ -357,25 +355,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
     }
   };
 
-  const flushList = () => {
-    if (listItems.length > 0) {
-      const isOrdered = currentListType === 'ordered';
-      const ListComponent = isOrdered ? mdxComponents.ol : mdxComponents.ul;
-      
-      elements.push(
-        <ListComponent key={elements.length}>
-          {listItems.map((item, index) => (
-            <li key={index} className="text-black dark:text-white">
-              {processInlineFormatting(item.text)}
-            </li>
-          ))}
-        </ListComponent>
-      );
-      
-      listItems = [];
-      currentListType = null;
-    }
-  };
+
 
   // Handle HTML tables
   let inHtmlTable = false;
@@ -549,30 +529,25 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
 
     // Handle lists
     if (line.match(/^\s*[-*+]\s/) || line.match(/^\s*\d+\.\s/)) {
-      if (!inList) {
-        flushParagraph();
-        inList = true;
-      }
-      
+      flushParagraph();
       const isOrdered = !!line.match(/^\s*\d+\.\s/);
-      const newListType = isOrdered ? 'ordered' : 'unordered';
-      
-      // If list type changes, flush current list and start new one
-      if (currentListType && currentListType !== newListType) {
-        flushList();
-        inList = true;
-      }
-      
-      currentListType = newListType;
       const text = line.replace(/^\s*(?:[-*+]|\d+\.)\s*/, '');
-      listItems.push({ text, isOrdered });
-      return;
-    } else if (inList && line.trim() !== '') {
-      // End of list, flush it
-      flushList();
-      inList = false;
-    } else if (inList && line.trim() === '') {
-      // Skip empty lines within lists
+      const processedText = processInlineFormatting(text);
+      
+      if (isOrdered) {
+        orderedListCounter++;
+        elements.push(
+          <ol key={elements.length} start={orderedListCounter} className="list-decimal pl-6 mb-4 space-y-2">
+            <li className="text-black dark:text-white">{processedText}</li>
+          </ol>
+        );
+      } else {
+        elements.push(
+          <ul key={elements.length} className="list-disc pl-6 mb-4 space-y-2">
+            <li className="text-black dark:text-white">{processedText}</li>
+          </ul>
+        );
+      }
       return;
     }
 
@@ -617,7 +592,6 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
   flushParagraph();
   flushCodeBlock(codeBlockLanguage);
   flushTable();
-  flushList();
   flushHtmlTable();
 
   return elements;
@@ -662,7 +636,7 @@ export default function MarkdownPreview({ content, className = '' }: MarkdownPre
 
   return (
     <MDXProvider components={mdxComponents}>
-      <div className={`markdown-preview prose prose-gray dark:prose-invert max-w-none ${className}`}>
+      <div className={`markdown-preview markdown-content prose prose-gray dark:prose-invert max-w-none ${className}`}>
         <style dangerouslySetInnerHTML={{
           __html: `
             .markdown-preview table td {
