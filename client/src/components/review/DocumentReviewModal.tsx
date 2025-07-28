@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import { 
   FileText, 
@@ -10,7 +11,8 @@ import {
   User, 
   Clock,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Workflow
 } from "lucide-react";
 import { type Documento } from "@shared/schema";
 
@@ -21,6 +23,14 @@ interface DocumentReviewModalProps {
 }
 
 export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentReviewModalProps) {
+  // Estado para gerenciar fluxos selecionados por documento
+  const [selectedFlows, setSelectedFlows] = useState<Record<string, string>>({});
+
+  // Buscar fluxos de documentação disponíveis
+  const { data: documentsFlows = [] } = useQuery({
+    queryKey: ["/api/documents-flows"],
+    enabled: isOpen
+  });
   // Buscar parâmetro MAX_ITEMS_PER_REVISOR
   const { data: maxItemsParam } = useQuery({
     queryKey: ["/api/system-params", "MAX_ITEMS_PER_REVISOR"],
@@ -80,6 +90,139 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
       return "Data inválida";
     }
   };
+
+  // Funções de filtragem de fluxos (copiadas da DocumentationModal)
+  const evaluateCondition = (document: Documento, condition: any): boolean => {
+    const field = condition.field;
+    const operator = condition.operator;
+    const value = condition.value;
+    const documentValue = document[field];
+    
+    switch (operator) {
+      case '=':
+      case '==':
+        return documentValue === value;
+      case '!=':
+      case '<>':
+        return documentValue !== value;
+      case '>':
+        return documentValue > value;
+      case '>=':
+        return documentValue >= value;
+      case '<':
+        return documentValue < value;
+      case '<=':
+        return documentValue <= value;
+      case 'contains':
+      case 'like':
+        return documentValue && documentValue.toString().toLowerCase().includes(value.toString().toLowerCase());
+      default:
+        console.warn(`Operador desconhecido: ${operator}`);
+        return true;
+    }
+  };
+
+  const evaluateAndConditions = (document: Documento, conditions: any[]): boolean => {
+    return conditions.every((condition: any) => {
+      if (condition.field && condition.operator && condition.value !== undefined) {
+        return evaluateCondition(document, condition);
+      } else if (condition.or) {
+        return evaluateOrConditions(document, condition.or);
+      } else if (condition.and) {
+        return evaluateAndConditions(document, condition.and);
+      }
+      return true;
+    });
+  };
+
+  const evaluateOrConditions = (document: Documento, conditions: any[]): boolean => {
+    return conditions.some((condition: any) => {
+      if (condition.field && condition.operator && condition.value !== undefined) {
+        return evaluateCondition(document, condition);
+      } else if (condition.or) {
+        return evaluateOrConditions(document, condition.or);
+      } else if (condition.and) {
+        return evaluateAndConditions(document, condition.and);
+      }
+      return false;
+    });
+  };
+
+  const documentMatchesFlowFilter = (document: Documento, flow: any): boolean => {
+    if (!flow.applicationFilter || Object.keys(flow.applicationFilter).length === 0) {
+      return true;
+    }
+
+    try {
+      const filter = flow.applicationFilter;
+      
+      if (filter.aplication && filter.aplication.filter) {
+        const filterConfig = filter.aplication.filter;
+        const field = filterConfig.field;
+        const operator = filterConfig.operator;
+        const value = filterConfig.value;
+        const documentValue = document[field];
+        
+        switch (operator) {
+          case '=':
+          case '==':
+            return documentValue === value;
+          case '!=':
+          case '<>':
+            return documentValue !== value;
+          case '>':
+            return documentValue > value;
+          case '>=':
+            return documentValue >= value;
+          case '<':
+            return documentValue < value;
+          case '<=':
+            return documentValue <= value;
+          case 'contains':
+          case 'like':
+            return documentValue && documentValue.toString().toLowerCase().includes(value.toString().toLowerCase());
+          default:
+            console.warn(`Operador desconhecido: ${operator}`);
+            return true;
+        }
+      }
+      
+      if (filter.aplication && filter.aplication.and) {
+        return evaluateAndConditions(document, filter.aplication.and);
+      }
+      
+      if (filter.aplication && filter.aplication.or) {
+        return evaluateOrConditions(document, filter.aplication.or);
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Erro ao avaliar application_filter:', error);
+      return true;
+    }
+  };
+
+  // Função para obter fluxos disponíveis para um documento
+  const getAvailableFlows = (document: Documento) => {
+    return documentsFlows.filter(
+      (flow: any) => flow.isEnabled === true && documentMatchesFlowFilter(document, flow)
+    );
+  };
+
+  // Função para atualizar fluxo selecionado
+  const handleFlowChange = (documentId: string, flowId: string) => {
+    setSelectedFlows(prev => ({
+      ...prev,
+      [documentId]: flowId
+    }));
+  };
+
+  // Limpar seleções ao fechar modal
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedFlows({});
+    }
+  }, [isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -144,34 +287,87 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
               </div>
 
               <div className="grid gap-4">
-                {documentosLimitados.map((documento, index) => (
-                  <Card key={documento.id} className="bg-gray-50 dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] hover:shadow-md transition-shadow">
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-base font-medium text-gray-900 dark:text-gray-200 mb-2">
-                            {documento.objeto || "Documento sem nome"}
-                          </CardTitle>
-                          <div className="flex flex-wrap gap-2 text-sm text-gray-600 dark:text-gray-300">
-                            <div className="flex items-center gap-1">
-                              <User className="h-3 w-3" />
-                              <span>{documento.responsavel}</span>
+                {documentosLimitados.map((documento, index) => {
+                  const availableFlows = getAvailableFlows(documento);
+                  const selectedFlowId = selectedFlows[documento.id] || "";
+                  
+                  return (
+                    <Card key={documento.id} className="bg-gray-50 dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] hover:shadow-md transition-shadow">
+                      <CardHeader className="pb-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <CardTitle className="text-base font-medium text-gray-900 dark:text-gray-200 mb-2">
+                              {documento.objeto || "Documento sem nome"}
+                            </CardTitle>
+                            <div className="flex flex-wrap gap-2 text-sm text-gray-600 dark:text-gray-300 mb-3">
+                              <div className="flex items-center gap-1">
+                                <User className="h-3 w-3" />
+                                <span>{documento.responsavel}</span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <Calendar className="h-3 w-3" />
+                                <span>{documento.createdAt ? formatDate(documento.createdAt.toString()) : "Data não disponível"}</span>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <Calendar className="h-3 w-3" />
-                              <span>{documento.createdAt ? formatDate(documento.createdAt.toString()) : "Data não disponível"}</span>
+                            
+                            {/* Select de Fluxo */}
+                            <div className="mt-3">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Workflow className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                                <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                  Fluxo de Documentação
+                                </span>
+                              </div>
+                              <Select 
+                                value={selectedFlowId} 
+                                onValueChange={(flowId) => handleFlowChange(documento.id, flowId)}
+                              >
+                                <SelectTrigger className="h-8 text-xs font-mono bg-white dark:bg-[#1E293B] border-gray-300 dark:border-[#374151] text-gray-700 dark:text-gray-200">
+                                  <SelectValue placeholder="Selecionar fluxo..." />
+                                </SelectTrigger>
+                                <SelectContent className="font-mono text-xs bg-white dark:bg-[#1E293B] border-gray-300 dark:border-[#374151]">
+                                  {availableFlows.length === 0 ? (
+                                    <div className="px-2 py-1 text-xs text-gray-500 dark:text-gray-400">
+                                      Nenhum fluxo disponível
+                                    </div>
+                                  ) : (
+                                    availableFlows.map((flow: any) => (
+                                      <SelectItem key={flow.id} value={flow.id} className="font-mono text-xs">
+                                        <span className="font-mono text-xs text-blue-600 dark:text-blue-400">
+                                          [{flow.code}]
+                                        </span>
+                                        <span className="ml-2 text-xs text-gray-700 dark:text-gray-200">
+                                          {flow.name}
+                                        </span>
+                                      </SelectItem>
+                                    ))
+                                  )}
+                                </SelectContent>
+                              </Select>
+                              
+                              {/* Informação do fluxo selecionado */}
+                              {selectedFlowId && (
+                                <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-600 rounded text-xs">
+                                  <div className="flex items-center gap-1">
+                                    <Workflow className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                                    <span className="font-medium text-blue-800 dark:text-blue-300">
+                                      {documentsFlows.find((flow: any) => flow.id === selectedFlowId)?.name}
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 ml-4">
+                            <div className="text-xs text-gray-400 dark:text-gray-500 font-mono">
+                              #{index + 1}
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 ml-4">
-                          <div className="text-xs text-gray-400 dark:text-gray-500 font-mono">
-                            #{index + 1}
-                          </div>
-                        </div>
-                      </div>
-                    </CardHeader>
-                  </Card>
-                ))}
+                      </CardHeader>
+                    </Card>
+                  );
+                })}
               </div>
             </div>
           )}
