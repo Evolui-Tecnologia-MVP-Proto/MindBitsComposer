@@ -1228,7 +1228,7 @@ function TemplateSectionsPlugin({ sections, mdFileOld }: { sections?: string[], 
           const hasAllSections = missingSeções.length === 0;
           
           // Se template já aplicado mas temos md_file_old, reprocessar conteúdo
-          if (hasAllSections && headerFieldsContainer && (!mdSections || mdSections.length === 0)) {
+          if (hasAllSections && headerFieldsContainer && (!mdSections || mdSections.size === 0)) {
             console.log('🔥 TemplateSectionsPlugin - Template já aplicado, preservando conteúdo');
             return; // Não fazer nada, template já está aplicado
           }
@@ -1259,7 +1259,9 @@ function TemplateSectionsPlugin({ sections, mdFileOld }: { sections?: string[], 
                 // Converter markdown para Lexical nodes com formatação completa
                 try {
                   console.log(`🔍 MARKDOWN RAW para "${sectionName}":`, JSON.stringify(matchingContent));
+                  console.log(`📝 Linhas detectadas:`, matchingContent.split('\n').map((line, i) => `${i+1}: ${line}`));
                   const lexicalNodes = convertMarkdownToLexicalNodes(matchingContent);
+                  console.log(`🔢 Nodes criados:`, lexicalNodes.map(n => n.getType()));
                   
                   // Adicionar todos os nodes convertidos ao container
                   lexicalNodes.forEach(node => content.append(node));
