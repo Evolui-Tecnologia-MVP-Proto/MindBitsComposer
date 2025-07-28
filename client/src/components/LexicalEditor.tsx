@@ -918,10 +918,17 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
       continue;
     }
     
-    // Processar items de lista com marcador "-"
-    const listItemMatch = line.match(/^(\s*)-\s+(.*)/);
+    // Processar items de lista com marcador "-" ou "•"
+    const listItemMatch = line.match(/^(\s*)[-•]\s+(.*)/);
     if (listItemMatch) {
+      const indent = listItemMatch[1];
       const itemText = listItemMatch[2];
+      
+      // Se temos uma lista numerada ativa, tratar bullets como sub-itens
+      if (currentList && listType === 'number') {
+        // Bullet dentro de lista numerada - ignorar e manter lista ativa
+        continue;
+      }
       
       // Se não temos lista atual ou é diferente do tipo bullet, criar nova
       if (!currentList || listType !== 'bullet') {
@@ -970,21 +977,34 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
     
     // Linha vazia - verificar se é parte de uma lista ativa
     if (line.trim() === '') {
-      // Se temos uma lista ativa, verificar a próxima linha
-      if (currentList && i + 1 < lines.length) {
-        const nextLine = lines[i + 1];
-        // Se a próxima linha é um item da mesma lista, pular linha vazia
-        if ((listType === 'bullet' && nextLine.match(/^(\s*)-\s+/)) ||
-            (listType === 'number' && nextLine.match(/^(\s*)\d+\.\s+/))) {
-          continue; // Pular linha vazia entre itens da lista
-        }
-      }
-      
-      // Finalizar lista se existir
+      // Se temos uma lista ativa, verificar se há mais itens da lista à frente
       if (currentList) {
-        nodes.push(currentList);
-        currentList = null;
-        listType = null;
+        let foundNextListItem = false;
+        // Verificar as próximas linhas (pulando linhas vazias) para ver se há mais itens da lista
+        for (let j = i + 1; j < lines.length; j++) {
+          const nextLine = lines[j];
+          if (nextLine.trim() === '') {
+            continue; // Pular linhas vazias
+          }
+          // Verificar se é um item da mesma lista (ignorar sub-bullets em listas numeradas)
+          if ((listType === 'bullet' && nextLine.match(/^(\s*)[-•]\s+/)) ||
+              (listType === 'number' && nextLine.match(/^(\s*)\d+\.\s+/))) {
+            foundNextListItem = true;
+          } else if (listType === 'number' && nextLine.match(/^(\s*)[-•]\s+/)) {
+            // Sub-bullet em lista numerada, continuar procurando
+            continue;
+          }
+          break; // Parar na primeira linha não vazia
+        }
+        
+        if (foundNextListItem) {
+          continue; // Pular linha vazia, mantém lista ativa
+        } else {
+          // Finalizar lista - não há mais itens
+          nodes.push(currentList);
+          currentList = null;
+          listType = null;
+        }
       }
       
       const emptyParagraph = $createParagraphNode();
@@ -992,7 +1012,7 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
       continue;
     }
     
-    // Se chegamos aqui e temos uma lista ativa, finalizá-la
+    // Se chegamos aqui e não é um item de lista, finalizar lista ativa
     if (currentList) {
       nodes.push(currentList);
       currentList = null;
