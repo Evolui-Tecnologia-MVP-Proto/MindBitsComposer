@@ -164,12 +164,6 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
                           </div>
                         </div>
                         <div className="flex items-center gap-2 ml-4">
-                          <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 border-blue-300 dark:border-blue-600">
-                            {documento.origem}
-                          </Badge>
-                          <Badge className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 border-green-300 dark:border-green-600">
-                            {documento.status}
-                          </Badge>
                           <div className="text-xs text-gray-400 dark:text-gray-500 font-mono">
                             #{index + 1}
                           </div>
