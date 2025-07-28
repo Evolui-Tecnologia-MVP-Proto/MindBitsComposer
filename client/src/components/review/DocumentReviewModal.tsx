@@ -285,8 +285,9 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-white dark:bg-[#111827] border-gray-200 dark:border-[#374151]">
-        <DialogHeader className="border-b border-gray-200 dark:border-[#374151] pb-4">
+      <DialogContent className="max-w-4xl max-h-[80vh] bg-white dark:bg-[#111827] border-gray-200 dark:border-[#374151] flex flex-col">
+        {/* Header fixo */}
+        <DialogHeader className="border-b border-gray-200 dark:border-[#374151] pb-4 flex-shrink-0">
           <DialogTitle className="flex items-center gap-2 text-xl font-semibold text-gray-900 dark:text-gray-200">
             <FileText className="h-5 w-5 text-purple-600 dark:text-purple-400" />
             Revisão de Documentos - {responsavel}
@@ -301,7 +302,8 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
           </p>
         </DialogHeader>
 
-        <div className="mt-6">
+        {/* Área com scroll */}
+        <div className="flex-1 overflow-y-auto py-6">
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
@@ -443,7 +445,8 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
           )}
         </div>
 
-        <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200 dark:border-[#374151] bg-gray-50 dark:bg-[#0F172A] -mx-6 -mb-6 px-6 py-4">
+        {/* Footer fixo */}
+        <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-[#374151] bg-gray-50 dark:bg-[#0F172A] px-6 py-4 -mx-6 -mb-6 flex-shrink-0">
           <Button
             variant="outline"
             onClick={onClose}
