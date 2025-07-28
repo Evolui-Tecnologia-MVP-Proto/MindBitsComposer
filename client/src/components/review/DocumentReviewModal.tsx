@@ -149,7 +149,7 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
                     <CardHeader className="pb-3">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <CardTitle className="text-lg font-medium text-gray-900 dark:text-gray-200 mb-2">
+                          <CardTitle className="text-base font-medium text-gray-900 dark:text-gray-200 mb-2">
                             {documento.objeto || "Documento sem nome"}
                           </CardTitle>
                           <div className="flex flex-wrap gap-2 text-sm text-gray-600 dark:text-gray-300">
