@@ -28,6 +28,34 @@ export function SpecialtiesTab() {
     }
   });
 
+  // Função para buscar número de especialistas por área
+  const { data: specialistsCounts = {} } = useQuery<Record<string, number>>({
+    queryKey: ["/api/specialties", "specialists-counts"],
+    queryFn: async () => {
+      const results: Record<string, number> = {};
+      
+      // Para cada especialidade, busca o número de especialistas
+      await Promise.all(
+        specialties.map(async (specialty) => {
+          try {
+            const res = await apiRequest("GET", `/api/specialties/${specialty.id}/users`);
+            if (res.ok) {
+              const users = await res.json();
+              results[specialty.id] = users.length;
+            } else {
+              results[specialty.id] = 0;
+            }
+          } catch {
+            results[specialty.id] = 0;
+          }
+        })
+      );
+      
+      return results;
+    },
+    enabled: specialties.length > 0
+  });
+
   // Mutação para excluir especialidade
   const deleteSpecialtyMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -112,7 +140,7 @@ export function SpecialtiesTab() {
                     <TableHead>Código</TableHead>
                     <TableHead>Nome</TableHead>
                     <TableHead>Descrição</TableHead>
-                    <TableHead>Data de Criação</TableHead>
+                    <TableHead>Especialistas</TableHead>
                     <TableHead className="w-[100px]">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -128,8 +156,13 @@ export function SpecialtiesTab() {
                       <TableCell className="text-sm text-gray-600 dark:text-gray-300">
                         {specialty.description || "—"}
                       </TableCell>
-                      <TableCell className="text-sm text-gray-500">
-                        {specialty.createdAt ? new Date(specialty.createdAt).toLocaleDateString('pt-BR') : '—'}
+                      <TableCell>
+                        <Badge 
+                          variant="outline" 
+                          className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 border-blue-300 dark:border-blue-600"
+                        >
+                          {specialistsCounts[specialty.id] || 0}
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">

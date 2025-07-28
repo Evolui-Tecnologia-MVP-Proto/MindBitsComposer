@@ -141,6 +141,7 @@ export function SpecialtyModal({ isOpen, onClose, specialty }: SpecialtyModalPro
     },
     onSuccess: () => {
       refetchSpecialtyUsers();
+      queryClient.invalidateQueries({ queryKey: ["/api/specialties", "specialists-counts"] });
       setSelectedUserId("");
       toast({
         title: "Especialista adicionado",
@@ -167,6 +168,7 @@ export function SpecialtyModal({ isOpen, onClose, specialty }: SpecialtyModalPro
     },
     onSuccess: () => {
       refetchSpecialtyUsers();
+      queryClient.invalidateQueries({ queryKey: ["/api/specialties", "specialists-counts"] });
       setUserToRemove(null);
       toast({
         title: "Especialista removido",
