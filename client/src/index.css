@@ -135,6 +135,45 @@ body.dark .Collapsible__title:hover {
   background: #020203 !important;
 }
 
+/* Force white text for collapsible containers in dark mode */
+.dark .Collapsible__title,
+.dark .Collapsible__title *,
+.dark .Collapsible__content,
+.dark .Collapsible__content *,
+.dark .lexical-editor-container .Collapsible__title,
+.dark .lexical-editor-container .Collapsible__title *,
+.dark .lexical-editor-container .Collapsible__content,
+.dark .lexical-editor-container .Collapsible__content *,
+.dark [data-lexical-editor] .Collapsible__title,
+.dark [data-lexical-editor] .Collapsible__title *,
+.dark [data-lexical-editor] .Collapsible__content,
+.dark [data-lexical-editor] .Collapsible__content * {
+  color: #FFFFFF !important;
+}
+
+/* Specific targeting for collapsible title text in dark mode */
+.dark .Collapsible__title summary,
+.dark .Collapsible__title span,
+.dark .lexical-editor-container .Collapsible__title summary,
+.dark .lexical-editor-container .Collapsible__title span,
+.dark [data-lexical-editor] .Collapsible__title summary,
+.dark [data-lexical-editor] .Collapsible__title span {
+  color: #FFFFFF !important;
+}
+
+/* Collapsible content paragraphs and text nodes in dark mode */
+.dark .Collapsible__content p,
+.dark .Collapsible__content span,
+.dark .Collapsible__content div,
+.dark .lexical-editor-container .Collapsible__content p,
+.dark .lexical-editor-container .Collapsible__content span,
+.dark .lexical-editor-container .Collapsible__content div,
+.dark [data-lexical-editor] .Collapsible__content p,
+.dark [data-lexical-editor] .Collapsible__content span,
+.dark [data-lexical-editor] .Collapsible__content div {
+  color: #FFFFFF !important;
+}
+
 /* Markdown Preview Table Dark Mode */
 .dark .markdown-preview table th,
 .dark .markdown-preview table td {

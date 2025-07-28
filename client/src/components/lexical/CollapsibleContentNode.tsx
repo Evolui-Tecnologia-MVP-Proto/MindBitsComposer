@@ -52,7 +52,9 @@ export class CollapsibleContentNode extends ElementNode {
       'dark:bg-[#020203]',
       'border-t',
       'border-gray-200',
-      'dark:border-[#374151]'
+      'dark:border-[#374151]',
+      'text-gray-900',
+      'dark:text-white'
     );
     return dom;
   }
