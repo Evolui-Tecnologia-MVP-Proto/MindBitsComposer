@@ -39,9 +39,9 @@ export class CollapsibleTitleNode extends TextNode {
     super(text, key);
   }
 
-  // Tornar o nó somente leitura
+  // Permitir funcionalidade normal mas proteger conteúdo
   isToken(): boolean {
-    return true;
+    return false;
   }
 
   canInsertTextBefore(): boolean {
@@ -53,12 +53,12 @@ export class CollapsibleTitleNode extends TextNode {
   }
 
   isTextEntity(): boolean {
-    return true;
+    return false;
   }
 
-  // Prevenir seleção e edição
+  // Permitir seleção mas não edição direta
   isSelectable(): boolean {
-    return false;
+    return true;
   }
 
   // Preservar o texto durante transformações
@@ -81,9 +81,13 @@ export class CollapsibleTitleNode extends TextNode {
       'p-2'
     );
     
-    // Tornar não editável
+    // Tornar título não editável mas permitir interação
     dom.contentEditable = 'false';
     dom.setAttribute('data-lexical-editor', 'false');
+    
+    // Prevenir propagação de eventos que possam interferir com a edição do conteúdo
+    dom.addEventListener('click', (e) => e.stopPropagation());
+    dom.addEventListener('mousedown', (e) => e.stopPropagation());
     
     // Adicionar ícone de expansão/contração
     const icon = document.createElement('span');

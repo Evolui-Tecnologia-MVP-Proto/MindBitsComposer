@@ -56,6 +56,20 @@ export class CollapsibleContentNode extends ElementNode {
       'text-gray-900',
       'dark:text-white'
     );
+    
+    // Garantir que seja editável
+    dom.contentEditable = 'true';
+    dom.setAttribute('data-lexical-content', 'true');
+    
+    // Debug logs
+    dom.addEventListener('click', () => {
+      console.log('🔍 EDIT: Click no CollapsibleContent');
+    });
+    
+    dom.addEventListener('focus', () => {
+      console.log('🔍 EDIT: Focus no CollapsibleContent');
+    });
+    
     return dom;
   }
 
@@ -74,6 +88,19 @@ export class CollapsibleContentNode extends ElementNode {
   }
 
   isShadowRoot(): boolean {
+    return false;
+  }
+  
+  // Garantir que seja editável
+  isInline(): boolean {
+    return false;
+  }
+  
+  canBeEmpty(): boolean {
+    return true;
+  }
+  
+  canIndent(): boolean {
     return false;
   }
 

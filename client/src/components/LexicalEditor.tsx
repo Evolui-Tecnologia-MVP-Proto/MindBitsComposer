@@ -1271,6 +1271,13 @@ function TemplateSectionsPlugin({ sections, mdFileOld }: { sections?: string[], 
                   const lexicalNodes = convertMarkdownToLexicalNodes(matchingContent);
                   console.log(`🔢 Nodes criados:`, lexicalNodes.map(n => n.getType()));
                   
+                  // Adicionar debug para conteúdo de listas
+                  lexicalNodes.forEach((node, i) => {
+                    if (node.getType() === 'list') {
+                      console.log(`🔍 LISTA ${i}: Tipo=${node.getListType()}, Items=${node.getChildrenSize()}`);
+                    }
+                  });
+                  
                   // Adicionar todos os nodes convertidos ao container
                   lexicalNodes.forEach(node => content.append(node));
                   
