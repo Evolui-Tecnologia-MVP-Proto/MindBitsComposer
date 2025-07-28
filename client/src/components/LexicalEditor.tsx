@@ -22,7 +22,7 @@ import { $getNodeByKey, $getSelection as $getLexicalSelection, $setSelection, $c
 // Import dos nós e plugin de container colapsível
 import { CollapsibleContainerNode, $createCollapsibleContainerNode, $isCollapsibleContainerNode } from './lexical/CollapsibleNode';
 import { CollapsibleTitleNode, $createCollapsibleTitleNode, $isCollapsibleTitleNode } from './lexical/CollapsibleTitleNode';
-import { CollapsibleContentNode, $createCollapsibleContentNode, $isCollapsibleContentNode } from './lexical/CollapsibleContentNode';
+import { CollapsibleContentNode, $createCollapsibleContentNode } from './lexical/CollapsibleContentNode';
 import CollapsiblePlugin, { INSERT_COLLAPSIBLE_COMMAND } from './lexical/CollapsiblePlugin';
 
 // Import dos nós e plugin de imagem
@@ -827,10 +827,33 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
           console.log('🔥 TemplateSectionsPlugin - Dentro do editor.update');
           const root = $getRoot();
           
-          console.log('🔥 TemplateSectionsPlugin - Aplicando template ao editor');
+          console.log('🔥 TemplateSectionsPlugin - Aplicando template ao editor, preservando campos de header');
+          
+          // Preservar campos de header antes de limpar
+          const children = root.getChildren();
+          let headerFieldsContainer = null;
+          
+          children.forEach(child => {
+            if ($isCollapsibleContainerNode(child)) {
+              const childNodes = child.getChildren();
+              const title = childNodes[0];
+              if ($isCollapsibleTitleNode(title)) {
+                const titleText = title.getTextContent();
+                if (titleText.includes('Campos') || titleText.includes('Template')) {
+                  headerFieldsContainer = child;
+                }
+              }
+            }
+          });
           
           // Limpar conteúdo para aplicar o template
           root.clear();
+          
+          // Restaurar campos de header se existiam
+          if (headerFieldsContainer) {
+            root.append(headerFieldsContainer);
+            console.log('🔥 TemplateSectionsPlugin - Campos de header preservados');
+          }
           
           // Criar container de cabeçalho padrão
           const headerTitle = $createCollapsibleTitleNode();
@@ -840,7 +863,7 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
           const headerParagraph = $createParagraphNode();
           headerContent.append(headerParagraph);
           
-          const headerContainer = $createCollapsibleContainerNode(true); // Aberto por padrão para mostrar campos
+          const headerContainer = $createCollapsibleContainerNode(false);
           headerContainer.append(headerTitle, headerContent);
           root.append(headerContainer);
           
@@ -1027,92 +1050,76 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       if (headerKeys.length > 0) {
         console.log('🔍 DEBUG: Iniciando inserção...');
         
-        // ABORDAGEM SUPER ROBUSTA: Inserir campos COM VERIFICAÇÃO CONTÍNUA
-        let insertionAttempts = 0;
-        const maxAttempts = 5;
-        
-        const attemptInsert = () => {
-          insertionAttempts++;
-          console.log(`🔄 TENTATIVA ${insertionAttempts}/${maxAttempts} de inserção`);
-          
-          editorInstance.update(() => {
-            const root = $getRoot();
-            const children = root.getChildren();
-            
-            console.log(`🔍 TENTATIVA ${insertionAttempts}: Total elementos: ${children.length}`);
-            
-            if (children.length > 0) {
-              const firstChild = children[0];
+        // Timeout maior para garantir que TemplateSectionsPlugin termine primeiro
+        setTimeout(() => {
+          try {
+            editorInstance.update(() => {
+              console.log('🔍 DEBUG: Dentro do editor.update() - APÓS TemplateSectionsPlugin');
+              const root = $getRoot();
               
-              if ($isCollapsibleContainerNode(firstChild)) {
-                const containerChildren = firstChild.getChildren();
-                
-                if (containerChildren.length > 1) {
-                  const content = containerChildren[1];
-                  
-                  if ($isCollapsibleContentNode(content)) {
-                    const contentChildren = content.getChildren();
-                    
-                    // Verificar se já tem campos de header
-                    let hasHeaderFields = false;
-                    contentChildren.forEach((child: any) => {
-                      if ($isHeaderFieldNode && $isHeaderFieldNode(child)) {
-                        hasHeaderFields = true;
-                      }
-                    });
-                    
-                    console.log(`🔍 TENTATIVA ${insertionAttempts}: Tem campos? ${hasHeaderFields}, Filhos: ${contentChildren.length}`);
-                    
-                    if (!hasHeaderFields && contentChildren.length <= 1) {
-                      console.log(`🔍 TENTATIVA ${insertionAttempts}: INSERINDO CAMPOS...`);
-                      
-                      // Limpar apenas se for um parágrafo vazio
-                      if (contentChildren.length === 1 && contentChildren[0].getTextContent().trim() === '') {
-                        content.clear();
-                      }
-                      
-                      // Inserir campos
-                      headerKeys.forEach((key, index) => {
-                        try {
-                          const fieldNode = $createHeaderFieldNode(
-                            key,
-                            (fieldsToUse as any)[key] || '',
-                            `Digite ${key.toLowerCase()}...`
-                          );
-                          content.append(fieldNode);
-                          console.log(`✅ TENTATIVA ${insertionAttempts}: Campo ${key} inserido`);
-                        } catch (fieldError) {
-                          console.error(`❌ TENTATIVA ${insertionAttempts}: Erro campo ${key}:`, fieldError);
-                        }
-                      });
-                      
-                      // Adicionar parágrafo editável
-                      const editableParagraph = $createParagraphNode();
-                      content.append(editableParagraph);
-                      
-                      console.log(`✅ TENTATIVA ${insertionAttempts}: TODOS OS CAMPOS INSERIDOS!`);
-                      return; // Sair se inserção foi bem-sucedida
-                    } else if (hasHeaderFields) {
-                      console.log(`✅ TENTATIVA ${insertionAttempts}: Campos já existem, parando tentativas`);
-                      return; // Campos já estão lá
+              const children = root.getChildren();
+              console.log('🔍 DEBUG: Elementos existentes:', children.length);
+              
+              // Verificar se já existe container de campos
+              let hasHeaderContainer = false;
+              children.forEach(child => {
+                if ($isCollapsibleContainerNode(child)) {
+                  const childNodes = child.getChildren();
+                  const title = childNodes[0];
+                  if ($isCollapsibleTitleNode(title)) {
+                    const titleText = title.getTextContent();
+                    if (titleText.includes('Campos') || titleText.includes('Template')) {
+                      hasHeaderContainer = true;
                     }
                   }
                 }
+              });
+              
+              if (!hasHeaderContainer) {
+                console.log('🔍 DEBUG: Criando container de campos...');
+                
+                // Criar título do container
+                const title = $createCollapsibleTitleNode('📝 Campos do Template');
+                
+                // Criar conteúdo do container
+                const content = $createCollapsibleContentNode();
+                
+                // Criar campos para cada item
+                headerKeys.forEach((key, index) => {
+                  console.log(`🔍 DEBUG: Criando campo ${index + 1}/${headerKeys.length}: ${key}`);
+                  try {
+                    const fieldNode = $createHeaderFieldNode(
+                      key,
+                      fieldsToUse[key] || '',
+                      `Digite ${key.toLowerCase()}...`
+                    );
+                    content.append(fieldNode);
+                    console.log(`✅ DEBUG: Campo ${key} criado com sucesso`);
+                  } catch (fieldError) {
+                    console.error(`❌ DEBUG: Erro ao criar campo ${key}:`, fieldError);
+                  }
+                });
+                
+                // Criar container colapsível
+                const container = $createCollapsibleContainerNode(true);
+                container.append(title, content);
+                
+                // Inserir no INÍCIO do documento (antes de qualquer seção do template)
+                if (root.getFirstChild()) {
+                  root.getFirstChild()!.insertBefore(container);
+                } else {
+                  root.append(container);
+                }
+                
+                console.log('✅ DEBUG: Container de campos inserido com sucesso APÓS template!');
+              } else {
+                console.log('⚠️ DEBUG: Container de campos já existe');
               }
-            }
-            
-            // Se chegou aqui, não conseguiu inserir - tentar novamente
-            if (insertionAttempts < maxAttempts) {
-              console.log(`⚠️ TENTATIVA ${insertionAttempts}: Falhou, tentando novamente em 500ms`);
-              setTimeout(attemptInsert, 500);
-            } else {
-              console.log(`❌ TODAS AS ${maxAttempts} TENTATIVAS FALHARAM`);
-            }
-          });
-        };
-        
-        // Começar tentativas após template ser aplicado
-        setTimeout(attemptInsert, 1200);
+            });
+          } catch (error) {
+            console.error('❌ DEBUG: Erro durante inserção:', error);
+          }
+        }, 1000); // Timeout maior para executar DEPOIS do TemplateSectionsPlugin
         
         // Backup timeout maior
         setTimeout(() => {
