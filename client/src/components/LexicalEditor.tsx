@@ -880,12 +880,14 @@ function processInlineFormatting(text: string): any[] {
 
 // Função para converter conteúdo markdown em nodes Lexical completos
 function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
-  const lines = markdownContent.split('\n');
+  const lines = markdownContent.split('\n').filter(line => line.trim() !== ''); // Remover linhas vazias 
   const nodes: any[] = [];
   let isInCodeBlock = false;
   let codeBlockContent: string[] = [];
   let currentList: any = null;
   let listType: 'bullet' | 'number' | null = null;
+  
+  console.log(`🔍 CONVERSÃO: Iniciando com ${lines.length} linhas:`, lines);
   
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -921,6 +923,7 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
     // Processar items de lista com marcador "-" ou "•"
     const listItemMatch = line.match(/^(\s*)[-•]\s+(.*)/);
     if (listItemMatch) {
+      console.log(`🔍 LISTA: Encontrado item de lista "${line}"`);
       const indent = listItemMatch[1];
       const itemText = listItemMatch[2];
       
@@ -958,15 +961,18 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
       if (!currentList || listType !== 'bullet') {
         // Finalizar lista anterior se existir
         if (currentList) {
+          console.log(`🔍 LISTA: Finalizando lista anterior (${listType})`);
           nodes.push(currentList);
         }
         
+        console.log(`🔍 LISTA: Criando nova lista bullet`);
         // Criar nova lista bullet
         currentList = $createListNode('bullet');
         listType = 'bullet';
       }
       
       // Criar item da lista
+      console.log(`🔍 LISTA: Adicionando item "${itemText}"`);
       const listItem = $createListItemNode();
       const textNodes = processInlineFormatting(itemText);
       textNodes.forEach(node => listItem.append(node));
@@ -1063,6 +1069,7 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
   
   // Finalizar lista se ainda existir
   if (currentList) {
+    console.log(`🔍 LISTA: Finalizando lista final (${listType})`);
     nodes.push(currentList);
   }
   
@@ -1073,6 +1080,7 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
     nodes.push(codeBlock);
   }
   
+  console.log(`🔍 CONVERSÃO: Finalizada com ${nodes.length} nodes:`, nodes.map(n => n.getType()));
   return nodes;
 }
 
