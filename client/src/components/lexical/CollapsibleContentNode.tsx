@@ -74,7 +74,7 @@ export class CollapsibleContentNode extends ElementNode {
   }
 
   isShadowRoot(): boolean {
-    return true;
+    return false;
   }
 
   exportDOM(): DOMExportOutput {
