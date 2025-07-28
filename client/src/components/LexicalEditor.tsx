@@ -827,11 +827,12 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
           console.log('🔥 TemplateSectionsPlugin - Dentro do editor.update');
           const root = $getRoot();
           
-          console.log('🔥 TemplateSectionsPlugin - Aplicando template ao editor, preservando campos de header');
+          console.log('🔥 TemplateSectionsPlugin - Verificando conteúdo existente');
           
-          // Preservar campos de header antes de limpar
+          // Mapear containers existentes para preservar conteúdo
           const children = root.getChildren();
           let headerFieldsContainer = null;
+          const existingSections = new Map();
           
           children.forEach(child => {
             if ($isCollapsibleContainerNode(child)) {
@@ -841,12 +842,26 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
                 const titleText = title.getTextContent();
                 if (titleText.includes('Document Header') || titleText.includes('Campos') || titleText.includes('Template')) {
                   headerFieldsContainer = child;
+                } else {
+                  // Guardar containers de seções existentes
+                  existingSections.set(titleText, child);
                 }
               }
             }
           });
           
-          // Limpar conteúdo para aplicar o template
+          console.log('🔥 TemplateSectionsPlugin - Seções existentes encontradas:', Array.from(existingSections.keys()));
+          
+          // Verificar se todas as seções já existem
+          const missingSeções = sections.filter(sectionName => !existingSections.has(sectionName));
+          const hasAllSections = missingSeções.length === 0;
+          
+          if (hasAllSections && headerFieldsContainer) {
+            console.log('🔥 TemplateSectionsPlugin - Template já aplicado, preservando conteúdo');
+            return; // Não fazer nada, template já está aplicado
+          }
+          
+          // Limpar apenas se precisar aplicar o template
           root.clear();
           
           // Restaurar campos de header se existiam
@@ -856,18 +871,26 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
           }
           
           sections.forEach((sectionName) => {
-            // Criar container colapsível
-            const title = $createCollapsibleTitleNode(sectionName);
-            const content = $createCollapsibleContentNode();
-            
-            // Adicionar parágrafo editável dentro do conteúdo
-            const paragraph = $createParagraphNode();
-            content.append(paragraph);
+            // Usar container existente se disponível, senão criar novo
+            if (existingSections.has(sectionName)) {
+              const existingContainer = existingSections.get(sectionName);
+              root.append(existingContainer);
+              console.log(`🔥 TemplateSectionsPlugin - Seção "${sectionName}" preservada com conteúdo`);
+            } else {
+              // Criar novo container apenas se não existir
+              const title = $createCollapsibleTitleNode(sectionName);
+              const content = $createCollapsibleContentNode();
+              
+              // Adicionar parágrafo editável dentro do conteúdo
+              const paragraph = $createParagraphNode();
+              content.append(paragraph);
 
-            const container = $createCollapsibleContainerNode(false);
-            container.append(title, content);
-            
-            root.append(container);
+              const container = $createCollapsibleContainerNode(false);
+              container.append(title, content);
+              
+              root.append(container);
+              console.log(`🔥 TemplateSectionsPlugin - Nova seção "${sectionName}" criada`);
+            }
           });
           
           // Adicionar parágrafo final para permitir edição após os containers
