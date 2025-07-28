@@ -377,7 +377,6 @@ export function SpecialtyModal({ isOpen, onClose, specialty }: SpecialtyModalPro
                           <Table>
                             <TableHeader>
                               <TableRow className="dark:bg-[#111827]">
-                                <TableHead className="dark:bg-[#111827]">Nome</TableHead>
                                 <TableHead className="dark:bg-[#111827]">Email</TableHead>
                                 <TableHead className="dark:bg-[#111827]">Função</TableHead>
                                 <TableHead className="dark:bg-[#111827]">Status</TableHead>
@@ -387,7 +386,6 @@ export function SpecialtyModal({ isOpen, onClose, specialty }: SpecialtyModalPro
                             <TableBody>
                               {specialtyUsers.map(({ user }) => (
                                 <TableRow key={user.id} className="dark:bg-[#0F172A]">
-                                  <TableCell className="font-medium dark:bg-[#0F172A]">{user.name}</TableCell>
                                   <TableCell className="dark:bg-[#0F172A]">{user.email}</TableCell>
                                   <TableCell className="dark:bg-[#0F172A]">
                                     <Badge variant="outline" className="font-mono">
