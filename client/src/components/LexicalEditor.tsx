@@ -20,8 +20,8 @@ import { $getNodeByKey, $getSelection as $getLexicalSelection, $setSelection, $c
 
 
 // Import dos nós e plugin de container colapsível
-import { CollapsibleContainerNode, $createCollapsibleContainerNode } from './lexical/CollapsibleNode';
-import { CollapsibleTitleNode, $createCollapsibleTitleNode } from './lexical/CollapsibleTitleNode';
+import { CollapsibleContainerNode, $createCollapsibleContainerNode, $isCollapsibleContainerNode } from './lexical/CollapsibleNode';
+import { CollapsibleTitleNode, $createCollapsibleTitleNode, $isCollapsibleTitleNode } from './lexical/CollapsibleTitleNode';
 import { CollapsibleContentNode, $createCollapsibleContentNode } from './lexical/CollapsibleContentNode';
 import CollapsiblePlugin, { INSERT_COLLAPSIBLE_COMMAND } from './lexical/CollapsiblePlugin';
 
@@ -29,6 +29,9 @@ import CollapsiblePlugin, { INSERT_COLLAPSIBLE_COMMAND } from './lexical/Collaps
 import { ImageNode, $createImageNode } from './lexical/ImageNode';
 import { ImageWithMetadataNode, $createImageWithMetadataNode, type ImageWithMetadataPayload } from './lexical/ImageWithMetadataNode';
 import ImagePlugin, { useImageUpload } from './lexical/ImagePlugin';
+
+// Import do nó de campos do header
+import { HeaderFieldNode, $createHeaderFieldNode, $isHeaderFieldNode } from './lexical/HeaderFieldNode';
 
 // Import do plugin customizado de tabela
 import CustomTablePlugin, { INSERT_CUSTOM_TABLE_COMMAND } from './lexical/TablePlugin';
@@ -987,25 +990,70 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
   const [markdownViewMode, setMarkdownViewMode] = useState<'current' | 'old'>('current');
   const [headerFields, setHeaderFields] = useState<HeaderField[]>([]);
 
-  // Processar template structure para extrair campos do header
+  // Processar template structure e inserir campos do header no editor
   useEffect(() => {
-    if (templateStructure && typeof templateStructure === 'object') {
+    if (templateStructure && typeof templateStructure === 'object' && editorInstance) {
       const structure = templateStructure;
       
       // Processar campos do header se existirem
       if (structure.header && typeof structure.header === 'object') {
-        const newHeaderFields: HeaderField[] = Object.keys(structure.header).map(key => ({
-          key: key,
-          value: structure.header[key] || ''
-        }));
-        setHeaderFields(newHeaderFields);
-      } else {
-        setHeaderFields([]);
+        const headerKeys = Object.keys(structure.header);
+        
+        if (headerKeys.length > 0) {
+          // Inserir container colapsível com campos do header automaticamente
+          editorInstance.update(() => {
+            // Verificar se já existe um container com campos do header
+            const root = $getRoot();
+            const children = root.getChildren();
+            let existingContainer = null;
+            
+            for (const child of children) {
+              if ($isCollapsibleContainerNode(child)) {
+                const childNodes = child.getChildren();
+                const title = childNodes[0]; // Primeiro filho deve ser o título
+                if ($isCollapsibleTitleNode(title)) {
+                  const titleText = title.getTextContent();
+                  if (titleText.includes('Campos do Template')) {
+                    existingContainer = child;
+                    break;
+                  }
+                }
+              }
+            }
+
+            if (!existingContainer) {
+              // Criar título do container
+              const title = $createCollapsibleTitleNode('Campos do Template');
+              
+              // Criar conteúdo do container
+              const content = $createCollapsibleContentNode();
+              
+              // Criar campos para cada item do header
+              headerKeys.forEach(key => {
+                const fieldNode = $createHeaderFieldNode(
+                  key,
+                  structure.header[key] || '',
+                  `Digite ${key.toLowerCase()}...`
+                );
+                content.append(fieldNode);
+              });
+              
+              // Criar container colapsível
+              const container = $createCollapsibleContainerNode(true); // Aberto por padrão
+              container.append(title, content);
+              
+              // Inserir no início do documento
+              if (root.getFirstChild()) {
+                root.getFirstChild()!.insertBefore(container);
+              } else {
+                root.append(container);
+              }
+            }
+          });
+        }
       }
-    } else {
-      setHeaderFields([]);
     }
-  }, [templateStructure]);
+  }, [templateStructure, editorInstance]);
 
   // Função para atualizar campo do header
   const updateHeaderField = (index: number, value: string) => {
@@ -1181,6 +1229,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       CollapsibleContentNode,
       ImageNode,
       ImageWithMetadataNode,
+      HeaderFieldNode,
     ],
   };
 
@@ -1235,34 +1284,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
     <div className={`lexical-editor-container w-full h-full flex flex-col ${className}`}>
       <LexicalComposer initialConfig={initialConfig}>
         <div className="w-full h-full flex flex-col min-h-0">
-          {/* Campos do Header do Template (apenas no modo editor) */}
-          {viewMode === 'editor' && headerFields.length > 0 && (
-            <div className="border-b border-gray-200 dark:border-[#374151] bg-gray-50 dark:bg-[#111827] p-4">
-              <div className="mb-2">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Campos do Template</h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {headerFields.map((field, index) => (
-                  <div key={field.key} className="flex flex-col">
-                    <label className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                      {field.key}
-                    </label>
-                    <input
-                      type="text"
-                      value={field.value}
-                      onChange={(e) => updateHeaderField(index, e.target.value)}
-                      className="px-3 py-2 text-sm border border-gray-300 dark:border-[#374151] rounded-md 
-                                 bg-white dark:bg-[#0F172A] text-gray-900 dark:text-gray-200
-                                 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                                 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-                      placeholder={`Digite ${field.key.toLowerCase()}...`}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
+
           {viewMode === 'editor' && isEnabled && (
             <ToolbarPlugin 
               tableRows={tableRows}
