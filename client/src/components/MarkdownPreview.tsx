@@ -362,14 +362,56 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
     if (htmlTableContent.length > 0) {
       const tableHtml = htmlTableContent.join('\n');
       
-      // Process HTML table content using dangerouslySetInnerHTML with proper styling
+      // Process HTML table content - show warning for nested tables
       const processHtmlTableContent = (html: string): React.ReactNode => {
+        // Check if the table contains nested tables
+        const hasNestedTables = (htmlString: string): boolean => {
+          // Parse the HTML to check for nested table structures
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlString, 'text/html');
+          const mainTable = doc.querySelector('table');
+          
+          if (!mainTable) return false;
+          
+          // Check if any cell contains a table
+          const cells = mainTable.querySelectorAll('td, th');
+          for (let i = 0; i < cells.length; i++) {
+            if (cells[i].querySelector('table')) {
+              return true;
+            }
+          }
+          return false;
+        };
+        
+        // If table has nested tables, show warning message
+        if (hasNestedTables(html)) {
+          return (
+            <div className="mb-4 p-4 border border-orange-300 dark:border-orange-600 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+              <div className="flex items-start space-x-3">
+                <svg className="w-5 h-5 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <div>
+                  <h4 className="text-sm font-medium text-orange-800 dark:text-orange-300 mb-1">
+                    Tabela com estrutura aninhada detectada
+                  </h4>
+                  <p className="text-sm text-orange-700 dark:text-orange-400">
+                    O visualizador não suporta a renderização de tabelas aninhadas, considere usar outra alternativa caso isto seja um problema. 
+                    Outros renderizadores podem oferecer este suporte, a estrutura do MD está correta e a semântica adequada para processamento por IA.
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        }
+        
+        // For simple tables, render normally
         return (
           <div 
             className="overflow-x-auto mb-4 table-html-container"
             dangerouslySetInnerHTML={{ __html: html }}
             style={{
-              // CSS variables for nested table styling
+              // CSS variables for table styling
               '--table-border': '#374151',
               '--table-bg': '#1B2028',
               '--cell-padding': '12px'
