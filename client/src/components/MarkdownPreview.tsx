@@ -362,20 +362,80 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
     if (htmlTableContent.length > 0) {
       const tableHtml = htmlTableContent.join('\n');
       
-      // Process HTML table content to handle code blocks
+      // Process HTML table content using React components
       const processHtmlTableContent = (html: string): React.ReactNode => {
-        // For tables with nested structures, render directly without parsing
-        // This preserves the original HTML structure and avoids style conflicts
-        return (
-          <div
-            className="table-container" 
-            dangerouslySetInnerHTML={{ __html: html }} 
-            style={{
-              '--border-color': '#374151',
-              '--bg-color': '#1B2028'
-            } as React.CSSProperties}
-          />
-        );
+        // Parse the HTML table and recreate it using React components
+        const createTableFromHtml = (htmlString: string) => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlString, 'text/html');
+          const table = doc.querySelector('table');
+          
+          if (!table) return <div>Erro na tabela</div>;
+          
+          const renderElement = (element: Element, key: number = 0): React.ReactNode => {
+            const tagName = element.tagName.toLowerCase();
+            const attrs: any = {};
+            
+            // Copy attributes
+            for (let i = 0; i < element.attributes.length; i++) {
+              const attr = element.attributes[i];
+              if (attr.name === 'style') {
+                attrs.style = parseStyle(attr.value);
+              } else if (attr.name === 'class') {
+                attrs.className = attr.value;
+              } else {
+                attrs[attr.name] = attr.value;
+              }
+            }
+            
+            // Process children
+            const children: React.ReactNode[] = [];
+            for (let i = 0; i < element.childNodes.length; i++) {
+              const child = element.childNodes[i];
+              if (child.nodeType === Node.ELEMENT_NODE) {
+                children.push(renderElement(child as Element, i));
+              } else if (child.nodeType === Node.TEXT_NODE) {
+                const text = child.textContent?.trim();
+                if (text) children.push(text);
+              }
+            }
+            
+            // Apply dark mode styling
+            if (tagName === 'table') {
+              attrs.className = 'min-w-full border border-gray-300 dark:border-[#374151] rounded-lg';
+              attrs.style = { ...attrs.style, width: '100%' };
+            } else if (tagName === 'tbody') {
+              attrs.className = 'divide-y divide-gray-200 dark:divide-[#374151]';
+            } else if (tagName === 'tr') {
+              attrs.className = 'hover:bg-gray-50 dark:hover:bg-[#1E293B]';
+            } else if (tagName === 'td') {
+              attrs.className = 'px-4 py-3 text-sm text-black dark:text-white border-b border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1B2028]';
+              attrs.style = { ...attrs.style, verticalAlign: 'top', padding: '12px' };
+            }
+            
+            return React.createElement(tagName, { key, ...attrs }, ...children);
+          };
+          
+          const parseStyle = (styleStr: string) => {
+            const style: any = {};
+            styleStr.split(';').forEach(rule => {
+              const [prop, value] = rule.split(':').map(s => s.trim());
+              if (prop && value) {
+                const camelProp = prop.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+                style[camelProp] = value;
+              }
+            });
+            return style;
+          };
+          
+          return (
+            <div className="overflow-x-auto mb-4">
+              {renderElement(table)}
+            </div>
+          );
+        };
+        
+        return createTableFromHtml(html);
       };
       
       // Render the HTML table directly
