@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { $getRoot, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, type TextFormatType, $createParagraphNode, $createTextNode, $insertNodes, $isParagraphNode, UNDO_COMMAND, REDO_COMMAND, COMMAND_PRIORITY_LOW, PASTE_COMMAND, $isTextNode } from 'lexical';
+
 import { createMarkdownConverter } from './markdown-converter';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
@@ -798,90 +799,75 @@ function cleanMarkdownContent(markdown: string): string {
     .trim();
 }
 
-// Função para converter texto markdown em nodes Lexical com formatação
-function createFormattedTextNodes(text: string): any[] {
-  const nodes: any[] = [];
-  let remaining = text;
+// Função para processar formatação inline e criar TextNodes corretos
+function processInlineFormatting(text: string): any[] {
+  const result: any[] = [];
+  const segments: Array<{text: string, formats: Set<string>}> = [];
   
-  while (remaining.length > 0) {
-    // Procurar por código inline primeiro (para evitar conflitos com outros marcadores)
-    const codeMatch = remaining.match(/`([^`]+)`/);
-    if (codeMatch && (codeMatch.index === 0 || remaining.indexOf(codeMatch[0]) < remaining.search(/(\*\*|\*|~~)/))) {
-      // Adicionar texto antes do código
-      if (codeMatch.index && codeMatch.index > 0) {
-        const beforeCode = remaining.substring(0, codeMatch.index);
-        nodes.push(...createFormattedTextNodes(beforeCode));
+  // Lista de marcadores ordenados por prioridade
+  const markers = [
+    { regex: /`([^`]+)`/g, format: 'code', replacement: '$1' },
+    { regex: /\*\*(.*?)\*\*/g, format: 'bold', replacement: '$1' },
+    { regex: /~~(.*?)~~/g, format: 'strikethrough', replacement: '$1' },
+    { regex: /\*(.*?)\*/g, format: 'italic', replacement: '$1' }
+  ];
+  
+  let remaining = text;
+  let currentPosition = 0;
+  
+  // Encontrar todas as ocorrências de formatação
+  const matches: Array<{start: number, end: number, text: string, format: string}> = [];
+  
+  markers.forEach(marker => {
+    let match;
+    const regex = new RegExp(marker.regex.source, marker.regex.flags);
+    while ((match = regex.exec(text)) !== null) {
+      matches.push({
+        start: match.index,
+        end: match.index + match[0].length,
+        text: match[1],
+        format: marker.format
+      });
+    }
+  });
+  
+  // Ordenar por posição
+  matches.sort((a, b) => a.start - b.start);
+  
+  // Processar matches sem sobreposição
+  let lastEnd = 0;
+  matches.forEach(match => {
+    // Adicionar texto antes do match
+    if (match.start > lastEnd) {
+      const beforeText = text.substring(lastEnd, match.start);
+      if (beforeText) {
+        result.push($createTextNode(beforeText));
       }
-      
-      // Criar node de código
-      const codeNode = $createTextNode(codeMatch[1]);
-      codeNode.setFormat('code');
-      nodes.push(codeNode);
-      
-      remaining = remaining.substring((codeMatch.index || 0) + codeMatch[0].length);
-      continue;
     }
     
-    // Procurar por negrito
-    const boldMatch = remaining.match(/\*\*(.*?)\*\*/);
-    if (boldMatch && (boldMatch.index === 0 || remaining.indexOf(boldMatch[0]) < remaining.search(/(\*|~~)/))) {
-      // Adicionar texto antes do negrito
-      if (boldMatch.index && boldMatch.index > 0) {
-        const beforeBold = remaining.substring(0, boldMatch.index);
-        nodes.push(...createFormattedTextNodes(beforeBold));
-      }
-      
-      // Criar node de negrito
-      const boldNode = $createTextNode(boldMatch[1]);
-      boldNode.setFormat('bold');
-      nodes.push(boldNode);
-      
-      remaining = remaining.substring((boldMatch.index || 0) + boldMatch[0].length);
-      continue;
-    }
+    // Criar node formatado
+    const formattedNode = $createTextNode(match.text);
+    formattedNode.setFormat(match.format as any);
+    console.log(`🔧 Aplicando formatação: "${match.format}" ao texto: "${match.text}"`);
+    result.push(formattedNode);
     
-    // Procurar por tachado
-    const strikeMatch = remaining.match(/~~(.*?)~~/);
-    if (strikeMatch && (strikeMatch.index === 0 || remaining.indexOf(strikeMatch[0]) < remaining.search(/\*/))) {
-      // Adicionar texto antes do tachado
-      if (strikeMatch.index && strikeMatch.index > 0) {
-        const beforeStrike = remaining.substring(0, strikeMatch.index);
-        nodes.push(...createFormattedTextNodes(beforeStrike));
-      }
-      
-      // Criar node de tachado
-      const strikeNode = $createTextNode(strikeMatch[1]);
-      strikeNode.setFormat('strikethrough');
-      nodes.push(strikeNode);
-      
-      remaining = remaining.substring((strikeMatch.index || 0) + strikeMatch[0].length);
-      continue;
+    lastEnd = match.end;
+  });
+  
+  // Adicionar texto restante
+  if (lastEnd < text.length) {
+    const remainingText = text.substring(lastEnd);
+    if (remainingText) {
+      result.push($createTextNode(remainingText));
     }
-    
-    // Procurar por itálico (após negrito para evitar conflitos)
-    const italicMatch = remaining.match(/\*(.*?)\*/);
-    if (italicMatch) {
-      // Adicionar texto antes do itálico
-      if (italicMatch.index && italicMatch.index > 0) {
-        const beforeItalic = remaining.substring(0, italicMatch.index);
-        nodes.push($createTextNode(beforeItalic));
-      }
-      
-      // Criar node de itálico
-      const italicNode = $createTextNode(italicMatch[1]);
-      italicNode.setFormat('italic');
-      nodes.push(italicNode);
-      
-      remaining = remaining.substring((italicMatch.index || 0) + italicMatch[0].length);
-      continue;
-    }
-    
-    // Nenhum marcador encontrado, adicionar texto restante
-    nodes.push($createTextNode(remaining));
-    break;
   }
   
-  return nodes;
+  // Se não houve matches, retornar texto simples
+  if (matches.length === 0) {
+    result.push($createTextNode(text));
+  }
+  
+  return result;
 }
 
 // Função para converter conteúdo markdown em nodes Lexical completos
@@ -890,7 +876,6 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
   const nodes: any[] = [];
   let isInCodeBlock = false;
   let codeBlockContent: string[] = [];
-  let codeBlockLanguage = '';
   
   for (const line of lines) {
     // Processar blocos de código
@@ -902,12 +887,9 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
         nodes.push(codeBlock);
         codeBlockContent = [];
         isInCodeBlock = false;
-        codeBlockLanguage = '';
       } else {
         // Iniciar bloco de código
         isInCodeBlock = true;
-        const match = line.match(/^```\s*(\w+)?/);
-        codeBlockLanguage = match?.[1] || '';
       }
       continue;
     }
@@ -917,7 +899,7 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
       continue;
     }
     
-    // Processar linha vazia
+    // Linha vazia
     if (line.trim() === '') {
       const emptyParagraph = $createParagraphNode();
       nodes.push(emptyParagraph);
@@ -929,7 +911,7 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
       const level = line.match(/^#+/)?.[0].length || 1;
       const text = line.replace(/^#+\s*/, '');
       const heading = $createHeadingNode(`h${Math.min(level, 6)}` as any);
-      const textNodes = createFormattedTextNodes(text);
+      const textNodes = processInlineFormatting(text);
       textNodes.forEach(node => heading.append(node));
       nodes.push(heading);
       continue;
@@ -937,7 +919,7 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
     
     // Processar linha normal com formatação
     const paragraph = $createParagraphNode();
-    const textNodes = createFormattedTextNodes(line);
+    const textNodes = processInlineFormatting(line);
     textNodes.forEach(node => paragraph.append(node));
     nodes.push(paragraph);
   }
