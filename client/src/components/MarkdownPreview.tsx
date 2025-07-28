@@ -262,7 +262,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
       const content = currentParagraph.join('\n').trim();
       if (content) {
         const processedContent = processInlineFormatting(content);
-        elements.push(<p key={elements.length} className="mb-4 leading-relaxed text-gray-700">{processedContent}</p>);
+        elements.push(<p key={elements.length} className="mb-4 leading-relaxed text-black dark:text-white">{processedContent}</p>);
       }
       currentParagraph = [];
     }
@@ -446,8 +446,9 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
       flushParagraph();
       const level = line.match(/^#+/)?.[0].length || 1;
       const text = line.replace(/^#+\s*/, '');
+      const processedText = processInlineFormatting(text);
       const HeadingComponent = mdxComponents[`h${level}` as keyof typeof mdxComponents] as any;
-      elements.push(<HeadingComponent key={elements.length}>{text}</HeadingComponent>);
+      elements.push(<HeadingComponent key={elements.length}>{processedText}</HeadingComponent>);
       return;
     }
 
@@ -455,9 +456,10 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
     if (line.startsWith('>')) {
       flushParagraph();
       const text = line.replace(/^>\s*/, '');
+      const processedText = processInlineFormatting(text);
       elements.push(
-        <blockquote key={elements.length} className="border-l-4 border-blue-500 pl-4 py-2 mb-4 bg-gray-50 italic text-gray-600">
-          {text}
+        <blockquote key={elements.length} className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 py-2 mb-4 bg-gray-50 dark:bg-[#1E293B] italic text-black dark:text-white">
+          {processedText}
         </blockquote>
       );
       return;
@@ -475,10 +477,11 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
       flushParagraph();
       const isOrdered = line.match(/^\s*\d+\.\s/);
       const text = line.replace(/^\s*(?:[-*+]|\d+\.)\s*/, '');
+      const processedText = processInlineFormatting(text);
       const ListComponent = isOrdered ? mdxComponents.ol : mdxComponents.ul;
       elements.push(
         <ListComponent key={elements.length}>
-          <li className="text-gray-700">{text}</li>
+          <li className="text-black dark:text-white">{processedText}</li>
         </ListComponent>
       );
       return;
@@ -502,6 +505,8 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
       return;
     }
 
+
+
     // Handle empty lines
     if (line.trim() === '') {
       flushParagraph();
@@ -522,7 +527,41 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
 }
 
 export default function MarkdownPreview({ content, className = '' }: MarkdownPreviewProps) {
-  const renderedContent = parseMarkdownToReact(content);
+  // Pre-process content to handle inline formatting in HTML elements
+  const preprocessContent = (content: string): string => {
+    if (!content) return content;
+    
+    // Process summary elements
+    content = content.replace(/<summary[^>]*>(.*?)<\/summary>/g, (match, summaryContent) => {
+      const processedContent = summaryContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                             .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                             .replace(/`([^`]+)`/g, '<code>$1</code>');
+      return `<summary>${processedContent}</summary>`;
+    });
+    
+    // Process content inside details elements (but not summary)
+    content = content.replace(/<details[^>]*>(.*?)<\/details>/g, (match, detailsContent) => {
+      // Split into summary and rest
+      const summaryMatch = detailsContent.match(/(<summary[^>]*>.*?<\/summary>)(.*)/);
+      if (summaryMatch) {
+        const [, summary, rest] = summaryMatch;
+        const processedRest = rest.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                  .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                  .replace(/`([^`]+)`/g, '<code>$1</code>');
+        return `<details>${summary}${processedRest}</details>`;
+      } else {
+        const processedContent = detailsContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                               .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                               .replace(/`([^`]+)`/g, '<code>$1</code>');
+        return `<details>${processedContent}</details>`;
+      }
+    });
+    
+    return content;
+  };
+
+  const processedContent = preprocessContent(content);
+  const renderedContent = parseMarkdownToReact(processedContent);
 
   return (
     <MDXProvider components={mdxComponents}>
