@@ -250,9 +250,58 @@ export function createMarkdownConverter() {
             // Content row
             markdown += '    <tr>\n';
             cells.forEach((cell: any) => {
+              // Process cell content to detect code blocks
+              function processMermaidTableCell(cell: any): string {
+                let content = '';
+                let hasCodeBlock = false;
+                
+                if (cell.getChildren) {
+                  const children = cell.getChildren();
+                  children.forEach((child: any) => {
+                    if (child.getType() === 'code') {
+                      hasCodeBlock = true;
+                      const codeText = child.getTextContent();
+                      // Check if it's Mermaid code
+                      if (codeText.includes('graph TD') || codeText.includes('flowchart') || 
+                          codeText.includes('sequenceDiagram') || codeText.includes('classDiagram') ||
+                          codeText.includes('stateDiagram') || codeText.includes('erDiagram') ||
+                          codeText.includes('journey') || codeText.includes('gantt')) {
+                        // Render as regular code block (no Mermaid rendering)
+                        content += '        <pre><code>\n';
+                        content += codeText + '\n';
+                        content += '        </code></pre>\n';
+                      } else {
+                        // Regular code block with backticks
+                        content += '        ```\n' + codeText + '\n```\n';
+                      }
+                    } else if (child.getType() === 'paragraph') {
+                      const paragraphContent = processChildrenWithFormatting(child);
+                      if (paragraphContent.trim()) {
+                        content += '        ' + paragraphContent + '\n';
+                      }
+                    } else {
+                      const nodeContent = processNode(child).trim();
+                      if (nodeContent) {
+                        content += '        ' + nodeContent + '\n';
+                      }
+                    }
+                  });
+                }
+                
+                // If no code block was found, return the plain text
+                if (!hasCodeBlock && !content) {
+                  const cellText = cell.getTextContent() || '';
+                  if (cellText.trim()) {
+                    content = '        ' + cellText + '\n';
+                  }
+                }
+                
+                return content;
+              }
+              
               // Extract images from this cell
               const cellImages = extractImagesRecursively(cell);
-              const cellText = cell.getTextContent() || '';
+              const cellContent = processMermaidTableCell(cell);
               
               markdown += '      <td>\n';
               
@@ -261,20 +310,10 @@ export function createMarkdownConverter() {
                 cellImages.forEach(img => {
                   markdown += `        <img src="${img.url}" alt="${img.imageId}" style="max-width: 100%; height: auto;" />\n`;
                 });
-              } else if (cellText.trim()) {
-                // Check if it's Mermaid code content
-                if (cellText.includes('graph TD') || cellText.includes('flowchart') || 
-                    cellText.includes('sequenceDiagram') || cellText.includes('classDiagram') ||
-                    cellText.includes('stateDiagram') || cellText.includes('erDiagram') ||
-                    cellText.includes('journey') || cellText.includes('gantt')) {
-                  // Render as regular code block (no Mermaid rendering)
-                  markdown += '        <pre><code>\n';
-                  markdown += cellText + '\n';
-                  markdown += '        </code></pre>\n';
-                } else {
-                  // Regular text content
-                  markdown += `        ${cellText}\n`;
-                }
+              }
+              
+              if (cellContent.trim()) {
+                markdown += cellContent;
               }
               
               markdown += '      </td>\n';
@@ -336,11 +375,38 @@ export function createMarkdownConverter() {
                   return images;
                 }
                 
-                const cellImages = extractCellImages(cell);
+                // Process cell content to preserve code blocks
+                function processCellContent(cell: any): string {
+                  let content = '';
+                  
+                  if (cell.getChildren) {
+                    const children = cell.getChildren();
+                    children.forEach((child: any) => {
+                      if (child.getType() === 'code') {
+                        // Preserve code blocks with backticks
+                        const codeText = child.getTextContent();
+                        content += '        ```\n' + codeText + '\n```\n';
+                      } else if (child.getType() === 'paragraph') {
+                        // Process paragraph content for inline formatting
+                        const paragraphContent = processChildrenWithFormatting(child);
+                        if (paragraphContent.trim()) {
+                          content += '        ' + paragraphContent + '\n';
+                        }
+                      } else {
+                        // For other types, get formatted content
+                        const nodeContent = processNode(child).trim();
+                        if (nodeContent) {
+                          content += '        ' + nodeContent + '\n';
+                        }
+                      }
+                    });
+                  }
+                  
+                  return content;
+                }
                 
-                // Get text content and clean it of internal line breaks
-                let cellText = cell.getTextContent() || '';
-                cellText = cellText.replace(/\s*\n\s*/g, ' ').replace(/\s+/g, ' ').trim();
+                const cellImages = extractCellImages(cell);
+                const cellContent = processCellContent(cell);
                 
                 markdown += '      <td style="vertical-align: top; padding: 12px">\n';
                 
@@ -351,14 +417,11 @@ export function createMarkdownConverter() {
                   });
                 }
                 
-                // Add text content if available
-                if (cellText.trim()) {
-                  if (cellImages.length > 0) {
-                    markdown += `        <p>${cellText}</p>\n`;
-                  } else {
-                    markdown += `        ${cellText}\n`;
-                  }
+                // Add processed content if available
+                if (cellContent.trim()) {
+                  markdown += cellContent;
                 } else if (cellImages.length === 0) {
+                  // If no content and no images, add empty space
                   markdown += '        \n';
                 }
                 
