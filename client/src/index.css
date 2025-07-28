@@ -71,6 +71,45 @@ body.dark .Collapsible__content {
   background-color: #020203 !important;
   background: #020203 !important;
   border-color: #374151 !important;
+  color: #FFFFFF !important;
+}
+
+/* Force white text for ALL content inside collapsible containers - MAXIMUM SPECIFICITY */
+html.dark .Collapsible__content,
+html.dark .Collapsible__content p,
+html.dark .Collapsible__content span,
+html.dark .Collapsible__content div,
+html.dark .Collapsible__content li,
+html.dark .Collapsible__content strong,
+html.dark .Collapsible__content em,
+html.dark .Collapsible__content [contenteditable],
+html.dark .Collapsible__content [contenteditable="true"],
+html.dark .lexical-editor-container .Collapsible__content,
+html.dark .lexical-editor-container .Collapsible__content p,
+html.dark .lexical-editor-container .Collapsible__content span,
+html.dark .lexical-editor-container .Collapsible__content div,
+html.dark .lexical-editor-container .Collapsible__content li,
+html.dark .lexical-editor-container .Collapsible__content strong,
+html.dark .lexical-editor-container .Collapsible__content em,
+html.dark .lexical-editor-container .Collapsible__content [contenteditable],
+html.dark .lexical-editor-container .Collapsible__content [contenteditable="true"] {
+  color: #FFFFFF !important;
+}
+
+/* Override any Tailwind classes that might set gray text */
+html.dark .Collapsible__content .text-gray-400,
+html.dark .Collapsible__content .text-gray-500,
+html.dark .Collapsible__content .text-gray-600,
+html.dark .Collapsible__content .text-gray-700,
+html.dark .Collapsible__content .text-gray-800,
+html.dark .Collapsible__content .text-gray-900,
+html.dark .Collapsible__content .text-slate-400,
+html.dark .Collapsible__content .text-slate-500,
+html.dark .Collapsible__content .text-slate-600,
+html.dark .Collapsible__content .text-slate-700,
+html.dark .Collapsible__content .text-slate-800,
+html.dark .Collapsible__content .text-slate-900 {
+  color: #FFFFFF !important;
 }
 
 /* Header field input styling with rounded bottom-right corner */
