@@ -10,6 +10,22 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
+✓ COMPLETED: Specialty-User Association System with Tabbed Modal Interface (January 28, 2025)
+  - Successfully implemented complete specialty-user association system with PostgreSQL specialty_users table
+  - Database schema: specialty_users table with foreign keys, cascade delete, and unique constraint
+  - Backend API endpoints: GET/POST/DELETE /api/specialties/:id/users for managing associations
+  - Storage layer methods: getSpecialtyUsers, addUserToSpecialty, removeUserFromSpecialty, getUserSpecialties
+  - Completely redesigned SpecialtyModal with tabbed interface ([Detalhes] and [Especialistas] tabs)
+  - Tab Detalhes: Contains the original form fields for specialty management
+  - Tab Especialistas: Full user association management with add/remove functionality
+  - User selection dropdown showing available users (filters out already associated ones)
+  - Complete table displaying associated users with name, email, role, status, and remove action
+  - Confirmation dialog for removing specialists with proper error handling
+  - Real-time updates using React Query with optimistic UI updates
+  - Authentication bypass still active for easier testing across all new endpoints
+  - Dark mode theming (#111827, #0F172A) applied consistently to all new components
+  - System fully functional and ready for production use
+
 ✓ COMPLETED: "Áreas de Especialidade" (Areas of Expertise) CRUD system fully operational (January 28, 2025)
   - Successfully replaced "Empresas" tab with "Áreas de Especialidade" in cadastros gerais page
   - PostgreSQL specialties table created with UUID primary key, unique code constraint, name, and description fields
@@ -20,6 +36,7 @@ Preferred communication style: Simple, everyday language.
   - Integration with query client and toast notification system working
   - API endpoints tested and confirmed operational - able to create, read, update, and delete specialties
   - Confirmation dialogs and comprehensive error handling implemented
+  - UI refinements: removed header text/icons, implemented actions column with icon-only buttons and tooltips
   - System ready for production use
 
 ✓ Temporarily disabled authentication requirements for easier application testing (January 28, 2025)

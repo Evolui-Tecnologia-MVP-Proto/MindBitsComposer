@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp, boolean, json, uuid, integer, bigint } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, boolean, json, uuid, integer, bigint, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -497,6 +497,17 @@ export const specialties = pgTable("specialties", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Tabela de associação entre especialidades e usuários
+export const specialtyUsers = pgTable("specialty_users", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  specialtyId: uuid("specialty_id").notNull().references(() => specialties.id, { onDelete: "cascade" }),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => ({
+  // Garante que um usuário não seja associado mais de uma vez à mesma especialidade
+  uniqueSpecialtyUser: unique().on(table.specialtyId, table.userId),
+}));
+
 // Specialties schema
 export const insertSpecialtySchema = createInsertSchema(specialties).omit({
   id: true,
@@ -504,5 +515,12 @@ export const insertSpecialtySchema = createInsertSchema(specialties).omit({
   updatedAt: true,
 });
 
+export const insertSpecialtyUserSchema = createInsertSchema(specialtyUsers).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertSpecialty = z.infer<typeof insertSpecialtySchema>;
 export type Specialty = typeof specialties.$inferSelect;
+export type InsertSpecialtyUser = z.infer<typeof insertSpecialtyUserSchema>;
+export type SpecialtyUser = typeof specialtyUsers.$inferSelect;

@@ -1,4 +1,4 @@
-import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos, documentsArtifacts, globalAssets, repoStructure, systemLogs, documentEditions, genericTables, specialties,
+import { users, templates, mondayMappings, mondayColumns, mappingColumns, serviceConnections, plugins, documentos, documentsArtifacts, globalAssets, repoStructure, systemLogs, documentEditions, genericTables, specialties, specialtyUsers,
   type User, type InsertUser, type Template, type InsertTemplate, 
   type MondayMapping, type InsertMondayMapping, type MondayColumn, type InsertMondayColumn, 
   type MappingColumn, type InsertMappingColumn, type ServiceConnection, type InsertServiceConnection,
@@ -7,6 +7,7 @@ import { users, templates, mondayMappings, mondayColumns, mappingColumns, servic
   type RepoStructure, type InsertRepoStructure,
   type SystemLog, type InsertSystemLog, type DocumentEdition, type InsertDocumentEdition,
   type GenericTable, type InsertGenericTable, type Specialty, type InsertSpecialty,
+  type SpecialtyUser, type InsertSpecialtyUser,
   UserStatus, UserRole, TemplateType, PluginStatus, PluginType } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, isNull, sql } from "drizzle-orm";
@@ -148,6 +149,12 @@ export interface IStorage {
   getAllSpecialties(): Promise<Specialty[]>;
   updateSpecialty(id: string, data: Partial<Specialty>): Promise<Specialty>;
   deleteSpecialty(id: string): Promise<void>;
+  
+  // Specialty-User association operations
+  getSpecialtyUsers(specialtyId: string): Promise<(SpecialtyUser & {user: User})[]>;
+  addUserToSpecialty(specialtyId: string, userId: number): Promise<SpecialtyUser>;
+  removeUserFromSpecialty(specialtyId: string, userId: number): Promise<void>;
+  getUserSpecialties(userId: number): Promise<(SpecialtyUser & {specialty: Specialty})[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1072,6 +1079,70 @@ export class DatabaseStorage implements IStorage {
 
   async deleteSpecialty(id: string): Promise<void> {
     await db.delete(specialties).where(eq(specialties.id, id));
+  }
+  
+  // Specialty-User association operations
+  async getSpecialtyUsers(specialtyId: string): Promise<(SpecialtyUser & {user: User})[]> {
+    return await db
+      .select({
+        id: specialtyUsers.id,
+        specialtyId: specialtyUsers.specialtyId,
+        userId: specialtyUsers.userId,
+        createdAt: specialtyUsers.createdAt,
+        user: {
+          id: users.id,
+          name: users.name,
+          email: users.email,
+          role: users.role,
+          status: users.status,
+          avatarUrl: users.avatarUrl,
+          mustChangePassword: users.mustChangePassword,
+          createdAt: users.createdAt,
+          updatedAt: users.updatedAt,
+          password: users.password
+        }
+      })
+      .from(specialtyUsers)
+      .innerJoin(users, eq(specialtyUsers.userId, users.id))
+      .where(eq(specialtyUsers.specialtyId, specialtyId));
+  }
+
+  async addUserToSpecialty(specialtyId: string, userId: number): Promise<SpecialtyUser> {
+    const [association] = await db
+      .insert(specialtyUsers)
+      .values({ specialtyId, userId })
+      .returning();
+    return association;
+  }
+
+  async removeUserFromSpecialty(specialtyId: string, userId: number): Promise<void> {
+    await db
+      .delete(specialtyUsers)
+      .where(and(
+        eq(specialtyUsers.specialtyId, specialtyId),
+        eq(specialtyUsers.userId, userId)
+      ));
+  }
+
+  async getUserSpecialties(userId: number): Promise<(SpecialtyUser & {specialty: Specialty})[]> {
+    return await db
+      .select({
+        id: specialtyUsers.id,
+        specialtyId: specialtyUsers.specialtyId,
+        userId: specialtyUsers.userId,
+        createdAt: specialtyUsers.createdAt,
+        specialty: {
+          id: specialties.id,
+          code: specialties.code,
+          name: specialties.name,
+          description: specialties.description,
+          createdAt: specialties.createdAt,
+          updatedAt: specialties.updatedAt
+        }
+      })
+      .from(specialtyUsers)
+      .innerJoin(specialties, eq(specialtyUsers.specialtyId, specialties.id))
+      .where(eq(specialtyUsers.userId, userId));
   }
 }
 

@@ -841,6 +841,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Specialty-User association endpoints
+  
+  // Get users associated with a specialty
+  app.get("/api/specialties/:id/users", async (req, res) => {
+    // if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      const specialtyUsers = await storage.getSpecialtyUsers(id);
+      console.log("✅ [API] Especialistas encontrados:", specialtyUsers.length);
+      res.json(specialtyUsers);
+    } catch (error: any) {
+      console.error("❌ [API] Erro ao buscar especialistas:", error);
+      res.status(500).send("Erro ao buscar especialistas");
+    }
+  });
+
+  // Add user to specialty
+  app.post("/api/specialties/:id/users", async (req, res) => {
+    // if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    const { userId } = req.body;
+    
+    try {
+      // Verificar se a especialidade existe
+      const existingSpecialty = await storage.getSpecialty(id);
+      if (!existingSpecialty) {
+        return res.status(404).send("Especialidade não encontrada");
+      }
+      
+      // Verificar se o usuário existe
+      const existingUser = await storage.getUser(userId);
+      if (!existingUser) {
+        return res.status(404).send("Usuário não encontrado");
+      }
+      
+      const association = await storage.addUserToSpecialty(id, userId);
+      console.log("✅ [API] Usuário adicionado à especialidade:", association);
+      res.status(201).json(association);
+    } catch (error: any) {
+      // Verificar se é erro de violação de constraint unique
+      if (error.message?.includes('unique') || error.code === '23505') {
+        return res.status(409).send("Usuário já está associado a esta especialidade");
+      }
+      console.error("❌ [API] Erro ao adicionar usuário à especialidade:", error);
+      res.status(500).send("Erro ao adicionar usuário à especialidade");
+    }
+  });
+
+  // Remove user from specialty
+  app.delete("/api/specialties/:id/users/:userId", async (req, res) => {
+    // if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id, userId } = req.params;
+    
+    try {
+      await storage.removeUserFromSpecialty(id, parseInt(userId));
+      console.log("✅ [API] Usuário removido da especialidade:", { specialtyId: id, userId });
+      res.status(204).send();
+    } catch (error: any) {
+      console.error("❌ [API] Erro ao remover usuário da especialidade:", error);
+      res.status(500).send("Erro ao remover usuário da especialidade");
+    }
+  });
+
+  // Get specialties for a user
+  app.get("/api/users/:id/specialties", async (req, res) => {
+    // if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      const userSpecialties = await storage.getUserSpecialties(parseInt(id));
+      console.log("✅ [API] Especialidades do usuário encontradas:", userSpecialties.length);
+      res.json(userSpecialties);
+    } catch (error: any) {
+      console.error("❌ [API] Erro ao buscar especialidades do usuário:", error);
+      res.status(500).send("Erro ao buscar especialidades do usuário");
+    }
+  });
+
   // Monday.com integration routes
   // Rotas para gerenciar conexões de serviço (tokens)
   
