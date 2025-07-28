@@ -887,8 +887,11 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
   let currentList: any = null;
   let listType: 'bullet' | 'number' | null = null;
   
+  console.log('📄 Processando markdown com', lines.length, 'linhas');
+  
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+    console.log(`Linha ${i + 1}:`, line);
     
     // Processar blocos de código
     if (line.trim().startsWith('```')) {
@@ -977,6 +980,7 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
     // Processar items de lista numerada
     const numberedListMatch = line.match(/^(\s*)\d+\.\s+(.*)/);
     if (numberedListMatch) {
+      console.log('🔢 Lista numerada detectada:', line);
       const itemText = numberedListMatch[2];
       
       // Se não temos lista atual ou é diferente do tipo number, criar nova
@@ -989,6 +993,7 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
         // Criar nova lista numerada
         currentList = $createListNode('number');
         listType = 'number';
+        console.log('✅ Lista numerada criada');
       }
       
       // Criar item da lista
@@ -996,6 +1001,7 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
       const textNodes = processInlineFormatting(itemText);
       textNodes.forEach(node => listItem.append(node));
       currentList.append(listItem);
+      console.log('➕ Item adicionado à lista:', itemText);
       continue;
     }
     
