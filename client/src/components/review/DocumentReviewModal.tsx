@@ -448,15 +448,15 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
           >
             Fechar
           </Button>
-          {documentosLimitados.length > 0 && (
+          {selectedItems.size > 0 && (
             <Button
               className="bg-blue-600 hover:bg-blue-700 text-white"
               onClick={() => {
                 // TODO: Implementar ação para iniciar revisão em lote
-                console.log("Iniciando revisão de", documentosLimitados.length, "documentos");
+                console.log("Iniciando revisão de", selectedItems.size, "documentos selecionados");
               }}
             >
-              Iniciar Revisão ({documentosLimitados.length})
+              Iniciar Revisão ({selectedItems.size})
             </Button>
           )}
         </div>

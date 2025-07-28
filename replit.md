@@ -10,6 +10,12 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
+✓ COMPLETED: Updated "Iniciar Revisão" Button to Show Selected Items Count (January 28, 2025)
+  - Modified DocumentReviewModal button to display count of selected documents instead of total listed documents
+  - Button now shows "Iniciar Revisão (N)" where N is the number of checked/selected documents
+  - Button only appears when at least one document is selected for better UX
+  - Improved user feedback by showing actual selection count rather than total available count
+
 ✓ COMPLETED: Fixed Session Persistence Issue - Restored Normal Authentication (January 28, 2025)
   - Disabled development authentication bypass that was automatically logging in as "Administrador" user
   - Removed setupDevAuth middleware that was overriding real user sessions on system restart
