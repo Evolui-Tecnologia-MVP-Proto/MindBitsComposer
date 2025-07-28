@@ -391,8 +391,49 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
           for (const cellMatch of cellMatches) {
             let cellContent = cellMatch[1].trim();
             
-            // Check if cell contains code blocks with backticks
-            if (cellContent.includes('```')) {
+            // Check if cell contains nested table
+            if (cellContent.includes('<table')) {
+              // Recursively process nested table
+              const nestedTableMatch = cellContent.match(/<table[^>]*>([\s\S]*?)<\/table>/);
+              if (nestedTableMatch) {
+                const beforeTable = cellContent.substring(0, cellContent.indexOf(nestedTableMatch[0])).trim();
+                const afterTable = cellContent.substring(cellContent.indexOf(nestedTableMatch[0]) + nestedTableMatch[0].length).trim();
+                
+                const parts: React.ReactNode[] = [];
+                let partKey = 0;
+                
+                // Add content before table
+                if (beforeTable) {
+                  parts.push(<div key={partKey++} dangerouslySetInnerHTML={{ __html: beforeTable }} />);
+                }
+                
+                // Process nested table
+                parts.push(
+                  <div key={partKey++} className="my-2">
+                    {processHtmlTableContent(nestedTableMatch[0])}
+                  </div>
+                );
+                
+                // Add content after table
+                if (afterTable) {
+                  parts.push(<div key={partKey++} dangerouslySetInnerHTML={{ __html: afterTable }} />);
+                }
+                
+                cells.push(
+                  <td key={cellIndex++} className="px-4 py-3 text-sm text-black dark:text-white border-b border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1B2028]" style={{ verticalAlign: 'top' }}>
+                    {parts}
+                  </td>
+                );
+              } else {
+                // Fallback if table regex doesn't match
+                cells.push(
+                  <td key={cellIndex++} className="px-4 py-3 text-sm text-black dark:text-white border-b border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1B2028]" style={{ verticalAlign: 'top' }}>
+                    <div dangerouslySetInnerHTML={{ __html: cellContent }} />
+                  </td>
+                );
+              }
+            } else if (cellContent.includes('```')) {
+              // Check if cell contains code blocks with backticks
               const parts: React.ReactNode[] = [];
               let remaining = cellContent;
               let partKey = 0;
