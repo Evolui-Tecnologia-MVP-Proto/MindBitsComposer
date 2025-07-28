@@ -873,59 +873,6 @@ body.dark .Collapsible__title:hover {
   border-color: #0F172A !important;
 }
 
-/* Lexical Lists styling for collapsible containers */
-.Collapsible__content .editor-list-ul {
-  padding: 0;
-  margin: 0;
-  margin-left: 16px;
-  list-style-type: none !important;
-}
-
-.Collapsible__content .editor-listitem {
-  margin: 8px 32px 8px 32px;
-  display: list-item !important;
-  list-style-type: none !important;
-}
-
-.Collapsible__content .editor-list-ul .editor-listitem:before {
-  content: '•' !important;
-  color: #000;
-  font-weight: bold;
-  display: inline-block;
-  width: 1em;
-  margin-left: -1em;
-  margin-right: 8px;
-}
-
-.dark .Collapsible__content .editor-list-ul .editor-listitem:before {
-  color: #9ca3af !important;
-}
-
-/* Force list display in Lexical editor */
-.ContentEditable__root ul {
-  display: block !important;
-  list-style-type: disc !important;
-  margin-block-start: 1em !important;
-  margin-block-end: 1em !important;
-  margin-inline-start: 0px !important;
-  margin-inline-end: 0px !important;
-  padding-inline-start: 40px !important;
-}
-
-.ContentEditable__root li {
-  display: list-item !important;
-  text-align: -webkit-match-parent !important;
-}
-
-/* Dark mode for native lists */
-.dark .ContentEditable__root ul {
-  color: #ffffff !important;
-}
-
-.dark .ContentEditable__root li {
-  color: #ffffff !important;
-}
-
 .dark [data-radix-dialog-content] table tr {
   border-color: #0F172A !important;
 }
