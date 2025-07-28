@@ -256,6 +256,9 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
   let codeBlockLanguage = '';
   let inTable = false;
   let tableRows: string[] = [];
+  let inList = false;
+  let listItems: Array<{text: string, isOrdered: boolean}> = [];
+  let currentListType: 'ordered' | 'unordered' | null = null;
 
   const flushParagraph = () => {
     if (currentParagraph.length > 0) {
@@ -351,6 +354,26 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
         );
       }
       tableRows = [];
+    }
+  };
+
+  const flushList = () => {
+    if (listItems.length > 0) {
+      const isOrdered = currentListType === 'ordered';
+      const ListComponent = isOrdered ? mdxComponents.ol : mdxComponents.ul;
+      
+      elements.push(
+        <ListComponent key={elements.length}>
+          {listItems.map((item, index) => (
+            <li key={index} className="text-black dark:text-white">
+              {processInlineFormatting(item.text)}
+            </li>
+          ))}
+        </ListComponent>
+      );
+      
+      listItems = [];
+      currentListType = null;
     }
   };
 
@@ -526,16 +549,30 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
 
     // Handle lists
     if (line.match(/^\s*[-*+]\s/) || line.match(/^\s*\d+\.\s/)) {
-      flushParagraph();
-      const isOrdered = line.match(/^\s*\d+\.\s/);
+      if (!inList) {
+        flushParagraph();
+        inList = true;
+      }
+      
+      const isOrdered = !!line.match(/^\s*\d+\.\s/);
+      const newListType = isOrdered ? 'ordered' : 'unordered';
+      
+      // If list type changes, flush current list and start new one
+      if (currentListType && currentListType !== newListType) {
+        flushList();
+        inList = true;
+      }
+      
+      currentListType = newListType;
       const text = line.replace(/^\s*(?:[-*+]|\d+\.)\s*/, '');
-      const processedText = processInlineFormatting(text);
-      const ListComponent = isOrdered ? mdxComponents.ol : mdxComponents.ul;
-      elements.push(
-        <ListComponent key={elements.length}>
-          <li className="text-black dark:text-white">{processedText}</li>
-        </ListComponent>
-      );
+      listItems.push({ text, isOrdered });
+      return;
+    } else if (inList && line.trim() !== '') {
+      // End of list, flush it
+      flushList();
+      inList = false;
+    } else if (inList && line.trim() === '') {
+      // Skip empty lines within lists
       return;
     }
 
@@ -580,6 +617,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
   flushParagraph();
   flushCodeBlock(codeBlockLanguage);
   flushTable();
+  flushList();
   flushHtmlTable();
 
   return elements;
