@@ -26,6 +26,8 @@ Preferred communication style: Simple, everyday language.
   - Bullet lists (- item) convert to ListNode('bullet') with ListItemNode children in Lexical editor
   - Numbered lists (1. item) convert to ListNode('number') with ListItemNode children in Lexical editor
   - Inline formatting preserved within list items (- Item with **bold** text)
+  - Fixed numbered list continuity issue - lists now maintain sequential numbering (1. 2. 3.) even with empty lines between items
+  - Enhanced list processing to ignore empty lines between list items while preserving list structure
   - System processes markdown sequentially to avoid conflicts between similar markers
   - Fixed Lexical-to-Markdown conversion with processTextNode and processChildrenWithFormatting functions
   - Enhanced MarkdownPreview with complete formatting support: bold, italic, strikethrough, underline, code, links, images

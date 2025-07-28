@@ -968,18 +968,35 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
       continue;
     }
     
+    // Linha vazia - verificar se é parte de uma lista ativa
+    if (line.trim() === '') {
+      // Se temos uma lista ativa, verificar a próxima linha
+      if (currentList && i + 1 < lines.length) {
+        const nextLine = lines[i + 1];
+        // Se a próxima linha é um item da mesma lista, pular linha vazia
+        if ((listType === 'bullet' && nextLine.match(/^(\s*)-\s+/)) ||
+            (listType === 'number' && nextLine.match(/^(\s*)\d+\.\s+/))) {
+          continue; // Pular linha vazia entre itens da lista
+        }
+      }
+      
+      // Finalizar lista se existir
+      if (currentList) {
+        nodes.push(currentList);
+        currentList = null;
+        listType = null;
+      }
+      
+      const emptyParagraph = $createParagraphNode();
+      nodes.push(emptyParagraph);
+      continue;
+    }
+    
     // Se chegamos aqui e temos uma lista ativa, finalizá-la
     if (currentList) {
       nodes.push(currentList);
       currentList = null;
       listType = null;
-    }
-    
-    // Linha vazia
-    if (line.trim() === '') {
-      const emptyParagraph = $createParagraphNode();
-      nodes.push(emptyParagraph);
-      continue;
     }
     
     // Processar cabeçalhos
