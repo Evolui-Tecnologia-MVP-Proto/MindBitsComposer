@@ -10,16 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
-✓ COMPLETED: MindBits_CT Document Totalization Boxes by Specialty Area (January 28, 2025)
+✓ COMPLETED: MindBits_CT Document Totalization Boxes by Responsible Person (January 28, 2025)
   - Added dynamic totalization boxes on main page for origem="MindBits_CT" and status="Integrado" documents
-  - Implemented automatic grouping by specialist areas - documents are grouped by the specialties of their responsible persons
-  - Cross-references document "responsavel" field with specialty_users table to determine associated specialties
+  - Implemented automatic grouping by "responsavel" field with individual counter boxes for each responsible person
   - Applied responsive grid layout (1-4 columns) with sorting by document count (descending)
   - Consistent dark mode theming (#1E293B cards, #374151 borders, purple User icon)
   - Conditional display - section only appears when relevant documents exist
   - Dynamic text with proper singular/plural formatting
   - Positioned below existing "Base de conhecimento OC" section
-  - Documents without specialty assignment fall under "Sem especialidade" category
+  - Section title displays as "Documentos MindBits_CT - Integrados por Especialidade" for clarity
 
 ✓ COMPLETED: Specialty-User Association System with Tabbed Modal Interface (January 28, 2025)
   - Successfully implemented complete specialty-user association system with PostgreSQL specialty_users table

@@ -31,64 +31,15 @@ export default function HomePage() {
     doc.status === "Concluido"
   ).length;
 
-  // Buscar especialidades e usuários associados
-  const { data: specialties = [] } = useQuery<Specialty[]>({
-    queryKey: ["/api/specialties"],
-  });
-
-  const { data: allSpecialtyUsers = [] } = useQuery({
-    queryKey: ["/api/specialty-users"],
-    queryFn: async () => {
-      const results: Array<{specialtyId: string, userId: number, specialtyName: string, userName: string}> = [];
-      
-      for (const specialty of specialties) {
-        try {
-          const res = await fetch(`/api/specialties/${specialty.id}/users`);
-          if (res.ok) {
-            const users = await res.json();
-            users.forEach((userAssoc: any) => {
-              results.push({
-                specialtyId: specialty.id,
-                userId: userAssoc.user.id,
-                specialtyName: specialty.name,
-                userName: userAssoc.user.name
-              });
-            });
-          }
-        } catch (error) {
-          console.error(`Erro ao buscar usuários da especialidade ${specialty.name}:`, error);
-        }
-      }
-      
-      return results;
-    },
-    enabled: specialties.length > 0
-  });
-
-  // Calcular documentos MindBits_CT Integrados agrupados por especialidade
+  // Calcular documentos MindBits_CT Integrados agrupados por responsável
   const documentosMindBitsIntegrados = documentos.filter(doc => 
     doc.origem === "MindBits_CT" && doc.status === "Integrado"
   );
 
-  // Agrupar por especialidade
+  // Agrupar por responsável
   const documentosPorEspecialidade = documentosMindBitsIntegrados.reduce((acc, doc) => {
-    const responsavel = doc.responsavel || "";
-    
-    // Encontrar especialidades do responsável
-    const especialidadesDoResponsavel = allSpecialtyUsers.filter(su => 
-      su.userName === responsavel
-    );
-    
-    if (especialidadesDoResponsavel.length > 0) {
-      // Adicionar o documento a cada especialidade do responsável
-      especialidadesDoResponsavel.forEach(su => {
-        acc[su.specialtyName] = (acc[su.specialtyName] || 0) + 1;
-      });
-    } else {
-      // Se não tem especialidade, adicionar a "Sem especialidade"
-      acc["Sem especialidade"] = (acc["Sem especialidade"] || 0) + 1;
-    }
-    
+    const responsavel = doc.responsavel || "Sem responsável";
+    acc[responsavel] = (acc[responsavel] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
@@ -186,11 +137,11 @@ export default function HomePage() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {Object.entries(documentosPorEspecialidade)
                 .sort(([, a], [, b]) => b - a) // Ordenar por quantidade (decrescente)
-                .map(([especialidade, quantidade]) => (
-                <Card key={especialidade} className="bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151]">
+                .map(([responsavel, quantidade]) => (
+                <Card key={responsavel} className="bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151]">
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300 truncate">
-                      {especialidade}
+                      {responsavel}
                     </CardTitle>
                     <CheckCircle2 className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0" />
                   </CardHeader>
