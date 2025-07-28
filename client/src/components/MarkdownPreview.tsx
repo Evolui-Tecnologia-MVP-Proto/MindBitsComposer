@@ -173,7 +173,7 @@ function processInlineFormatting(text: string): React.ReactNode {
         parts.push(beforeBold);
       }
       parts.push(
-        <strong key={key++} className="font-semibold text-gray-900 dark:text-[#E5E7EB]">
+        <strong key={key++} className="font-semibold text-black dark:text-white">
           {boldMatch[1]}
         </strong>
       );
@@ -189,7 +189,7 @@ function processInlineFormatting(text: string): React.ReactNode {
         parts.push(beforeItalic);
       }
       parts.push(
-        <em key={key++} className="italic text-gray-700 dark:text-[#D1D5DB]">
+        <em key={key++} className="italic text-black dark:text-white">
           {italicMatch[1]}
         </em>
       );
@@ -205,7 +205,7 @@ function processInlineFormatting(text: string): React.ReactNode {
         parts.push(beforeCode);
       }
       parts.push(
-        <code key={key++} className="bg-gray-100 dark:bg-[#1E293B] text-gray-800 dark:text-[#E5E7EB] px-2 py-1 rounded text-sm font-mono">
+        <code key={key++} className="bg-gray-100 dark:bg-[#1E293B] text-black dark:text-white px-2 py-1 rounded text-sm font-mono">
           {codeMatch[1]}
         </code>
       );
