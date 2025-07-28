@@ -112,12 +112,9 @@ html.dark .Collapsible__content .text-slate-900 {
   color: #FFFFFF !important;
 }
 
-/* Header field input styling with rounded bottom-right corner */
+/* Header field input styling - removed rounded corners */
 .header-field-input {
-  border-bottom-right-radius: 6px !important;
-  border-top-right-radius: 0px !important;
-  border-top-left-radius: 0px !important;
-  border-bottom-left-radius: 0px !important;
+  border-radius: 0px !important;
 }
 
 .header-field-container {
@@ -127,10 +124,7 @@ html.dark .Collapsible__content .text-slate-900 {
 /* Force override for any conflicting styles */
 input.header-field-input,
 .header-field-input input {
-  border-bottom-right-radius: 6px !important;
-  border-top-right-radius: 0px !important;
-  border-top-left-radius: 0px !important;
-  border-bottom-left-radius: 0px !important;
+  border-radius: 0px !important;
 }
 
 /* NUCLEAR APPROACH: Remove all problematic ReactFlow CSS */
@@ -4126,10 +4120,7 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   overflow: auto !important;
 }
 
-/* Force all child elements in canvas to respect the rounded corners */
-.editor-left-rounded .lexical-canvas * {
-  border-bottom-left-radius: inherit !important;
-}
+/* Removed - was causing unwanted rounding on child elements */
 
 /* === RIGHT PANEL CONDITIONAL ROUNDING === */
 /* Conditional rounded corners for editor when right panel is retracted */
@@ -4182,10 +4173,7 @@ html.dark input[type="time"]::-webkit-calendar-picker-indicator {
   overflow: auto !important;
 }
 
-/* Force all child elements in canvas to respect the rounded corners on right side */
-.editor-right-rounded .lexical-canvas * {
-  border-bottom-right-radius: inherit !important;
-}
+/* Removed - was causing unwanted rounding on child elements */
 
 /* ViewDocumentModal - Anexos tab table colors for dark theme only */
 html.dark div[data-radix-tabs-content][value="anexos"] table.table-fixed thead tr {

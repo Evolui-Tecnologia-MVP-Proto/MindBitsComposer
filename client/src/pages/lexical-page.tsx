@@ -1795,7 +1795,7 @@ export default function LexicalPage() {
 
         {/* Painel de Anexos - desabilitado apenas quando há template struct sem documento composer */}
         {showAttachments && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) && (
-          <div className="w-80 border-l bg-gray-50 dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col composer-side-panel composer-attachments-panel rounded-tr-xl rounded-br-xl">
+          <div className="w-80 border-l bg-gray-50 dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col composer-side-panel composer-attachments-panel rounded-tr-xl">
             {/* Header fixo */}
             <div className="p-4 border-b bg-gray-50 dark:bg-[#111827] border-gray-200 dark:border-[#374151] rounded-tr-xl">
               <div className="flex items-center justify-between w-full">
@@ -1827,7 +1827,7 @@ export default function LexicalPage() {
             </div>
 
             {/* Área de conteúdo com scroll */}
-            <div className="flex-1 overflow-y-auto p-4 rounded-br-xl">
+            <div className="flex-1 overflow-y-auto p-4">
               <Accordion type="multiple" className="w-full space-y-2">
                 {/* Global Assets */}
                 <AccordionItem value="global-assets" className="border rounded-lg bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151]">
