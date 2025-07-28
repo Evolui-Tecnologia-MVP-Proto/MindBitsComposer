@@ -802,40 +802,53 @@ function cleanMarkdownContent(markdown: string): string {
 // Função para processar formatação inline e criar TextNodes corretos
 function processInlineFormatting(text: string): any[] {
   const result: any[] = [];
-  const segments: Array<{text: string, formats: Set<string>}> = [];
   
-  // Lista de marcadores ordenados por prioridade
+  // Lista de marcadores ordenados por prioridade (código primeiro para evitar conflitos)
   const markers = [
-    { regex: /`([^`]+)`/g, format: 'code', replacement: '$1' },
-    { regex: /\*\*(.*?)\*\*/g, format: 'bold', replacement: '$1' },
-    { regex: /~~(.*?)~~/g, format: 'strikethrough', replacement: '$1' },
-    { regex: /\*(.*?)\*/g, format: 'italic', replacement: '$1' }
+    { regex: /`([^`]+)`/g, format: 'code' },
+    { regex: /\*\*(.*?)\*\*/g, format: 'bold' },
+    { regex: /~~(.*?)~~/g, format: 'strikethrough' },
+    { regex: /\*(.*?)\*/g, format: 'italic' }
   ];
-  
-  let remaining = text;
-  let currentPosition = 0;
   
   // Encontrar todas as ocorrências de formatação
   const matches: Array<{start: number, end: number, text: string, format: string}> = [];
   
   markers.forEach(marker => {
     let match;
-    const regex = new RegExp(marker.regex.source, marker.regex.flags);
-    while ((match = regex.exec(text)) !== null) {
-      matches.push({
-        start: match.index,
-        end: match.index + match[0].length,
-        text: match[1],
-        format: marker.format
-      });
+    // Reset regex para garantir que começamos do início
+    marker.regex.lastIndex = 0;
+    while ((match = marker.regex.exec(text)) !== null) {
+      // Verificar se este match não sobrepõe com matches existentes
+      const overlaps = matches.some(existingMatch => 
+        (match.index >= existingMatch.start && match.index < existingMatch.end) ||
+        (match.index + match[0].length > existingMatch.start && match.index + match[0].length <= existingMatch.end) ||
+        (match.index <= existingMatch.start && match.index + match[0].length >= existingMatch.end)
+      );
+      
+      if (!overlaps) {
+        matches.push({
+          start: match.index,
+          end: match.index + match[0].length,
+          text: match[1],
+          format: marker.format
+        });
+      }
     }
   });
   
   // Ordenar por posição
   matches.sort((a, b) => a.start - b.start);
   
+  // Se não há matches, retornar texto simples
+  if (matches.length === 0) {
+    result.push($createTextNode(text));
+    return result;
+  }
+  
   // Processar matches sem sobreposição
   let lastEnd = 0;
+  
   matches.forEach(match => {
     // Adicionar texto antes do match
     if (match.start > lastEnd) {
@@ -854,17 +867,12 @@ function processInlineFormatting(text: string): any[] {
     lastEnd = match.end;
   });
   
-  // Adicionar texto restante
+  // Adicionar texto restante após o último match
   if (lastEnd < text.length) {
     const remainingText = text.substring(lastEnd);
     if (remainingText) {
       result.push($createTextNode(remainingText));
     }
-  }
-  
-  // Se não houve matches, retornar texto simples
-  if (matches.length === 0) {
-    result.push($createTextNode(text));
   }
   
   return result;
