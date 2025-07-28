@@ -161,12 +161,6 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
                               <Calendar className="h-3 w-3" />
                               <span>{documento.createdAt ? formatDate(documento.createdAt.toString()) : "Data não disponível"}</span>
                             </div>
-                            {documento.updatedAt && (
-                              <div className="flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                <span>Atualizado: {formatDate(documento.updatedAt.toString())}</span>
-                              </div>
-                            )}
                           </div>
                         </div>
                         <div className="flex items-center gap-2 ml-4">
