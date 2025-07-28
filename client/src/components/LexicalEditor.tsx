@@ -827,10 +827,33 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
           console.log('🔥 TemplateSectionsPlugin - Dentro do editor.update');
           const root = $getRoot();
           
-          console.log('🔥 TemplateSectionsPlugin - Aplicando template ao editor, limpando conteúdo existente');
+          console.log('🔥 TemplateSectionsPlugin - Aplicando template ao editor, preservando campos de header');
           
-          // Limpar sempre o conteúdo para aplicar o template
+          // Preservar campos de header antes de limpar
+          const children = root.getChildren();
+          let headerFieldsContainer = null;
+          
+          children.forEach(child => {
+            if ($isCollapsibleContainerNode(child)) {
+              const childNodes = child.getChildren();
+              const title = childNodes[0];
+              if ($isCollapsibleTitleNode(title)) {
+                const titleText = title.getTextContent();
+                if (titleText.includes('Campos') || titleText.includes('Template')) {
+                  headerFieldsContainer = child;
+                }
+              }
+            }
+          });
+          
+          // Limpar conteúdo para aplicar o template
           root.clear();
+          
+          // Restaurar campos de header se existiam
+          if (headerFieldsContainer) {
+            root.append(headerFieldsContainer);
+            console.log('🔥 TemplateSectionsPlugin - Campos de header preservados');
+          }
           
           // Criar container de cabeçalho padrão
           const headerTitle = $createCollapsibleTitleNode();
@@ -1027,14 +1050,13 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       if (headerKeys.length > 0) {
         console.log('🔍 DEBUG: Iniciando inserção...');
         
-        // Múltiplos timeouts para garantir que funcione
+        // Timeout maior para garantir que TemplateSectionsPlugin termine primeiro
         setTimeout(() => {
           try {
             editorInstance.update(() => {
-              console.log('🔍 DEBUG: Dentro do editor.update()');
+              console.log('🔍 DEBUG: Dentro do editor.update() - APÓS TemplateSectionsPlugin');
               const root = $getRoot();
               
-              // Limpar conteúdo existente primeiro
               const children = root.getChildren();
               console.log('🔍 DEBUG: Elementos existentes:', children.length);
               
@@ -1082,14 +1104,14 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                 const container = $createCollapsibleContainerNode(true);
                 container.append(title, content);
                 
-                // Inserir no início do documento
+                // Inserir no INÍCIO do documento (antes de qualquer seção do template)
                 if (root.getFirstChild()) {
                   root.getFirstChild()!.insertBefore(container);
                 } else {
                   root.append(container);
                 }
                 
-                console.log('✅ DEBUG: Container de campos inserido com sucesso!');
+                console.log('✅ DEBUG: Container de campos inserido com sucesso APÓS template!');
               } else {
                 console.log('⚠️ DEBUG: Container de campos já existe');
               }
@@ -1097,7 +1119,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           } catch (error) {
             console.error('❌ DEBUG: Erro durante inserção:', error);
           }
-        }, 200);
+        }, 1000); // Timeout maior para executar DEPOIS do TemplateSectionsPlugin
         
         // Backup timeout maior
         setTimeout(() => {
