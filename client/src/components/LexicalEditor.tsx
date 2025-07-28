@@ -827,33 +827,10 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
           console.log('🔥 TemplateSectionsPlugin - Dentro do editor.update');
           const root = $getRoot();
           
-          console.log('🔥 TemplateSectionsPlugin - Aplicando template ao editor, preservando campos de header');
-          
-          // Preservar campos de header antes de limpar
-          const children = root.getChildren();
-          let headerFieldsContainer = null;
-          
-          children.forEach(child => {
-            if ($isCollapsibleContainerNode(child)) {
-              const childNodes = child.getChildren();
-              const title = childNodes[0];
-              if ($isCollapsibleTitleNode(title)) {
-                const titleText = title.getTextContent();
-                if (titleText.includes('Campos') || titleText.includes('Template')) {
-                  headerFieldsContainer = child;
-                }
-              }
-            }
-          });
+          console.log('🔥 TemplateSectionsPlugin - Aplicando template ao editor');
           
           // Limpar conteúdo para aplicar o template
           root.clear();
-          
-          // Restaurar campos de header se existiam
-          if (headerFieldsContainer) {
-            root.append(headerFieldsContainer);
-            console.log('🔥 TemplateSectionsPlugin - Campos de header preservados');
-          }
           
           // Criar container de cabeçalho padrão
           const headerTitle = $createCollapsibleTitleNode();
@@ -863,7 +840,7 @@ function TemplateSectionsPlugin({ sections }: { sections?: string[] }): JSX.Elem
           const headerParagraph = $createParagraphNode();
           headerContent.append(headerParagraph);
           
-          const headerContainer = $createCollapsibleContainerNode(false);
+          const headerContainer = $createCollapsibleContainerNode(true); // Aberto por padrão para mostrar campos
           headerContainer.append(headerTitle, headerContent);
           root.append(headerContainer);
           
@@ -1054,66 +1031,75 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
         setTimeout(() => {
           try {
             editorInstance.update(() => {
-              console.log('🔍 DEBUG: Dentro do editor.update() - APÓS TemplateSectionsPlugin');
+              console.log('🔍 DEBUG: Procurando container "Conteúdo de cabeçalho" existente');
               const root = $getRoot();
               
               const children = root.getChildren();
               console.log('🔍 DEBUG: Elementos existentes:', children.length);
               
-              // Verificar se já existe container de campos
-              let hasHeaderContainer = false;
+              // Procurar pelo container "Conteúdo de cabeçalho"
+              let headerContainer = null;
+              let headerContent = null;
+              
               children.forEach(child => {
                 if ($isCollapsibleContainerNode(child)) {
                   const childNodes = child.getChildren();
                   const title = childNodes[0];
                   if ($isCollapsibleTitleNode(title)) {
                     const titleText = title.getTextContent();
-                    if (titleText.includes('Campos') || titleText.includes('Template')) {
-                      hasHeaderContainer = true;
+                    console.log('🔍 DEBUG: Container encontrado com título:', titleText);
+                    if (titleText.includes('Conteúdo de cabeçalho')) {
+                      headerContainer = child;
+                      headerContent = childNodes[1]; // O segundo filho deve ser o content
+                      console.log('✅ DEBUG: Container de cabeçalho encontrado!');
                     }
                   }
                 }
               });
               
-              if (!hasHeaderContainer) {
-                console.log('🔍 DEBUG: Criando container de campos...');
+              if (headerContainer && headerContent && $isCollapsibleContentNode(headerContent)) {
+                console.log('🔍 DEBUG: Inserindo campos no container de cabeçalho existente...');
                 
-                // Criar título do container
-                const title = $createCollapsibleTitleNode('📝 Campos do Template');
+                // Verificar se já existem campos no container
+                const contentChildren = headerContent.getChildren();
+                let hasHeaderFields = false;
                 
-                // Criar conteúdo do container
-                const content = $createCollapsibleContentNode();
-                
-                // Criar campos para cada item
-                headerKeys.forEach((key, index) => {
-                  console.log(`🔍 DEBUG: Criando campo ${index + 1}/${headerKeys.length}: ${key}`);
-                  try {
-                    const fieldNode = $createHeaderFieldNode(
-                      key,
-                      fieldsToUse[key] || '',
-                      `Digite ${key.toLowerCase()}...`
-                    );
-                    content.append(fieldNode);
-                    console.log(`✅ DEBUG: Campo ${key} criado com sucesso`);
-                  } catch (fieldError) {
-                    console.error(`❌ DEBUG: Erro ao criar campo ${key}:`, fieldError);
+                contentChildren.forEach(child => {
+                  if ($isHeaderFieldNode(child)) {
+                    hasHeaderFields = true;
                   }
                 });
                 
-                // Criar container colapsível
-                const container = $createCollapsibleContainerNode(true);
-                container.append(title, content);
-                
-                // Inserir no INÍCIO do documento (antes de qualquer seção do template)
-                if (root.getFirstChild()) {
-                  root.getFirstChild()!.insertBefore(container);
+                if (!hasHeaderFields) {
+                  // Inserir campos no início do conteúdo do container de cabeçalho
+                  headerKeys.forEach((key, index) => {
+                    console.log(`🔍 DEBUG: Inserindo campo ${index + 1}/${headerKeys.length}: ${key} no container de cabeçalho`);
+                    try {
+                      const fieldNode = $createHeaderFieldNode(
+                        key,
+                        fieldsToUse[key] || '',
+                        `Digite ${key.toLowerCase()}...`
+                      );
+                      
+                      // Inserir no início do conteúdo
+                      if (headerContent.getFirstChild()) {
+                        headerContent.getFirstChild()!.insertBefore(fieldNode);
+                      } else {
+                        headerContent.append(fieldNode);
+                      }
+                      
+                      console.log(`✅ DEBUG: Campo ${key} inserido no container de cabeçalho`);
+                    } catch (fieldError) {
+                      console.error(`❌ DEBUG: Erro ao inserir campo ${key}:`, fieldError);
+                    }
+                  });
+                  
+                  console.log('✅ DEBUG: Todos os campos inseridos no container de cabeçalho!');
                 } else {
-                  root.append(container);
+                  console.log('⚠️ DEBUG: Campos já existem no container de cabeçalho');
                 }
-                
-                console.log('✅ DEBUG: Container de campos inserido com sucesso APÓS template!');
               } else {
-                console.log('⚠️ DEBUG: Container de campos já existe');
+                console.log('❌ DEBUG: Container "Conteúdo de cabeçalho" não encontrado');
               }
             });
           } catch (error) {
