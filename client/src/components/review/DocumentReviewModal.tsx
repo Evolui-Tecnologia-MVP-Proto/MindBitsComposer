@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useQuery } from "@tanstack/react-query";
 import { 
   FileText, 
@@ -25,6 +26,9 @@ interface DocumentReviewModalProps {
 export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentReviewModalProps) {
   // Estado para gerenciar fluxos selecionados por documento
   const [selectedFlows, setSelectedFlows] = useState<Record<string, string>>({});
+  
+  // Estado para gerenciar itens selecionados via checkbox
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
 
   // Buscar fluxos de documentação disponíveis
   const { data: documentsFlows = [] } = useQuery({
@@ -217,10 +221,38 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
     }));
   };
 
+  // Função para alternar seleção de item via checkbox
+  const handleItemSelection = (documentId: string, checked: boolean) => {
+    setSelectedItems(prev => {
+      const newSet = new Set(prev);
+      if (checked) {
+        newSet.add(documentId);
+      } else {
+        newSet.delete(documentId);
+      }
+      return newSet;
+    });
+  };
+
+  // Função para selecionar/desselecionar todos
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedItems(new Set(documentosLimitados.map(doc => doc.id)));
+    } else {
+      setSelectedItems(new Set());
+    }
+  };
+
+  // Verificar se todos os itens estão selecionados
+  const allSelected = documentosLimitados.length > 0 && selectedItems.size === documentosLimitados.length;
+  // Verificar se alguns itens estão selecionados (para estado intermediário)
+  const someSelected = selectedItems.size > 0 && selectedItems.size < documentosLimitados.length;
+
   // Limpar seleções ao fechar modal
   useEffect(() => {
     if (!isOpen) {
       setSelectedFlows({});
+      setSelectedItems(new Set());
     }
   }, [isOpen]);
 
@@ -302,9 +334,30 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
           ) : (
             <div className="space-y-4">
               <div className="flex items-center justify-between mb-4">
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                  Exibindo {documentosLimitados.length} de {documentos.length} documentos
-                </p>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="select-all"
+                      checked={allSelected}
+                      onCheckedChange={handleSelectAll}
+                      className="data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                      ref={(el) => {
+                        if (el && someSelected) {
+                          (el as any).indeterminate = true;
+                        }
+                      }}
+                    />
+                    <label 
+                      htmlFor="select-all" 
+                      className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer"
+                    >
+                      Selecionar todos
+                    </label>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    Exibindo {documentosLimitados.length} de {documentos.length} documentos
+                  </p>
+                </div>
                 {documentos.length > maxItems && (
                   <Badge variant="outline" className="bg-yellow-50 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 border-yellow-300 dark:border-yellow-600">
                     <AlertCircle className="h-3 w-3 mr-1" />
@@ -322,10 +375,17 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
                     <Card key={documento.id} className="bg-gray-50 dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] hover:shadow-md transition-shadow">
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <CardTitle className="text-base font-medium text-gray-900 dark:text-gray-200 mb-2">
-                              {documento.objeto || "Documento sem nome"}
-                            </CardTitle>
+                          <div className="flex items-start gap-3 flex-1">
+                            <Checkbox
+                              id={`select-${documento.id}`}
+                              checked={selectedItems.has(documento.id)}
+                              onCheckedChange={(checked) => handleItemSelection(documento.id, !!checked)}
+                              className="mt-1 data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600"
+                            />
+                            <div className="flex-1">
+                              <CardTitle className="text-base font-medium text-gray-900 dark:text-gray-200 mb-2">
+                                {documento.objeto || "Documento sem nome"}
+                              </CardTitle>
                             <div className="flex flex-wrap gap-2 text-sm text-gray-600 dark:text-gray-300 mb-3">
                               <div className="flex items-center gap-1">
                                 <User className="h-3 w-3" />
@@ -372,6 +432,7 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
                               #{index + 1}
                             </div>
                           </div>
+                        </div>
                         </div>
                       </CardHeader>
                     </Card>
