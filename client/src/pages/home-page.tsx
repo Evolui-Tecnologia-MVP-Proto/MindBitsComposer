@@ -24,6 +24,12 @@ export default function HomePage() {
     queryKey: ["/api/documentos"],
   });
 
+  // Buscar edições de documentos para identificar documentos em processo pelo usuário
+  const { data: documentEditions = [] } = useQuery({
+    queryKey: ["/api/document-editions"],
+    enabled: !!user?.id
+  });
+
   // Calcular contadores para Base de conhecimento OC
   const documentosARevisar = documentos.filter(doc => 
     doc.origem === "MindBits_CT" && doc.status === "Integrado"
@@ -71,6 +77,30 @@ export default function HomePage() {
   const isUserResponsibleForSpecialty = (responsavel: string) => {
     return userSpecialties.some((specialty: Specialty) => specialty.code === responsavel);
   };
+
+  // Calcular documentos "em processo por mim" agrupados por responsável
+  const documentosEmProcessoPorMim = documentos.filter(doc => {
+    // Documento deve estar "Em Processo"
+    if (doc.status !== "Em Processo") return false;
+    
+    // Verificar se o documento foi iniciado pelo usuário logado
+    if (doc.userId === user?.id) return true;
+    
+    // Verificar se há edições ativas iniciadas pelo usuário logado
+    const userEditions = documentEditions.filter((edition: any) => 
+      edition.documentId === doc.id && 
+      edition.startedBy === user?.id &&
+      (edition.status === "in_progress" || edition.status === "draft" || edition.status === "ready_to_revise")
+    );
+    
+    return userEditions.length > 0;
+  });
+
+  const documentosEmProcessoPorMimPorResponsavel = documentosEmProcessoPorMim.reduce((acc, doc) => {
+    const responsavel = doc.responsavel || "Sem responsável";
+    acc[responsavel] = (acc[responsavel] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
 
 
@@ -178,9 +208,17 @@ export default function HomePage() {
                     <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                       {quantidade}
                     </div>
-                    <p className="text-xs text-muted-foreground mb-3">
+                    <p className="text-xs text-muted-foreground">
                       {quantidade === 1 ? "documento integrado" : "documentos integrados"}
                     </p>
+                    {documentosEmProcessoPorMimPorResponsavel[responsavel] && (
+                      <div className="mt-2 flex items-center gap-1 mb-4">
+                        <div className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></div>
+                        <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                          {documentosEmProcessoPorMimPorResponsavel[responsavel]} em processo por mim
+                        </span>
+                      </div>
+                    )}
                     <div className="absolute bottom-2 right-2">
                       <Button
                         size="sm"
