@@ -591,6 +591,49 @@ export default function MarkdownPreview({ content, className = '' }: MarkdownPre
               background-color: #020203 !important;
               color: #FFFFFF !important;
             }
+            /* Force list bullets and numbers to follow theme colors */
+            .markdown-preview ul li::marker,
+            .markdown-preview ol li::marker {
+              color: #000000 !important;
+            }
+            .dark .markdown-preview ul li::marker,
+            .dark .markdown-preview ol li::marker {
+              color: #FFFFFF !important;
+            }
+            /* Ensure list items and their content follow theme */
+            .markdown-preview ul,
+            .markdown-preview ol,
+            .markdown-preview ul li,
+            .markdown-preview ol li {
+              color: #000000 !important;
+            }
+            .dark .markdown-preview ul,
+            .dark .markdown-preview ol,
+            .dark .markdown-preview ul li,
+            .dark .markdown-preview ol li {
+              color: #FFFFFF !important;
+            }
+            /* Force nested lists to maintain colors */
+            .markdown-preview ul ul,
+            .markdown-preview ul ol,
+            .markdown-preview ol ul,
+            .markdown-preview ol ol,
+            .markdown-preview ul ul li,
+            .markdown-preview ul ol li,
+            .markdown-preview ol ul li,
+            .markdown-preview ol ol li {
+              color: #000000 !important;
+            }
+            .dark .markdown-preview ul ul,
+            .dark .markdown-preview ul ol,
+            .dark .markdown-preview ol ul,
+            .dark .markdown-preview ol ol,
+            .dark .markdown-preview ul ul li,
+            .dark .markdown-preview ul ol li,
+            .dark .markdown-preview ol ul li,
+            .dark .markdown-preview ol ol li {
+              color: #FFFFFF !important;
+            }
           `
         }} />
         <div className="space-y-4">
