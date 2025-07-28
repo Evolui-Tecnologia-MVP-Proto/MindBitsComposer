@@ -63,6 +63,27 @@
   max-height: 100%;
 }
 
+/* Fix for ordered list numbering in MDX */
+ol {
+  list-style-type: decimal !important;
+  counter-reset: list-counter !important;
+}
+
+ol li {
+  list-style-type: decimal !important;
+  display: list-item !important;
+}
+
+ol li::marker {
+  content: counter(list-counter) ". " !important;
+  counter-increment: list-counter !important;
+}
+
+/* Ensure proper counter behavior */
+ol[start] {
+  counter-reset: list-counter calc(attr(start) - 1) !important;
+}
+
 /* Collapsible container dark mode styling */
 .dark .Collapsible__content,
 .dark details .Collapsible__content,
