@@ -295,12 +295,12 @@ export function createMarkdownConverter() {
                     } else if (child.getType() === 'paragraph') {
                       const paragraphContent = processChildrenWithFormatting(child);
                       if (paragraphContent.trim()) {
-                        content += '        ' + paragraphContent + '\n';
+                        content += paragraphContent;
                       }
                     } else {
                       const nodeContent = processNode(child).trim();
                       if (nodeContent) {
-                        content += '        ' + nodeContent + '\n';
+                        content += nodeContent;
                       }
                     }
                   });
@@ -310,7 +310,7 @@ export function createMarkdownConverter() {
                 if (!hasCodeBlock && !content) {
                   const cellText = cell.getTextContent() || '';
                   if (cellText.trim()) {
-                    content = '        ' + cellText + '\n';
+                    content = cellText;
                   }
                 }
                 
@@ -344,13 +344,13 @@ export function createMarkdownConverter() {
       } else {
         // Convert to HTML table with proper alignment for MDX
         if (rows.length > 0) {
-          markdown += '\n<table style="width: 100%">\n  <tbody>\n';
+          markdown += '\n<table style="width: 100%"><tbody>';
           
           rows.forEach((row: any, rowIndex: number) => {
             const cells = row.getChildren();
             
             // All rows are content rows
-            markdown += '    <tr>\n';
+            markdown += '<tr>';
             cells.forEach((cell: any) => {
                 // Extract images from this specific cell without affecting global processing
                 function extractCellImages(node: any): Array<{imageId: string, url: string}> {
@@ -427,13 +427,13 @@ export function createMarkdownConverter() {
                         // Process paragraph content for inline formatting
                         const paragraphContent = processChildrenWithFormatting(child);
                         if (paragraphContent.trim()) {
-                          content += '        ' + paragraphContent + '\n';
+                          content += paragraphContent;
                         }
                       } else {
                         // For other types, get formatted content
                         const nodeContent = processNode(child).trim();
                         if (nodeContent) {
-                          content += '        ' + nodeContent + '\n';
+                          content += nodeContent;
                         }
                       }
                     });
@@ -445,7 +445,7 @@ export function createMarkdownConverter() {
                 const cellImages = extractCellImages(cell);
                 const cellContent = processCellContent(cell);
                 
-                markdown += '      <td style="vertical-align: top; padding: 12px">\n';
+                markdown += '<td style="vertical-align: top; padding: 12px">';
                 
                 // Render images with block display for proper alignment
                 if (cellImages.length > 0) {
@@ -459,15 +459,15 @@ export function createMarkdownConverter() {
                   markdown += cellContent;
                 } else if (cellImages.length === 0) {
                   // If no content and no images, add empty space
-                  markdown += '        \n';
+                  markdown += '';
                 }
                 
-                markdown += '      </td>\n';
+                markdown += '</td>';
               });
-              markdown += '    </tr>\n';
+              markdown += '</tr>';
           });
           
-          markdown += '  </tbody>\n</table>\n\n';
+          markdown += '</tbody></table>\n\n';
         }
       }
     } else if (node.getType() === 'collapsible-container') {
