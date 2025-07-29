@@ -23,8 +23,9 @@ import { $getNodeByKey, $getSelection as $getLexicalSelection, $setSelection, $c
 // Import dos nós e plugin de container colapsível
 import { CollapsibleContainerNode, $createCollapsibleContainerNode, $isCollapsibleContainerNode } from './lexical/CollapsibleNode';
 import { CollapsibleTitleNode, $createCollapsibleTitleNode, $isCollapsibleTitleNode } from './lexical/CollapsibleTitleNode';
-import { CollapsibleContentNode, $createCollapsibleContentNode } from './lexical/CollapsibleContentNode';
+import { CollapsibleContentNode, $createCollapsibleContentNode, $isCollapsibleContentNode } from './lexical/CollapsibleContentNode';
 import CollapsiblePlugin, { INSERT_COLLAPSIBLE_COMMAND } from './lexical/CollapsiblePlugin';
+import EditProtectionPlugin from './lexical/EditProtectionPlugin';
 
 // Import dos nós e plugin de imagem
 import { ImageNode, $createImageNode } from './lexical/ImageNode';
@@ -1511,7 +1512,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                           childNodes.forEach(node => {
                             if ($isCollapsibleContentNode(node)) {
                               const contentChildren = node.getChildren();
-                              contentChildren.forEach(contentChild => {
+                              contentChildren.forEach((contentChild: any) => {
                                 if (contentChild.getType() === 'header-field' && !firstHeaderField) {
                                   firstHeaderField = contentChild;
                                 }
@@ -1547,7 +1548,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                           childNodes.forEach(node => {
                             if ($isCollapsibleContentNode(node)) {
                               const contentChildren = node.getChildren();
-                              contentChildren.forEach(contentChild => {
+                              contentChildren.forEach((contentChild: any) => {
                                 if (contentChild.getType() === 'header-field' && !firstHeaderField) {
                                   firstHeaderField = contentChild;
                                 }
@@ -1932,6 +1933,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <ImageEventListenerPlugin />
           <ImageIdAutoConvertPlugin />
           <TemplateSectionsPlugin sections={templateSections} mdFileOld={mdFileOld} />
+          <EditProtectionPlugin />
           <EditorInstancePlugin setEditorInstance={(editor) => {
             setEditorInstance(editor);
             if (onEditorInstanceChange) {

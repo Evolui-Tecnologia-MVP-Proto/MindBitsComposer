@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 29, 2025)
 
+✓ COMPLETED: Edit Protection Plugin - Prevents Editing Outside Collapsible Containers (January 29, 2025)
+  - Created EditProtectionPlugin to restrict editing to CollapsibleContentNode areas only
+  - Plugin intercepts key commands (Enter, Tab, Paste) and blocks execution outside valid containers
+  - Automatically repositions cursor to first valid content area when selection moves outside containers
+  - Works for both new template documents and saved documents loaded from document_editions table
+  - Plugin has high command priority to intercept before other plugins process commands
+  - Resolves issue where users could edit outside container areas in previously saved documents
+  - Enhanced editing workflow by ensuring consistent editing restrictions regardless of document load method
+
 ✓ COMPLETED: Fixed Automatic Header Field Population with Correct Data Source + Auto Cursor Positioning (January 29, 2025)
   - Fixed critical issue where template mappings were failing due to missing data from documentos table
   - Enhanced /api/document-editions-in-progress endpoint to include sistema, modulo, and idOrigemTxt fields from documentos table
