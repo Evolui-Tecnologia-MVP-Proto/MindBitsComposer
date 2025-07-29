@@ -1271,10 +1271,12 @@ interface LexicalEditorProps {
   markdownContent?: string;
   mdFileOld?: string;
   isEnabled?: boolean;
+  documentData?: any; // Dados do documento para preenchimento automático
+  templateMappings?: any; // Mapeamentos do template
 }
 
 // Componente principal do editor Lexical completo
-export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, onEditorInstanceChange, className = '', templateSections, templateStructure, viewMode = 'editor', initialEditorState, markdownContent: mdxContent = '', mdFileOld = '', isEnabled = true }: LexicalEditorProps): JSX.Element {
+export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, onEditorInstanceChange, className = '', templateSections, templateStructure, viewMode = 'editor', initialEditorState, markdownContent: mdxContent = '', mdFileOld = '', isEnabled = true, documentData, templateMappings }: LexicalEditorProps): JSX.Element {
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [tableRows, setTableRows] = useState(2);
   const [tableColumns, setTableColumns] = useState(3);
@@ -1283,12 +1285,65 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
   const [markdownViewMode, setMarkdownViewMode] = useState<'current' | 'old'>('current');
   const [headerFields, setHeaderFields] = useState<HeaderField[]>([]);
 
+  // Função para preencher campos automaticamente com base no mapeamento
+  const populateFieldFromMapping = (fieldName: string): string => {
+    if (!templateMappings || !documentData) {
+      return ''; // Retorna vazio se não há mapeamento ou dados
+    }
+
+    // Buscar por mapeamento de campo de header (header.campo ou header)
+    const headerKey = `header.${fieldName}`;
+    const mappedColumn = templateMappings[headerKey] || templateMappings['header'];
+    
+    if (!mappedColumn) {
+      return ''; // Não há mapeamento para este campo
+    }
+
+    console.log(`🔍 DEBUG: Mapeando campo ${fieldName} usando coluna ${mappedColumn}`);
+    
+    // Tentar buscar valor nos dados do documento
+    let value = '';
+    
+    // Primeiro tentar em general_columns (dados do Monday)
+    if (documentData.general_columns && documentData.general_columns[mappedColumn]) {
+      value = documentData.general_columns[mappedColumn];
+    }
+    // Depois tentar diretamente no documentData
+    else if (documentData[mappedColumn]) {
+      value = documentData[mappedColumn];
+    }
+    // Por último, tentar campos padrão
+    else {
+      switch (mappedColumn) {
+        case 'objeto':
+          value = documentData.objeto || '';
+          break;
+        case 'origem':
+          value = documentData.origem || '';
+          break;
+        case 'responsavel':
+          value = documentData.responsavel || '';
+          break;
+        case 'observacoes':
+          value = documentData.observacoes || '';
+          break;
+        default:
+          value = '';
+      }
+    }
+
+    console.log(`✅ DEBUG: Campo ${fieldName} preenchido com: "${value}"`);
+    return String(value || ''); // Garantir que retorna string
+  };
+
   // Processar template structure e inserir campos do header no editor
   useEffect(() => {
     console.log('🔍 DEBUG: useEffect chamado', { 
       templateStructure: templateStructure, 
       editorInstance: !!editorInstance,
-      templateType: typeof templateStructure
+      templateType: typeof templateStructure,
+      documentData: !!documentData,
+      templateMappings: !!templateMappings
     });
     
     if (editorInstance && templateStructure) {
@@ -1358,9 +1413,15 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                 headerKeys.forEach((key, index) => {
                   console.log(`🔍 DEBUG: Criando campo ${index + 1}/${headerKeys.length}: ${key}`);
                   try {
+                    // Tentar preencher automaticamente com base no mapeamento
+                    const autoValue = populateFieldFromMapping(key);
+                    const finalValue = autoValue || fieldsToUse[key] || '';
+                    
+                    console.log(`🔍 DEBUG: Campo ${key} - valor automático: "${autoValue}", valor final: "${finalValue}"`);
+                    
                     const fieldNode = $createHeaderFieldNode(
                       key,
-                      fieldsToUse[key] || '',
+                      finalValue,
                       `Digite ${key.toLowerCase()}...`
                     );
                     content.append(fieldNode);
@@ -1404,7 +1465,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
         }, 500);
       }
     }
-  }, [templateStructure, editorInstance]);
+  }, [templateStructure, editorInstance, documentData, templateMappings]);
 
   // Função para atualizar campo do header
   const updateHeaderField = (index: number, value: string) => {
