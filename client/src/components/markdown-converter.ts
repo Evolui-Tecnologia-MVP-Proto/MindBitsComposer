@@ -510,18 +510,17 @@ export function createMarkdownConverter() {
             }
           });
           
-          // If we found HeaderField nodes, generate them as a table
+          // If we found HeaderField nodes, generate them as a markdown table
           if (headerFields.length > 0) {
-            markdown += '\n<table style="width: 100%">\n  <tbody>\n';
+            // Add empty header row
+            markdown += '|  |  |\n';
+            markdown += '|--|--|\n';
             
             headerFields.forEach(field => {
-              markdown += '    <tr>\n';
-              markdown += `      <td style="padding: 8px; font-weight: bold; background-color: #f8f9fa; border: 1px solid #dee2e6;">${field.label}</td>\n`;
-              markdown += `      <td style="padding: 8px; border: 1px solid #dee2e6;">${field.value}</td>\n`;
-              markdown += '    </tr>\n';
+              markdown += `| ${field.label} | ${field.value} |\n`;
             });
             
-            markdown += '  </tbody>\n</table>\n\n';
+            markdown += '\n';
           } else {
             // Process content recursively if no HeaderField nodes found
             contentChildren.forEach((contentChild: any) => {
