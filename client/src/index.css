@@ -927,14 +927,46 @@ body.dark .Collapsible__title:hover {
 /* Fix markdown table rendering - ensure proper column layout */
 .markdown-content table {
   table-layout: auto !important;
-  width: auto !important;
+  width: 100% !important;
   max-width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
 }
 
 .markdown-content table td,
 .markdown-content table th {
   word-break: break-word;
-  min-width: 100px;
+  min-width: 100px !important;
+  width: 50% !important;
+  border: 1px solid #dee2e6 !important;
+  padding: 8px !important;
+  display: table-cell !important;
+}
+
+/* Force two-column layout specifically for header tables */
+.markdown-content table tr {
+  display: table-row !important;
+}
+
+.markdown-content table td:first-child {
+  background-color: #f8f9fa !important;
+  font-weight: bold !important;
+  width: 40% !important;
+}
+
+.markdown-content table td:last-child {
+  width: 60% !important;
+}
+
+.dark .markdown-content table td:first-child {
+  background-color: #374151 !important;
+  color: #ffffff !important;
+}
+
+.dark .markdown-content table td {
+  border-color: #374151 !important;
+  background-color: #1f2937 !important;
+  color: #ffffff !important;
 }
 
 .dark [data-radix-dialog-content] .border-t-0 {
