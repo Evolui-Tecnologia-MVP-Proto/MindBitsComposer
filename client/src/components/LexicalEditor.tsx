@@ -40,6 +40,7 @@ import CustomTablePlugin, { INSERT_CUSTOM_TABLE_COMMAND } from './lexical/TableP
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
 import MarkdownPreview from './MarkdownPreview';
 import {
   Bold,
@@ -1430,6 +1431,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
   const [selectedTableElement, setSelectedTableElement] = useState<HTMLTableElement | null>(null);
   const [markdownViewMode, setMarkdownViewMode] = useState<'current' | 'old'>('current');
   const [headerFields, setHeaderFields] = useState<HeaderField[]>([]);
+  const { toast } = useToast();
 
   // Event listeners para refresh e unplug dos campos de header
   useEffect(() => {
@@ -1468,8 +1470,63 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       
       console.log('🔌 HeaderField Unplug Event:', customEvent.detail);
       
-      // TODO: Implementar execução de plugin quando a infraestrutura estiver disponível
-      console.log(`Plugin ${mappingValue} seria executado para o campo ${label}`);
+      // Verificar se é um mapeamento de plugin
+      if (mappingType !== 'plugin') {
+        console.log('❌ Mapeamento não é do tipo plugin');
+        return;
+      }
+      
+      // Buscar o plugin pelo ID (mappingValue)
+      const pluginId = mappingValue;
+      
+      // Fazer requisição para verificar o status do plugin
+      fetch(`/api/plugins/${pluginId}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Plugin não encontrado');
+          }
+          return response.json();
+        })
+        .then(plugin => {
+          console.log('🔍 Plugin encontrado:', plugin);
+          
+          // Verificar se o plugin está ativo
+          if (plugin.status !== 'ACTIVE') {
+            toast({
+              title: "Plugin inativo",
+              description: `O plugin "${plugin.name}" está inativo e não pode ser executado.`,
+              variant: "destructive",
+            });
+            return;
+          }
+          
+          // Verificar se o plugin tem página de execução (verificar se tem código)
+          if (!plugin.code || plugin.code.trim() === '') {
+            toast({
+              title: "Plugin sem execução",
+              description: `O plugin "${plugin.name}" não possui código de execução configurado.`,
+              variant: "destructive",
+            });
+            return;
+          }
+          
+          // Se chegou até aqui, o plugin está válido
+          toast({
+            title: "Plugin executado",
+            description: `Plugin "${plugin.name}" executado para o campo "${label}".`,
+          });
+          
+          // TODO: Implementar execução real do plugin quando a infraestrutura estiver disponível
+          console.log(`Plugin ${plugin.name} seria executado para o campo ${label}`);
+        })
+        .catch(error => {
+          console.error('❌ Erro ao verificar plugin:', error);
+          toast({
+            title: "Erro no plugin",
+            description: "Não foi possível verificar o status do plugin.",
+            variant: "destructive",
+          });
+        });
     };
     
     window.addEventListener('headerFieldRefresh', handleHeaderFieldRefresh);

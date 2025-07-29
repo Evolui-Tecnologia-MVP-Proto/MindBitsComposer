@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 29, 2025)
 
+✓ COMPLETED: Plugin Validation with Toast Notifications (January 29, 2025)
+  - Added comprehensive plugin validation when clicking unplug button in header fields
+  - Checks if plugin exists and fetches plugin details via API call to /api/plugins/{id}
+  - Validates plugin status - shows "Plugin inativo" toast if status is not ACTIVE
+  - Validates plugin execution code - shows "Plugin sem execução" toast if code is empty
+  - Shows "Erro no plugin" toast if API call fails or plugin not found
+  - Shows success toast when plugin is valid and ready for execution
+  - Implemented proper error handling for all validation scenarios
+
 ✓ COMPLETED: Disabled Local File Button When Editing Library Documents (January 29, 2025)
   - Disabled "Abrir arquivo .lexical local" button when editing documents selected from library (left side panel)
   - Added logic to check if selectedEdition exists (indicates document from library)
