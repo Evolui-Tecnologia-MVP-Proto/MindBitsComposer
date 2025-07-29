@@ -924,6 +924,19 @@ body.dark .Collapsible__title:hover {
   border-color: #0F172A !important;
 }
 
+/* Fix markdown table rendering - ensure proper column layout */
+.markdown-content table {
+  table-layout: auto !important;
+  width: auto !important;
+  max-width: 100% !important;
+}
+
+.markdown-content table td,
+.markdown-content table th {
+  word-break: break-word;
+  min-width: 100px;
+}
+
 .dark [data-radix-dialog-content] .border-t-0 {
   border-color: #0F172A !important;
 }

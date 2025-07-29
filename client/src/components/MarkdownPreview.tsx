@@ -96,7 +96,7 @@ const mdxComponents = {
   ),
   table: (props: any) => (
     <div className="overflow-x-auto mb-4">
-      <table className="min-w-full border border-gray-300 dark:border-[#374151] rounded-lg" {...props} />
+      <table className="border-collapse border border-gray-300 dark:border-[#374151] rounded-lg" {...props} />
     </div>
   ),
   thead: (props: any) => <thead className="bg-gray-50 dark:bg-[#111827]" {...props} />,
