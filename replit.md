@@ -59,6 +59,7 @@ Preferred communication style: Simple, everyday language.
   - Added automatic modal closure when plugin sends closeModal flag
   - Enhanced context cleanup when modal is closed manually or automatically
   - System now correctly transfers plugin output back to the originating HeaderField input
+  - Disabled toast notifications when plugin is invoked from document context for cleaner UX
 
 ✓ COMPLETED: Plugin Validation with Toast Notifications (January 29, 2025)
   - Added comprehensive plugin validation when clicking unplug button in header fields

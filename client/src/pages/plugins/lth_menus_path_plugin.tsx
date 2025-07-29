@@ -718,10 +718,14 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       });
     }
 
-    toast({
-      title: "Funcionalidade salva",
-      description: `Caminho "${formattedPath}" foi salvo com sucesso.`,
-    });
+    // Não mostrar toast quando usado no contexto de documento (onDataExchange disponível)
+    // O toast só aparece quando usado fora do contexto de documento
+    if (!onDataExchange) {
+      toast({
+        title: "Funcionalidade salva",
+        description: `Caminho "${formattedPath}" foi salvo com sucesso.`,
+      });
+    }
 
     console.log('Caminho salvo do plugin LTH Menus Path:', formattedPath);
   };
