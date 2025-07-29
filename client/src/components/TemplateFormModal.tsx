@@ -635,7 +635,7 @@ export default function TemplateFormModal({
                     value={formData.repoPath || ""}
                     onValueChange={handleRepoPathChange}
                   >
-                    <SelectTrigger className="w-full dark:bg-[#0F172A] dark:border-[#374151]">
+                    <SelectTrigger className="w-full border-white dark:bg-[#0F172A] dark:border-white">
                       <SelectValue placeholder="Selecione um caminho do repositório" />
                     </SelectTrigger>
                     <SelectContent className="dark:bg-[#0F172A] dark:border-[#374151]">
