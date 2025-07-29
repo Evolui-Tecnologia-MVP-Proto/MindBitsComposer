@@ -169,7 +169,7 @@ export default function PluginModal({
       <DialogContent 
         className="p-0 gap-0 !max-w-none !max-h-none"
         style={{
-          width: actualPluginName === 'lth_menus_path_plugin' ? '60vw' :
+          width: actualPluginName === 'lth_menus_path_plugin' ? '40vw' :
                  actualPluginName === 'mermaid-graph-plugin' ? '80vw' : 
                  actualPluginName === 'vector-graph-plugin' ? '80vw' :
                  actualPluginName === 'simple-excalidraw-plugin' ? '90vw' : '100vw',
@@ -184,7 +184,7 @@ export default function PluginModal({
                actualPluginName === 'mermaid-graph-plugin' ? '10vh' : 
                actualPluginName === 'vector-graph-plugin' ? '10vh' :
                actualPluginName === 'simple-excalidraw-plugin' ? '5vh' : '0',
-          left: actualPluginName === 'lth_menus_path_plugin' ? '20vw' :
+          left: actualPluginName === 'lth_menus_path_plugin' ? '30vw' :
                 actualPluginName === 'mermaid-graph-plugin' ? '10vw' : 
                 actualPluginName === 'vector-graph-plugin' ? '10vw' :
                 actualPluginName === 'simple-excalidraw-plugin' ? '5vw' : '0',
