@@ -1373,8 +1373,10 @@ function HeaderFieldMappingPlugin({ templateMappings, documentData }: { template
           }
           
           // Recursivamente visitar filhos
-          const children = node.getChildren ? node.getChildren() : [];
-          children.forEach((child: LexicalNode) => visitNodes(child));
+          if ('getChildren' in node && typeof node.getChildren === 'function') {
+            const children = node.getChildren();
+            children.forEach((child: LexicalNode) => visitNodes(child));
+          }
         };
         
         // Começar a visita pela raiz
@@ -1485,81 +1487,99 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
     console.log(`🔍 DEBUG - dados disponíveis:`, data);
     console.log(`🔍 DEBUG - general_columns:`, data.general_columns);
     
-    // Substituir campos por valores reais
     let result = formula;
+    
+    // Helper function to get field value from data
+    const getFieldValue = (fieldName: string): string => {
+      let value = '';
+      
+      // Primeiro tentar diretamente no data
+      if (data[fieldName] !== undefined && data[fieldName] !== null) {
+        value = String(data[fieldName]);
+        console.log(`🔍 DEBUG - Campo "${fieldName}" encontrado em data: "${value}"`);
+      }
+      // Depois tentar em general_columns
+      else if (data.general_columns && data.general_columns[fieldName] !== undefined && data.general_columns[fieldName] !== null) {
+        value = String(data.general_columns[fieldName]);
+        console.log(`🔍 DEBUG - Campo "${fieldName}" encontrado em general_columns: "${value}"`);
+      }
+      // Tentar variações conhecidas
+      else {
+        switch (fieldName) {
+          case 'id_origem_txt':
+            value = String(data.id_origem_txt || data.idOrigemTxt || '');
+            break;
+          case 'created_at':
+            value = String(data.created_at || data.createdAt || '');
+            break;
+          default:
+            console.log(`❌ DEBUG - Campo "${fieldName}" não encontrado`);
+            return fieldName; // Retornar o nome original se não encontrar
+        }
+      }
+      
+      return value;
+    };
     
     // Primeiro, processar SUBSTR(campo, inicio, fim)
     const substrRegex = /SUBSTR\((\w+),\s*(\d+),\s*(\d+)\)/g;
     result = result.replace(substrRegex, (match, field, start, end) => {
-      // Buscar valor do campo em várias localizações
-      let value = '';
-      
-      // Primeiro tentar diretamente no data
-      if (data[field] !== undefined && data[field] !== null) {
-        value = data[field];
-      }
-      // Depois tentar em general_columns
-      else if (data.general_columns && data.general_columns[field] !== undefined && data.general_columns[field] !== null) {
-        value = data.general_columns[field];
-      }
-      
-      console.log(`🔍 DEBUG - SUBSTR(${field}): valor encontrado = "${value}"`);
-      return value.substring(parseInt(start), parseInt(end));
+      const value = getFieldValue(field);
+      const substringResult = value.substring(parseInt(start), parseInt(end));
+      console.log(`🔍 DEBUG - SUBSTR(${field}): "${value}" -> substring(${start}, ${end}) = "${substringResult}"`);
+      return substringResult;
     });
     
     console.log(`🔍 DEBUG - Após SUBSTR: "${result}"`);
     
-    // Identificar campos únicos na fórmula para substituição
-    const fieldsToReplace = [];
-    const fieldRegex = /\b(\w+)\b/g;
-    let match;
-    while ((match = fieldRegex.exec(formula)) !== null) {
-      const field = match[1];
-      // Ignorar palavras-chave e números
-      if (!['SUBSTR'].includes(field) && isNaN(Number(field))) {
-        fieldsToReplace.push(field);
+    // Agora processar campos simples que restaram
+    // Fazer várias passadas para garantir que todos os campos sejam substituídos
+    let maxIterations = 5;
+    let currentIteration = 0;
+    
+    while (currentIteration < maxIterations) {
+      let hadReplacement = false;
+      
+      // Encontrar campos que são palavras simples (não dentro de aspas)
+      const fieldMatches = result.match(/\b[a-zA-Z_][a-zA-Z0-9_]*\b/g);
+      
+      if (fieldMatches) {
+        console.log(`🔍 DEBUG - Iteração ${currentIteration + 1}, campos encontrados:`, fieldMatches);
+        
+        // Para cada campo encontrado, tentar substituir
+        fieldMatches.forEach(field => {
+          // Pular palavras-chave e números
+          if (['SUBSTR'].includes(field) || !isNaN(Number(field))) return;
+          
+          const fieldValue = getFieldValue(field);
+          
+          // Se encontrou um valor e é diferente do nome do campo
+          if (fieldValue && fieldValue !== field) {
+            // Substituir apenas ocorrências que são palavras completas
+            const fieldRegex = new RegExp(`\\b${field}\\b`, 'g');
+            const beforeReplace = result;
+            result = result.replace(fieldRegex, fieldValue);
+            
+            if (result !== beforeReplace) {
+              hadReplacement = true;
+              console.log(`✅ DEBUG - Campo "${field}" substituído por "${fieldValue}"`);
+              console.log(`🔍 DEBUG - Resultado após substituição: "${result}"`);
+            }
+          }
+        });
       }
+      
+      // Se não houve substituições nesta iteração, parar
+      if (!hadReplacement) {
+        break;
+      }
+      
+      currentIteration++;
     }
     
-    console.log(`🔍 DEBUG - Campos identificados para substituição:`, fieldsToReplace);
+    console.log(`🔍 DEBUG - Após substituição de campos: "${result}"`);
     
-    // Substituir cada campo identificado
-    fieldsToReplace.forEach(field => {
-      let value = '';
-      
-      // Buscar valor do campo em várias localizações
-      if (data[field] !== undefined && data[field] !== null) {
-        value = data[field];
-        console.log(`🔍 DEBUG - Campo ${field} encontrado em data: "${value}"`);
-      }
-      else if (data.general_columns && data.general_columns[field] !== undefined && data.general_columns[field] !== null) {
-        value = data.general_columns[field];
-        console.log(`🔍 DEBUG - Campo ${field} encontrado em general_columns: "${value}"`);
-      }
-      else {
-        // Tentar variações conhecidas
-        switch (field) {
-          case 'id_origem_txt':
-            value = data.id_origem_txt || data.idOrigemTxt || '';
-            break;
-          case 'created_at':
-            value = data.created_at || data.createdAt || '';
-            break;
-          default:
-            console.log(`❌ DEBUG - Campo ${field} não encontrado, mantendo nome original`);
-            return; // Não substituir se não encontrar
-        }
-      }
-      
-      if (value !== '') {
-        // Criar regex específico para este campo (word boundary)
-        const specificFieldRegex = new RegExp(`\\b${field}\\b`, 'g');
-        result = result.replace(specificFieldRegex, String(value));
-        console.log(`✅ DEBUG - Campo ${field} substituído por "${value}". Resultado: "${result}"`);
-      }
-    });
-    
-    // Processar concatenação (+)
+    // Processar concatenação (+) - remover aspas e juntar
     const parts = result.split(/\s*\+\s*/);
     result = parts.map(part => {
       // Remover aspas se existirem
@@ -1569,7 +1589,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       return part;
     }).join('');
     
-    console.log(`✅ DEBUG - Formula resultado: "${result}"`);
+    console.log(`✅ DEBUG - Formula resultado final: "${result}"`);
     return result;
   };
 
