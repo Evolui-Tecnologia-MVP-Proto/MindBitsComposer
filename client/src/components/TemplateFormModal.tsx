@@ -189,6 +189,12 @@ export default function TemplateFormModal({
     }
   }, [isOpen, openAccordions]);
 
+  // Função para verificar se um valor é um UUID (ID de plugin)
+  const isPluginId = (value: string) => {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(value) && documentPartPlugins.some((plugin: any) => plugin.id === value);
+  };
+
   // Atualiza os mapeamentos quando a estrutura muda ou template é carregado
   useEffect(() => {
     const fields = extractFieldsFromStructure(
@@ -198,6 +204,7 @@ export default function TemplateFormModal({
     const newMappings: Record<string, string> = {};
     const newFormulaFields = new Set<string>();
     const newPluginFields = new Set<string>();
+    const newPluginValues: Record<string, string> = {};
     
     fields.forEach(field => {
       // Preserva valores existentes do template ou do estado local
@@ -213,18 +220,31 @@ export default function TemplateFormModal({
           [field]: existingValue
         }));
       }
-      
-      // Manter campos de plugin
-      if (existingValue === '__data_plugin__') {
+      // Manter campos de plugin - verifica se o valor é __data_plugin__ ou um UUID de plugin
+      else if (existingValue === '__data_plugin__' || isPluginId(existingValue)) {
         newPluginFields.add(field);
-        newMappings[field] = '__data_plugin__';
+        if (existingValue === '__data_plugin__') {
+          newMappings[field] = '__data_plugin__';
+        } else {
+          // Se é um UUID de plugin, manter o valor e armazenar para pluginValues
+          newMappings[field] = '__data_plugin__';
+          newPluginValues[field] = existingValue;
+        }
       }
     });
     
     setFieldMappings(newMappings);
     setFormulaFields(newFormulaFields);
     setPluginFields(newPluginFields);
-  }, [formData.structure, formData.mappings]);
+    
+    // Atualizar pluginValues se há novos valores
+    if (Object.keys(newPluginValues).length > 0) {
+      setPluginValues(prev => ({
+        ...prev,
+        ...newPluginValues
+      }));
+    }
+  }, [formData.structure, formData.mappings, documentPartPlugins]);
 
   // Função para atualizar valor de mapeamento
   const handleMappingChange = (field: string, value: string) => {

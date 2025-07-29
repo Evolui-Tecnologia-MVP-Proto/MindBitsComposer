@@ -10,7 +10,7 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 29, 2025)
 
-✓ COMPLETED: Data Plugin Selection in Template Edit Modal Mapping Tab (January 29, 2025)
+✓ COMPLETED: Data Plugin Selection in Template Edit Modal Mapping Tab with Persistence Fix (January 29, 2025)
   - Added "Data Plugin" selection option in template mapping tab similar to "Compose Formula" implementation
   - Added toggle button with Lucide "unplug" icon that shows/hides plugin selector when Data Plugin is selected
   - Created SelectTrigger for selecting active plugins of type DOCUMENT_PART with name and version display
@@ -19,7 +19,9 @@ Preferred communication style: Simple, everyday language.
   - Added query to fetch active DOCUMENT_PART plugins when modal is open
   - Updated form submission logic to integrate plugin values into final mappings
   - Applied consistent dark mode styling matching existing design patterns
-  - Template fields can now be mapped to either database columns, compose formulas, or data plugins
+  - Fixed plugin value persistence issue - templates now correctly reload plugin selections when reopened for editing
+  - Added UUID validation and plugin ID detection to properly restore plugin selections from saved mappings
+  - Template fields can now be mapped to either database columns, compose formulas, or data plugins with full persistence
 
 ✓ COMPLETED: Filtered Composer Attachments Panel to Show Only COMPOSER_ASSET Plugins (January 29, 2025)
   - Modified composer right side panel (attachments) to filter plugins by type COMPOSER_ASSET
