@@ -164,9 +164,76 @@ export default function PluginModal({
     );
   }
 
+  // Force immediate sizing with aggressive approaches
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const applyStyles = (element: HTMLElement) => {
+      if (actualPluginName === 'lth_menus_path_plugin') {
+        element.style.setProperty('width', '40vw', 'important');
+        element.style.setProperty('height', '60vh', 'important');
+        element.style.setProperty('position', 'fixed', 'important');
+        element.style.setProperty('top', '20vh', 'important');
+        element.style.setProperty('left', '30vw', 'important');
+        element.style.setProperty('right', 'auto', 'important');
+        element.style.setProperty('bottom', 'auto', 'important');
+        element.style.setProperty('margin', '0', 'important');
+        element.style.setProperty('padding', '0', 'important');
+        element.style.setProperty('transform', 'none', 'important');
+        element.style.setProperty('max-width', 'none', 'important');
+        element.style.setProperty('max-height', 'none', 'important');
+        element.style.setProperty('transition', 'none', 'important');
+        element.style.setProperty('animation', 'none', 'important');
+      }
+    };
+
+    // Immediate attempt
+    const dialogContent = document.querySelector('[data-radix-dialog-content]');
+    if (dialogContent) {
+      applyStyles(dialogContent as HTMLElement);
+    }
+
+    // MutationObserver to catch when the element is created
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            const element = node as Element;
+            if (element.matches('[data-radix-dialog-content]')) {
+              applyStyles(element as HTMLElement);
+            }
+            // Also check children
+            const dialogContent = element.querySelector('[data-radix-dialog-content]');
+            if (dialogContent) {
+              applyStyles(dialogContent as HTMLElement);
+            }
+          }
+        });
+      });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Multiple timeout attempts to ensure styles are applied
+    const timeouts = [0, 1, 5, 10, 50, 100].map(delay => 
+      setTimeout(() => {
+        const dialogContent = document.querySelector('[data-radix-dialog-content]');
+        if (dialogContent) {
+          applyStyles(dialogContent as HTMLElement);
+        }
+      }, delay)
+    );
+
+    return () => {
+      observer.disconnect();
+      timeouts.forEach(clearTimeout);
+    };
+  }, [isOpen, actualPluginName]);
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={onClose} modal>
       <DialogContent 
+        forceMount={isOpen ? true : undefined} 
         className={`p-0 gap-0 !max-w-none !max-h-none ${
           actualPluginName === 'lth_menus_path_plugin' ? 'plugin-modal-lth' :
           actualPluginName === 'mermaid-graph-plugin' ? 'plugin-modal-large' : 
@@ -174,6 +241,32 @@ export default function PluginModal({
           actualPluginName === 'simple-excalidraw-plugin' ? 'plugin-modal-xlarge' : 'plugin-modal-fullscreen'
         }`}
         style={{
+          width: actualPluginName === 'lth_menus_path_plugin' ? '40vw' :
+                 actualPluginName === 'mermaid-graph-plugin' ? '80vw' : 
+                 actualPluginName === 'vector-graph-plugin' ? '80vw' :
+                 actualPluginName === 'simple-excalidraw-plugin' ? '90vw' : '100vw',
+          height: actualPluginName === 'lth_menus_path_plugin' ? '60vh' :
+                  actualPluginName === 'mermaid-graph-plugin' ? '80vh' : 
+                  actualPluginName === 'vector-graph-plugin' ? '80vh' :
+                  actualPluginName === 'simple-excalidraw-plugin' ? '90vh' : '100vh',
+          position: 'fixed',
+          top: actualPluginName === 'lth_menus_path_plugin' ? '20vh' :
+               actualPluginName === 'mermaid-graph-plugin' ? '10vh' : 
+               actualPluginName === 'vector-graph-plugin' ? '10vh' :
+               actualPluginName === 'simple-excalidraw-plugin' ? '5vh' : '0',
+          left: actualPluginName === 'lth_menus_path_plugin' ? '30vw' :
+                actualPluginName === 'mermaid-graph-plugin' ? '10vw' : 
+                actualPluginName === 'vector-graph-plugin' ? '10vw' :
+                actualPluginName === 'simple-excalidraw-plugin' ? '5vw' : '0',
+          right: 'auto',
+          bottom: 'auto',
+          margin: '0',
+          padding: '0',
+          transform: 'none',
+          maxWidth: 'none',
+          maxHeight: 'none',
+          transition: 'none',
+          animation: 'none',
           borderRadius: (actualPluginName === 'lth_menus_path_plugin' || actualPluginName === 'mermaid-graph-plugin' || actualPluginName === 'vector-graph-plugin' || actualPluginName === 'simple-excalidraw-plugin') ? '8px' : '0',
           zIndex: 50,
           border: 'none',
