@@ -20,6 +20,7 @@ Preferred communication style: Simple, everyday language.
   - Updated form submission logic to integrate plugin values into final mappings
   - Applied consistent dark mode styling matching existing design patterns
   - Template fields can now be mapped to either database columns, compose formulas, or data plugins
+  - FIXED: System now correctly saves plugin name instead of UUID when using Data Plugin feature
 
 ✓ COMPLETED: Filtered Composer Attachments Panel to Show Only COMPOSER_ASSET Plugins (January 29, 2025)
   - Modified composer right side panel (attachments) to filter plugins by type COMPOSER_ASSET

@@ -758,7 +758,7 @@ export default function TemplateFormModal({
                                                           </SelectTrigger>
                                                           <SelectContent>
                                                             {documentPartPlugins.map((plugin: any) => (
-                                                              <SelectItem key={plugin.id} value={plugin.id}>
+                                                              <SelectItem key={plugin.id} value={plugin.name}>
                                                                 <div className="flex items-center gap-2">
                                                                   <span className="text-xs">{plugin.name}</span>
                                                                   <span className="text-xs text-gray-500">v{plugin.version}</span>
@@ -896,7 +896,7 @@ export default function TemplateFormModal({
                                                   </SelectTrigger>
                                                   <SelectContent>
                                                     {documentPartPlugins.map((plugin: any) => (
-                                                      <SelectItem key={plugin.id} value={plugin.id}>
+                                                      <SelectItem key={plugin.id} value={plugin.name}>
                                                         <div className="flex items-center gap-2">
                                                           <span className="text-sm">{plugin.name}</span>
                                                           <span className="text-xs text-gray-500">v{plugin.version}</span>
