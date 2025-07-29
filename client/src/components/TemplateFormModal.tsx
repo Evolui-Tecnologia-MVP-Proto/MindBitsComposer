@@ -456,6 +456,10 @@ export default function TemplateFormModal({
   }
 
   const handleRepoPathChange = (value: string) => {
+    // Não permitir definir o valor placeholder como repoPath real
+    if (value === "no-repo-structures") {
+      return;
+    }
     setFormData(prev => ({ ...prev, repoPath: value }));
   };
 
@@ -647,7 +651,7 @@ export default function TemplateFormModal({
                           </SelectItem>
                         ))
                       ) : (
-                        <SelectItem value="" disabled>
+                        <SelectItem value="no-repo-structures" disabled>
                           Nenhuma estrutura de repositório encontrada
                         </SelectItem>
                       )}
