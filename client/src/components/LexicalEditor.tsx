@@ -1278,6 +1278,9 @@ function HeaderFieldMappingPlugin({ templateMappings, documentData }: { template
       editor.update(() => {
         const root = $getRoot();
         
+        console.log('🔍 HeaderFieldMappingPlugin: Starting update');
+        console.log('📋 Template mappings:', templateMappings);
+        
         // Função recursiva para percorrer todos os nodes
         const visitNodes = (node: LexicalNode) => {
           if (node.getType() === 'header-field') {
@@ -1286,11 +1289,17 @@ function HeaderFieldMappingPlugin({ templateMappings, documentData }: { template
             const headerKey = `header.${label}`;
             const mapping = templateMappings[headerKey];
             
+            console.log(`🏷️ Found header field: "${label}", key: "${headerKey}"`);
+            console.log(`📦 Mapping for this field:`, mapping);
+            
             if (mapping) {
               const { type, value } = extractMappingInfo(mapping);
               
+              console.log(`✅ Extracted mapping - Type: ${type}, Value: ${value}`);
+              
               // Criar novo node com informações de mapeamento
               if (type && !headerNode.getMappingType()) {
+                console.log(`🔄 Creating new node with mapping info for "${label}"`);
                 const newNode = $createHeaderFieldNode(
                   label,
                   headerNode.getValue(),
@@ -1299,7 +1308,11 @@ function HeaderFieldMappingPlugin({ templateMappings, documentData }: { template
                   value
                 );
                 headerNode.replace(newNode);
+              } else if (headerNode.getMappingType()) {
+                console.log(`ℹ️ Node "${label}" already has mapping type: ${headerNode.getMappingType()}`);
               }
+            } else {
+              console.log(`❌ No mapping found for field "${label}"`);
             }
           }
           
@@ -1310,6 +1323,7 @@ function HeaderFieldMappingPlugin({ templateMappings, documentData }: { template
         
         // Começar a visita pela raiz
         visitNodes(root);
+        console.log('✅ HeaderFieldMappingPlugin: Update complete');
       });
     };
 

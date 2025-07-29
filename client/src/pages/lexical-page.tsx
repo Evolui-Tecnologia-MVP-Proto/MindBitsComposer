@@ -1380,10 +1380,45 @@ export default function LexicalPage() {
       // Forçar re-render do editor para aplicar as seções do template
       setEditorKey(prev => prev + 1);
     } else {
-      console.log('Carregando lex_file existente, não aplicar template');
+      console.log('Carregando lex_file existente, mas precisamos carregar template para mapeamentos');
       
-      // Limpar template para não aplicar seções
-      setSelectedTemplate(null);
+      // Buscar dados completos do template para obter os mapeamentos
+      try {
+        let templateMappings = {};
+        if (edition.templateId) {
+          console.log('🔍 DEBUG: Buscando template completo para obter mapeamentos (documento com lexFile)...');
+          const response = await fetch(`/api/template/${edition.templateId}`);
+          if (response.ok) {
+            const fullTemplate = await response.json();
+            console.log('🔍 DEBUG: Template completo recebido:', fullTemplate);
+            templateMappings = fullTemplate.mappings || {};
+            console.log('🔍 DEBUG: Mapeamentos extraídos:', templateMappings);
+            
+            // Criar objeto template apenas com mapeamentos (sem aplicar estrutura)
+            const template = {
+              id: edition.templateId,
+              name: edition.templateCode,
+              code: edition.templateCode,
+              description: '',
+              type: 'struct' as const,
+              structure: edition.templateStructure,
+              mappings: templateMappings,
+              createdAt: '',
+              updatedAt: ''
+            };
+            console.log('🔍 DEBUG: Template com mapeamentos criado para documento existente:', template);
+            setSelectedTemplate(template);
+          } else {
+            console.log('❌ DEBUG: Erro ao buscar template completo');
+            setSelectedTemplate(null);
+          }
+        } else {
+          setSelectedTemplate(null);
+        }
+      } catch (error) {
+        console.error('❌ DEBUG: Erro ao buscar template:', error);
+        setSelectedTemplate(null);
+      }
       
       // Carregar estado serializado do Lexical
       setInitialEditorState(edition.lexFile);
