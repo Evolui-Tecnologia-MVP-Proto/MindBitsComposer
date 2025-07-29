@@ -1787,7 +1787,7 @@ export default function LexicalPage() {
                   markdownContent={markdownContent}
                   mdFileOld={selectedEdition?.mdFileOld || ''}
                   isEnabled={!!(currentDocumentId || selectedTemplate || selectedEdition || loadedFileName)}
-                  documentData={currentDocument}
+                  documentData={selectedEdition}
                   templateMappings={selectedTemplate?.mappings}
                 />
               </CardContent>
