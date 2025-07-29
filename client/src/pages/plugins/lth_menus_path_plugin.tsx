@@ -31,7 +31,8 @@ interface Subsystem {
   description?: string;
 }
 
-export default function LthMenusPathPlugin({ onDataExchange, selectedEdition }: LthMenusPathPluginProps = {}) {
+export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null | undefined) {
+  const { onDataExchange, selectedEdition } = props || {};
   const [selectedSubsystem, setSelectedSubsystem] = useState<string>("");
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
   const [selectedPaths, setSelectedPaths] = useState<Set<string>>(new Set());

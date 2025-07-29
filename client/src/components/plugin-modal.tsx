@@ -63,6 +63,7 @@ export default function PluginModal({
   // Carregar componente do plugin dinamicamente quando modal abre
   useEffect(() => {
     if (isOpen && actualPluginName) {
+      console.log('Carregando plugin:', actualPluginName);
       setIsLoadingPlugin(true);
       setLoadError(null);
       setPluginComponent(null);
@@ -70,14 +71,16 @@ export default function PluginModal({
       loadPluginComponent(actualPluginName)
         .then((component) => {
           if (component) {
-            setPluginComponent(component);
+            console.log('Plugin carregado com sucesso:', actualPluginName);
+            setPluginComponent(() => component);
             setLoadError(null);
           } else {
+            console.log('Plugin não encontrado:', actualPluginName);
             setLoadError(`Plugin "${actualPluginName}" não foi encontrado.`);
           }
         })
         .catch((error) => {
-          console.error('Erro ao carregar plugin:', error);
+          console.error('Erro ao carregar plugin:', actualPluginName, error);
           setLoadError(`Erro ao carregar plugin: ${error.message}`);
         })
         .finally(() => {
@@ -203,10 +206,10 @@ export default function PluginModal({
             </div>
           }>
             <PluginComponent
-              onDataExchange={handleDataExchange}
-              selectedEdition={selectedEdition}
-              globalAssets={globalAssets}
-              documentArtifacts={documentArtifacts}
+              onDataExchange={handleDataExchange || (() => {})}
+              selectedEdition={selectedEdition || null}
+              globalAssets={globalAssets || []}
+              documentArtifacts={documentArtifacts || []}
             />
           </Suspense>
         ) : (
