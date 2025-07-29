@@ -20,6 +20,7 @@ type TemplateFormValues = {
   type: string;
   structure: string | object;
   mappings?: Record<string, string>;
+  repoPath?: string;
 };
 
 const emptyTemplate: TemplateFormValues = {
@@ -29,6 +30,7 @@ const emptyTemplate: TemplateFormValues = {
   type: "struct",
   structure: "{}",
   mappings: {},
+  repoPath: "",
 };
 
 interface TemplateFormModalProps {
@@ -59,6 +61,7 @@ export default function TemplateFormModal({
             ? JSON.stringify(template.structure, null, 2) 
             : "{}",
           mappings: template.mappings || {},
+          repoPath: (template as any).repoPath || "",
         }
       : { 
           ...emptyTemplate, 
@@ -94,6 +97,12 @@ export default function TemplateFormModal({
       const plugins = await response.json();
       return plugins.filter((plugin: any) => plugin.status === 'active' && plugin.type === 'DOCUMENT_PART');
     },
+    enabled: isOpen,
+  });
+
+  // Query para buscar estrutura do repositório
+  const { data: repoStructures = [] } = useQuery({
+    queryKey: ["/api/repo-structure"],
     enabled: isOpen,
   });
 
@@ -444,6 +453,10 @@ export default function TemplateFormModal({
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
+  }
+
+  const handleRepoPathChange = (value: string) => {
+    setFormData(prev => ({ ...prev, repoPath: value }));
   };
 
   const handleTypeChange = (value: string) => {
@@ -608,6 +621,41 @@ export default function TemplateFormModal({
                       required
                     />
                   </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="repoPath">
+                    Caminho do Repositório
+                  </Label>
+                  <Select
+                    value={formData.repoPath || ""}
+                    onValueChange={handleRepoPathChange}
+                  >
+                    <SelectTrigger className="w-full dark:bg-[#0F172A] dark:border-[#374151]">
+                      <SelectValue placeholder="Selecione um caminho do repositório" />
+                    </SelectTrigger>
+                    <SelectContent className="dark:bg-[#0F172A] dark:border-[#374151]">
+                      {Array.isArray(repoStructures) && repoStructures.length > 0 ? (
+                        repoStructures.map((structure: any) => (
+                          <SelectItem key={structure.path} value={structure.path}>
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-sm">{structure.path}</span>
+                              {structure.type === 'directory' && (
+                                <span className="text-xs text-gray-500">📁</span>
+                              )}
+                            </div>
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="" disabled>
+                          Nenhuma estrutura de repositório encontrada
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-sm text-gray-500">
+                    Selecione o caminho no repositório onde este template será aplicado
+                  </p>
                 </div>
                 
                 <div className="space-y-2">

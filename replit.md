@@ -10,6 +10,19 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 29, 2025)
 
+✓ COMPLETED: Repository Path Selection in Template Form - Added repo_path Field Integration (January 29, 2025)
+  - Added repo_path text field to templates database table schema with nullable support
+  - Enhanced TemplateFormModal with repository path selector between código and descrição fields
+  - Integrated with existing /api/repo-structure endpoint for fetching repository structures
+  - Added handleRepoPathChange function for proper form state management
+  - Repository selector displays hierarchical folder structure with icons (📁 for directories)
+  - Includes proper dark mode theming matching application design standards
+  - Repository path field shows helpful placeholder text and description
+  - Template save/load functionality automatically handles repoPath persistence
+  - Form validation and submission updated to include repository path in template data
+  - Applied proper database migration without backup table conflicts using npm run db:push
+  - Complete integration allows template assignment to specific repository paths for workflow organization
+
 ✓ COMPLETED: LTH Menus Path Plugin Development (January 29, 2025)
   - Created new plugin page `lth_menus_path_plugin.tsx` in client/src/pages/plugins directory
   - Implemented modal-style interface with three action buttons: [Atualizar], [Cancelar], [Salvar]
