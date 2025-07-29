@@ -657,9 +657,6 @@ export default function TemplateFormModal({
                       )}
                     </SelectContent>
                   </Select>
-                  <p className="text-sm text-gray-500">
-                    Selecione o caminho no repositório onde este template será aplicado
-                  </p>
                 </div>
                 
                 <div className="space-y-2">
