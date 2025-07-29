@@ -815,15 +815,15 @@ function processInlineFormatting(text: string): any[] {
   const matches: Array<{start: number, end: number, text: string, format: string}> = [];
   
   markers.forEach(marker => {
-    let match;
+    let match: RegExpExecArray | null;
     // Reset regex para garantir que começamos do início
     marker.regex.lastIndex = 0;
     while ((match = marker.regex.exec(text)) !== null) {
       // Verificar se este match não sobrepõe com matches existentes
       const overlaps = matches.some(existingMatch => 
-        (match.index >= existingMatch.start && match.index < existingMatch.end) ||
-        (match.index + match[0].length > existingMatch.start && match.index + match[0].length <= existingMatch.end) ||
-        (match.index <= existingMatch.start && match.index + match[0].length >= existingMatch.end)
+        (match!.index >= existingMatch.start && match!.index < existingMatch.end) ||
+        (match!.index + match![0].length > existingMatch.start && match!.index + match![0].length <= existingMatch.end) ||
+        (match!.index <= existingMatch.start && match!.index + match![0].length >= existingMatch.end)
       );
       
       if (!overlaps) {
