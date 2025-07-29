@@ -1287,15 +1287,25 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
 
   // Função para preencher campos automaticamente com base no mapeamento
   const populateFieldFromMapping = (fieldName: string): string => {
+    console.log(`🔍 DEBUG - populateFieldFromMapping: Iniciando para campo "${fieldName}"`);
+    console.log(`🔍 DEBUG - templateMappings:`, templateMappings);
+    console.log(`🔍 DEBUG - documentData:`, documentData);
+
     if (!templateMappings || !documentData) {
+      console.log(`❌ DEBUG: Sem mapeamento ou dados - templateMappings: ${!!templateMappings}, documentData: ${!!documentData}`);
       return ''; // Retorna vazio se não há mapeamento ou dados
     }
 
     // Buscar por mapeamento de campo de header (header.campo ou header)
     const headerKey = `header.${fieldName}`;
+    console.log(`🔍 DEBUG: Procurando chave "${headerKey}" nos mapeamentos`);
+    
     const mappedColumn = templateMappings[headerKey] || templateMappings['header'];
+    console.log(`🔍 DEBUG: Coluna mapeada encontrada: "${mappedColumn}"`);
     
     if (!mappedColumn) {
+      console.log(`❌ DEBUG: Nenhum mapeamento encontrado para campo "${fieldName}"`);
+      console.log(`🔍 DEBUG: Chaves disponíveis nos mapeamentos:`, Object.keys(templateMappings));
       return ''; // Não há mapeamento para este campo
     }
 
@@ -1307,13 +1317,16 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
     // Primeiro tentar em general_columns (dados do Monday)
     if (documentData.general_columns && documentData.general_columns[mappedColumn]) {
       value = documentData.general_columns[mappedColumn];
+      console.log(`✅ DEBUG: Valor encontrado em general_columns: "${value}"`);
     }
     // Depois tentar diretamente no documentData
     else if (documentData[mappedColumn]) {
       value = documentData[mappedColumn];
+      console.log(`✅ DEBUG: Valor encontrado em documentData direto: "${value}"`);
     }
     // Por último, tentar campos padrão
     else {
+      console.log(`🔍 DEBUG: Tentando campos padrão para coluna "${mappedColumn}"`);
       switch (mappedColumn) {
         case 'objeto':
           value = documentData.objeto || '';
@@ -1327,9 +1340,23 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
         case 'observacoes':
           value = documentData.observacoes || '';
           break;
+        case 'id_origem_txt':
+          value = documentData.id_origem_txt || documentData.idOrigemTxt || '';
+          break;
+        case 'created_at':
+          value = documentData.created_at || documentData.createdAt || '';
+          break;
+        case 'sistema':
+          value = documentData.sistema || '';
+          break;
+        case 'modulo':
+          value = documentData.modulo || '';
+          break;
         default:
+          console.log(`❌ DEBUG: Campo padrão "${mappedColumn}" não reconhecido`);
           value = '';
       }
+      console.log(`🔍 DEBUG: Valor do campo padrão "${mappedColumn}": "${value}"`);
     }
 
     console.log(`✅ DEBUG: Campo ${fieldName} preenchido com: "${value}"`);
