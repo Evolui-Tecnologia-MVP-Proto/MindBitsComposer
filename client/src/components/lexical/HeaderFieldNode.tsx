@@ -13,12 +13,15 @@ import {
 } from 'lexical';
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { RefreshCw, Unplug } from 'lucide-react';
 
 export type SerializedHeaderFieldNode = Spread<
   {
     label: string;
     value: string;
     placeholder: string;
+    mappingType?: 'field' | 'formula' | 'plugin' | null;
+    mappingValue?: string;
     type: 'header-field';
     version: 1;
   },
@@ -39,6 +42,8 @@ export class HeaderFieldNode extends DecoratorNode<JSX.Element> {
   __label: string;
   __value: string;
   __placeholder: string;
+  __mappingType: 'field' | 'formula' | 'plugin' | null;
+  __mappingValue: string | undefined;
 
   static getType(): string {
     return 'header-field';
@@ -49,15 +54,26 @@ export class HeaderFieldNode extends DecoratorNode<JSX.Element> {
       node.__label,
       node.__value,
       node.__placeholder,
+      node.__mappingType,
+      node.__mappingValue,
       node.__key,
     );
   }
 
-  constructor(label: string, value: string, placeholder: string, key?: NodeKey) {
+  constructor(
+    label: string, 
+    value: string, 
+    placeholder: string, 
+    mappingType: 'field' | 'formula' | 'plugin' | null = null,
+    mappingValue?: string,
+    key?: NodeKey
+  ) {
     super(key);
     this.__label = label;
     this.__value = value;
     this.__placeholder = placeholder;
+    this.__mappingType = mappingType;
+    this.__mappingValue = mappingValue;
   }
 
   createDOM(config: EditorConfig): HTMLElement {
@@ -94,6 +110,14 @@ export class HeaderFieldNode extends DecoratorNode<JSX.Element> {
     writableNode.__label = label;
   }
 
+  getMappingType(): 'field' | 'formula' | 'plugin' | null {
+    return this.__mappingType;
+  }
+
+  getMappingValue(): string | undefined {
+    return this.__mappingValue;
+  }
+
   static importDOM(): DOMConversionMap | null {
     return {
       div: (domNode: HTMLElement) => {
@@ -109,8 +133,8 @@ export class HeaderFieldNode extends DecoratorNode<JSX.Element> {
   }
 
   static importJSON(serializedNode: SerializedHeaderFieldNode): HeaderFieldNode {
-    const { label, value, placeholder } = serializedNode;
-    const node = $createHeaderFieldNode(label, value, placeholder);
+    const { label, value, placeholder, mappingType, mappingValue } = serializedNode;
+    const node = $createHeaderFieldNode(label, value, placeholder, mappingType, mappingValue);
     return node;
   }
 
@@ -119,6 +143,8 @@ export class HeaderFieldNode extends DecoratorNode<JSX.Element> {
       label: this.__label,
       value: this.__value,
       placeholder: this.__placeholder,
+      mappingType: this.__mappingType || null,
+      mappingValue: this.__mappingValue,
       type: 'header-field',
       version: 1,
     };
@@ -149,12 +175,44 @@ export class HeaderFieldNode extends DecoratorNode<JSX.Element> {
 function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element {
   const [editor] = useLexicalComposerContext();
   const [value, setValue] = React.useState(node.getValue());
+  const mappingType = node.getMappingType();
+  const mappingValue = node.getMappingValue();
 
   const handleChange = (newValue: string) => {
     setValue(newValue);
     editor.update(() => {
       node.setValue(newValue);
     });
+  };
+
+  const handleRefresh = () => {
+    console.log('🔄 Refresh clicked - mappingType:', mappingType, 'mappingValue:', mappingValue);
+    
+    // Disparar evento customizado para o LexicalEditor lidar
+    const event = new CustomEvent('headerFieldRefresh', {
+      detail: {
+        label: node.getLabel(),
+        mappingType,
+        mappingValue,
+        nodeKey: node.getKey()
+      }
+    });
+    window.dispatchEvent(event);
+  };
+
+  const handleUnplug = () => {
+    console.log('🔌 Unplug clicked - mappingType:', mappingType, 'mappingValue:', mappingValue);
+    
+    // Disparar evento customizado para o LexicalEditor lidar
+    const event = new CustomEvent('headerFieldUnplug', {
+      detail: {
+        label: node.getLabel(),
+        mappingType,
+        mappingValue,
+        nodeKey: node.getKey()
+      }
+    });
+    window.dispatchEvent(event);
   };
 
   return (
@@ -165,21 +223,42 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
       >
         {node.getLabel()}
       </div>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => handleChange(e.target.value)}
-        className="header-field-input flex-1 px-3 py-2 text-sm border-0 outline-none
-                   bg-white dark:bg-[#0F172A] text-gray-900 dark:text-gray-200
-                   focus:ring-0 focus:border-0"
-        style={{ 
-          borderBottomRightRadius: '6px !important',
-          borderTopRightRadius: '0px !important',
-          borderTopLeftRadius: '0px !important',
-          borderBottomLeftRadius: '0px !important'
-        }}
-        placeholder={node.__placeholder}
-      />
+      <div className="flex-1 flex items-center bg-white dark:bg-[#0F172A]" style={{ borderTopRightRadius: '6px', borderBottomRightRadius: '6px' }}>
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => handleChange(e.target.value)}
+          className="header-field-input flex-1 px-3 py-2 text-sm border-0 outline-none
+                     bg-transparent text-gray-900 dark:text-gray-200
+                     focus:ring-0 focus:border-0"
+          placeholder={node.__placeholder}
+          disabled={value !== '' && mappingType !== null} // Desabilitar se tem valor preenchido e tem mapeamento
+        />
+        
+        {/* Botões de ação baseados no tipo de mapeamento */}
+        {mappingType && value !== '' && (
+          <div className="pr-2">
+            {(mappingType === 'field' || mappingType === 'formula') && (
+              <button
+                onClick={handleRefresh}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                title="Recarregar valor"
+              >
+                <RefreshCw className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              </button>
+            )}
+            {mappingType === 'plugin' && (
+              <button
+                onClick={handleUnplug}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                title="Executar plugin"
+              >
+                <Unplug className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -187,9 +266,11 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
 export function $createHeaderFieldNode(
   label: string,
   value: string = '',
-  placeholder: string = ''
+  placeholder: string = '',
+  mappingType: 'field' | 'formula' | 'plugin' | null = null,
+  mappingValue?: string
 ): HeaderFieldNode {
-  return new HeaderFieldNode(label, value, placeholder);
+  return new HeaderFieldNode(label, value, placeholder, mappingType, mappingValue);
 }
 
 export function $isHeaderFieldNode(

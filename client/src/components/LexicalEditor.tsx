@@ -1286,48 +1286,178 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
   const [markdownViewMode, setMarkdownViewMode] = useState<'current' | 'old'>('current');
   const [headerFields, setHeaderFields] = useState<HeaderField[]>([]);
 
+  // Event listeners para refresh e unplug dos campos de header
+  useEffect(() => {
+    const handleHeaderFieldRefresh = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { label, mappingType, mappingValue, nodeKey } = customEvent.detail;
+      
+      console.log('🔄 HeaderField Refresh Event:', customEvent.detail);
+      
+      if (!editorInstance || !documentData || !templateMappings) {
+        console.log('❌ Cannot refresh: missing editor or data');
+        return;
+      }
+      
+      // Re-executar a lógica de preenchimento
+      const mappingInfo = populateFieldFromMapping(label);
+      
+      if (mappingInfo.value) {
+        editorInstance.update(() => {
+          const node = $getNodeByKey(nodeKey);
+          if (node && 'setValue' in node) {
+            (node as any).setValue(mappingInfo.value);
+            console.log(`✅ Campo ${label} atualizado com valor: "${mappingInfo.value}"`);
+          }
+        });
+      }
+    };
+    
+    const handleHeaderFieldUnplug = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { label, mappingType, mappingValue, nodeKey } = customEvent.detail;
+      
+      console.log('🔌 HeaderField Unplug Event:', customEvent.detail);
+      
+      // TODO: Implementar execução de plugin quando a infraestrutura estiver disponível
+      console.log(`Plugin ${mappingValue} seria executado para o campo ${label}`);
+    };
+    
+    window.addEventListener('headerFieldRefresh', handleHeaderFieldRefresh);
+    window.addEventListener('headerFieldUnplug', handleHeaderFieldUnplug);
+    
+    return () => {
+      window.removeEventListener('headerFieldRefresh', handleHeaderFieldRefresh);
+      window.removeEventListener('headerFieldUnplug', handleHeaderFieldUnplug);
+    };
+  }, [editorInstance, documentData, templateMappings]);
+
+  // Função para processar fórmulas simples (SUBSTR, concatenação)
+  const processFormula = (formula: string, data: any): string => {
+    console.log(`🔍 DEBUG - processFormula: "${formula}"`);
+    
+    // Substituir campos por valores reais
+    let result = formula;
+    
+    // Processar SUBSTR(campo, inicio, fim)
+    const substrRegex = /SUBSTR\((\w+),\s*(\d+),\s*(\d+)\)/g;
+    result = result.replace(substrRegex, (match, field, start, end) => {
+      const value = data[field] || '';
+      return value.substring(parseInt(start), parseInt(end));
+    });
+    
+    // Substituir campos simples
+    const fieldRegex = /\b(\w+)\b/g;
+    result = result.replace(fieldRegex, (match, field) => {
+      // Ignorar palavras-chave da fórmula
+      if (['SUBSTR'].includes(field)) return match;
+      // Substituir por valor do campo
+      return data[field] || match;
+    });
+    
+    // Processar concatenação (+)
+    const parts = result.split(/\s*\+\s*/);
+    result = parts.map(part => {
+      // Remover aspas se existirem
+      if (part.startsWith("'") && part.endsWith("'")) {
+        return part.slice(1, -1);
+      }
+      return part;
+    }).join('');
+    
+    console.log(`✅ DEBUG - Formula resultado: "${result}"`);
+    return result;
+  };
+
   // Função para preencher campos automaticamente com base no mapeamento
-  const populateFieldFromMapping = (fieldName: string): string => {
+  const populateFieldFromMapping = (fieldName: string): { value: string; type: 'field' | 'formula' | 'plugin' | null; mappingValue?: string } => {
     console.log(`🔍 DEBUG - populateFieldFromMapping: Iniciando para campo "${fieldName}"`);
     console.log(`🔍 DEBUG - templateMappings:`, templateMappings);
     console.log(`🔍 DEBUG - documentData:`, documentData);
 
     if (!templateMappings || !documentData) {
       console.log(`❌ DEBUG: Sem mapeamento ou dados - templateMappings: ${!!templateMappings}, documentData: ${!!documentData}`);
-      return ''; // Retorna vazio se não há mapeamento ou dados
+      return { value: '', type: null };
     }
 
-    // Buscar por mapeamento de campo de header (header.campo ou header)
+    // Buscar por mapeamento de campo de header
     const headerKey = `header.${fieldName}`;
     console.log(`🔍 DEBUG: Procurando chave "${headerKey}" nos mapeamentos`);
     
-    const mappedColumn = templateMappings[headerKey] || templateMappings['header'];
-    console.log(`🔍 DEBUG: Coluna mapeada encontrada: "${mappedColumn}"`);
+    const mapping = templateMappings[headerKey];
+    console.log(`🔍 DEBUG: Mapeamento encontrado:`, mapping);
     
-    if (!mappedColumn) {
-      console.log(`❌ DEBUG: Nenhum mapeamento encontrado para campo "${fieldName}"`);
-      console.log(`🔍 DEBUG: Chaves disponíveis nos mapeamentos:`, Object.keys(templateMappings));
-      return ''; // Não há mapeamento para este campo
+    if (!mapping || mapping === '') {
+      console.log(`❌ DEBUG: Sem mapeamento para campo "${fieldName}"`);
+      return { value: '', type: null };
     }
-
-    console.log(`🔍 DEBUG: Mapeando campo ${fieldName} usando coluna ${mappedColumn}`);
     
-    // Tentar buscar valor nos dados do documento
+    // Novo formato estruturado
+    if (typeof mapping === 'object' && mapping.type && mapping.value) {
+      const mappingType = mapping.type;
+      const mappingValue = mapping.value;
+      
+      console.log(`🔍 DEBUG: Tipo de mapeamento: ${mappingType}, Valor: ${mappingValue}`);
+      
+      switch (mappingType) {
+        case 'field':
+          // Campo direto do documento
+          let fieldValue = documentData[mappingValue];
+          
+          // Se não encontrou, tentar em general_columns
+          if ((fieldValue === undefined || fieldValue === null) && documentData.general_columns) {
+            fieldValue = documentData.general_columns[mappingValue];
+          }
+          
+          // Se ainda não encontrou, tentar variações de nome
+          if (fieldValue === undefined || fieldValue === null) {
+            switch (mappingValue) {
+              case 'id_origem_txt':
+                fieldValue = documentData.id_origem_txt || documentData.idOrigemTxt || '';
+                break;
+              case 'created_at':
+                fieldValue = documentData.created_at || documentData.createdAt || '';
+                break;
+              default:
+                fieldValue = '';
+            }
+          }
+          
+          console.log(`✅ DEBUG: Campo ${mappingType} - valor: "${fieldValue}"`);
+          return { value: String(fieldValue || ''), type: 'field', mappingValue };
+          
+        case 'formula':
+          // Processar fórmula
+          const formulaResult = processFormula(mappingValue, documentData);
+          console.log(`✅ DEBUG: Fórmula processada - resultado: "${formulaResult}"`);
+          return { value: formulaResult, type: 'formula', mappingValue };
+          
+        case 'plugin':
+          // Plugin - não preencher automaticamente, mas retornar info
+          console.log(`✅ DEBUG: Plugin configurado - ID: "${mappingValue}"`);
+          return { value: '', type: 'plugin', mappingValue };
+          
+        default:
+          console.log(`❌ DEBUG: Tipo de mapeamento desconhecido: "${mappingType}"`);
+          return { value: '', type: null };
+      }
+    }
+    
+    // Formato antigo (retrocompatibilidade) - assumir como field
+    console.log(`⚠️ DEBUG: Formato antigo detectado, tratando como campo`);
+    const mappedColumn = mapping;
     let value = '';
     
-    // Primeiro tentar diretamente no documentData (campos da tabela documentos)
+    // Primeiro tentar diretamente no documentData
     if (documentData[mappedColumn]) {
       value = documentData[mappedColumn];
-      console.log(`✅ DEBUG: Valor encontrado em documentData direto: "${value}"`);
     }
-    // Depois tentar em general_columns (dados do Monday)
+    // Depois tentar em general_columns
     else if (documentData.general_columns && documentData.general_columns[mappedColumn]) {
       value = documentData.general_columns[mappedColumn];
-      console.log(`✅ DEBUG: Valor encontrado em general_columns: "${value}"`);
     }
     // Por último, tentar campos padrão
     else {
-      console.log(`🔍 DEBUG: Tentando campos padrão para coluna "${mappedColumn}"`);
       switch (mappedColumn) {
         case 'objeto':
           value = documentData.objeto || '';
@@ -1354,14 +1484,11 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           value = documentData.modulo || '';
           break;
         default:
-          console.log(`❌ DEBUG: Campo padrão "${mappedColumn}" não reconhecido`);
           value = '';
       }
-      console.log(`🔍 DEBUG: Valor do campo padrão "${mappedColumn}": "${value}"`);
     }
-
-    console.log(`✅ DEBUG: Campo ${fieldName} preenchido com: "${value}"`);
-    return String(value || ''); // Garantir que retorna string
+    
+    return { value: String(value || ''), type: 'field', mappingValue: mappedColumn };
   };
 
   // Processar template structure e inserir campos do header no editor
@@ -1468,15 +1595,22 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                   console.log(`🔍 DEBUG: Criando campo ${index + 1}/${headerKeys.length}: ${key}`);
                   try {
                     // Tentar preencher automaticamente com base no mapeamento
-                    const autoValue = populateFieldFromMapping(key);
-                    const finalValue = autoValue || fieldsToUse[key] || '';
+                    const mappingInfo = populateFieldFromMapping(key);
                     
-                    console.log(`🔍 DEBUG: Campo ${key} - valor automático: "${autoValue}", valor final: "${finalValue}"`);
+                    // Se não tem mapeamento, preencher apenas campos vazios
+                    let finalValue = '';
+                    if (mappingInfo.type && mappingInfo.value !== '') {
+                      finalValue = mappingInfo.value;
+                    }
+                    
+                    console.log(`🔍 DEBUG: Campo ${key} - mapeamento:`, mappingInfo, `valor final: "${finalValue}"`);
                     
                     const fieldNode = $createHeaderFieldNode(
                       key,
                       finalValue,
-                      `Digite ${key.toLowerCase()}...`
+                      `Digite ${key.toLowerCase()}...`,
+                      mappingInfo.type,
+                      mappingInfo.mappingValue
                     );
                     content.append(fieldNode);
                     console.log(`✅ DEBUG: Campo ${key} criado com sucesso`);
