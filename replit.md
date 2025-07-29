@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 29, 2025)
 
+✓ COMPLETED: Fixed Formula Processing - Simple Field Substitution (January 29, 2025)
+  - Fixed critical bug where simple field names in formulas weren't being replaced with actual values
+  - Enhanced processFormula function to properly identify and substitute all field references
+  - Added comprehensive debugging logs for formula processing steps
+  - Improved field search logic to check data, general_columns, and known field variations
+  - Fixed issue where only SUBSTR functions worked but simple field concatenation failed
+  - Formula now correctly processes: responsavel + '-' + SUBSTR(modulo, 0, 3) + '-' + id_origem_txt
+
 ✓ COMPLETED: Fixed Initial Header Field Editability Issue (January 29, 2025)
   - Fixed issue where header fields were not editable when documents first opened
   - Implemented 2-second grace period in EditProtectionPlugin before enforcing selection restrictions

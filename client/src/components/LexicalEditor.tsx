@@ -1482,35 +1482,15 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
   // Função para processar fórmulas simples (SUBSTR, concatenação)
   const processFormula = (formula: string, data: any): string => {
     console.log(`🔍 DEBUG - processFormula: "${formula}"`);
+    console.log(`🔍 DEBUG - dados disponíveis:`, data);
+    console.log(`🔍 DEBUG - general_columns:`, data.general_columns);
     
     // Substituir campos por valores reais
     let result = formula;
     
-    // Processar SUBSTR(campo, inicio, fim)
+    // Primeiro, processar SUBSTR(campo, inicio, fim)
     const substrRegex = /SUBSTR\((\w+),\s*(\d+),\s*(\d+)\)/g;
     result = result.replace(substrRegex, (match, field, start, end) => {
-      // Buscar valor do campo em várias localizações
-      let value = '';
-      
-      // Primeiro tentar diretamente no data
-      if (data[field]) {
-        value = data[field];
-      }
-      // Depois tentar em general_columns
-      else if (data.general_columns && data.general_columns[field]) {
-        value = data.general_columns[field];
-      }
-      
-      console.log(`🔍 DEBUG - SUBSTR(${field}): valor encontrado = "${value}"`);
-      return value.substring(parseInt(start), parseInt(end));
-    });
-    
-    // Substituir campos simples
-    const fieldRegex = /\b(\w+)\b/g;
-    result = result.replace(fieldRegex, (match, field) => {
-      // Ignorar palavras-chave da fórmula
-      if (['SUBSTR'].includes(field)) return match;
-      
       // Buscar valor do campo em várias localizações
       let value = '';
       
@@ -1522,8 +1502,42 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       else if (data.general_columns && data.general_columns[field] !== undefined && data.general_columns[field] !== null) {
         value = data.general_columns[field];
       }
-      // Se ainda não encontrou, tentar variações conhecidas
+      
+      console.log(`🔍 DEBUG - SUBSTR(${field}): valor encontrado = "${value}"`);
+      return value.substring(parseInt(start), parseInt(end));
+    });
+    
+    console.log(`🔍 DEBUG - Após SUBSTR: "${result}"`);
+    
+    // Identificar campos únicos na fórmula para substituição
+    const fieldsToReplace = [];
+    const fieldRegex = /\b(\w+)\b/g;
+    let match;
+    while ((match = fieldRegex.exec(formula)) !== null) {
+      const field = match[1];
+      // Ignorar palavras-chave e números
+      if (!['SUBSTR'].includes(field) && isNaN(Number(field))) {
+        fieldsToReplace.push(field);
+      }
+    }
+    
+    console.log(`🔍 DEBUG - Campos identificados para substituição:`, fieldsToReplace);
+    
+    // Substituir cada campo identificado
+    fieldsToReplace.forEach(field => {
+      let value = '';
+      
+      // Buscar valor do campo em várias localizações
+      if (data[field] !== undefined && data[field] !== null) {
+        value = data[field];
+        console.log(`🔍 DEBUG - Campo ${field} encontrado em data: "${value}"`);
+      }
+      else if (data.general_columns && data.general_columns[field] !== undefined && data.general_columns[field] !== null) {
+        value = data.general_columns[field];
+        console.log(`🔍 DEBUG - Campo ${field} encontrado em general_columns: "${value}"`);
+      }
       else {
+        // Tentar variações conhecidas
         switch (field) {
           case 'id_origem_txt':
             value = data.id_origem_txt || data.idOrigemTxt || '';
@@ -1532,13 +1546,17 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
             value = data.created_at || data.createdAt || '';
             break;
           default:
-            // Se não encontrou em lugar nenhum, manter o nome do campo
-            value = match;
+            console.log(`❌ DEBUG - Campo ${field} não encontrado, mantendo nome original`);
+            return; // Não substituir se não encontrar
         }
       }
       
-      console.log(`🔍 DEBUG - Campo ${field}: valor = "${value}"`);
-      return String(value);
+      if (value !== '') {
+        // Criar regex específico para este campo (word boundary)
+        const specificFieldRegex = new RegExp(`\\b${field}\\b`, 'g');
+        result = result.replace(specificFieldRegex, String(value));
+        console.log(`✅ DEBUG - Campo ${field} substituído por "${value}". Resultado: "${result}"`);
+      }
     });
     
     // Processar concatenação (+)
