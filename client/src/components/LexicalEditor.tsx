@@ -1434,6 +1434,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
   const [headerFields, setHeaderFields] = useState<HeaderField[]>([]);
   const [isPluginModalOpen, setIsPluginModalOpen] = useState(false);
   const [selectedPlugin, setSelectedPlugin] = useState<any>(null);
+  const [currentFieldContext, setCurrentFieldContext] = useState<{label: string, nodeKey: string} | null>(null);
   const { toast } = useToast();
 
   // Event listeners para refresh e unplug dos campos de header
@@ -1518,6 +1519,9 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           
           // Se chegou até aqui, o plugin está válido - abrir modal
           console.log(`🚀 Abrindo plugin "${plugin.name}" para o campo "${label}"`);
+          
+          // Salvar o contexto do campo que invocou o plugin
+          setCurrentFieldContext({ label, nodeKey });
           
           // Abrir o modal do plugin
           setSelectedPlugin(plugin);
@@ -2428,11 +2432,60 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       {/* Plugin Modal */}
       <PluginModal
         isOpen={isPluginModalOpen}
-        onClose={() => setIsPluginModalOpen(false)}
+        onClose={() => {
+          setIsPluginModalOpen(false);
+          setCurrentFieldContext(null);
+          setSelectedPlugin(null);
+        }}
         plugin={selectedPlugin}
         onDataExchange={(data) => {
-          console.log('Plugin data exchange:', data);
-          // Handle plugin data exchange if needed
+          console.log('🔄 Plugin data exchange recebido:', data);
+          
+          // Verificar se temos contexto do campo que invocou o plugin
+          if (!currentFieldContext || !editorInstance) {
+            console.log('❌ Contexto do campo ou editor não disponível');
+            return;
+          }
+          
+          const { label, nodeKey } = currentFieldContext;
+          console.log(`🎯 Atualizando campo "${label}" (nodeKey: ${nodeKey}) com dados do plugin`);
+          
+          // Extrair o valor do plugin dependendo do formato dos dados
+          let pluginValue = '';
+          if (typeof data === 'string') {
+            pluginValue = data;
+          } else if (data && typeof data === 'object') {
+            // Se o plugin retornou um objeto, tentar extrair o valor
+            if (data.value) {
+              pluginValue = String(data.value);
+            } else if (data.closeModal !== undefined) {
+              // Caso especial onde só há flag de fechar modal
+              pluginValue = data.value || '';
+            } else {
+              // Converter objeto para string se necessário
+              pluginValue = JSON.stringify(data);
+            }
+          }
+          
+          console.log(`📝 Valor extraído do plugin: "${pluginValue}"`);
+          
+          // Atualizar o campo HeaderField no editor
+          editorInstance.update(() => {
+            const node = $getNodeByKey(nodeKey);
+            if (node && 'setValue' in node) {
+              (node as any).setValue(pluginValue);
+              console.log(`✅ Campo "${label}" atualizado com sucesso!`);
+            } else {
+              console.log(`❌ Não foi possível encontrar o nó ${nodeKey} ou ele não tem método setValue`);
+            }
+          });
+          
+          // Fechar o modal e limpar contexto
+          if (data && typeof data === 'object' && data.closeModal) {
+            setIsPluginModalOpen(false);
+            setCurrentFieldContext(null);
+            setSelectedPlugin(null);
+          }
         }}
       />
     </div>
