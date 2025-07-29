@@ -1860,8 +1860,8 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                           <h3 className="text-lg font-semibold text-gray-800 dark:text-[#E5E7EB]">Visualização Markdown</h3>
                           <p className="text-sm text-gray-600 dark:text-[#9CA3AF] mt-1">
                             {markdownViewMode === 'current' 
-                              ? 'Representação em markdown do conteúdo do editor'
-                              : 'Versão anterior do documento (backup)'}
+                              ? 'Representação em markdown do conteúdo em edição'
+                              : 'Versão original do documento (backup)'}
                           </p>
                         </div>
                         {mdFileOld && mdFileOld.trim() !== '' && (
@@ -1874,8 +1874,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                                 ? "bg-blue-600 text-white hover:bg-blue-700" 
                                 : "border-gray-300 dark:border-[#374151] hover:bg-gray-50 dark:hover:bg-[#374151]"}
                             >
-                              <Edit className="w-4 h-4 mr-1" />
-                              Atual
+                              Em Edição
                             </Button>
                             <Button
                               onClick={() => setMarkdownViewMode('old')}
@@ -1885,8 +1884,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                                 ? "bg-blue-600 text-white hover:bg-blue-700" 
                                 : "border-gray-300 dark:border-[#374151] hover:bg-gray-50 dark:hover:bg-[#374151]"}
                             >
-                              <Eye className="w-4 h-4 mr-1" />
-                              Anterior
+                              Original
                             </Button>
                           </div>
                         )}
@@ -1895,7 +1893,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                     <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed text-gray-900 dark:text-[#E5E7EB] bg-gray-50 dark:bg-[#1B2028] p-4 rounded-md border border-gray-300 dark:border-[#374151] overflow-x-auto">
                       {markdownViewMode === 'current' 
                         ? (currentMarkdown || '// Nenhum conteúdo para visualizar\n// Adicione texto no editor para ver a conversão markdown')
-                        : (mdFileOld || '// Nenhuma versão anterior disponível')}
+                        : (mdFileOld || '// Nenhuma versão original disponível')}
                     </pre>
                   </div>
                 </div>
