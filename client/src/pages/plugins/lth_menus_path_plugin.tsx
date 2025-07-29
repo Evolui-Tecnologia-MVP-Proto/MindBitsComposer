@@ -569,7 +569,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
                 }`}>
                   {item.type === 'menu' ? 'Menu' : 
                    item.type === 'submenu' ? 'Submenu' : 
-                   item.type === 'action' ? 'Ação' : 
+                   item.type === 'action' ? 'Funcionalidade' : 
                    item.type.charAt(0).toUpperCase() + item.type.slice(1)}
                 </span>
               </div>
