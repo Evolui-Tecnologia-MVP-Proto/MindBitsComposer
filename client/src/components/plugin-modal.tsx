@@ -204,9 +204,9 @@ export default function PluginModal({
           }>
             <PluginComponent
               onDataExchange={handleDataExchange}
-              selectedEdition={actualPluginName === 'mermaid-graph-plugin' || actualPluginName === 'vector-graph-plugin' ? selectedEdition : undefined}
-              globalAssets={actualPluginName === 'vector-graph-plugin' ? globalAssets : undefined}
-              documentArtifacts={actualPluginName === 'vector-graph-plugin' ? documentArtifacts : undefined}
+              selectedEdition={selectedEdition}
+              globalAssets={globalAssets}
+              documentArtifacts={documentArtifacts}
             />
           </Suspense>
         ) : (
