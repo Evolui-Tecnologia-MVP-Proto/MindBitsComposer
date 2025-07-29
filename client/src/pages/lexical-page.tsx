@@ -22,7 +22,7 @@ import type { ImagePayload } from '@/components/lexical/ImageNode';
 import { createMarkdownConverter } from '@/components/markdown-converter';
 import { $getRoot } from 'lexical';
 import PluginModal from '@/components/plugin-modal';
-import type { Plugin } from '@shared/schema';
+import type { Plugin as PluginType } from '@shared/schema';
 
 interface LexicalDocument {
   id: string;
@@ -111,7 +111,7 @@ export default function LexicalPage() {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [loadedFileName, setLoadedFileName] = useState<string | null>(null);
   const [isPluginModalOpen, setIsPluginModalOpen] = useState(false);
-  const [selectedPlugin, setSelectedPlugin] = useState<Plugin | null>(null);
+  const [selectedPlugin, setSelectedPlugin] = useState<PluginType | null>(null);
   const [pluginSelectValue, setPluginSelectValue] = useState<string>("");
   const { toast } = useToast();
   const { showConfirmation } = useConfirmationToast();
@@ -225,11 +225,15 @@ export default function LexicalPage() {
   // Query para buscar document_editions em progresso - sempre ativa para detectar composer
   const { data: documentEditions = [], isLoading: isLoadingEditions } = useQuery({
     queryKey: ['/api/document-editions-in-progress'],
-    enabled: true,
-    onSuccess: (data) => {
-      console.log('🔥 Query document-editions-in-progress carregada:', data?.length || 0, 'documentos');
-    }
+    enabled: true
   });
+
+  // Log quando documentEditions mudar
+  useEffect(() => {
+    if (documentEditions && Array.isArray(documentEditions)) {
+      console.log('🔥 Query document-editions-in-progress carregada:', documentEditions.length || 0, 'documentos');
+    }
+  }, [documentEditions]);
 
   // Query para buscar artifacts do documento selecionado
   const { data: documentArtifacts = [], isLoading: isLoadingArtifacts } = useQuery<DocumentArtifact[]>({
@@ -253,13 +257,13 @@ export default function LexicalPage() {
   });
 
   // Query para buscar plugins ativos - sempre ativa para mostrar seletor quando editor está vazio
-  const { data: activePlugins = [], isLoading: isLoadingPlugins } = useQuery<Plugin[]>({
+  const { data: activePlugins = [], isLoading: isLoadingPlugins } = useQuery<PluginType[]>({
     queryKey: ['/api/plugins', 'active'],
     queryFn: async () => {
       const response = await fetch('/api/plugins');
       if (!response.ok) throw new Error('Erro ao buscar plugins');
       const plugins = await response.json();
-      return plugins.filter((plugin: Plugin) => plugin.status === 'active');
+      return plugins.filter((plugin: any) => plugin.status === 'active');
     },
     enabled: true,
   });
@@ -1595,7 +1599,7 @@ export default function LexicalPage() {
                   size="sm"
                   className={showAttachments ? "bg-green-600 text-white hover:bg-green-700" : ""}
                   title="Anexos"
-                  disabled={viewMode === 'preview' || (selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId)}
+                  disabled={viewMode === 'preview' || (selectedTemplate?.type === 'struct' && !currentDocumentId)}
                 >
                   <Paperclip className={`w-4 h-4 ${showAttachments ? "text-white" : ""}`} />
                 </Button>
@@ -1980,7 +1984,7 @@ export default function LexicalPage() {
                                   </p>
                                   <div className="flex items-center gap-2 mt-2">
                                     <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800">
-                                      {asset.editor || asset.type || 'Global'}
+                                      {(asset as any).editor || asset.type || 'Global'}
                                     </Badge>
                                     {asset.fileSize && (
                                       <span className="text-xs text-gray-500">
@@ -2119,9 +2123,9 @@ export default function LexicalPage() {
                                           </span>
                                         )}
                                       </div>
-                                      {artifact.description && (
+                                      {(artifact as any).description && (
                                         <p className="text-xs text-gray-600 mt-1 truncate">
-                                          {artifact.description}
+                                          {(artifact as any).description}
                                         </p>
                                       )}
                                     </div>
