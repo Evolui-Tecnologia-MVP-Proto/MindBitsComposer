@@ -42,6 +42,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import MarkdownPreview from './MarkdownPreview';
+import PluginModal from './plugin-modal';
 import {
   Bold,
   Italic,
@@ -1431,6 +1432,8 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
   const [selectedTableElement, setSelectedTableElement] = useState<HTMLTableElement | null>(null);
   const [markdownViewMode, setMarkdownViewMode] = useState<'current' | 'old'>('current');
   const [headerFields, setHeaderFields] = useState<HeaderField[]>([]);
+  const [isPluginModalOpen, setIsPluginModalOpen] = useState(false);
+  const [selectedPlugin, setSelectedPlugin] = useState<any>(null);
   const { toast } = useToast();
 
   // Event listeners para refresh e unplug dos campos de header
@@ -1513,14 +1516,17 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
             return;
           }
           
-          // Se chegou até aqui, o plugin está válido
-          toast({
-            title: "Plugin executado",
-            description: `Plugin "${plugin.name}" executado para o campo "${label}".`,
-          });
+          // Se chegou até aqui, o plugin está válido - abrir modal
+          console.log(`🚀 Abrindo plugin "${plugin.name}" para o campo "${label}"`);
           
-          // TODO: Implementar execução real do plugin quando a infraestrutura estiver disponível
-          console.log(`Plugin ${plugin.name} seria executado para o campo ${label}`);
+          // Abrir o modal do plugin
+          setSelectedPlugin(plugin);
+          setIsPluginModalOpen(true);
+          
+          toast({
+            title: "Abrindo plugin",
+            description: `Plugin "${plugin.name}" sendo carregado...`,
+          });
         })
         .catch(error => {
           console.error('❌ Erro ao verificar plugin:', error);
@@ -2423,6 +2429,17 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <FocusPlugin initialEditorState={initialEditorState} />
         </div>
       </LexicalComposer>
+      
+      {/* Plugin Modal */}
+      <PluginModal
+        isOpen={isPluginModalOpen}
+        onClose={() => setIsPluginModalOpen(false)}
+        plugin={selectedPlugin}
+        onDataExchange={(data) => {
+          console.log('Plugin data exchange:', data);
+          // Handle plugin data exchange if needed
+        }}
+      />
     </div>
   );
 }
