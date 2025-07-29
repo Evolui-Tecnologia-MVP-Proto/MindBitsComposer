@@ -2502,10 +2502,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).send("Plugin não encontrado");
       }
       
-      // Log temporário para debug
-      console.log('🔍 Plugin API Response - ID:', req.params.id);
-      console.log('🔍 Plugin details:', JSON.stringify(plugin, null, 2));
-      console.log('🔍 Plugin status:', `"${plugin.status}"`, typeof plugin.status);
+
       
       res.json(plugin);
     } catch (error) {

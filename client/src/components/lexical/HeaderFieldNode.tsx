@@ -233,8 +233,6 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
   };
 
   const handleUnplug = () => {
-    console.log('🔌🔌🔌 UNPLUG BUTTON CLICKED! 🔌🔌🔌');
-    console.log('🔌 Field Label:', node.getLabel());
     console.log('🔌 Unplug clicked - mappingType:', mappingType, 'mappingValue:', mappingValue);
     
     // Salvar referência do input antes de disparar o evento
@@ -298,11 +296,10 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
             {mappingType === 'plugin' && (
               <button
                 onClick={handleUnplug}
-                className="p-1 hover:bg-blue-100 dark:hover:bg-blue-700 rounded transition-colors border border-blue-300 dark:border-blue-600"
-                title="🔌 CLIQUE AQUI - Executar plugin"
-                style={{ backgroundColor: '#e0f2fe' }}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                title="Executar plugin"
               >
-                <Unplug className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <Unplug className="w-4 h-4 text-gray-500 dark:text-gray-400" />
               </button>
             )}
           </div>

@@ -1503,11 +1503,11 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
             return;
           }
           
-          // Verificar se o plugin tem página de execução (verificar se tem código)
-          if (!plugin.code || plugin.code.trim() === '') {
+          // Verificar se o plugin tem página de execução
+          if (!plugin.pageName || plugin.pageName.trim() === '') {
             toast({
               title: "Plugin sem execução",
-              description: `O plugin "${plugin.name}" não possui código de execução configurado.`,
+              description: `O plugin "${plugin.name}" não possui página de execução configurada.`,
               variant: "destructive",
             });
             return;
