@@ -1372,6 +1372,8 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       documentData: !!documentData,
       templateMappings: !!templateMappings
     });
+    console.log('🔍 DEBUG: templateMappings completo:', templateMappings);
+    console.log('🔍 DEBUG: documentData completo:', documentData);
     
     if (editorInstance && templateStructure) {
       console.log('🔍 DEBUG: Processando template...');

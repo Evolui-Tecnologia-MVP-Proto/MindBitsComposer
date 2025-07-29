@@ -1303,7 +1303,7 @@ export default function LexicalPage() {
     }
   };
 
-  const executeSelectEdition = (edition: any) => {
+  const executeSelectEdition = async (edition: any) => {
     console.log('Selecionando edition:', edition);
     setSelectedEdition(edition);
     setCurrentDocumentId(null);
@@ -1313,20 +1313,55 @@ export default function LexicalPage() {
     if (!edition.lexFile || edition.lexFile.trim() === '') {
       console.log('Carregando template, lex_file está vazio');
       console.log('Template structure:', edition.templateStructure);
+      console.log('Template ID:', edition.templateId);
       
-      // Criar objeto template para aplicar as seções
-      const template = {
-        id: edition.templateId,
-        name: edition.templateCode,
-        code: edition.templateCode,
-        description: '',
-        type: 'struct' as const,
-        structure: edition.templateStructure,
-        mappings: {},
-        createdAt: '',
-        updatedAt: ''
-      };
-      setSelectedTemplate(template);
+      // Buscar dados completos do template para obter os mapeamentos
+      try {
+        let templateMappings = {};
+        if (edition.templateId) {
+          console.log('🔍 DEBUG: Buscando template completo para obter mapeamentos...');
+          const response = await fetch(`/api/templates/${edition.templateId}`);
+          if (response.ok) {
+            const fullTemplate = await response.json();
+            console.log('🔍 DEBUG: Template completo recebido:', fullTemplate);
+            templateMappings = fullTemplate.mappings || {};
+            console.log('🔍 DEBUG: Mapeamentos extraídos:', templateMappings);
+          } else {
+            console.log('❌ DEBUG: Erro ao buscar template completo');
+          }
+        }
+        
+        // Criar objeto template para aplicar as seções
+        const template = {
+          id: edition.templateId,
+          name: edition.templateCode,
+          code: edition.templateCode,
+          description: '',
+          type: 'struct' as const,
+          structure: edition.templateStructure,
+          mappings: templateMappings,
+          createdAt: '',
+          updatedAt: ''
+        };
+        console.log('🔍 DEBUG: Template final criado com mapeamentos:', template);
+        setSelectedTemplate(template);
+        
+      } catch (error) {
+        console.error('❌ DEBUG: Erro ao buscar template:', error);
+        // Criar template básico em caso de erro
+        const template = {
+          id: edition.templateId,
+          name: edition.templateCode,
+          code: edition.templateCode,
+          description: '',
+          type: 'struct' as const,
+          structure: edition.templateStructure,
+          mappings: {},
+          createdAt: '',
+          updatedAt: ''
+        };
+        setSelectedTemplate(template);
+      }
       
       // Limpar estado inicial do editor para usar template
       setInitialEditorState(undefined);
