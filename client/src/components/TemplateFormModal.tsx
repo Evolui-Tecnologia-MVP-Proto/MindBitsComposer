@@ -195,6 +195,33 @@ export default function TemplateFormModal({
     return uuidRegex.test(value) && documentPartPlugins.some((plugin: any) => plugin.id === value);
   };
 
+  // Função para extrair valor de mapping (compatibilidade com formato antigo e novo)
+  const extractMappingValue = (mapping: any) => {
+    if (typeof mapping === 'string') {
+      // Formato antigo - string direta
+      return mapping;
+    } else if (mapping && typeof mapping === 'object' && mapping.value) {
+      // Formato novo - objeto com type e value
+      return mapping.value;
+    }
+    return '';
+  };
+
+  // Função para extrair tipo de mapping
+  const extractMappingType = (mapping: any, value: string) => {
+    if (mapping && typeof mapping === 'object' && mapping.type) {
+      // Formato novo - objeto com type definido
+      return mapping.type;
+    }
+    // Formato antigo - inferir tipo baseado no valor
+    if (value === '__compose_formula__' || (value && value.includes('SUBSTR') || value.includes('+'))) {
+      return 'formula';
+    } else if (value === '__data_plugin__' || isPluginId(value)) {
+      return 'plugin';
+    }
+    return 'field';
+  };
+
   // Atualiza os mapeamentos quando a estrutura muda ou template é carregado
   useEffect(() => {
     const fields = extractFieldsFromStructure(
@@ -208,28 +235,27 @@ export default function TemplateFormModal({
     
     fields.forEach(field => {
       // Preserva valores existentes do template ou do estado local
-      const existingValue = formData.mappings?.[field] || fieldMappings[field] || '';
-      newMappings[field] = existingValue;
+      const existingMapping = formData.mappings?.[field] || fieldMappings[field] || '';
+      const existingValue = extractMappingValue(existingMapping);
+      const mappingType = extractMappingType(existingMapping, existingValue);
       
-      // Manter campos de fórmula
-      if (existingValue === '__compose_formula__' || (existingValue && existingValue.includes('SUBSTR') || existingValue.includes('+'))) {
-        newFormulaFields.add(field);
+      // Define o valor de exibição baseado no tipo
+      if (mappingType === 'formula') {
         newMappings[field] = '__compose_formula__';
+        newFormulaFields.add(field);
         setFormulaValues(prev => ({
           ...prev,
           [field]: existingValue
         }));
-      }
-      // Manter campos de plugin - verifica se o valor é __data_plugin__ ou um UUID de plugin
-      else if (existingValue === '__data_plugin__' || isPluginId(existingValue)) {
+      } else if (mappingType === 'plugin') {
+        newMappings[field] = '__data_plugin__';
         newPluginFields.add(field);
-        if (existingValue === '__data_plugin__') {
-          newMappings[field] = '__data_plugin__';
-        } else {
-          // Se é um UUID de plugin, manter o valor e armazenar para pluginValues
-          newMappings[field] = '__data_plugin__';
+        if (existingValue && existingValue !== '__data_plugin__') {
           newPluginValues[field] = existingValue;
         }
+      } else {
+        // Tipo 'field' ou valor direto
+        newMappings[field] = existingValue;
       }
     });
     
@@ -473,16 +499,34 @@ export default function TemplateFormModal({
       setIsLoading(true);
       
       // Converter a estrutura de string para objeto JSON antes de enviar
-      // Integrar fórmulas e plugins aos mapeamentos
-      const finalMappings = { ...fieldMappings };
-      Object.keys(formulaValues).forEach(field => {
-        if (finalMappings[field] === '__compose_formula__' && formulaValues[field]) {
-          finalMappings[field] = formulaValues[field];
-        }
-      });
-      Object.keys(pluginValues).forEach(field => {
-        if (finalMappings[field] === '__data_plugin__' && pluginValues[field]) {
-          finalMappings[field] = pluginValues[field];
+      // Converter para o novo formato estruturado com tipo e valor
+      const finalMappings: Record<string, any> = {};
+      
+      Object.entries(fieldMappings).forEach(([field, value]) => {
+        if (field.startsWith('[SEÇÃO]')) {
+          // Seções de agrupamento mantém formato string vazio
+          finalMappings[field] = '';
+        } else if (value === '__compose_formula__' && formulaValues[field]) {
+          // Campos de fórmula
+          finalMappings[field] = {
+            type: 'formula',
+            value: formulaValues[field]
+          };
+        } else if (value === '__data_plugin__' && pluginValues[field]) {
+          // Campos de plugin
+          finalMappings[field] = {
+            type: 'plugin',
+            value: pluginValues[field]
+          };
+        } else if (value && value !== '__compose_formula__' && value !== '__data_plugin__') {
+          // Campos diretos
+          finalMappings[field] = {
+            type: 'field',
+            value: value
+          };
+        } else {
+          // Campos vazios ou sem valor definido
+          finalMappings[field] = '';
         }
       });
       

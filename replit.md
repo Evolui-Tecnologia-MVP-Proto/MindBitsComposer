@@ -23,6 +23,15 @@ Preferred communication style: Simple, everyday language.
   - Added UUID validation and plugin ID detection to properly restore plugin selections from saved mappings
   - Template fields can now be mapped to either database columns, compose formulas, or data plugins with full persistence
 
+✓ COMPLETED: Structured JSON Format for Template Mappings (January 29, 2025)
+  - Implemented new structured JSON format with explicit type definitions: {"type": "field/formula/plugin", "value": "..."}
+  - Added backward compatibility to handle both old string format and new structured format
+  - Updated save logic to convert all mappings to structured format with proper type classification
+  - Updated load logic with extractMappingValue and extractMappingType functions for seamless migration
+  - Field types: "field" (database columns), "formula" (compose formulas), "plugin" (data plugins)
+  - Seção markers continue to use empty string format for grouping purposes
+  - System automatically migrates existing templates to new format while maintaining full functionality
+
 ✓ COMPLETED: Filtered Composer Attachments Panel to Show Only COMPOSER_ASSET Plugins (January 29, 2025)
   - Modified composer right side panel (attachments) to filter plugins by type COMPOSER_ASSET
   - Created composerAssetPlugins filter from activePlugins array
