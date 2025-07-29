@@ -716,7 +716,10 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           )}
         </div>
 
-        <div className="flex-1 border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#111827] min-h-0 overflow-hidden">
+        <div 
+          className="border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#111827] overflow-hidden"
+          style={{ height: 'calc(100vh - 400px)', minHeight: '300px', maxHeight: 'calc(100vh - 300px)' }}
+        >
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
