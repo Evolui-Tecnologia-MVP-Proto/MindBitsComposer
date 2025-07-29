@@ -105,66 +105,7 @@ export default function PluginModal({
     }
   }, [isOpen, actualPluginName]);
 
-  // Função para interceptar dados do plugin e verificar se deve fechar modal
-  const handleDataExchange = (data: any) => {
-    console.log('PluginModal recebeu dados:', data);
-    
-    // Chamar função original se existir
-    if (onDataExchange) {
-      onDataExchange(data);
-    }
-    
-    // Se é uma exportação de imagem, chamar onImageExport
-    if (data && data.action === 'export' && data.type === 'selection_image' && data.data?.imageUrl && onImageExport) {
-      console.log('Chamando onImageExport com URL:', data.data.imageUrl);
-      onImageExport(data.data.imageUrl);
-    }
-    
-    // Verificar se o plugin solicitou fechamento do modal
-    if (data && data.closeModal === true) {
-      onClose();
-    }
-  };
-
-  // Renderizar estados de loading e erro
-  if (isLoadingPlugin) {
-    return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-[500px]">
-          <VisuallyHidden>
-            <DialogTitle>Carregando plugin</DialogTitle>
-          </VisuallyHidden>
-          <div className="p-6 text-center">
-            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Carregando plugin</h3>
-            <p className="text-muted-foreground">
-              Carregando "{actualPluginName}"...
-            </p>
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
-  if (loadError || !PluginComponent) {
-    return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-[500px]">
-          <VisuallyHidden>
-            <DialogTitle>Plugin não encontrado</DialogTitle>
-          </VisuallyHidden>
-          <div className="p-6 text-center">
-            <h3 className="text-lg font-semibold mb-2">Plugin não encontrado</h3>
-            <p className="text-muted-foreground">
-              {loadError || `O plugin "${actualPluginName}" não foi encontrado ou não está disponível.`}
-            </p>
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
-
-  // Force immediate sizing with aggressive approaches
+  // Force immediate sizing with aggressive approaches - MUST be before conditional returns
   useEffect(() => {
     if (!isOpen) return;
 
@@ -229,6 +170,65 @@ export default function PluginModal({
       timeouts.forEach(clearTimeout);
     };
   }, [isOpen, actualPluginName]);
+
+  // Função para interceptar dados do plugin e verificar se deve fechar modal
+  const handleDataExchange = (data: any) => {
+    console.log('PluginModal recebeu dados:', data);
+    
+    // Chamar função original se existir
+    if (onDataExchange) {
+      onDataExchange(data);
+    }
+    
+    // Se é uma exportação de imagem, chamar onImageExport
+    if (data && data.action === 'export' && data.type === 'selection_image' && data.data?.imageUrl && onImageExport) {
+      console.log('Chamando onImageExport com URL:', data.data.imageUrl);
+      onImageExport(data.data.imageUrl);
+    }
+    
+    // Verificar se o plugin solicitou fechamento do modal
+    if (data && data.closeModal === true) {
+      onClose();
+    }
+  };
+
+  // Renderizar estados de loading e erro
+  if (isLoadingPlugin) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-[500px]">
+          <VisuallyHidden>
+            <DialogTitle>Carregando plugin</DialogTitle>
+          </VisuallyHidden>
+          <div className="p-6 text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Carregando plugin</h3>
+            <p className="text-muted-foreground">
+              Carregando "{actualPluginName}"...
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (loadError || !PluginComponent) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-[500px]">
+          <VisuallyHidden>
+            <DialogTitle>Plugin não encontrado</DialogTitle>
+          </VisuallyHidden>
+          <div className="p-6 text-center">
+            <h3 className="text-lg font-semibold mb-2">Plugin não encontrado</h3>
+            <p className="text-muted-foreground">
+              {loadError || `O plugin "${actualPluginName}" não foi encontrado ou não está disponível.`}
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose} modal>
