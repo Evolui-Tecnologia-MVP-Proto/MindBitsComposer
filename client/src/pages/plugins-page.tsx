@@ -201,6 +201,11 @@ export default function PluginsPage() {
     queryKey: ["/api/plugins", "all"],
   });
 
+  // Query para buscar tipos de plugin de system_params
+  const { data: pluginTypes = [], isLoading: isLoadingPluginTypes } = useQuery<Array<{value: string, label: string}>>({
+    queryKey: ["/api/plugin-types"],
+  });
+
   // Mutation para criar/editar plugin
   const createPluginMutation = useMutation({
     mutationFn: async (data: PluginFormValues) => {
@@ -639,12 +644,24 @@ export default function PluginsPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value={PluginType.DATA_SOURCE}>Fonte de Dados</SelectItem>
-                          <SelectItem value={PluginType.AI_AGENT}>Agente de IA</SelectItem>
-                          <SelectItem value={PluginType.CHART}>Gráficos</SelectItem>
-                          <SelectItem value={PluginType.FORMATTER}>Formatador</SelectItem>
-                          <SelectItem value={PluginType.INTEGRATION}>Integração</SelectItem>
-                          <SelectItem value={PluginType.UTILITY}>Utilitário</SelectItem>
+                          {isLoadingPluginTypes ? (
+                            <SelectItem value="loading" disabled>Carregando tipos...</SelectItem>
+                          ) : pluginTypes.length === 0 ? (
+                            <>
+                              <SelectItem value={PluginType.DATA_SOURCE}>Fonte de Dados</SelectItem>
+                              <SelectItem value={PluginType.AI_AGENT}>Agente de IA</SelectItem>
+                              <SelectItem value={PluginType.CHART}>Gráficos</SelectItem>
+                              <SelectItem value={PluginType.FORMATTER}>Formatador</SelectItem>
+                              <SelectItem value={PluginType.INTEGRATION}>Integração</SelectItem>
+                              <SelectItem value={PluginType.UTILITY}>Utilitário</SelectItem>
+                            </>
+                          ) : (
+                            pluginTypes.map((type) => (
+                              <SelectItem key={type.value} value={type.value}>
+                                {type.label}
+                              </SelectItem>
+                            ))
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />

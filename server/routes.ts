@@ -1064,6 +1064,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Plugin Types endpoint - busca tipos de plugin de system_params
+  app.get("/api/plugin-types", async (req, res) => {
+    try {
+      console.log("🔍 [API] Buscando tipos de plugin de system_params...");
+      const pluginTypesParam = await storage.getSystemParam('PLUGIN_TYPES');
+      
+      if (!pluginTypesParam) {
+        console.log("❌ [API] PLUGIN_TYPES não encontrado em system_params");
+        return res.status(404).json({ error: 'PLUGIN_TYPES não encontrado em system_params' });
+      }
+
+      let pluginTypes;
+      try {
+        pluginTypes = JSON.parse(pluginTypesParam.paramValue || '[]');
+        console.log("✅ [API] Tipos de plugin encontrados:", pluginTypes.length, "tipos");
+        return res.json(pluginTypes);
+      } catch (parseError) {
+        console.error("❌ [API] Erro ao fazer parse do JSON em PLUGIN_TYPES:", parseError);
+        return res.status(500).json({ error: 'Erro ao fazer parse do JSON em PLUGIN_TYPES' });
+      }
+    } catch (error: any) {
+      console.error('❌ [API] Erro ao buscar tipos de plugin:', error);
+      return res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
   // Monday.com integration routes
   // Rotas para gerenciar conexões de serviço (tokens)
   
