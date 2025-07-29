@@ -10,6 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 29, 2025)
 
+✓ COMPLETED: Dynamic Plugin Loading System - Automated Plugin Registration (January 29, 2025)
+  - Replaced manual PLUGIN_COMPONENTS registry with dynamic plugin loading system
+  - Implemented loadPluginComponent function using dynamic imports for automatic plugin discovery
+  - Added component caching (pluginComponentsCache) for improved performance and reusability
+  - Enhanced PluginModal with comprehensive loading states, error handling, and Suspense wrappers
+  - System now automatically discovers and loads plugins based on pageName from database
+  - Eliminated need for manual component registration in plugin-modal.tsx when adding new plugins
+  - Added proper loading indicators and error messages for failed plugin loads
+  - Maintains backward compatibility while enabling seamless plugin addition workflow
+  - Developers can now simply create plugin file + database entry without touching registry code
+
 ✓ COMPLETED: Repository Path Selection in Template Form - Added repo_path Field Integration (January 29, 2025)
   - Added repo_path text field to templates database table schema with nullable support
   - Enhanced TemplateFormModal with repository path selector between código and descrição fields

@@ -1,11 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import FreeHandCanvasPlugin from "@/pages/plugins/freehand-canvas-plugin";
-import MermaidGraphPlugin from "@/pages/plugins/mermaid-graph-plugin";
-import SimpleExcalidrawPlugin from "@/pages/plugins/simple-excalidraw-plugin";
-import VectorGraphPlugin from "@/pages/plugins/vector-graph-plugin";
-import LthMenusPathPlugin from "@/pages/plugins/lth_menus_path_plugin";
+import { Loader2 } from "lucide-react";
 
 interface PluginModalProps {
   isOpen: boolean;
@@ -19,12 +15,31 @@ interface PluginModalProps {
   documentArtifacts?: any[];
 }
 
-const PLUGIN_COMPONENTS: Record<string, React.ComponentType<any>> = {
-  'freehand-canvas-plugin': FreeHandCanvasPlugin,
-  'mermaid-graph-plugin': MermaidGraphPlugin,
-  'simple-excalidraw-plugin': SimpleExcalidrawPlugin,
-  'vector-graph-plugin': VectorGraphPlugin,
-  'lth_menus_path_plugin': LthMenusPathPlugin,
+// Cache de componentes carregados dinamicamente
+const pluginComponentsCache: Record<string, React.ComponentType<any>> = {};
+
+// Função para carregar componente de plugin dinamicamente
+const loadPluginComponent = async (pageName: string): Promise<React.ComponentType<any> | null> => {
+  // Verificar se já está no cache
+  if (pluginComponentsCache[pageName]) {
+    return pluginComponentsCache[pageName];
+  }
+
+  try {
+    // Tentar carregar o componente dinamicamente
+    const module = await import(`@/pages/plugins/${pageName}.tsx`);
+    const Component = module.default;
+    
+    // Armazenar no cache para reutilização
+    if (Component) {
+      pluginComponentsCache[pageName] = Component;
+      return Component;
+    }
+  } catch (error) {
+    console.error(`Erro ao carregar plugin ${pageName}:`, error);
+  }
+  
+  return null;
 };
 
 export default function PluginModal({ 
@@ -40,8 +55,40 @@ export default function PluginModal({
 }: PluginModalProps) {
   // Determinar o nome do plugin a partir do objeto plugin ou do pluginName
   const actualPluginName = plugin?.pageName || pluginName || "";
-  const PluginComponent = actualPluginName ? PLUGIN_COMPONENTS[actualPluginName] : null;
+  const [PluginComponent, setPluginComponent] = useState<React.ComponentType<any> | null>(null);
+  const [isLoadingPlugin, setIsLoadingPlugin] = useState(false);
   const [isReadyToMountPlugin, setIsReadyToMountPlugin] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  // Carregar componente do plugin dinamicamente quando modal abre
+  useEffect(() => {
+    if (isOpen && actualPluginName) {
+      setIsLoadingPlugin(true);
+      setLoadError(null);
+      setPluginComponent(null);
+      
+      loadPluginComponent(actualPluginName)
+        .then((component) => {
+          if (component) {
+            setPluginComponent(component);
+            setLoadError(null);
+          } else {
+            setLoadError(`Plugin "${actualPluginName}" não foi encontrado.`);
+          }
+        })
+        .catch((error) => {
+          console.error('Erro ao carregar plugin:', error);
+          setLoadError(`Erro ao carregar plugin: ${error.message}`);
+        })
+        .finally(() => {
+          setIsLoadingPlugin(false);
+        });
+    } else {
+      setPluginComponent(null);
+      setIsLoadingPlugin(false);
+      setLoadError(null);
+    }
+  }, [isOpen, actualPluginName]);
 
   // Espera a modal abrir completamente para renderizar plugin pesado como o Excalidraw
   useEffect(() => {
@@ -76,7 +123,27 @@ export default function PluginModal({
     }
   };
 
-  if (!PluginComponent) {
+  // Renderizar estados de loading e erro
+  if (isLoadingPlugin) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-[500px]">
+          <VisuallyHidden>
+            <DialogTitle>Carregando plugin</DialogTitle>
+          </VisuallyHidden>
+          <div className="p-6 text-center">
+            <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Carregando plugin</h3>
+            <p className="text-muted-foreground">
+              Carregando "{actualPluginName}"...
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (loadError || !PluginComponent) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-[500px]">
@@ -86,7 +153,7 @@ export default function PluginModal({
           <div className="p-6 text-center">
             <h3 className="text-lg font-semibold mb-2">Plugin não encontrado</h3>
             <p className="text-muted-foreground">
-              O plugin "{actualPluginName}" não foi encontrado ou não está disponível.
+              {loadError || `O plugin "${actualPluginName}" não foi encontrado ou não está disponível.`}
             </p>
           </div>
         </DialogContent>
@@ -129,16 +196,23 @@ export default function PluginModal({
           <DialogTitle>Plugin {pluginName}</DialogTitle>
         </VisuallyHidden>
 
-        {(actualPluginName !== 'simple-excalidraw-plugin' || isReadyToMountPlugin) ? (
-          <PluginComponent
-            onDataExchange={handleDataExchange}
-            selectedEdition={actualPluginName === 'mermaid-graph-plugin' || actualPluginName === 'vector-graph-plugin' ? selectedEdition : undefined}
-            globalAssets={actualPluginName === 'vector-graph-plugin' ? globalAssets : undefined}
-            documentArtifacts={actualPluginName === 'vector-graph-plugin' ? documentArtifacts : undefined}
-          />
+        {(actualPluginName !== 'simple-excalidraw-plugin' || isReadyToMountPlugin) && PluginComponent ? (
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-64">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          }>
+            <PluginComponent
+              onDataExchange={handleDataExchange}
+              selectedEdition={actualPluginName === 'mermaid-graph-plugin' || actualPluginName === 'vector-graph-plugin' ? selectedEdition : undefined}
+              globalAssets={actualPluginName === 'vector-graph-plugin' ? globalAssets : undefined}
+              documentArtifacts={actualPluginName === 'vector-graph-plugin' ? documentArtifacts : undefined}
+            />
+          </Suspense>
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            Carregando editor...
+            <Loader2 className="h-6 w-6 animate-spin" />
+            <span className="ml-2">Carregando editor...</span>
           </div>
         )}
       </DialogContent>
