@@ -1489,7 +1489,19 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
     // Processar SUBSTR(campo, inicio, fim)
     const substrRegex = /SUBSTR\((\w+),\s*(\d+),\s*(\d+)\)/g;
     result = result.replace(substrRegex, (match, field, start, end) => {
-      const value = data[field] || '';
+      // Buscar valor do campo em várias localizações
+      let value = '';
+      
+      // Primeiro tentar diretamente no data
+      if (data[field]) {
+        value = data[field];
+      }
+      // Depois tentar em general_columns
+      else if (data.general_columns && data.general_columns[field]) {
+        value = data.general_columns[field];
+      }
+      
+      console.log(`🔍 DEBUG - SUBSTR(${field}): valor encontrado = "${value}"`);
       return value.substring(parseInt(start), parseInt(end));
     });
     
@@ -1498,8 +1510,35 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
     result = result.replace(fieldRegex, (match, field) => {
       // Ignorar palavras-chave da fórmula
       if (['SUBSTR'].includes(field)) return match;
-      // Substituir por valor do campo
-      return data[field] || match;
+      
+      // Buscar valor do campo em várias localizações
+      let value = '';
+      
+      // Primeiro tentar diretamente no data
+      if (data[field] !== undefined && data[field] !== null) {
+        value = data[field];
+      }
+      // Depois tentar em general_columns
+      else if (data.general_columns && data.general_columns[field] !== undefined && data.general_columns[field] !== null) {
+        value = data.general_columns[field];
+      }
+      // Se ainda não encontrou, tentar variações conhecidas
+      else {
+        switch (field) {
+          case 'id_origem_txt':
+            value = data.id_origem_txt || data.idOrigemTxt || '';
+            break;
+          case 'created_at':
+            value = data.created_at || data.createdAt || '';
+            break;
+          default:
+            // Se não encontrou em lugar nenhum, manter o nome do campo
+            value = match;
+        }
+      }
+      
+      console.log(`🔍 DEBUG - Campo ${field}: valor = "${value}"`);
+      return String(value);
     });
     
     // Processar concatenação (+)
