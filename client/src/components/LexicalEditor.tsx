@@ -1375,6 +1375,30 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
     console.log('🔍 DEBUG: templateMappings completo:', templateMappings);
     console.log('🔍 DEBUG: documentData completo:', documentData);
     
+    // Debug específico para os campos que deveriam ser preenchidos
+    if (templateMappings && documentData) {
+      console.log('🔍 DEBUG: Testando mapeamentos específicos:');
+      console.log('🔍 DEBUG: header.RAG Index =>', templateMappings['header.RAG Index'], '-> valor:', documentData[templateMappings['header.RAG Index']]);
+      console.log('🔍 DEBUG: header.Sistema =>', templateMappings['header.Sistema'], '-> valor:', documentData[templateMappings['header.Sistema']]);
+      console.log('🔍 DEBUG: header.Módulo =>', templateMappings['header.Módulo'], '-> valor:', documentData[templateMappings['header.Módulo']]);
+      
+      // Verificar todas as propriedades do documentData
+      console.log('🔍 DEBUG: Propriedades disponíveis no documentData:', Object.keys(documentData));
+      
+      // Verificar campos específicos que esperamos
+      console.log('🔍 DEBUG: documentData.id_origem_txt:', documentData.id_origem_txt);
+      console.log('🔍 DEBUG: documentData.sistema:', documentData.sistema);
+      console.log('🔍 DEBUG: documentData.modulo:', documentData.modulo);
+      
+      // Verificar general_columns se existir
+      if (documentData.general_columns) {
+        console.log('🔍 DEBUG: general_columns disponíveis:', Object.keys(documentData.general_columns));
+        console.log('🔍 DEBUG: general_columns.id_origem_txt:', documentData.general_columns.id_origem_txt);
+        console.log('🔍 DEBUG: general_columns.sistema:', documentData.general_columns.sistema);
+        console.log('🔍 DEBUG: general_columns.modulo:', documentData.general_columns.modulo);
+      }
+    }
+    
     if (editorInstance && templateStructure) {
       console.log('🔍 DEBUG: Processando template...');
       
