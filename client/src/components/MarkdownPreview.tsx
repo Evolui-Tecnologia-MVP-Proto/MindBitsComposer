@@ -408,11 +408,45 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
           );
         }
         
-        // For simple tables, render normally
+        // Process markdown content inside table cells
+        const processMarkdownInCells = (htmlContent: string): string => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlContent, 'text/html');
+          const cells = doc.querySelectorAll('td, th');
+          
+          cells.forEach(cell => {
+            let cellContent = cell.innerHTML;
+            
+            // Handle code blocks (```language code ```)
+            cellContent = cellContent.replace(/```(\w+)?\s*([\s\S]*?)```/g, (match, language, code) => {
+              const lang = language || '';
+              const trimmedCode = code.trim();
+              return `<pre class="bg-gray-900 dark:bg-[#111827] text-white p-2 rounded my-1 overflow-x-auto text-xs"><code class="text-xs font-mono text-white">${trimmedCode}</code></pre>`;
+            });
+            
+            // Handle inline code (`code`)
+            cellContent = cellContent.replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-[#1E293B] text-black dark:text-white px-1 py-0.5 rounded text-xs font-mono">$1</code>');
+            
+            // Handle bold (**text**)
+            cellContent = cellContent.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-black dark:text-white">$1</strong>');
+            
+            // Handle italic (*text*)
+            cellContent = cellContent.replace(/\*(.*?)\*/g, '<em class="italic text-black dark:text-white">$1</em>');
+            
+            cell.innerHTML = cellContent;
+          });
+          
+          return doc.body.innerHTML;
+        };
+        
+        // Process markdown content in cells before rendering
+        const processedHtml = processMarkdownInCells(html);
+        
+        // For simple tables, render with processed content
         return (
           <div 
             className="overflow-x-auto mb-4 table-html-container"
-            dangerouslySetInnerHTML={{ __html: html }}
+            dangerouslySetInnerHTML={{ __html: processedHtml }}
             style={{
               // CSS variables for table styling
               '--table-border': '#374151',
