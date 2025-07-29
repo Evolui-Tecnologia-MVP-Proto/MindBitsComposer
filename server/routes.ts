@@ -3396,8 +3396,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Forçar busca direta de todas as estruturas sem cache
         const allStructures = await storage.getAllRepoStructures();
         console.log("API: Total de estruturas encontradas:", allStructures.length);
-        console.log("API: Estruturas completas:", JSON.stringify(allStructures, null, 2));
-        res.json(allStructures);
+        
+        // Construir um mapa de estruturas para facilitar a busca de pais
+        const structureMap = new Map();
+        allStructures.forEach(structure => {
+          structureMap.set(structure.uid, structure);
+        });
+        
+        // Função para construir o caminho hierárquico
+        const buildPath = (structure: any): string => {
+          if (!structure.linkedTo) {
+            // É uma pasta raiz
+            return structure.folderName;
+          } else {
+            // É uma subpasta - construir caminho recursivamente
+            const parent = structureMap.get(structure.linkedTo);
+            if (parent) {
+              return buildPath(parent) + "/" + structure.folderName;
+            } else {
+              return structure.folderName; // Fallback se não encontrar o pai
+            }
+          }
+        };
+        
+        // Transformar estruturas para incluir path e type
+        const structuresWithPaths = allStructures.map(structure => ({
+          uid: structure.uid,
+          path: buildPath(structure),
+          type: 'directory', // Todas são pastas no contexto atual
+          folderName: structure.folderName,
+          linkedTo: structure.linkedTo,
+          isSync: structure.isSync,
+          createdAt: structure.createdAt,
+          updatedAt: structure.updatedAt
+        }));
+        
+        console.log("API: Estruturas com paths:", JSON.stringify(structuresWithPaths, null, 2));
+        res.json(structuresWithPaths);
       }
     } catch (error: any) {
       console.error("Erro ao buscar estrutura do repositório:", error);
