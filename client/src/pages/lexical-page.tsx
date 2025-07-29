@@ -1320,7 +1320,7 @@ export default function LexicalPage() {
         let templateMappings = {};
         if (edition.templateId) {
           console.log('🔍 DEBUG: Buscando template completo para obter mapeamentos...');
-          const response = await fetch(`/api/templates/${edition.templateId}`);
+          const response = await fetch(`/api/template/${edition.templateId}`);
           if (response.ok) {
             const fullTemplate = await response.json();
             console.log('🔍 DEBUG: Template completo recebido:', fullTemplate);
