@@ -517,7 +517,7 @@ export function createMarkdownConverter() {
             markdown += '|--|--|\n';
             
             headerFields.forEach(field => {
-              markdown += `| ${field.label} | ${field.value} |\n`;
+              markdown += `| **${field.label}** | ${field.value} |\n`;
             });
             
             markdown += '\n';
