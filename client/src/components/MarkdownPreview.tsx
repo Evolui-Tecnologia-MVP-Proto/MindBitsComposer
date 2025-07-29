@@ -527,21 +527,24 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
       return;
     }
 
-    // Handle lists
+    // Handle lists - render ordered lists as paragraphs, keep unordered lists as lists
     if (line.match(/^\s*[-*+]\s/) || line.match(/^\s*\d+\.\s/)) {
       flushParagraph();
       const isOrdered = !!line.match(/^\s*\d+\.\s/);
-      const text = line.replace(/^\s*(?:[-*+]|\d+\.)\s*/, '');
-      const processedText = processInlineFormatting(text);
       
       if (isOrdered) {
-        orderedListCounter++;
+        // For ordered lists, render as paragraphs preserving the original numbering
+        const text = line.replace(/^\s*/, ''); // Keep the number and text
+        const processedText = processInlineFormatting(text);
         elements.push(
-          <ol key={elements.length} start={orderedListCounter} className="list-decimal pl-6 mb-4 space-y-2">
-            <li className="text-black dark:text-white">{processedText}</li>
-          </ol>
+          <p key={elements.length} className="mb-4 leading-relaxed text-black dark:text-white">
+            {processedText}
+          </p>
         );
       } else {
+        // Keep unordered lists as actual lists
+        const text = line.replace(/^\s*(?:[-*+])\s*/, '');
+        const processedText = processInlineFormatting(text);
         elements.push(
           <ul key={elements.length} className="list-disc pl-6 mb-4 space-y-2">
             <li className="text-black dark:text-white">{processedText}</li>
