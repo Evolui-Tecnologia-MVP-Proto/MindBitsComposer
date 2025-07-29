@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 29, 2025)
 
+✓ COMPLETED: LTH Menus Path Plugin Development (January 29, 2025)
+  - Created new plugin page `lth_menus_path_plugin.tsx` in client/src/pages/plugins directory
+  - Implemented modal-style interface with three action buttons: [Atualizar], [Cancelar], [Salvar]
+  - Added "Subsistema" select trigger with 5 predefined subsystems (DOC, RH, FIN, TRIB, CONT)
+  - Developed hierarchical structure visualization component similar to repository FileExplorer
+  - Features 3-level menu hierarchy: menu > submenu > action with expandable tree structure
+  - Integrated selection state management with visual feedback and selection counters
+  - Applied consistent dark mode theming matching application design standards
+  - Included comprehensive mock data for different subsystems with realistic menu structures
+  - Added proper loading states, toast notifications, and error handling
+  - Implemented data exchange functionality for integration with composer workflow
+
 ✓ COMPLETED: Plugin Validation with Toast Notifications (January 29, 2025)
   - Added comprehensive plugin validation when clicking unplug button in header fields
   - Checks if plugin exists and fetches plugin details via API call to /api/plugins/{id}
