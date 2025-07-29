@@ -1314,15 +1314,15 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
     // Tentar buscar valor nos dados do documento
     let value = '';
     
-    // Primeiro tentar em general_columns (dados do Monday)
-    if (documentData.general_columns && documentData.general_columns[mappedColumn]) {
-      value = documentData.general_columns[mappedColumn];
-      console.log(`✅ DEBUG: Valor encontrado em general_columns: "${value}"`);
-    }
-    // Depois tentar diretamente no documentData
-    else if (documentData[mappedColumn]) {
+    // Primeiro tentar diretamente no documentData (campos da tabela documentos)
+    if (documentData[mappedColumn]) {
       value = documentData[mappedColumn];
       console.log(`✅ DEBUG: Valor encontrado em documentData direto: "${value}"`);
+    }
+    // Depois tentar em general_columns (dados do Monday)
+    else if (documentData.general_columns && documentData.general_columns[mappedColumn]) {
+      value = documentData.general_columns[mappedColumn];
+      console.log(`✅ DEBUG: Valor encontrado em general_columns: "${value}"`);
     }
     // Por último, tentar campos padrão
     else {

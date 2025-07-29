@@ -1831,35 +1831,12 @@ export default function LexicalPage() {
                     ...selectedEdition,
                     // Se existir general_columns, sobrescrever com esses dados
                     ...(selectedEdition.general_columns || {}),
-                    // Debug: log da estrutura
+                    // Debug: verificar campos essenciais
                     _debug_info: (() => {
-                      console.log('🔍 DEBUG: selectedEdition completo:', selectedEdition);
-                      console.log('🔍 DEBUG: selectedEdition.general_columns:', selectedEdition.general_columns);
-                      console.log('🔍 DEBUG: selectedEdition.sistema:', selectedEdition.sistema);
-                      console.log('🔍 DEBUG: selectedEdition.modulo:', selectedEdition.modulo);
-                      console.log('🔍 DEBUG: selectedEdition.id_origem_txt:', selectedEdition.id_origem_txt);
-                      
-                      // Se general_columns existir, mostrar todas as propriedades
-                      if (selectedEdition.general_columns) {
-                        console.log('🔍 DEBUG: general_columns KEYS:', Object.keys(selectedEdition.general_columns));
-                        console.log('🔍 DEBUG: general_columns.Sistema:', selectedEdition.general_columns.Sistema);
-                        console.log('🔍 DEBUG: general_columns.sistema:', selectedEdition.general_columns.sistema);
-                        console.log('🔍 DEBUG: general_columns.Módulo:', selectedEdition.general_columns.Módulo);
-                        console.log('🔍 DEBUG: general_columns.modulo:', selectedEdition.general_columns.modulo);
-                        console.log('🔍 DEBUG: general_columns.ID_ORIGEM_TXT:', selectedEdition.general_columns.ID_ORIGEM_TXT);
-                        console.log('🔍 DEBUG: general_columns.id_origem_txt:', selectedEdition.general_columns.id_origem_txt);
-                      }
-                      
-                      // Mostrar o documentData final que será enviado
-                      const finalDocumentData = {
-                        ...selectedEdition,
-                        ...(selectedEdition.general_columns || {})
-                      };
-                      console.log('🔍 DEBUG: documentData FINAL que será enviado para LexicalEditor:', finalDocumentData);
-                      console.log('🔍 DEBUG: documentData.sistema final:', finalDocumentData.sistema);
-                      console.log('🔍 DEBUG: documentData.modulo final:', finalDocumentData.modulo);
-                      console.log('🔍 DEBUG: documentData.id_origem_txt final:', finalDocumentData.id_origem_txt);
-                      
+                      console.log('✅ DEBUG: Dados do documento carregados');
+                      console.log('✅ sistema:', selectedEdition.sistema);
+                      console.log('✅ modulo:', selectedEdition.modulo);
+                      console.log('✅ idOrigemTxt:', selectedEdition.idOrigemTxt);
                       return true;
                     })()
                   } : undefined}
