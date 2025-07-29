@@ -10,6 +10,18 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 29, 2025)
 
+✓ COMPLETED: Action Buttons for Header Fields with Mapping Information (January 29, 2025)
+  - Added refresh button (RefreshCw icon) for field/formula type mappings in header fields
+  - Added unplug button (Unplug icon) for plugin type mappings in header fields  
+  - Buttons appear when fields have mapping information, regardless of whether they have values
+  - Enhanced HeaderFieldNode to store mappingType and mappingValue for action context
+  - Implemented custom events (headerFieldRefresh, headerFieldUnplug) for button interactions
+  - Added HeaderFieldMappingPlugin to enrich saved documents with mapping information from templates
+  - Fixed button visibility for both new and saved documents - buttons now always show when mapping exists
+  - Refresh button reloads field values from mapped data sources (fields/formulas)
+  - Unplug button prepared for future plugin execution functionality
+  - Complete integration with structured JSON format for template mappings
+
 ✓ COMPLETED: Data Plugin Selection in Template Edit Modal Mapping Tab with Persistence Fix (January 29, 2025)
   - Added "Data Plugin" selection option in template mapping tab similar to "Compose Formula" implementation
   - Added toggle button with Lucide "unplug" icon that shows/hides plugin selector when Data Plugin is selected

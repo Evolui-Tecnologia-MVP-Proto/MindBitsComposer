@@ -1251,6 +1251,79 @@ function ImageIdAutoConvertPlugin() {
   return null;
 }
 
+// Plugin para enriquecer HeaderFieldNodes com informações de mapeamento
+function HeaderFieldMappingPlugin({ templateMappings, documentData }: { templateMappings?: any; documentData?: any }): null {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    if (!templateMappings) return;
+
+    // Função para extrair tipo e valor do mapeamento
+    const extractMappingInfo = (mapping: any): { type: 'field' | 'formula' | 'plugin' | null; value: string } => {
+      if (!mapping || mapping === '') {
+        return { type: null, value: '' };
+      }
+      
+      // Novo formato estruturado
+      if (typeof mapping === 'object' && mapping.type && mapping.value) {
+        return { type: mapping.type, value: mapping.value };
+      }
+      
+      // Formato antigo - assumir como field
+      return { type: 'field', value: mapping };
+    };
+
+    // Atualizar HeaderFieldNodes existentes com informações de mapeamento
+    const updateHeaderFieldsWithMapping = () => {
+      editor.update(() => {
+        const root = $getRoot();
+        
+        // Função recursiva para percorrer todos os nodes
+        const visitNodes = (node: LexicalNode) => {
+          if (node.getType() === 'header-field') {
+            const headerNode = node as HeaderFieldNode;
+            const label = headerNode.getLabel();
+            const headerKey = `header.${label}`;
+            const mapping = templateMappings[headerKey];
+            
+            if (mapping) {
+              const { type, value } = extractMappingInfo(mapping);
+              
+              // Criar novo node com informações de mapeamento
+              if (type && !headerNode.getMappingType()) {
+                const newNode = $createHeaderFieldNode(
+                  label,
+                  headerNode.getValue(),
+                  headerNode.__placeholder,
+                  type,
+                  value
+                );
+                headerNode.replace(newNode);
+              }
+            }
+          }
+          
+          // Recursivamente visitar filhos
+          const children = node.getChildren ? node.getChildren() : [];
+          children.forEach((child: LexicalNode) => visitNodes(child));
+        };
+        
+        // Começar a visita pela raiz
+        visitNodes(root);
+      });
+    };
+
+    // Executar após um pequeno delay para garantir que o documento foi carregado
+    const timeoutId = setTimeout(updateHeaderFieldsWithMapping, 500);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [editor, templateMappings, documentData]);
+
+  return null;
+}
+
 // Interface para campos do header
 interface HeaderField {
   key: string;
@@ -2066,6 +2139,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <ImageIdAutoConvertPlugin />
           <TemplateSectionsPlugin sections={templateSections} mdFileOld={mdFileOld} />
           <EditProtectionPlugin />
+          <HeaderFieldMappingPlugin templateMappings={templateMappings} documentData={documentData} />
           <EditorInstancePlugin setEditorInstance={(editor) => {
             setEditorInstance(editor);
             if (onEditorInstanceChange) {

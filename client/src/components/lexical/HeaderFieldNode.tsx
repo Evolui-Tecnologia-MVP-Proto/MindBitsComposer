@@ -236,7 +236,7 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
         />
         
         {/* Botões de ação baseados no tipo de mapeamento */}
-        {mappingType && value !== '' && (
+        {mappingType && (
           <div className="pr-2">
             {(mappingType === 'field' || mappingType === 'formula') && (
               <button
