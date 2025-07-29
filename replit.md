@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 29, 2025)
 
+✓ COMPLETED: DateTime Formatting in Field Mapping (January 29, 2025)
+  - Implemented automatic datetime formatting to DD/MM/AAAA format when mapping datetime fields
+  - Added datetime detection patterns for ISO, SQL, and simple date formats
+  - Applied formatting in both formula processing (getFieldValue) and direct field mapping (populateFieldFromMapping)
+  - System automatically detects datetime values and converts to Brazilian date format
+  - Added comprehensive debug logging for datetime conversion process
+
 ✓ COMPLETED: Fixed Formula Processing - Added Missing responsavel Field (January 29, 2025)
   - Fixed root cause: responsavel field was missing from /api/document-editions-in-progress API response
   - Added responsavel field to database query in document-editions-in-progress endpoint

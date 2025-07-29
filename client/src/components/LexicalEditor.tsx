@@ -1518,6 +1518,37 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
         }
       }
       
+      // Verificar se o valor é um datetime e formatá-lo para DD/MM/AAAA
+      if (value && value !== fieldName) {
+        // Tentar detectar formato de datetime (ISO, timestamp, etc.)
+        const datePatterns = [
+          /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/, // ISO datetime
+          /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/, // SQL datetime
+          /^\d{4}-\d{2}-\d{2}$/, // Data simples YYYY-MM-DD
+        ];
+        
+        const isDateTime = datePatterns.some(pattern => pattern.test(value)) || 
+                          (!isNaN(Date.parse(value)) && value.includes('-') && value.length > 8);
+        
+        if (isDateTime) {
+          try {
+            const date = new Date(value);
+            if (!isNaN(date.getTime())) {
+              // Formatar para DD/MM/AAAA
+              const day = String(date.getDate()).padStart(2, '0');
+              const month = String(date.getMonth() + 1).padStart(2, '0');
+              const year = date.getFullYear();
+              const formattedDate = `${day}/${month}/${year}`;
+              
+              console.log(`📅 DEBUG - DateTime "${value}" formatado para "${formattedDate}"`);
+              return formattedDate;
+            }
+          } catch (error) {
+            console.log(`⚠️ DEBUG - Erro ao formatar datetime "${value}":`, error);
+          }
+        }
+      }
+      
       return value;
     };
     
@@ -1647,8 +1678,39 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
             }
           }
           
-          console.log(`✅ DEBUG: Campo ${mappingType} - valor: "${fieldValue}"`);
-          return { value: String(fieldValue || ''), type: 'field', mappingValue };
+          // Formatação de datetime para DD/MM/AAAA
+          let formattedValue = String(fieldValue || '');
+          if (formattedValue && formattedValue !== '') {
+            // Tentar detectar formato de datetime
+            const datePatterns = [
+              /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/, // ISO datetime
+              /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/, // SQL datetime
+              /^\d{4}-\d{2}-\d{2}$/, // Data simples YYYY-MM-DD
+            ];
+            
+            const isDateTime = datePatterns.some(pattern => pattern.test(formattedValue)) || 
+                              (!isNaN(Date.parse(formattedValue)) && formattedValue.includes('-') && formattedValue.length > 8);
+            
+            if (isDateTime) {
+              try {
+                const date = new Date(formattedValue);
+                if (!isNaN(date.getTime())) {
+                  // Formatar para DD/MM/AAAA
+                  const day = String(date.getDate()).padStart(2, '0');
+                  const month = String(date.getMonth() + 1).padStart(2, '0');
+                  const year = date.getFullYear();
+                  formattedValue = `${day}/${month}/${year}`;
+                  
+                  console.log(`📅 DEBUG - DateTime "${fieldValue}" formatado para "${formattedValue}"`);
+                }
+              } catch (error) {
+                console.log(`⚠️ DEBUG - Erro ao formatar datetime "${fieldValue}":`, error);
+              }
+            }
+          }
+          
+          console.log(`✅ DEBUG: Campo ${mappingType} - valor: "${formattedValue}"`);
+          return { value: formattedValue, type: 'field', mappingValue };
           
         case 'formula':
           // Processar fórmula
