@@ -693,10 +693,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           <SelectContent className="bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151]">
             {subsystems.map((subsystem) => (
               <SelectItem key={subsystem.id} value={subsystem.code}>
-                <div className="flex flex-col">
-                  <span className="font-medium">{subsystem.name}</span>
-                  <span className="text-xs text-gray-500">{subsystem.code}</span>
-                </div>
+                <span className="font-medium">{subsystem.name}</span>
               </SelectItem>
             ))}
           </SelectContent>
