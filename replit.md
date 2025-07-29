@@ -10,6 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 29, 2025)
 
+✓ COMPLETED: Filtered Composer Attachments Panel to Show Only COMPOSER_ASSET Plugins (January 29, 2025)
+  - Modified composer right side panel (attachments) to filter plugins by type COMPOSER_ASSET
+  - Created composerAssetPlugins filter from activePlugins array
+  - Updated plugin selector component to use composerAssetPlugins instead of activePlugins
+  - Updated handleOpenPlugin function to search from filtered COMPOSER_ASSET plugins only
+  - Right side panel now exclusively shows active plugins designed for composer asset generation
+  - Improves user experience by displaying only relevant plugins for content creation workflow
+
 ✓ COMPLETED: Dynamic Plugin Type Validation Fix (January 29, 2025)
   - Fixed plugin type validation error that was restricting types to old hardcoded enum values
   - Updated shared/schema.ts PluginType enum to include all current database values (COMPOSER_ASSET, DOCUMENT_PART, etc.)

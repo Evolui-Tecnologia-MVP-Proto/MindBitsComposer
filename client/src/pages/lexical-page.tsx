@@ -268,9 +268,12 @@ export default function LexicalPage() {
     enabled: true,
   });
 
+  // Filter plugins for composer attachments panel - only COMPOSER_ASSET type
+  const composerAssetPlugins = activePlugins.filter((plugin: any) => plugin.type === 'COMPOSER_ASSET');
+
   // Função para abrir plugin selecionado
   const handleOpenPlugin = (pluginId: string) => {
-    const plugin = activePlugins.find(p => p.id === pluginId);
+    const plugin = composerAssetPlugins.find(p => p.id === pluginId);
     if (plugin) {
       setSelectedPlugin(plugin);
       setIsPluginModalOpen(true);
@@ -1857,15 +1860,15 @@ export default function LexicalPage() {
                   <Paperclip className="w-5 h-5" />
                   <h3 className="font-semibold text-gray-900 dark:text-[#E5E7EB]">Anexos</h3>
                 </div>
-                {/* Combo de Plugins - desabilitado apenas quando há template struct sem documento composer */}
-                {activePlugins.length > 0 && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) && (
+                {/* Combo de Plugins - apenas COMPOSER_ASSET ativos */}
+                {composerAssetPlugins.length > 0 && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) && (
                   <div className="flex items-center gap-2 ml-auto">
                     <Select value={pluginSelectValue} onValueChange={handleOpenPlugin}>
                       <SelectTrigger className="w-32 h-8 text-xs">
                         <SelectValue placeholder="Plugins" />
                       </SelectTrigger>
                       <SelectContent>
-                        {activePlugins.map((plugin) => (
+                        {composerAssetPlugins.map((plugin) => (
                           <SelectItem key={plugin.id} value={plugin.id}>
                             <div className="flex items-center gap-2">
                               {getPluginIcon(plugin.icon)}
