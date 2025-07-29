@@ -497,11 +497,37 @@ export function createMarkdownConverter() {
           const headerLevel = isHeaderSection ? '#' : '##';
           markdown += `${headerLevel} ${titleText}\n\n`;
         } else if (child.getType() === 'collapsible-content') {
-          // Process content recursively
+          // Check if this content contains HeaderFieldNode elements
           const contentChildren = child.getChildren();
+          const headerFields: Array<{label: string, value: string}> = [];
+          
+          // Collect all HeaderFieldNode elements
           contentChildren.forEach((contentChild: any) => {
-            markdown += processNode(contentChild);
+            if (contentChild.getType() === 'header-field') {
+              const label = contentChild.getLabel();
+              const value = contentChild.getValue() || '';
+              headerFields.push({ label, value });
+            }
           });
+          
+          // If we found HeaderField nodes, generate them as a table
+          if (headerFields.length > 0) {
+            markdown += '\n<table style="width: 100%">\n  <tbody>\n';
+            
+            headerFields.forEach(field => {
+              markdown += '    <tr>\n';
+              markdown += `      <td style="padding: 8px; font-weight: bold; background-color: #f8f9fa; border: 1px solid #dee2e6;">${field.label}</td>\n`;
+              markdown += `      <td style="padding: 8px; border: 1px solid #dee2e6;">${field.value}</td>\n`;
+              markdown += '    </tr>\n';
+            });
+            
+            markdown += '  </tbody>\n</table>\n\n';
+          } else {
+            // Process content recursively if no HeaderField nodes found
+            contentChildren.forEach((contentChild: any) => {
+              markdown += processNode(contentChild);
+            });
+          }
         }
       });
     } else {
