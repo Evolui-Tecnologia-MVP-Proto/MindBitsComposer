@@ -167,32 +167,13 @@ export default function PluginModal({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="p-0 gap-0 !max-w-none !max-h-none"
+        className={`p-0 gap-0 !max-w-none !max-h-none ${
+          actualPluginName === 'lth_menus_path_plugin' ? 'plugin-modal-lth' :
+          actualPluginName === 'mermaid-graph-plugin' ? 'plugin-modal-large' : 
+          actualPluginName === 'vector-graph-plugin' ? 'plugin-modal-large' :
+          actualPluginName === 'simple-excalidraw-plugin' ? 'plugin-modal-xlarge' : 'plugin-modal-fullscreen'
+        }`}
         style={{
-          width: actualPluginName === 'lth_menus_path_plugin' ? '40vw' :
-                 actualPluginName === 'mermaid-graph-plugin' ? '80vw' : 
-                 actualPluginName === 'vector-graph-plugin' ? '80vw' :
-                 actualPluginName === 'simple-excalidraw-plugin' ? '90vw' : '100vw',
-          height: actualPluginName === 'lth_menus_path_plugin' ? '60vh' :
-                  actualPluginName === 'mermaid-graph-plugin' ? '80vh' : 
-                  actualPluginName === 'vector-graph-plugin' ? '80vh' :
-                  actualPluginName === 'simple-excalidraw-plugin' ? '90vh' : '100vh',
-          maxWidth: 'none',
-          maxHeight: 'none',
-          position: 'fixed',
-          top: actualPluginName === 'lth_menus_path_plugin' ? '20vh' :
-               actualPluginName === 'mermaid-graph-plugin' ? '10vh' : 
-               actualPluginName === 'vector-graph-plugin' ? '10vh' :
-               actualPluginName === 'simple-excalidraw-plugin' ? '5vh' : '0',
-          left: actualPluginName === 'lth_menus_path_plugin' ? '30vw' :
-                actualPluginName === 'mermaid-graph-plugin' ? '10vw' : 
-                actualPluginName === 'vector-graph-plugin' ? '10vw' :
-                actualPluginName === 'simple-excalidraw-plugin' ? '5vw' : '0',
-          right: 'auto',
-          bottom: 'auto',
-          margin: '0',
-          padding: '0',
-          transform: 'none',
           borderRadius: (actualPluginName === 'lth_menus_path_plugin' || actualPluginName === 'mermaid-graph-plugin' || actualPluginName === 'vector-graph-plugin' || actualPluginName === 'simple-excalidraw-plugin') ? '8px' : '0',
           zIndex: 50,
           border: 'none',
