@@ -10,13 +10,14 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 29, 2025)
 
-✓ COMPLETED: Fixed Automatic Header Field Population with Correct Data Source (January 29, 2025)
+✓ COMPLETED: Fixed Automatic Header Field Population with Correct Data Source + Auto Cursor Positioning (January 29, 2025)
   - Fixed critical issue where template mappings were failing due to missing data from documentos table
   - Enhanced /api/document-editions-in-progress endpoint to include sistema, modulo, and idOrigemTxt fields from documentos table
   - Corrected populateFieldFromMapping function to prioritize direct document fields over general_columns data
   - Resolved TypeScript compilation errors that were preventing application functionality
   - System now properly retrieves Sistema, Módulo, and RAG Index values from documentos database table
   - Template mapping correctly populates: "header.Sistema":"sistema", "header.Módulo":"modulo", "header.RAG Index":"id_origem_txt"
+  - Added automatic cursor positioning in first header field when document opens for editing
   - Cleaned up debug logging for better development experience
   - Document edition selection now provides complete document context for automatic field population
 

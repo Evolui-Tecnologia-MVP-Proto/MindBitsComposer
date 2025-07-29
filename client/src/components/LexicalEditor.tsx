@@ -1496,8 +1496,76 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                 }
                 
                 console.log('✅ DEBUG: Container de campos inserido com sucesso APÓS template!');
+                
+                // Posicionar cursor no primeiro campo após criação
+                setTimeout(() => {
+                  try {
+                    editorInstance.update(() => {
+                      const root = $getRoot();
+                      let firstHeaderField: any = null;
+                      
+                      // Buscar o primeiro HeaderFieldNode no documento
+                      root.getChildren().forEach(child => {
+                        if ($isCollapsibleContainerNode(child)) {
+                          const childNodes = child.getChildren();
+                          childNodes.forEach(node => {
+                            if ($isCollapsibleContentNode(node)) {
+                              const contentChildren = node.getChildren();
+                              contentChildren.forEach(contentChild => {
+                                if (contentChild.getType() === 'header-field' && !firstHeaderField) {
+                                  firstHeaderField = contentChild;
+                                }
+                              });
+                            }
+                          });
+                        }
+                      });
+                      
+                      if (firstHeaderField) {
+                        console.log('✅ DEBUG: Posicionando cursor no primeiro campo do header');
+                        firstHeaderField.selectStart();
+                      }
+                    });
+                  } catch (error) {
+                    console.error('❌ DEBUG: Erro ao posicionar cursor:', error);
+                  }
+                }, 100); // Pequeno delay após criação dos campos
               } else {
                 console.log('⚠️ DEBUG: Container de campos já existe');
+                
+                // Se já existe, ainda assim tentar posicionar cursor no primeiro campo
+                setTimeout(() => {
+                  try {
+                    editorInstance.update(() => {
+                      const root = $getRoot();
+                      let firstHeaderField: any = null;
+                      
+                      // Buscar o primeiro HeaderFieldNode no documento
+                      root.getChildren().forEach(child => {
+                        if ($isCollapsibleContainerNode(child)) {
+                          const childNodes = child.getChildren();
+                          childNodes.forEach(node => {
+                            if ($isCollapsibleContentNode(node)) {
+                              const contentChildren = node.getChildren();
+                              contentChildren.forEach(contentChild => {
+                                if (contentChild.getType() === 'header-field' && !firstHeaderField) {
+                                  firstHeaderField = contentChild;
+                                }
+                              });
+                            }
+                          });
+                        }
+                      });
+                      
+                      if (firstHeaderField) {
+                        console.log('✅ DEBUG: Posicionando cursor no primeiro campo do header (container existente)');
+                        firstHeaderField.selectStart();
+                      }
+                    });
+                  } catch (error) {
+                    console.error('❌ DEBUG: Erro ao posicionar cursor:', error);
+                  }
+                }, 100);
               }
             });
           } catch (error) {
