@@ -716,7 +716,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           )}
         </div>
 
-        <div className="flex-1 border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#111827] min-h-0">
+        <div className="flex-1 border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#111827] min-h-0 overflow-hidden">
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
