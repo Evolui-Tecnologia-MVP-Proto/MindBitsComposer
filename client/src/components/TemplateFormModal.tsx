@@ -70,6 +70,7 @@ export default function TemplateFormModal({
   const [structureError, setStructureError] = useState("");
   const [fieldMappings, setFieldMappings] = useState<Record<string, string>>({});
   const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>({});
+  const [formulaFields, setFormulaFields] = useState<Set<string>>(new Set());
   const modalRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -178,12 +179,21 @@ export default function TemplateFormModal({
     );
     
     const newMappings: Record<string, string> = {};
+    const newFormulaFields = new Set<string>();
+    
     fields.forEach(field => {
       // Preserva valores existentes do template ou do estado local
-      newMappings[field] = formData.mappings?.[field] || fieldMappings[field] || '';
+      const existingValue = formData.mappings?.[field] || fieldMappings[field] || '';
+      newMappings[field] = existingValue;
+      
+      // Manter campos de fórmula
+      if (existingValue === '__compose_formula__') {
+        newFormulaFields.add(field);
+      }
     });
     
     setFieldMappings(newMappings);
+    setFormulaFields(newFormulaFields);
   }, [formData.structure, formData.mappings]);
 
   // Função para atualizar valor de mapeamento
@@ -192,6 +202,18 @@ export default function TemplateFormModal({
       ...prev,
       [field]: value
     }));
+    
+    // Se selecionou "Compose Formula", adiciona ao set
+    if (value === '__compose_formula__') {
+      setFormulaFields(prev => new Set(prev).add(field));
+    } else {
+      // Se mudou para outra opção, remove do set
+      setFormulaFields(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(field);
+        return newSet;
+      });
+    }
   };
 
   // Função para obter o nome real da seção a partir da estrutura
@@ -575,24 +597,44 @@ export default function TemplateFormModal({
                                                     </span>
                                                   </TableCell>
                                                   <TableCell className="py-2">
-                                                    <Select
-                                                      value={value}
-                                                      onValueChange={(selectedValue) => handleMappingChange(field, selectedValue)}
-                                                    >
-                                                      <SelectTrigger className="w-full h-8 text-xs">
-                                                        <SelectValue placeholder="Selecione uma coluna" />
-                                                      </SelectTrigger>
-                                                      <SelectContent>
-                                                        {Array.isArray(documentosColumns) && documentosColumns.map((column: any) => (
-                                                          <SelectItem key={column.name} value={column.name}>
-                                                            <div className="flex flex-col">
-                                                              <span className="font-mono text-xs">{column.name}</span>
-                                                              <span className="text-xs text-gray-500">{column.type}</span>
-                                                            </div>
+                                                    <div className="flex items-center gap-2">
+                                                      <Select
+                                                        value={value}
+                                                        onValueChange={(selectedValue) => handleMappingChange(field, selectedValue)}
+                                                      >
+                                                        <SelectTrigger className={`h-8 text-xs ${formulaFields.has(field) ? 'flex-1' : 'w-full'}`}>
+                                                          <SelectValue placeholder="Selecione uma coluna" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                          <SelectItem value="__compose_formula__" className="text-red-600 font-semibold">
+                                                            Compose Formula
                                                           </SelectItem>
-                                                        ))}
-                                                      </SelectContent>
-                                                    </Select>
+                                                          <div className="h-px bg-gray-200 dark:bg-gray-700 my-1" />
+                                                          {Array.isArray(documentosColumns) && documentosColumns.map((column: any) => (
+                                                            <SelectItem key={column.name} value={column.name}>
+                                                              <div className="flex flex-col">
+                                                                <span className="font-mono text-xs">{column.name}</span>
+                                                                <span className="text-xs text-gray-500">{column.type}</span>
+                                                              </div>
+                                                            </SelectItem>
+                                                          ))}
+                                                        </SelectContent>
+                                                      </Select>
+                                                      {formulaFields.has(field) && (
+                                                        <Button
+                                                          type="button"
+                                                          variant="outline"
+                                                          size="sm"
+                                                          className="h-8 px-3"
+                                                          onClick={() => {
+                                                            // Placeholder - funcionalidade será implementada posteriormente
+                                                            console.log('Formula button clicked for field:', field);
+                                                          }}
+                                                        >
+                                                          <span className="italic">f(x)</span>
+                                                        </Button>
+                                                      )}
+                                                    </div>
                                                   </TableCell>
                                                 </TableRow>
                                               ))}
@@ -620,24 +662,44 @@ export default function TemplateFormModal({
                                             </span>
                                           </TableCell>
                                           <TableCell>
-                                            <Select
-                                              value={value}
-                                              onValueChange={(selectedValue) => handleMappingChange(field, selectedValue)}
-                                            >
-                                              <SelectTrigger className="w-full">
-                                                <SelectValue placeholder="Selecione uma coluna" />
-                                              </SelectTrigger>
-                                              <SelectContent>
-                                                {Array.isArray(documentosColumns) && documentosColumns.map((column: any) => (
-                                                  <SelectItem key={column.name} value={column.name}>
-                                                    <div className="flex flex-col">
-                                                      <span className="font-mono text-sm">{column.name}</span>
-                                                      <span className="text-xs text-gray-500">{column.type}</span>
-                                                    </div>
+                                            <div className="flex items-center gap-2">
+                                              <Select
+                                                value={value}
+                                                onValueChange={(selectedValue) => handleMappingChange(field, selectedValue)}
+                                              >
+                                                <SelectTrigger className={`${formulaFields.has(field) ? 'flex-1' : 'w-full'}`}>
+                                                  <SelectValue placeholder="Selecione uma coluna" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                  <SelectItem value="__compose_formula__" className="text-red-600 font-semibold">
+                                                    Compose Formula
                                                   </SelectItem>
-                                                ))}
-                                              </SelectContent>
-                                            </Select>
+                                                  <div className="h-px bg-gray-200 dark:bg-gray-700 my-1" />
+                                                  {Array.isArray(documentosColumns) && documentosColumns.map((column: any) => (
+                                                    <SelectItem key={column.name} value={column.name}>
+                                                      <div className="flex flex-col">
+                                                        <span className="font-mono text-sm">{column.name}</span>
+                                                        <span className="text-xs text-gray-500">{column.type}</span>
+                                                      </div>
+                                                    </SelectItem>
+                                                  ))}
+                                                </SelectContent>
+                                              </Select>
+                                              {formulaFields.has(field) && (
+                                                <Button
+                                                  type="button"
+                                                  variant="outline"
+                                                  size="sm"
+                                                  className="h-9 px-3"
+                                                  onClick={() => {
+                                                    // Placeholder - funcionalidade será implementada posteriormente
+                                                    console.log('Formula button clicked for field:', field);
+                                                  }}
+                                                >
+                                                  <span className="italic">f(x)</span>
+                                                </Button>
+                                              )}
+                                            </div>
                                           </TableCell>
                                         </TableRow>
                                       ))}
