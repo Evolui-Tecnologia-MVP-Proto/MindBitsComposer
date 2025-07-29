@@ -232,7 +232,6 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
                      bg-transparent text-gray-900 dark:text-gray-200
                      focus:ring-0 focus:border-0"
           placeholder={node.__placeholder}
-          disabled={value !== '' && mappingType !== null} // Desabilitar se tem valor preenchido e tem mapeamento
         />
         
         {/* Botões de ação baseados no tipo de mapeamento */}
