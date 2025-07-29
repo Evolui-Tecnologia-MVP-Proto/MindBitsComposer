@@ -10,6 +10,17 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 29, 2025)
 
+✓ COMPLETED: Data Plugin Selection in Template Edit Modal Mapping Tab (January 29, 2025)
+  - Added "Data Plugin" selection option in template mapping tab similar to "Compose Formula" implementation
+  - Added toggle button with Lucide "unplug" icon that shows/hides plugin selector when Data Plugin is selected
+  - Created SelectTrigger for selecting active plugins of type DOCUMENT_PART with name and version display
+  - Added state management for pluginFields, openPluginSelectors, and pluginValues following same pattern as formula feature
+  - Implemented mutual exclusivity between formula and plugin fields (selecting one deselects the other)
+  - Added query to fetch active DOCUMENT_PART plugins when modal is open
+  - Updated form submission logic to integrate plugin values into final mappings
+  - Applied consistent dark mode styling matching existing design patterns
+  - Template fields can now be mapped to either database columns, compose formulas, or data plugins
+
 ✓ COMPLETED: Filtered Composer Attachments Panel to Show Only COMPOSER_ASSET Plugins (January 29, 2025)
   - Modified composer right side panel (attachments) to filter plugins by type COMPOSER_ASSET
   - Created composerAssetPlugins filter from activePlugins array

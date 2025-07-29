@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Unplug } from "lucide-react";
 import { Template, TemplateType } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
@@ -73,6 +73,9 @@ export default function TemplateFormModal({
   const [formulaFields, setFormulaFields] = useState<Set<string>>(new Set());
   const [openFormulaEditors, setOpenFormulaEditors] = useState<Set<string>>(new Set());
   const [formulaValues, setFormulaValues] = useState<Record<string, string>>({});
+  const [pluginFields, setPluginFields] = useState<Set<string>>(new Set());
+  const [openPluginSelectors, setOpenPluginSelectors] = useState<Set<string>>(new Set());
+  const [pluginValues, setPluginValues] = useState<Record<string, string>>({});
   const modalRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -80,6 +83,18 @@ export default function TemplateFormModal({
   const { data: documentosColumns = [] } = useQuery({
     queryKey: ["/api/schema/documentos/columns"],
     enabled: isOpen, // Só executa quando a modal está aberta
+  });
+
+  // Query para buscar plugins ativos do tipo DOCUMENT_PART
+  const { data: documentPartPlugins = [] } = useQuery({
+    queryKey: ['/api/plugins', 'DOCUMENT_PART'],
+    queryFn: async () => {
+      const response = await fetch('/api/plugins');
+      if (!response.ok) throw new Error('Erro ao buscar plugins');
+      const plugins = await response.json();
+      return plugins.filter((plugin: any) => plugin.status === 'active' && plugin.type === 'DOCUMENT_PART');
+    },
+    enabled: isOpen,
   });
 
   // Função para extrair campos do JSON da estrutura
@@ -182,6 +197,7 @@ export default function TemplateFormModal({
     
     const newMappings: Record<string, string> = {};
     const newFormulaFields = new Set<string>();
+    const newPluginFields = new Set<string>();
     
     fields.forEach(field => {
       // Preserva valores existentes do template ou do estado local
@@ -197,10 +213,17 @@ export default function TemplateFormModal({
           [field]: existingValue
         }));
       }
+      
+      // Manter campos de plugin
+      if (existingValue === '__data_plugin__') {
+        newPluginFields.add(field);
+        newMappings[field] = '__data_plugin__';
+      }
     });
     
     setFieldMappings(newMappings);
     setFormulaFields(newFormulaFields);
+    setPluginFields(newPluginFields);
   }, [formData.structure, formData.mappings]);
 
   // Função para atualizar valor de mapeamento
@@ -213,9 +236,27 @@ export default function TemplateFormModal({
     // Se selecionou "Compose Formula", adiciona ao set
     if (value === '__compose_formula__') {
       setFormulaFields(prev => new Set(prev).add(field));
-    } else {
-      // Se mudou para outra opção, remove do set
+      setPluginFields(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(field);
+        return newSet;
+      });
+    } else if (value === '__data_plugin__') {
+      // Se selecionou "Data Plugin", adiciona ao set
+      setPluginFields(prev => new Set(prev).add(field));
       setFormulaFields(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(field);
+        return newSet;
+      });
+    } else {
+      // Se mudou para outra opção, remove de ambos os sets
+      setFormulaFields(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(field);
+        return newSet;
+      });
+      setPluginFields(prev => {
         const newSet = new Set(prev);
         newSet.delete(field);
         return newSet;
@@ -412,11 +453,16 @@ export default function TemplateFormModal({
       setIsLoading(true);
       
       // Converter a estrutura de string para objeto JSON antes de enviar
-      // Integrar fórmulas aos mapeamentos
+      // Integrar fórmulas e plugins aos mapeamentos
       const finalMappings = { ...fieldMappings };
       Object.keys(formulaValues).forEach(field => {
         if (finalMappings[field] === '__compose_formula__' && formulaValues[field]) {
           finalMappings[field] = formulaValues[field];
+        }
+      });
+      Object.keys(pluginValues).forEach(field => {
+        if (finalMappings[field] === '__data_plugin__' && pluginValues[field]) {
+          finalMappings[field] = pluginValues[field];
         }
       });
       
@@ -617,12 +663,15 @@ export default function TemplateFormModal({
                                                         value={value}
                                                         onValueChange={(selectedValue) => handleMappingChange(field, selectedValue)}
                                                       >
-                                                        <SelectTrigger className={`h-8 text-xs ${formulaFields.has(field) ? 'flex-1' : 'w-full'}`}>
+                                                        <SelectTrigger className={`h-8 text-xs ${formulaFields.has(field) || pluginFields.has(field) ? 'flex-1' : 'w-full'}`}>
                                                           <SelectValue placeholder="Selecione uma coluna" />
                                                         </SelectTrigger>
                                                         <SelectContent>
                                                           <SelectItem value="__compose_formula__" className="text-red-600 font-semibold">
                                                             Compose Formula
+                                                          </SelectItem>
+                                                          <SelectItem value="__data_plugin__" className="text-blue-600 font-semibold">
+                                                            Data Plugin
                                                           </SelectItem>
                                                           <div className="h-px bg-gray-200 dark:bg-gray-700 my-1" />
                                                           {Array.isArray(documentosColumns) && documentosColumns.map((column: any) => (
@@ -656,6 +705,27 @@ export default function TemplateFormModal({
                                                           <span className="italic">f(x)</span>
                                                         </Button>
                                                       )}
+                                                      {pluginFields.has(field) && (
+                                                        <Button
+                                                          type="button"
+                                                          variant="outline"
+                                                          size="sm"
+                                                          className="h-8 px-3"
+                                                          onClick={() => {
+                                                            setOpenPluginSelectors(prev => {
+                                                              const newSet = new Set(prev);
+                                                              if (newSet.has(field)) {
+                                                                newSet.delete(field);
+                                                              } else {
+                                                                newSet.add(field);
+                                                              }
+                                                              return newSet;
+                                                            });
+                                                          }}
+                                                        >
+                                                          <Unplug className="h-3 w-3" />
+                                                        </Button>
+                                                      )}
                                                     </div>
                                                     {openFormulaEditors.has(field) && (
                                                       <div className="mt-2">
@@ -670,6 +740,33 @@ export default function TemplateFormModal({
                                                           }}
                                                           className="font-mono text-xs h-20 resize-none dark:bg-[#0F172A] dark:border-[#374151]"
                                                         />
+                                                      </div>
+                                                    )}
+                                                    {openPluginSelectors.has(field) && (
+                                                      <div className="mt-2">
+                                                        <Select
+                                                          value={pluginValues[field] || ''}
+                                                          onValueChange={(selectedValue) => {
+                                                            setPluginValues(prev => ({
+                                                              ...prev,
+                                                              [field]: selectedValue
+                                                            }));
+                                                          }}
+                                                        >
+                                                          <SelectTrigger className="h-8 text-xs dark:bg-[#0F172A] dark:border-[#374151]">
+                                                            <SelectValue placeholder="Selecione um plugin" />
+                                                          </SelectTrigger>
+                                                          <SelectContent>
+                                                            {documentPartPlugins.map((plugin: any) => (
+                                                              <SelectItem key={plugin.id} value={plugin.id}>
+                                                                <div className="flex items-center gap-2">
+                                                                  <span className="text-xs">{plugin.name}</span>
+                                                                  <span className="text-xs text-gray-500">v{plugin.version}</span>
+                                                                </div>
+                                                              </SelectItem>
+                                                            ))}
+                                                          </SelectContent>
+                                                        </Select>
                                                       </div>
                                                     )}
                                                   </TableCell>
@@ -704,12 +801,15 @@ export default function TemplateFormModal({
                                                 value={value}
                                                 onValueChange={(selectedValue) => handleMappingChange(field, selectedValue)}
                                               >
-                                                <SelectTrigger className={`${formulaFields.has(field) ? 'flex-1' : 'w-full'}`}>
+                                                <SelectTrigger className={`${formulaFields.has(field) || pluginFields.has(field) ? 'flex-1' : 'w-full'}`}>
                                                   <SelectValue placeholder="Selecione uma coluna" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                   <SelectItem value="__compose_formula__" className="text-red-600 font-semibold">
                                                     Compose Formula
+                                                  </SelectItem>
+                                                  <SelectItem value="__data_plugin__" className="text-blue-600 font-semibold">
+                                                    Data Plugin
                                                   </SelectItem>
                                                   <div className="h-px bg-gray-200 dark:bg-gray-700 my-1" />
                                                   {Array.isArray(documentosColumns) && documentosColumns.map((column: any) => (
@@ -743,6 +843,27 @@ export default function TemplateFormModal({
                                                   <span className="italic">f(x)</span>
                                                 </Button>
                                               )}
+                                              {pluginFields.has(field) && (
+                                                <Button
+                                                  type="button"
+                                                  variant="outline"
+                                                  size="sm"
+                                                  className="h-9 px-3"
+                                                  onClick={() => {
+                                                    setOpenPluginSelectors(prev => {
+                                                      const newSet = new Set(prev);
+                                                      if (newSet.has(field)) {
+                                                        newSet.delete(field);
+                                                      } else {
+                                                        newSet.add(field);
+                                                      }
+                                                      return newSet;
+                                                    });
+                                                  }}
+                                                >
+                                                  <Unplug className="h-4 w-4" />
+                                                </Button>
+                                              )}
                                             </div>
                                             {openFormulaEditors.has(field) && (
                                               <div className="mt-2">
@@ -757,6 +878,33 @@ export default function TemplateFormModal({
                                                   }}
                                                   className="font-mono text-sm h-24 resize-none dark:bg-[#0F172A] dark:border-[#374151]"
                                                 />
+                                              </div>
+                                            )}
+                                            {openPluginSelectors.has(field) && (
+                                              <div className="mt-2">
+                                                <Select
+                                                  value={pluginValues[field] || ''}
+                                                  onValueChange={(selectedValue) => {
+                                                    setPluginValues(prev => ({
+                                                      ...prev,
+                                                      [field]: selectedValue
+                                                    }));
+                                                  }}
+                                                >
+                                                  <SelectTrigger className="h-9 text-sm dark:bg-[#0F172A] dark:border-[#374151]">
+                                                    <SelectValue placeholder="Selecione um plugin" />
+                                                  </SelectTrigger>
+                                                  <SelectContent>
+                                                    {documentPartPlugins.map((plugin: any) => (
+                                                      <SelectItem key={plugin.id} value={plugin.id}>
+                                                        <div className="flex items-center gap-2">
+                                                          <span className="text-sm">{plugin.name}</span>
+                                                          <span className="text-xs text-gray-500">v{plugin.version}</span>
+                                                        </div>
+                                                      </SelectItem>
+                                                    ))}
+                                                  </SelectContent>
+                                                </Select>
                                               </div>
                                             )}
                                           </TableCell>
