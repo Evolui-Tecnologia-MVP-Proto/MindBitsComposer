@@ -1822,7 +1822,21 @@ export default function LexicalPage() {
                   markdownContent={markdownContent}
                   mdFileOld={selectedEdition?.mdFileOld || ''}
                   isEnabled={!!(currentDocumentId || selectedTemplate || selectedEdition || loadedFileName)}
-                  documentData={selectedEdition}
+                  documentData={selectedEdition ? {
+                    // Campos diretos do selectedEdition
+                    ...selectedEdition,
+                    // Se existir general_columns, sobrescrever com esses dados
+                    ...(selectedEdition.general_columns || {}),
+                    // Debug: log da estrutura
+                    _debug_info: (() => {
+                      console.log('🔍 DEBUG: selectedEdition completo:', selectedEdition);
+                      console.log('🔍 DEBUG: selectedEdition.general_columns:', selectedEdition.general_columns);
+                      console.log('🔍 DEBUG: selectedEdition.sistema:', selectedEdition.sistema);
+                      console.log('🔍 DEBUG: selectedEdition.modulo:', selectedEdition.modulo);
+                      console.log('🔍 DEBUG: selectedEdition.id_origem_txt:', selectedEdition.id_origem_txt);
+                      return true;
+                    })()
+                  } : undefined}
                   templateMappings={selectedTemplate?.mappings}
                 />
               </CardContent>
