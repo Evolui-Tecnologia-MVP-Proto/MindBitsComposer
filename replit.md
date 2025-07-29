@@ -10,8 +10,9 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 29, 2025)
 
-✓ COMPLETED: Fixed Formula Processing - Simple Field Substitution (January 29, 2025)
-  - Fixed critical bug where simple field names in formulas weren't being replaced with actual values
+✓ COMPLETED: Fixed Formula Processing - Added Missing responsavel Field (January 29, 2025)
+  - Fixed root cause: responsavel field was missing from /api/document-editions-in-progress API response
+  - Added responsavel field to database query in document-editions-in-progress endpoint
   - Enhanced processFormula function to properly identify and substitute all field references
   - Added comprehensive debugging logs for formula processing steps
   - Improved field search logic to check data, general_columns, and known field variations
