@@ -1175,25 +1175,58 @@ function FocusPlugin({ initialEditorState }: { initialEditorState?: string }) {
       // Aguardar um pouco para garantir que o conteúdo foi carregado
       const timeoutId = setTimeout(() => {
         editor.update(() => {
-          // Mover cursor para o final do documento
           const root = $getRoot();
-          const lastChild = root.getLastChild();
           
-          if (lastChild) {
-            // Se o último nó é um parágrafo, colocar cursor no final dele
-            if ($isParagraphNode(lastChild)) {
-              lastChild.selectEnd();
+          // Procurar primeiro por HeaderFieldNodes
+          let firstHeaderField: HeaderFieldNode | null = null;
+          
+          const findFirstHeaderField = (node: LexicalNode): void => {
+            if ($isHeaderFieldNode(node) && !firstHeaderField) {
+              firstHeaderField = node as HeaderFieldNode;
+              return;
+            }
+            
+            if ('getChildren' in node && typeof node.getChildren === 'function') {
+              const children = (node as any).getChildren();
+              for (const child of children) {
+                findFirstHeaderField(child);
+                if (firstHeaderField) break;
+              }
+            }
+          };
+          
+          findFirstHeaderField(root);
+          
+          // Se encontrou um HeaderFieldNode, focar nele
+          if (firstHeaderField) {
+            setTimeout(() => {
+              const headerLabel = firstHeaderField!.getLabel();
+              const inputElement = document.querySelector(`[data-label="${headerLabel}"] input`) as HTMLInputElement;
+              if (inputElement) {
+                inputElement.focus();
+                console.log('📍 Foco inicial posicionado no primeiro campo de header');
+              }
+            }, 50);
+          } else {
+            // Caso contrário, usar o comportamento padrão
+            const lastChild = root.getLastChild();
+            
+            if (lastChild) {
+              // Se o último nó é um parágrafo, colocar cursor no final dele
+              if ($isParagraphNode(lastChild)) {
+                lastChild.selectEnd();
+              } else {
+                // Caso contrário, criar um novo parágrafo e focar nele
+                const newParagraph = $createParagraphNode();
+                root.append(newParagraph);
+                newParagraph.select();
+              }
             } else {
-              // Caso contrário, criar um novo parágrafo e focar nele
+              // Se não há conteúdo, criar parágrafo inicial
               const newParagraph = $createParagraphNode();
               root.append(newParagraph);
               newParagraph.select();
             }
-          } else {
-            // Se não há conteúdo, criar parágrafo inicial
-            const newParagraph = $createParagraphNode();
-            root.append(newParagraph);
-            newParagraph.select();
           }
         });
         
