@@ -612,9 +612,9 @@ export default function TemplateFormModal({
                                                           <div className="h-px bg-gray-200 dark:bg-gray-700 my-1" />
                                                           {Array.isArray(documentosColumns) && documentosColumns.map((column: any) => (
                                                             <SelectItem key={column.name} value={column.name}>
-                                                              <div className="flex flex-col">
-                                                                <span className="font-mono text-xs">{column.name}</span>
-                                                                <span className="text-xs text-gray-500">{column.type}</span>
+                                                              <div className="flex flex-col items-start">
+                                                                <span className="font-mono text-xs text-left">{column.name}</span>
+                                                                <span className="text-xs text-gray-500 text-left">{column.type}</span>
                                                               </div>
                                                             </SelectItem>
                                                           ))}
@@ -677,9 +677,9 @@ export default function TemplateFormModal({
                                                   <div className="h-px bg-gray-200 dark:bg-gray-700 my-1" />
                                                   {Array.isArray(documentosColumns) && documentosColumns.map((column: any) => (
                                                     <SelectItem key={column.name} value={column.name}>
-                                                      <div className="flex flex-col">
-                                                        <span className="font-mono text-sm">{column.name}</span>
-                                                        <span className="text-xs text-gray-500">{column.type}</span>
+                                                      <div className="flex flex-col items-start">
+                                                        <span className="font-mono text-sm text-left">{column.name}</span>
+                                                        <span className="text-xs text-gray-500 text-left">{column.type}</span>
                                                       </div>
                                                     </SelectItem>
                                                   ))}
