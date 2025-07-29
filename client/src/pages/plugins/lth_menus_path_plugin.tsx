@@ -623,6 +623,28 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     }, 1000);
   };
 
+  // Função para construir o path completo hierárquico
+  const getFullPath = (selectedId: string): string => {
+    const findPathRecursively = (items: MenuPath[], targetId: string, currentPath: string[] = []): string[] | null => {
+      for (const item of items) {
+        const newPath = [...currentPath, item.name];
+        
+        if (item.id === targetId) {
+          return newPath;
+        }
+        
+        if (item.children) {
+          const found = findPathRecursively(item.children, targetId, newPath);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    const pathArray = findPathRecursively(menuStructure, selectedId);
+    return pathArray ? pathArray.join(' → ') : '';
+  };
+
   const handleSalvar = () => {
     if (!selectedPath) {
       toast({
@@ -728,8 +750,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
             Estrutura Hierárquica
           </h3>
           {selectedPath && (
-            <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 rounded-full text-sm font-medium">
-              Funcionalidade selecionada
+            <span className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-md text-sm font-mono border border-gray-300 dark:border-gray-600">
+              {getFullPath(selectedPath)}
             </span>
           )}
         </div>

@@ -4849,6 +4849,18 @@ html:not(.dark) [data-radix-dialog-content] .h-full.flex.flex-col.bg-white .bg-g
   color: #065F46 !important;
 }
 
+/* Path badge styling for light mode */
+html:not(.dark) [data-radix-dialog-content] .h-full.flex.flex-col.bg-white .bg-gray-100 {
+  background-color: #F3F4F6 !important;
+  color: #1F2937 !important;
+  border-color: #D1D5DB !important;
+}
+
+/* Monospace font styling */
+html:not(.dark) [data-radix-dialog-content] .h-full.flex.flex-col.bg-white .font-mono {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace !important;
+}
+
 /* Buttons in light mode for LTH plugin */
 html:not(.dark) [data-radix-dialog-content] .h-full.flex.flex-col.bg-white button[class*="border-gray-300"] {
   background-color: #FFFFFF !important;
