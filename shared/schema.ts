@@ -25,13 +25,22 @@ export enum PluginStatus {
   DEVELOPMENT = "development"
 }
 
+// Plugin types are now loaded dynamically from system_params table
+// This enum is kept for backward compatibility but is no longer restrictive
 export enum PluginType {
-  DATA_SOURCE = "data_source",
-  AI_AGENT = "ai_agent", 
-  CHART = "chart",
-  FORMATTER = "formatter",
-  INTEGRATION = "integration",
-  UTILITY = "utility"
+  DATA_SOURCE = "DATA_SOURCE",
+  AI_AGENT = "AI_AGENT", 
+  CHART = "CHART",
+  FORMATTER = "FORMATTER",
+  INTEGRATION = "INTEGRATION",
+  UTILITY = "UTILITY",
+  WORKFLOW = "WORKFLOW",
+  COMPOSER = "COMPOSER",
+  DOCUMENT = "DOCUMENT",
+  COMPOSER_ASSET = "COMPOSER_ASSET",
+  DOCUMENT_PART = "DOCUMENT_PART",
+  FLUX_ANALISER = "FLUX_ANALISER",
+  FLUX_VALIDATOR = "FLUX_VALIDATOR"
 }
 
 export const users = pgTable("users", {
@@ -112,7 +121,7 @@ export const plugins = pgTable("plugins", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
   description: text("description").notNull(),
-  type: text("type").$type<PluginType>().notNull(),
+  type: text("type").notNull(), // Plugin types are now loaded dynamically from system_params
   status: text("status").$type<PluginStatus>().notNull().default(PluginStatus.INACTIVE),
   version: text("version").notNull().default("1.0.0"),
   author: text("author"),
