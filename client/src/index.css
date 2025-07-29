@@ -86,6 +86,26 @@
   list-style-type: decimal !important;
 }
 
+/* Apply left margin indentation to bullet lists in MDX */
+.markdown-content ul {
+  margin-left: 2rem !important;
+  padding-left: 1.5rem !important;
+}
+
+.markdown-content ul li {
+  margin-left: 1rem !important;
+  padding-left: 0.5rem !important;
+}
+
+/* Nested lists indentation */
+.markdown-content ul ul {
+  margin-left: 2.5rem !important;
+}
+
+.markdown-content ul ul li {
+  margin-left: 1.5rem !important;
+}
+
 /* Collapsible container dark mode styling */
 .dark .Collapsible__content,
 .dark details .Collapsible__content,
