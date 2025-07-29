@@ -1491,7 +1491,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           console.log('🔍 Plugin encontrado:', plugin);
           
           // Verificar se o plugin está ativo
-          if (plugin.status !== 'ACTIVE') {
+          if (plugin.status !== 'active') {
             toast({
               title: "Plugin inativo",
               description: `O plugin "${plugin.name}" está inativo e não pode ser executado.`,
