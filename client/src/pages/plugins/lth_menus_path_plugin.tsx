@@ -663,10 +663,10 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     setExpandedPaths(new Set());
     setSelectedPaths(new Set());
     
-    toast({
-      title: "Operação cancelada",
-      description: "Todas as seleções foram limpa.",
-    });
+    // Close modal without toast notification
+    if (onDataExchange) {
+      onDataExchange({ closeModal: true });
+    }
   };
 
   return (
