@@ -1489,9 +1489,12 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
         })
         .then(plugin => {
           console.log('🔍 Plugin encontrado:', plugin);
+          console.log('🔍 Status do plugin:', `"${plugin.status}"`, typeof plugin.status);
+          console.log('🔍 Comparação status:', plugin.status !== 'active', plugin.status === 'active');
           
           // Verificar se o plugin está ativo
           if (plugin.status !== 'active') {
+            console.log('❌ Plugin não está ativo, status atual:', plugin.status);
             toast({
               title: "Plugin inativo",
               description: `O plugin "${plugin.name}" está inativo e não pode ser executado.`,
