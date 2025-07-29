@@ -35,7 +35,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   const { onDataExchange, selectedEdition } = props || {};
   const [selectedSubsystem, setSelectedSubsystem] = useState<string>("");
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
-  const [selectedPaths, setSelectedPaths] = useState<Set<string>>(new Set());
+  const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [menuStructure, setMenuStructure] = useState<MenuPath[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -466,7 +466,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       const structure = generateMenuStructure(subsystemCode);
       setMenuStructure(structure);
       setExpandedPaths(new Set()); // Reset expanded state
-      setSelectedPaths(new Set()); // Reset selected state
+      setSelectedPath(null); // Reset selected state
       setIsLoading(false);
     }, 500);
   };
@@ -481,14 +481,18 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     setExpandedPaths(newExpanded);
   };
 
-  const toggleSelected = (pathId: string) => {
-    const newSelected = new Set(selectedPaths);
-    if (newSelected.has(pathId)) {
-      newSelected.delete(pathId);
-    } else {
-      newSelected.add(pathId);
+  const handleItemClick = (item: MenuPath) => {
+    // Only allow selection of action items (funcionalidade)
+    if (item.type !== 'action') {
+      return;
     }
-    setSelectedPaths(newSelected);
+    
+    // Single selection: if already selected, deselect; otherwise select
+    if (selectedPath === item.id) {
+      setSelectedPath(null);
+    } else {
+      setSelectedPath(item.id);
+    }
   };
 
   const getIcon = (iconName?: string, type?: string, isExpanded?: boolean) => {
@@ -511,18 +515,25 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   const renderMenuTree = (menuItems: MenuPath[], level = 0): JSX.Element[] => {
     return menuItems.map((item) => {
       const isExpanded = expandedPaths.has(item.id);
-      const isSelected = selectedPaths.has(item.id);
+      const isSelected = selectedPath === item.id;
       const hasChildren = item.children && item.children.length > 0;
       const paddingLeft = level * 24;
+      const isSelectable = item.type === 'action';
 
       return (
         <div key={item.id} className="select-none">
           <div
-            className={`flex items-center py-2 px-3 hover:bg-gray-50 dark:hover:bg-[#1F2937] cursor-pointer rounded-md transition-colors ${
+            className={`flex items-center py-2 px-3 rounded-md transition-colors ${
+              isSelectable 
+                ? 'hover:bg-gray-50 dark:hover:bg-[#1F2937] cursor-pointer' 
+                : 'cursor-default'
+            } ${
               isSelected ? 'bg-blue-50 dark:bg-blue-900/30 border-l-2 border-blue-500' : ''
+            } ${
+              !isSelectable ? 'opacity-75' : ''
             }`}
             style={{ paddingLeft: `${paddingLeft + 12}px` }}
-            onClick={() => toggleSelected(item.id)}
+            onClick={() => handleItemClick(item)}
           >
             <div className="flex items-center flex-1 min-w-0">
               {hasChildren && (
@@ -613,33 +624,43 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   };
 
   const handleSalvar = () => {
-    if (selectedPaths.size === 0) {
+    if (!selectedPath) {
       toast({
-        title: "Nenhum caminho selecionado",
-        description: "Selecione pelo menos um caminho de menu para salvar.",
+        title: "Nenhuma funcionalidade selecionada",
+        description: "Selecione uma funcionalidade para salvar.",
         variant: "destructive",
       });
       return;
     }
 
-    const selectedMenus = menuStructure
-      .filter(menu => selectedPaths.has(menu.id))
-      .concat(
-        menuStructure
-          .flatMap(menu => menu.children || [])
-          .filter(submenu => selectedPaths.has(submenu.id))
-      )
-      .concat(
-        menuStructure
-          .flatMap(menu => menu.children || [])
-          .flatMap(submenu => submenu.children || [])
-          .filter(action => selectedPaths.has(action.id))
-      );
+    // Encontrar o item selecionado na estrutura
+    const findSelectedItem = (items: MenuPath[]): MenuPath | null => {
+      for (const item of items) {
+        if (item.id === selectedPath) {
+          return item;
+        }
+        if (item.children) {
+          const found = findSelectedItem(item.children);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    const selectedItem = findSelectedItem(menuStructure);
+    
+    if (!selectedItem) {
+      toast({
+        title: "Erro",
+        description: "Item selecionado não encontrado.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const resultData = {
       subsystem: subsystems.find(s => s.code === selectedSubsystem),
-      selectedPaths: Array.from(selectedPaths),
-      selectedMenus: selectedMenus,
+      selectedFunction: selectedItem,
       timestamp: new Date().toISOString()
     };
 
@@ -649,8 +670,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     }
 
     toast({
-      title: "Dados salvos",
-      description: `${selectedPaths.size} caminhos de menu foram salvos com sucesso.`,
+      title: "Funcionalidade salva",
+      description: `Funcionalidade "${selectedItem.name}" foi salva com sucesso.`,
     });
 
     console.log('Dados do plugin LTH Menus Path:', resultData);
@@ -661,7 +682,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     setSelectedSubsystem("");
     setMenuStructure([]);
     setExpandedPaths(new Set());
-    setSelectedPaths(new Set());
+    setSelectedPath(null);
     
     // Close modal without toast notification
     if (onDataExchange) {
@@ -706,9 +727,9 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
             Estrutura Hierárquica
           </h3>
-          {selectedPaths.size > 0 && (
-            <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-full text-sm font-medium">
-              {selectedPaths.size} selecionado{selectedPaths.size > 1 ? 's' : ''}
+          {selectedPath && (
+            <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 rounded-full text-sm font-medium">
+              Funcionalidade selecionada
             </span>
           )}
         </div>
@@ -768,7 +789,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         
         <Button
           onClick={handleSalvar}
-          disabled={selectedPaths.size === 0}
+          disabled={!selectedPath}
           className="bg-blue-600 hover:bg-blue-700 text-white"
         >
           <Save className="h-4 w-4 mr-2" />
