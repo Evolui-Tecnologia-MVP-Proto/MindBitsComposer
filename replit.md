@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 29, 2025)
 
+✓ COMPLETED: Disabled Local File Button When Editing Library Documents (January 29, 2025)
+  - Disabled "Abrir arquivo .lexical local" button when editing documents selected from library (left side panel)
+  - Added logic to check if selectedEdition exists (indicates document from library)
+  - Enhanced button tooltip to show "Não disponível - editando documento da biblioteca" when disabled
+  - Prevents conflicts between library document editing and local file loading
+  - Maintains clean editing workflow by restricting functionality appropriately
+
 ✓ COMPLETED: DateTime Formatting in Field Mapping (January 29, 2025)
   - Implemented automatic datetime formatting to DD/MM/AAAA format when mapping datetime fields
   - Added datetime detection patterns for ISO, SQL, and simple date formats

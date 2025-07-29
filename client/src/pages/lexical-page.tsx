@@ -1652,8 +1652,8 @@ export default function LexicalPage() {
                   variant="outline"
                   size="sm"
                   className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
-                  title="Abrir arquivo .lexical local"
-                  disabled={viewMode === 'preview'}
+                  title={selectedEdition ? "Não disponível - editando documento da biblioteca" : "Abrir arquivo .lexical local"}
+                  disabled={viewMode === 'preview' || !!selectedEdition}
                 >
                   <FolderOpen className="w-4 h-4" />
                 </Button>
