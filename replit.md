@@ -81,6 +81,18 @@ Preferred communication style: Simple, everyday language.
   - Shows success toast when plugin is valid and ready for execution
   - Implemented proper error handling for all validation scenarios
 
+✓ COMPLETED: Multiple Document Processing in Review Modal (January 29, 2025)
+  - Implemented "Iniciar Documentação" functionality in DocumentReviewModal for batch processing
+  - Added mutation for starting documentation using /api/documentos/start-documentation endpoint
+  - Supports processing multiple selected documents with individual flow assignments
+  - Visual progress indicators: pending (clock), processing (spinner), success (check), error (X)
+  - Cards show colored rings during processing: blue (processing), green (success), red (error)
+  - Button displays loading state with spinner and "Processando..." text
+  - Comprehensive error handling with success/partial/error toast notifications
+  - Automatic modal closure after successful batch processing (2 second delay)
+  - Invalidates all related queries to refresh document lists after processing
+  - Exact same functionality as "Iniciar Documentação" in documentos page, but for multiple documents
+
 ✓ COMPLETED: Disabled Local File Button When Editing Library Documents (January 29, 2025)
   - Disabled "Abrir arquivo .lexical local" button when editing documents selected from library (left side panel)
   - Added logic to check if selectedEdition exists (indicates document from library)

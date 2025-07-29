@@ -5,7 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import { 
   FileText, 
   Calendar, 
@@ -13,7 +15,10 @@ import {
   Clock,
   Loader2,
   AlertCircle,
-  Workflow
+  Workflow,
+  BookOpen,
+  CheckCircle,
+  XCircle
 } from "lucide-react";
 import { type Documento } from "@shared/schema";
 
@@ -24,11 +29,17 @@ interface DocumentReviewModalProps {
 }
 
 export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentReviewModalProps) {
+  const { toast } = useToast();
+  
   // Estado para gerenciar fluxos selecionados por documento
   const [selectedFlows, setSelectedFlows] = useState<Record<string, string>>({});
   
   // Estado para gerenciar itens selecionados via checkbox
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  
+  // Estado para rastrear progresso da documentação
+  const [documentationProgress, setDocumentationProgress] = useState<Record<string, 'pending' | 'processing' | 'success' | 'error'>>({});
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Buscar fluxos de documentação disponíveis
   const { data: documentsFlows = [] } = useQuery({
@@ -46,6 +57,34 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
       return null;
     },
     enabled: isOpen
+  });
+  
+  // Mutation para iniciar documentação
+  const startDocumentationMutation = useMutation({
+    mutationFn: async ({ documentId, flowId }: { documentId: string; flowId: string }) => {
+      const response = await fetch("/api/documentos/start-documentation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          documentId,
+          flowId
+        }),
+      });
+      if (!response.ok) throw new Error("Erro ao iniciar documentação");
+      return response.json();
+    },
+    onError: (error: any, variables) => {
+      setDocumentationProgress(prev => ({
+        ...prev,
+        [variables.documentId]: 'error'
+      }));
+    },
+    onSuccess: (data, variables) => {
+      setDocumentationProgress(prev => ({
+        ...prev,
+        [variables.documentId]: 'success'
+      }));
+    }
   });
 
   // Buscar documentos filtrados
@@ -253,8 +292,93 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
     if (!isOpen) {
       setSelectedFlows({});
       setSelectedItems(new Set());
+      setDocumentationProgress({});
+      setIsProcessing(false);
     }
   }, [isOpen]);
+  
+  // Função para processar documentação de todos os documentos selecionados
+  const handleStartDocumentation = async () => {
+    const selectedDocumentIds = Array.from(selectedItems);
+    
+    // Verificar se todos os documentos selecionados têm fluxo associado
+    const documentsWithoutFlow = selectedDocumentIds.filter(docId => !selectedFlows[docId]);
+    
+    if (documentsWithoutFlow.length > 0) {
+      toast({
+        title: "Fluxo não selecionado",
+        description: `Selecione um fluxo para todos os ${documentsWithoutFlow.length} documento(s) antes de iniciar.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsProcessing(true);
+    
+    // Inicializar progresso como 'pending' para todos os documentos selecionados
+    const initialProgress: Record<string, 'pending'> = {};
+    selectedDocumentIds.forEach(docId => {
+      initialProgress[docId] = 'pending';
+    });
+    setDocumentationProgress(initialProgress);
+    
+    // Processar cada documento
+    let successCount = 0;
+    let errorCount = 0;
+    
+    for (const documentId of selectedDocumentIds) {
+      const flowId = selectedFlows[documentId];
+      
+      // Atualizar progresso para 'processing'
+      setDocumentationProgress(prev => ({
+        ...prev,
+        [documentId]: 'processing'
+      }));
+      
+      try {
+        await startDocumentationMutation.mutateAsync({
+          documentId,
+          flowId
+        });
+        successCount++;
+      } catch (error) {
+        errorCount++;
+        console.error(`Erro ao processar documento ${documentId}:`, error);
+      }
+    }
+    
+    // Invalidar queries relacionadas
+    queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions/count"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/documentos/review", responsavel] });
+    
+    // Mostrar resultado final
+    if (successCount > 0 && errorCount === 0) {
+      toast({
+        title: "Documentação iniciada com sucesso!",
+        description: `${successCount} documento(s) processado(s) com sucesso.`,
+      });
+      // Aguardar um pouco antes de fechar para mostrar o status
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+    } else if (successCount > 0 && errorCount > 0) {
+      toast({
+        title: "Processamento parcialmente concluído",
+        description: `${successCount} sucesso(s), ${errorCount} erro(s).`,
+        variant: "default",
+      });
+    } else {
+      toast({
+        title: "Erro no processamento",
+        description: `Não foi possível processar os documentos selecionados.`,
+        variant: "destructive",
+      });
+    }
+    
+    setIsProcessing(false);
+  };
 
   // Seleção automática de fluxos quando há apenas um disponível para cada documento
   useEffect(() => {
@@ -367,8 +491,17 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
                   const availableFlows = getAvailableFlows(documento);
                   const selectedFlowId = selectedFlows[documento.id] || "";
                   
+                  const documentProgress = documentationProgress[documento.id];
+                  
                   return (
-                    <Card key={documento.id} className="bg-gray-50 dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] hover:shadow-md transition-shadow">
+                    <Card key={documento.id} className={`bg-gray-50 dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] hover:shadow-md transition-shadow ${
+                      documentProgress ? 'ring-2' : ''
+                    } ${
+                      documentProgress === 'processing' ? 'ring-blue-500' :
+                      documentProgress === 'success' ? 'ring-green-500' :
+                      documentProgress === 'error' ? 'ring-red-500' :
+                      documentProgress === 'pending' ? 'ring-gray-400' : ''
+                    }`}>
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between">
                           <div className="flex items-start gap-3 flex-1">
@@ -424,6 +557,22 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
                             </div>
                           </div>
                           <div className="flex items-center gap-2 ml-4">
+                            {documentProgress && (
+                              <div className="flex items-center gap-2">
+                                {documentProgress === 'pending' && (
+                                  <Clock className="h-4 w-4 text-gray-400" />
+                                )}
+                                {documentProgress === 'processing' && (
+                                  <Loader2 className="h-4 w-4 text-blue-500 animate-spin" />
+                                )}
+                                {documentProgress === 'success' && (
+                                  <CheckCircle className="h-4 w-4 text-green-500" />
+                                )}
+                                {documentProgress === 'error' && (
+                                  <XCircle className="h-4 w-4 text-red-500" />
+                                )}
+                              </div>
+                            )}
                             <div className="text-xs text-gray-400 dark:text-gray-500 font-mono">
                               #{index + 1}
                             </div>
@@ -450,13 +599,21 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
           </Button>
           {selectedItems.size > 0 && (
             <Button
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={() => {
-                // TODO: Implementar ação para iniciar revisão em lote
-                console.log("Iniciando revisão de", selectedItems.size, "documentos selecionados");
-              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+              onClick={handleStartDocumentation}
+              disabled={isProcessing}
             >
-              Iniciar Revisão ({selectedItems.size})
+              {isProcessing ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Processando...
+                </>
+              ) : (
+                <>
+                  <BookOpen className="h-4 w-4" />
+                  Iniciar Documentação ({selectedItems.size})
+                </>
+              )}
             </Button>
           )}
         </div>
