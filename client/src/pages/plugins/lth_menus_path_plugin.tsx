@@ -704,7 +704,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       </div>
 
       {/* Menu Structure Visualization */}
-      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+      <div className="flex-1 flex flex-col min-h-0 relative">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
             Estrutura Hierárquica
@@ -716,7 +716,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           )}
         </div>
 
-        <div className="flex-1 border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#111827] overflow-hidden min-h-0">
+        <div className="absolute inset-x-0 top-12 bottom-0 border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#111827] overflow-hidden">
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
@@ -725,7 +725,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
               </div>
             </div>
           ) : selectedSubsystem && menuStructure.length > 0 ? (
-            <div className="p-4 overflow-y-auto overflow-x-hidden" style={{ height: '100%', maxHeight: '100%' }}>
+            <div className="absolute inset-0 p-4 overflow-y-auto overflow-x-hidden">
               <div className="space-y-1">
                 {renderMenuTree(menuStructure)}
               </div>
