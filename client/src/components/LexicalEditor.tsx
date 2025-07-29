@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { $getRoot, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, type TextFormatType, $createParagraphNode, $createTextNode, $insertNodes, $isParagraphNode, UNDO_COMMAND, REDO_COMMAND, COMMAND_PRIORITY_LOW, PASTE_COMMAND, $isTextNode } from 'lexical';
+import { $getRoot, $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND, type TextFormatType, $createParagraphNode, $createTextNode, $insertNodes, $isParagraphNode, UNDO_COMMAND, REDO_COMMAND, COMMAND_PRIORITY_LOW, PASTE_COMMAND, $isTextNode, type LexicalNode } from 'lexical';
 
 import { createMarkdownConverter } from './markdown-converter';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
@@ -1389,15 +1389,19 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       // Re-executar a lógica de preenchimento
       const mappingInfo = populateFieldFromMapping(label);
       
-      if (mappingInfo.value) {
-        editorInstance.update(() => {
-          const node = $getNodeByKey(nodeKey);
-          if (node && 'setValue' in node) {
-            (node as any).setValue(mappingInfo.value);
-            console.log(`✅ Campo ${label} atualizado com valor: "${mappingInfo.value}"`);
-          }
-        });
-      }
+      console.log('🔍 Mapping info result:', mappingInfo);
+      
+      // Sempre tentar atualizar, mesmo se o valor estiver vazio
+      editorInstance.update(() => {
+        const node = $getNodeByKey(nodeKey);
+        if (node && 'setValue' in node) {
+          const newValue = mappingInfo.value || '';
+          (node as any).setValue(newValue);
+          console.log(`✅ Campo ${label} atualizado com valor: "${newValue}"`);
+        } else {
+          console.log(`❌ Não foi possível encontrar o nó ${nodeKey} ou ele não tem método setValue`);
+        }
+      });
     };
     
     const handleHeaderFieldUnplug = (event: Event) => {

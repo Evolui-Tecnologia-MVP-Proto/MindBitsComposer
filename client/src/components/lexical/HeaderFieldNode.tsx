@@ -97,6 +97,7 @@ export class HeaderFieldNode extends DecoratorNode<JSX.Element> {
   }
 
   setValue(value: string): void {
+    console.log(`🔧 HeaderFieldNode.setValue called with value: "${value}" for label: "${this.__label}"`);
     const writableNode = this.getWritable();
     writableNode.__value = value;
   }
@@ -177,6 +178,22 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
   const [value, setValue] = React.useState(node.getValue());
   const mappingType = node.getMappingType();
   const mappingValue = node.getMappingValue();
+
+  // Sincronizar valor quando o nó for atualizado
+  React.useEffect(() => {
+    const unregister = editor.registerUpdateListener(() => {
+      editor.getEditorState().read(() => {
+        const nodeValue = node.getValue();
+        if (nodeValue !== value) {
+          setValue(nodeValue);
+        }
+      });
+    });
+    
+    return () => {
+      unregister();
+    };
+  }, [editor, node, value]);
 
   const handleChange = (newValue: string) => {
     setValue(newValue);
