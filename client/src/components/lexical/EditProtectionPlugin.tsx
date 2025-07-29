@@ -17,6 +17,7 @@ import {
 import { $isCollapsibleContainerNode } from './CollapsibleNode';
 import { $isCollapsibleContentNode } from './CollapsibleContentNode';
 import { $isCollapsibleTitleNode } from './CollapsibleTitleNode';
+import { $isHeaderFieldNode } from './HeaderFieldNode';
 
 // Plugin que protege contra edição fora dos containers colapsíveis
 export default function EditProtectionPlugin(): null {
@@ -47,8 +48,21 @@ export default function EditProtectionPlugin(): null {
           return true;
         }
         
-        // Se chegamos ao root sem encontrar um CollapsibleContentNode, bloquear
+        // Se estamos em um HeaderFieldNode ou seus filhos, permitir edição
+        if ($isHeaderFieldNode(currentNode)) {
+          return true;
+        }
+        
+        // Se chegamos ao root sem encontrar um nó válido, bloquear
         if (currentNode === $getRoot()) {
+          // Verificar se o nó original está dentro de um HeaderFieldNode
+          let parent = node.getParent();
+          while (parent && parent !== $getRoot()) {
+            if ($isHeaderFieldNode(parent)) {
+              return true;
+            }
+            parent = parent.getParent();
+          }
           return false;
         }
         

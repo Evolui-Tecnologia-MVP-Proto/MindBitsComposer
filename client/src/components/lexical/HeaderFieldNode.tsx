@@ -205,6 +205,9 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
   const handleRefresh = () => {
     console.log('🔄 Refresh clicked - mappingType:', mappingType, 'mappingValue:', mappingValue);
     
+    // Salvar referência do input antes de disparar o evento
+    const inputElement = document.querySelector(`[data-label="${node.getLabel()}"] input`) as HTMLInputElement;
+    
     // Disparar evento customizado para o LexicalEditor lidar
     const event = new CustomEvent('headerFieldRefresh', {
       detail: {
@@ -215,10 +218,25 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
       }
     });
     window.dispatchEvent(event);
+    
+    // Restaurar foco após um pequeno delay para garantir que a atualização foi concluída
+    setTimeout(() => {
+      if (inputElement) {
+        inputElement.focus();
+        // Posicionar cursor no final do texto
+        inputElement.setSelectionRange(inputElement.value.length, inputElement.value.length);
+        
+        // Forçar o editor a reconhecer que estamos em uma área editável
+        editor.focus();
+      }
+    }, 50);
   };
 
   const handleUnplug = () => {
     console.log('🔌 Unplug clicked - mappingType:', mappingType, 'mappingValue:', mappingValue);
+    
+    // Salvar referência do input antes de disparar o evento
+    const inputElement = document.querySelector(`[data-label="${node.getLabel()}"] input`) as HTMLInputElement;
     
     // Disparar evento customizado para o LexicalEditor lidar
     const event = new CustomEvent('headerFieldUnplug', {
@@ -230,6 +248,18 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
       }
     });
     window.dispatchEvent(event);
+    
+    // Restaurar foco após um pequeno delay para garantir que a atualização foi concluída
+    setTimeout(() => {
+      if (inputElement) {
+        inputElement.focus();
+        // Posicionar cursor no final do texto
+        inputElement.setSelectionRange(inputElement.value.length, inputElement.value.length);
+        
+        // Forçar o editor a reconhecer que estamos em uma área editável
+        editor.focus();
+      }
+    }, 50);
   };
 
   return (
