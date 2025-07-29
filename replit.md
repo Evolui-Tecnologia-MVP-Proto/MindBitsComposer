@@ -10,6 +10,13 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 28, 2025)
 
+✓ COMPLETED: Section Separators in Markdown Generation (January 28, 2025)
+  - Added horizontal lines (---) to separate each collapsible container section in generated markdown
+  - Modified processNode function in markdown-converter.ts to insert horizontal separator after each section
+  - Improves visual structure and readability of generated markdown documents
+  - Creates clear visual boundaries between different sections of the document
+  - Applied to all collapsible-container nodes during markdown conversion
+
 ✓ COMPLETED: Header Field Names in Bold on Markdown Generation (January 28, 2025)
   - Modified markdown generation to format header field names (captions) in bold using **text** syntax
   - Updated processNode function in markdown-converter.ts to wrap field labels with ** markers

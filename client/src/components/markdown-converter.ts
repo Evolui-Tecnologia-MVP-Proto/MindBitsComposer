@@ -529,6 +529,9 @@ export function createMarkdownConverter() {
           }
         }
       });
+      
+      // Add horizontal line to separate sections
+      markdown += '---\n\n';
     } else {
       // For any other node type, extract images first
       const nodeImages = extractImagesRecursively(node);
