@@ -716,7 +716,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           )}
         </div>
 
-        <div className="border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#111827]" style={{ height: '350px', maxHeight: '350px', minHeight: '350px' }}>
+        <div className="flex-1 border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#111827] min-h-0">
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
@@ -725,15 +725,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
               </div>
             </div>
           ) : selectedSubsystem && menuStructure.length > 0 ? (
-            <div 
-              className="p-4 space-y-1" 
-              style={{ 
-                height: '350px', 
-                maxHeight: '350px', 
-                overflowY: 'auto', 
-                overflowX: 'hidden'
-              }}
-            >
+            <div className="h-full p-4 space-y-1 overflow-y-auto overflow-x-hidden">
               {renderMenuTree(menuStructure)}
             </div>
           ) : selectedSubsystem ? (
