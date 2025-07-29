@@ -71,6 +71,8 @@ export default function TemplateFormModal({
   const [fieldMappings, setFieldMappings] = useState<Record<string, string>>({});
   const [openAccordions, setOpenAccordions] = useState<Record<string, boolean>>({});
   const [formulaFields, setFormulaFields] = useState<Set<string>>(new Set());
+  const [openFormulaEditors, setOpenFormulaEditors] = useState<Set<string>>(new Set());
+  const [formulaValues, setFormulaValues] = useState<Record<string, string>>({});
   const modalRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -187,8 +189,13 @@ export default function TemplateFormModal({
       newMappings[field] = existingValue;
       
       // Manter campos de fórmula
-      if (existingValue === '__compose_formula__') {
+      if (existingValue === '__compose_formula__' || (existingValue && existingValue.includes('SUBSTR') || existingValue.includes('+'))) {
         newFormulaFields.add(field);
+        newMappings[field] = '__compose_formula__';
+        setFormulaValues(prev => ({
+          ...prev,
+          [field]: existingValue
+        }));
       }
     });
     
@@ -405,12 +412,20 @@ export default function TemplateFormModal({
       setIsLoading(true);
       
       // Converter a estrutura de string para objeto JSON antes de enviar
+      // Integrar fórmulas aos mapeamentos
+      const finalMappings = { ...fieldMappings };
+      Object.keys(formulaValues).forEach(field => {
+        if (finalMappings[field] === '__compose_formula__' && formulaValues[field]) {
+          finalMappings[field] = formulaValues[field];
+        }
+      });
+      
       const processedData = {
         ...formData,
         structure: typeof formData.structure === 'string' 
           ? JSON.parse(formData.structure) 
           : formData.structure,
-        mappings: fieldMappings
+        mappings: finalMappings
       };
       
       console.log("Enviando template:", JSON.stringify(processedData, null, 2));
@@ -627,14 +642,36 @@ export default function TemplateFormModal({
                                                           size="sm"
                                                           className="h-8 px-3"
                                                           onClick={() => {
-                                                            // Placeholder - funcionalidade será implementada posteriormente
-                                                            console.log('Formula button clicked for field:', field);
+                                                            setOpenFormulaEditors(prev => {
+                                                              const newSet = new Set(prev);
+                                                              if (newSet.has(field)) {
+                                                                newSet.delete(field);
+                                                              } else {
+                                                                newSet.add(field);
+                                                              }
+                                                              return newSet;
+                                                            });
                                                           }}
                                                         >
                                                           <span className="italic">f(x)</span>
                                                         </Button>
                                                       )}
                                                     </div>
+                                                    {openFormulaEditors.has(field) && (
+                                                      <div className="mt-2">
+                                                        <Textarea
+                                                          placeholder={`Ex: SUBSTR(coluna_x, 0, 3) + ' - ' + coluna_y`}
+                                                          value={formulaValues[field] || ''}
+                                                          onChange={(e) => {
+                                                            setFormulaValues(prev => ({
+                                                              ...prev,
+                                                              [field]: e.target.value
+                                                            }));
+                                                          }}
+                                                          className="font-mono text-xs h-20 resize-none dark:bg-[#0F172A] dark:border-[#374151]"
+                                                        />
+                                                      </div>
+                                                    )}
                                                   </TableCell>
                                                 </TableRow>
                                               ))}
@@ -692,14 +729,36 @@ export default function TemplateFormModal({
                                                   size="sm"
                                                   className="h-9 px-3"
                                                   onClick={() => {
-                                                    // Placeholder - funcionalidade será implementada posteriormente
-                                                    console.log('Formula button clicked for field:', field);
+                                                    setOpenFormulaEditors(prev => {
+                                                      const newSet = new Set(prev);
+                                                      if (newSet.has(field)) {
+                                                        newSet.delete(field);
+                                                      } else {
+                                                        newSet.add(field);
+                                                      }
+                                                      return newSet;
+                                                    });
                                                   }}
                                                 >
                                                   <span className="italic">f(x)</span>
                                                 </Button>
                                               )}
                                             </div>
+                                            {openFormulaEditors.has(field) && (
+                                              <div className="mt-2">
+                                                <Textarea
+                                                  placeholder={`Ex: SUBSTR(coluna_x, 0, 3) + ' - ' + coluna_y`}
+                                                  value={formulaValues[field] || ''}
+                                                  onChange={(e) => {
+                                                    setFormulaValues(prev => ({
+                                                      ...prev,
+                                                      [field]: e.target.value
+                                                    }));
+                                                  }}
+                                                  className="font-mono text-sm h-24 resize-none dark:bg-[#0F172A] dark:border-[#374151]"
+                                                />
+                                              </div>
+                                            )}
                                           </TableCell>
                                         </TableRow>
                                       ))}
