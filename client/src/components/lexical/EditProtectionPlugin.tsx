@@ -24,6 +24,15 @@ export default function EditProtectionPlugin(): null {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
+    // Flag para controlar se a proteção está ativa
+    let protectionActive = false;
+    
+    // Ativar proteção após 2 segundos para permitir foco inicial
+    const activationTimeout = setTimeout(() => {
+      protectionActive = true;
+      console.log('🛡️ EditProtectionPlugin: Proteção ativada após delay inicial');
+    }, 2000);
+    
     // Função para verificar se a seleção atual está dentro de um container colapsível
     const isSelectionInValidContainer = (): boolean => {
       const selection = $getSelection();
@@ -75,6 +84,8 @@ export default function EditProtectionPlugin(): null {
 
     // Comando para interceptar tentativas de inserção de parágrafo
     const handleInsertParagraph = () => {
+      if (!protectionActive) return false; // Permitir durante grace period
+      
       editor.update(() => {
         if (!isSelectionInValidContainer()) {
           console.log('🚫 Edição bloqueada: tentativa de inserir parágrafo fora de container');
@@ -86,6 +97,8 @@ export default function EditProtectionPlugin(): null {
 
     // Comando para interceptar Enter
     const handleEnterKey = (): boolean => {
+      if (!protectionActive) return false; // Permitir durante grace period
+      
       let shouldBlock = false;
       editor.update(() => {
         if (!isSelectionInValidContainer()) {
@@ -98,6 +111,8 @@ export default function EditProtectionPlugin(): null {
 
     // Comando para interceptar Tab
     const handleTabKey = (): boolean => {
+      if (!protectionActive) return false; // Permitir durante grace period
+      
       let shouldBlock = false;
       editor.update(() => {
         if (!isSelectionInValidContainer()) {
@@ -110,6 +125,8 @@ export default function EditProtectionPlugin(): null {
 
     // Comando para interceptar Paste
     const handlePaste = (): boolean => {
+      if (!protectionActive) return false; // Permitir durante grace period
+      
       let shouldBlock = false;
       editor.update(() => {
         if (!isSelectionInValidContainer()) {
@@ -122,6 +139,9 @@ export default function EditProtectionPlugin(): null {
 
     // Interceptar mudanças de seleção para posicionar cursor adequadamente
     const handleSelectionChange = () => {
+      // Não fazer nada se a proteção ainda não está ativa
+      if (!protectionActive) return;
+      
       editor.update(() => {
         const selection = $getSelection();
         if ($isRangeSelection(selection)) {
@@ -203,6 +223,7 @@ export default function EditProtectionPlugin(): null {
 
     // Cleanup
     return () => {
+      clearTimeout(activationTimeout);
       unregisterInsertParagraph();
       unregisterEnter();
       unregisterTab();

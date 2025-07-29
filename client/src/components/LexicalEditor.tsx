@@ -1174,6 +1174,8 @@ function FocusPlugin({ initialEditorState }: { initialEditorState?: string }) {
     if (initialEditorState) {
       // Aguardar um pouco para garantir que o conteúdo foi carregado
       const timeoutId = setTimeout(() => {
+        console.log('🎯 InitialFocusPlugin: Iniciando busca por campo de header');
+        
         editor.update(() => {
           const root = $getRoot();
           
@@ -1183,6 +1185,7 @@ function FocusPlugin({ initialEditorState }: { initialEditorState?: string }) {
           const findFirstHeaderField = (node: LexicalNode): void => {
             if ($isHeaderFieldNode(node) && !firstHeaderField) {
               firstHeaderField = node as HeaderFieldNode;
+              console.log('✅ Encontrado HeaderFieldNode:', (node as HeaderFieldNode).getLabel());
               return;
             }
             
@@ -1199,15 +1202,35 @@ function FocusPlugin({ initialEditorState }: { initialEditorState?: string }) {
           
           // Se encontrou um HeaderFieldNode, focar nele
           if (firstHeaderField) {
-            setTimeout(() => {
+            // Aumentar delay e forçar foco múltiplas vezes
+            const focusField = () => {
               const headerLabel = firstHeaderField!.getLabel();
               const inputElement = document.querySelector(`[data-label="${headerLabel}"] input`) as HTMLInputElement;
               if (inputElement) {
+                console.log('🎯 Tentando focar no campo:', headerLabel);
                 inputElement.focus();
-                console.log('📍 Foco inicial posicionado no primeiro campo de header');
+                inputElement.click(); // Simular clique também
+                
+                // Verificar se o foco foi aplicado
+                setTimeout(() => {
+                  if (document.activeElement === inputElement) {
+                    console.log('✅ Foco inicial aplicado com sucesso no campo:', headerLabel);
+                  } else {
+                    console.log('❌ Falha ao aplicar foco. Elemento ativo:', document.activeElement);
+                  }
+                }, 100);
+              } else {
+                console.log('❌ Input não encontrado para o campo:', headerLabel);
               }
-            }, 50);
+            };
+            
+            // Tentar focar múltiplas vezes com delays diferentes
+            // Delays aumentados para ocorrer após o grace period do EditProtectionPlugin
+            setTimeout(focusField, 2100);  // Após 2s do grace period
+            setTimeout(focusField, 2500);
+            setTimeout(focusField, 3000);
           } else {
+            console.log('❌ Nenhum HeaderFieldNode encontrado no documento');
             // Caso contrário, usar o comportamento padrão
             const lastChild = root.getLastChild();
             
@@ -1788,7 +1811,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                   } catch (error) {
                     console.error('❌ DEBUG: Erro ao posicionar cursor:', error);
                   }
-                }, 100); // Pequeno delay após criação dos campos
+                }, 2100); // Delay após grace period do EditProtectionPlugin
               } else {
                 console.log('⚠️ DEBUG: Container de campos já existe');
                 
@@ -1824,7 +1847,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                   } catch (error) {
                     console.error('❌ DEBUG: Erro ao posicionar cursor:', error);
                   }
-                }, 100);
+                }, 2100); // Delay após grace period do EditProtectionPlugin
               }
             });
           } catch (error) {
