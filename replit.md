@@ -45,6 +45,9 @@ Preferred communication style: Simple, everyday language.
   - Included comprehensive mock data for different subsystems with realistic menu structures
   - Added proper loading states, toast notifications, and error handling
   - Implemented data exchange functionality for integration with composer workflow
+  - Updated to show full path in monospace badge instead of "Funcionalidade selecionada"
+  - Enhanced save functionality to send formatted path string: [Subsystem: NAME] - MENU -> SUBMENU -> FUNCIONALIDADE
+  - Plugin now returns structured path string directly to input field that invoked it
 
 ✓ COMPLETED: Plugin Validation with Toast Notifications (January 29, 2025)
   - Added comprehensive plugin validation when clicking unplug button in header fields

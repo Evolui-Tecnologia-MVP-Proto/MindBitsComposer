@@ -623,7 +623,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     }, 1000);
   };
 
-  // Função para construir o path completo hierárquico
+  // Função para construir o path completo hierárquico (display na badge)
   const getFullPath = (selectedId: string): string => {
     const findPathRecursively = (items: MenuPath[], targetId: string, currentPath: string[] = []): string[] | null => {
       for (const item of items) {
@@ -643,6 +643,33 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
     const pathArray = findPathRecursively(menuStructure, selectedId);
     return pathArray ? pathArray.join(' → ') : '';
+  };
+
+  // Função para construir o path no formato solicitado para envio
+  const getFormattedPathForSave = (selectedId: string): string => {
+    const findPathRecursively = (items: MenuPath[], targetId: string, currentPath: string[] = []): string[] | null => {
+      for (const item of items) {
+        const newPath = [...currentPath, item.name];
+        
+        if (item.id === targetId) {
+          return newPath;
+        }
+        
+        if (item.children) {
+          const found = findPathRecursively(item.children, targetId, newPath);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    const pathArray = findPathRecursively(menuStructure, selectedId);
+    if (!pathArray) return '';
+
+    const subsystemName = subsystems.find(s => s.code === selectedSubsystem)?.name || selectedSubsystem;
+    const pathString = pathArray.join(' -> ');
+    
+    return `[Subsystem: ${selectedSubsystem}] - ${pathString}`;
   };
 
   const handleSalvar = () => {
@@ -680,23 +707,23 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       return;
     }
 
-    const resultData = {
-      subsystem: subsystems.find(s => s.code === selectedSubsystem),
-      selectedFunction: selectedItem,
-      timestamp: new Date().toISOString()
-    };
+    // Gerar o caminho formatado para envio
+    const formattedPath = getFormattedPathForSave(selectedPath);
 
-    // Chamar função de troca de dados se disponível
+    // Enviar o caminho formatado como string para o campo input
     if (onDataExchange) {
-      onDataExchange(resultData);
+      onDataExchange({
+        value: formattedPath, // String formatada para o campo input
+        closeModal: true // Fechar o modal após salvar
+      });
     }
 
     toast({
       title: "Funcionalidade salva",
-      description: `Funcionalidade "${selectedItem.name}" foi salva com sucesso.`,
+      description: `Caminho "${formattedPath}" foi salvo com sucesso.`,
     });
 
-    console.log('Dados do plugin LTH Menus Path:', resultData);
+    console.log('Caminho salvo do plugin LTH Menus Path:', formattedPath);
   };
 
   const handleCancelar = () => {
