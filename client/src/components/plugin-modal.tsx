@@ -5,6 +5,7 @@ import FreeHandCanvasPlugin from "@/pages/plugins/freehand-canvas-plugin";
 import MermaidGraphPlugin from "@/pages/plugins/mermaid-graph-plugin";
 import SimpleExcalidrawPlugin from "@/pages/plugins/simple-excalidraw-plugin";
 import VectorGraphPlugin from "@/pages/plugins/vector-graph-plugin";
+import LthMenusPathPlugin from "@/pages/plugins/lth_menus_path_plugin";
 
 interface PluginModalProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ const PLUGIN_COMPONENTS: Record<string, React.ComponentType<any>> = {
   'mermaid-graph-plugin': MermaidGraphPlugin,
   'simple-excalidraw-plugin': SimpleExcalidrawPlugin,
   'vector-graph-plugin': VectorGraphPlugin,
+  'lth_menus_path_plugin': LthMenusPathPlugin,
 };
 
 export default function PluginModal({ 
