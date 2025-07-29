@@ -91,14 +91,15 @@ const availableIcons = {
   "Upload": Upload
 };
 
-// Tipos de plugin
+// Plugin types are now loaded dynamically from system_params table
+// Keeping some common types for fallback only
 const PluginType = {
-  DATA_SOURCE: "data_source",
-  AI_AGENT: "ai_agent",
-  CHART: "chart",
-  FORMATTER: "formatter",
-  INTEGRATION: "integration",
-  UTILITY: "utility"
+  DATA_SOURCE: "DATA_SOURCE",
+  AI_AGENT: "AI_AGENT",
+  CHART: "CHART",
+  FORMATTER: "FORMATTER",
+  INTEGRATION: "INTEGRATION",
+  UTILITY: "UTILITY"
 } as const;
 
 const PluginStatus = {
@@ -109,18 +110,11 @@ const PluginStatus = {
 
 
 
-// Schema para validação
+// Schema para validação - types are now dynamic from database
 const pluginFormSchema = z.object({
   name: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
   description: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"),
-  type: z.enum([
-    PluginType.DATA_SOURCE,
-    PluginType.AI_AGENT,
-    PluginType.CHART,
-    PluginType.FORMATTER,
-    PluginType.INTEGRATION,
-    PluginType.UTILITY
-  ]),
+  type: z.string().min(1, "Tipo é obrigatório"), // Accept any string from database
   version: z.string().min(1, "Versão é obrigatória"),
   author: z.string().optional(),
   icon: z.string().optional(),
@@ -648,12 +642,12 @@ export default function PluginsPage() {
                             <SelectItem value="loading" disabled>Carregando tipos...</SelectItem>
                           ) : pluginTypes.length === 0 ? (
                             <>
-                              <SelectItem value={PluginType.DATA_SOURCE}>Fonte de Dados</SelectItem>
-                              <SelectItem value={PluginType.AI_AGENT}>Agente de IA</SelectItem>
-                              <SelectItem value={PluginType.CHART}>Gráficos</SelectItem>
-                              <SelectItem value={PluginType.FORMATTER}>Formatador</SelectItem>
-                              <SelectItem value={PluginType.INTEGRATION}>Integração</SelectItem>
-                              <SelectItem value={PluginType.UTILITY}>Utilitário</SelectItem>
+                              <SelectItem value="DATA_SOURCE">Fonte de Dados</SelectItem>
+                              <SelectItem value="AI_AGENT">Agente de IA</SelectItem>
+                              <SelectItem value="CHART">Gráficos</SelectItem>
+                              <SelectItem value="FORMATTER">Formatador</SelectItem>
+                              <SelectItem value="INTEGRATION">Integração</SelectItem>
+                              <SelectItem value="UTILITY">Utilitário</SelectItem>
                             </>
                           ) : (
                             pluginTypes.map((type) => (

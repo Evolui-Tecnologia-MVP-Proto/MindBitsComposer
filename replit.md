@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Updates (January 29, 2025)
 
+✓ COMPLETED: Dynamic Plugin Type Validation Fix (January 29, 2025)
+  - Fixed plugin type validation error that was restricting types to old hardcoded enum values
+  - Updated shared/schema.ts PluginType enum to include all current database values (COMPOSER_ASSET, DOCUMENT_PART, etc.)
+  - Removed restrictive database schema constraint allowing plugins.type to accept any string value
+  - Updated client-side form validation (pluginFormSchema) to accept dynamic string types instead of enum restriction
+  - Plugin types now fully loaded from system_params table without validation conflicts
+  - System supports 9+ plugin types: DATA_SOURCE, AI_AGENT, CHART, FORMATTER, INTEGRATION, UTILITY, WORKFLOW, COMPOSER, DOCUMENT, COMPOSER_ASSET, DOCUMENT_PART, FLUX_ANALISER, FLUX_VALIDATOR
+  - Resolves "Invalid enum value" error when editing plugins with database-sourced types
+
 ✓ COMPLETED: Edit Protection Plugin - Prevents Editing Outside Collapsible Containers (January 29, 2025)
   - Created EditProtectionPlugin to restrict editing to CollapsibleContentNode areas only
   - Plugin intercepts key commands (Enter, Tab, Paste) and blocks execution outside valid containers
