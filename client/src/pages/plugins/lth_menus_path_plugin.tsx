@@ -17,7 +17,7 @@ interface MenuPath {
   path: string;
   parentId?: string;
   level: number;
-  type: 'menu' | 'submenu' | 'action';
+  type: 'menu' | 'submenu' | 'action' | 'item';
   subsystem: string;
   icon?: string;
   description?: string;
@@ -78,8 +78,78 @@ export default function LthMenusPathPlugin({ onDataExchange, selectedEdition }: 
                   path: "/documentos/consultar/busca-avancada",
                   parentId: "doc_1_1",
                   level: 2,
-                  type: "action",
-                  subsystem: "DOC"
+                  type: "submenu",
+                  subsystem: "DOC",
+                  icon: "Settings",
+                  children: [
+                    {
+                      id: "doc_1_1_1_1",
+                      name: "Por Data de Criação",
+                      path: "/documentos/consultar/busca-avancada/data-criacao",
+                      parentId: "doc_1_1_1",
+                      level: 3,
+                      type: "action",
+                      subsystem: "DOC"
+                    },
+                    {
+                      id: "doc_1_1_1_2",
+                      name: "Por Tipo de Documento",
+                      path: "/documentos/consultar/busca-avancada/tipo-documento",
+                      parentId: "doc_1_1_1",
+                      level: 3,
+                      type: "submenu",
+                      subsystem: "DOC",
+                      children: [
+                        {
+                          id: "doc_1_1_1_2_1",
+                          name: "Contratos",
+                          path: "/documentos/consultar/busca-avancada/tipo-documento/contratos",
+                          parentId: "doc_1_1_1_2",
+                          level: 4,
+                          type: "action",
+                          subsystem: "DOC"
+                        },
+                        {
+                          id: "doc_1_1_1_2_2",
+                          name: "Relatórios",
+                          path: "/documentos/consultar/busca-avancada/tipo-documento/relatorios",
+                          parentId: "doc_1_1_1_2",
+                          level: 4,
+                          type: "submenu",
+                          subsystem: "DOC",
+                          children: [
+                            {
+                              id: "doc_1_1_1_2_2_1",
+                              name: "Financeiros",
+                              path: "/documentos/consultar/busca-avancada/tipo-documento/relatorios/financeiros",
+                              parentId: "doc_1_1_1_2_2",
+                              level: 5,
+                              type: "action",
+                              subsystem: "DOC"
+                            },
+                            {
+                              id: "doc_1_1_1_2_2_2",
+                              name: "Operacionais",
+                              path: "/documentos/consultar/busca-avancada/tipo-documento/relatorios/operacionais",
+                              parentId: "doc_1_1_1_2_2",
+                              level: 5,
+                              type: "action",
+                              subsystem: "DOC"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      id: "doc_1_1_1_3",
+                      name: "Por Status",
+                      path: "/documentos/consultar/busca-avancada/status",
+                      parentId: "doc_1_1_1",
+                      level: 3,
+                      type: "action",
+                      subsystem: "DOC"
+                    }
+                  ]
                 },
                 {
                   id: "doc_1_1_2",
@@ -118,8 +188,28 @@ export default function LthMenusPathPlugin({ onDataExchange, selectedEdition }: 
               path: "/templates/gerenciar",
               parentId: "doc_2",
               level: 1,
-              type: "action",
-              subsystem: "DOC"
+              type: "submenu",
+              subsystem: "DOC",
+              children: [
+                {
+                  id: "doc_2_1_1",
+                  name: "Criar Template",
+                  path: "/templates/gerenciar/criar",
+                  parentId: "doc_2_1",
+                  level: 2,
+                  type: "action",
+                  subsystem: "DOC"
+                },
+                {
+                  id: "doc_2_1_2",
+                  name: "Editar Template",
+                  path: "/templates/gerenciar/editar",
+                  parentId: "doc_2_1",
+                  level: 2,
+                  type: "action",
+                  subsystem: "DOC"
+                }
+              ]
             }
           ]
         }
@@ -140,8 +230,48 @@ export default function LthMenusPathPlugin({ onDataExchange, selectedEdition }: 
               path: "/funcionarios/cadastro",
               parentId: "rh_1",
               level: 1,
-              type: "action",
-              subsystem: "RH"
+              type: "submenu",
+              subsystem: "RH",
+              children: [
+                {
+                  id: "rh_1_1_1",
+                  name: "Dados Pessoais",
+                  path: "/funcionarios/cadastro/dados-pessoais",
+                  parentId: "rh_1_1",
+                  level: 2,
+                  type: "action",
+                  subsystem: "RH"
+                },
+                {
+                  id: "rh_1_1_2",
+                  name: "Dados Funcionais",
+                  path: "/funcionarios/cadastro/dados-funcionais",
+                  parentId: "rh_1_1",
+                  level: 2,
+                  type: "submenu",
+                  subsystem: "RH",
+                  children: [
+                    {
+                      id: "rh_1_1_2_1",
+                      name: "Cargo e Salário",
+                      path: "/funcionarios/cadastro/dados-funcionais/cargo-salario",
+                      parentId: "rh_1_1_2",
+                      level: 3,
+                      type: "action",
+                      subsystem: "RH"
+                    },
+                    {
+                      id: "rh_1_1_2_2",
+                      name: "Horário de Trabalho",
+                      path: "/funcionarios/cadastro/dados-funcionais/horario",
+                      parentId: "rh_1_1_2",
+                      level: 3,
+                      type: "action",
+                      subsystem: "RH"
+                    }
+                  ]
+                }
+              ]
             },
             {
               id: "rh_1_2",
@@ -171,8 +301,48 @@ export default function LthMenusPathPlugin({ onDataExchange, selectedEdition }: 
               path: "/contas-pagar/lancamentos",
               parentId: "fin_1",
               level: 1,
-              type: "action",
-              subsystem: "FIN"
+              type: "submenu",
+              subsystem: "FIN",
+              children: [
+                {
+                  id: "fin_1_1_1",
+                  name: "Manual",
+                  path: "/contas-pagar/lancamentos/manual",
+                  parentId: "fin_1_1",
+                  level: 2,
+                  type: "action",
+                  subsystem: "FIN"
+                },
+                {
+                  id: "fin_1_1_2",
+                  name: "Importação",
+                  path: "/contas-pagar/lancamentos/importacao",
+                  parentId: "fin_1_1",
+                  level: 2,
+                  type: "submenu",
+                  subsystem: "FIN",
+                  children: [
+                    {
+                      id: "fin_1_1_2_1",
+                      name: "Excel/CSV",
+                      path: "/contas-pagar/lancamentos/importacao/excel",
+                      parentId: "fin_1_1_2",
+                      level: 3,
+                      type: "action",
+                      subsystem: "FIN"
+                    },
+                    {
+                      id: "fin_1_1_2_2",
+                      name: "Integração Bancária",
+                      path: "/contas-pagar/lancamentos/importacao/bancaria",
+                      parentId: "fin_1_1_2",
+                      level: 3,
+                      type: "action",
+                      subsystem: "FIN"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         }
@@ -193,8 +363,28 @@ export default function LthMenusPathPlugin({ onDataExchange, selectedEdition }: 
               path: "/obrigacoes/dctf",
               parentId: "trib_1",
               level: 1,
-              type: "action",
-              subsystem: "TRIB"
+              type: "submenu",
+              subsystem: "TRIB",
+              children: [
+                {
+                  id: "trib_1_1_1",
+                  name: "Gerar Arquivo",
+                  path: "/obrigacoes/dctf/gerar",
+                  parentId: "trib_1_1",
+                  level: 2,
+                  type: "action",
+                  subsystem: "TRIB"
+                },
+                {
+                  id: "trib_1_1_2",
+                  name: "Validar Arquivo",
+                  path: "/obrigacoes/dctf/validar",
+                  parentId: "trib_1_1",
+                  level: 2,
+                  type: "action",
+                  subsystem: "TRIB"
+                }
+              ]
             }
           ]
         }
@@ -215,8 +405,48 @@ export default function LthMenusPathPlugin({ onDataExchange, selectedEdition }: 
               path: "/plano-contas/gerenciar",
               parentId: "cont_1",
               level: 1,
-              type: "action",
-              subsystem: "CONT"
+              type: "submenu",
+              subsystem: "CONT",
+              children: [
+                {
+                  id: "cont_1_1_1",
+                  name: "Contas Analíticas",
+                  path: "/plano-contas/gerenciar/analiticas",
+                  parentId: "cont_1_1",
+                  level: 2,
+                  type: "submenu",
+                  subsystem: "CONT",
+                  children: [
+                    {
+                      id: "cont_1_1_1_1",
+                      name: "Ativo",
+                      path: "/plano-contas/gerenciar/analiticas/ativo",
+                      parentId: "cont_1_1_1",
+                      level: 3,
+                      type: "action",
+                      subsystem: "CONT"
+                    },
+                    {
+                      id: "cont_1_1_1_2",
+                      name: "Passivo",
+                      path: "/plano-contas/gerenciar/analiticas/passivo",
+                      parentId: "cont_1_1_1",
+                      level: 3,
+                      type: "action",
+                      subsystem: "CONT"
+                    }
+                  ]
+                },
+                {
+                  id: "cont_1_1_2",
+                  name: "Contas Sintéticas",
+                  path: "/plano-contas/gerenciar/sinteticas",
+                  parentId: "cont_1_1",
+                  level: 2,
+                  type: "action",
+                  subsystem: "CONT"
+                }
+              ]
             }
           ]
         }
@@ -332,9 +562,14 @@ export default function LthMenusPathPlugin({ onDataExchange, selectedEdition }: 
                     ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400'
                     : item.type === 'submenu'
                     ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400'
-                    : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
+                    : item.type === 'action'
+                    ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
+                    : 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400'
                 }`}>
-                  {item.type === 'menu' ? 'Menu' : item.type === 'submenu' ? 'Submenu' : 'Ação'}
+                  {item.type === 'menu' ? 'Menu' : 
+                   item.type === 'submenu' ? 'Submenu' : 
+                   item.type === 'action' ? 'Ação' : 
+                   item.type.charAt(0).toUpperCase() + item.type.slice(1)}
                 </span>
               </div>
             </div>
