@@ -174,6 +174,7 @@ export default function PluginsPage() {
   const [testingPlugin, setTestingPlugin] = useState<Plugin | null>(null);
   const [testResult, setTestResult] = useState<any>(null);
   const [isTestingInProgress, setIsTestingInProgress] = useState(false);
+  const [jsonValidationResult, setJsonValidationResult] = useState<{ isValid: boolean; message: string; error?: string } | null>(null);
 
   const { toast } = useToast();
 
@@ -290,6 +291,9 @@ export default function PluginsPage() {
       author: "",
       icon: "Puzzle",
     });
+    setConfigurationJson('');
+    setJsonValidationResult(null);
+    setActivePluginTab('geral');
     setIsModalOpen(true);
   };
 
@@ -306,6 +310,7 @@ export default function PluginsPage() {
     });
     // Carregar configuração JSON
     setConfigurationJson(JSON.stringify(plugin.configuration || {}, null, 2));
+    setJsonValidationResult(null);
     setActivePluginTab('geral');
     setIsModalOpen(true);
   };
@@ -834,7 +839,11 @@ export default function PluginsPage() {
                       <Textarea
                         id="config-json"
                         value={configurationJson}
-                        onChange={(e) => setConfigurationJson(e.target.value)}
+                        onChange={(e) => {
+                          setConfigurationJson(e.target.value);
+                          // Limpar resultado de validação quando o conteúdo mudar
+                          setJsonValidationResult(null);
+                        }}
                         placeholder={`{
   "apiUrl": "https://api.exemplo.com",
   "timeout": 5000,
@@ -847,22 +856,80 @@ export default function PluginsPage() {
                         className="min-h-[300px] font-mono text-sm"
                       />
                       {configurationJson && (
-                        <div className="mt-2">
+                        <div className="mt-2 space-y-3">
                           <Button
                             type="button"
                             variant="outline"
                             size="sm"
                             onClick={() => {
                               try {
-                                JSON.parse(configurationJson);
-                                alert("JSON válido!");
+                                const parsed = JSON.parse(configurationJson);
+                                setJsonValidationResult({
+                                  isValid: true,
+                                  message: "JSON válido e formatado corretamente!",
+                                });
                               } catch (error) {
-                                alert("JSON inválido: " + (error as Error).message);
+                                setJsonValidationResult({
+                                  isValid: false,
+                                  message: "JSON inválido",
+                                  error: (error as Error).message
+                                });
                               }
                             }}
                           >
                             Validar JSON
                           </Button>
+                          
+                          {/* Área de resultado da validação */}
+                          {jsonValidationResult && (
+                            <div className={`p-3 rounded-lg border ${
+                              jsonValidationResult.isValid 
+                                ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
+                                : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+                            }`}>
+                              <div className="flex items-start gap-2">
+                                {jsonValidationResult.isValid ? (
+                                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 dark:bg-green-800 flex items-center justify-center mt-0.5">
+                                    <svg className="w-3 h-3 text-green-600 dark:text-green-300" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    </svg>
+                                  </div>
+                                ) : (
+                                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-red-100 dark:bg-red-800 flex items-center justify-center mt-0.5">
+                                    <svg className="w-3 h-3 text-red-600 dark:text-red-300" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                    </svg>
+                                  </div>
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <p className={`text-sm font-medium ${
+                                    jsonValidationResult.isValid 
+                                      ? 'text-green-800 dark:text-green-200' 
+                                      : 'text-red-800 dark:text-red-200'
+                                  }`}>
+                                    {jsonValidationResult.message}
+                                  </p>
+                                  {!jsonValidationResult.isValid && jsonValidationResult.error && (
+                                    <p className="text-sm text-red-600 dark:text-red-300 mt-1 font-mono">
+                                      {jsonValidationResult.error}
+                                    </p>
+                                  )}
+                                </div>
+                                <button
+                                  onClick={() => setJsonValidationResult(null)}
+                                  className={`flex-shrink-0 rounded-md p-1.5 ${
+                                    jsonValidationResult.isValid
+                                      ? 'text-green-500 hover:bg-green-200 dark:text-green-400 dark:hover:bg-green-800'
+                                      : 'text-red-500 hover:bg-red-200 dark:text-red-400 dark:hover:bg-red-800'
+                                  }`}
+                                >
+                                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
