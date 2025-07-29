@@ -1522,11 +1522,6 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           // Abrir o modal do plugin
           setSelectedPlugin(plugin);
           setIsPluginModalOpen(true);
-          
-          toast({
-            title: "Abrindo plugin",
-            description: `Plugin "${plugin.name}" sendo carregado...`,
-          });
         })
         .catch(error => {
           console.error('❌ Erro ao verificar plugin:', error);
