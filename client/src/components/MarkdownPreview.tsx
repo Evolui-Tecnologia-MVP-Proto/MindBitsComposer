@@ -517,7 +517,6 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
       // Clean up table row - normalize spaces and ensure proper pipe formatting
       const cleanRow = line.trim()
         .replace(/\s+/g, ' ') // Normalize whitespace
-        .replace(/\|\s*\|\s*\|/g, '| |') // Fix empty cells with multiple pipes
         .replace(/^\s*\|/, '|') // Ensure starts with pipe
         .replace(/\|\s*$/, '|'); // Ensure ends with pipe
       tableRows.push(cleanRow);
