@@ -324,7 +324,12 @@ export default function HomePage() {
       exec.documentId === documentId
     );
     
-    console.log(`[DEBUG] Execuções para documento ${documentId}:`, allDocumentExecutions);
+    if (allDocumentExecutions.length > 0) {
+      console.log(`[DEBUG] Execuções para documento ${documentId}:`, allDocumentExecutions);
+      console.log(`[DEBUG] Primeira execução:`, allDocumentExecutions[0]);
+      console.log(`[DEBUG] Status:`, allDocumentExecutions[0].status);
+      console.log(`[DEBUG] ExecutionData:`, allDocumentExecutions[0].executionData);
+    }
     
     // Try to find active executions (initiated status)
     const activeExecutions = allDocumentExecutions.filter((exec: any) => 
@@ -345,7 +350,11 @@ export default function HomePage() {
         ? JSON.parse(mostRecent.executionData) 
         : mostRecent.executionData || {};
       
-      console.log(`[DEBUG] Usando execução mais recente:`, mostRecent.status, executionData);
+      console.log(`[DEBUG] Nenhuma execução iniciada. Usando mais recente:`, {
+        status: mostRecent.status,
+        flowCode: executionData.flowCode,
+        flowName: executionData.flowName
+      });
       
       return {
         flowCode: executionData.flowCode || '',
