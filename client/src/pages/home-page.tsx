@@ -126,6 +126,18 @@ export default function HomePage() {
     return doc.status === "Em Processo" && doc.userId === user?.id;
   });
 
+  // Função para formatar datas
+  const formatDate = (dateString: string | Date | null) => {
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(date);
+  };
+
 
 
   // Funções auxiliares para formatação da tabela
@@ -309,23 +321,37 @@ export default function HomePage() {
               </Badge>
             </div>
             
-            <div className="bg-white dark:bg-[#0F172A] rounded-lg border dark:border-[#374151] overflow-hidden">
+            <div className="border rounded-lg dark:border-[#374151] dark:bg-[#111827]">
               <Table>
-                <TableHeader>
-                  <TableRow className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151]">
-                    <TableHead className="dark:text-gray-200">Origem</TableHead>
-                    <TableHead className="dark:text-gray-200">Descrição</TableHead>
-                    <TableHead className="dark:text-gray-200">Responsável</TableHead>
-                    <TableHead className="dark:text-gray-200">Sistema</TableHead>
-                    <TableHead className="dark:text-gray-200">Módulo</TableHead>
-                    <TableHead className="dark:text-gray-200">Tsk.Status</TableHead>
-                    <TableHead className="text-right dark:text-gray-200">Ações</TableHead>
+                <TableHeader className="sticky top-0 bg-white dark:bg-[#111827] z-10 shadow-sm">
+                  <TableRow>
+                    <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
+                      Origem
+                    </TableHead>
+                    <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
+                      Nome
+                    </TableHead>
+                    <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
+                      Incluído
+                    </TableHead>
+                    <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
+                      Iniciado
+                    </TableHead>
+                    <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
+                      Status
+                    </TableHead>
+                    <TableHead className="w-[120px] bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
+                      Tsk.Status
+                    </TableHead>
+                    <TableHead className="text-right bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
+                      Ações
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {documentosEmProcessoDoUsuario.map((documento) => (
-                    <TableRow key={documento.id} className="dark:border-[#374151]">
-                      <TableCell className="dark:text-gray-200">
+                    <TableRow key={documento.id}>
+                      <TableCell>
                         <div className="flex items-center">
                           {documento.origem === "Monday" ? (
                             <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded text-xs font-medium">
@@ -338,53 +364,86 @@ export default function HomePage() {
                           )}
                         </div>
                       </TableCell>
-                      <TableCell className="font-medium dark:text-gray-200 max-w-md">
-                        <div className="truncate" title={documento.objeto}>
-                          {documento.objeto}
+                      <TableCell className="font-medium">{documento.objeto}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center text-gray-500 text-sm">
+                          <Clock className="mr-1.5 h-3.5 w-3.5" />
+                          {formatDate(documento.createdAt)}
                         </div>
                       </TableCell>
-                      <TableCell className="dark:text-gray-200">
-                        {documento.responsavel || "-"}
-                      </TableCell>
-                      <TableCell className="dark:text-gray-200">
-                        {documento.sistema || "-"}
-                      </TableCell>
-                      <TableCell className="dark:text-gray-200">
-                        {documento.modulo || "-"}
+                      <TableCell>
+                        <div className="flex items-center text-gray-500 text-sm">
+                          <Clock className="mr-1.5 h-3.5 w-3.5" />
+                          {formatDate(documento.updatedAt)}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <Badge
-                          variant={
-                            documento.taskStatus === "Ação Pendente" ? "default" as any :
-                            documento.taskStatus === "Documentando" ? "secondary" as any :
-                            documento.taskStatus === "Em aprovação" ? "outline" as any :
-                            documento.taskStatus === "Concluído" ? "default" as any :
-                            documento.taskStatus === "Bloqueado" ? "destructive" as any :
-                            documento.taskStatus === "Em revisão" ? "secondary" as any :
-                            "default" as any
-                          }
-                          className={`flex items-center gap-1 whitespace-nowrap w-fit ${
-                            documento.taskStatus === "Ação Pendente" ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 border-yellow-300 dark:border-yellow-600" :
-                            documento.taskStatus === "Documentando" ? "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400 border-purple-300 dark:border-purple-600" :
-                            documento.taskStatus === "Em aprovação" ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 border-green-300 dark:border-green-600" :
-                            documento.taskStatus === "Concluído" ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 border-blue-300 dark:border-blue-600" :
-                            documento.taskStatus === "Bloqueado" ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 border-red-300 dark:border-red-600" :
-                            documento.taskStatus === "Em revisão" ? "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400 border-orange-300 dark:border-orange-600" :
-                            "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400 border-gray-300 dark:border-gray-600"
-                          }`}
+                          variant={getStatusBadgeVariant(documento.status) as any}
+                          className="flex items-center gap-1 whitespace-nowrap"
                         >
-                          {documento.taskStatus || "-"}
+                          {getStatusIcon(documento.status)}
+                          {documento.status}
                         </Badge>
                       </TableCell>
+                      <TableCell>
+                        {(() => {
+                          if (!documento.taskState || documento.taskState === '') {
+                            return (
+                              <Badge variant="secondary" className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 border-yellow-200 dark:border-yellow-600">
+                                Ação Pendente
+                              </Badge>
+                            );
+                          } else if (documento.taskState === 'in_doc') {
+                            return (
+                              <Badge variant="secondary" className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400 border-purple-200 dark:border-purple-600">
+                                Documentando
+                              </Badge>
+                            );
+                          } else if (documento.taskState === 'in_apr') {
+                            return (
+                              <Badge variant="secondary" className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 border-green-200 dark:border-green-600">
+                                Em aprovação
+                              </Badge>
+                            );
+                          } else if (documento.taskState === 'completed') {
+                            return (
+                              <Badge variant="secondary" className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 border-blue-200 dark:border-blue-600">
+                                Concluído
+                              </Badge>
+                            );
+                          } else if (documento.taskState === 'blocked') {
+                            return (
+                              <Badge variant="secondary" className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 border-red-200 dark:border-red-600">
+                                Bloqueado
+                              </Badge>
+                            );
+                          } else if (documento.taskState === 'review') {
+                            return (
+                              <Badge variant="secondary" className="bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400 border-orange-200 dark:border-orange-600">
+                                Em revisão
+                              </Badge>
+                            );
+                          } else {
+                            return (
+                              <Badge variant="secondary" className="bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400 border-gray-200 dark:border-gray-600">
+                                {documento.taskState}
+                              </Badge>
+                            );
+                          }
+                        })()}
+                      </TableCell>
                       <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() => openViewModal(documento)}
-                        >
-                          <Eye className="h-4 w-4 text-blue-500" />
-                        </Button>
+                        <div className="flex justify-end space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => openViewModal(documento)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
