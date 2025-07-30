@@ -133,9 +133,11 @@ export function FlowDiagramModal({
         }}
       >
         <DialogHeader className="flex-shrink-0">
-          <DialogTitle className="flex items-center gap-2 dark:text-gray-200">
-            <Network className="h-5 w-5 dark:text-blue-400" />
-            Diagrama do Fluxo - {flowDiagramModal.documentTitle}
+          <DialogTitle className="dark:text-gray-200">
+            <span className="flex items-center gap-2">
+              <Network className="h-5 w-5 dark:text-blue-400" />
+              Diagrama do Fluxo - {flowDiagramModal.documentTitle}
+            </span>
           </DialogTitle>
           {flowDiagramModal.documentObject && (
             <DialogDescription className="text-sm font-medium text-gray-700 dark:text-gray-300">
