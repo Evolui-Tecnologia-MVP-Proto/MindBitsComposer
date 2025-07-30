@@ -4901,3 +4901,25 @@ html:not(.dark) [data-radix-dialog-content] .h-full.flex.flex-col.bg-white h3 {
 main:has([data-page="documentos"]) {
   overflow: hidden !important;
 }
+
+/* REPOSITORY TAB FULL HEIGHT */
+[data-radix-tabs-content="repositorio"] {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 220px) !important; /* Adjusts for header, tabs and footer with 10px margin */
+  margin-bottom: 10px;
+}
+
+[data-radix-tabs-content="repositorio"] > div {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+[data-radix-tabs-content="repositorio"] .space-y-6 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}

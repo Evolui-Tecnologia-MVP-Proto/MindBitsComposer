@@ -34,8 +34,8 @@ export function GitHubTab({
 }: GitHubTabProps) {
   const queryClient = useQueryClient();
   return (
-    <div className="space-y-6 bg-white dark:bg-[#0F172A] p-6 rounded-lg">
-      <div className="bg-white dark:bg-[#0F172A] rounded-lg border dark:border-[#374151] p-6">
+    <div className="flex flex-col h-full bg-white dark:bg-[#0F172A]">
+      <div className="bg-white dark:bg-[#0F172A] rounded-lg border dark:border-[#374151] p-6 flex-1 flex flex-col">
         <div className="flex items-center justify-between mb-6 flex-shrink-0">
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">
@@ -112,8 +112,8 @@ export function GitHubTab({
           </div>
         </div>
 
-        <div className="border-t dark:border-[#374151] pt-6 bg-white dark:bg-[#0F172A] p-4 rounded-lg">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="border-t dark:border-[#374151] pt-6 bg-white dark:bg-[#0F172A] p-4 rounded-lg flex-1 overflow-y-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
             <div className="space-y-4 bg-white dark:bg-[#1F2937] p-4 rounded-lg">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="font-medium text-gray-900 dark:text-[#E5E7EB]">
