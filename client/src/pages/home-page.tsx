@@ -122,73 +122,16 @@ export default function HomePage() {
   }, {} as Record<string, number>);
 
   // Filtrar documentos integrados do usuário logado
-  const documentosIntegrados = documentos.filter(doc => doc.status === "Integrado");
-  
-  console.log("🔍 DEBUG - Dados disponíveis:", {
+  const documentosIntegradosDoUsuario = documentos.filter(doc => {
+    return doc.status === "Integrado" && doc.userId === user?.id;
+  });
+
+  console.log("🔍 DEBUG - Filtro simples correto:", {
     totalDocumentos: documentos.length,
-    documentosIntegrados: documentosIntegrados.length,
+    documentosIntegrados: documentos.filter(doc => doc.status === "Integrado").length,
     userId: user?.id,
-    userName: user?.name,
-    totalEditions: (documentEditions as any[]).length
+    documentosIntegradosDoUsuario: documentosIntegradosDoUsuario.length
   });
-
-  console.log("🔍 DEBUG - Primeiros documentos integrados:", 
-    documentosIntegrados.slice(0, 3).map(doc => ({
-      id: doc.id,
-      objeto: doc.objeto?.substring(0, 50) + "...",
-      status: doc.status,
-      userId: doc.userId,
-      origem: doc.origem
-    }))
-  );
-
-  console.log("🔍 DEBUG - Primeiras edições:", 
-    (documentEditions as any[]).slice(0, 5).map((edition: any) => ({
-      id: edition.id,
-      documentId: edition.documentId,
-      startedBy: edition.startedBy,
-      status: edition.status
-    }))
-  );
-
-  // Verificar se há edições do usuário atual
-  const edicoesDoUsuario = (documentEditions as any[]).filter((edition: any) => edition.startedBy === user?.id);
-  console.log("🔍 DEBUG - Edições do usuário atual:", edicoesDoUsuario.length, edicoesDoUsuario.map((e: any) => ({
-    documentId: e.documentId,
-    status: e.status
-  })));
-
-  // Verificar quais documentos integrados têm edições do usuário
-  const documentosComEdicoes = documentosIntegrados.filter(doc => {
-    const userEditions = (documentEditions as any[]).filter((edition: any) => 
-      edition.documentId === doc.id && edition.startedBy === user?.id
-    );
-    return userEditions.length > 0;
-  });
-  console.log("🔍 DEBUG - Documentos integrados com edições do usuário:", documentosComEdicoes.length);
-
-  const documentosIntegradosDoUsuario = documentosIntegrados.filter(doc => {
-    // Verificar se o documento foi iniciado pelo usuário logado
-    if (doc.userId === user?.id) {
-      console.log("✅ Documento do usuário encontrado:", doc.objeto?.substring(0, 50));
-      return true;
-    }
-    
-    // Verificar se há edições do usuário logado
-    const userEditions = (documentEditions as any[]).filter((edition: any) => 
-      edition.documentId === doc.id && 
-      edition.startedBy === user?.id
-    );
-    
-    if (userEditions.length > 0) {
-      console.log("✅ Documento com edição do usuário encontrado:", doc.objeto?.substring(0, 50));
-      return true;
-    }
-    
-    return false;
-  });
-
-  console.log("🎯 RESULTADO - Documentos integrados do usuário:", documentosIntegradosDoUsuario.length);
 
 
 
