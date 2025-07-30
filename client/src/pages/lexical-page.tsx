@@ -2344,8 +2344,12 @@ export default function LexicalPage() {
             <AlertDialogTitle className="dark:text-gray-200">
               Confirmação de Finalização
             </AlertDialogTitle>
-            <AlertDialogDescription className="dark:text-gray-300">
-              Atenção: Finalizando a edição do documento você o libera para que seja processado para as fases consecutivas do fluxo definido. Esta ação não poderá ser desfeita caso alguma fase posterior seja processada. Confima a finalização do documento e efetiva disponibilização para a próxima fase?
+            <AlertDialogDescription asChild>
+              <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-600 rounded-lg p-4 mt-4">
+                <p className="text-yellow-800 dark:text-yellow-400">
+                  <span className="font-bold">Atenção:</span> Finalizando a edição do documento você o libera para que seja processado para as fases consecutivas do fluxo definido. Esta ação não poderá ser desfeita caso alguma fase posterior seja processada. Confima a finalização do documento e efetiva disponibilização para a próxima fase?
+                </p>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
