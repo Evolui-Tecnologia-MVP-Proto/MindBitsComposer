@@ -139,12 +139,13 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Applied overflow: hidden !important to disable scrollbar exclusively on documentos page
   - Solution maintains visual layout while preventing main area scrolling without affecting other pages
 
-✓ COMPLETED: Repository Tab Full Height Container (January 30, 2025)
-  - Modified repository tab container to occupy all available area below tabs with 10px footer margin
-  - Added CSS rules for [data-radix-tabs-content="repositorio"] with height: calc(100vh - 220px)
-  - Updated GitHubTab component structure to use flex layout with h-full and flex-1 classes
-  - Applied overflow-y-auto to inner grid container for proper scrolling within repository content
-  - Ensures repository tab maximizes available vertical space for better content visibility
+✓ COMPLETED: Repository Tab Dynamic Height Container (January 30, 2025)
+  - Modified repository tab to use dynamic flexbox layout instead of fixed height calculations
+  - Added CSS rules for tabs-root class with flex display and dynamic height adjustment
+  - Updated documentos page containers to use flex layout with h-full classes
+  - Applied padding-bottom: 10px to maintain footer margin without fixed height
+  - Repository tab now dynamically adjusts to available viewport height
+  - Ensures proper content scrolling within repository tab while maintaining responsive layout
 
 ✓ COMPLETED: DateTime Formatting in Field Mapping (January 29, 2025)
   - Implemented automatic datetime formatting to DD/MM/AAAA format when mapping datetime fields

@@ -1622,8 +1622,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   }
 
   return (
-    <div className="container mx-auto py-6 bg-background dark:bg-[#1F2937] text-foreground" data-page="documentos">
-      <div className="space-y-6 bg-[#F9FAFB] dark:bg-[#1F2937]">
+    <div className="container mx-auto py-6 bg-background dark:bg-[#1F2937] text-foreground h-full flex flex-col" data-page="documentos">
+      <div className="space-y-6 bg-[#F9FAFB] dark:bg-[#1F2937] flex flex-col h-full">
         <div className="flex items-center justify-between p-6 rounded-lg bg-gray-50 dark:bg-[#0F172A]">
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-[#6B7280] flex items-center gap-3">
             <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
@@ -1648,7 +1648,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           defaultValue="incluidos"
           value={activeTab}
           onValueChange={setActiveTab}
-          className="w-full"
+          className="w-full tabs-root flex flex-col h-full"
         >
           <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-[#0F172A] mb-6">
             <TabsTrigger value="incluidos" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Incluídos</TabsTrigger>
