@@ -10,6 +10,7 @@ import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, 
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useConfirmationToast } from "@/hooks/use-confirmation-toast";
 import { useNavigationGuard } from "@/hooks/use-navigation-guard";
@@ -103,6 +104,7 @@ export default function LexicalPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [viewMode, setViewMode] = useState<'editor' | 'preview' | 'mdx'>('editor');
   const [selectedEdition, setSelectedEdition] = useState<any>(null);
+  const [showFinalizeModal, setShowFinalizeModal] = useState(false);
   const [editorState, setEditorState] = useState<string>('');
   const [initialEditorState, setInitialEditorState] = useState<string | undefined>(undefined);
   const [editorKey, setEditorKey] = useState<number>(0); // Chave para forçar re-render do editor
@@ -1676,7 +1678,7 @@ export default function LexicalPage() {
                   <Save className="w-4 h-4" />
                 </Button>
                 <Button
-                  onClick={() => {}} // Placeholder for future functionality
+                  onClick={() => setShowFinalizeModal(true)}
                   variant="outline"
                   size="sm"
                   className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
@@ -2334,6 +2336,37 @@ export default function LexicalPage() {
         onSave={handleSaveFile}
         defaultFilename={getDefaultFilename()}
       />
+
+      {/* Modal de Confirmação para Finalizar */}
+      <AlertDialog open={showFinalizeModal} onOpenChange={setShowFinalizeModal}>
+        <AlertDialogContent className="dark:bg-[#0F1729] dark:border-[#374151]">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="dark:text-gray-200">
+              Confirmação de Finalização
+            </AlertDialogTitle>
+            <AlertDialogDescription className="dark:text-gray-300">
+              Atenção: Finalizando a edição do documento você o libera para que seja processado para as fases consecutivas do fluxo definido. Esta ação não poderá ser desfeita caso alguma fase posterior seja processada. Confima a finalização do documento e efetiva disponibilização para a próxima fase?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel 
+              onClick={() => setShowFinalizeModal(false)}
+              className="dark:bg-[#374151] dark:text-gray-200 dark:border-[#374151] dark:hover:bg-[#4B5563]"
+            >
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => {
+                // TODO: Implementar funcionalidade de finalização
+                setShowFinalizeModal(false);
+              }}
+              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
+            >
+              Confirmar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Plugin Modal */}
       {selectedPlugin && (
