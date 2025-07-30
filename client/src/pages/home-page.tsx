@@ -121,14 +121,17 @@ export default function HomePage() {
     return acc;
   }, {} as Record<string, number>);
 
+  // Filtrar documentos integrados
+  const documentosIntegrados = documentos.filter(doc => doc.status === "Integrado");
+  
   // Filtrar documentos integrados do usuário logado
-  const documentosIntegradosDoUsuario = documentos.filter(doc => {
-    return doc.status === "Integrado" && doc.userId === user?.id;
+  const documentosIntegradosDoUsuario = documentosIntegrados.filter(doc => {
+    return doc.userId === user?.id;
   });
 
   console.log("🔍 DEBUG - Filtro simples correto:", {
     totalDocumentos: documentos.length,
-    documentosIntegrados: documentos.filter(doc => doc.status === "Integrado").length,
+    documentosIntegrados: documentosIntegrados.length,
     userId: user?.id,
     documentosIntegradosDoUsuario: documentosIntegradosDoUsuario.length
   });
