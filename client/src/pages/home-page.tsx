@@ -3,13 +3,30 @@ import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { 
   BookOpen, 
   Clock, 
   CheckCircle2, 
   AlertCircle,
   User,
-  Play
+  Play,
+  Eye,
+  FileText
 } from "lucide-react";
 import { type Documento, type Specialty } from "@shared/schema";
 import { DocumentReviewModal } from "@/components/review/DocumentReviewModal";
@@ -18,6 +35,8 @@ export default function HomePage() {
   const { user } = useAuth();
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedResponsavel, setSelectedResponsavel] = useState<string>("");
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<Documento | null>(null);
 
   // Buscar todos os documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
@@ -101,6 +120,52 @@ export default function HomePage() {
     acc[responsavel] = (acc[responsavel] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
+
+  // Filtrar documentos integrados do usuário logado
+  const documentosIntegradosDoUsuario = documentos.filter(doc => {
+    // Documento deve estar "Integrado"
+    if (doc.status !== "Integrado") return false;
+    
+    // Verificar se o documento foi iniciado pelo usuário logado
+    if (doc.userId === user?.id) return true;
+    
+    // Verificar se há edições do usuário logado
+    const userEditions = (documentEditions as any[]).filter((edition: any) => 
+      edition.documentId === doc.id && 
+      edition.startedBy === user?.id
+    );
+    
+    return userEditions.length > 0;
+  });
+
+  // Funções auxiliares para formatação da tabela
+  const formatDate = (date: Date | null) => {
+    if (!date) return "-";
+    return new Date(date).toLocaleDateString("pt-BR");
+  };
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case "Integrado": return "secondary";
+      case "Em Processo": return "default";
+      case "Concluido": return "default";
+      default: return "secondary";
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "Integrado": return <CheckCircle2 className="h-3 w-3" />;
+      case "Em Processo": return <Clock className="h-3 w-3" />;
+      case "Concluido": return <CheckCircle2 className="h-3 w-3" />;
+      default: return <AlertCircle className="h-3 w-3" />;
+    }
+  };
+
+  const openViewModal = (documento: Documento) => {
+    setSelectedDocument(documento);
+    setViewModalOpen(true);
+  };
 
 
 
@@ -241,6 +306,89 @@ export default function HomePage() {
           </div>
         )}
 
+        {/* Meus Documentos Integrados */}
+        {documentosIntegradosDoUsuario.length > 0 && (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                Meus Documentos Integrados
+              </h2>
+              <Badge variant="outline" className="ml-2">
+                {documentosIntegradosDoUsuario.length}
+              </Badge>
+            </div>
+            
+            <div className="bg-white dark:bg-[#0F172A] rounded-lg border dark:border-[#374151] overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151]">
+                    <TableHead className="dark:text-gray-200">Origem</TableHead>
+                    <TableHead className="dark:text-gray-200">Descrição</TableHead>
+                    <TableHead className="dark:text-gray-200">Responsável</TableHead>
+                    <TableHead className="dark:text-gray-200">Sistema</TableHead>
+                    <TableHead className="dark:text-gray-200">Módulo</TableHead>
+                    <TableHead className="dark:text-gray-200">Status</TableHead>
+                    <TableHead className="text-right dark:text-gray-200">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {documentosIntegradosDoUsuario.map((documento) => (
+                    <TableRow key={documento.id} className="dark:border-[#374151]">
+                      <TableCell className="dark:text-gray-200">
+                        <div className="flex items-center">
+                          {documento.origem === "Monday" ? (
+                            <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded text-xs font-medium">
+                              Monday
+                            </div>
+                          ) : (
+                            <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400 px-2 py-1 rounded text-xs font-medium">
+                              {documento.origem}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell className="font-medium dark:text-gray-200 max-w-md">
+                        <div className="truncate" title={documento.objeto}>
+                          {documento.objeto}
+                        </div>
+                      </TableCell>
+                      <TableCell className="dark:text-gray-200">
+                        {documento.responsavel || "-"}
+                      </TableCell>
+                      <TableCell className="dark:text-gray-200">
+                        {documento.sistema || "-"}
+                      </TableCell>
+                      <TableCell className="dark:text-gray-200">
+                        {documento.modulo || "-"}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={getStatusBadgeVariant(documento.status) as any}
+                          className="flex items-center gap-1 whitespace-nowrap w-fit"
+                        >
+                          {getStatusIcon(documento.status)}
+                          {documento.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => openViewModal(documento)}
+                        >
+                          <Eye className="h-4 w-4 text-blue-500" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        )}
+
       </div>
 
       {/* Modal de Revisão */}
@@ -249,6 +397,78 @@ export default function HomePage() {
         onClose={() => setReviewModalOpen(false)}
         responsavel={selectedResponsavel}
       />
+
+      {/* Modal de Visualização de Documento */}
+      <Dialog open={viewModalOpen} onOpenChange={setViewModalOpen}>
+        <DialogContent className="max-w-4xl dark:bg-[#0F1729] dark:border-[#374151]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 dark:text-gray-200">
+              <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
+              Visualizar Documento
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedDocument && (
+            <div className="space-y-6">
+              {/* Informações Básicas */}
+              <div className="bg-gray-50 dark:bg-[#1E293B] p-4 rounded-lg border dark:border-[#374151]">
+                <h3 className="text-lg font-semibold mb-3 dark:text-gray-200">Informações Básicas</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Descrição</label>
+                    <p className="text-gray-900 dark:text-gray-300">{selectedDocument.objeto}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Status</label>
+                    <div className="mt-1">
+                      <Badge
+                        variant={getStatusBadgeVariant(selectedDocument.status) as any}
+                        className="flex items-center gap-1 whitespace-nowrap w-fit"
+                      >
+                        {getStatusIcon(selectedDocument.status)}
+                        {selectedDocument.status}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Origem</label>
+                    <p className="text-gray-900 dark:text-gray-300">{selectedDocument.origem}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Responsável</label>
+                    <p className="text-gray-900 dark:text-gray-300">{selectedDocument.responsavel || "Não informado"}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Sistema</label>
+                    <p className="text-gray-900 dark:text-gray-300">{selectedDocument.sistema || "Não informado"}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Módulo</label>
+                    <p className="text-gray-900 dark:text-gray-300">{selectedDocument.modulo || "Não informado"}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Cliente</label>
+                    <p className="text-gray-900 dark:text-gray-300">{selectedDocument.cliente || "Não informado"}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Data de Criação</label>
+                    <p className="text-gray-900 dark:text-gray-300">{formatDate(selectedDocument.createdAt)}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* ID do Documento */}
+              <div className="bg-gray-50 dark:bg-[#1E293B] p-4 rounded-lg border dark:border-[#374151]">
+                <h3 className="text-lg font-semibold mb-2 dark:text-gray-200">Identificação</h3>
+                <div>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">ID do Documento</label>
+                  <p className="text-gray-900 dark:text-gray-300 font-mono text-sm">{selectedDocument.id}</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
