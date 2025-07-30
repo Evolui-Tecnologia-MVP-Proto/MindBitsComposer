@@ -94,6 +94,17 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Invalidates all related queries to refresh document lists after processing
   - Exact same functionality as "Iniciar Documentação" in documentos page, but for multiple documents
 
+✓ COMPLETED: Full DocumentosTable Implementation on Home Page (January 30, 2025)
+  - Implemented complete table functionality from documentos page "em-processo" tab on home page
+  - Added "Fluxo Atual" column showing active flow information: [code] - name
+  - Implemented multi-flow dropdown when clicking Network button for documents with multiple flows
+  - Added flow execution counter badge (purple) showing number of executed flows per document
+  - Integrated functions: getActiveFlow, getDocumentFlows, handleFlowButtonClick
+  - Dropdown shows flow list with status badges and dates, opens FlowDiagramModal on selection
+  - Added useEffect for closing dropdown when clicking outside
+  - Table includes all 8 columns: Origem, Nome, Incluído, Iniciado, Fluxo Atual, Status, Tsk.Status, Ações
+  - Complete feature parity with documentos page table functionality
+
 ✓ COMPLETED: Changed Navigation Menu Item from "Home" to "Principal" (January 30, 2025)
   - Updated Sidebar.tsx to display "Principal" instead of "Home" for Portuguese localization
   - Menu item maintains same functionality and navigation behavior

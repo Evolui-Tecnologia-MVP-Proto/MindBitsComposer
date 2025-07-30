@@ -28,7 +28,8 @@ import {
   Eye,
   FileText,
   Network,
-  Loader2
+  Loader2,
+  ChevronDown
 } from "lucide-react";
 import { type Documento, type Specialty } from "@shared/schema";
 import { DocumentReviewModal } from "@/components/review/DocumentReviewModal";
@@ -55,6 +56,17 @@ export default function HomePage() {
   const [selectedFlowNode, setSelectedFlowNode] = useState<any>(null);
   const [showApprovalAlert, setShowApprovalAlert] = useState(false);
   const [isFlowInspectorPinned, setIsFlowInspectorPinned] = useState(false);
+  const [dropdown, setDropdown] = useState<{
+    isOpen: boolean;
+    documentId: string;
+    position: { x: number; y: number };
+    flows: any[];
+  }>({
+    isOpen: false,
+    documentId: "",
+    position: { x: 0, y: 0 },
+    flows: [],
+  });
 
   // Buscar todos os documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
@@ -70,6 +82,12 @@ export default function HomePage() {
   // Query for document flow executions
   const { data: documentFlowExecutions } = useQuery({
     queryKey: ["/api/document-flow-executions"],
+    enabled: !!user?.id
+  });
+
+  // Query for document flow execution counts
+  const { data: flowExecutionCounts = {} } = useQuery({
+    queryKey: ["/api/document-flow-executions/count"],
     enabled: !!user?.id
   });
 
@@ -149,6 +167,18 @@ export default function HomePage() {
   const documentosEmProcessoDoUsuario = documentos.filter(doc => {
     return doc.status === "Em Processo" && doc.userId === user?.id;
   });
+
+  // Fechar dropdown ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdown.isOpen) {
+        setDropdown(prev => ({ ...prev, isOpen: false }));
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [dropdown.isOpen]);
 
   // Função para formatar datas
   const formatDate = (dateString: string | Date | null) => {
@@ -273,35 +303,88 @@ export default function HomePage() {
     )[0];
   };
 
-  // Function to open flow diagram modal
-  const openFlowDiagramModal = (documento: Documento) => {
-    const execution = getMostRecentExecution(documento.id);
+  // Function to get all flows for a document
+  const getDocumentFlows = (documentId: string) => {
+    if (!documentFlowExecutions || documentFlowExecutions.length === 0) {
+      return [];
+    }
+
+    return documentFlowExecutions.filter((execution: any) => 
+      execution.documentId === documentId && 
+      (execution.status === "concluded" || execution.status === "initiated" || execution.status === "completed" || execution.status === "transfered")
+    );
+  };
+
+  // Function to get active flow for a document
+  const getActiveFlow = (documentId: string) => {
+    if (!documentFlowExecutions) return null;
     
-    if (execution) {
-      const executionData = typeof execution.executionData === 'string' 
-        ? JSON.parse(execution.executionData) 
-        : execution.executionData || {};
-      
-      const baseFlowData = executionData.flowTasks || executionData;
-      const flowDataWithDocumentId = {
-        ...baseFlowData,
-        documentId: documento.id,
-        edges: baseFlowData.edges || [],
-        nodes: baseFlowData.nodes || [],
-        viewport: baseFlowData.viewport || { x: 0, y: 0, zoom: 1 }
-      };
-      
-      setFlowDiagramModal({
-        isOpen: true,
-        flowData: flowDataWithDocumentId,
-        documentTitle: executionData.flowName || "Fluxo sem nome",
-        documentObject: documento.objeto || ""
-      });
-    } else {
+    const activeExecutions = documentFlowExecutions.filter((exec: any) => 
+      exec.documentId === documentId && exec.status === "initiated"
+    );
+    
+    if (activeExecutions.length === 0) return null;
+    
+    const activeExecution = activeExecutions[0];
+    const executionData = typeof activeExecution.executionData === 'string' 
+      ? JSON.parse(activeExecution.executionData) 
+      : activeExecution.executionData || {};
+    
+    return {
+      flowCode: executionData.flowCode || '',
+      flowName: executionData.flowName || '',
+    };
+  };
+
+  // Function to open flow diagram modal for execution
+  const openFlowDiagramModalForExecution = (execution: any) => {
+    const documento = documentos?.find(doc => doc.id === execution.documentId);
+    const documentObject = documento?.objeto || execution.document?.objeto || "";
+    
+    const executionData = typeof execution.executionData === 'string' 
+      ? JSON.parse(execution.executionData) 
+      : execution.executionData || {};
+    
+    const baseFlowData = executionData.flowTasks || executionData;
+    const flowDataWithDocumentId = {
+      ...baseFlowData,
+      documentId: execution.documentId || execution.document_id || execution.id,
+      edges: baseFlowData.edges || execution.edges || [],
+      nodes: baseFlowData.nodes || execution.nodes || [],
+      viewport: baseFlowData.viewport || execution.viewport || { x: 0, y: 0, zoom: 1 }
+    };
+    
+    setFlowDiagramModal({
+      isOpen: true,
+      flowData: flowDataWithDocumentId,
+      documentTitle: executionData.flowName || execution.flowName || "Fluxo sem nome",
+      documentObject: documentObject
+    });
+  };
+
+  // Handle flow button click
+  const handleFlowButtonClick = (evento: React.MouseEvent, documento: Documento) => {
+    evento.preventDefault();
+    evento.stopPropagation();
+    
+    const documentFlows = getDocumentFlows(documento.id);
+    
+    if (documentFlows.length === 0) {
       toast({
         title: "Sem execuções",
-        description: "Este documento ainda não possui execuções de fluxo concluídas.",
+        description: "Este documento ainda não possui execuções de fluxo.",
         variant: "destructive"
+      });
+    } else if (documentFlows.length === 1) {
+      // Open directly when there's only one flow
+      openFlowDiagramModalForExecution(documentFlows[0]);
+    } else {
+      // Show dropdown when there are multiple flows
+      setDropdown({
+        isOpen: true,
+        documentId: documento.id,
+        position: { x: evento.clientX - 340, y: evento.clientY },
+        flows: documentFlows,
       });
     }
   };
@@ -477,6 +560,9 @@ export default function HomePage() {
                       Iniciado
                     </TableHead>
                     <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
+                      Fluxo Atual
+                    </TableHead>
+                    <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
                       Status
                     </TableHead>
                     <TableHead className="w-[120px] bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
@@ -515,6 +601,23 @@ export default function HomePage() {
                           <Clock className="mr-1.5 h-3.5 w-3.5" />
                           {formatDate(documento.updatedAt)}
                         </div>
+                      </TableCell>
+                      <TableCell>
+                        {(() => {
+                          const activeFlow = getActiveFlow(documento.id);
+                          if (activeFlow) {
+                            return (
+                              <div className="flex items-center text-gray-500 text-sm">
+                                [{activeFlow.flowCode}] - {activeFlow.flowName}
+                              </div>
+                            );
+                          }
+                          return (
+                            <div className="text-xs text-gray-400">
+                              -
+                            </div>
+                          );
+                        })()}
                       </TableCell>
                       <TableCell>
                         <Badge
@@ -587,11 +690,23 @@ export default function HomePage() {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
-                            onClick={() => openFlowDiagramModal(documento)}
-                            title="Ver Diagrama do Fluxo"
+                            onClick={(e) => handleFlowButtonClick(e, documento)}
+                            title="Mostrar diagrama do fluxo"
                           >
-                            <Network className="h-4 w-4" />
+                            <Network className="h-4 w-4 text-purple-500" />
+                            {getDocumentFlows(documento.id).length > 1 && (
+                              <ChevronDown className="h-3 w-3 ml-1 text-purple-500" />
+                            )}
                           </Button>
+                          {flowExecutionCounts[documento.id] && (
+                            <Badge 
+                              variant="secondary" 
+                              className="ml-1 text-xs bg-purple-100 text-purple-700 hover:bg-purple-200"
+                              title="Número de fluxos executados"
+                            >
+                              {flowExecutionCounts[documento.id]}
+                            </Badge>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -696,6 +811,72 @@ export default function HomePage() {
         isFlowInspectorPinned={isFlowInspectorPinned}
         FlowWithAutoFitView={FlowWithAutoFitView}
       />
+
+      {/* Dropdown de fluxos na posição do mouse */}
+      {dropdown.isOpen && (
+        <div
+          className="fixed bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-[#374151] rounded-lg shadow-xl min-w-[250px] max-w-[400px]"
+          style={{
+            left: Math.max(10, dropdown.position.x),
+            top: dropdown.position.y + 10,
+            zIndex: 99999,
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+
+          <div className="max-h-64 overflow-y-auto">
+            {dropdown.flows.map((flow, index) => {
+              // Parse execution_data if it's a string
+              const executionData = typeof flow.executionData === 'string' 
+                ? JSON.parse(flow.executionData) 
+                : flow.executionData || {};
+              
+              return (
+                <div
+                  key={index}
+                  className="p-3 hover:bg-gray-50 dark:hover:bg-[#1F2937] cursor-pointer border-b border-gray-50 dark:border-[#374151] last:border-b-0"
+                  onClick={() => {
+                    openFlowDiagramModalForExecution(flow);
+                    setDropdown(prev => ({ ...prev, isOpen: false }));
+                  }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="font-medium text-sm text-gray-900 dark:text-gray-200 mb-1">
+                        {executionData.flowName || flow.flowName || flow.name || "Fluxo sem nome"}
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          flow.status === "concluded" 
+                            ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400" 
+                            : flow.status === "initiated"
+                            ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
+                            : flow.status === "transfered"
+                            ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
+                            : "bg-gray-100 dark:bg-gray-900/30 text-gray-700 dark:text-gray-400"
+                        }`}>
+                          {flow.status === "concluded" ? "Concluído" : 
+                           flow.status === "initiated" ? "Em andamento" :
+                           flow.status === "transfered" ? "Transferido" : 
+                           flow.status}
+                        </span>
+                        {flow.createdAt && (
+                          <span className="text-xs text-gray-400 dark:text-gray-500">
+                            {new Date(flow.createdAt).toLocaleDateString('pt-BR')}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <Network className="h-4 w-4 text-purple-500 dark:text-purple-400" />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
