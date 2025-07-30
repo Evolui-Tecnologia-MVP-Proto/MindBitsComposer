@@ -21,7 +21,7 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
-      <header className="bg-white dark:bg-[#111827] shadow-sm z-10 w-full flex-shrink-0">
+      <header className="bg-white dark:bg-[#111827] shadow-sm z-10 w-full flex-shrink-0 border-b border-gray-200 dark:border-gray-700">
         <div className="w-full px-0 mx-0">
           <div className="flex justify-between h-16 w-full">
             <div className="flex items-center pl-5" style={{ marginLeft: 0 }}>

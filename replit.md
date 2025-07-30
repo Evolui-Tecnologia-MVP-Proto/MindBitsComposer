@@ -127,6 +127,12 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Resolved issue where handleSelectionChange was firing on every keystroke
   - Maintains edit protection while preserving smooth typing experience
 
+✓ COMPLETED: Added Bottom Border to App Header (January 30, 2025)
+  - Added border-b border-gray-200 dark:border-gray-700 to application header
+  - Matches exactly the same border properties as footer's top border
+  - Creates visual symmetry between header and footer elements
+  - Maintains consistency across light and dark themes
+
 ✓ COMPLETED: DateTime Formatting in Field Mapping (January 29, 2025)
   - Implemented automatic datetime formatting to DD/MM/AAAA format when mapping datetime fields
   - Added datetime detection patterns for ISO, SQL, and simple date formats
