@@ -361,23 +361,36 @@ export default function HomePage() {
     const documento = documentos?.find(doc => doc.id === execution.documentId);
     const documentObject = documento?.objeto || execution.document?.objeto || "";
     
-    const executionData = typeof execution.executionData === 'string' 
-      ? JSON.parse(execution.executionData) 
-      : execution.executionData || {};
+    // Debug log
+    console.log('[DEBUG] Opening flow diagram modal with execution:', execution);
     
-    const baseFlowData = executionData.flowTasks || executionData;
+    // Use flowTasks directly from execution, not from executionData
+    const flowTasks = execution.flowTasks;
+    
+    if (!flowTasks || !flowTasks.nodes || !flowTasks.edges) {
+      console.error('[ERROR] Flow tasks data is missing or invalid:', flowTasks);
+      toast({
+        title: "Erro",
+        description: "Dados do fluxo estão incompletos ou inválidos.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     const flowDataWithDocumentId = {
-      ...baseFlowData,
-      documentId: execution.documentId || execution.document_id || execution.id,
-      edges: baseFlowData.edges || execution.edges || [],
-      nodes: baseFlowData.nodes || execution.nodes || [],
-      viewport: baseFlowData.viewport || execution.viewport || { x: 0, y: 0, zoom: 1 }
+      ...flowTasks,
+      documentId: execution.documentId,
+      edges: flowTasks.edges || [],
+      nodes: flowTasks.nodes || [],
+      viewport: flowTasks.viewport || { x: 0, y: 0, zoom: 1 }
     };
+    
+    console.log('[DEBUG] Flow data being set:', flowDataWithDocumentId);
     
     setFlowDiagramModal({
       isOpen: true,
       flowData: flowDataWithDocumentId,
-      documentTitle: executionData.flowName || execution.flowName || "Fluxo sem nome",
+      documentTitle: execution.flowName || "Fluxo sem nome",
       documentObject: documentObject
     });
   };
