@@ -121,19 +121,9 @@ export default function HomePage() {
     return acc;
   }, {} as Record<string, number>);
 
-  // Filtrar documentos integrados
-  const documentosIntegrados = documentos.filter(doc => doc.status === "Integrado");
-  
   // Filtrar documentos integrados do usuário logado
-  const documentosIntegradosDoUsuario = documentosIntegrados.filter(doc => {
-    return doc.userId === user?.id;
-  });
-
-  console.log("🔍 DEBUG - Filtro simples correto:", {
-    totalDocumentos: documentos.length,
-    documentosIntegrados: documentosIntegrados.length,
-    userId: user?.id,
-    documentosIntegradosDoUsuario: documentosIntegradosDoUsuario.length
+  const documentosIntegradosDoUsuario = documentos.filter(doc => {
+    return doc.status === "Integrado" && doc.userId === user?.id;
   });
 
 
@@ -307,65 +297,18 @@ export default function HomePage() {
         )}
 
         {/* Meus Documentos Integrados */}
-        {/* DEBUG: Sempre mostrar para análise */}
-        {(documentosIntegradosDoUsuario.length > 0 || true) && (
+        {documentosIntegradosDoUsuario.length > 0 && (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                Meus Documentos Integrados (DEBUG)
+                Meus Documentos Integrados
               </h2>
               <Badge variant="outline" className="ml-2">
-                {documentosIntegradosDoUsuario.length} encontrados
-              </Badge>
-              <Badge variant="outline" className="ml-2 bg-blue-100 dark:bg-blue-900/30">
-                {documentosIntegrados.length} total integrados
-              </Badge>
-              <Badge variant="outline" className="ml-2 bg-yellow-100 dark:bg-yellow-900/30">
-                User ID: {user?.id}
+                {documentosIntegradosDoUsuario.length}
               </Badge>
             </div>
             
-            {/* Tabela de debug com amostra de documentos integrados */}
-            <div className="bg-white dark:bg-[#0F172A] rounded-lg border dark:border-[#374151] overflow-hidden mb-4">
-              <div className="p-4 bg-orange-50 dark:bg-orange-900/30 border-b dark:border-[#374151]">
-                <h3 className="text-sm font-medium text-orange-800 dark:text-orange-400">
-                  DEBUG: Amostra de documentos integrados no sistema (primeiros 5)
-                </h3>
-              </div>
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151]">
-                    <TableHead className="dark:text-gray-200">Descrição</TableHead>
-                    <TableHead className="dark:text-gray-200">Status</TableHead>
-                    <TableHead className="dark:text-gray-200">User ID</TableHead>
-                    <TableHead className="dark:text-gray-200">Origem</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {documentosIntegrados.slice(0, 5).map((documento) => (
-                    <TableRow key={documento.id} className="dark:border-[#374151]">
-                      <TableCell className="dark:text-gray-200 max-w-md">
-                        <div className="truncate" title={documento.objeto}>
-                          {documento.objeto?.substring(0, 80)}...
-                        </div>
-                      </TableCell>
-                      <TableCell className="dark:text-gray-200">
-                        {documento.status}
-                      </TableCell>
-                      <TableCell className="dark:text-gray-200 font-mono">
-                        {documento.userId || "null"}
-                      </TableCell>
-                      <TableCell className="dark:text-gray-200">
-                        {documento.origem}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-
-            {/* Tabela real dos documentos do usuário */}
             <div className="bg-white dark:bg-[#0F172A] rounded-lg border dark:border-[#374151] overflow-hidden">
               <Table>
                 <TableHeader>
@@ -380,69 +323,56 @@ export default function HomePage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {documentosIntegradosDoUsuario.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8 dark:text-gray-400">
-                        <div className="space-y-2">
-                          <p>Nenhum documento integrado encontrado para este usuário</p>
-                          <p className="text-xs">
-                            Verifique os logs do console do navegador para mais detalhes
-                          </p>
+                  {documentosIntegradosDoUsuario.map((documento) => (
+                    <TableRow key={documento.id} className="dark:border-[#374151]">
+                      <TableCell className="dark:text-gray-200">
+                        <div className="flex items-center">
+                          {documento.origem === "Monday" ? (
+                            <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded text-xs font-medium">
+                              Monday
+                            </div>
+                          ) : (
+                            <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400 px-2 py-1 rounded text-xs font-medium">
+                              {documento.origem}
+                            </div>
+                          )}
                         </div>
                       </TableCell>
+                      <TableCell className="font-medium dark:text-gray-200 max-w-md">
+                        <div className="truncate" title={documento.objeto}>
+                          {documento.objeto}
+                        </div>
+                      </TableCell>
+                      <TableCell className="dark:text-gray-200">
+                        {documento.responsavel || "-"}
+                      </TableCell>
+                      <TableCell className="dark:text-gray-200">
+                        {documento.sistema || "-"}
+                      </TableCell>
+                      <TableCell className="dark:text-gray-200">
+                        {documento.modulo || "-"}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={getStatusBadgeVariant(documento.status) as any}
+                          className="flex items-center gap-1 whitespace-nowrap w-fit"
+                        >
+                          {getStatusIcon(documento.status)}
+                          {documento.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => openViewModal(documento)}
+                        >
+                          <Eye className="h-4 w-4 text-blue-500" />
+                        </Button>
+                      </TableCell>
                     </TableRow>
-                  ) : (
-                    documentosIntegradosDoUsuario.map((documento) => (
-                      <TableRow key={documento.id} className="dark:border-[#374151]">
-                        <TableCell className="dark:text-gray-200">
-                          <div className="flex items-center">
-                            {documento.origem === "Monday" ? (
-                              <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded text-xs font-medium">
-                                Monday
-                              </div>
-                            ) : (
-                              <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400 px-2 py-1 rounded text-xs font-medium">
-                                {documento.origem}
-                              </div>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-medium dark:text-gray-200 max-w-md">
-                          <div className="truncate" title={documento.objeto}>
-                            {documento.objeto}
-                          </div>
-                        </TableCell>
-                        <TableCell className="dark:text-gray-200">
-                          {documento.responsavel || "-"}
-                        </TableCell>
-                        <TableCell className="dark:text-gray-200">
-                          {documento.sistema || "-"}
-                        </TableCell>
-                        <TableCell className="dark:text-gray-200">
-                          {documento.modulo || "-"}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={getStatusBadgeVariant(documento.status) as any}
-                            className="flex items-center gap-1 whitespace-nowrap w-fit"
-                          >
-                            {getStatusIcon(documento.status)}
-                            {documento.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8"
-                            onClick={() => openViewModal(documento)}
-                          >
-                            <Eye className="h-4 w-4 text-blue-500" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
+                  ))}
                 </TableBody>
               </Table>
             </div>
