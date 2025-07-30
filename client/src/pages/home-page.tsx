@@ -319,16 +319,12 @@ export default function HomePage() {
   const getActiveFlow = (documentId: string) => {
     if (!documentFlowExecutions) return null;
     
-    // Debug: Log all executions for this document
+    // Get all executions for this document
     const allDocumentExecutions = documentFlowExecutions.filter((exec: any) => 
       exec.documentId === documentId
     );
     
-    if (allDocumentExecutions.length > 0) {
-      console.log(`[DEBUG] Execuções para documento ${documentId}:`, allDocumentExecutions);
-      const firstExec = allDocumentExecutions[0];
-      console.log(`[DEBUG] Estrutura completa da execução:`, JSON.stringify(firstExec, null, 2));
-    }
+    if (allDocumentExecutions.length === 0) return null;
     
     // Try to find active executions (initiated status)
     const activeExecutions = allDocumentExecutions.filter((exec: any) => 
@@ -345,30 +341,18 @@ export default function HomePage() {
       if (sortedExecutions.length === 0) return null;
       
       const mostRecent = sortedExecutions[0];
-      const executionData = typeof mostRecent.executionData === 'string' 
-        ? JSON.parse(mostRecent.executionData) 
-        : mostRecent.executionData || {};
-      
-      console.log(`[DEBUG] Nenhuma execução iniciada. Usando mais recente:`, {
-        status: mostRecent.status,
-        flowCode: executionData.flowCode,
-        flowName: executionData.flowName
-      });
       
       return {
-        flowCode: executionData.flowCode || '',
-        flowName: executionData.flowName || '',
+        flowCode: mostRecent.flowCode || '',
+        flowName: mostRecent.flowName || '',
       };
     }
     
     const activeExecution = activeExecutions[0];
-    const executionData = typeof activeExecution.executionData === 'string' 
-      ? JSON.parse(activeExecution.executionData) 
-      : activeExecution.executionData || {};
     
     return {
-      flowCode: executionData.flowCode || '',
-      flowName: executionData.flowName || '',
+      flowCode: activeExecution.flowCode || '',
+      flowName: activeExecution.flowName || '',
     };
   };
 
