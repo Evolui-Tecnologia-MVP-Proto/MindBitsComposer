@@ -11,6 +11,12 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 30, 2025)
 
+✓ COMPLETED: Database Schema Update - Removed NOT NULL Constraint from document_editions.started_by (January 30, 2025)
+  - Executed SQL command to remove NOT NULL constraint from document_editions.started_by field
+  - Updated shared/schema.ts to reflect database change by removing .notNull() from startedBy field definition
+  - Field now allows null values enabling flexible document creation workflows
+  - Change applied to both database structure and TypeScript schema for consistency
+
 ✓ COMPLETED: Finalize Document Confirmation Modal (January 30, 2025)
   - Added confirmation modal for "Finalizar" button in composer editor toolbar
   - Modal displays warning message about document finalization and workflow progression
@@ -19,6 +25,7 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Added [Confirmar] button placeholder (functionality to be implemented later)
   - Modal prevents accidental document finalization with clear confirmation workflow
   - Enhanced user experience with proper warning about irreversible action consequences
+  - Enhanced modal with yellow warning card design and bold "Atenção:" text for better visual emphasis
 
 ✓ COMPLETED: Major Refactoring - ExecutionFormPanel Component Extraction (January 30, 2025)
   - Successfully extracted 2890+ lines of inline form rendering code into reusable ExecutionFormPanel component
