@@ -129,7 +129,7 @@ export default function HomePage() {
     documentosIntegrados: documentosIntegrados.length,
     userId: user?.id,
     userName: user?.name,
-    totalEditions: documentEditions.length
+    totalEditions: (documentEditions as any[]).length
   });
 
   console.log("🔍 DEBUG - Primeiros documentos integrados:", 
@@ -143,13 +143,29 @@ export default function HomePage() {
   );
 
   console.log("🔍 DEBUG - Primeiras edições:", 
-    documentEditions.slice(0, 3).map((edition: any) => ({
+    (documentEditions as any[]).slice(0, 5).map((edition: any) => ({
       id: edition.id,
       documentId: edition.documentId,
       startedBy: edition.startedBy,
       status: edition.status
     }))
   );
+
+  // Verificar se há edições do usuário atual
+  const edicoesDoUsuario = (documentEditions as any[]).filter((edition: any) => edition.startedBy === user?.id);
+  console.log("🔍 DEBUG - Edições do usuário atual:", edicoesDoUsuario.length, edicoesDoUsuario.map((e: any) => ({
+    documentId: e.documentId,
+    status: e.status
+  })));
+
+  // Verificar quais documentos integrados têm edições do usuário
+  const documentosComEdicoes = documentosIntegrados.filter(doc => {
+    const userEditions = (documentEditions as any[]).filter((edition: any) => 
+      edition.documentId === doc.id && edition.startedBy === user?.id
+    );
+    return userEditions.length > 0;
+  });
+  console.log("🔍 DEBUG - Documentos integrados com edições do usuário:", documentosComEdicoes.length);
 
   const documentosIntegradosDoUsuario = documentosIntegrados.filter(doc => {
     // Verificar se o documento foi iniciado pelo usuário logado
