@@ -319,11 +319,39 @@ export default function HomePage() {
   const getActiveFlow = (documentId: string) => {
     if (!documentFlowExecutions) return null;
     
-    const activeExecutions = documentFlowExecutions.filter((exec: any) => 
-      exec.documentId === documentId && exec.status === "initiated"
+    // Debug: Log all executions for this document
+    const allDocumentExecutions = documentFlowExecutions.filter((exec: any) => 
+      exec.documentId === documentId
     );
     
-    if (activeExecutions.length === 0) return null;
+    console.log(`[DEBUG] Execuções para documento ${documentId}:`, allDocumentExecutions);
+    
+    // Try to find active executions (initiated status)
+    const activeExecutions = allDocumentExecutions.filter((exec: any) => 
+      exec.status === "initiated"
+    );
+    
+    // If no initiated, try to get the most recent execution
+    if (activeExecutions.length === 0) {
+      // Get the most recent execution regardless of status
+      const sortedExecutions = allDocumentExecutions.sort((a: any, b: any) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      
+      if (sortedExecutions.length === 0) return null;
+      
+      const mostRecent = sortedExecutions[0];
+      const executionData = typeof mostRecent.executionData === 'string' 
+        ? JSON.parse(mostRecent.executionData) 
+        : mostRecent.executionData || {};
+      
+      console.log(`[DEBUG] Usando execução mais recente:`, mostRecent.status, executionData);
+      
+      return {
+        flowCode: executionData.flowCode || '',
+        flowName: executionData.flowName || '',
+      };
+    }
     
     const activeExecution = activeExecutions[0];
     const executionData = typeof activeExecution.executionData === 'string' 
