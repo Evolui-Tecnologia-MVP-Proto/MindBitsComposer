@@ -34,7 +34,7 @@ export function GitHubTab({
 }: GitHubTabProps) {
   const queryClient = useQueryClient();
   return (
-    <div className="flex flex-col h-full bg-white dark:bg-[#0F172A]">
+    <div className="flex flex-col flex-1 bg-white dark:bg-[#0F172A]">
       <div className="bg-white dark:bg-[#0F172A] rounded-lg border dark:border-[#374151] p-6 flex-1 flex flex-col">
         <div className="flex items-center justify-between mb-6 flex-shrink-0">
           <div>
@@ -112,9 +112,9 @@ export function GitHubTab({
           </div>
         </div>
 
-        <div className="border-t dark:border-[#374151] pt-6 bg-white dark:bg-[#0F172A] p-4 rounded-lg flex-1 overflow-y-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
-            <div className="space-y-4 bg-white dark:bg-[#1F2937] p-4 rounded-lg">
+        <div className="border-t dark:border-[#374151] pt-6 bg-white dark:bg-[#0F172A] p-4 rounded-lg flex-1 flex flex-col min-h-0">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0">
+            <div className="space-y-4 bg-white dark:bg-[#1F2937] p-4 rounded-lg flex flex-col">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="font-medium text-gray-900 dark:text-[#E5E7EB]">
                   Estrutura do Repositório
@@ -136,7 +136,7 @@ export function GitHubTab({
                 )}
               </div>
 
-              <div className="min-h-[400px]">
+              <div className="flex-1 overflow-y-auto">
                 {githubRepoFiles.length > 0 ? (
                   <FileExplorer
                     data={githubRepoFiles}
@@ -225,7 +225,7 @@ export function GitHubTab({
               </div>
             </div>
 
-            <div className="space-y-4 bg-white dark:bg-[#1F2937] p-4 rounded-lg">
+            <div className="space-y-4 bg-white dark:bg-[#1F2937] p-4 rounded-lg flex flex-col">
               <h4 className="font-medium text-gray-900 dark:text-[#E5E7EB]">
                 {selectedFolderPath ? (
                   <span>
@@ -238,7 +238,7 @@ export function GitHubTab({
                   "Arquivos na pasta"
                 )}
               </h4>
-              <div className="min-h-[400px] space-y-3">
+              <div className="flex-1 overflow-y-auto space-y-3">
                 {isLoadingFolderFiles ? (
                   <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
