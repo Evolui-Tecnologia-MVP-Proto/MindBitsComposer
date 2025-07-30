@@ -26,17 +26,27 @@ import {
   User,
   Play,
   Eye,
-  FileText
+  FileText,
+  Network,
+  Loader2
 } from "lucide-react";
 import { type Documento, type Specialty } from "@shared/schema";
 import { DocumentReviewModal } from "@/components/review/DocumentReviewModal";
+import { DocumentationModal } from "@/components/documentos/modals/DocumentationModal";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 export default function HomePage() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedResponsavel, setSelectedResponsavel] = useState<string>("");
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<Documento | null>(null);
+  const [isDocumentationModalOpen, setIsDocumentationModalOpen] = useState(false);
+  const [selectedFlowId, setSelectedFlowId] = useState("");
+  const [optimisticSyncState, setOptimisticSyncState] = useState<string | null>(null);
 
   // Buscar todos os documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
@@ -47,6 +57,12 @@ export default function HomePage() {
   const { data: documentEditions = [] } = useQuery({
     queryKey: ["/api/document-editions"],
     enabled: !!user?.id
+  });
+
+  // Buscar fluxos de documentação disponíveis
+  const { data: documentsFlows = [] } = useQuery<any[]>({
+    queryKey: ["/api/documents-flows"],
+    enabled: isDocumentationModalOpen
   });
 
   // Calcular contadores para Base de conhecimento OC
@@ -165,6 +181,79 @@ export default function HomePage() {
   const openViewModal = (documento: Documento) => {
     setSelectedDocument(documento);
     setViewModalOpen(true);
+  };
+
+  // Mutation para iniciar documentação
+  const startDocumentationMutation = useMutation({
+    mutationFn: async ({ documentId, flowId }: { documentId: string; flowId: string }) => {
+      const response = await fetch("/api/documentos/start-documentation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          documentId,
+          flowId
+        }),
+      });
+      if (!response.ok) throw new Error("Erro ao iniciar documentação");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions/count"] });
+      setIsDocumentationModalOpen(false);
+      setSelectedFlowId("");
+      toast({
+        title: "Documentação iniciada!",
+        description: "O processo de documentação foi iniciado com sucesso.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao iniciar documentação",
+        description: error.message || "Não foi possível iniciar o processo de documentação.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation para integrar anexos
+  const integrateAttachmentsMutation = useMutation({
+    mutationFn: async (documentId: string) => {
+      const response = await fetch("/api/monday/integrate-attachments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ documentId }),
+      });
+      if (!response.ok) throw new Error("Erro ao integrar anexos");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Anexos integrados!",
+        description: "Os anexos foram integrados com sucesso.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+    },
+    onError: (error: any) => {
+      setOptimisticSyncState(null); // Reverter estado otimista em caso de erro
+      toast({
+        title: "Erro ao integrar anexos",
+        description: error.message || "Não foi possível integrar os anexos.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Helper function para verificar se documento tem valores do Monday
+  const hasMondayItemValues = (doc: Documento) => {
+    return !!(doc.mondayItemValues && Object.keys(doc.mondayItemValues).length > 0) || 
+           !!(doc.generalColumns && Object.keys(doc.generalColumns).length > 0);
+  };
+
+  const openDocumentationModal = (documento: Documento) => {
+    setSelectedDocument(documento);
+    setIsDocumentationModalOpen(true);
   };
 
 
@@ -438,8 +527,18 @@ export default function HomePage() {
                             size="icon"
                             className="h-8 w-8"
                             onClick={() => openViewModal(documento)}
+                            title="Visualizar Documento"
                           >
                             <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => openDocumentationModal(documento)}
+                            title="Executar Fluxo"
+                          >
+                            <Network className="h-4 w-4" />
                           </Button>
                         </div>
                       </TableCell>
@@ -531,6 +630,30 @@ export default function HomePage() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Modal de Documentação */}
+      <DocumentationModal
+        isOpen={isDocumentationModalOpen}
+        onClose={() => {
+          setIsDocumentationModalOpen(false);
+          setSelectedFlowId("");
+        }}
+        selectedDocument={selectedDocument}
+        selectedFlowId={selectedFlowId}
+        setSelectedFlowId={setSelectedFlowId}
+        documentsFlows={documentsFlows}
+        optimisticSyncState={optimisticSyncState}
+        setOptimisticSyncState={setOptimisticSyncState}
+        onStartDocumentation={({ documentId, flowId }) => {
+          startDocumentationMutation.mutate({ documentId, flowId });
+        }}
+        onIntegrateAttachments={(documentId) => {
+          integrateAttachmentsMutation.mutate(documentId);
+        }}
+        hasMondayItemValues={hasMondayItemValues}
+        startDocumentationMutation={startDocumentationMutation}
+        integrateAttachmentsMutation={integrateAttachmentsMutation}
+      />
     </div>
   );
 }
