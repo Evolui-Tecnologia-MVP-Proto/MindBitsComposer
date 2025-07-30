@@ -94,17 +94,6 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
             </div>
           </div>
           
-          {/* Link temporário para testar refatoração */}
-          <div className="sidebar-item-container">
-            <div 
-              className={`sidebar-item ${activeItem === "documentos-refact" ? "sidebar-active" : ""}`}
-              onClick={() => handleNavigation("/documentos-refact")}
-            >
-              <FileText className="mr-3 h-6 w-6" />
-              Documentos (Refact)
-            </div>
-          </div>
-          
           <div className="sidebar-item-container">
             <div 
               className={`sidebar-item ${activeItem === "templates" ? "sidebar-active" : ""}`}
