@@ -32,7 +32,8 @@ import {
 } from "lucide-react";
 import { type Documento, type Specialty } from "@shared/schema";
 import { DocumentReviewModal } from "@/components/review/DocumentReviewModal";
-import { DocumentationModal } from "@/components/documentos/modals/DocumentationModal";
+import { FlowDiagramModal } from "@/components/documentos/modals/FlowDiagramModal";
+import { FlowWithAutoFitView } from "@/components/documentos/flow/FlowWithAutoFitView";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
@@ -44,9 +45,16 @@ export default function HomePage() {
   const [selectedResponsavel, setSelectedResponsavel] = useState<string>("");
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<Documento | null>(null);
-  const [isDocumentationModalOpen, setIsDocumentationModalOpen] = useState(false);
-  const [selectedFlowId, setSelectedFlowId] = useState("");
-  const [optimisticSyncState, setOptimisticSyncState] = useState<string | null>(null);
+  const [flowDiagramModal, setFlowDiagramModal] = useState({
+    isOpen: false,
+    flowData: null as any,
+    documentTitle: "",
+    documentObject: ""
+  });
+  const [showFlowInspector, setShowFlowInspector] = useState(false);
+  const [selectedFlowNode, setSelectedFlowNode] = useState<any>(null);
+  const [showApprovalAlert, setShowApprovalAlert] = useState(false);
+  const [isFlowInspectorPinned, setIsFlowInspectorPinned] = useState(false);
 
   // Buscar todos os documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
@@ -59,10 +67,10 @@ export default function HomePage() {
     enabled: !!user?.id
   });
 
-  // Buscar fluxos de documentação disponíveis
-  const { data: documentsFlows = [] } = useQuery<any[]>({
-    queryKey: ["/api/documents-flows"],
-    enabled: isDocumentationModalOpen
+  // Query for document flow executions
+  const { data: documentFlowExecutions } = useQuery({
+    queryKey: ["/api/document-flow-executions"],
+    enabled: !!user?.id
   });
 
   // Calcular contadores para Base de conhecimento OC
@@ -245,16 +253,60 @@ export default function HomePage() {
     },
   });
 
-  // Helper function para verificar se documento tem valores do Monday
-  const hasMondayItemValues = (doc: Documento) => {
-    return !!(doc.mondayItemValues && Object.keys(doc.mondayItemValues).length > 0) || 
-           !!(doc.generalColumns && Object.keys(doc.generalColumns).length > 0);
+  // Function to get most recent execution for a document
+  const getMostRecentExecution = (documentId: string) => {
+    if (!documentFlowExecutions) return null;
+    
+    const documentExecutions = documentFlowExecutions.filter((exec: any) => 
+      exec.documentId === documentId
+    );
+    
+    const concludedExecutions = documentExecutions.filter((exec: any) => {
+      const executionData = typeof exec.executionData === 'string' 
+        ? JSON.parse(exec.executionData) 
+        : exec.executionData || {};
+      return executionData.status === "completed";
+    });
+    
+    return concludedExecutions.sort((a: any, b: any) => 
+      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    )[0];
   };
 
-  const openDocumentationModal = (documento: Documento) => {
-    setSelectedDocument(documento);
-    setIsDocumentationModalOpen(true);
+  // Function to open flow diagram modal
+  const openFlowDiagramModal = (documento: Documento) => {
+    const execution = getMostRecentExecution(documento.id);
+    
+    if (execution) {
+      const executionData = typeof execution.executionData === 'string' 
+        ? JSON.parse(execution.executionData) 
+        : execution.executionData || {};
+      
+      const baseFlowData = executionData.flowTasks || executionData;
+      const flowDataWithDocumentId = {
+        ...baseFlowData,
+        documentId: documento.id,
+        edges: baseFlowData.edges || [],
+        nodes: baseFlowData.nodes || [],
+        viewport: baseFlowData.viewport || { x: 0, y: 0, zoom: 1 }
+      };
+      
+      setFlowDiagramModal({
+        isOpen: true,
+        flowData: flowDataWithDocumentId,
+        documentTitle: executionData.flowName || "Fluxo sem nome",
+        documentObject: documento.objeto || ""
+      });
+    } else {
+      toast({
+        title: "Sem execuções",
+        description: "Este documento ainda não possui execuções de fluxo concluídas.",
+        variant: "destructive"
+      });
+    }
   };
+
+
 
 
 
@@ -535,8 +587,8 @@ export default function HomePage() {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
-                            onClick={() => openDocumentationModal(documento)}
-                            title="Executar Fluxo"
+                            onClick={() => openFlowDiagramModal(documento)}
+                            title="Ver Diagrama do Fluxo"
                           >
                             <Network className="h-4 w-4" />
                           </Button>
@@ -631,28 +683,18 @@ export default function HomePage() {
         </DialogContent>
       </Dialog>
 
-      {/* Modal de Documentação */}
-      <DocumentationModal
-        isOpen={isDocumentationModalOpen}
-        onClose={() => {
-          setIsDocumentationModalOpen(false);
-          setSelectedFlowId("");
-        }}
-        selectedDocument={selectedDocument}
-        selectedFlowId={selectedFlowId}
-        setSelectedFlowId={setSelectedFlowId}
-        documentsFlows={documentsFlows}
-        optimisticSyncState={optimisticSyncState}
-        setOptimisticSyncState={setOptimisticSyncState}
-        onStartDocumentation={({ documentId, flowId }) => {
-          startDocumentationMutation.mutate({ documentId, flowId });
-        }}
-        onIntegrateAttachments={(documentId) => {
-          integrateAttachmentsMutation.mutate(documentId);
-        }}
-        hasMondayItemValues={hasMondayItemValues}
-        startDocumentationMutation={startDocumentationMutation}
-        integrateAttachmentsMutation={integrateAttachmentsMutation}
+      {/* Modal de Diagrama do Fluxo */}
+      <FlowDiagramModal
+        flowDiagramModal={flowDiagramModal}
+        setFlowDiagramModal={setFlowDiagramModal}
+        showFlowInspector={showFlowInspector}
+        setShowFlowInspector={setShowFlowInspector}
+        selectedFlowNode={selectedFlowNode}
+        setSelectedFlowNode={setSelectedFlowNode}
+        showApprovalAlert={showApprovalAlert}
+        setShowApprovalAlert={setShowApprovalAlert}
+        isFlowInspectorPinned={isFlowInspectorPinned}
+        FlowWithAutoFitView={FlowWithAutoFitView}
       />
     </div>
   );
