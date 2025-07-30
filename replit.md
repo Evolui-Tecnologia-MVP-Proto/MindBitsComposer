@@ -7,6 +7,7 @@ EVO-MindBits Composer is an integrated technical and business documentation plat
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 29, 2025)
 
@@ -92,6 +93,11 @@ Preferred communication style: Simple, everyday language.
   - Automatic modal closure after successful batch processing (2 second delay)
   - Invalidates all related queries to refresh document lists after processing
   - Exact same functionality as "Iniciar Documentação" in documentos page, but for multiple documents
+
+✓ COMPLETED: Changed Navigation Menu Item from "Home" to "Principal" (January 30, 2025)
+  - Updated Sidebar.tsx to display "Principal" instead of "Home" for Portuguese localization
+  - Menu item maintains same functionality and navigation behavior
+  - Updated user preferences in replit.md to track menu naming preference
 
 ✓ COMPLETED: Disabled Local File Button When Editing Library Documents (January 29, 2025)
   - Disabled "Abrir arquivo .lexical local" button when editing documents selected from library (left side panel)

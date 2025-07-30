@@ -58,7 +58,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
               onClick={() => handleNavigation("/")}
             >
               <Home className="mr-3 h-6 w-6" />
-              Home
+              Principal
             </div>
           </div>
           
