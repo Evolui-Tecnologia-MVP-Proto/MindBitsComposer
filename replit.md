@@ -94,17 +94,6 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Invalidates all related queries to refresh document lists after processing
   - Exact same functionality as "Iniciar Documentação" in documentos page, but for multiple documents
 
-✓ COMPLETED: Full DocumentosTable Implementation on Home Page (January 30, 2025)
-  - Implemented complete table functionality from documentos page "em-processo" tab on home page
-  - Added "Fluxo Atual" column showing active flow information: [code] - name
-  - Implemented multi-flow dropdown when clicking Network button for documents with multiple flows
-  - Added flow execution counter badge (purple) showing number of executed flows per document
-  - Integrated functions: getActiveFlow, getDocumentFlows, handleFlowButtonClick
-  - Dropdown shows flow list with status badges and dates, opens FlowDiagramModal on selection
-  - Added useEffect for closing dropdown when clicking outside
-  - Table includes all 8 columns: Origem, Nome, Incluído, Iniciado, Fluxo Atual, Status, Tsk.Status, Ações
-  - Complete feature parity with documentos page table functionality
-
 ✓ COMPLETED: Changed Navigation Menu Item from "Home" to "Principal" (January 30, 2025)
   - Updated Sidebar.tsx to display "Principal" instead of "Home" for Portuguese localization
   - Menu item maintains same functionality and navigation behavior
@@ -143,17 +132,6 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Matches exactly the same border properties as footer's top border
   - Creates visual symmetry between header and footer elements
   - Maintains consistency across light and dark themes
-
-✓ COMPLETED: Added User's In-Process Documents Table to Home Page (January 30, 2025)
-  - Added "Meus Documentos Em Processo" section below existing totalization cards
-  - Table shows only documents with status "Em Processo" where userId matches logged user
-  - Clean implementation with simple filter: `doc.status === "Em Processo" && doc.userId === user?.id`
-  - Replicates exact structure of "Em Processo" tab with columns: Origem, Descrição, Responsável, Sistema, Módulo, Tsk.Status, Ações
-  - Includes document count badge and eye icon for viewing details
-  - Added comprehensive document view modal with all document information
-  - Applied consistent dark mode theming matching application standards
-  - Section only appears when user has in-process documents
-  - Tsk.Status column shows colored badges for different task states (Ação Pendente, Documentando, Em aprovação, etc.)
 
 ✓ COMPLETED: DateTime Formatting in Field Mapping (January 29, 2025)
   - Implemented automatic datetime formatting to DD/MM/AAAA format when mapping datetime fields
