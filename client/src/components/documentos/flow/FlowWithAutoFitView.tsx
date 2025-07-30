@@ -1,11 +1,27 @@
-import { useState, useEffect } from "react";
-import { useReactFlow } from "@reactflow/core";
+import { useState, useEffect, useMemo } from "react";
+import ReactFlow, { 
+  useReactFlow, 
+  Controls, 
+  Background,
+  BackgroundVariant,
+  ConnectionLineType,
+  MarkerType
+} from "reactflow";
+import 'reactflow/dist/style.css';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, X, Play, Loader2, AlertCircle } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import {
+  StartNodeComponent,
+  EndNodeComponent,
+  ActionNodeComponent,
+  DocumentNodeComponent,
+  IntegrationNodeComponent,
+  SwitchNodeComponent
+} from "@/components/documentos/flow/FlowNodes";
 
 interface FlowWithAutoFitViewProps {
   flowData: any;
@@ -181,8 +197,67 @@ export function FlowWithAutoFitView({
     });
   };
 
+  // Node types for ReactFlow
+  const nodeTypes = useMemo(() => ({
+    startNode: StartNodeComponent,
+    endNode: EndNodeComponent,
+    actionNode: ActionNodeComponent,
+    documentNode: DocumentNodeComponent,
+    integrationNode: IntegrationNodeComponent,
+    switchNode: SwitchNodeComponent,
+  }), []);
+
+  // Convert flow data to nodes and edges
+  const { nodes, edges } = useMemo(() => {
+    if (!flowData || !flowData.nodes) {
+      return { nodes: [], edges: [] };
+    }
+
+    const convertedNodes = flowData.nodes.map((node: any) => ({
+      ...node,
+      data: {
+        ...node.data,
+        isReadonly: true,
+      },
+    }));
+
+    return {
+      nodes: convertedNodes,
+      edges: flowData.edges || [],
+    };
+  }, [flowData]);
+
+  // Handler para clique em nós
+  const onNodeClick = (event: React.MouseEvent, node: any) => {
+    setSelectedFlowNode(node);
+    setShowFlowInspector(true);
+  };
+
   return (
-    <div className="bg-white dark:bg-[#0F172A] rounded-lg border dark:border-[#374151] p-6">
+    <div className="bg-white dark:bg-[#0F172A] rounded-lg border dark:border-[#374151] h-full relative">
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={nodeTypes}
+        onNodeClick={onNodeClick}
+        onPaneClick={onPaneClick}
+        fitView
+        fitViewOptions={{ padding: 0.2 }}
+        defaultEdgeOptions={{
+          type: 'smoothstep',
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+          },
+        }}
+        connectionLineType={ConnectionLineType.SmoothStep}
+        nodesDraggable={false}
+        nodesConnectable={false}
+        elementsSelectable={true}
+      >
+        <Controls />
+        <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
+      </ReactFlow>
+
       {/* Resultado da integração */}
       {integrationResult.status && (
         <div className={`mb-4 p-3 rounded-lg border ${
@@ -205,7 +280,7 @@ export function FlowWithAutoFitView({
 
       {/* Painel do FlowInspector */}
       {showFlowInspector && selectedFlowNode && (
-        <div className={`mb-6 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-4 border-l-4 border-blue-500 dark:border-blue-400 ${isPinned ? 'relative' : 'absolute top-4 right-4 z-50 w-80 shadow-lg'}`}>
+        <div className={`bg-gray-50 dark:bg-[#0F172A] rounded-lg p-4 border-l-4 border-blue-500 dark:border-blue-400 ${isPinned ? 'relative' : 'absolute top-4 right-4 z-50 w-80 shadow-lg'}`}>
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-200">
               Inspetor de Nó: {selectedFlowNode.data.label}
