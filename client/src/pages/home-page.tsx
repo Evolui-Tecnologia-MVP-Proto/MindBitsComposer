@@ -138,10 +138,8 @@ export default function HomePage() {
     }).format(date);
   };
 
-
-
-  // Funções auxiliares para formatação da tabela
-  const formatDate = (date: Date | null) => {
+  // Função auxiliar para formatação simples de data
+  const formatSimpleDate = (date: Date | null) => {
     if (!date) return "-";
     return new Date(date).toLocaleDateString("pt-BR");
   };
