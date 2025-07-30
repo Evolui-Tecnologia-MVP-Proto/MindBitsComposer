@@ -10,7 +10,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, X, Play, Loader2, AlertCircle } from "lucide-react";
+import { Check, X, Play, Loader2, AlertCircle, Pin } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -32,6 +32,7 @@ interface FlowWithAutoFitViewProps {
   showApprovalAlert: boolean;
   setShowApprovalAlert: (show: boolean) => void;
   isPinned: boolean;
+  setIsPinned: (pinned: boolean) => void;
 }
 
 export function FlowWithAutoFitView({ 
@@ -42,7 +43,8 @@ export function FlowWithAutoFitView({
   selectedFlowNode, 
   showApprovalAlert, 
   setShowApprovalAlert, 
-  isPinned 
+  isPinned,
+  setIsPinned
 }: FlowWithAutoFitViewProps) {
   const { fitView, getNodes, setNodes } = useReactFlow();
   const { toast } = useToast();
@@ -71,16 +73,14 @@ export function FlowWithAutoFitView({
   // Mutation para executar integração
   const executeIntegrationMutation = useMutation({
     mutationFn: async (data: { nodeId: string; formData: Record<string, string> }) => {
-      return apiRequest(`/api/flow-nodes/${data.nodeId}/execute`, {
-        method: 'POST',
-        body: data.formData
-      });
+      const response = await apiRequest(`/api/flow-nodes/${data.nodeId}/execute`, 'POST', data.formData);
+      return response;
     },
     onSuccess: (data) => {
       console.log('✅ Integração executada com sucesso:', data);
       setIntegrationResult({
         status: 'success',
-        message: data.message || 'Integração executada com sucesso!'
+        message: 'Integração executada com sucesso!'
       });
       
       // Invalidar cache para atualizar dados
@@ -95,7 +95,7 @@ export function FlowWithAutoFitView({
       console.error('❌ Erro na execução da integração:', error);
       setIntegrationResult({
         status: 'error',
-        message: error.message || 'Erro na execução da integração'
+        message: 'Erro na execução da integração'
       });
       
       toast({
@@ -154,13 +154,10 @@ export function FlowWithAutoFitView({
       setNodes(updatedNodes);
 
       // Salvar no banco de dados
-      const response = await apiRequest(`/api/flow-nodes/${selectedFlowNode.id}/save`, {
-        method: 'POST',
-        body: {
-          formData: formValues,
-          isAproved: selectedFlowNode.data.isAproved,
-          lastUpdated: new Date().toISOString()
-        }
+      const response = await apiRequest(`/api/flow-nodes/${selectedFlowNode.id}/save`, 'POST', {
+        formData: formValues,
+        isAproved: selectedFlowNode.data.isAproved,
+        lastUpdated: new Date().toISOString()
       });
 
       console.log('✅ Alterações salvas com sucesso:', response);
@@ -288,49 +285,216 @@ export function FlowWithAutoFitView({
 
       {/* Painel do FlowInspector */}
       {showFlowInspector && selectedFlowNode && (
-        <div className={`bg-gray-50 dark:bg-[#0F172A] rounded-lg p-4 border-l-4 border-blue-500 dark:border-blue-400 ${isPinned ? 'relative' : 'absolute top-4 right-4 z-50 w-80 shadow-lg'}`}>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-200">
-              Inspetor de Nó: {selectedFlowNode.data.label}
-            </h3>
-            <button
-              onClick={() => setShowFlowInspector(false)}
-              className="text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100 transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+        <div className="absolute top-0 right-0 w-80 bg-white dark:bg-[#0F172A] border-l border-gray-200 dark:border-[#374151] h-full overflow-y-auto">
+          <div className="p-4 space-y-4">
+            <div className="border-b dark:border-[#374151] pb-2 relative">
+              <h3 className="text-lg font-semibold dark:text-gray-200">Execution Form</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 font-mono">
+                {(() => {
+                  const typeMap: { [key: string]: string } = {
+                    'startNode': 'Início',
+                    'endNode': 'Fim', 
+                    'actionNode': 'Ação',
+                    'documentNode': 'Documento',
+                    'integrationNode': 'Integração',
+                    'switchNode': 'Condição'
+                  };
+                  return typeMap[selectedFlowNode.type] || selectedFlowNode.type;
+                })()} - {selectedFlowNode.id}
+              </p>
+              <div className="absolute top-0 right-0 flex space-x-2">
+                <button
+                  onClick={() => setIsPinned(!isPinned)}
+                  className="text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100 transition-colors"
+                  title={isPinned ? "Desafixar painel" : "Fixar painel"}
+                >
+                  <Pin className={`w-4 h-4 ${isPinned ? 'fill-current' : ''}`} />
+                </button>
+                <button
+                  onClick={() => setShowFlowInspector(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100 transition-colors"
+                  title="Fechar painel"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
 
-          <div className="space-y-3">
-            <div className="text-xs text-gray-600 dark:text-gray-300">
-              <strong>ID:</strong> {selectedFlowNode.id}
-            </div>
-            <div className="text-xs text-gray-600 dark:text-gray-300">
-              <strong>Tipo:</strong> {selectedFlowNode.type}
-            </div>
-            
+            {/* Status Exec./Tipo apenas para ActionNode */}
+            {selectedFlowNode.type === 'actionNode' && (
+              <table className="w-full text-xs">
+                <thead className="bg-gray-50 dark:bg-[#111827]">
+                  <tr>
+                    <th className="px-2 py-1.5 text-center font-medium text-xs dark:text-gray-200">Status Exec.</th>
+                    <th className="px-2 py-1.5 text-center font-medium text-xs dark:text-gray-200">Tipo Ação</th>
+                    <th className="px-2 py-1.5 text-center font-medium text-xs dark:text-gray-200">Aprovação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-t dark:border-[#374151]">
+                    <td className="px-2 py-1.5 text-center">
+                      <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                        selectedFlowNode.data.isExecuted === 'TRUE' 
+                          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' 
+                          : selectedFlowNode.data.isPendingConnected
+                          ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400'
+                          : 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-200'
+                      }`}>
+                        {selectedFlowNode.data.isExecuted === 'TRUE' 
+                          ? 'Executado' 
+                          : selectedFlowNode.data.isPendingConnected
+                          ? 'Pendente'
+                          : 'N.Exec.'}
+                      </div>
+                    </td>
+                    <td className="px-2 py-1.5 text-center">
+                      {selectedFlowNode.data.actionType ? (
+                        <div className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400">
+                          {selectedFlowNode.data.actionType}
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 dark:text-gray-300 text-xs">-</span>
+                      )}
+                    </td>
+                    <td className="px-2 py-1.5 text-center">
+                      {selectedFlowNode.data.isAproved ? (
+                        <div className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                          selectedFlowNode.data.isAproved === 'TRUE' 
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
+                            : selectedFlowNode.data.isAproved === 'FALSE'
+                            ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400'
+                            : 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-200'
+                        }`}>
+                          {selectedFlowNode.data.isAproved === 'TRUE' 
+                            ? 'SIM' 
+                            : selectedFlowNode.data.isAproved === 'FALSE'
+                            ? 'NÃO'
+                            : 'UNDEF'}
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 dark:text-gray-300 text-xs">-</span>
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            )}
+
+            {/* Layout tabular para DocumentNode - 2 colunas */}
+            {selectedFlowNode.type === 'documentNode' && (
+              <table className="w-full text-xs">
+                <thead className="bg-gray-50 dark:bg-[#111827]">
+                  <tr>
+                    <th className="px-2 py-1.5 text-center font-medium text-xs dark:text-gray-200">Status Exec.</th>
+                    <th className="px-2 py-1.5 text-center font-medium text-xs dark:text-gray-200">ID Template</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-t dark:border-[#374151]">
+                    <td className="px-2 py-1.5 text-center">
+                      <div className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                        selectedFlowNode.data.isExecuted === 'TRUE' 
+                          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' 
+                          : selectedFlowNode.data.isPendingConnected
+                          ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400'
+                          : 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-200'
+                      }`}>
+                        {selectedFlowNode.data.isExecuted === 'TRUE' 
+                          ? 'Executado' 
+                          : selectedFlowNode.data.isPendingConnected
+                          ? 'Pendente'
+                          : 'N.Exec.'}
+                      </div>
+                    </td>
+                    <td className="px-2 py-1.5 text-center">
+                      {selectedFlowNode.data.docType ? (
+                        <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400 font-mono">
+                          {selectedFlowNode.data.docType}
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 dark:text-gray-300 text-xs font-mono">-</span>
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            )}
+
+            {/* Descrição */}
             {selectedFlowNode.data.description && (
-              <div className="text-xs text-gray-600 dark:text-gray-300">
-                <strong>Descrição:</strong> {selectedFlowNode.data.description}
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-200">Descrição</p>
+                <p className="text-xs text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-[#1F2937] p-2 rounded border dark:border-[#374151] font-mono">
+                  {selectedFlowNode.data.description}
+                </p>
               </div>
             )}
 
-            {/* Badge de status de aprovação */}
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-medium text-gray-600 dark:text-gray-300">Status:</span>
-              <Badge 
-                variant={
-                  selectedFlowNode.data.isAproved === 'YES' ? 'default' : 
-                  selectedFlowNode.data.isAproved === 'NO' ? 'destructive' : 
-                  'secondary'
-                }
-                className="text-xs"
-              >
-                {selectedFlowNode.data.isAproved === 'YES' ? 'Aprovado' : 
-                 selectedFlowNode.data.isAproved === 'NO' ? 'Rejeitado' : 
-                 'Pendente'}
-              </Badge>
-            </div>
+          <div className="space-y-3">
+
+            {/* Processamento de attached_Form */}
+            {selectedFlowNode.data.attached_Form && selectedFlowNode.data.attached_Form.length > 0 && (
+              <div className="space-y-4">
+                <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-b dark:border-[#374151] pb-1">
+                  Formulário Anexado
+                </h4>
+                {selectedFlowNode.data.attached_Form.map((field: any, index: number) => (
+                  <div key={index} className="space-y-2">
+                    <label className="text-xs font-medium text-gray-700 dark:text-gray-200 flex items-center">
+                      {field.label}
+                      {field.required && <span className="text-red-500 ml-1">*</span>}
+                    </label>
+                    {field.type === 'select' ? (
+                      <select
+                        value={formValues[field.id] || ''}
+                        onChange={(e) => setFormValues(prev => ({
+                          ...prev,
+                          [field.id]: e.target.value
+                        }))}
+                        className="w-full px-3 py-1.5 text-xs border border-gray-300 dark:border-[#374151] dark:bg-[#0F172A] dark:text-gray-200 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        disabled={field.readonly}
+                      >
+                        <option value="">Selecione...</option>
+                        {field.options?.map((option: any) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    ) : field.type === 'textarea' ? (
+                      <textarea
+                        value={formValues[field.id] || ''}
+                        onChange={(e) => setFormValues(prev => ({
+                          ...prev,
+                          [field.id]: e.target.value
+                        }))}
+                        placeholder={field.placeholder}
+                        className="w-full px-3 py-1.5 text-xs border border-gray-300 dark:border-[#374151] dark:bg-[#0F172A] dark:text-gray-200 dark:placeholder-gray-400 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        rows={3}
+                        disabled={field.readonly}
+                      />
+                    ) : (
+                      <input
+                        type={field.type || 'text'}
+                        value={formValues[field.id] || ''}
+                        onChange={(e) => setFormValues(prev => ({
+                          ...prev,
+                          [field.id]: e.target.value
+                        }))}
+                        placeholder={field.placeholder}
+                        className="w-full px-3 py-1.5 text-xs border border-gray-300 dark:border-[#374151] dark:bg-[#0F172A] dark:text-gray-200 dark:placeholder-gray-400 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                        disabled={field.readonly}
+                      />
+                    )}
+                    {field.description && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {field.description}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Campos do formulário */}
             {selectedFlowNode.data.fields && (
@@ -496,6 +660,7 @@ export function FlowWithAutoFitView({
                 </div>
               </div>
             )}
+          </div>
           </div>
         </div>
       )}
