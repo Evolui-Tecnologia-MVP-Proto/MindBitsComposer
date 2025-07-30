@@ -126,6 +126,12 @@ export default function HomePage() {
     return doc.status === "Integrado" && doc.userId === user?.id;
   });
 
+  // Log temporário para verificar
+  if (user?.id) {
+    const integrados = documentos.filter(doc => doc.status === "Integrado");
+    console.log(`Total integrados: ${integrados.length}, Do usuário ${user.id}: ${documentosIntegradosDoUsuario.length}`);
+  }
+
 
 
   // Funções auxiliares para formatação da tabela
