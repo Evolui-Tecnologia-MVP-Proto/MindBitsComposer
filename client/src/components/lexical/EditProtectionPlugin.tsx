@@ -5,11 +5,14 @@ import {
   $isRangeSelection,
   $getRoot,
   COMMAND_PRIORITY_HIGH,
+  COMMAND_PRIORITY_LOW,
   KEY_ENTER_COMMAND,
   KEY_TAB_COMMAND,
   PASTE_COMMAND,
   INSERT_PARAGRAPH_COMMAND,
   INSERT_LINE_BREAK_COMMAND,
+  SELECTION_CHANGE_COMMAND,
+  CONTROLLED_TEXT_INSERTION_COMMAND,
   LexicalNode,
   ElementNode,
   $isElementNode
@@ -137,18 +140,26 @@ export default function EditProtectionPlugin(): null {
       return shouldBlock;
     };
 
+    // Variável para rastrear se estamos digitando
+    let isTyping = false;
+    let typingTimeout: NodeJS.Timeout | null = null;
+    
     // Interceptar mudanças de seleção para posicionar cursor adequadamente
     const handleSelectionChange = () => {
       // Não fazer nada se a proteção ainda não está ativa
       if (!protectionActive) return;
+      
+      // Se estamos digitando, não reposicionar o cursor
+      if (isTyping) return;
       
       editor.update(() => {
         const selection = $getSelection();
         if ($isRangeSelection(selection)) {
           const anchor = selection.anchor.getNode();
           
-          // Se a seleção está fora de um container válido, mover para o primeiro container válido
-          if (!isNodeInValidContainer(anchor)) {
+          // Se a seleção está fora de um container válido E não é uma seleção colapsada (cursor),
+          // mover para o primeiro container válido
+          if (!isNodeInValidContainer(anchor) && selection.isCollapsed()) {
             const root = $getRoot();
             let firstValidContainer: LexicalNode | null = null;
             
@@ -182,6 +193,23 @@ export default function EditProtectionPlugin(): null {
         }
       });
     };
+    
+    // Detectar quando o usuário está digitando
+    const handleBeforeInput = () => {
+      isTyping = true;
+      
+      // Limpar timeout anterior se existir
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+      }
+      
+      // Definir novo timeout para resetar flag de digitação
+      typingTimeout = setTimeout(() => {
+        isTyping = false;
+      }, 500); // 500ms após parar de digitar
+      
+      return false; // Permitir input normal
+    };
 
     // Registrar comandos com alta prioridade para interceptar antes de outros plugins
     const unregisterInsertParagraph = editor.registerCommand(
@@ -214,22 +242,41 @@ export default function EditProtectionPlugin(): null {
       COMMAND_PRIORITY_HIGH
     );
 
-    // Monitorar mudanças no editor para aplicar proteção
-    const unregisterUpdateListener = editor.registerUpdateListener(() => {
-      handleSelectionChange();
-    });
+    // Registrar handler para detectar quando está digitando
+    const unregisterTextInsertion = editor.registerCommand(
+      CONTROLLED_TEXT_INSERTION_COMMAND,
+      () => {
+        handleBeforeInput();
+        return false; // Permitir inserção de texto normal
+      },
+      COMMAND_PRIORITY_HIGH
+    );
+    
+    // Monitorar apenas mudanças de seleção (não a cada keystroke)
+    const unregisterSelectionListener = editor.registerCommand(
+      SELECTION_CHANGE_COMMAND,
+      () => {
+        handleSelectionChange();
+        return false; // Permitir que outros listeners processem o comando
+      },
+      COMMAND_PRIORITY_LOW
+    );
 
     console.log('✅ Plugin de proteção de edição ativado');
 
     // Cleanup
     return () => {
       clearTimeout(activationTimeout);
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+      }
       unregisterInsertParagraph();
       unregisterEnter();
       unregisterTab();
       unregisterPaste();
       unregisterLineBreak();
-      unregisterUpdateListener();
+      unregisterTextInsertion();
+      unregisterSelectionListener();
     };
   }, [editor]);
 

@@ -119,6 +119,14 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Prevents conflicts between library document editing and local file loading
   - Maintains clean editing workflow by restricting functionality appropriately
 
+✓ COMPLETED: Fixed Cursor Disappearing Issue in Collapsible Containers (January 30, 2025)
+  - Fixed critical bug where cursor would disappear after typing/backspace in collapsible containers
+  - Changed EditProtectionPlugin from using updateListener to SELECTION_CHANGE_COMMAND
+  - Added typing detection with 500ms grace period to prevent cursor repositioning while typing
+  - Plugin now only repositions cursor when user explicitly clicks outside valid areas
+  - Resolved issue where handleSelectionChange was firing on every keystroke
+  - Maintains edit protection while preserving smooth typing experience
+
 ✓ COMPLETED: DateTime Formatting in Field Mapping (January 29, 2025)
   - Implemented automatic datetime formatting to DD/MM/AAAA format when mapping datetime fields
   - Added datetime detection patterns for ISO, SQL, and simple date formats
