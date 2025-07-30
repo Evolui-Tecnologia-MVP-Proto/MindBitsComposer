@@ -64,37 +64,6 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
           
           <div className="sidebar-item-container">
             <div 
-              className={`sidebar-item ${activeItem === "admin" ? "sidebar-active" : ""}`}
-              onClick={() => handleNavigation("/admin")}
-            >
-              <Settings className="mr-3 h-6 w-6" />
-              Administração
-            </div>
-          </div>
-          
-          <div className="sidebar-item-container">
-            <div 
-              className={`sidebar-item ${activeItem === "templates" ? "sidebar-active" : ""}`}
-              onClick={() => handleNavigation("/templates")}
-            >
-              <FileText className="mr-3 h-6 w-6" />
-              Templates
-            </div>
-          </div>
-          
-          <div className="sidebar-item-container">
-            <div 
-              className={`sidebar-item ${activeItem === "cadastros-gerais" ? "sidebar-active" : ""}`}
-              onClick={() => handleNavigation("/cadastros-gerais")}
-            >
-              <Database className="mr-3 h-6 w-6" />
-              Cadastros Gerais
-            </div>
-          </div>
-
-          
-          <div className="sidebar-item-container">
-            <div 
               className={`sidebar-item ${activeItem === "lexical" ? "sidebar-active" : ""}`}
               onClick={() => handleNavigation("/lexical")}
             >
@@ -125,11 +94,41 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
           
           <div className="sidebar-item-container">
             <div 
+              className={`sidebar-item ${activeItem === "templates" ? "sidebar-active" : ""}`}
+              onClick={() => handleNavigation("/templates")}
+            >
+              <FileText className="mr-3 h-6 w-6" />
+              Templates
+            </div>
+          </div>
+          
+          <div className="sidebar-item-container">
+            <div 
+              className={`sidebar-item ${activeItem === "cadastros-gerais" ? "sidebar-active" : ""}`}
+              onClick={() => handleNavigation("/cadastros-gerais")}
+            >
+              <Database className="mr-3 h-6 w-6" />
+              Cadastros Gerais
+            </div>
+          </div>
+          
+          <div className="sidebar-item-container">
+            <div 
               className={`sidebar-item ${activeItem === "plugins" ? "sidebar-active" : ""}`}
               onClick={() => handleNavigation("/plugins")}
             >
               <Puzzle className="mr-3 h-6 w-6" />
               Plugins
+            </div>
+          </div>
+
+          <div className="sidebar-item-container">
+            <div 
+              className={`sidebar-item ${activeItem === "admin" ? "sidebar-active" : ""}`}
+              onClick={() => handleNavigation("/admin")}
+            >
+              <Settings className="mr-3 h-6 w-6" />
+              Administração
             </div>
           </div>
 

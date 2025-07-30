@@ -105,6 +105,13 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Badge displays "Template: [code]" information with consistent dark mode theming
   - Maintains same functionality while improving visual hierarchy in composer interface
 
+✓ COMPLETED: Reordered Main Navigation Menu Items (January 30, 2025)
+  - Updated Sidebar.tsx to reorder menu items from top to bottom as requested
+  - New order: Principal, Composer, Fluxos, Documentos, Templates, Cadastros Gerais, Plugins, Administração
+  - Moved Administração from second position to last position
+  - Moved Composer from fifth position to second position
+  - Maintained all functionality and navigation behavior
+
 ✓ COMPLETED: Disabled Local File Button When Editing Library Documents (January 29, 2025)
   - Disabled "Abrir arquivo .lexical local" button when editing documents selected from library (left side panel)
   - Added logic to check if selectedEdition exists (indicates document from library)
