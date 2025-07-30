@@ -233,6 +233,14 @@ export function FlowWithAutoFitView({
     setShowFlowInspector(true);
   };
 
+  // Handler para clique no painel
+  const onPaneClick = () => {
+    if (!isPinned) {
+      setShowFlowInspector(false);
+      setSelectedFlowNode(null);
+    }
+  };
+
   return (
     <div className="bg-white dark:bg-[#0F172A] rounded-lg border dark:border-[#374151] h-full relative">
       <ReactFlow
