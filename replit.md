@@ -99,6 +99,12 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Menu item maintains same functionality and navigation behavior
   - Updated user preferences in replit.md to track menu naming preference
 
+✓ COMPLETED: Changed Template Badge Color to Yellow in Composer Editor Header (January 30, 2025)
+  - Modified template badge in lexical-page.tsx header from secondary gray to yellow
+  - Applied yellow theme: bg-yellow-100/text-yellow-800 (light), bg-yellow-900/30/text-yellow-400 (dark)
+  - Badge displays "Template: [code]" information with consistent dark mode theming
+  - Maintains same functionality while improving visual hierarchy in composer interface
+
 ✓ COMPLETED: Disabled Local File Button When Editing Library Documents (January 29, 2025)
   - Disabled "Abrir arquivo .lexical local" button when editing documents selected from library (left side panel)
   - Added logic to check if selectedEdition exists (indicates document from library)

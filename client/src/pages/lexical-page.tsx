@@ -1566,7 +1566,7 @@ export default function LexicalPage() {
                 </Badge>
               )}
               {(selectedTemplate || selectedEdition) && (
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="secondary" className="text-xs bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">
                   Template: {selectedTemplate?.code || selectedEdition?.templateCode}
                 </Badge>
               )}
