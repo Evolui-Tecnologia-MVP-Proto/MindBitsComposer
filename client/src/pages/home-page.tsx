@@ -326,9 +326,8 @@ export default function HomePage() {
     
     if (allDocumentExecutions.length > 0) {
       console.log(`[DEBUG] Execuções para documento ${documentId}:`, allDocumentExecutions);
-      console.log(`[DEBUG] Primeira execução:`, allDocumentExecutions[0]);
-      console.log(`[DEBUG] Status:`, allDocumentExecutions[0].status);
-      console.log(`[DEBUG] ExecutionData:`, allDocumentExecutions[0].executionData);
+      const firstExec = allDocumentExecutions[0];
+      console.log(`[DEBUG] Estrutura completa da execução:`, JSON.stringify(firstExec, null, 2));
     }
     
     // Try to find active executions (initiated status)
