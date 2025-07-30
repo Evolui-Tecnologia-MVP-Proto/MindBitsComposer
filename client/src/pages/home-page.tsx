@@ -138,23 +138,7 @@ export default function HomePage() {
     return userEditions.length > 0;
   });
 
-  // Debug logs
-  console.log('📊 DEBUG: Dados para filtro:', {
-    totalDocumentos: documentos.length,
-    documentosIntegrados: documentos.filter(doc => doc.status === "Integrado").length,
-    userId: user?.id,
-    documentEditions: documentEditions.length,
-    documentosIntegradosDoUsuario: documentosIntegradosDoUsuario.length
-  });
 
-  console.log('📊 DEBUG: Documentos integrados encontrados:', documentosIntegradosDoUsuario.map(doc => ({
-    id: doc.id,
-    objeto: doc.objeto,
-    userId: doc.userId,
-    status: doc.status
-  })));
-
-  console.log('📊 DEBUG: Document editions:', documentEditions.slice(0, 3));
 
   // Funções auxiliares para formatação da tabela
   const formatDate = (date: Date | null) => {
@@ -325,16 +309,15 @@ export default function HomePage() {
         )}
 
         {/* Meus Documentos Integrados */}
-        {/* Temporariamente mostrando sempre para debug */}
-        {true && (
+        {documentosIntegradosDoUsuario.length > 0 && (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                Meus Documentos Integrados (DEBUG)
+                Meus Documentos Integrados
               </h2>
               <Badge variant="outline" className="ml-2">
-                {documentosIntegradosDoUsuario.length} do usuário / {documentos.filter(doc => doc.status === "Integrado").length} total
+                {documentosIntegradosDoUsuario.length}
               </Badge>
             </div>
             
@@ -352,8 +335,7 @@ export default function HomePage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {/* DEBUG: Mostrando primeiro alguns documentos integrados gerais */}
-                  {documentos.filter(doc => doc.status === "Integrado").slice(0, 5).map((documento) => (
+                  {documentosIntegradosDoUsuario.map((documento) => (
                     <TableRow key={documento.id} className="dark:border-[#374151]">
                       <TableCell className="dark:text-gray-200">
                         <div className="flex items-center">

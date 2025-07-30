@@ -142,6 +142,7 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Added comprehensive document view modal with all document information
   - Applied consistent dark mode theming matching application standards
   - Section only appears when user has integrated documents
+  - Debug mode tested and removed - table now properly displays user-specific documents
 
 ✓ COMPLETED: DateTime Formatting in Field Mapping (January 29, 2025)
   - Implemented automatic datetime formatting to DD/MM/AAAA format when mapping datetime fields
