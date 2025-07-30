@@ -137,13 +137,11 @@ export function FlowDiagramModal({
             <Network className="h-5 w-5 dark:text-blue-400" />
             Diagrama do Fluxo - {flowDiagramModal.documentTitle}
           </DialogTitle>
-          <DialogDescription>
-            {flowDiagramModal.documentObject && (
-              <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Documento: {flowDiagramModal.documentObject}
-              </div>
-            )}
-          </DialogDescription>
+          {flowDiagramModal.documentObject && (
+            <DialogDescription className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Documento: {flowDiagramModal.documentObject}
+            </DialogDescription>
+          )}
         </DialogHeader>
         
         <div className="flex-1 w-full border rounded-lg overflow-hidden dark:border-[#374151] dark:bg-[#0F172A]">
