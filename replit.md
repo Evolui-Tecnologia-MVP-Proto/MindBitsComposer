@@ -133,16 +133,16 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Creates visual symmetry between header and footer elements
   - Maintains consistency across light and dark themes
 
-✓ COMPLETED: Added User's Integrated Documents Table to Home Page (January 30, 2025)
-  - Added "Meus Documentos Integrados" section below existing totalization cards
-  - Table shows only documents with status "Integrado" where userId matches logged user
-  - Clean implementation with simple filter: `doc.status === "Integrado" && doc.userId === user?.id`
-  - Replicates exact structure of "Integrados" tab with columns: Origem, Descrição, Responsável, Sistema, Módulo, Status, Ações
+✓ COMPLETED: Added User's In-Process Documents Table to Home Page (January 30, 2025)
+  - Added "Meus Documentos Em Processo" section below existing totalization cards
+  - Table shows only documents with status "Em Processo" where userId matches logged user
+  - Clean implementation with simple filter: `doc.status === "Em Processo" && doc.userId === user?.id`
+  - Replicates exact structure of "Em Processo" tab with columns: Origem, Descrição, Responsável, Sistema, Módulo, Tsk.Status, Ações
   - Includes document count badge and eye icon for viewing details
   - Added comprehensive document view modal with all document information
   - Applied consistent dark mode theming matching application standards
-  - Section only appears when user has integrated documents
-  - All debug code removed - clean, professional implementation
+  - Section only appears when user has in-process documents
+  - Tsk.Status column shows colored badges for different task states (Ação Pendente, Documentando, Em aprovação, etc.)
 
 ✓ COMPLETED: DateTime Formatting in Field Mapping (January 29, 2025)
   - Implemented automatic datetime formatting to DD/MM/AAAA format when mapping datetime fields

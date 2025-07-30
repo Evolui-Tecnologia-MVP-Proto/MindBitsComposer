@@ -121,16 +121,10 @@ export default function HomePage() {
     return acc;
   }, {} as Record<string, number>);
 
-  // Filtrar documentos integrados do usuário logado
-  const documentosIntegradosDoUsuario = documentos.filter(doc => {
-    return doc.status === "Integrado" && doc.userId === user?.id;
+  // Filtrar documentos em processo do usuário logado
+  const documentosEmProcessoDoUsuario = documentos.filter(doc => {
+    return doc.status === "Em Processo" && doc.userId === user?.id;
   });
-
-  // Log temporário para verificar
-  if (user?.id) {
-    const integrados = documentos.filter(doc => doc.status === "Integrado");
-    console.log(`Total integrados: ${integrados.length}, Do usuário ${user.id}: ${documentosIntegradosDoUsuario.length}`);
-  }
 
 
 
@@ -302,16 +296,16 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Meus Documentos Integrados */}
-        {documentosIntegradosDoUsuario.length > 0 && (
+        {/* Meus Documentos Em Processo */}
+        {documentosEmProcessoDoUsuario.length > 0 && (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                Meus Documentos Integrados
+                Meus Documentos Em Processo
               </h2>
               <Badge variant="outline" className="ml-2">
-                {documentosIntegradosDoUsuario.length}
+                {documentosEmProcessoDoUsuario.length}
               </Badge>
             </div>
             
@@ -324,12 +318,12 @@ export default function HomePage() {
                     <TableHead className="dark:text-gray-200">Responsável</TableHead>
                     <TableHead className="dark:text-gray-200">Sistema</TableHead>
                     <TableHead className="dark:text-gray-200">Módulo</TableHead>
-                    <TableHead className="dark:text-gray-200">Status</TableHead>
+                    <TableHead className="dark:text-gray-200">Tsk.Status</TableHead>
                     <TableHead className="text-right dark:text-gray-200">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {documentosIntegradosDoUsuario.map((documento) => (
+                  {documentosEmProcessoDoUsuario.map((documento) => (
                     <TableRow key={documento.id} className="dark:border-[#374151]">
                       <TableCell className="dark:text-gray-200">
                         <div className="flex items-center">
@@ -360,11 +354,26 @@ export default function HomePage() {
                       </TableCell>
                       <TableCell>
                         <Badge
-                          variant={getStatusBadgeVariant(documento.status) as any}
-                          className="flex items-center gap-1 whitespace-nowrap w-fit"
+                          variant={
+                            documento.taskStatus === "Ação Pendente" ? "default" as any :
+                            documento.taskStatus === "Documentando" ? "secondary" as any :
+                            documento.taskStatus === "Em aprovação" ? "outline" as any :
+                            documento.taskStatus === "Concluído" ? "default" as any :
+                            documento.taskStatus === "Bloqueado" ? "destructive" as any :
+                            documento.taskStatus === "Em revisão" ? "secondary" as any :
+                            "default" as any
+                          }
+                          className={`flex items-center gap-1 whitespace-nowrap w-fit ${
+                            documento.taskStatus === "Ação Pendente" ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 border-yellow-300 dark:border-yellow-600" :
+                            documento.taskStatus === "Documentando" ? "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400 border-purple-300 dark:border-purple-600" :
+                            documento.taskStatus === "Em aprovação" ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 border-green-300 dark:border-green-600" :
+                            documento.taskStatus === "Concluído" ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 border-blue-300 dark:border-blue-600" :
+                            documento.taskStatus === "Bloqueado" ? "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 border-red-300 dark:border-red-600" :
+                            documento.taskStatus === "Em revisão" ? "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400 border-orange-300 dark:border-orange-600" :
+                            "bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400 border-gray-300 dark:border-gray-600"
+                          }`}
                         >
-                          {getStatusIcon(documento.status)}
-                          {documento.status}
+                          {documento.taskStatus || "-"}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
