@@ -133,6 +133,12 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Creates visual symmetry between header and footer elements
   - Maintains consistency across light and dark themes
 
+✓ COMPLETED: Disabled Scrollbar on Documentos Page Main Area (January 30, 2025)
+  - Added data-page="documentos" attribute to DocumentosPage main container
+  - Created CSS rule using :has() selector to target main element containing documentos page
+  - Applied overflow: hidden !important to disable scrollbar exclusively on documentos page
+  - Solution maintains visual layout while preventing main area scrolling without affecting other pages
+
 ✓ COMPLETED: DateTime Formatting in Field Mapping (January 29, 2025)
   - Implemented automatic datetime formatting to DD/MM/AAAA format when mapping datetime fields
   - Added datetime detection patterns for ISO, SQL, and simple date formats

@@ -3816,7 +3816,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
   }
 
   return (
-    <div className="container mx-auto py-6 bg-background text-foreground">
+    <div className="container mx-auto py-6 bg-background text-foreground" data-page="documentos">
       <EditDocumentModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}

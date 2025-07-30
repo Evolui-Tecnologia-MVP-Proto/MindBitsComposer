@@ -4896,3 +4896,8 @@ html:not(.dark) [data-radix-dialog-content] .h-full.flex.flex-col.bg-white .bord
 html:not(.dark) [data-radix-dialog-content] .h-full.flex.flex-col.bg-white h3 {
   color: #111827 !important;
 }
+
+/* DISABLE SCROLLBAR ON DOCUMENTOS PAGE */
+main:has([data-page="documentos"]) {
+  overflow: hidden !important;
+}
