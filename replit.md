@@ -9,6 +9,14 @@ EVO-MindBits Composer is an integrated technical and business documentation plat
 Preferred communication style: Simple, everyday language.
 Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
+## Recent Updates (January 30, 2025)
+
+✓ COMPLETED: Changed Composer Page "Publicar" Button to "Finalizar" (January 30, 2025)
+  - Updated button in composer page toolbar actions header from "Publicar" to "Finalizar"
+  - Changed icon from Split to BookOpenCheck (lucide-react)
+  - Button maintains same blue styling and functionality
+  - Located in lexical-page.tsx toolbar actions section
+
 ## Recent Updates (January 29, 2025)
 
 ✓ COMPLETED: Dynamic Plugin Loading System - Automated Plugin Registration (January 29, 2025)

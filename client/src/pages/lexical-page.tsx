@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool, Eye, Edit, File, Image, Video, FileAudio, FileCode2, CircleChevronLeft, Globe, Split, FileInput, FileOutput, Puzzle, Palette, Settings, Database, Brain, BarChart, Zap, Wrench, Code, Cpu, Lock, Mail, Music, Calendar, Clock, Users, Star, Heart, Flag, Target, Bookmark, Search } from "lucide-react";
+import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool, Eye, Edit, File, Image, Video, FileAudio, FileCode2, CircleChevronLeft, Globe, Split, FileInput, FileOutput, Puzzle, Palette, Settings, Database, Brain, BarChart, Zap, Wrench, Code, Cpu, Lock, Mail, Music, Calendar, Clock, Users, Star, Heart, Flag, Target, Bookmark, Search, BookOpenCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -1681,9 +1681,9 @@ export default function LexicalPage() {
                   size="sm"
                   className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
                   disabled={!selectedEdition || viewMode === 'preview'}
-                  title="Publicar"
+                  title="Finalizar"
                 >
-                  <Split className="w-4 h-4" />
+                  <BookOpenCheck className="w-4 h-4" />
                 </Button>
               </div>
             </div>
