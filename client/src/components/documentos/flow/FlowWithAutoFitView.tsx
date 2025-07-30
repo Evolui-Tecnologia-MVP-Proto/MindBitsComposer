@@ -433,7 +433,7 @@ export function FlowWithAutoFitView({
           <div className="space-y-3">
 
             {/* Processamento de attached_Form */}
-            {selectedFlowNode.data.attached_Form && selectedFlowNode.data.attached_Form.length > 0 && (
+            {selectedFlowNode.data.attached_Form && Array.isArray(selectedFlowNode.data.attached_Form) && selectedFlowNode.data.attached_Form.length > 0 && (
               <div className="space-y-4">
                 <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-200 border-b dark:border-[#374151] pb-1">
                   Formulário Anexado
