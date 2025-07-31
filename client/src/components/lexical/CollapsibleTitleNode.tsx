@@ -205,9 +205,10 @@ export class CollapsibleTitleNode extends TextNode {
               // Criar input temporário
               const input = document.createElement('input');
               input.value = currentText;
-              input.className = 'bg-transparent border-2 border-blue-500 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white';
-              input.style.minWidth = '150px';
-              input.style.zIndex = '999';
+              input.className = 'bg-white dark:bg-gray-800 border-2 border-blue-500 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white shadow-lg';
+              input.style.minWidth = '200px';
+              input.style.zIndex = '9999';
+              input.style.position = 'relative';
               
               console.log('🆕 Input criado:', input);
               
@@ -226,9 +227,21 @@ export class CollapsibleTitleNode extends TextNode {
               // Impedir que outros sistemas roubem o foco
               input.setAttribute('data-lexical-editor', 'false');
               input.setAttribute('data-editing-title', 'true');
+              input.placeholder = 'Digite o título (Enter=salvar, Esc=cancelar)';
+              
+              // Timeout de segurança - salvar após 30 segundos sem interação
+              let inactivityTimeout = setTimeout(() => {
+                console.log('⏰ Timeout - salvando automaticamente');
+                finishEdit(true);
+              }, 30000);
               
               const finishEdit = (save: boolean = true) => {
                 console.log('🏁 Finalizando edição, save:', save);
+                
+                // Limpar timeout
+                if (inactivityTimeout) {
+                  clearTimeout(inactivityTimeout);
+                }
                 
                 if (save) {
                   const newText = input.value.trim();
@@ -262,21 +275,13 @@ export class CollapsibleTitleNode extends TextNode {
                 }
               });
               
-              // Adicionar blur com delay
-              let blurTimeout: NodeJS.Timeout;
+              // Não remover automaticamente no blur - só com Enter/Escape
               input.addEventListener('blur', () => {
-                console.log('🔍 Input perdeu foco');
-                blurTimeout = setTimeout(() => {
-                  finishEdit(true);
-                }, 200);
+                console.log('🔍 Input perdeu foco - mas não será removido automaticamente');
               });
               
-              // Cancelar blur se voltar o foco
               input.addEventListener('focus', () => {
                 console.log('🎯 Input recuperou foco');
-                if (blurTimeout) {
-                  clearTimeout(blurTimeout);
-                }
               });
             }
           }
