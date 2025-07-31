@@ -11,6 +11,12 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
+✓ COMPLETED: Standardized Editor Paragraph Spacing to Match Quote Spacing (January 31, 2025)
+  - Changed paragraph margin-bottom from 8px to 10px to match quote spacing
+  - Unified spacing throughout editor for consistent visual rhythm
+  - All text blocks now use same 10px bottom margin for better reading experience
+  - Applied to .editor-paragraph class in index.css
+
 ✓ COMPLETED: Fixed Quote Button to Convert Selected Text (January 31, 2025)
   - Fixed issue where quote button was deleting selected text and inserting empty quote
   - Modified insertQuote function to preserve and convert selected text into quote format

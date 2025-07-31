@@ -1303,7 +1303,7 @@ body.dark [data-radix-alert-dialog-content]:not([style*="background"]) {
 
 .editor-paragraph {
   margin: 0;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   position: relative;
 }
 
