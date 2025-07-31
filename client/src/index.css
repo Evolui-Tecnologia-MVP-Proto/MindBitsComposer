@@ -526,6 +526,26 @@ body.dark .Collapsible__title:hover {
   border: 3px solid #2563EB !important;
 }
 
+/* Selected container states - Dark mode */
+.dark .lexical-editor-container .lexical-container-selected,
+.dark [data-lexical-editor] .lexical-container-selected,
+.dark .ContentEditable__root .lexical-container-selected {
+  border: 3px solid #60A5FA !important;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.3) !important;
+  outline: none !important;
+}
+
+/* Selected container states - Light mode */
+.lexical-editor-container .lexical-container-selected,
+[data-lexical-editor] .lexical-container-selected,
+.ContentEditable__root .lexical-container-selected {
+  border: 3px solid #2563EB !important;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.3) !important;
+  outline: none !important;
+}
+
 
 
 /* Active table cell selection in dark mode */
@@ -1623,6 +1643,19 @@ table:not(.lexical-editor-container table) th {
 }
 
 .lexical-table-selected:focus {
+  border: 3px solid #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.4) !important;
+}
+
+/* Container selection styles */
+.lexical-container-selected {
+  border: 3px solid #3b82f6 !important;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3) !important;
+  outline: none !important;
+}
+
+.lexical-container-selected:focus {
   border: 3px solid #2563eb !important;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.4) !important;
 }

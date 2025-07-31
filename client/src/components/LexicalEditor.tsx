@@ -401,6 +401,13 @@ function ToolbarPlugin({
     return editor.registerUpdateListener(({ editorState }) => {
       editorState.read(() => {
         const selection = $getSelection();
+        
+        // Remove destaque de container anteriormente selecionado
+        const previousSelected = document.querySelector('.lexical-container-selected');
+        if (previousSelected) {
+          previousSelected.classList.remove('lexical-container-selected');
+        }
+        
         if (!$isRangeSelection(selection)) {
           setSelectedContainerKey(null);
           setSelectedContainerFromToolbar(false);
@@ -415,8 +422,15 @@ function ToolbarPlugin({
           
           while (currentNode) {
             if ($isCollapsibleContainerNode(currentNode)) {
-              setSelectedContainerKey(currentNode.getKey());
+              const containerKey = currentNode.getKey();
+              setSelectedContainerKey(containerKey);
               setSelectedContainerFromToolbar(currentNode.getFromToolbar());
+              
+              // Adicionar destaque visual ao container selecionado
+              const containerElement = editor.getElementByKey(containerKey);
+              if (containerElement) {
+                containerElement.classList.add('lexical-container-selected');
+              }
               
               // Buscar o título do container
               const children = currentNode.getChildren();
