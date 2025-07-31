@@ -11,12 +11,13 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
-✓ COMPLETED: Removed Automatic Focus Behavior After Document Load (January 31, 2025)
-  - Issue: Editing inside containers was transferring focus to document header after 2.1 seconds
-  - Root cause: FocusPlugin in LexicalEditor.tsx had setTimeout(focusField, 2100) forcing focus to header
-  - Solution: Completely removed FocusPlugin instantiation - no automatic focus happens after document load
-  - User requirement: NO automatic focus transfers regardless of document content state
-  - EditProtectionPlugin remains active for container-only editing protection
+✓ IN PROGRESS: Debugging Container Editing Issues (January 31, 2025)
+  - Issue: User cannot type in containers, focus transfers to first container
+  - Actions taken:
+    1. Removed FocusPlugin completely - no automatic focus after document load
+    2. Temporarily disabled EditProtectionPlugin to test if it's blocking container edits
+  - EditProtectionPlugin was checking if edits are within CollapsibleContentNode
+  - Testing if protection logic was incorrectly blocking valid container edits
 
 ✓ COMPLETED: Fixed Plugin Data Transfer to Header Fields (January 31, 2025)
   - Fixed issue where plugin button (unplug) wasn't updating header field values

@@ -2487,7 +2487,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <ImageEventListenerPlugin />
           <ImageIdAutoConvertPlugin />
           <TemplateSectionsPlugin sections={templateSections} mdFileOld={mdFileOld} />
-          <EditProtectionPlugin />
+          {/* <EditProtectionPlugin /> - Temporariamente desabilitado para debug */}
           <HeaderFieldMappingPlugin templateMappings={templateMappings} documentData={documentData} />
           <EditorInstancePlugin setEditorInstance={(editor) => {
             setEditorInstance(editor);
