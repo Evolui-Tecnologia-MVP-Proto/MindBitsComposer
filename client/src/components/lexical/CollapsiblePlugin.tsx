@@ -46,7 +46,7 @@ export const DELETE_COLLAPSIBLE_COMMAND: LexicalCommand<NodeKey> = createCommand
   'DELETE_COLLAPSIBLE_COMMAND',
 );
 
-export function $insertCollapsibleContainer(isOpen = true, fromToolbar = false, titleText = 'Container Colapsível'): void {
+export function $insertCollapsibleContainer(isOpen = true, fromToolbar = false, titleText = 'Sub Sessão'): void {
   const title = $createCollapsibleTitleNode(titleText);
   const content = $createCollapsibleContentNode();
   const paragraph = $createParagraphNode();
