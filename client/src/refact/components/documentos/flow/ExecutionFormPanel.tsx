@@ -21,7 +21,7 @@ import {
 
 interface ExecutionFormProps {
   nodeId: string;
-  nodeType: 'actionNode' | 'documentNode' | 'integrationNode' | 'endNode';
+  nodeType: 'startNode' | 'actionNode' | 'documentNode' | 'integrationNode' | 'endNode' | 'switchNode';
   nodeData: any;
   onSubmit: (data: any) => void;
   onCancel?: () => void;
@@ -41,6 +41,8 @@ export function ExecutionFormPanel({
   
   const renderForm = () => {
     switch (nodeType) {
+      case 'startNode':
+        return <StartNodeForm nodeData={nodeData} onSubmit={onSubmit} onCancel={onCancel} isLoading={isLoading} />;
       case 'actionNode':
         return <ActionNodeForm nodeData={nodeData} onSubmit={onSubmit} onCancel={onCancel} isLoading={isLoading} />;
       case 'documentNode':
@@ -49,8 +51,10 @@ export function ExecutionFormPanel({
         return <IntegrationNodeForm nodeData={nodeData} onSubmit={onSubmit} onCancel={onCancel} isLoading={isLoading} />;
       case 'endNode':
         return <EndNodeForm nodeData={nodeData} onSubmit={onSubmit} onCancel={onCancel} isLoading={isLoading} />;
+      case 'switchNode':
+        return <SwitchNodeForm nodeData={nodeData} onSubmit={onSubmit} onCancel={onCancel} isLoading={isLoading} />;
       default:
-        return <div>Tipo de nó não suportado</div>;
+        return <div className="text-red-500">Tipo de nó não suportado: {nodeType}</div>;
     }
   };
 
@@ -323,6 +327,106 @@ function EndNodeForm({ nodeData, onSubmit, onCancel, isLoading }: any) {
             <Button type="submit" disabled={isLoading}>
               {isLoading ? 'Concluindo...' : 'Concluir Fluxo'}
             </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
+  );
+}
+
+function StartNodeForm({ nodeData, onSubmit, onCancel, isLoading }: any) {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit({});
+  };
+
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="text-lg">Nó de Início</CardTitle>
+        <CardDescription>{nodeData?.label || 'Este é o ponto de partida do fluxo'}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            O nó de início é executado automaticamente quando o fluxo é iniciado.
+            Não requer configuração adicional.
+          </AlertDescription>
+        </Alert>
+        
+        {nodeData?.isExecuted === 'TRUE' && (
+          <div className="mt-4 flex items-center gap-2 text-green-600 dark:text-green-400">
+            <Check className="h-4 w-4" />
+            <span className="text-sm font-medium">Fluxo iniciado</span>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function SwitchNodeForm({ nodeData, onSubmit, onCancel, isLoading }: any) {
+  const [formData, setFormData] = React.useState({
+    condition: '',
+    value: ''
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle className="text-lg">Nó de Condição</CardTitle>
+        <CardDescription>{nodeData?.label || 'Configurar condição de decisão'}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Este nó avalia uma condição e direciona o fluxo para diferentes caminhos.
+            </AlertDescription>
+          </Alert>
+
+          <div className="space-y-2">
+            <Label>Valor de Entrada</Label>
+            <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+              <p className="text-sm font-mono">{nodeData?.inputSwitch || 'Não definido'}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Condição Esquerda</Label>
+              <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                <p className="text-sm font-mono">{nodeData?.leftSwitch || 'Não definido'}</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Condição Direita</Label>
+              <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                <p className="text-sm font-mono">{nodeData?.rightSwitch || 'Não definido'}</p>
+              </div>
+            </div>
+          </div>
+
+          {nodeData?.isExecuted === 'TRUE' && (
+            <div className="mt-4 flex items-center gap-2 text-green-600 dark:text-green-400">
+              <Check className="h-4 w-4" />
+              <span className="text-sm font-medium">Condição avaliada</span>
+            </div>
+          )}
+
+          <div className="flex justify-end space-x-2 pt-4">
+            {onCancel && (
+              <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
+                Fechar
+              </Button>
+            )}
           </div>
         </form>
       </CardContent>
