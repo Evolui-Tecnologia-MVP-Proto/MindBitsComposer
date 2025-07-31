@@ -29,6 +29,12 @@ interface Connection {
   name: string;
   code: string;
   description?: string;
+  endpoint?: string;
+  credentials?: {
+    userType: string;
+    login: string;
+    password: string;
+  };
 }
 
 interface Subsystem {
@@ -46,12 +52,40 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [menuStructure, setMenuStructure] = useState<MenuPath[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [authToken, setAuthToken] = useState<string | null>(null);
+  const [pluginConfig, setPluginConfig] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Mock data for connections - em produção seria uma API
-  const connections: Connection[] = [
-    { id: "1", name: "Produção Principal", code: "PROD", description: "Ambiente de produção principal" },
+  // Fetch plugin configuration
+  const { data: lthPlugin } = useQuery({
+    queryKey: ['/api/plugins/lth-menus-path'],
+    queryFn: async () => {
+      const plugins = await apiRequest("GET", "/api/plugins");
+      return plugins.find((p: any) => p.pageName === 'lth_menus_path_plugin');
+    }
+  });
+
+  useEffect(() => {
+    if (lthPlugin?.configuration) {
+      setPluginConfig(lthPlugin.configuration);
+    }
+  }, [lthPlugin]);
+
+  // Get connections from plugin configuration
+  const connections: Connection[] = pluginConfig?.connections || [
+    { 
+      id: "1", 
+      name: "Produção Principal", 
+      code: "PROD", 
+      description: "Ambiente de produção principal",
+      endpoint: "https://portal.evoluitecnologia.com.br:8039/api/public/auth/login",
+      credentials: {
+        userType: "CUSTOM",
+        login: "super",
+        password: "super@1234"
+      }
+    },
     { id: "2", name: "Homologação", code: "HOM", description: "Ambiente de homologação" },
     { id: "3", name: "Desenvolvimento", code: "DEV", description: "Ambiente de desenvolvimento" },
     { id: "4", name: "Teste Integrado", code: "TEST", description: "Ambiente de testes integrados" }
@@ -473,27 +507,110 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     return baseMenus[subsystemCode] || [];
   };
 
-  const handleConnectionChange = (connectionCode: string) => {
+  // Function to authenticate with the API
+  const authenticateConnection = async (connectionCode: string) => {
+    const connection = connections.find(c => c.code === connectionCode);
+    if (!connection?.endpoint || !connection?.credentials) {
+      return false;
+    }
+
+    try {
+      const response = await apiRequest("POST", "/api/plugin/lth-auth", {
+        endpoint: connection.endpoint,
+        credentials: connection.credentials
+      });
+
+      if (response.success) {
+        setAuthToken(response.token);
+        return true;
+      }
+    } catch (error) {
+      console.error("Authentication failed:", error);
+      toast({
+        title: "Erro de autenticação",
+        description: "Falha ao autenticar com a conexão selecionada",
+        variant: "destructive"
+      });
+    }
+    return false;
+  };
+
+  // Function to fetch subsystems from API
+  const fetchSubsystems = async () => {
+    if (!authToken || !selectedConnection) return;
+
+    try {
+      const response = await apiRequest("POST", "/api/plugin/lth-subsystems", {
+        connectionCode: selectedConnection,
+        authToken: authToken
+      });
+
+      if (response.subsystems) {
+        // Update subsystems with API data
+        return response.subsystems;
+      }
+    } catch (error) {
+      console.error("Failed to fetch subsystems:", error);
+    }
+    return [];
+  };
+
+  const handleConnectionChange = async (connectionCode: string) => {
     setSelectedConnection(connectionCode);
     // Reset subsystem and related states when connection changes
     setSelectedSubsystem("");
     setMenuStructure([]);
     setExpandedPaths(new Set());
     setSelectedPath(null);
+    
+    // Authenticate with the selected connection
+    setIsLoading(true);
+    const authenticated = await authenticateConnection(connectionCode);
+    setIsLoading(false);
+
+    if (authenticated) {
+      toast({
+        title: "Conexão estabelecida",
+        description: "Autenticação realizada com sucesso",
+      });
+    }
   };
 
-  const handleSubsystemChange = (subsystemCode: string) => {
+  const handleSubsystemChange = async (subsystemCode: string) => {
     setSelectedSubsystem(subsystemCode);
     setIsLoading(true);
     
-    // Simular carregamento de dados
-    setTimeout(() => {
+    try {
+      if (authToken) {
+        const response = await apiRequest("POST", "/api/plugin/lth-menus", {
+          connectionCode: selectedConnection,
+          subsystemCode: subsystemCode,
+          authToken: authToken
+        });
+
+        if (response.menuStructure) {
+          setMenuStructure(response.menuStructure);
+        }
+      } else {
+        // Fallback to mock data if not authenticated
+        const structure = generateMenuStructure(subsystemCode);
+        setMenuStructure(structure);
+      }
+    } catch (error) {
+      console.error("Failed to fetch menu structure:", error);
+      toast({
+        title: "Erro ao carregar menus",
+        description: "Falha ao obter estrutura de menus do subsistema",
+        variant: "destructive"
+      });
+      // Use mock data as fallback
       const structure = generateMenuStructure(subsystemCode);
       setMenuStructure(structure);
+    } finally {
       setExpandedPaths(new Set()); // Reset expanded state
       setSelectedPath(null); // Reset selected state
       setIsLoading(false);
-    }, 500);
+    }
   };
 
   const toggleExpanded = (pathId: string) => {

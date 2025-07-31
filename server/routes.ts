@@ -2584,6 +2584,135 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // LTH Plugin API routes
+  app.post("/api/plugin/lth-auth", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { endpoint, credentials } = req.body;
+    
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(credentials)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Authentication failed: ${response.status} ${response.statusText}`);
+      }
+
+      // Extract cookies from response headers
+      const setCookieHeader = response.headers.get("set-cookie");
+      let cookies = "";
+      
+      if (setCookieHeader) {
+        // Parse and store cookies
+        cookies = setCookieHeader.split(", ").map(cookie => {
+          const [nameValue] = cookie.split(";");
+          return nameValue;
+        }).join("; ");
+      }
+
+      // Store cookies in a file for this user session
+      const cookiePath = path.join(__dirname, `../cookies_${req.user?.id}.txt`);
+      fs.writeFileSync(cookiePath, cookies);
+
+      res.json({ 
+        success: true, 
+        token: cookies,
+        message: "Authentication successful"
+      });
+    } catch (error) {
+      console.error("LTH authentication error:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+  });
+
+  app.post("/api/plugin/lth-subsystems", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { connectionCode, authToken } = req.body;
+    
+    try {
+      // Read cookies from file
+      const cookiePath = path.join(__dirname, `../cookies_${req.user?.id}.txt`);
+      let cookies = authToken;
+      
+      if (fs.existsSync(cookiePath)) {
+        cookies = fs.readFileSync(cookiePath, 'utf-8');
+      }
+
+      // TODO: Replace with actual API endpoint when available
+      // For now, return mock data
+      const subsystems = [
+        { id: "DOC", name: "Documentação", description: "Sistema de documentação" },
+        { id: "FIN", name: "Financeiro", description: "Sistema financeiro" },
+        { id: "RH", name: "Recursos Humanos", description: "Sistema de RH" },
+        { id: "PROJ", name: "Projetos", description: "Sistema de projetos" }
+      ];
+
+      res.json({ subsystems });
+    } catch (error) {
+      console.error("LTH subsystems error:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+  });
+
+  app.post("/api/plugin/lth-menus", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { connectionCode, subsystemCode, authToken } = req.body;
+    
+    try {
+      // Read cookies from file
+      const cookiePath = path.join(__dirname, `../cookies_${req.user?.id}.txt`);
+      let cookies = authToken;
+      
+      if (fs.existsSync(cookiePath)) {
+        cookies = fs.readFileSync(cookiePath, 'utf-8');
+      }
+
+      // TODO: Replace with actual API endpoint when available
+      // For now, return mock menu structure
+      const menuStructure = [
+        {
+          id: "1",
+          label: "Cadastros",
+          path: `${subsystemCode}/cadastros`,
+          children: [
+            { id: "1.1", label: "Usuários", path: `${subsystemCode}/cadastros/usuarios` },
+            { id: "1.2", label: "Perfis", path: `${subsystemCode}/cadastros/perfis` }
+          ]
+        },
+        {
+          id: "2",
+          label: "Relatórios",
+          path: `${subsystemCode}/relatorios`,
+          children: [
+            { id: "2.1", label: "Gerenciais", path: `${subsystemCode}/relatorios/gerenciais` },
+            { id: "2.2", label: "Operacionais", path: `${subsystemCode}/relatorios/operacionais` }
+          ]
+        }
+      ];
+
+      res.json({ menuStructure });
+    } catch (error) {
+      console.error("LTH menus error:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+  });
+
   // Testar plugin
   app.post("/api/plugins/:id/test", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
