@@ -187,71 +187,93 @@ export class CollapsibleTitleNode extends TextNode {
           e.preventDefault();
           e.stopPropagation();
           
+          console.log('🖱️ Botão de editar clicado');
+          
           // Encontrar o span de texto no DOM atual
           const target = e.target as HTMLElement;
           if (target) {
             const titleElement = target.closest('summary');
+            console.log('📍 Elemento summary encontrado:', titleElement);
+            
             const textSpan = titleElement?.querySelector('span:not(.mr-2)') as HTMLElement;
+            console.log('📝 Span de texto encontrado:', textSpan);
             
             if (textSpan) {
               const currentText = textSpan.textContent || '';
+              console.log('📄 Texto atual:', currentText);
               
               // Criar input temporário
               const input = document.createElement('input');
               input.value = currentText;
-              input.className = 'bg-transparent border border-blue-500 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white';
+              input.className = 'bg-transparent border-2 border-blue-500 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white';
+              input.style.minWidth = '150px';
+              input.style.zIndex = '999';
               
-              // Substituir o span pelo input temporariamente
+              console.log('🆕 Input criado:', input);
+              
+              // Esconder o span e inserir o input
               textSpan.style.display = 'none';
               textSpan.parentNode?.insertBefore(input, textSpan);
               
-              // Usar setTimeout para garantir que o foco funcione corretamente
-              setTimeout(() => {
-                input.focus();
-                input.select();
-              }, 10);
+              console.log('👁️ Span escondido e input inserido');
               
-              let isEditing = true; // Flag para controlar se ainda está editando
+              // Focar no input imediatamente
+              input.focus();
+              input.select();
               
-              const finishEdit = () => {
-                if (!isEditing) return; // Evitar execução múltipla
-                isEditing = false;
+              console.log('🎯 Input focado e selecionado');
+              
+              const finishEdit = (save: boolean = true) => {
+                console.log('🏁 Finalizando edição, save:', save);
                 
-                const newText = input.value.trim();
-                if (newText && newText !== currentText) {
-                  // Atualizar apenas o texto do span
-                  this.setTextContent(newText);
-                  textSpan.textContent = newText;
+                if (save) {
+                  const newText = input.value.trim();
+                  console.log('💾 Novo texto:', newText);
+                  
+                  if (newText && newText !== currentText) {
+                    this.setTextContent(newText);
+                    textSpan.textContent = newText;
+                    console.log('✅ Texto atualizado');
+                  }
                 }
                 
-                // Remover input e mostrar span novamente
+                // Remover input e mostrar span
                 if (input.parentNode) {
                   input.remove();
+                  console.log('🗑️ Input removido');
                 }
                 textSpan.style.display = '';
+                console.log('👁️ Span mostrado novamente');
               };
               
-              // Finalizar edição ao pressionar Enter ou perder foco
+              // Event listeners
               input.addEventListener('keydown', (event) => {
+                console.log('⌨️ Tecla pressionada:', event.key);
                 if (event.key === 'Enter') {
                   event.preventDefault();
-                  finishEdit();
+                  finishEdit(true);
                 } else if (event.key === 'Escape') {
                   event.preventDefault();
-                  isEditing = false;
-                  if (input.parentNode) {
-                    input.remove();
-                  }
-                  textSpan.style.display = '';
+                  finishEdit(false);
                 }
               });
               
-              // Usar setTimeout para evitar blur imediato
-              setTimeout(() => {
-                if (isEditing) {
-                  input.addEventListener('blur', finishEdit);
+              // Adicionar blur com delay
+              let blurTimeout: NodeJS.Timeout;
+              input.addEventListener('blur', () => {
+                console.log('🔍 Input perdeu foco');
+                blurTimeout = setTimeout(() => {
+                  finishEdit(true);
+                }, 200);
+              });
+              
+              // Cancelar blur se voltar o foco
+              input.addEventListener('focus', () => {
+                console.log('🎯 Input recuperou foco');
+                if (blurTimeout) {
+                  clearTimeout(blurTimeout);
                 }
-              }, 100);
+              });
             }
           }
         };
