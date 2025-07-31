@@ -173,11 +173,15 @@ export default function PluginModal({
 
   // Função para interceptar dados do plugin e verificar se deve fechar modal
   const handleDataExchange = (data: any) => {
-    console.log('PluginModal recebeu dados:', data);
+    console.log('🎨 PluginModal recebeu dados:', data);
+    console.log('🎨 PluginModal - onDataExchange existe?', !!onDataExchange);
     
     // Chamar função original se existir
     if (onDataExchange) {
+      console.log('🎨 PluginModal - Chamando onDataExchange com dados:', data);
       onDataExchange(data);
+    } else {
+      console.error('🎨 PluginModal - onDataExchange não foi fornecido!');
     }
     
     // Se é uma exportação de imagem, chamar onImageExport

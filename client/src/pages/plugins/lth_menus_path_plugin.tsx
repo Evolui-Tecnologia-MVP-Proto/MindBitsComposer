@@ -717,10 +717,15 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
     // Enviar o caminho formatado como string para o campo input
     if (onDataExchange) {
+      console.log('🎯 LTH Plugin - Enviando dados via onDataExchange');
+      console.log('🎯 LTH Plugin - Dados:', { value: formattedPath, closeModal: true });
       onDataExchange({
         value: formattedPath, // String formatada para o campo input
         closeModal: true // Fechar o modal após salvar
       });
+      console.log('🎯 LTH Plugin - Dados enviados com sucesso!');
+    } else {
+      console.error('❌ LTH Plugin - onDataExchange não está definido!');
     }
 
     // Não mostrar toast quando usado no contexto de documento (onDataExchange disponível)

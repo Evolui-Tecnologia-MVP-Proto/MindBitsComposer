@@ -2472,11 +2472,15 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
         }}
         plugin={selectedPlugin}
         onDataExchange={(data) => {
-          console.log('🔄 Plugin data exchange recebido:', data);
+          console.log('🔄 Plugin data exchange recebido no LexicalEditor:', data);
+          console.log('🔄 currentFieldContext:', currentFieldContext);
+          console.log('🔄 editorInstance:', !!editorInstance);
           
           // Verificar se temos contexto do campo que invocou o plugin
           if (!currentFieldContext || !editorInstance) {
             console.log('❌ Contexto do campo ou editor não disponível');
+            console.log('❌ currentFieldContext:', currentFieldContext);
+            console.log('❌ editorInstance:', editorInstance);
             return;
           }
           
