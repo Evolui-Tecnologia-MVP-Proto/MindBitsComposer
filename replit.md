@@ -12,9 +12,11 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 ## Recent Updates (January 31, 2025)
 
 ✓ COMPLETED: Conditional Template Accordion Based on System Parameter (January 31, 2025)
-  - Implemented conditional display of template accordion in biblioteca based on system_params configuration
+  - Implemented conditional template accordion state in biblioteca based on system_params configuration
   - Added query to fetch system parameter "COMPOSER_TEMPLATE_ENABLED" via /api/system-params/COMPOSER_TEMPLATE_ENABLED
-  - Template accordion only shows when param_value = "TRUE", hidden when "FALSE" or parameter doesn't exist
+  - Template accordion shows disabled state when param_value = "FALSE" or parameter doesn't exist
+  - When disabled: accordion trigger shows "(Desabilitado)" with disabled styling and informative message
+  - When enabled: full template functionality available as normal
   - Query enabled only when biblioteca (document list) is open for performance optimization
   - Proper error handling: returns default "FALSE" value when parameter doesn't exist (404 response)
   - Complete integration with existing accordion structure maintaining all existing functionality

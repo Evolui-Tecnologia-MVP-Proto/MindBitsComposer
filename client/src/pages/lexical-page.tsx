@@ -1765,15 +1765,27 @@ export default function LexicalPage() {
             {/* Área com scroll */}
             <div className="flex-1 p-4 overflow-y-auto overflow-x-hidden rounded-bl-xl">
               <Accordion type="multiple" defaultValue={[]} className="w-full overflow-hidden">
-                {/* Grupo 1: Templates Estruturais - Condicional baseado em system_params */}
-                {isTemplatesEnabled && (
-                  <AccordionItem value="templates">
-                    <AccordionTrigger className="text-md font-medium text-gray-700 dark:text-[#9CA3AF] hover:no-underline">
-                      Templates Estruturais
-                    </AccordionTrigger>
+                {/* Grupo 1: Templates Estruturais - Sempre visível, desabilitado quando parâmetro = FALSE */}
+                <AccordionItem value="templates">
+                  <AccordionTrigger 
+                    className={`text-md font-medium hover:no-underline ${
+                      isTemplatesEnabled 
+                        ? 'text-gray-700 dark:text-[#9CA3AF]' 
+                        : 'text-gray-400 dark:text-[#6B7280] cursor-not-allowed opacity-60'
+                    }`}
+                    disabled={!isTemplatesEnabled}
+                  >
+                    Templates Estruturais {!isTemplatesEnabled && '(Desabilitado)'}
+                  </AccordionTrigger>
                   <AccordionContent className="overflow-hidden">
                     <div className="space-y-2 pt-2 overflow-x-hidden">
-                      {isLoadingTemplates ? (
+                      {!isTemplatesEnabled ? (
+                        <div className="text-center py-4 text-amber-600 dark:text-amber-400">
+                          <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                          <p className="text-xs">Templates desabilitados pelo administrador</p>
+                          <p className="text-xs opacity-75 mt-1">Entre em contato com o suporte para habilitar</p>
+                        </div>
+                      ) : isLoadingTemplates ? (
                         <div className="text-center py-2 text-sm">Carregando templates...</div>
                       ) : (
                         <>
@@ -1832,7 +1844,6 @@ export default function LexicalPage() {
                     </div>
                   </AccordionContent>
                 </AccordionItem>
-                )}
 
                 {/* Grupo 2: Documentos Composer */}
                 <AccordionItem value="documents">
