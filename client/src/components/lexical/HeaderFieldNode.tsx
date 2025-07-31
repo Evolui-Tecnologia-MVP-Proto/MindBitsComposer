@@ -181,6 +181,24 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
   
   console.log(`🏷️ HeaderFieldComponent renderizado - label: "${node.getLabel()}", mappingType: "${mappingType}", mappingValue: "${mappingValue}"`);
   
+  // Adicionar listener global temporário para debug
+  React.useEffect(() => {
+    if (mappingType && (mappingType === 'field' || mappingType === 'formula')) {
+      const handleGlobalClick = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        if (target.closest('button') && target.closest(`[data-label="${node.getLabel()}"]`)) {
+          console.log(`🎯 CLIQUE GLOBAL DETECTADO NO BOTÃO DE ${node.getLabel()}!`);
+        }
+      };
+      
+      document.addEventListener('click', handleGlobalClick, true);
+      
+      return () => {
+        document.removeEventListener('click', handleGlobalClick, true);
+      };
+    }
+  }, [mappingType, node]);
+  
 
 
   // Sincronizar valor quando o nó for atualizado
@@ -442,6 +460,7 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
             {(mappingType === 'field' || mappingType === 'formula') && (
               <button
                   onClick={(e) => {
+                    console.log('🎯🎯🎯 ONCLICK DO BOTÃO ACIONADO!');
                     e.preventDefault();
                     e.stopPropagation();
                     handleRefresh();
@@ -453,8 +472,14 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
                   className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                   title="Recarregar valor"
                   type="button"
+                  style={{ 
+                    pointerEvents: 'auto', 
+                    position: 'relative', 
+                    zIndex: 9999,
+                    cursor: 'pointer'
+                  }}
                 >
-                  <RefreshCw className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  <RefreshCw className="w-4 h-4 text-gray-500 dark:text-gray-400 pointer-events-none" />
                 </button>
             )}
             {mappingType === 'plugin' && (
@@ -472,7 +497,7 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
                 title="Executar plugin"
                 type="button"
               >
-                <Unplug className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                <Unplug className="w-4 h-4 text-gray-500 dark:text-gray-400 pointer-events-none" />
               </button>
             )}
           </div>
