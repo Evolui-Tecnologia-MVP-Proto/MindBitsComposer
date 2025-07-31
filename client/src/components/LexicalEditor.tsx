@@ -2512,6 +2512,22 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
             if (node && 'setValue' in node) {
               (node as any).setValue(pluginValue);
               console.log(`✅ Campo "${label}" atualizado com sucesso!`);
+              
+              // Forçar atualização do input via DOM (mesma lógica do refresh)
+              setTimeout(() => {
+                const inputElement = document.querySelector(`[data-label="${label}"] input`) as HTMLInputElement;
+                if (inputElement) {
+                  console.log(`📝 Forçando atualização do DOM para campo "${label}"`);
+                  inputElement.value = pluginValue;
+                  inputElement.dispatchEvent(new Event('input', { bubbles: true }));
+                  inputElement.dispatchEvent(new Event('change', { bubbles: true }));
+                  
+                  // Focar no campo após atualizar
+                  inputElement.focus();
+                  // Posicionar cursor no final do texto
+                  inputElement.setSelectionRange(inputElement.value.length, inputElement.value.length);
+                }
+              }, 100);
             } else {
               console.log(`❌ Não foi possível encontrar o nó ${nodeKey} ou ele não tem método setValue`);
             }
