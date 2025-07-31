@@ -4351,6 +4351,20 @@ html.dark div[data-radix-tabs-content][value="anexos"] table.table-fixed tbody t
   background-color: #0F172A !important;
 }
 
+/* HomePage EmProcessoTab table header colors for dark theme */
+html.dark .fade-in table thead th {
+  background-color: #111827 !important;
+  border-color: #111827 !important;
+}
+
+html.dark .fade-in table thead tr {
+  background-color: #111827 !important;
+}
+
+html.dark .fade-in .bg-gray-50 {
+  background-color: #111827 !important;
+}
+
 /* ===== #292C33 THEME - TEXT CONTAINERS AND NODE FILLS (DARK MODE ONLY) ===== */
 /* ReactFlow node text containers and specific UI elements - dark mode only */
 .dark .flow-node-text-container,
