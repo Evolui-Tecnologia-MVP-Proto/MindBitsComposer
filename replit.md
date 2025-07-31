@@ -11,6 +11,15 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
+✓ COMPLETED: Code Block Line Numbering System (January 31, 2025)
+  - Implemented automatic line numbering for code blocks in Lexical editor
+  - Created CodeLineNumberPlugin that automatically calculates and displays line numbers
+  - Enhanced CSS with dark mode support for line number gutters (#1e293b background, #9ca3af text)
+  - Plugin observes code blocks via DOM and updates data-gutter attribute with line numbers
+  - Line numbers display with proper formatting (padded, right-aligned) in left gutter
+  - Integrates seamlessly with existing code block functionality and theme switching
+  - Users now see line numbers automatically in all code blocks for better code readability
+
 ✓ COMPLETED: Fixed Code Block Button to Convert Selected Text (January 31, 2025)
   - Fixed issue where code block button was deleting selected text and inserting empty code block
   - Modified insertCodeBlock function to preserve and convert selected text into code block format

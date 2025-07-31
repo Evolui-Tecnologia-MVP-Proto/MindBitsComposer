@@ -1405,6 +1405,12 @@ body.dark [data-radix-alert-dialog-content]:not([style*="background"]) {
   min-width: 25px;
 }
 
+.dark .editor-code:before {
+  background-color: #1e293b;
+  border-right-color: #374151;
+  color: #9ca3af;
+}
+
 .editor-code:after {
   content: attr(data-highlight-language);
   top: 0;

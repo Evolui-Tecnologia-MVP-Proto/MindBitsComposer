@@ -38,6 +38,9 @@ import { HeaderFieldNode, $createHeaderFieldNode, $isHeaderFieldNode } from './l
 // Import do plugin customizado de tabela
 import CustomTablePlugin, { INSERT_CUSTOM_TABLE_COMMAND } from './lexical/TablePlugin';
 
+// Import do plugin de numeração de linha para código
+import CodeLineNumberPlugin from './lexical/CodeLineNumberPlugin';
+
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
@@ -2478,6 +2481,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <TemplateSectionsPlugin sections={templateSections} mdFileOld={mdFileOld} />
           <EditProtectionPlugin />
           <HeaderFieldMappingPlugin templateMappings={templateMappings} documentData={documentData} />
+          <CodeLineNumberPlugin />
           <FocusDebugPlugin />
           <EditorInstancePlugin setEditorInstance={(editor) => {
             setEditorInstance(editor);
