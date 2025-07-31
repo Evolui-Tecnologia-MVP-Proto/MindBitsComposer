@@ -417,7 +417,9 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
             userSelect: 'text',
             cursor: 'text',
             WebkitUserSelect: 'text',
-            MozUserSelect: 'text'
+            MozUserSelect: 'text',
+            caretColor: 'auto', // Garantir que o cursor seja visível
+            color: 'inherit'   // Herdar a cor do texto
           }}
           placeholder={node.__placeholder}
           data-header-field-input="true"

@@ -4960,3 +4960,42 @@ main:has([data-page="documentos"]) {
   display: flex;
   flex-direction: column;
 }
+
+/* GARANTIR CURSOR SEMPRE VISÍVEL NOS CAMPOS DO HEADER */
+.header-field-input {
+  caret-color: currentColor !important;
+}
+
+.dark .header-field-input {
+  caret-color: #E5E7EB !important;
+}
+
+/* Prevenir que o Lexical esconda o cursor */
+.header-field-container input {
+  caret-color: currentColor !important;
+}
+
+.dark .header-field-container input {
+  caret-color: #E5E7EB !important;
+}
+
+/* Forçar cursor visível com alta especificidade */
+.lexical-editor-container .header-field-input {
+  caret-color: #111827 !important;
+}
+
+.dark .lexical-editor-container .header-field-input {
+  caret-color: #E5E7EB !important;
+}
+
+/* Garantir que o cursor pisque normalmente */
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.header-field-input:focus {
+  animation: none !important;
+  caret-color: currentColor !important;
+}
