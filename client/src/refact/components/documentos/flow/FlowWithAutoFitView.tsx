@@ -625,6 +625,8 @@ export function FlowWithAutoFitView({
 
   // Processar nós para aplicar cores e animações
   const processedNodes = useMemo(() => {
+    if (!nodes || !Array.isArray(nodes)) return [];
+    
     return nodes.map(node => {
       // Cores padrão
       const defaultColors = {
@@ -669,11 +671,11 @@ export function FlowWithAutoFitView({
 
   // Processar edges para aplicar animações
   const processedEdges = useMemo(() => {
-    if (!edges) return [];
+    if (!edges || !Array.isArray(edges)) return [];
     
     return edges.map(edge => {
       // Encontrar nó de origem
-      const sourceNode = nodes.find(node => node.id === edge.source);
+      const sourceNode = nodes && Array.isArray(nodes) ? nodes.find(node => node.id === edge.source) : null;
       
       // Lógica de animação
       let shouldAnimate = false;
