@@ -270,6 +270,26 @@ export default function LexicalPage() {
     enabled: true,
   });
 
+  // Query para buscar parâmetro COMPOSER_TEMPLATE_ENABLED
+  const { data: templateEnabledParam, isLoading: isLoadingTemplateParam } = useQuery({
+    queryKey: ['/api/system-params', 'COMPOSER_TEMPLATE_ENABLED'],
+    queryFn: async () => {
+      const response = await fetch('/api/system-params/COMPOSER_TEMPLATE_ENABLED');
+      if (!response.ok) {
+        // Se parâmetro não existe, retornar valor padrão FALSE
+        if (response.status === 404) {
+          return { paramValue: 'FALSE' };
+        }
+        throw new Error('Erro ao buscar parâmetro do sistema');
+      }
+      return await response.json();
+    },
+    enabled: showDocumentList, // Só buscar quando biblioteca estiver aberta
+  });
+
+  // Verificar se templates estão habilitados
+  const isTemplatesEnabled = templateEnabledParam?.paramValue === 'TRUE';
+
   // Filter plugins for composer attachments panel - only COMPOSER_ASSET type
   const composerAssetPlugins = activePlugins.filter((plugin: any) => plugin.type === 'COMPOSER_ASSET');
 
@@ -1745,11 +1765,12 @@ export default function LexicalPage() {
             {/* Área com scroll */}
             <div className="flex-1 p-4 overflow-y-auto overflow-x-hidden rounded-bl-xl">
               <Accordion type="multiple" defaultValue={[]} className="w-full overflow-hidden">
-                {/* Grupo 1: Templates Estruturais */}
-                <AccordionItem value="templates">
-                  <AccordionTrigger className="text-md font-medium text-gray-700 dark:text-[#9CA3AF] hover:no-underline">
-                    Templates Estruturais
-                  </AccordionTrigger>
+                {/* Grupo 1: Templates Estruturais - Condicional baseado em system_params */}
+                {isTemplatesEnabled && (
+                  <AccordionItem value="templates">
+                    <AccordionTrigger className="text-md font-medium text-gray-700 dark:text-[#9CA3AF] hover:no-underline">
+                      Templates Estruturais
+                    </AccordionTrigger>
                   <AccordionContent className="overflow-hidden">
                     <div className="space-y-2 pt-2 overflow-x-hidden">
                       {isLoadingTemplates ? (
@@ -1811,6 +1832,7 @@ export default function LexicalPage() {
                     </div>
                   </AccordionContent>
                 </AccordionItem>
+                )}
 
                 {/* Grupo 2: Documentos Composer */}
                 <AccordionItem value="documents">

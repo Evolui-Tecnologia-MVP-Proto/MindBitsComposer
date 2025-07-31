@@ -11,6 +11,15 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
+✓ COMPLETED: Conditional Template Accordion Based on System Parameter (January 31, 2025)
+  - Implemented conditional display of template accordion in biblioteca based on system_params configuration
+  - Added query to fetch system parameter "COMPOSER_TEMPLATE_ENABLED" via /api/system-params/COMPOSER_TEMPLATE_ENABLED
+  - Template accordion only shows when param_value = "TRUE", hidden when "FALSE" or parameter doesn't exist
+  - Query enabled only when biblioteca (document list) is open for performance optimization
+  - Proper error handling: returns default "FALSE" value when parameter doesn't exist (404 response)
+  - Complete integration with existing accordion structure maintaining all existing functionality
+  - System administrators can now control template feature availability through system_params table
+
 ✓ COMPLETED: ELIMINATED ALL Automatic Focus Behavior - Complete Solution (January 31, 2025)
   - User was extremely frustrated with persistent focus stealing from containers to header fields
   - CRITICAL FIX: Completely removed FocusPlugin function (lines 1171-1307) that was using setTimeout(focusField, 2100)
