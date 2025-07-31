@@ -15,6 +15,7 @@ import LexicalPage from "@/pages/lexical-page";
 import FluxosPage from "@/pages/fluxos-page";
 import DocumentosPage from "@/pages/documentos-page";
 import DocumentosPageRefact from "@/refact/pages/documentos-page_refact";
+import DocumentosPageEmbed from "@/pages/documentos-page-embed";
 import PluginsPage from "@/pages/plugins-page";
 import CadastrosGeraisPage from "@/pages/cadastros-gerais-page";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -35,6 +36,7 @@ function Router() {
       <ProtectedRoute path="/fluxos" component={FluxosPage} />
       <ProtectedRoute path="/documentos" component={DocumentosPage} />
       <ProtectedRoute path="/documentos-refact" component={DocumentosPageRefact} />
+      <ProtectedRoute path="/documentos-embed" component={DocumentosPageEmbed} />
       <ProtectedRoute path="/plugins" component={PluginsPage} />
       <ProtectedRoute path="/configuracoes" component={ConfiguracoesPage} />
       <Route component={NotFound} />

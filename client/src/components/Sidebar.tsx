@@ -154,6 +154,16 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
             </div>
           </div>
 
+          <div className="sidebar-item-container">
+            <div 
+              className={`sidebar-item ${activeItem === "documentos-embed" ? "sidebar-active" : ""}`}
+              onClick={() => handleNavigation("/documentos-embed")}
+            >
+              <FlaskConical className="mr-3 h-6 w-6" />
+              Documentos (Embed)
+            </div>
+          </div>
+
         </nav>
       </aside>
 
