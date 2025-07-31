@@ -467,8 +467,18 @@ function ToolbarPlugin({
     editor.update(() => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
-        const codeNode = $createCodeNode();
-        $insertNodes([codeNode]);
+        // Se há texto selecionado, converter em bloco de código
+        if (!selection.isCollapsed()) {
+          const selectedText = selection.getTextContent();
+          const codeNode = $createCodeNode();
+          const textNode = $createTextNode(selectedText);
+          codeNode.append(textNode);
+          selection.insertNodes([codeNode]);
+        } else {
+          // Se não há seleção, inserir bloco de código vazio
+          const codeNode = $createCodeNode();
+          $insertNodes([codeNode]);
+        }
       }
     });
   };

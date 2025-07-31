@@ -11,6 +11,13 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
+✓ COMPLETED: Fixed Code Block Button to Convert Selected Text (January 31, 2025)
+  - Fixed issue where code block button was deleting selected text and inserting empty code block
+  - Modified insertCodeBlock function to preserve and convert selected text into code block format
+  - When text is selected: converts selection into code block with selected text content
+  - When no text selected: inserts empty code block (original behavior)
+  - Improved user experience by maintaining expected text formatting behavior
+
 ✓ COMPLETED: Final Editor Paragraph Spacing Set to 3px (January 31, 2025)
   - Changed paragraph margin-bottom to 3px for very tight spacing
   - User iteratively adjusted from 8px → 10px → 5px → 3px to achieve optimal layout
