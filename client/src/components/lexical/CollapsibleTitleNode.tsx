@@ -184,18 +184,22 @@ export class CollapsibleTitleNode extends TextNode {
         editButton.appendChild(editIcon);
         editButton.title = 'Editar título';
         editButton.onclick = (e) => {
-          console.log('🖱️ Botão de editar clicado');
           e.preventDefault();
           e.stopPropagation();
-          // Disparar evento personalizado para editar título
-          const nodeKey = this.getKey();
-          console.log('🔑 NodeKey do título:', nodeKey);
           
-          const event = new CustomEvent('editCollapsibleTitle', {
-            detail: { nodeKey: nodeKey }
-          });
-          console.log('📤 Disparando evento editCollapsibleTitle:', event.detail);
-          document.dispatchEvent(event);
+          // Abrir prompt diretamente aqui em vez de usar eventos
+          const currentText = this.getTextContent();
+          const newText = prompt('Digite o novo título:', currentText);
+          
+          if (newText !== null && newText.trim() !== '' && newText.trim() !== currentText) {
+            // Obter o editor do config
+            const editor = config.editor;
+            if (editor) {
+              editor.update(() => {
+                this.setTextContent(newText.trim());
+              });
+            }
+          }
         };
         
         // Botão de Excluir
