@@ -178,6 +178,15 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
   const [value, setValue] = React.useState(node.getValue());
   const mappingType = node.getMappingType();
   const mappingValue = node.getMappingValue();
+  
+  console.log(`🏷️ HeaderFieldComponent renderizado - label: "${node.getLabel()}", mappingType: "${mappingType}", mappingValue: "${mappingValue}"`);
+  
+  // Log para verificar se os botões devem ser renderizados
+  if (mappingType) {
+    console.log(`🔘 Campo "${node.getLabel()}" tem mappingType: ${mappingType} - botão deve aparecer`);
+  } else {
+    console.log(`❌ Campo "${node.getLabel()}" não tem mappingType - botão NÃO aparecerá`);
+  }
 
   // Sincronizar valor quando o nó for atualizado
   React.useEffect(() => {
