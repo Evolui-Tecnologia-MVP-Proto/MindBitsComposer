@@ -183,58 +183,71 @@ export class CollapsibleTitleNode extends TextNode {
       if (containerNode.getFromToolbar && containerNode.getFromToolbar()) {
         // Container direito para botões de ação
         const rightContainer = document.createElement('div');
-        rightContainer.classList.add('flex', 'items-center', 'gap-1', 'ml-2');
+        rightContainer.classList.add('flex', 'items-center', 'gap-1', 'ml-2', 'relative');
         
-        // Input de edição (inicialmente oculto)
+        // Dropdown panel de edição
+        const editDropdown = document.createElement('div');
+        editDropdown.className = 'absolute top-full right-0 mt-1 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-50 hidden';
+        editDropdown.style.minWidth = '250px';
+        
+        // Input de edição dentro do dropdown
         const editInput = document.createElement('input');
         editInput.type = 'text';
         editInput.value = this.getTextContent();
-        editInput.className = 'hidden px-2 py-0.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500';
-        editInput.style.minWidth = '150px';
+        editInput.className = 'w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2';
+        
+        // Container dos botões do dropdown
+        const dropdownButtons = document.createElement('div');
+        dropdownButtons.className = 'flex gap-2 justify-end';
+        
+        // Botão Cancelar
+        const cancelButton = document.createElement('button');
+        cancelButton.className = 'px-3 py-1 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors';
+        cancelButton.textContent = 'Cancelar';
+        
+        // Botão Salvar
+        const saveButton = document.createElement('button');
+        saveButton.className = 'px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors';
+        saveButton.textContent = 'Salvar';
+        
+        dropdownButtons.appendChild(cancelButton);
+        dropdownButtons.appendChild(saveButton);
+        editDropdown.appendChild(editInput);
+        editDropdown.appendChild(dropdownButtons);
         
         // Estado de edição
         let isEditing = false;
         
-        // Função para alternar modo edição
-        const toggleEditMode = (save: boolean = false) => {
-          isEditing = !isEditing;
-          
-          if (isEditing) {
-            // Entrar no modo edição
-            editInput.classList.remove('hidden');
+        // Função para abrir/fechar dropdown
+        const toggleDropdown = (show: boolean) => {
+          isEditing = show;
+          if (show) {
+            editDropdown.classList.remove('hidden');
             editInput.value = this.getTextContent();
-            editButton.innerHTML = '';
-            editButton.appendChild(createLucideIcon('save'));
-            editButton.title = 'Salvar título';
-            
-            // Focar no input
             setTimeout(() => {
               editInput.focus();
               editInput.select();
             }, 10);
           } else {
-            // Sair do modo edição
-            editInput.classList.add('hidden');
-            editButton.innerHTML = '';
-            editButton.appendChild(createLucideIcon('square-pen'));
-            editButton.title = 'Editar título';
-            
-            if (save) {
-              // Salvar o novo texto
-              const newText = editInput.value.trim();
-              if (newText && newText !== this.getTextContent()) {
-                const nodeKey = this.getKey();
-                const event = new CustomEvent('updateCollapsibleTitle', {
-                  detail: { nodeKey, newText }
-                });
-                window.dispatchEvent(event);
-                console.log('💾 Título salvo:', newText);
-              }
-            }
+            editDropdown.classList.add('hidden');
           }
         };
         
-        // Botão de Editar/Salvar
+        // Função para salvar
+        const saveTitle = () => {
+          const newText = editInput.value.trim();
+          if (newText && newText !== this.getTextContent()) {
+            const nodeKey = this.getKey();
+            const event = new CustomEvent('updateCollapsibleTitle', {
+              detail: { nodeKey, newText }
+            });
+            window.dispatchEvent(event);
+            console.log('💾 Título salvo:', newText);
+          }
+          toggleDropdown(false);
+        };
+        
+        // Botão de Editar
         const editButton = document.createElement('button');
         editButton.classList.add(
           'p-1', 'rounded', 'hover:bg-gray-200', 'dark:hover:bg-gray-600',
@@ -248,23 +261,34 @@ export class CollapsibleTitleNode extends TextNode {
         editButton.onclick = (e) => {
           e.preventDefault();
           e.stopPropagation();
-          toggleEditMode(isEditing); // Se está editando, salva; senão, entra em modo edição
+          toggleDropdown(!isEditing);
         };
         
         // Eventos do input
         editInput.addEventListener('keydown', (e) => {
           if (e.key === 'Enter') {
             e.preventDefault();
-            toggleEditMode(true); // Salvar
+            saveTitle();
           } else if (e.key === 'Escape') {
             e.preventDefault();
-            toggleEditMode(false); // Cancelar
+            toggleDropdown(false);
           }
         });
         
-        // Adicionar input e botão ao container
-        rightContainer.appendChild(editInput);
+        // Eventos dos botões
+        cancelButton.onclick = () => toggleDropdown(false);
+        saveButton.onclick = saveTitle;
+        
+        // Fechar dropdown ao clicar fora
+        document.addEventListener('click', (e) => {
+          if (isEditing && !editDropdown.contains(e.target as Node) && e.target !== editButton) {
+            toggleDropdown(false);
+          }
+        });
+        
+        // Adicionar elementos ao container
         rightContainer.appendChild(editButton);
+        rightContainer.appendChild(editDropdown);
         
         // Botão de Excluir
         const deleteButton = document.createElement('button');
