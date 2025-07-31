@@ -209,7 +209,8 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
     };
   }, [editor, node.getKey()]);
 
-  // Focar automaticamente se for o primeiro campo
+  // REMOVIDO: Foco automático no primeiro campo estava interferindo com edição nos containers
+  /*
   React.useEffect(() => {
     const checkAndFocus = () => {
       const allHeaderInputs = document.querySelectorAll('.header-field-input');
@@ -242,6 +243,7 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
       timers.forEach(timer => clearTimeout(timer));
     };
   }, []);
+  */
 
   const handleChange = (newValue: string) => {
     console.log('📝 handleChange chamado com:', newValue);
@@ -411,19 +413,7 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
             e.stopPropagation();
             console.log('🎯 Input desfocado:', node.getLabel());
             setHasFocus(false);
-            
-            // Se perdeu o foco muito rapidamente (menos de 5 segundos), pode ser um bug
-            const focusDuration = Date.now() - lastFocusTime.current;
-            if (focusDuration < 5000 && inputRef.current) {
-              console.log('⚠️ Perda de foco inesperada após', focusDuration, 'ms. Tentando restaurar...');
-              // Tentar restaurar o foco após um pequeno delay
-              setTimeout(() => {
-                if (!hasFocus && inputRef.current && document.activeElement !== inputRef.current) {
-                  console.log('🔄 Restaurando foco no campo:', node.getLabel());
-                  inputRef.current.focus();
-                }
-              }, 100);
-            }
+            // REMOVIDO: Lógica de restauração automática de foco - estava interferindo com edição em containers
           }}
           onClick={(e) => {
             e.stopPropagation();
