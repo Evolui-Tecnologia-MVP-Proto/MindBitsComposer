@@ -73,7 +73,7 @@ export default function CollapsiblePlugin(): JSX.Element | null {
       INSERT_COLLAPSIBLE_COMMAND,
       (isOpen: boolean) => {
         editor.update(() => {
-          $insertCollapsibleContainer(isOpen);
+          $insertCollapsibleContainer(isOpen, true); // fromToolbar=true para containers inseridos via toolbar
         });
         return true;
       },
