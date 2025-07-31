@@ -46,6 +46,7 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
     queryKey: ["/api/documents-flows"],
     enabled: isOpen
   });
+  
   // Buscar parâmetro MAX_ITEMS_PER_REVISOR
   const { data: maxItemsParam } = useQuery({
     queryKey: ["/api/system-params", "MAX_ITEMS_PER_REVISOR"],
@@ -55,6 +56,19 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
         return res.json();
       }
       return null;
+    },
+    enabled: isOpen
+  });
+
+  // Buscar documentos já em processo do usuário logado
+  const { data: documentosEmProcessoUsuario = [] } = useQuery({
+    queryKey: ["/api/document-editions-in-progress"],
+    queryFn: async () => {
+      const res = await fetch("/api/document-editions-in-progress");
+      if (res.ok) {
+        return res.json();
+      }
+      return [];
     },
     enabled: isOpen
   });
@@ -100,8 +114,8 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
     enabled: isOpen && !!responsavel
   });
 
-  // Calcular limite de itens
-  const getMaxItems = () => {
+  // Calcular limite de itens considerando documentos já em processo do usuário
+  const getMaxItemsFromParam = () => {
     if (!maxItemsParam) return 10; // valor padrão
     
     const paramType = maxItemsParam.paramType;
@@ -123,8 +137,10 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
     }
   };
 
-  const maxItems = getMaxItems();
-  const documentosLimitados = documentos.slice(0, maxItems);
+  const maxItemsParam_value = getMaxItemsFromParam();
+  const documentosJaEmProcesso = documentosEmProcessoUsuario.length;
+  const limiteDiponivel = Math.max(0, maxItemsParam_value - documentosJaEmProcesso);
+  const documentosLimitados = documentos.slice(0, limiteDiponivel);
 
   const formatDate = (dateString: string) => {
     try {
@@ -417,11 +433,19 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
             Revisão de Documentos - {responsavel}
           </DialogTitle>
           <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-            Documentos MindBits_CT integrados para revisão 
+            Documentos MindBits_CT integrados para revisão
             {maxItemsParam && (
-              <span className="text-purple-600 dark:text-purple-400">
-                {" "}(Limite: {maxItems} itens - mais antigos primeiro)
-              </span>
+              <div className="flex items-center gap-4 mt-2">
+                <span className="text-purple-600 dark:text-purple-400">
+                  Limite máximo: {maxItemsParam_value} itens por revisor
+                </span>
+                <span className="text-amber-600 dark:text-amber-400">
+                  Em processo: {documentosJaEmProcesso} itens
+                </span>
+                <span className="text-green-600 dark:text-green-400 font-medium">
+                  Disponível: {limiteDiponivel} itens
+                </span>
+              </div>
             )}
           </p>
         </DialogHeader>
@@ -448,13 +472,31 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
           ) : documentosLimitados.length === 0 ? (
             <div className="flex items-center justify-center py-12">
               <div className="text-center">
-                <FileText className="h-8 w-8 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500 dark:text-gray-400">
-                  Nenhum documento encontrado para revisão
-                </p>
-                <p className="text-sm text-gray-400 mt-2">
-                  Responsável: {responsavel} | Origem: MindBits_CT | Status: Integrado
-                </p>
+                {limiteDiponivel === 0 && documentos.length > 0 ? (
+                  <>
+                    <AlertCircle className="h-8 w-8 text-amber-500 mx-auto mb-4" />
+                    <p className="text-amber-600 dark:text-amber-400 font-medium">
+                      Limite de documentos por revisor atingido
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                      Você já possui {documentosJaEmProcesso} documentos em processo 
+                      (limite: {maxItemsParam_value} por revisor)
+                    </p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                      Finalize alguns documentos para poder pegar novos
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <FileText className="h-8 w-8 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-500 dark:text-gray-400">
+                      Nenhum documento encontrado para revisão
+                    </p>
+                    <p className="text-sm text-gray-400 mt-2">
+                      Responsável: {responsavel} | Origem: MindBits_CT | Status: Integrado
+                    </p>
+                  </>
+                )}
               </div>
             </div>
           ) : (
@@ -481,7 +523,12 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
                     </label>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-300">
-                    Exibindo {documentosLimitados.length} de {documentos.length} documentos
+                    Exibindo {documentosLimitados.length} de {documentos.length} documentos 
+                    {limiteDiponivel === 0 && (
+                      <span className="ml-2 text-red-600 dark:text-red-400 font-medium">
+                        (Limite de {maxItemsParam_value} atingido)
+                      </span>
+                    )}
                   </p>
                 </div>
               </div>

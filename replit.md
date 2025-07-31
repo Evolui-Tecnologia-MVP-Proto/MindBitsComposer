@@ -11,6 +11,17 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
+✓ COMPLETED: Document Review Limit Control Based on MAX_ITEMS_PER_REVISOR Parameter (January 31, 2025)
+  - Implemented smart limit calculation in DocumentReviewModal considering user's documents already in process
+  - Added query to fetch current user's documents in process via /api/document-editions-in-progress endpoint
+  - Logic: Available slots = MAX_ITEMS_PER_REVISOR - documents_already_in_process_by_user
+  - Enhanced modal header with detailed limit information: maximum limit, items in process, available slots
+  - Added visual feedback when limit is reached with amber alert and clear explanation
+  - User can only start new documentation up to their remaining limit, encouraging completion of existing work
+  - Applied color-coded status indicators: purple (max limit), amber (current usage), green (available)
+  - Modal shows proper empty state when limit reached vs no documents available
+  - Complete business logic implementation ensuring reviewers don't exceed their capacity limit
+
 ✓ COMPLETED: Fixed EmProcessoTab TabsContent Context Error and Home Page Integration (January 31, 2025)
   - Fixed runtime error where TabsContent must be used within Tabs context
   - Added useTabsContext prop to EmProcessoTab component for flexible usage
@@ -19,7 +30,7 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Created renderDocumentosTable function for home page with essential document data display
   - Implemented flexible layout using flex-col structure for dynamic space utilization
   - Applied consistent dark mode theming throughout integration
-  - Home page now shows "Documentos Em Processo" section occupying space between cards and footer
+  - Home page now shows "Meus Documentos em Processo" section occupying space between cards and footer
 
 ✓ COMPLETED: Extracted EmProcessoTab Component from Documentos Page (January 31, 2025)
   - Created new reusable component client/src/refact/components/documentos/tables/EmProcessoTab.tsx
