@@ -184,7 +184,10 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
   
 
 
-  // Sincronizar valor quando o nó for atualizado
+  // TEMPORARIAMENTE DESABILITADO: registerUpdateListener pode estar causando roubo de foco dos containers
+  // Quando o usuário digita nos containers, isso dispara updates no editor que executam este listener
+  // para TODOS os HeaderFieldNodes, possivelmente causando interferência no foco
+  /*
   React.useEffect(() => {
     const unregister = editor.registerUpdateListener(({ editorState }) => {
       editorState.read(() => {
@@ -208,6 +211,7 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
       unregister();
     };
   }, [editor, node.getKey()]);
+  */
 
   // REMOVIDO: Foco automático no primeiro campo estava interferindo com edição nos containers
   /*
