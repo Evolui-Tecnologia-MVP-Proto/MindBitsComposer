@@ -21,7 +21,8 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Implemented custom DOM events for communication between buttons and plugin handlers
   - Updated CollapsiblePlugin with command handlers for EDIT_COLLAPSIBLE_TITLE_COMMAND and DELETE_COLLAPSIBLE_COMMAND
   - Enhanced updateDOM method to properly re-render buttons when container properties change
-  - Buttons use emoji icons (✏️ for edit, 🗑️ for delete) with proper hover states and dark mode support
+  - Buttons use Lucide icons (square-pen for edit, trash-2 for delete) with proper hover states and dark mode support
+  - Replaced emoji with SVG-based Lucide icons for better visual consistency and scalability
 
 ✓ COMPLETED: Enhanced Quote and Code Block Insertion with Line Spacing (January 31, 2025)
   - Modified insertQuote function to automatically add empty lines before and after quote blocks

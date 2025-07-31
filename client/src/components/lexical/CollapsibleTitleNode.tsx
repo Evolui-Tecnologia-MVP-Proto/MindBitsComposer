@@ -26,6 +26,67 @@ export function $convertCollapsibleTitleElement(): DOMConversionOutput | null {
   };
 }
 
+// Helper function to create Lucide icons as SVG elements
+function createLucideIcon(iconName: 'square-pen' | 'trash-2'): SVGSVGElement {
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('width', '16');
+  svg.setAttribute('height', '16');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '2');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+
+  if (iconName === 'square-pen') {
+    // Square pen icon paths
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('width', '14');
+    rect.setAttribute('height', '14');
+    rect.setAttribute('x', '3');
+    rect.setAttribute('y', '3');
+    rect.setAttribute('rx', '2');
+    svg.appendChild(rect);
+
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', 'm21 21-6-6m-5-5-4-4');
+    svg.appendChild(path);
+
+    const path2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path2.setAttribute('d', 'm9 7 4 4');
+    svg.appendChild(path2);
+  } else if (iconName === 'trash-2') {
+    // Trash 2 icon paths
+    const path1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path1.setAttribute('d', 'M3 6h18');
+    svg.appendChild(path1);
+
+    const path2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path2.setAttribute('d', 'M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6');
+    svg.appendChild(path2);
+
+    const path3 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path3.setAttribute('d', 'M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2');
+    svg.appendChild(path3);
+
+    const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line1.setAttribute('x1', '10');
+    line1.setAttribute('x2', '10');
+    line1.setAttribute('y1', '11');
+    line1.setAttribute('y2', '17');
+    svg.appendChild(line1);
+
+    const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line2.setAttribute('x1', '14');
+    line2.setAttribute('x2', '14');
+    line2.setAttribute('y1', '11');
+    line2.setAttribute('y2', '17');
+    svg.appendChild(line2);
+  }
+
+  return svg;
+}
+
 export class CollapsibleTitleNode extends TextNode {
   static getType(): string {
     return 'collapsible-title';
@@ -117,7 +178,7 @@ export class CollapsibleTitleNode extends TextNode {
           'p-1', 'rounded', 'hover:bg-gray-200', 'dark:hover:bg-gray-600',
           'text-blue-600', 'dark:text-blue-400', 'transition-colors'
         );
-        editButton.innerHTML = '✏️';
+        editButton.appendChild(createLucideIcon('square-pen'));
         editButton.title = 'Editar título';
         editButton.onclick = (e) => {
           e.preventDefault();
@@ -135,7 +196,7 @@ export class CollapsibleTitleNode extends TextNode {
           'p-1', 'rounded', 'hover:bg-red-200', 'dark:hover:bg-red-600',
           'text-red-600', 'dark:text-red-400', 'transition-colors'
         );
-        deleteButton.innerHTML = '🗑️';
+        deleteButton.appendChild(createLucideIcon('trash-2'));
         deleteButton.title = 'Excluir container';
         deleteButton.onclick = (e) => {
           e.preventDefault();
