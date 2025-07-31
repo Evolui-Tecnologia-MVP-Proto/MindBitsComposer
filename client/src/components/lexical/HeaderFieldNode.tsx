@@ -181,23 +181,6 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
   
   console.log(`🏷️ HeaderFieldComponent renderizado - label: "${node.getLabel()}", mappingType: "${mappingType}", mappingValue: "${mappingValue}"`);
   
-  // Adicionar listener global temporário para debug
-  React.useEffect(() => {
-    if (mappingType && (mappingType === 'field' || mappingType === 'formula')) {
-      const handleGlobalClick = (e: MouseEvent) => {
-        const target = e.target as HTMLElement;
-        if (target.closest('button') && target.closest(`[data-label="${node.getLabel()}"]`)) {
-          console.log(`🎯 CLIQUE GLOBAL DETECTADO NO BOTÃO DE ${node.getLabel()}!`);
-        }
-      };
-      
-      document.addEventListener('click', handleGlobalClick, true);
-      
-      return () => {
-        document.removeEventListener('click', handleGlobalClick, true);
-      };
-    }
-  }, [mappingType, node]);
   
 
 

@@ -1761,23 +1761,30 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
         console.log('🔍 Node type:', node?.getType());
         console.log('🔍 Node tem setValue:', node && 'setValue' in node);
         
-        if (node && 'setValue' in node) {
+        if (node && $isHeaderFieldNode(node)) {
           const newValue = mappingInfo.value || '';
           console.log(`📝 Chamando setValue com valor: "${newValue}"`);
           
-          // VERIFICAR SE O NODE É HEADERFIELD
-          alert(`Node found: ${node?.getType()}\nSetting value: "${newValue}"`);
-          
-          (node as any).setValue(newValue);
+          node.setValue(newValue);
           console.log(`✅ Campo ${label} atualizado com valor: "${newValue}"`);
           
           // Verificar se o valor foi realmente atualizado
-          const updatedValue = (node as any).getValue();
+          const updatedValue = node.getValue();
           console.log(`🔍 Valor após atualização: "${updatedValue}"`);
           
-          alert(`Value after update: "${updatedValue}"`);
+          // Forçar atualização do input via DOM
+          setTimeout(() => {
+            const inputElement = document.querySelector(`[data-label="${label}"] input`) as HTMLInputElement;
+            if (inputElement) {
+              inputElement.value = newValue;
+              inputElement.dispatchEvent(new Event('input', { bubbles: true }));
+              inputElement.focus();
+              // Posicionar cursor no final
+              inputElement.setSelectionRange(inputElement.value.length, inputElement.value.length);
+              console.log(`✅ Input DOM atualizado para: "${newValue}"`);
+            }
+          }, 0);
         } else {
-          alert(`Node not found or doesn't have setValue method!`);
           console.log(`❌ Não foi possível encontrar o nó ${nodeKey} ou ele não tem método setValue`);
         }
       });
