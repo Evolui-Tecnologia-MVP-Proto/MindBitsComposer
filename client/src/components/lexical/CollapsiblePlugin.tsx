@@ -200,9 +200,28 @@ export default function CollapsiblePlugin(): JSX.Element | null {
         editor.update(() => {
           const node = $getNodeByKey(nodeKey);
           console.log('🔍 Nó encontrado:', node);
-          if (node && $isCollapsibleTitleNode(node)) {
+          console.log('🔍 Tipo do nó:', node?.getType());
+          
+          // Se o nodeKey é de um CollapsibleContainerNode, procurar o título filho
+          if (node && $isCollapsibleContainerNode(node)) {
+            console.log('📦 Container encontrado, procurando título filho...');
+            const children = node.getChildren();
+            for (const child of children) {
+              console.log('👶 Filho encontrado:', child.getType());
+              if ($isCollapsibleTitleNode(child)) {
+                child.setTextContent(newText);
+                console.log('✅ Texto do título atualizado para:', newText);
+                return;
+              }
+            }
+            console.log('❌ Nenhum CollapsibleTitleNode encontrado no container');
+          }
+          // Se o nodeKey já é de um CollapsibleTitleNode (fallback)
+          else if (node && $isCollapsibleTitleNode(node)) {
             node.setTextContent(newText);
-            console.log('✅ Texto do título atualizado para:', newText);
+            console.log('✅ Texto do título atualizado diretamente para:', newText);
+          } else {
+            console.log('❌ Nó não é nem Container nem Title:', node?.getType());
           }
         });
       }

@@ -602,7 +602,16 @@ function ToolbarPlugin({
   };
 
   const saveContainerTitle = () => {
-    if (!selectedContainerKey || !containerTitle.trim()) return;
+    console.log('🔧 saveContainerTitle chamado');
+    console.log('📋 selectedContainerKey:', selectedContainerKey);
+    console.log('📝 containerTitle:', containerTitle);
+    
+    if (!selectedContainerKey || !containerTitle.trim()) {
+      console.log('❌ Saindo - selectedContainerKey ou containerTitle vazio');
+      return;
+    }
+    
+    console.log('🚀 Disparando evento updateCollapsibleTitle');
     
     // Usar o evento customizado para atualizar o título
     const event = new CustomEvent('updateCollapsibleTitle', {
