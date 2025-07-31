@@ -243,7 +243,10 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
 
 
   const handleRefresh = () => {
+    console.log('🔄 BOTÃO REFRESH CLICADO!');
     console.log('🔄 Refresh clicked - mappingType:', mappingType, 'mappingValue:', mappingValue);
+    console.log('🔄 Label:', node.getLabel());
+    console.log('🔄 NodeKey:', node.getKey());
     
     // Salvar referência do input antes de disparar o evento
     const inputElement = document.querySelector(`[data-label="${node.getLabel()}"] input`) as HTMLInputElement;
@@ -257,6 +260,7 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
         nodeKey: node.getKey()
       }
     });
+    console.log('🔄 Disparando evento headerFieldRefresh:', event.detail);
     window.dispatchEvent(event);
     
     // Restaurar foco após um pequeno delay para garantir que a atualização foi concluída
@@ -433,18 +437,36 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
           <div className="pr-2">
             {(mappingType === 'field' || mappingType === 'formula') && (
               <button
-                onClick={handleRefresh}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleRefresh();
+                }}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
                 className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                 title="Recarregar valor"
+                type="button"
               >
                 <RefreshCw className="w-4 h-4 text-gray-500 dark:text-gray-400" />
               </button>
             )}
             {mappingType === 'plugin' && (
               <button
-                onClick={handleUnplug}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleUnplug();
+                }}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
                 className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                 title="Executar plugin"
+                type="button"
               >
                 <Unplug className="w-4 h-4 text-gray-500 dark:text-gray-400" />
               </button>
