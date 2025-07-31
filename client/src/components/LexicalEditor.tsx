@@ -1226,11 +1226,8 @@ function FocusPlugin({ initialEditorState }: { initialEditorState?: string }) {
               }
             };
             
-            // Tentar focar múltiplas vezes com delays diferentes
-            // Delays aumentados para ocorrer após o grace period do EditProtectionPlugin
-            setTimeout(focusField, 5100);  // Após 5s do grace period
-            setTimeout(focusField, 2500);
-            setTimeout(focusField, 3000);
+            // Focar apenas uma vez após o grace period do EditProtectionPlugin
+            setTimeout(focusField, 2100);  // Apenas uma vez, após 2.1s do grace period
           } else {
             console.log('❌ Nenhum HeaderFieldNode encontrado no documento');
             // Caso contrário, usar o comportamento padrão
