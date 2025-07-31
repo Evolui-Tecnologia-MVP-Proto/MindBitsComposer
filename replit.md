@@ -11,6 +11,14 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
+✓ COMPLETED: Fixed Plugin Data Transfer to Header Fields (January 31, 2025)
+  - Fixed issue where plugin button (unplug) wasn't updating header field values
+  - Root cause: Missing DOM update logic after setting value in Lexical node
+  - Solution: Applied same forced DOM update pattern used in refresh button
+  - Added comprehensive data flow: Plugin → PluginModal → LexicalEditor → DOM
+  - Both action buttons (refresh and plugin) now working correctly with proper value updates
+  - User confirmed both buttons now update fields as expected
+
 ✓ COMPLETED: Fixed Header Field Cursor Visibility Issue in Composer (January 31, 2025)
   - Fixed critical bug where cursor was disappearing in header fields after document load
   - Root cause: AutoFocusPlugin and FocusPlugin were competing for cursor positioning
