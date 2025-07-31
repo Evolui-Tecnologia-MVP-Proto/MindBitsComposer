@@ -1739,8 +1739,6 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       const customEvent = event as CustomEvent;
       const { label, mappingType, mappingValue, nodeKey } = customEvent.detail;
       
-      alert(`EVENT RECEIVED! Field: ${label}, Mapping: ${mappingValue}`);
-      
       console.log('🔄 HeaderField Refresh Event:', customEvent.detail);
       console.log('📊 documentData atual:', documentData);
       console.log('📊 templateMappings atual:', templateMappings);
@@ -1755,6 +1753,8 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       
       console.log('🔍 Mapping info result:', mappingInfo);
       console.log('📝 Value to be set:', mappingInfo.value);
+      
+      alert(`Field: ${label}\nMapping: ${mappingValue}\nValue found: "${mappingInfo.value}"`);
       
       // Sempre tentar atualizar, mesmo se o valor estiver vazio
       editorInstance.update(() => {
