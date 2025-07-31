@@ -2424,7 +2424,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
               onEditorInstanceChange(editor);
             }
           }} />
-          <AutoFocusPlugin />
+          {/* <AutoFocusPlugin /> - Comentado porque estava interferindo com o foco dos campos do header */}
           <FocusPlugin initialEditorState={initialEditorState} />
         </div>
       </LexicalComposer>

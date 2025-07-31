@@ -238,18 +238,7 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
     });
   };
   
-  // Tentar focar após delay maior
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      if (inputRef.current) {
-        console.log('🎯 Tentando focar após 3 segundos...');
-        inputRef.current.focus();
-        inputRef.current.click();
-      }
-    }, 3000);
-    
-    return () => clearTimeout(timer);
-  }, []);
+
 
   const handleRefresh = () => {
     console.log('🔄 Refresh clicked - mappingType:', mappingType, 'mappingValue:', mappingValue);
