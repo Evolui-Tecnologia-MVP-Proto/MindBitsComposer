@@ -319,13 +319,13 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* Seção de Documentos Em Processo */}
+        {/* Seção de Meus Documentos em Processo */}
         <div className="flex-1 min-h-0 mt-6">
           <div className="bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6 h-full flex flex-col">
             <div className="flex items-center gap-2 mb-4">
               <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                Documentos Em Processo
+                Meus Documentos em Processo
               </h2>
             </div>
             
