@@ -11,6 +11,13 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
+✓ COMPLETED: Disabled H1, H2, H3 Buttons in Lexical Editor Toolbar (January 31, 2025)
+  - Disabled heading buttons (H1, H2, H3) in Lexical editor toolbar without hiding them
+  - Added disabled={true} property to all three heading buttons
+  - Applied disabled styling: gray colors, opacity 60%, cursor not-allowed
+  - Updated titles to show "(Desabilitado)" status for user feedback
+  - Buttons remain visible but non-functional, maintaining toolbar layout consistency
+
 ✓ COMPLETED: Conditional Template Accordion Based on System Parameter (January 31, 2025)
   - Implemented conditional template accordion state in biblioteca based on system_params configuration
   - Added query to fetch system parameter "COMPOSER_TEMPLATE_ENABLED" via /api/system-params/COMPOSER_TEMPLATE_ENABLED

@@ -587,8 +587,9 @@ function ToolbarPlugin({
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB]"
-          title="Título 1"
+          className="h-8 px-2 text-xs text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-60"
+          title="Título 1 (Desabilitado)"
+          disabled={true}
           onClick={() => insertHeading('h1')}
         >
           <Heading1 className="w-4 h-4" />
@@ -596,8 +597,9 @@ function ToolbarPlugin({
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB]"
-          title="Título 2"
+          className="h-8 px-2 text-xs text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-60"
+          title="Título 2 (Desabilitado)"
+          disabled={true}
           onClick={() => insertHeading('h2')}
         >
           <Heading2 className="w-4 h-4" />
@@ -605,8 +607,9 @@ function ToolbarPlugin({
         <Button
           variant="ghost"
           size="sm"
-          className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB]"
-          title="Título 3"
+          className="h-8 px-2 text-xs text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-60"
+          title="Título 3 (Desabilitado)"
+          disabled={true}
           onClick={() => insertHeading('h3')}
         >
           <Heading3 className="w-4 h-4" />
