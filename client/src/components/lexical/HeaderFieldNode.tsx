@@ -200,14 +200,13 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
           
           // Verificar computed styles
           const styles = window.getComputedStyle(button);
-          console.log(`🔍 Estilos do botão:`, {
-            pointerEvents: styles.pointerEvents,
-            visibility: styles.visibility,
-            display: styles.display,
-            opacity: styles.opacity,
-            position: styles.position,
-            zIndex: styles.zIndex
-          });
+          console.log(`🔍 Estilos do botão para ${node.getLabel()}:`);
+          console.log(`  - pointerEvents: ${styles.pointerEvents}`);
+          console.log(`  - visibility: ${styles.visibility}`);
+          console.log(`  - display: ${styles.display}`);
+          console.log(`  - opacity: ${styles.opacity}`);
+          console.log(`  - position: ${styles.position}`);
+          console.log(`  - zIndex: ${styles.zIndex}`);
           
           // Verificar se algo está cobrindo o botão
           const rect = button.getBoundingClientRect();
@@ -215,6 +214,13 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
           if (elementAtPoint !== button && !button.contains(elementAtPoint)) {
             console.log(`⚠️ AVISO: O botão está sendo coberto por outro elemento:`, elementAtPoint);
           }
+          
+          // Testar clique programático
+          console.log(`🧪 Testando clique programático no botão de ${node.getLabel()}...`);
+          setTimeout(() => {
+            button.click();
+            console.log(`✅ Clique programático executado`);
+          }, 500);
           
           // Remover listener após 5 segundos
           setTimeout(() => button.removeEventListener('click', testClick), 5000);
