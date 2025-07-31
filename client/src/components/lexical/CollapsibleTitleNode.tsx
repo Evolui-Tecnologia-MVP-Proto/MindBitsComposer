@@ -187,18 +187,51 @@ export class CollapsibleTitleNode extends TextNode {
           e.preventDefault();
           e.stopPropagation();
           
-          // Abrir prompt diretamente aqui em vez de usar eventos
-          const currentText = this.getTextContent();
-          const newText = prompt('Digite o novo título:', currentText);
-          
-          if (newText !== null && newText.trim() !== '' && newText.trim() !== currentText) {
-            // Obter o editor do config
-            const editor = config.editor;
-            if (editor) {
-              editor.update(() => {
-                this.setTextContent(newText.trim());
-              });
-            }
+          // Tornar o título editável temporariamente
+          const titleSpan = titleWrapper.querySelector('.collapsible-title-text');
+          if (titleSpan) {
+            const currentText = titleSpan.textContent || '';
+            
+            // Criar input temporário
+            const input = document.createElement('input');
+            input.value = currentText;
+            input.className = 'bg-transparent border border-blue-500 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500';
+            
+            // Substituir o span pelo input temporariamente
+            titleSpan.style.display = 'none';
+            titleSpan.parentNode?.insertBefore(input, titleSpan);
+            input.focus();
+            input.select();
+            
+            const finishEdit = () => {
+              const newText = input.value.trim();
+              if (newText && newText !== currentText) {
+                // Atualizar o texto no node
+                const editor = config.editor;
+                if (editor) {
+                  editor.update(() => {
+                    this.setTextContent(newText);
+                  });
+                }
+                titleSpan.textContent = newText;
+              }
+              
+              // Remover input e mostrar span novamente
+              input.remove();
+              titleSpan.style.display = '';
+            };
+            
+            // Finalizar edição ao pressionar Enter ou perder foco
+            input.addEventListener('keydown', (event) => {
+              if (event.key === 'Enter') {
+                finishEdit();
+              } else if (event.key === 'Escape') {
+                input.remove();
+                titleSpan.style.display = '';
+              }
+            });
+            
+            input.addEventListener('blur', finishEdit);
           }
         };
         
