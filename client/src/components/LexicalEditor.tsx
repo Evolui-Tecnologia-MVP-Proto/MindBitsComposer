@@ -894,7 +894,6 @@ function ToolbarPlugin({
           <>
             <div className="h-6 w-px bg-gray-300 mx-2"></div>
             <div className="flex items-center gap-1 ml-2">
-              <span className="text-xs text-gray-600 dark:text-gray-400">Título do Container:</span>
               <input
                 type="text"
                 value={containerTitle}
