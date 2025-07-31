@@ -11,6 +11,13 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
+✓ COMPLETED: Fixed Quote Button to Convert Selected Text (January 31, 2025)
+  - Fixed issue where quote button was deleting selected text and inserting empty quote
+  - Modified insertQuote function to preserve and convert selected text into quote format
+  - When text is selected: converts selection into quote block with selected text content
+  - When no text selected: inserts empty quote block (original behavior)
+  - Improved user experience by maintaining expected text formatting behavior
+
 ✓ COMPLETED: Disabled H1, H2, H3 Buttons in Lexical Editor Toolbar (January 31, 2025)
   - Disabled heading buttons (H1, H2, H3) in Lexical editor toolbar without hiding them
   - Added disabled={true} property to all three heading buttons

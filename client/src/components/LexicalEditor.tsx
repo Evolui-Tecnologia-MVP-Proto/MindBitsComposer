@@ -444,8 +444,21 @@ function ToolbarPlugin({
     editor.update(() => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
-        const quoteNode = $createQuoteNode();
-        $insertNodes([quoteNode]);
+        // Se há texto selecionado, converter em citação
+        if (!selection.isCollapsed()) {
+          const selectedText = selection.getTextContent();
+          const quoteNode = $createQuoteNode();
+          const paragraphNode = $createParagraphNode();
+          paragraphNode.append($createTextNode(selectedText));
+          quoteNode.append(paragraphNode);
+          selection.insertNodes([quoteNode]);
+        } else {
+          // Se não há seleção, inserir citação vazia
+          const quoteNode = $createQuoteNode();
+          const paragraphNode = $createParagraphNode();
+          quoteNode.append(paragraphNode);
+          $insertNodes([quoteNode]);
+        }
       }
     });
   };
