@@ -470,17 +470,28 @@ function ToolbarPlugin({
     editor.update(() => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
+        // Criar parágrafo vazio antes do código
+        const paragraphBefore = $createParagraphNode();
+        
         // Se há texto selecionado, converter em bloco de código
         if (!selection.isCollapsed()) {
           const selectedText = selection.getTextContent();
           const codeNode = $createCodeNode();
           const textNode = $createTextNode(selectedText);
           codeNode.append(textNode);
-          selection.insertNodes([codeNode]);
+          
+          // Criar parágrafo vazio depois do código
+          const paragraphAfter = $createParagraphNode();
+          
+          selection.insertNodes([paragraphBefore, codeNode, paragraphAfter]);
         } else {
           // Se não há seleção, inserir bloco de código vazio
           const codeNode = $createCodeNode();
-          $insertNodes([codeNode]);
+          
+          // Criar parágrafo vazio depois do código
+          const paragraphAfter = $createParagraphNode();
+          
+          $insertNodes([paragraphBefore, codeNode, paragraphAfter]);
         }
       }
     });

@@ -11,6 +11,12 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
+✓ COMPLETED: Enhanced Code Block Insertion with Line Spacing (January 31, 2025)
+  - Modified insertCodeBlock function to automatically add empty lines before and after code blocks
+  - Improved document formatting and readability by ensuring proper spacing around code blocks
+  - Works for both new empty code blocks and when converting selected text to code blocks
+  - Follows same pattern as table insertion for consistent spacing behavior throughout editor
+
 ✓ COMPLETED: Code Block Line Numbering System (January 31, 2025)
   - Implemented automatic line numbering for code blocks in Lexical editor
   - Created CodeLineNumberPlugin that automatically calculates and displays line numbers
