@@ -199,7 +199,7 @@ export default function HomePage() {
     <div className="fade-in p-6 bg-gray-50 dark:bg-[#1F2937] h-full flex flex-col">
       <div className="flex flex-col flex-1 min-h-0 space-y-8">
         {/* Container para Base de conhecimento e MindBits_CT */}
-        <div className="space-y-8">
+        <div className="space-y-8 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6">
           {/* Base de conhecimento OC */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
