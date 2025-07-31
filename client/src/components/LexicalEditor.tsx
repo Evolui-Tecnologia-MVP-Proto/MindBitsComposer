@@ -1845,6 +1845,9 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           // Salvar o contexto do campo que invocou o plugin
           setCurrentFieldContext({ label, nodeKey });
           
+          // Também salvar no window para acesso do lexical-page
+          (window as any).__currentFieldContext = { label, nodeKey };
+          
           // Abrir o modal do plugin
           setSelectedPlugin(plugin);
           setIsPluginModalOpen(true);

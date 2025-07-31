@@ -313,7 +313,43 @@ export default function LexicalPage() {
   // Função para receber dados do plugin
   const handlePluginDataExchange = (data: any) => {
     console.log('Dados recebidos do plugin:', data);
-    // Aqui você pode processar os dados do plugin se necessário
+    
+    // Se há um campo de contexto do LexicalEditor, atualizar o campo
+    const fieldContext = (window as any).__currentFieldContext;
+    if (fieldContext && fieldContext.nodeKey && editorInstance) {
+      console.log('📍 Atualizando campo do header com contexto:', fieldContext);
+      
+      // Extrair o valor do plugin
+      let value = '';
+      if (typeof data === 'string') {
+        value = data;
+      } else if (data && typeof data === 'object') {
+        // Tentar extrair o valor de diferentes formatos possíveis
+        value = data.value || data.data || data.result || JSON.stringify(data);
+      }
+      
+      // Atualizar o campo usando o editor
+      editorInstance.update(() => {
+        const node = editorInstance.getEditorState()._nodeMap.get(fieldContext.nodeKey);
+        if (node && node.setValue) {
+          console.log(`✅ Atualizando campo "${fieldContext.label}" com valor:`, value);
+          node.setValue(value);
+          
+          // Forçar atualização visual do campo
+          setTimeout(() => {
+            const inputElement = document.querySelector(`[data-label="${fieldContext.label}"] input`);
+            if (inputElement) {
+              (inputElement as HTMLInputElement).value = value;
+              inputElement.dispatchEvent(new Event('input', { bubbles: true }));
+              inputElement.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+          }, 100);
+        }
+      });
+      
+      // Limpar o contexto após usar
+      delete (window as any).__currentFieldContext;
+    }
   };
 
   // Função para inserir imagem no editor
