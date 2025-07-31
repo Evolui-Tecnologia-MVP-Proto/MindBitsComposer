@@ -11,11 +11,17 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
+✓ COMPLETED: Updated Knowledge Base Section Title (January 31, 2025)
+  - Renamed "Base de conhecimento OC" to "Base de conhecimento CT → OC (Atendimento e Suporte)"
+  - Better reflects the content flow from CT (Central de Tributária) to OC (Operational Center)
+  - Added context "(Atendimento e Suporte)" to clarify the section's purpose
+
 ✓ COMPLETED: Grouped Knowledge Base Cards in Home Page UI (January 31, 2025)
   - Grouped "Base de conhecimento OC" and "Documentos MindBits_CT - Integrados por Especialidade" sections in a single container div
   - Maintained original layout and functionality while improving semantic structure
   - Both sections now share a parent container for better component organization
   - Applied consistent spacing and visual hierarchy within the grouped container
+  - Applied #0F172A background color to the container div in dark mode
 
 ✓ COMPLETED: Fixed Document Review Limit Control to Use Correct Data Source (January 31, 2025)
   - CORRECTED: Changed from /api/document-editions-in-progress to /api/documentos/user-in-process endpoint

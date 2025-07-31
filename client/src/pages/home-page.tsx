@@ -205,7 +205,7 @@ export default function HomePage() {
             <div className="flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                Base de conhecimento OC
+                Base de conhecimento CT → OC (Atendimento e Suporte)
               </h2>
             </div>
             
