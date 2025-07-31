@@ -52,6 +52,12 @@ export default function EditProtectionPlugin(): null {
       return activeElement?.getAttribute('data-header-field-input') === 'true';
     };
     
+    // Verificar se estamos editando um título de container
+    const isTitleEditingActive = () => {
+      const activeElement = document.activeElement;
+      return activeElement?.getAttribute('data-editing-title') === 'true';
+    };
+    
     // Ativar proteção após 2 segundos para permitir foco inicial e carregamento completo
     const activationTimeout = setTimeout(() => {
       protectionActive = true;
@@ -111,6 +117,11 @@ export default function EditProtectionPlugin(): null {
     const handleInsertParagraph = () => {
       if (!protectionActive) return false; // Permitir durante grace period
       
+      // Permitir se estamos editando título ou header field
+      if (isTitleEditingActive() || isHeaderFieldInputFocused()) {
+        return false; // Permitir comando
+      }
+      
       let shouldBlock = false;
       editor.update(() => {
         if (!isSelectionInValidContainer()) {
@@ -131,6 +142,11 @@ export default function EditProtectionPlugin(): null {
     const handleEnterKey = (): boolean => {
       if (!protectionActive) return false; // Permitir durante grace period
       
+      // Permitir se estamos editando título ou header field
+      if (isTitleEditingActive() || isHeaderFieldInputFocused()) {
+        return false; // Permitir comando
+      }
+      
       let shouldBlock = false;
       editor.update(() => {
         if (!isSelectionInValidContainer()) {
@@ -150,6 +166,11 @@ export default function EditProtectionPlugin(): null {
     const handleTabKey = (): boolean => {
       if (!protectionActive) return false; // Permitir durante grace period
       
+      // Permitir se estamos editando título ou header field
+      if (isTitleEditingActive() || isHeaderFieldInputFocused()) {
+        return false; // Permitir comando
+      }
+      
       let shouldBlock = false;
       editor.update(() => {
         if (!isSelectionInValidContainer()) {
@@ -168,6 +189,11 @@ export default function EditProtectionPlugin(): null {
     // Comando para interceptar Paste
     const handlePaste = (): boolean => {
       if (!protectionActive) return false; // Permitir durante grace period
+      
+      // Permitir se estamos editando título ou header field
+      if (isTitleEditingActive() || isHeaderFieldInputFocused()) {
+        return false; // Permitir comando
+      }
       
       let shouldBlock = false;
       editor.update(() => {
@@ -252,6 +278,11 @@ export default function EditProtectionPlugin(): null {
         
         // Se a proteção está ativa, verificar se a edição é permitida
         if (protectionActive) {
+          // Permitir se estamos editando título ou header field
+          if (isTitleEditingActive() || isHeaderFieldInputFocused()) {
+            return false; // Permitir inserção de texto
+          }
+          
           let shouldBlock = false;
           editor.getEditorState().read(() => {
             if (!isSelectionInValidContainer()) {
