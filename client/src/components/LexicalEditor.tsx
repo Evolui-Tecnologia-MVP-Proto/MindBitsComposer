@@ -1334,6 +1334,91 @@ interface LexicalEditorProps {
   onPluginOpen?: (plugin: any) => void; // Callback para abrir plugin
 }
 
+// Plugin para DEBUG - Rastrear mudanças de foco e descobrir o que está causando a transferência
+function FocusDebugPlugin(): JSX.Element | null {
+  const [editor] = useLexicalComposerContext();
+  
+  useEffect(() => {
+    let focusHistory: Array<{timestamp: number, element: string, event: string}> = [];
+    
+    const logFocusChange = (event: string, element: Element | null) => {
+      const timestamp = Date.now();
+      const elementDesc = element ? 
+        `${element.tagName}${element.className ? '.' + element.className.split(' ').join('.') : ''}${element.id ? '#' + element.id : ''}` : 
+        'null';
+      
+      focusHistory.push({ timestamp, element: elementDesc, event });
+      
+      // Manter apenas os últimos 10 eventos
+      if (focusHistory.length > 10) {
+        focusHistory = focusHistory.slice(-10);
+      }
+      
+      console.log('🎯 FOCUS DEBUG:', event, elementDesc);
+      console.log('🎯 FOCUS HISTORY:', focusHistory.map(h => `${h.event}: ${h.element} (${h.timestamp})`));
+    };
+    
+    // Monitorar mudanças de foco
+    const handleFocus = (e: FocusEvent) => {
+      logFocusChange('FOCUS', e.target as Element);
+    };
+    
+    const handleBlur = (e: FocusEvent) => {
+      logFocusChange('BLUR', e.target as Element);
+    };
+    
+    // Monitorar cliques
+    const handleClick = (e: MouseEvent) => {
+      logFocusChange('CLICK', e.target as Element);
+    };
+    
+    // Monitorar eventos de input
+    const handleInput = (e: InputEvent) => {
+      console.log('⌨️ INPUT EVENT:', e.target, 'data:', e.data, 'inputType:', e.inputType);
+      logFocusChange('INPUT', e.target as Element);
+    };
+    
+    // Monitorar keydown
+    const handleKeydown = (e: KeyboardEvent) => {
+      console.log('⌨️ KEYDOWN:', e.key, 'target:', e.target);
+    };
+    
+    // Adicionar listeners globais
+    document.addEventListener('focus', handleFocus, true);
+    document.addEventListener('blur', handleBlur, true); 
+    document.addEventListener('click', handleClick, true);
+    document.addEventListener('input', handleInput, true);
+    document.addEventListener('keydown', handleKeydown, true);
+    
+    // Monitorar mudanças no activeElement a cada 100ms
+    const activeElementMonitor = setInterval(() => {
+      const current = document.activeElement;
+      const currentDesc = current ? 
+        `${current.tagName}${current.className ? '.' + current.className.split(' ').join('.') : ''}${current.id ? '#' + current.id : ''}` : 
+        'null';
+      
+      // Só loggar se mudou
+      if (focusHistory.length === 0 || focusHistory[focusHistory.length - 1]?.element !== currentDesc) {
+        console.log('🔍 ACTIVE ELEMENT MONITOR:', currentDesc);
+        logFocusChange('MONITOR', current);
+      }
+    }, 100);
+    
+    console.log('🎯 FOCUS DEBUG PLUGIN ATIVADO - Monitorando todas as mudanças de foco');
+    
+    return () => {
+      document.removeEventListener('focus', handleFocus, true);
+      document.removeEventListener('blur', handleBlur, true);
+      document.removeEventListener('click', handleClick, true);
+      document.removeEventListener('input', handleInput, true);
+      document.removeEventListener('keydown', handleKeydown, true);
+      clearInterval(activeElementMonitor);
+    };
+  }, [editor]);
+
+  return null;
+}
+
 // Componente principal do editor Lexical completo
 export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, onEditorInstanceChange, className = '', templateSections, templateStructure, viewMode = 'editor', initialEditorState, markdownContent: mdxContent = '', mdFileOld = '', isEnabled = true, documentData, templateMappings, onPluginOpen }: LexicalEditorProps): JSX.Element {
   const [editorInstance, setEditorInstance] = useState<any>(null);
@@ -2360,6 +2445,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <TemplateSectionsPlugin sections={templateSections} mdFileOld={mdFileOld} />
           <EditProtectionPlugin />
           <HeaderFieldMappingPlugin templateMappings={templateMappings} documentData={documentData} />
+          <FocusDebugPlugin />
           <EditorInstancePlugin setEditorInstance={(editor) => {
             setEditorInstance(editor);
             if (onEditorInstanceChange) {
