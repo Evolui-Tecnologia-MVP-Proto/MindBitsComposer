@@ -26,6 +26,7 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Event system fully functional: toolbar buttons → custom events → CollapsiblePlugin commands
   - Clean separation of concerns: UI controls in toolbar, title rendering in nodes
   - Removed "Título do Container:" caption text from toolbar, keeping only edit input box and save button
+  - Moved editbox and save button to the right side of container insertion button for better UI flow
 
 ✓ COMPLETED: Collapsible Container Edit/Delete Functionality - FULLY WORKING (January 31, 2025)
   - Added edit and delete buttons to collapsible containers inserted via toolbar (not template-loaded ones)

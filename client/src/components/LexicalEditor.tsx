@@ -805,6 +805,48 @@ function ToolbarPlugin({
           <ChevronDown className="w-4 h-4" />
         </Button>
         
+        {/* Controles de edição de título do container - apenas quando um container está selecionado */}
+        {selectedContainerKey && (
+          <div className="flex items-center gap-1 ml-2">
+            <input
+              type="text"
+              value={containerTitle}
+              onChange={(e) => setContainerTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  saveContainerTitle();
+                } else if (e.key === 'Escape') {
+                  setIsEditingTitle(false);
+                  // Restaurar título original
+                  editor.getEditorState().read(() => {
+                    const node = $getNodeByKey(selectedContainerKey);
+                    if (node && $isCollapsibleContainerNode(node)) {
+                      const children = node.getChildren();
+                      for (const child of children) {
+                        if ($isCollapsibleTitleNode(child)) {
+                          setContainerTitle(child.getTextContent());
+                          break;
+                        }
+                      }
+                    }
+                  });
+                }
+              }}
+              className="w-48 h-6 px-2 border border-blue-400 dark:border-blue-500 bg-white dark:bg-[#1E293B] text-gray-900 dark:text-[#E5E7EB] rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-600 dark:focus:border-blue-400"
+              placeholder="Digite o título"
+            />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 px-2 text-xs hover:bg-green-100 text-green-600 hover:text-green-700"
+              title="Salvar título"
+              onClick={saveContainerTitle}
+            >
+              <Save className="w-3 h-3" />
+            </Button>
+          </div>
+        )}
+        
         {/* Botões de editar e excluir container - apenas quando um container está selecionado */}
         {selectedContainerKey && (
           <>
@@ -889,50 +931,7 @@ function ToolbarPlugin({
           </Button>
         )}
 
-        {/* Controles de edição de título do container - apenas quando um container está selecionado */}
-        {selectedContainerKey && (
-          <>
-            <div className="h-6 w-px bg-gray-300 mx-2"></div>
-            <div className="flex items-center gap-1 ml-2">
-              <input
-                type="text"
-                value={containerTitle}
-                onChange={(e) => setContainerTitle(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    saveContainerTitle();
-                  } else if (e.key === 'Escape') {
-                    setIsEditingTitle(false);
-                    // Restaurar título original
-                    editor.getEditorState().read(() => {
-                      const node = $getNodeByKey(selectedContainerKey);
-                      if (node && $isCollapsibleContainerNode(node)) {
-                        const children = node.getChildren();
-                        for (const child of children) {
-                          if ($isCollapsibleTitleNode(child)) {
-                            setContainerTitle(child.getTextContent());
-                            break;
-                          }
-                        }
-                      }
-                    });
-                  }
-                }}
-                className="w-48 h-6 px-2 border border-blue-400 dark:border-blue-500 bg-white dark:bg-[#1E293B] text-gray-900 dark:text-[#E5E7EB] rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-600 dark:focus:border-blue-400"
-                placeholder="Digite o título"
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 px-2 text-xs hover:bg-green-100 text-green-600 hover:text-green-700"
-                title="Salvar título"
-                onClick={saveContainerTitle}
-              >
-                <Save className="w-3 h-3" />
-              </Button>
-            </div>
-          </>
-        )}
+
 
       </div>
     </div>
