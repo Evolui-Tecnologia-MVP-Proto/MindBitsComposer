@@ -217,13 +217,33 @@ export class CollapsibleTitleNode extends TextNode {
               
               console.log('👁️ Span escondido e input inserido');
               
-              // Focar no input imediatamente
+              // Focar no input imediatamente e manter o foco
               input.focus();
               input.select();
               
               console.log('🎯 Input focado e selecionado');
               
+              // Impedir que outros sistemas roubem o foco
+              input.setAttribute('data-lexical-editor', 'false');
+              input.setAttribute('data-editing-title', 'true');
+              
+              // Sistema para manter o foco no input
+              let focusInterval: NodeJS.Timeout;
+              const maintainFocus = () => {
+                if (document.activeElement !== input && input.parentNode) {
+                  console.log('🔄 Restaurando foco no input');
+                  input.focus();
+                }
+              };
+              
+              // Verificar e restaurar foco a cada 50ms
+              focusInterval = setInterval(maintainFocus, 50);
+              
               const finishEdit = (save: boolean = true) => {
+                // Parar o sistema de manutenção de foco
+                if (focusInterval) {
+                  clearInterval(focusInterval);
+                }
                 console.log('🏁 Finalizando edição, save:', save);
                 
                 if (save) {
