@@ -134,46 +134,48 @@ export default function HomePage() {
     }
 
     return (
-      <div className="border rounded-lg dark:border-[#374151] bg-white dark:bg-[#111827] overflow-hidden">
-        <Table>
-          <TableHeader className="bg-gray-50 dark:bg-[#111827]">
-            <TableRow>
-              <TableHead className="dark:text-gray-200">Origem</TableHead>
-              <TableHead className="dark:text-gray-200">Nome</TableHead>
-              <TableHead className="dark:text-gray-200">Responsável</TableHead>
-              <TableHead className="dark:text-gray-200">Cliente</TableHead>
-              <TableHead className="dark:text-gray-200">Atualizado</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {documentos.map((documento) => (
-              <TableRow key={documento.id} className="hover:bg-gray-50 dark:hover:bg-[#1F2937]">
-                <TableCell>
-                  <div className="flex items-center">
-                    {documento.origem === "Monday" ? (
-                      <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded text-xs font-medium">
-                        Monday
-                      </div>
-                    ) : (
-                      <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400 px-2 py-1 rounded text-xs font-medium">
-                        {documento.origem}
-                      </div>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell className="font-medium dark:text-gray-200">{documento.objeto}</TableCell>
-                <TableCell className="dark:text-gray-300">{documento.responsavel || "-"}</TableCell>
-                <TableCell className="dark:text-gray-300">{documento.cliente || "-"}</TableCell>
-                <TableCell>
-                  <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
-                    <Clock className="mr-1.5 h-3.5 w-3.5" />
-                    {formatDate(documento.updatedAt)}
-                  </div>
-                </TableCell>
+      <div className="border rounded-lg dark:border-[#374151] bg-white dark:bg-[#111827] overflow-hidden h-full flex flex-col">
+        <div className="flex-1 overflow-auto">
+          <Table>
+            <TableHeader className="bg-gray-50 dark:bg-[#111827] sticky top-0 z-10">
+              <TableRow>
+                <TableHead className="dark:text-gray-200">Origem</TableHead>
+                <TableHead className="dark:text-gray-200">Nome</TableHead>
+                <TableHead className="dark:text-gray-200">Responsável</TableHead>
+                <TableHead className="dark:text-gray-200">Cliente</TableHead>
+                <TableHead className="dark:text-gray-200">Atualizado</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {documentos.map((documento) => (
+                <TableRow key={documento.id} className="hover:bg-gray-50 dark:hover:bg-[#1F2937]">
+                  <TableCell>
+                    <div className="flex items-center">
+                      {documento.origem === "Monday" ? (
+                        <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded text-xs font-medium">
+                          Monday
+                        </div>
+                      ) : (
+                        <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400 px-2 py-1 rounded text-xs font-medium">
+                          {documento.origem}
+                        </div>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell className="font-medium dark:text-gray-200">{documento.objeto}</TableCell>
+                  <TableCell className="dark:text-gray-300">{documento.responsavel || "-"}</TableCell>
+                  <TableCell className="dark:text-gray-300">{documento.cliente || "-"}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
+                      <Clock className="mr-1.5 h-3.5 w-3.5" />
+                      {formatDate(documento.updatedAt)}
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     );
   };
