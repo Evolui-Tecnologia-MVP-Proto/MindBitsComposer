@@ -59,6 +59,7 @@ import { GitHubTab } from "@/refact/components/documentos/tabs/GitHubTab_refact"
 import { IncluirDocumentosTab } from "@/refact/components/documentos/tabs/IncluirDocumentosTab_refact";
 import { IntegradosTab } from "@/refact/components/documentos/tabs/IntegradosTab_refact";
 import { ConcluidosTab } from "@/refact/components/documentos/tabs/ConcluidosTab_refact";
+import { EmProcessoTab } from "@/refact/components/documentos/tables/EmProcessoTab";
 import { ExecutionFormPanel } from "@/refact/components/documentos/flow/ExecutionFormPanel";
 
 export default function DocumentosPageRefact() {
@@ -1693,13 +1694,11 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             showFilters={showFilters}
           />
 
-          <TabsContent value="em-processo" className="slide-in">
-            {isLoading ? (
-              <div className="text-center py-6">Carregando documentos...</div>
-            ) : (
-              renderDocumentosTable(documentosProcessando)
-            )}
-          </TabsContent>
+          <EmProcessoTab
+            isLoading={isLoading}
+            renderDocumentosTable={renderDocumentosTable}
+            documentosProcessando={documentosProcessando}
+          />
 
           <ConcluidosTab
             isLoading={isLoading}

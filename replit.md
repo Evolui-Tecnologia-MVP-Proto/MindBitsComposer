@@ -9,6 +9,17 @@ EVO-MindBits Composer is an integrated technical and business documentation plat
 Preferred communication style: Simple, everyday language.
 Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
+## Recent Updates (January 31, 2025)
+
+✓ COMPLETED: Extracted EmProcessoTab Component from Documentos Page (January 31, 2025)
+  - Created new reusable component client/src/refact/components/documentos/tables/EmProcessoTab.tsx
+  - Extracted "Em Processo" tab container from documentos-page_refact.tsx following established component pattern
+  - Component receives isLoading, renderDocumentosTable, and documentosProcessando props
+  - Maintains identical functionality as inline implementation but in reusable format
+  - Successfully imported and integrated into main documentos page
+  - Consistent with pattern established by IntegradosTab, ConcluidosTab, and IncluirDocumentosTab components
+  - Part of ongoing refactoring to improve code organization and maintainability
+
 ## Recent Updates (January 30, 2025)
 
 ✓ COMPLETED: Database Schema Update - Removed NOT NULL Constraint from document_editions.started_by (January 30, 2025)
