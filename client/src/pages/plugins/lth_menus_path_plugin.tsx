@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronRight, ChevronDown, Folder, FolderOpen, FileText, Database, Settings, RefreshCw, X, Save } from "lucide-react";
+import { ChevronRight, ChevronDown, Folder, FolderOpen, FileText, Database, Settings, RefreshCw, X, Save, Check, Circle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { Badge } from "@/components/ui/badge";
 
 interface LthMenusPathPluginProps {
   onDataExchange?: (data: any) => void;
@@ -54,6 +55,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   const [isLoading, setIsLoading] = useState(false);
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [pluginConfig, setPluginConfig] = useState<any>(null);
+  const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -511,9 +513,12 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   const authenticateConnection = async (connectionCode: string) => {
     const connection = connections.find(c => c.code === connectionCode);
     if (!connection?.endpoint || !connection?.credentials) {
+      setConnectionStatus('error');
       return false;
     }
 
+    setConnectionStatus('connecting');
+    
     try {
       const response = await apiRequest("POST", "/api/plugin/lth-auth", {
         endpoint: connection.endpoint,
@@ -522,10 +527,14 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
       if (response.success) {
         setAuthToken(response.token);
+        setConnectionStatus('connected');
         return true;
+      } else {
+        setConnectionStatus('error');
       }
     } catch (error) {
       console.error("Authentication failed:", error);
+      setConnectionStatus('error');
       toast({
         title: "Erro de autenticação",
         description: "Falha ao autenticar com a conexão selecionada",
@@ -562,6 +571,13 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     setMenuStructure([]);
     setExpandedPaths(new Set());
     setSelectedPath(null);
+    
+    // Reset connection status if empty selection
+    if (!connectionCode) {
+      setConnectionStatus('disconnected');
+      setAuthToken(null);
+      return;
+    }
     
     // Authenticate with the selected connection
     setIsLoading(true);
@@ -907,13 +923,49 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     }
   };
 
+  const getConnectionStatusBadge = () => {
+    switch (connectionStatus) {
+      case 'disconnected':
+        return (
+          <Badge variant="secondary" className="ml-2">
+            <Circle className="h-2 w-2 mr-1" fill="currentColor" />
+            Desconectado
+          </Badge>
+        );
+      case 'connecting':
+        return (
+          <Badge variant="outline" className="ml-2 animate-pulse">
+            <RefreshCw className="h-2 w-2 mr-1 animate-spin" />
+            Conectando...
+          </Badge>
+        );
+      case 'connected':
+        return (
+          <Badge variant="default" className="ml-2 bg-green-600 hover:bg-green-700">
+            <Check className="h-2 w-2 mr-1" />
+            Conectado
+          </Badge>
+        );
+      case 'error':
+        return (
+          <Badge variant="destructive" className="ml-2">
+            <X className="h-2 w-2 mr-1" />
+            Erro
+          </Badge>
+        );
+    }
+  };
+
   return (
     <div className="h-full flex flex-col bg-white dark:bg-[#0F172A] p-6">
       {/* Header com título e descrição */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-200 mb-2">
-          LTH Menus Path Plugin
-        </h2>
+        <div className="flex items-center mb-2">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-200">
+            LTH Menus Path Plugin
+          </h2>
+          {getConnectionStatusBadge()}
+        </div>
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Selecione um subsistema e explore a estrutura hierárquica de menus para definir caminhos de navegação.
         </p>
