@@ -24,6 +24,13 @@ interface MenuPath {
   children?: MenuPath[];
 }
 
+interface Connection {
+  id: string;
+  name: string;
+  code: string;
+  description?: string;
+}
+
 interface Subsystem {
   id: string;
   name: string;
@@ -33,6 +40,7 @@ interface Subsystem {
 
 export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null | undefined) {
   const { onDataExchange, selectedEdition } = props || {};
+  const [selectedConnection, setSelectedConnection] = useState<string>("");
   const [selectedSubsystem, setSelectedSubsystem] = useState<string>("");
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
@@ -40,6 +48,14 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Mock data for connections - em produção seria uma API
+  const connections: Connection[] = [
+    { id: "1", name: "Produção Principal", code: "PROD", description: "Ambiente de produção principal" },
+    { id: "2", name: "Homologação", code: "HOM", description: "Ambiente de homologação" },
+    { id: "3", name: "Desenvolvimento", code: "DEV", description: "Ambiente de desenvolvimento" },
+    { id: "4", name: "Teste Integrado", code: "TEST", description: "Ambiente de testes integrados" }
+  ];
 
   // Mock data for subsystems - em produção seria uma API
   const subsystems: Subsystem[] = [
@@ -457,6 +473,15 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     return baseMenus[subsystemCode] || [];
   };
 
+  const handleConnectionChange = (connectionCode: string) => {
+    setSelectedConnection(connectionCode);
+    // Reset subsystem and related states when connection changes
+    setSelectedSubsystem("");
+    setMenuStructure([]);
+    setExpandedPaths(new Set());
+    setSelectedPath(null);
+  };
+
   const handleSubsystemChange = (subsystemCode: string) => {
     setSelectedSubsystem(subsystemCode);
     setIsLoading(true);
@@ -598,6 +623,15 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   };
 
   const handleAtualizar = () => {
+    if (!selectedConnection) {
+      toast({
+        title: "Conexão não selecionada",
+        description: "Selecione uma conexão para atualizar os dados.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!selectedSubsystem) {
       toast({
         title: "Subsistema não selecionado",
@@ -666,10 +700,11 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     const pathArray = findPathRecursively(menuStructure, selectedId);
     if (!pathArray) return '';
 
+    const connectionName = connections.find(c => c.code === selectedConnection)?.name || selectedConnection;
     const subsystemName = subsystems.find(s => s.code === selectedSubsystem)?.name || selectedSubsystem;
     const pathString = pathArray.join(' -> ');
     
-    return `[Subsystem: ${selectedSubsystem}] - ${pathString}`;
+    return `[Connection: ${selectedConnection}] [Subsystem: ${selectedSubsystem}] - ${pathString}`;
   };
 
   const handleSalvar = () => {
@@ -683,8 +718,9 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     }
 
     console.log('🎯 LTH Plugin - handleSalvar chamado');
-    console.log('🎯 LTH Plugin - selectedPath:', selectedPath);
+    console.log('🎯 LTH Plugin - selectedConnection:', selectedConnection);
     console.log('🎯 LTH Plugin - selectedSubsystem:', selectedSubsystem);
+    console.log('🎯 LTH Plugin - selectedPath:', selectedPath);
     console.log('🎯 LTH Plugin - onDataExchange:', typeof onDataExchange, onDataExchange);
 
     // Encontrar o item selecionado na estrutura
@@ -742,6 +778,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
   const handleCancelar = () => {
     // Reset all states
+    setSelectedConnection("");
     setSelectedSubsystem("");
     setMenuStructure([]);
     setExpandedPaths(new Set());
@@ -765,14 +802,33 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         </p>
       </div>
 
+      {/* Connection Selector */}
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Conexão
+        </label>
+        <Select value={selectedConnection} onValueChange={handleConnectionChange}>
+          <SelectTrigger className="w-full bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151]">
+            <SelectValue placeholder="Selecione uma conexão..." />
+          </SelectTrigger>
+          <SelectContent className="bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151]">
+            {connections.map((connection) => (
+              <SelectItem key={connection.id} value={connection.code}>
+                <span className="font-medium">{connection.name}</span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Subsystem Selector */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Subsistema
         </label>
-        <Select value={selectedSubsystem} onValueChange={handleSubsystemChange}>
+        <Select value={selectedSubsystem} onValueChange={handleSubsystemChange} disabled={!selectedConnection}>
           <SelectTrigger className="w-full bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151]">
-            <SelectValue placeholder="Selecione um subsistema..." />
+            <SelectValue placeholder={!selectedConnection ? "Selecione uma conexão primeiro..." : "Selecione um subsistema..."} />
           </SelectTrigger>
           <SelectContent className="bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151]">
             {subsystems.map((subsystem) => (
@@ -805,17 +861,24 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
                 <span>Carregando estrutura...</span>
               </div>
             </div>
-          ) : selectedSubsystem && menuStructure.length > 0 ? (
+          ) : selectedConnection && selectedSubsystem && menuStructure.length > 0 ? (
             <div className="absolute inset-0 p-4 overflow-y-auto overflow-x-hidden">
               <div className="space-y-1">
                 {renderMenuTree(menuStructure)}
               </div>
             </div>
-          ) : selectedSubsystem ? (
+          ) : selectedConnection && selectedSubsystem ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center text-gray-500 dark:text-gray-400">
                 <Database className="h-12 w-12 mx-auto mb-3 opacity-50" />
                 <p>Nenhum menu encontrado para este subsistema</p>
+              </div>
+            </div>
+          ) : !selectedConnection ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center text-gray-500 dark:text-gray-400">
+                <Folder className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                <p>Selecione uma conexão para iniciar</p>
               </div>
             </div>
           ) : (
@@ -834,7 +897,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         <Button
           variant="outline"
           onClick={handleAtualizar}
-          disabled={!selectedSubsystem || isLoading}
+          disabled={!selectedConnection || !selectedSubsystem || isLoading}
           className="border-gray-300 dark:border-[#374151] hover:bg-gray-50 dark:hover:bg-[#1F2937]"
         >
           <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
