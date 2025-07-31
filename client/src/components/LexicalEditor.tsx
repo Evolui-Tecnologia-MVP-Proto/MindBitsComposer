@@ -801,7 +801,7 @@ function ToolbarPlugin({
         </Button>
         
         {/* Controles de edição de título do container - apenas quando um container inserido via toolbar está selecionado e nenhuma tabela está selecionada */}
-        {selectedContainerKey && selectedContainerFromToolbar && !selectedTableKey && (
+        {!selectedTableKey && selectedContainerKey && selectedContainerFromToolbar && (
           <div className="flex items-center gap-1 ml-2">
             <input
               type="text"
@@ -843,7 +843,7 @@ function ToolbarPlugin({
         )}
         
         {/* Botão de excluir container - apenas quando um container inserido via toolbar está selecionado e nenhuma tabela está selecionada */}
-        {selectedContainerKey && selectedContainerFromToolbar && !selectedTableKey && (
+        {!selectedTableKey && selectedContainerKey && selectedContainerFromToolbar && (
           <Button
             variant="ghost"
             size="sm"
@@ -865,8 +865,8 @@ function ToolbarPlugin({
           <Table className="w-4 h-4" />
         </Button>
         
-        {/* Controles de dimensionamento da tabela - apenas quando uma tabela está selecionada e nenhum container está selecionado */}
-        {selectedTableKey && !selectedContainerKey && (
+        {/* Controles de dimensionamento da tabela - sempre que uma tabela está selecionada */}
+        {selectedTableKey && (
           <div className="flex items-center gap-1 ml-2 text-xs">
             <input
               type="number"
@@ -902,8 +902,8 @@ function ToolbarPlugin({
           </div>
         )}
         
-        {/* Botão para excluir tabela selecionada - apenas quando nenhum container está selecionado */}
-        {selectedTableKey && !selectedContainerKey && (
+        {/* Botão para excluir tabela selecionada */}
+        {selectedTableKey && (
           <Button
             variant="ghost"
             size="sm"
