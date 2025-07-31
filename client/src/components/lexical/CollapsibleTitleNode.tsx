@@ -195,15 +195,15 @@ export class CollapsibleTitleNode extends TextNode {
             const titleElement = target.closest('summary');
             console.log('📍 Elemento summary encontrado:', titleElement);
             
-            const textSpan = titleElement?.querySelector('span:not(.mr-2)') as HTMLElement;
+            // Buscar o texto do título diretamente do nó
+            const currentText = this.getTextContent();
+            console.log('📄 Texto do nó:', currentText);
+            
+            // Buscar o span onde o texto deve ser mostrado
+            let textSpan = titleElement?.querySelector('span:not(.mr-2)') as HTMLElement;
             console.log('📝 Span de texto encontrado:', textSpan);
             
-            if (textSpan) {
-              const currentText = textSpan.textContent || textSpan.innerText || '';
-              console.log('📄 Texto atual (textContent):', textSpan.textContent);
-              console.log('📄 Texto atual (innerText):', textSpan.innerText);
-              console.log('📄 Texto final usado:', currentText);
-              console.log('📄 Span completo:', textSpan);
+            if (titleElement && currentText) {
               
               // Criar input temporário
               const input = document.createElement('input');
@@ -217,11 +217,32 @@ export class CollapsibleTitleNode extends TextNode {
               
               console.log('🆕 Input criado:', input);
               
-              // Esconder o span e inserir o input
-              textSpan.style.display = 'none';
-              textSpan.parentNode?.insertBefore(input, textSpan);
+              // Encontrar onde inserir o input
+              if (textSpan) {
+                // Se o span existe, escondê-lo e inserir input antes dele
+                textSpan.style.display = 'none';
+                textSpan.parentNode?.insertBefore(input, textSpan);
+              } else {
+                // Se não há span, criar um e adicionar ao titleElement
+                const newSpan = document.createElement('span');
+                newSpan.textContent = currentText;
+                newSpan.style.display = 'none';
+                
+                // Inserir após os botões
+                const buttonsContainer = titleElement.querySelector('.mr-2');
+                if (buttonsContainer && buttonsContainer.parentNode) {
+                  buttonsContainer.parentNode.insertBefore(input, buttonsContainer.nextSibling);
+                  buttonsContainer.parentNode.insertBefore(newSpan, input.nextSibling);
+                } else {
+                  titleElement.appendChild(input);
+                  titleElement.appendChild(newSpan);
+                }
+                
+                // Guardar referência ao span criado
+                textSpan = newSpan;
+              }
               
-              console.log('👁️ Span escondido e input inserido');
+              console.log('👁️ Input inserido no DOM');
               
               // Desabilitar temporariamente o editor principal
               const editorDiv = document.querySelector('.w-full.outline-none.resize-none') as HTMLElement;
@@ -270,18 +291,33 @@ export class CollapsibleTitleNode extends TextNode {
                   
                   if (newText && newText !== currentText) {
                     this.setTextContent(newText);
-                    textSpan.textContent = newText;
-                    console.log('✅ Texto atualizado');
+                    console.log('✅ Texto atualizado no nó');
                   }
                 }
                 
-                // Remover input e mostrar span
+                // Remover input
                 if (input.parentNode) {
                   input.remove();
                   console.log('🗑️ Input removido');
                 }
-                textSpan.style.display = '';
-                console.log('👁️ Span mostrado novamente');
+                
+                // Buscar o span novamente no DOM e atualizar
+                const currentSpan = titleElement?.querySelector('span:not(.mr-2)') as HTMLElement;
+                if (currentSpan) {
+                  currentSpan.textContent = this.getTextContent();
+                  currentSpan.style.display = '';
+                  console.log('👁️ Span atualizado e mostrado');
+                } else {
+                  // Se não encontrar o span, criar um novo
+                  const newSpan = document.createElement('span');
+                  newSpan.textContent = this.getTextContent();
+                  
+                  const leftContainer = titleElement?.querySelector('.flex.items-center');
+                  if (leftContainer) {
+                    leftContainer.appendChild(newSpan);
+                    console.log('✨ Novo span criado e adicionado');
+                  }
+                }
               };
               
               // Event listeners
