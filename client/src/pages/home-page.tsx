@@ -332,6 +332,7 @@ export default function HomePage() {
                 isLoading={isLoading}
                 renderDocumentosTable={renderDocumentosTable}
                 documentosProcessando={documentos.filter(doc => doc.status === "Em Processo")}
+                useTabsContext={false}
               />
             </div>
           </div>
