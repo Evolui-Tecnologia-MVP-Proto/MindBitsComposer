@@ -1754,8 +1754,6 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       console.log('🔍 Mapping info result:', mappingInfo);
       console.log('📝 Value to be set:', mappingInfo.value);
       
-      alert(`Field: ${label}\nMapping: ${mappingValue}\nValue found: "${mappingInfo.value}"`);
-      
       // Sempre tentar atualizar, mesmo se o valor estiver vazio
       editorInstance.update(() => {
         const node = $getNodeByKey(nodeKey);
@@ -1766,13 +1764,20 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
         if (node && 'setValue' in node) {
           const newValue = mappingInfo.value || '';
           console.log(`📝 Chamando setValue com valor: "${newValue}"`);
+          
+          // VERIFICAR SE O NODE É HEADERFIELD
+          alert(`Node found: ${node?.getType()}\nSetting value: "${newValue}"`);
+          
           (node as any).setValue(newValue);
           console.log(`✅ Campo ${label} atualizado com valor: "${newValue}"`);
           
           // Verificar se o valor foi realmente atualizado
           const updatedValue = (node as any).getValue();
           console.log(`🔍 Valor após atualização: "${updatedValue}"`);
+          
+          alert(`Value after update: "${updatedValue}"`);
         } else {
+          alert(`Node not found or doesn't have setValue method!`);
           console.log(`❌ Não foi possível encontrar o nó ${nodeKey} ou ele não tem método setValue`);
         }
       });
