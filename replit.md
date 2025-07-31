@@ -28,6 +28,8 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Enhanced user experience with styled confirmation UI instead of native browser dialogs
   - Botão "Cancelar" fecha o toast sem nenhuma ação adicional
   - Botão "Confirmar" executa a exclusão do container e fecha o toast automaticamente
+  - Fixed SVG click interception issue by adding pointerEvents: 'none' to Lucide icons
+  - Edit and delete buttons now properly capture click events instead of SVG elements intercepting them
 
 ✓ COMPLETED: Enhanced Quote and Code Block Insertion with Line Spacing (January 31, 2025)
   - Modified insertQuote function to automatically add empty lines before and after quote blocks

@@ -178,7 +178,10 @@ export class CollapsibleTitleNode extends TextNode {
           'p-1', 'rounded', 'hover:bg-gray-200', 'dark:hover:bg-gray-600',
           'text-blue-600', 'dark:text-blue-400', 'transition-colors'
         );
-        editButton.appendChild(createLucideIcon('square-pen'));
+        const editIcon = createLucideIcon('square-pen');
+        // Prevenir que o SVG intercepte os eventos de click
+        editIcon.style.pointerEvents = 'none';
+        editButton.appendChild(editIcon);
         editButton.title = 'Editar título';
         editButton.onclick = (e) => {
           console.log('🖱️ Botão de editar clicado');
@@ -201,7 +204,10 @@ export class CollapsibleTitleNode extends TextNode {
           'p-1', 'rounded', 'hover:bg-red-200', 'dark:hover:bg-red-600',
           'text-red-600', 'dark:text-red-400', 'transition-colors'
         );
-        deleteButton.appendChild(createLucideIcon('trash-2'));
+        const deleteIcon = createLucideIcon('trash-2');
+        // Prevenir que o SVG intercepte os eventos de click
+        deleteIcon.style.pointerEvents = 'none';
+        deleteButton.appendChild(deleteIcon);
         deleteButton.title = 'Excluir container';
         deleteButton.onclick = (e) => {
           e.preventDefault();
