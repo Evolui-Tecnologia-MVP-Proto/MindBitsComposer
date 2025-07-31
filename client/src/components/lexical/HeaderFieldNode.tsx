@@ -357,7 +357,9 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
     });
   }, []);
   
-  // Monitor para manter cursor visível
+  // REMOVIDO: Monitor que mantinha cursor visível estava interferindo com edição nos containers
+  // O setInterval chamava focus() a cada segundo, causando roubo de foco dos containers
+  /*
   React.useEffect(() => {
     if (!hasFocus) return;
     
@@ -370,7 +372,7 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
           console.log('🔍 Cursor ainda visível no campo:', node.getLabel());
         } else {
           console.log('⚠️ Cursor pode ter desaparecido, restaurando seleção...');
-          inputRef.current.focus();
+          inputRef.current.focus(); // ESTAVA CAUSANDO ROUBO DE FOCO DOS CONTAINERS!
           inputRef.current.setSelectionRange(inputRef.current.value.length, inputRef.current.value.length);
         }
       }
@@ -378,6 +380,7 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
     
     return () => clearInterval(interval);
   }, [hasFocus, node]);
+  */
 
   return (
     <div 

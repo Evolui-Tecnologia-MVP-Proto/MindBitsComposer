@@ -6,7 +6,7 @@ import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
-import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin';
+// REMOVIDO: AutoFocusPlugin - não queremos foco automático
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { OnChangePlugin } from '@lexical/react/LexicalOnChangePlugin';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -1168,143 +1168,8 @@ function TemplateSectionsPlugin({ sections, mdFileOld }: { sections?: string[], 
   return null;
 }
 
-// Plugin para garantir foco adequado quando carregando conteúdo existente
-function FocusPlugin({ initialEditorState }: { initialEditorState?: string }) {
-  const [editor] = useLexicalComposerContext();
-  
-  useEffect(() => {
-    if (initialEditorState) {
-      // Aguardar um pouco para garantir que o conteúdo foi carregado
-      const timeoutId = setTimeout(() => {
-        console.log('🎯 InitialFocusPlugin: Verificando se deve aplicar foco inicial');
-        
-        editor.update(() => {
-          const root = $getRoot();
-          
-          // Verificar se já existe conteúdo no documento (além do header)
-          let hasExistingContent = false;
-          
-          const checkForContent = (node: LexicalNode): void => {
-            // Se encontrar um CollapsibleContainerNode com conteúdo, há conteúdo existente
-            if ($isCollapsibleContainerNode(node)) {
-              hasExistingContent = true;
-              return;
-            }
-            
-            if ('getChildren' in node && typeof node.getChildren === 'function') {
-              const children = (node as any).getChildren();
-              for (const child of children) {
-                checkForContent(child);
-                if (hasExistingContent) break;
-              }
-            }
-          };
-          
-          checkForContent(root);
-          
-          // Se já há conteúdo no documento, NÃO aplicar foco automático
-          if (hasExistingContent) {
-            console.log('⚠️ Documento já possui conteúdo - NÃO vou aplicar foco automático');
-            return;
-          }
-          
-          // Procurar primeiro por HeaderFieldNodes
-          let firstHeaderField: HeaderFieldNode | null = null;
-          
-          const findFirstHeaderField = (node: LexicalNode): void => {
-            if ($isHeaderFieldNode(node) && !firstHeaderField) {
-              firstHeaderField = node as HeaderFieldNode;
-              console.log('✅ Encontrado HeaderFieldNode:', (node as HeaderFieldNode).getLabel());
-              return;
-            }
-            
-            if ('getChildren' in node && typeof node.getChildren === 'function') {
-              const children = (node as any).getChildren();
-              for (const child of children) {
-                findFirstHeaderField(child);
-                if (firstHeaderField) break;
-              }
-            }
-          };
-          
-          findFirstHeaderField(root);
-          
-          // Se encontrou um HeaderFieldNode E não há conteúdo existente, focar nele
-          if (firstHeaderField && !hasExistingContent) {
-            // Aumentar delay e forçar foco múltiplas vezes
-            const focusField = () => {
-              // Verificar se já há algum elemento com foco ativo (usuário está editando)
-              const activeElement = document.activeElement;
-              const isEditingInEditor = activeElement && (
-                activeElement.getAttribute('contenteditable') === 'true' ||
-                activeElement.tagName === 'INPUT' ||
-                activeElement.tagName === 'TEXTAREA'
-              );
-              
-              // Se o usuário já está editando algo, não interferir
-              if (isEditingInEditor) {
-                console.log('⚠️ Usuário já está editando, não vou transferir o foco');
-                return;
-              }
-              
-              const headerLabel = firstHeaderField!.getLabel();
-              const inputElement = document.querySelector(`[data-label="${headerLabel}"] input`) as HTMLInputElement;
-              if (inputElement) {
-                console.log('🎯 Tentando focar no campo:', headerLabel);
-                inputElement.focus();
-                inputElement.click(); // Simular clique também
-                
-                // Verificar se o foco foi aplicado
-                setTimeout(() => {
-                  if (document.activeElement === inputElement) {
-                    console.log('✅ Foco inicial aplicado com sucesso no campo:', headerLabel);
-                  } else {
-                    console.log('❌ Falha ao aplicar foco. Elemento ativo:', document.activeElement);
-                  }
-                }, 100);
-              } else {
-                console.log('❌ Input não encontrado para o campo:', headerLabel);
-              }
-            };
-            
-            // Focar apenas uma vez após o grace period do EditProtectionPlugin
-            setTimeout(focusField, 2100);  // Apenas uma vez, após 2.1s do grace period
-          } else if (!firstHeaderField) {
-            console.log('❌ Nenhum HeaderFieldNode encontrado no documento');
-            // Caso contrário, usar o comportamento padrão
-            const lastChild = root.getLastChild();
-            
-            if (lastChild) {
-              // Se o último nó é um parágrafo, colocar cursor no final dele
-              if ($isParagraphNode(lastChild)) {
-                lastChild.selectEnd();
-              } else {
-                // Caso contrário, criar um novo parágrafo e focar nele
-                const newParagraph = $createParagraphNode();
-                root.append(newParagraph);
-                newParagraph.select();
-              }
-            } else {
-              // Se não há conteúdo, criar parágrafo inicial
-              const newParagraph = $createParagraphNode();
-              root.append(newParagraph);
-              newParagraph.select();
-            }
-          }
-        });
-        
-        // Comentado - estava tirando o foco dos campos do header
-        // setTimeout(() => {
-        //   editor.focus();
-        // }, 50);
-      }, 100);
-      
-      return () => clearTimeout(timeoutId);
-    }
-  }, [editor, initialEditorState]);
-
-  return null;
-}
+// REMOVIDO COMPLETAMENTE: FocusPlugin que estava causando transferência automática de foco dos containers para header fields
+// O usuário não quer NENHUMA mudança automática de foco
 
 // Plugin para detectar e converter automaticamente [Imagem_ID: numeroimagem] para código inline
 function ImageIdAutoConvertPlugin() {
@@ -1811,15 +1676,14 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           const updatedValue = node.getValue();
           console.log(`🔍 Valor após atualização: "${updatedValue}"`);
           
-          // Forçar atualização do input via DOM
+          // Forçar atualização do input via DOM - REMOVIDO focus() automático
           setTimeout(() => {
             const inputElement = document.querySelector(`[data-label="${label}"] input`) as HTMLInputElement;
             if (inputElement) {
               inputElement.value = newValue;
               inputElement.dispatchEvent(new Event('input', { bubbles: true }));
-              inputElement.focus();
-              // Posicionar cursor no final
-              inputElement.setSelectionRange(inputElement.value.length, inputElement.value.length);
+              // REMOVIDO: inputElement.focus() - não queremos mudança automática de foco
+              // REMOVIDO: inputElement.setSelectionRange() - não queremos mudança de cursor
               console.log(`✅ Input DOM atualizado para: "${newValue}"`);
             }
           }, 0);
@@ -2551,7 +2415,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
               (node as any).setValue(pluginValue);
               console.log(`✅ Campo "${label}" atualizado com sucesso!`);
               
-              // Forçar atualização do input via DOM (mesma lógica do refresh)
+              // Forçar atualização do input via DOM - REMOVIDO focus() automático
               setTimeout(() => {
                 const inputElement = document.querySelector(`[data-label="${label}"] input`) as HTMLInputElement;
                 if (inputElement) {
@@ -2559,11 +2423,8 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                   inputElement.value = pluginValue;
                   inputElement.dispatchEvent(new Event('input', { bubbles: true }));
                   inputElement.dispatchEvent(new Event('change', { bubbles: true }));
-                  
-                  // Focar no campo após atualizar
-                  inputElement.focus();
-                  // Posicionar cursor no final do texto
-                  inputElement.setSelectionRange(inputElement.value.length, inputElement.value.length);
+                  // REMOVIDO: inputElement.focus() - não queremos mudança automática de foco
+                  // REMOVIDO: inputElement.setSelectionRange() - não queremos mudança de cursor
                 }
               }, 100);
             } else {

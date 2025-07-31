@@ -11,6 +11,15 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
+✓ COMPLETED: ELIMINATED ALL Automatic Focus Behavior - Complete Solution (January 31, 2025)
+  - User was extremely frustrated with persistent focus stealing from containers to header fields
+  - CRITICAL FIX: Completely removed FocusPlugin function (lines 1171-1307) that was using setTimeout(focusField, 2100)
+  - CRITICAL FIX: Removed setInterval in HeaderFieldNode that called focus() every 1000ms (1 second)
+  - Removed AutoFocusPlugin import and usage completely
+  - Removed all automatic focus() calls from refresh button and plugin data exchange handlers
+  - User can now type in containers without any automatic focus interference
+  - Zero automatic focus behavior achieved - user has complete control over cursor placement
+
 ✓ COMPLETED: Fixed Container Editing and Focus Transfer Issues (January 31, 2025)
   - Issue: User could not type in containers, focus was automatically transferring to header fields
   - Root causes identified:
