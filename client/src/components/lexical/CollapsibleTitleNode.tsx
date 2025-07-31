@@ -223,9 +223,19 @@ export class CollapsibleTitleNode extends TextNode {
               
               console.log('👁️ Span escondido e input inserido');
               
-              // Focar no input imediatamente e manter o foco
-              input.focus();
-              input.select();
+              // Desabilitar temporariamente o editor principal
+              const editorDiv = document.querySelector('.w-full.outline-none.resize-none') as HTMLElement;
+              if (editorDiv) {
+                editorDiv.setAttribute('contenteditable', 'false');
+                console.log('🛑 Editor desabilitado temporariamente');
+              }
+              
+              // Focar no input imediatamente
+              setTimeout(() => {
+                input.focus();
+                input.select();
+                console.log('🎯 Input focado e selecionado (com delay)');
+              }, 50);
               
               console.log('🎯 Input focado e selecionado');
               
@@ -234,35 +244,19 @@ export class CollapsibleTitleNode extends TextNode {
               input.setAttribute('data-editing-title', 'true');
               input.placeholder = 'Digite o título (Enter=salvar, Esc=cancelar)';
               
-              // Sistema agressivo para manter foco - reconquistar foco se perdido
-              let focusMaintainer: NodeJS.Timeout;
-              let isEditingActive = true;
-              
-              const maintainFocus = () => {
-                if (isEditingActive && document.activeElement !== input && input.parentNode) {
-                  console.log('🔄 Reconquistando foco roubado');
-                  input.focus();
-                }
-              };
-              
-              // Verificar e reconquistar foco a cada 100ms
-              focusMaintainer = setInterval(maintainFocus, 100);
-              
               // Timeout de segurança - salvar após 30 segundos sem interação
               let inactivityTimeout = setTimeout(() => {
                 console.log('⏰ Timeout - salvando automaticamente');
-                isEditingActive = false;
-                clearInterval(focusMaintainer);
                 finishEdit(true);
               }, 30000);
               
               const finishEdit = (save: boolean = true) => {
                 console.log('🏁 Finalizando edição, save:', save);
                 
-                // Parar sistema de manutenção de foco
-                isEditingActive = false;
-                if (focusMaintainer) {
-                  clearInterval(focusMaintainer);
+                // Reabilitar o editor principal
+                if (editorDiv) {
+                  editorDiv.setAttribute('contenteditable', 'true');
+                  console.log('✅ Editor reabilitado');
                 }
                 
                 // Limpar timeout
