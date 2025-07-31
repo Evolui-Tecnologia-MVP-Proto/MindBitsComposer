@@ -11,6 +11,21 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
+✓ COMPLETED: Toolbar-Based Container Edit/Delete System - FULLY WORKING (January 31, 2025)
+  - Successfully moved edit and delete buttons from individual containers to Lexical editor toolbar
+  - Positioned buttons after "Container Colapsável" insertion button in toolbar
+  - Buttons appear conditionally only when selectedContainerKey exists (container is selected)
+  - Added SquarePen and Trash2 icons to LexicalEditor imports
+  - Implemented editContainer and deleteContainer functions in LexicalEditor
+  - Functions dispatch 'editCollapsibleTitle' and 'deleteCollapsibleContainer' events to CollapsiblePlugin
+  - Completely simplified CollapsibleTitleNode by removing all button-related code and UI complexity
+  - CollapsibleTitleNode now focuses solely on title rendering without interactive buttons
+  - Edit button opens prompt for title editing via CollapsiblePlugin command system
+  - Delete button shows toast confirmation with "Cancelar" and "Confirmar" options
+  - Enhanced button styling with proper dark mode support and hover states
+  - Event system fully functional: toolbar buttons → custom events → CollapsiblePlugin commands
+  - Clean separation of concerns: UI controls in toolbar, title rendering in nodes
+
 ✓ COMPLETED: Collapsible Container Edit/Delete Functionality - FULLY WORKING (January 31, 2025)
   - Added edit and delete buttons to collapsible containers inserted via toolbar (not template-loaded ones)
   - Implemented distinction between toolbar-inserted vs template-loaded containers using fromToolbar property

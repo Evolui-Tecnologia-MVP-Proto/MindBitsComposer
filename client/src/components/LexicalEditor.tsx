@@ -62,6 +62,7 @@ import {
   Table,
   ChevronDown,
   Trash2,
+  SquarePen,
   Eye,
   Edit,
   Undo,
@@ -625,6 +626,26 @@ function ToolbarPlugin({
     setIsEditingTitle(false);
   };
 
+  const editContainer = () => {
+    if (!selectedContainerKey) return;
+    
+    // Disparar evento customizado para editar container
+    const event = new CustomEvent('editCollapsibleTitle', {
+      detail: { nodeKey: selectedContainerKey }
+    });
+    document.dispatchEvent(event);
+  };
+
+  const deleteContainer = () => {
+    if (!selectedContainerKey) return;
+    
+    // Disparar evento customizado para excluir container
+    const event = new CustomEvent('deleteCollapsibleContainer', {
+      detail: { nodeKey: selectedContainerKey }
+    });
+    document.dispatchEvent(event);
+  };
+
   return (
     <div className="flex items-center gap-1 p-3 border-b bg-gray-50 dark:bg-[#111827] border-gray-200 dark:border-[#374151]">
       {/* Undo/Redo buttons */}
@@ -783,6 +804,30 @@ function ToolbarPlugin({
         >
           <ChevronDown className="w-4 h-4" />
         </Button>
+        
+        {/* Botões de editar e excluir container - apenas quando um container está selecionado */}
+        {selectedContainerKey && (
+          <>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 text-xs hover:bg-blue-100 text-blue-600 hover:text-blue-700 dark:hover:bg-blue-900/30 dark:text-blue-400 dark:hover:text-blue-300"
+              title="Editar título do container"
+              onClick={editContainer}
+            >
+              <SquarePen className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 px-2 text-xs hover:bg-red-100 text-red-600 hover:text-red-700 dark:hover:bg-red-900/30 dark:text-red-400 dark:hover:text-red-300"
+              title="Excluir container"
+              onClick={deleteContainer}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </>
+        )}
         <div className="h-6 w-px bg-gray-300 mx-2"></div>
         <Button
           variant="ghost"
