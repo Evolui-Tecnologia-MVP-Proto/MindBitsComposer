@@ -185,6 +185,10 @@ export class CollapsibleTitleNode extends TextNode {
         const rightContainer = document.createElement('div');
         rightContainer.classList.add('flex', 'items-center', 'gap-1', 'ml-2', 'relative');
         
+        // Obter o texto atual do span
+        const textSpanElement = leftContainer.querySelector('span');
+        let currentText = textSpanElement ? textSpanElement.textContent || 'Container Colapsável' : 'Container Colapsável';
+        
         // Dropdown panel de edição
         const editDropdown = document.createElement('div');
         editDropdown.className = 'absolute top-full right-0 mt-1 p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg z-50 hidden';
@@ -193,7 +197,7 @@ export class CollapsibleTitleNode extends TextNode {
         // Input de edição dentro do dropdown
         const editInput = document.createElement('input');
         editInput.type = 'text';
-        editInput.value = this.getTextContent();
+        editInput.value = currentText;
         editInput.className = 'w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2';
         
         // Container dos botões do dropdown
@@ -223,7 +227,10 @@ export class CollapsibleTitleNode extends TextNode {
           isEditing = show;
           if (show) {
             editDropdown.classList.remove('hidden');
-            editInput.value = this.getTextContent();
+            // Obter o texto atual novamente ao abrir
+            const span = leftContainer.querySelector('span');
+            currentText = span ? span.textContent || '' : '';
+            editInput.value = currentText;
             setTimeout(() => {
               editInput.focus();
               editInput.select();
@@ -236,7 +243,7 @@ export class CollapsibleTitleNode extends TextNode {
         // Função para salvar
         const saveTitle = () => {
           const newText = editInput.value.trim();
-          if (newText && newText !== this.getTextContent()) {
+          if (newText && newText !== currentText) {
             const nodeKey = this.getKey();
             const event = new CustomEvent('updateCollapsibleTitle', {
               detail: { nodeKey, newText }
