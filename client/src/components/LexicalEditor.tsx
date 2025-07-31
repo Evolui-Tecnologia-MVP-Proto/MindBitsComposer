@@ -391,6 +391,7 @@ function ToolbarPlugin({
   const [isStrikethrough, setIsStrikethrough] = useState(false);
   const [isCode, setIsCode] = useState(false);
   const [selectedContainerKey, setSelectedContainerKey] = useState<string | null>(null);
+  const [selectedContainerFromToolbar, setSelectedContainerFromToolbar] = useState<boolean>(false);
   const [containerTitle, setContainerTitle] = useState<string>('');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const { fileInputRef, openFileDialog, handleFileChange } = useImageUpload();
@@ -402,6 +403,7 @@ function ToolbarPlugin({
         const selection = $getSelection();
         if (!$isRangeSelection(selection)) {
           setSelectedContainerKey(null);
+          setSelectedContainerFromToolbar(false);
           return;
         }
 
@@ -414,6 +416,7 @@ function ToolbarPlugin({
           while (currentNode) {
             if ($isCollapsibleContainerNode(currentNode)) {
               setSelectedContainerKey(currentNode.getKey());
+              setSelectedContainerFromToolbar(currentNode.getFromToolbar());
               
               // Buscar o título do container
               const children = currentNode.getChildren();
@@ -431,6 +434,7 @@ function ToolbarPlugin({
         
         // Nenhum container encontrado
         setSelectedContainerKey(null);
+        setSelectedContainerFromToolbar(false);
         setContainerTitle('');
       });
     });
@@ -796,8 +800,8 @@ function ToolbarPlugin({
           <ChevronDown className="w-4 h-4" />
         </Button>
         
-        {/* Controles de edição de título do container - apenas quando um container está selecionado */}
-        {selectedContainerKey && (
+        {/* Controles de edição de título do container - apenas quando um container inserido via toolbar está selecionado */}
+        {selectedContainerKey && selectedContainerFromToolbar && (
           <div className="flex items-center gap-1 ml-2">
             <input
               type="text"
@@ -838,8 +842,8 @@ function ToolbarPlugin({
           </div>
         )}
         
-        {/* Botão de excluir container - apenas quando um container está selecionado */}
-        {selectedContainerKey && (
+        {/* Botão de excluir container - apenas quando um container inserido via toolbar está selecionado */}
+        {selectedContainerKey && selectedContainerFromToolbar && (
           <Button
             variant="ghost"
             size="sm"
