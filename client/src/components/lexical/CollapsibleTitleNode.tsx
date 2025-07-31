@@ -188,9 +188,8 @@ export class CollapsibleTitleNode extends TextNode {
           e.stopPropagation();
           
           // Tornar o título editável temporariamente
-          const titleSpan = titleWrapper.querySelector('.collapsible-title-text');
-          if (titleSpan) {
-            const currentText = titleSpan.textContent || '';
+          if (textSpan) {
+            const currentText = textSpan.textContent || '';
             
             // Criar input temporário
             const input = document.createElement('input');
@@ -198,8 +197,8 @@ export class CollapsibleTitleNode extends TextNode {
             input.className = 'bg-transparent border border-blue-500 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500';
             
             // Substituir o span pelo input temporariamente
-            titleSpan.style.display = 'none';
-            titleSpan.parentNode?.insertBefore(input, titleSpan);
+            textSpan.style.display = 'none';
+            textSpan.parentNode?.insertBefore(input, textSpan);
             input.focus();
             input.select();
             
@@ -213,12 +212,12 @@ export class CollapsibleTitleNode extends TextNode {
                     this.setTextContent(newText);
                   });
                 }
-                titleSpan.textContent = newText;
+                textSpan.textContent = newText;
               }
               
               // Remover input e mostrar span novamente
               input.remove();
-              titleSpan.style.display = '';
+              textSpan.style.display = '';
             };
             
             // Finalizar edição ao pressionar Enter ou perder foco
@@ -227,7 +226,7 @@ export class CollapsibleTitleNode extends TextNode {
                 finishEdit();
               } else if (event.key === 'Escape') {
                 input.remove();
-                titleSpan.style.display = '';
+                textSpan.style.display = '';
               }
             });
             
