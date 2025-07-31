@@ -187,161 +187,22 @@ export class CollapsibleTitleNode extends TextNode {
           e.preventDefault();
           e.stopPropagation();
           
-          console.log('🖱️ Botão de editar clicado');
+          console.log('🖱️ Botão de editar clicado - teste simples');
           
-          // Encontrar o span de texto no DOM atual
-          const target = e.target as HTMLElement;
-          if (target) {
-            const titleElement = target.closest('summary');
-            console.log('📍 Elemento summary encontrado:', titleElement);
-            
-            // Buscar o texto do título diretamente do nó
-            const currentText = this.getTextContent();
-            console.log('📄 Texto do nó:', currentText);
-            
-            // Buscar o span onde o texto deve ser mostrado
-            let textSpan = titleElement?.querySelector('span:not(.mr-2)') as HTMLElement;
-            console.log('📝 Span de texto encontrado:', textSpan);
-            
-            if (titleElement && currentText) {
-              
-              // Criar input temporário
-              const input = document.createElement('input');
-              input.value = currentText;
-              console.log('🆕 Input criado com valor:', input.value);
-              
-              input.className = 'bg-white dark:bg-gray-800 border-2 border-blue-500 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white shadow-lg';
-              input.style.minWidth = '200px';
-              input.style.zIndex = '9999';
-              input.style.position = 'relative';
-              
-              console.log('🆕 Input criado:', input);
-              
-              // Encontrar onde inserir o input
-              if (textSpan) {
-                // Se o span existe, escondê-lo e inserir input antes dele
-                textSpan.style.display = 'none';
-                textSpan.parentNode?.insertBefore(input, textSpan);
-              } else {
-                // Se não há span, criar um e adicionar ao titleElement
-                const newSpan = document.createElement('span');
-                newSpan.textContent = currentText;
-                newSpan.style.display = 'none';
-                
-                // Inserir após os botões
-                const buttonsContainer = titleElement.querySelector('.mr-2');
-                if (buttonsContainer && buttonsContainer.parentNode) {
-                  buttonsContainer.parentNode.insertBefore(input, buttonsContainer.nextSibling);
-                  buttonsContainer.parentNode.insertBefore(newSpan, input.nextSibling);
-                } else {
-                  titleElement.appendChild(input);
-                  titleElement.appendChild(newSpan);
-                }
-                
-                // Guardar referência ao span criado
-                textSpan = newSpan;
-              }
-              
-              console.log('👁️ Input inserido no DOM');
-              
-              // Desabilitar temporariamente o editor principal
-              const editorDiv = document.querySelector('.w-full.outline-none.resize-none') as HTMLElement;
-              if (editorDiv) {
-                editorDiv.setAttribute('contenteditable', 'false');
-                console.log('🛑 Editor desabilitado temporariamente');
-              }
-              
-              // Focar no input imediatamente
-              setTimeout(() => {
-                input.focus();
-                input.select();
-                console.log('🎯 Input focado e selecionado (com delay)');
-              }, 50);
-              
-              console.log('🎯 Input focado e selecionado');
-              
-              // Impedir que outros sistemas roubem o foco
-              input.setAttribute('data-lexical-editor', 'false');
-              input.setAttribute('data-editing-title', 'true');
-              input.placeholder = 'Digite o título (Enter=salvar, Esc=cancelar)';
-              
-              // Timeout de segurança - salvar após 30 segundos sem interação
-              let inactivityTimeout = setTimeout(() => {
-                console.log('⏰ Timeout - salvando automaticamente');
-                finishEdit(true);
-              }, 30000);
-              
-              const finishEdit = (save: boolean = true) => {
-                console.log('🏁 Finalizando edição, save:', save);
-                
-                // Reabilitar o editor principal
-                if (editorDiv) {
-                  editorDiv.setAttribute('contenteditable', 'true');
-                  console.log('✅ Editor reabilitado');
-                }
-                
-                // Limpar timeout
-                if (inactivityTimeout) {
-                  clearTimeout(inactivityTimeout);
-                }
-                
-                if (save) {
-                  const newText = input.value.trim();
-                  console.log('💾 Novo texto:', newText);
-                  
-                  if (newText && newText !== currentText) {
-                    this.setTextContent(newText);
-                    console.log('✅ Texto atualizado no nó');
-                  }
-                }
-                
-                // Remover input
-                if (input.parentNode) {
-                  input.remove();
-                  console.log('🗑️ Input removido');
-                }
-                
-                // Buscar o span novamente no DOM e atualizar
-                const currentSpan = titleElement?.querySelector('span:not(.mr-2)') as HTMLElement;
-                if (currentSpan) {
-                  currentSpan.textContent = this.getTextContent();
-                  currentSpan.style.display = '';
-                  console.log('👁️ Span atualizado e mostrado');
-                } else {
-                  // Se não encontrar o span, criar um novo
-                  const newSpan = document.createElement('span');
-                  newSpan.textContent = this.getTextContent();
-                  
-                  const leftContainer = titleElement?.querySelector('.flex.items-center');
-                  if (leftContainer) {
-                    leftContainer.appendChild(newSpan);
-                    console.log('✨ Novo span criado e adicionado');
-                  }
-                }
-              };
-              
-              // Event listeners
-              input.addEventListener('keydown', (event) => {
-                console.log('⌨️ Tecla pressionada:', event.key);
-                if (event.key === 'Enter') {
-                  event.preventDefault();
-                  finishEdit(true);
-                } else if (event.key === 'Escape') {
-                  event.preventDefault();
-                  finishEdit(false);
-                }
-              });
-              
-              // Não remover automaticamente no blur - só com Enter/Escape
-              input.addEventListener('blur', () => {
-                console.log('🔍 Input perdeu foco - mas não será removido automaticamente');
-              });
-              
-              input.addEventListener('focus', () => {
-                console.log('🎯 Input recuperou foco');
-              });
-            }
-          }
+          // Simplesmente alterar o texto para "testando"
+          const newText = 'testando';
+          
+          // Atualizar o texto no nó via comando do editor
+          const nodeKey = this.getKey();
+          console.log('🔑 Node key:', nodeKey);
+          
+          // Usar comando customizado para atualizar texto
+          const event = new CustomEvent('updateCollapsibleTitle', {
+            detail: { nodeKey, newText }
+          });
+          window.dispatchEvent(event);
+          
+          console.log('📤 Evento disparado para atualizar título');
         };
         
         // Botão de Excluir

@@ -193,8 +193,24 @@ export default function CollapsiblePlugin(): JSX.Element | null {
       }
     };
 
+    const handleUpdateCollapsibleTitle = (event: any) => {
+      console.log('📨 Evento updateCollapsibleTitle recebido:', event.detail);
+      if (event.detail && event.detail.nodeKey && event.detail.newText) {
+        const { nodeKey, newText } = event.detail;
+        editor.update(() => {
+          const node = $getNodeByKey(nodeKey);
+          console.log('🔍 Nó encontrado:', node);
+          if (node && $isCollapsibleTitleNode(node)) {
+            node.setTextContent(newText);
+            console.log('✅ Texto do título atualizado para:', newText);
+          }
+        });
+      }
+    };
+
     document.addEventListener('editCollapsibleTitle', handleEditCollapsibleTitle);
     document.addEventListener('deleteCollapsibleContainer', handleDeleteCollapsibleContainer);
+    window.addEventListener('updateCollapsibleTitle', handleUpdateCollapsibleTitle);
 
     return () => {
       removeInsertCollapsibleCommand();
@@ -203,6 +219,7 @@ export default function CollapsiblePlugin(): JSX.Element | null {
       removeDeleteCollapsibleCommand();
       document.removeEventListener('editCollapsibleTitle', handleEditCollapsibleTitle);
       document.removeEventListener('deleteCollapsibleContainer', handleDeleteCollapsibleContainer);
+      window.removeEventListener('updateCollapsibleTitle', handleUpdateCollapsibleTitle);
     };
   }, [editor]);
 
