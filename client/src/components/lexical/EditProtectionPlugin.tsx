@@ -161,6 +161,12 @@ export default function EditProtectionPlugin(): null {
       // Se o foco está em um input do header field, não interferir
       if (isHeaderFieldInputFocused()) return;
       
+      // Verificar se clicamos em um botão - não interferir com cliques em botões
+      const activeElement = document.activeElement;
+      if (activeElement?.tagName === 'BUTTON' || activeElement?.closest('button')) {
+        return;
+      }
+      
       editor.update(() => {
         const selection = $getSelection();
         if ($isRangeSelection(selection)) {

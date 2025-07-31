@@ -365,7 +365,10 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
       label: node.getLabel(),
       value: value,
       placeholder: node.__placeholder,
-      inputRef: inputRef.current
+      inputRef: inputRef.current,
+      mappingType: mappingType,
+      mappingValue: mappingValue,
+      hasButton: mappingType === 'field' || mappingType === 'formula' || mappingType === 'plugin'
     });
   }, []);
   
@@ -467,6 +470,18 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
           data-header-field-input="true"
           autoComplete="off"
         />
+        
+        {/* BOTÃO DE TESTE SIMPLES */}
+        <button
+          onClick={() => {
+            console.log('🚨🚨🚨 TESTE BUTTON CLICKED!');
+            alert('TESTE - BOTÃO FUNCIONANDO!');
+          }}
+          className="px-2 py-1 mr-2 bg-red-500 text-white text-xs rounded"
+          type="button"
+        >
+          TESTE
+        </button>
         
         {/* Botões de ação baseados no tipo de mapeamento */}
         {mappingType && (
