@@ -114,16 +114,7 @@ export default function CollapsiblePlugin(): JSX.Element | null {
       DELETE_COLLAPSIBLE_COMMAND,
       (nodeKey: NodeKey) => {
         // Mostrar toast de confirmação em vez de confirm() do navegador
-        const confirmDelete = () => {
-          editor.update(() => {
-            const node = $getNodeByKey(nodeKey);
-            if (node && $isCollapsibleContainerNode(node)) {
-              node.remove();
-            }
-          });
-        };
-
-        toast({
+        const toastInstance = toast({
           title: "Confirmação de Exclusão",
           description: "A Exclusão do container excluira também todo o seu conteúdo. Confirma a exclusão?",
           variant: "destructive",
@@ -133,7 +124,8 @@ export default function CollapsiblePlugin(): JSX.Element | null {
                 size="sm"
                 variant="outline"
                 onClick={() => {
-                  // Toast se fecha automaticamente
+                  // Fechar o toast sem ação adicional
+                  toastInstance.dismiss();
                 }}
               >
                 Cancelar
@@ -141,7 +133,17 @@ export default function CollapsiblePlugin(): JSX.Element | null {
               <Button
                 size="sm"
                 variant="destructive"
-                onClick={confirmDelete}
+                onClick={() => {
+                  // Executar exclusão do container
+                  editor.update(() => {
+                    const node = $getNodeByKey(nodeKey);
+                    if (node && $isCollapsibleContainerNode(node)) {
+                      node.remove();
+                    }
+                  });
+                  // Fechar o toast após a exclusão
+                  toastInstance.dismiss();
+                }}
               >
                 Confirmar
               </Button>

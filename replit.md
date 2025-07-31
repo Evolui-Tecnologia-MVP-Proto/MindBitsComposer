@@ -26,6 +26,8 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Replaced browser confirm dialog with custom toast confirmation featuring "Cancelar" and "Confirmar" buttons
   - Toast displays message: "A Exclusão do container excluira também todo o seu conteúdo. Confirma a exclusão?"
   - Enhanced user experience with styled confirmation UI instead of native browser dialogs
+  - Botão "Cancelar" fecha o toast sem nenhuma ação adicional
+  - Botão "Confirmar" executa a exclusão do container e fecha o toast automaticamente
 
 ✓ COMPLETED: Enhanced Quote and Code Block Insertion with Line Spacing (January 31, 2025)
   - Modified insertQuote function to automatically add empty lines before and after quote blocks
