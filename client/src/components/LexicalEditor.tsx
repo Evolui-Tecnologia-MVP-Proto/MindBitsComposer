@@ -447,6 +447,9 @@ function ToolbarPlugin({
     editor.update(() => {
       const selection = $getSelection();
       if ($isRangeSelection(selection)) {
+        // Criar parágrafo vazio antes da citação
+        const paragraphBefore = $createParagraphNode();
+        
         // Se há texto selecionado, converter em citação
         if (!selection.isCollapsed()) {
           const selectedText = selection.getTextContent();
@@ -454,13 +457,21 @@ function ToolbarPlugin({
           const paragraphNode = $createParagraphNode();
           paragraphNode.append($createTextNode(selectedText));
           quoteNode.append(paragraphNode);
-          selection.insertNodes([quoteNode]);
+          
+          // Criar parágrafo vazio depois da citação
+          const paragraphAfter = $createParagraphNode();
+          
+          selection.insertNodes([paragraphBefore, quoteNode, paragraphAfter]);
         } else {
           // Se não há seleção, inserir citação vazia
           const quoteNode = $createQuoteNode();
           const paragraphNode = $createParagraphNode();
           quoteNode.append(paragraphNode);
-          $insertNodes([quoteNode]);
+          
+          // Criar parágrafo vazio depois da citação
+          const paragraphAfter = $createParagraphNode();
+          
+          $insertNodes([paragraphBefore, quoteNode, paragraphAfter]);
         }
       }
     });
