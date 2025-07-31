@@ -210,23 +210,16 @@ export default function EditProtectionPlugin(): null {
         if ($isRangeSelection(selection)) {
           const anchor = selection.anchor.getNode();
           
-          // Se a seleção está fora de um container válido E não é uma seleção colapsada (cursor),
-          // mover para o primeiro container válido
+          // Se a seleção está fora de um container válido, mover para o primeiro container válido
+          // MAS NÃO PARA O HEADER - apenas para CollapsibleContentNode
           if (!isNodeInValidContainer(anchor) && selection.isCollapsed()) {
             const root = $getRoot();
             let firstValidContainer: LexicalNode | null = null;
-            let firstHeaderField: HeaderFieldNode | null = null;
             
-            // Buscar primeiro por HeaderFieldNodes
+            // Buscar apenas por CollapsibleContentNode (não HeaderField!)
             const findFirstEditableArea = (node: LexicalNode): void => {
-              // Priorizar HeaderFieldNodes
-              if ($isHeaderFieldNode(node) && !firstHeaderField) {
-                firstHeaderField = node as HeaderFieldNode;
-                return;
-              }
-              
-              // Se não encontrou HeaderField, buscar CollapsibleContentNode
-              if ($isCollapsibleContentNode(node) && !firstValidContainer && !firstHeaderField) {
+              // Buscar APENAS CollapsibleContentNode
+              if ($isCollapsibleContentNode(node) && !firstValidContainer) {
                 firstValidContainer = node;
                 return;
               }
@@ -235,24 +228,20 @@ export default function EditProtectionPlugin(): null {
                 const children = node.getChildren();
                 for (const child of children) {
                   findFirstEditableArea(child);
-                  if (firstHeaderField) break; // Parar se encontrou HeaderField
+                  if (firstValidContainer) break;
                 }
               }
             };
             
             findFirstEditableArea(root);
             
-            // Priorizar HeaderField se encontrado
-            if (firstHeaderField) {
-              console.log('📍 Focando em HeaderField');
-              // Não fazer nada aqui - deixar o campo do header manter seu foco natural
-              // Os campos do header gerenciam seu próprio foco através de seus inputs
-            } else if (firstValidContainer && $isElementNode(firstValidContainer)) {
+            // Focar apenas em container de conteúdo (não header!)
+            if (firstValidContainer && $isElementNode(firstValidContainer)) {
               const elementNode = firstValidContainer as ElementNode;
               const firstChild = elementNode.getFirstChild();
               if (firstChild) {
                 firstChild.selectStart();
-                console.log('📍 Cursor reposicionado para área editável válida');
+                console.log('📍 Cursor reposicionado para container de conteúdo válido');
               }
             }
           }

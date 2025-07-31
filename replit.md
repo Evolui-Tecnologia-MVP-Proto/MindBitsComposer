@@ -11,6 +11,15 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
+✓ COMPLETED: Fixed Focus Transfer Bug in EditProtectionPlugin (January 31, 2025)
+  - Fixed critical bug where editing inside containers was transferring focus to document header
+  - Root cause: EditProtectionPlugin was searching for HeaderFieldNodes and attempting to focus them
+  - Solution: Removed header field focus logic - plugin now only repositions to CollapsibleContentNode
+  - Added toast notifications when editing is blocked outside protected areas
+  - Protection activates after 2-second grace period on document load
+  - System now correctly maintains focus within active container during editing
+  - User confirmed issue was occurring - now resolved with targeted focus management
+
 ✓ COMPLETED: Fixed Plugin Data Transfer to Header Fields (January 31, 2025)
   - Fixed issue where plugin button (unplug) wasn't updating header field values
   - Root cause: Missing DOM update logic after setting value in Lexical node
