@@ -26,14 +26,16 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
       setActiveItem("lexical");
     } else if (location.startsWith("/fluxos")) {
       setActiveItem("fluxos");
+    } else if (location.startsWith("/documentos-embed")) {
+      setActiveItem("documentos-embed");
+    } else if (location.startsWith("/documentos-refact")) {
+      setActiveItem("documentos-refact");
     } else if (location.startsWith("/documentos")) {
       setActiveItem("documentos");
     } else if (location.startsWith("/plugins")) {
       setActiveItem("plugins");
     } else if (location.startsWith("/configuracoes")) {
       setActiveItem("configuracoes");
-    } else if (location.startsWith("/documentos-refact")) {
-      setActiveItem("documentos-refact");
     } else {
       setActiveItem("");
     }
