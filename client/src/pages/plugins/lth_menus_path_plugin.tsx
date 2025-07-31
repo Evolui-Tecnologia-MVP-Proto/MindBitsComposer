@@ -607,9 +607,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     }
     
     // Authenticate with the selected connection
-    setIsLoading(true);
     const authenticated = await authenticateConnection(connectionCode);
-    setIsLoading(false);
 
     if (authenticated) {
       toast({
@@ -637,52 +635,12 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
   const handleSubsystemChange = async (subsystemCode: string) => {
     setSelectedSubsystem(subsystemCode);
-    setIsLoading(true);
     
-    try {
-      if (authToken) {
-        const response = await fetch("/api/plugin/lth-menus", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            connectionCode: selectedConnection,
-            subsystemCode: subsystemCode,
-            authToken: authToken
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch menus: ${response.status}`);
-        }
-
-        const data = await response.json();
-        
-        if (data.menuStructure) {
-          setMenuStructure(data.menuStructure);
-        }
-      } else {
-        // Fallback to mock data if not authenticated
-        const structure = generateMenuStructure(subsystemCode);
-        setMenuStructure(structure);
-      }
-    } catch (error) {
-      console.error("Failed to fetch menu structure:", error);
-      toast({
-        title: "Erro ao carregar menus",
-        description: "Falha ao obter estrutura de menus do subsistema",
-        variant: "destructive"
-      });
-      // Use mock data as fallback
-      const structure = generateMenuStructure(subsystemCode);
-      setMenuStructure(structure);
-    } finally {
-      setExpandedPaths(new Set()); // Reset expanded state
-      setSelectedPath(null); // Reset selected state
-      setIsLoading(false);
-    }
+    // Don't show loading spinner, just use mock data for now
+    const structure = generateMenuStructure(subsystemCode);
+    setMenuStructure(structure);
+    setExpandedPaths(new Set()); // Reset expanded state
+    setSelectedPath(null); // Reset selected state
   };
 
   const toggleExpanded = (pathId: string) => {
@@ -1079,14 +1037,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         </div>
 
         <div className="absolute inset-x-0 top-12 bottom-0 border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#111827] overflow-hidden">
-          {isLoading ? (
-            <div className="flex items-center justify-center h-full">
-              <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400">
-                <RefreshCw className="h-5 w-5 animate-spin" />
-                <span>Carregando estrutura...</span>
-              </div>
-            </div>
-          ) : selectedConnection && selectedSubsystem && menuStructure.length > 0 ? (
+          {selectedConnection && selectedSubsystem && menuStructure.length > 0 ? (
             <div className="absolute inset-0 p-4 overflow-y-auto overflow-x-hidden">
               <div className="space-y-1">
                 {renderMenuTree(menuStructure)}
@@ -1122,7 +1073,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         <Button
           variant="outline"
           onClick={handleAtualizar}
-          disabled={!selectedConnection || !selectedSubsystem || isLoading}
+          disabled={!selectedConnection || !selectedSubsystem}
           className="border-gray-300 dark:border-[#374151] hover:bg-gray-50 dark:hover:bg-[#1F2937]"
         >
           <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
