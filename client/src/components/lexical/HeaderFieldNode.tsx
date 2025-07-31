@@ -181,57 +181,7 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
   
   console.log(`🏷️ HeaderFieldComponent renderizado - label: "${node.getLabel()}", mappingType: "${mappingType}", mappingValue: "${mappingValue}"`);
   
-  // Log para verificar se os botões devem ser renderizados
-  React.useEffect(() => {
-    if (mappingType) {
-      console.log(`🔘 Campo "${node.getLabel()}" tem mappingType: ${mappingType} - botão deve aparecer`);
-      // Verificar se o botão está realmente no DOM após um pequeno delay
-      setTimeout(() => {
-        const container = document.querySelector(`[data-label="${node.getLabel()}"]`);
-        const button = container?.querySelector('button');
-        if (button) {
-          console.log(`✅ Botão encontrado no DOM para campo "${node.getLabel()}"`);
-          
-          // Adicionar listener direto para debug
-          const testClick = (e: Event) => {
-            console.log('🎯 CLIQUE DIRETO NO BOTÃO VIA ADDEVENTLISTENER!', e);
-          };
-          button.addEventListener('click', testClick);
-          
-          // Verificar computed styles
-          const styles = window.getComputedStyle(button);
-          console.log(`🔍 Estilos do botão para ${node.getLabel()}:`);
-          console.log(`  - pointerEvents: ${styles.pointerEvents}`);
-          console.log(`  - visibility: ${styles.visibility}`);
-          console.log(`  - display: ${styles.display}`);
-          console.log(`  - opacity: ${styles.opacity}`);
-          console.log(`  - position: ${styles.position}`);
-          console.log(`  - zIndex: ${styles.zIndex}`);
-          
-          // Verificar se algo está cobrindo o botão
-          const rect = button.getBoundingClientRect();
-          const elementAtPoint = document.elementFromPoint(rect.left + rect.width/2, rect.top + rect.height/2);
-          if (elementAtPoint !== button && !button.contains(elementAtPoint)) {
-            console.log(`⚠️ AVISO: O botão está sendo coberto por outro elemento:`, elementAtPoint);
-          }
-          
-          // Testar clique programático
-          console.log(`🧪 Testando clique programático no botão de ${node.getLabel()}...`);
-          setTimeout(() => {
-            button.click();
-            console.log(`✅ Clique programático executado`);
-          }, 500);
-          
-          // Remover listener após 5 segundos
-          setTimeout(() => button.removeEventListener('click', testClick), 5000);
-        } else {
-          console.log(`❌ BOTÃO NÃO ENCONTRADO no DOM para campo "${node.getLabel()}" mesmo com mappingType: ${mappingType}`);
-        }
-      }, 100);
-    } else {
-      console.log(`❌ Campo "${node.getLabel()}" não tem mappingType - botão NÃO aparecerá`);
-    }
-  }, [mappingType, node]);
+
 
   // Sincronizar valor quando o nó for atualizado
   React.useEffect(() => {
@@ -492,20 +442,17 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
             {(mappingType === 'field' || mappingType === 'formula') && (
               <button
                   onClick={(e) => {
-                    console.log('🎯 CLIQUE NO BOTÃO CAPTURADO!');
                     e.preventDefault();
                     e.stopPropagation();
                     handleRefresh();
                   }}
                   onMouseDown={(e) => {
-                    console.log('🎯 MOUSE DOWN NO BOTÃO!');
                     e.preventDefault();
                     e.stopPropagation();
                   }}
                   className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                   title="Recarregar valor"
                   type="button"
-                  style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}
                 >
                   <RefreshCw className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                 </button>

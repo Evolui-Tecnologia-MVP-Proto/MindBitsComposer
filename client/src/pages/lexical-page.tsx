@@ -2338,39 +2338,41 @@ export default function LexicalPage() {
       />
 
       {/* Modal de Confirmação para Finalizar */}
-      <AlertDialog open={showFinalizeModal} onOpenChange={setShowFinalizeModal}>
-        <AlertDialogContent className="dark:bg-[#0F1729] dark:border-[#374151]">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="dark:text-gray-200">
-              Confirmação de Finalização
-            </AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-600 rounded-lg p-4 mt-4">
-                <p className="text-yellow-800 dark:text-yellow-400">
-                  <span className="font-bold">Atenção:</span> Finalizando a edição do documento você o libera para que seja processado para as fases consecutivas do fluxo definido. Esta ação não poderá ser desfeita caso alguma fase posterior seja processada. Confima a finalização do documento e efetiva disponibilização para a próxima fase?
-                </p>
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel 
-              onClick={() => setShowFinalizeModal(false)}
-              className="dark:bg-[#374151] dark:text-gray-200 dark:border-[#374151] dark:hover:bg-[#4B5563]"
-            >
-              Cancelar
-            </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={() => {
-                // TODO: Implementar funcionalidade de finalização
-                setShowFinalizeModal(false);
-              }}
-              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
-            >
-              Confirmar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {showFinalizeModal && (
+        <AlertDialog open={showFinalizeModal} onOpenChange={setShowFinalizeModal}>
+          <AlertDialogContent className="dark:bg-[#0F1729] dark:border-[#374151]">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="dark:text-gray-200">
+                Confirmação de Finalização
+              </AlertDialogTitle>
+              <AlertDialogDescription asChild>
+                <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-600 rounded-lg p-4 mt-4">
+                  <p className="text-yellow-800 dark:text-yellow-400">
+                    <span className="font-bold">Atenção:</span> Finalizando a edição do documento você o libera para que seja processado para as fases consecutivas do fluxo definido. Esta ação não poderá ser desfeita caso alguma fase posterior seja processada. Confima a finalização do documento e efetiva disponibilização para a próxima fase?
+                  </p>
+                </div>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel 
+                onClick={() => setShowFinalizeModal(false)}
+                className="dark:bg-[#374151] dark:text-gray-200 dark:border-[#374151] dark:hover:bg-[#4B5563]"
+              >
+                Cancelar
+              </AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={() => {
+                  // TODO: Implementar funcionalidade de finalização
+                  setShowFinalizeModal(false);
+                }}
+                className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
+              >
+                Confirmar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
 
       {/* Plugin Modal */}
       {selectedPlugin && (
