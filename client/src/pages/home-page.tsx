@@ -149,7 +149,7 @@ export default function HomePage() {
             <TableBody>
               {documentos.map((documento) => (
                 <TableRow key={documento.id} className="hover:bg-gray-50 dark:hover:bg-[#1F2937]">
-                  <TableCell>
+                  <TableCell className="dark:bg-[#0F172A]">
                     <div className="flex items-center">
                       {documento.origem === "Monday" ? (
                         <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded text-xs font-medium">
@@ -162,10 +162,10 @@ export default function HomePage() {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="font-medium dark:text-gray-200">{documento.objeto}</TableCell>
-                  <TableCell className="dark:text-gray-300">{documento.responsavel || "-"}</TableCell>
-                  <TableCell className="dark:text-gray-300">{documento.cliente || "-"}</TableCell>
-                  <TableCell>
+                  <TableCell className="font-medium dark:text-gray-200 dark:bg-[#0F172A]">{documento.objeto}</TableCell>
+                  <TableCell className="dark:text-gray-300 dark:bg-[#0F172A]">{documento.responsavel || "-"}</TableCell>
+                  <TableCell className="dark:text-gray-300 dark:bg-[#0F172A]">{documento.cliente || "-"}</TableCell>
+                  <TableCell className="dark:bg-[#0F172A]">
                     <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
                       <Clock className="mr-1.5 h-3.5 w-3.5" />
                       {formatDate(documento.updatedAt)}
