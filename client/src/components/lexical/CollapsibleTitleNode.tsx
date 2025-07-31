@@ -187,50 +187,55 @@ export class CollapsibleTitleNode extends TextNode {
           e.preventDefault();
           e.stopPropagation();
           
-          // Tornar o título editável temporariamente
-          if (textSpan) {
-            const currentText = textSpan.textContent || '';
+          // Encontrar o span de texto no DOM atual
+          const target = e.target as HTMLElement;
+          if (target) {
+            const titleElement = target.closest('summary');
+            const textSpan = titleElement?.querySelector('span:not(.mr-2)') as HTMLElement;
             
-            // Criar input temporário
-            const input = document.createElement('input');
-            input.value = currentText;
-            input.className = 'bg-transparent border border-blue-500 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500';
-            
-            // Substituir o span pelo input temporariamente
-            textSpan.style.display = 'none';
-            textSpan.parentNode?.insertBefore(input, textSpan);
-            input.focus();
-            input.select();
-            
-            const finishEdit = () => {
-              const newText = input.value.trim();
-              if (newText && newText !== currentText) {
-                // Atualizar o texto no node
-                const editor = config.editor;
-                if (editor) {
-                  editor.update(() => {
-                    this.setTextContent(newText);
-                  });
-                }
-                textSpan.textContent = newText;
-              }
+            if (textSpan) {
+              const currentText = textSpan.textContent || '';
               
-              // Remover input e mostrar span novamente
-              input.remove();
-              textSpan.style.display = '';
-            };
-            
-            // Finalizar edição ao pressionar Enter ou perder foco
-            input.addEventListener('keydown', (event) => {
-              if (event.key === 'Enter') {
-                finishEdit();
-              } else if (event.key === 'Escape') {
-                input.remove();
+              // Criar input temporário
+              const input = document.createElement('input');
+              input.value = currentText;
+              input.className = 'bg-transparent border border-blue-500 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white';
+              
+              // Substituir o span pelo input temporariamente
+              textSpan.style.display = 'none';
+              textSpan.parentNode?.insertBefore(input, textSpan);
+              input.focus();
+              input.select();
+              
+              const finishEdit = () => {
+                const newText = input.value.trim();
+                if (newText && newText !== currentText) {
+                  // Atualizar apenas o texto do span
+                  this.setTextContent(newText);
+                  textSpan.textContent = newText;
+                }
+                
+                // Remover input e mostrar span novamente
+                if (input.parentNode) {
+                  input.remove();
+                }
                 textSpan.style.display = '';
-              }
-            });
-            
-            input.addEventListener('blur', finishEdit);
+              };
+              
+              // Finalizar edição ao pressionar Enter ou perder foco
+              input.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                  finishEdit();
+                } else if (event.key === 'Escape') {
+                  if (input.parentNode) {
+                    input.remove();
+                  }
+                  textSpan.style.display = '';
+                }
+              });
+              
+              input.addEventListener('blur', finishEdit);
+            }
           }
         };
         
