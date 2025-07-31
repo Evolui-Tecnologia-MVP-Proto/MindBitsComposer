@@ -808,7 +808,7 @@ function ToolbarPlugin({
           variant="ghost"
           size="sm"
           className="h-8 px-2 text-xs hover:bg-gray-100 dark:hover:bg-[#374151] dark:text-[#E5E7EB]"
-          title="Container Colapsível"
+          title="Sub Sessão"
           onClick={insertCollapsible}
         >
           <ChevronDown className="w-4 h-4" />

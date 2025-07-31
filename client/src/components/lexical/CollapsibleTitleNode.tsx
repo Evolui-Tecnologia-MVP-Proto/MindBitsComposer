@@ -153,7 +153,7 @@ export class CollapsibleTitleNode extends TextNode {
   }
 }
 
-export function $createCollapsibleTitleNode(text = 'Container Colapsível'): CollapsibleTitleNode {
+export function $createCollapsibleTitleNode(text = 'Sub Sessão'): CollapsibleTitleNode {
   return $applyNodeReplacement(new CollapsibleTitleNode(text));
 }
 
