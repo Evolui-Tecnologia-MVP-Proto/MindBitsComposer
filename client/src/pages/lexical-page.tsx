@@ -1783,12 +1783,12 @@ export default function LexicalPage() {
                   className={`${
                     (!selectedEdition || viewMode === 'preview')
                       ? "opacity-50 bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed hover:bg-gray-200"
-                      : "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                      : "bg-purple-600 text-white border-purple-600 hover:bg-purple-700 shadow-md"
                   }`}
                   disabled={!selectedEdition || viewMode === 'preview'}
                   title="Finalizar"
                 >
-                  <BookOpenCheck className={`w-4 h-4 ${(!selectedEdition || viewMode === 'preview') ? "text-gray-400" : "text-blue-700"}`} />
+                  <BookOpenCheck className={`w-4 h-4 ${(!selectedEdition || viewMode === 'preview') ? "text-gray-400" : "text-white"}`} />
                 </Button>
               </div>
             </div>
