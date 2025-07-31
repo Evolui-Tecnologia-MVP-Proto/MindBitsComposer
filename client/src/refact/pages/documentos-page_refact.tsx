@@ -2826,21 +2826,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
               </div>
               
               <ExecutionFormPanel 
-                selectedFlowNode={selectedFlowNode}
-                queryClient={queryClient}
-                toast={toast}
-                flowDiagramModal={flowDiagramModal}
-                getTemplateInfo={getTemplateInfo}
-                areAllFieldsFilled={areAllFieldsFilled}
-                saveChangesToDatabase={saveChangesToDatabase}
-                updateApprovalStatus={updateApprovalStatus}
-                showApprovalAlert={showApprovalAlert}
-                fieldValues={fieldValues}
-                setFieldValues={setFieldValues}
-                approvalFieldValues={approvalFieldValues}
-                setApprovalFieldValues={setApprovalFieldValues}
-                integrationResult={integrationResult}
-                setIntegrationResult={setIntegrationResult}
+                nodeId={selectedFlowNode.id}
+                nodeType={selectedFlowNode.type as 'actionNode' | 'documentNode' | 'integrationNode' | 'endNode'}
+                nodeData={selectedFlowNode.data}
+                onSubmit={(data) => {
+                  console.log('Form submitted:', data);
+                  // TODO: Implementar lógica de submit
+                }}
+                onCancel={() => {
+                  setShowFlowInspector(false);
+                  setSelectedFlowNode(null);
+                }}
+                isLoading={false}
               />
             </div>
           </div>
