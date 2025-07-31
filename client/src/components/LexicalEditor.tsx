@@ -24,7 +24,7 @@ import { $getNodeByKey, $getSelection as $getLexicalSelection, $setSelection, $c
 import { CollapsibleContainerNode, $createCollapsibleContainerNode, $isCollapsibleContainerNode } from './lexical/CollapsibleNode';
 import { CollapsibleTitleNode, $createCollapsibleTitleNode, $isCollapsibleTitleNode } from './lexical/CollapsibleTitleNode';
 import { CollapsibleContentNode, $createCollapsibleContentNode, $isCollapsibleContentNode } from './lexical/CollapsibleContentNode';
-import CollapsiblePlugin, { INSERT_COLLAPSIBLE_COMMAND } from './lexical/CollapsiblePlugin';
+import CollapsiblePlugin, { INSERT_COLLAPSIBLE_COMMAND, $insertCollapsibleContainer } from './lexical/CollapsiblePlugin';
 import EditProtectionPlugin from './lexical/EditProtectionPlugin';
 
 // Import dos nós e plugin de imagem
@@ -551,7 +551,9 @@ function ToolbarPlugin({
 
 
   const insertCollapsible = () => {
-    editor.dispatchCommand(INSERT_COLLAPSIBLE_COMMAND, true);
+    editor.update(() => {
+      $insertCollapsibleContainer(true, true); // true para isOpen, true para fromToolbar
+    });
   };
 
   return (

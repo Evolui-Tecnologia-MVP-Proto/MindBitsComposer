@@ -7,6 +7,7 @@ import {
   createCommand,
   LexicalCommand,
   NodeKey,
+  $getNodeByKey,
 } from 'lexical';
 import { $insertNodeToNearestRoot } from '@lexical/utils';
 import { useEffect } from 'react';
@@ -35,13 +36,21 @@ export const TOGGLE_COLLAPSIBLE_COMMAND: LexicalCommand<NodeKey> = createCommand
   'TOGGLE_COLLAPSIBLE_COMMAND',
 );
 
-export function $insertCollapsibleContainer(isOpen = true): void {
+export const EDIT_COLLAPSIBLE_TITLE_COMMAND: LexicalCommand<NodeKey> = createCommand(
+  'EDIT_COLLAPSIBLE_TITLE_COMMAND',
+);
+
+export const DELETE_COLLAPSIBLE_COMMAND: LexicalCommand<NodeKey> = createCommand(
+  'DELETE_COLLAPSIBLE_COMMAND',
+);
+
+export function $insertCollapsibleContainer(isOpen = true, fromToolbar = false): void {
   const title = $createCollapsibleTitleNode('Container Colapsável');
   const content = $createCollapsibleContentNode();
   const paragraph = $createParagraphNode();
   content.append(paragraph);
 
-  const container = $createCollapsibleContainerNode(isOpen);
+  const container = $createCollapsibleContainerNode(isOpen, fromToolbar);
   container.append(title, content);
 
   $insertNodeToNearestRoot(container);
@@ -80,9 +89,63 @@ export default function CollapsiblePlugin(): JSX.Element | null {
       COMMAND_PRIORITY_EDITOR,
     );
 
+    const removeEditCollapsibleTitleCommand = editor.registerCommand(
+      EDIT_COLLAPSIBLE_TITLE_COMMAND,
+      (nodeKey: NodeKey) => {
+        editor.update(() => {
+          const node = $getNodeByKey(nodeKey);
+          if ($isCollapsibleTitleNode(node)) {
+            // Fazer o título editável temporariamente
+            const newText = prompt('Digite o novo título:', node.getTextContent());
+            if (newText !== null && newText.trim() !== '') {
+              node.setTextContent(newText.trim());
+            }
+          }
+        });
+        return true;
+      },
+      COMMAND_PRIORITY_EDITOR,
+    );
+
+    const removeDeleteCollapsibleCommand = editor.registerCommand(
+      DELETE_COLLAPSIBLE_COMMAND,
+      (nodeKey: NodeKey) => {
+        editor.update(() => {
+          const node = $getNodeByKey(nodeKey);
+          if (node && $isCollapsibleContainerNode(node)) {
+            if (confirm('Tem certeza que deseja excluir este container?')) {
+              node.remove();
+            }
+          }
+        });
+        return true;
+      },
+      COMMAND_PRIORITY_EDITOR,
+    );
+
+    // Event listeners para eventos personalizados do DOM
+    const handleEditCollapsibleTitle = (event: any) => {
+      if (event.detail && event.detail.nodeKey) {
+        editor.dispatchCommand(EDIT_COLLAPSIBLE_TITLE_COMMAND, event.detail.nodeKey);
+      }
+    };
+
+    const handleDeleteCollapsibleContainer = (event: any) => {
+      if (event.detail && event.detail.nodeKey) {
+        editor.dispatchCommand(DELETE_COLLAPSIBLE_COMMAND, event.detail.nodeKey);
+      }
+    };
+
+    document.addEventListener('editCollapsibleTitle', handleEditCollapsibleTitle);
+    document.addEventListener('deleteCollapsibleContainer', handleDeleteCollapsibleContainer);
+
     return () => {
       removeInsertCollapsibleCommand();
       removeToggleCollapsibleCommand();
+      removeEditCollapsibleTitleCommand();
+      removeDeleteCollapsibleCommand();
+      document.removeEventListener('editCollapsibleTitle', handleEditCollapsibleTitle);
+      document.removeEventListener('deleteCollapsibleContainer', handleDeleteCollapsibleContainer);
     };
   }, [editor]);
 

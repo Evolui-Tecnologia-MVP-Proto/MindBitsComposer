@@ -11,6 +11,18 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
+✓ COMPLETED: Collapsible Container Edit/Delete Functionality (January 31, 2025)
+  - Added edit and delete buttons to collapsible containers inserted via toolbar (not template-loaded ones)
+  - Implemented distinction between toolbar-inserted vs template-loaded containers using fromToolbar property
+  - Edit button allows users to change container title using prompt dialog
+  - Delete button removes entire container with confirmation dialog
+  - Enhanced CollapsibleContainerNode with fromToolbar tracking and getter/setter methods
+  - Modified CollapsibleTitleNode to conditionally display action buttons based on container origin
+  - Implemented custom DOM events for communication between buttons and plugin handlers
+  - Updated CollapsiblePlugin with command handlers for EDIT_COLLAPSIBLE_TITLE_COMMAND and DELETE_COLLAPSIBLE_COMMAND
+  - Enhanced updateDOM method to properly re-render buttons when container properties change
+  - Buttons use emoji icons (✏️ for edit, 🗑️ for delete) with proper hover states and dark mode support
+
 ✓ COMPLETED: Enhanced Quote and Code Block Insertion with Line Spacing (January 31, 2025)
   - Modified insertQuote function to automatically add empty lines before and after quote blocks
   - Modified insertCodeBlock function to automatically add empty lines before and after code blocks

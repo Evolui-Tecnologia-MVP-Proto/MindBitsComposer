@@ -20,6 +20,7 @@ import {
 export type SerializedCollapsibleContainerNode = Spread<
   {
     open: boolean;
+    fromToolbar: boolean;
   },
   SerializedElementNode
 >;
@@ -36,10 +37,12 @@ export function $convertCollapsibleContainerElement(
 
 export class CollapsibleContainerNode extends ElementNode {
   __open: boolean;
+  __fromToolbar: boolean;
 
-  constructor(open: boolean, key?: NodeKey) {
+  constructor(open: boolean, fromToolbar: boolean = false, key?: NodeKey) {
     super(key);
     this.__open = open;
+    this.__fromToolbar = fromToolbar;
   }
 
   static getType(): string {
@@ -47,7 +50,7 @@ export class CollapsibleContainerNode extends ElementNode {
   }
 
   static clone(node: CollapsibleContainerNode): CollapsibleContainerNode {
-    return new CollapsibleContainerNode(node.__open, node.__key);
+    return new CollapsibleContainerNode(node.__open, node.__fromToolbar, node.__key);
   }
 
   createDOM(config: EditorConfig): HTMLElement {
@@ -90,7 +93,7 @@ export class CollapsibleContainerNode extends ElementNode {
   static importJSON(
     serializedNode: SerializedCollapsibleContainerNode,
   ): CollapsibleContainerNode {
-    const node = $createCollapsibleContainerNode(serializedNode.open);
+    const node = $createCollapsibleContainerNode(serializedNode.open, serializedNode.fromToolbar);
     return node;
   }
 
@@ -105,6 +108,7 @@ export class CollapsibleContainerNode extends ElementNode {
     return {
       ...super.exportJSON(),
       open: this.__open,
+      fromToolbar: this.__fromToolbar,
       type: 'collapsible-container',
       version: 1,
     };
@@ -122,12 +126,22 @@ export class CollapsibleContainerNode extends ElementNode {
   toggleOpen(): void {
     this.setOpen(!this.getOpen());
   }
+
+  getFromToolbar(): boolean {
+    return this.__fromToolbar;
+  }
+
+  setFromToolbar(fromToolbar: boolean): void {
+    const writable = this.getWritable();
+    writable.__fromToolbar = fromToolbar;
+  }
 }
 
 export function $createCollapsibleContainerNode(
   isOpen: boolean,
+  fromToolbar: boolean = false,
 ): CollapsibleContainerNode {
-  return new CollapsibleContainerNode(isOpen);
+  return new CollapsibleContainerNode(isOpen, fromToolbar);
 }
 
 export function $isCollapsibleContainerNode(
