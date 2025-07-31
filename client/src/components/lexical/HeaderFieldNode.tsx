@@ -182,11 +182,23 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
   console.log(`🏷️ HeaderFieldComponent renderizado - label: "${node.getLabel()}", mappingType: "${mappingType}", mappingValue: "${mappingValue}"`);
   
   // Log para verificar se os botões devem ser renderizados
-  if (mappingType) {
-    console.log(`🔘 Campo "${node.getLabel()}" tem mappingType: ${mappingType} - botão deve aparecer`);
-  } else {
-    console.log(`❌ Campo "${node.getLabel()}" não tem mappingType - botão NÃO aparecerá`);
-  }
+  React.useEffect(() => {
+    if (mappingType) {
+      console.log(`🔘 Campo "${node.getLabel()}" tem mappingType: ${mappingType} - botão deve aparecer`);
+      // Verificar se o botão está realmente no DOM após um pequeno delay
+      setTimeout(() => {
+        const container = document.querySelector(`[data-label="${node.getLabel()}"]`);
+        const button = container?.querySelector('button');
+        if (button) {
+          console.log(`✅ Botão encontrado no DOM para campo "${node.getLabel()}"`);
+        } else {
+          console.log(`❌ BOTÃO NÃO ENCONTRADO no DOM para campo "${node.getLabel()}" mesmo com mappingType: ${mappingType}`);
+        }
+      }, 100);
+    } else {
+      console.log(`❌ Campo "${node.getLabel()}" não tem mappingType - botão NÃO aparecerá`);
+    }
+  }, [mappingType, node]);
 
   // Sincronizar valor quando o nó for atualizado
   React.useEffect(() => {
@@ -446,21 +458,21 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
           <div className="pr-2">
             {(mappingType === 'field' || mappingType === 'formula') && (
               <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  handleRefresh();
-                }}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                title="Recarregar valor"
-                type="button"
-              >
-                <RefreshCw className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-              </button>
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleRefresh();
+                  }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                  title="Recarregar valor"
+                  type="button"
+                >
+                  <RefreshCw className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                </button>
             )}
             {mappingType === 'plugin' && (
               <button
