@@ -203,13 +203,20 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
 
   // Sincronizar valor quando o nó for atualizado
   React.useEffect(() => {
-    const unregister = editor.registerUpdateListener(() => {
-      editor.getEditorState().read(() => {
-        const nodeValue = node.getValue();
-        console.log(`🔄 HeaderFieldComponent sync - label: "${node.getLabel()}", nodeValue: "${nodeValue}", currentValue: "${value}"`);
-        if (nodeValue !== value) {
-          console.log(`✅ Atualizando valor do componente de "${value}" para "${nodeValue}"`);
-          setValue(nodeValue);
+    const unregister = editor.registerUpdateListener(({ editorState }) => {
+      editorState.read(() => {
+        const nodeKey = node.getKey();
+        const currentNode = $getNodeByKey(nodeKey);
+        
+        if (currentNode && $isHeaderFieldNode(currentNode)) {
+          const nodeValue = currentNode.getValue();
+          console.log(`🔄 HeaderFieldComponent sync - label: "${currentNode.getLabel()}", nodeValue: "${nodeValue}", currentValue: "${value}"`);
+          if (nodeValue !== value) {
+            console.log(`✅ Atualizando valor do componente de "${value}" para "${nodeValue}"`);
+            setValue(nodeValue);
+          }
+        } else {
+          console.log(`❌ Não foi possível encontrar o node ${nodeKey} no update listener`);
         }
       });
     });
@@ -217,7 +224,7 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
     return () => {
       unregister();
     };
-  }, [editor, node, value]);
+  }, [editor, node.getKey()]);
 
   // Focar automaticamente se for o primeiro campo
   React.useEffect(() => {
@@ -269,6 +276,8 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
     console.log('🔄 Refresh clicked - mappingType:', mappingType, 'mappingValue:', mappingValue);
     console.log('🔄 Label:', node.getLabel());
     console.log('🔄 NodeKey:', node.getKey());
+    console.log('🔍 Valor ANTES do refresh:', value);
+    console.log('🔍 Valor no node ANTES do refresh:', node.getValue());
     
     // Salvar referência do input antes de disparar o evento
     const inputElement = document.querySelector(`[data-label="${node.getLabel()}"] input`) as HTMLInputElement;
@@ -285,8 +294,13 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
     console.log('🔄 Disparando evento headerFieldRefresh:', event.detail);
     window.dispatchEvent(event);
     
-    // Restaurar foco após um pequeno delay para garantir que a atualização foi concluída
+    // Verificar se o valor mudou após um delay maior
     setTimeout(() => {
+      console.log('🔍 Verificando após 500ms:');
+      console.log('  - Valor no componente (state):', value);
+      console.log('  - Valor no node:', node.getValue());
+      console.log('  - Valor no input DOM:', inputElement?.value);
+      
       if (inputElement) {
         inputElement.focus();
         // Posicionar cursor no final do texto
@@ -295,7 +309,7 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
         // Forçar o editor a reconhecer que estamos em uma área editável
         editor.focus();
       }
-    }, 50);
+    }, 500);
   };
 
   const handleUnplug = () => {
@@ -518,7 +532,7 @@ export function $createHeaderFieldNode(
 }
 
 export function $isHeaderFieldNode(
-  node: LexicalNode | null | undefined,
+  node: LexicalNode | null | undefined
 ): node is HeaderFieldNode {
   return node instanceof HeaderFieldNode;
 }
