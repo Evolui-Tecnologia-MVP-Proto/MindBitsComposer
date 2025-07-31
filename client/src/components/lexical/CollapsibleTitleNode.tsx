@@ -27,7 +27,7 @@ export function $convertCollapsibleTitleElement(): DOMConversionOutput | null {
 }
 
 // Helper function to create Lucide icons as SVG elements
-function createLucideIcon(iconName: 'square-pen' | 'trash-2'): SVGSVGElement {
+function createLucideIcon(iconName: 'square-pen' | 'trash-2' | 'save'): SVGSVGElement {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.setAttribute('width', '16');
   svg.setAttribute('height', '16');
@@ -82,6 +82,19 @@ function createLucideIcon(iconName: 'square-pen' | 'trash-2'): SVGSVGElement {
     line2.setAttribute('y1', '11');
     line2.setAttribute('y2', '17');
     svg.appendChild(line2);
+  } else if (iconName === 'save') {
+    // Save icon paths
+    const path1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path1.setAttribute('d', 'M17 21v-8H7v8');
+    svg.appendChild(path1);
+    
+    const path2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path2.setAttribute('d', 'M7 3v5h8');
+    svg.appendChild(path2);
+    
+    const path3 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path3.setAttribute('d', 'M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z');
+    svg.appendChild(path3);
   }
 
   return svg;
@@ -172,38 +185,86 @@ export class CollapsibleTitleNode extends TextNode {
         const rightContainer = document.createElement('div');
         rightContainer.classList.add('flex', 'items-center', 'gap-1', 'ml-2');
         
-        // Botão de Editar
+        // Input de edição (inicialmente oculto)
+        const editInput = document.createElement('input');
+        editInput.type = 'text';
+        editInput.value = this.getTextContent();
+        editInput.className = 'hidden px-2 py-0.5 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-1 focus:ring-blue-500';
+        editInput.style.minWidth = '150px';
+        
+        // Estado de edição
+        let isEditing = false;
+        
+        // Função para alternar modo edição
+        const toggleEditMode = (save: boolean = false) => {
+          isEditing = !isEditing;
+          
+          if (isEditing) {
+            // Entrar no modo edição
+            editInput.classList.remove('hidden');
+            editInput.value = this.getTextContent();
+            editButton.innerHTML = '';
+            editButton.appendChild(createLucideIcon('save'));
+            editButton.title = 'Salvar título';
+            
+            // Focar no input
+            setTimeout(() => {
+              editInput.focus();
+              editInput.select();
+            }, 10);
+          } else {
+            // Sair do modo edição
+            editInput.classList.add('hidden');
+            editButton.innerHTML = '';
+            editButton.appendChild(createLucideIcon('square-pen'));
+            editButton.title = 'Editar título';
+            
+            if (save) {
+              // Salvar o novo texto
+              const newText = editInput.value.trim();
+              if (newText && newText !== this.getTextContent()) {
+                const nodeKey = this.getKey();
+                const event = new CustomEvent('updateCollapsibleTitle', {
+                  detail: { nodeKey, newText }
+                });
+                window.dispatchEvent(event);
+                console.log('💾 Título salvo:', newText);
+              }
+            }
+          }
+        };
+        
+        // Botão de Editar/Salvar
         const editButton = document.createElement('button');
         editButton.classList.add(
           'p-1', 'rounded', 'hover:bg-gray-200', 'dark:hover:bg-gray-600',
           'text-blue-600', 'dark:text-blue-400', 'transition-colors'
         );
         const editIcon = createLucideIcon('square-pen');
-        // Prevenir que o SVG intercepte os eventos de click
         editIcon.style.pointerEvents = 'none';
         editButton.appendChild(editIcon);
         editButton.title = 'Editar título';
+        
         editButton.onclick = (e) => {
           e.preventDefault();
           e.stopPropagation();
-          
-          console.log('🖱️ Botão de editar clicado - teste simples');
-          
-          // Simplesmente alterar o texto para "testando"
-          const newText = 'testando';
-          
-          // Atualizar o texto no nó via comando do editor
-          const nodeKey = this.getKey();
-          console.log('🔑 Node key:', nodeKey);
-          
-          // Usar comando customizado para atualizar texto
-          const event = new CustomEvent('updateCollapsibleTitle', {
-            detail: { nodeKey, newText }
-          });
-          window.dispatchEvent(event);
-          
-          console.log('📤 Evento disparado para atualizar título');
+          toggleEditMode(isEditing); // Se está editando, salva; senão, entra em modo edição
         };
+        
+        // Eventos do input
+        editInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            toggleEditMode(true); // Salvar
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            toggleEditMode(false); // Cancelar
+          }
+        });
+        
+        // Adicionar input e botão ao container
+        rightContainer.appendChild(editInput);
+        rightContainer.appendChild(editButton);
         
         // Botão de Excluir
         const deleteButton = document.createElement('button');
