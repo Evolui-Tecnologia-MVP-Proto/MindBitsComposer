@@ -20,7 +20,7 @@ import {
 import { $isCollapsibleContainerNode } from './CollapsibleNode';
 import { $isCollapsibleContentNode } from './CollapsibleContentNode';
 import { $isCollapsibleTitleNode } from './CollapsibleTitleNode';
-import { $isHeaderFieldNode } from './HeaderFieldNode';
+import { $isHeaderFieldNode, HeaderFieldNode } from './HeaderFieldNode';
 
 // Plugin que protege contra edição fora dos containers colapsíveis
 export default function EditProtectionPlugin(): null {
@@ -30,11 +30,11 @@ export default function EditProtectionPlugin(): null {
     // Flag para controlar se a proteção está ativa
     let protectionActive = false;
     
-    // Ativar proteção após 2 segundos para permitir foco inicial
+    // Ativar proteção após 5 segundos para permitir foco inicial e carregamento completo
     const activationTimeout = setTimeout(() => {
       protectionActive = true;
-      console.log('🛡️ EditProtectionPlugin: Proteção ativada após delay inicial');
-    }, 2000);
+      console.log('🛡️ EditProtectionPlugin: Proteção ativada após delay inicial de 5s');
+    }, 5000);
     
     // Função para verificar se a seleção atual está dentro de um container colapsível
     const isSelectionInValidContainer = (): boolean => {
@@ -162,10 +162,18 @@ export default function EditProtectionPlugin(): null {
           if (!isNodeInValidContainer(anchor) && selection.isCollapsed()) {
             const root = $getRoot();
             let firstValidContainer: LexicalNode | null = null;
+            let firstHeaderField: HeaderFieldNode | null = null;
             
-            // Buscar o primeiro CollapsibleContentNode
-            const findFirstValidContainer = (node: LexicalNode): void => {
-              if ($isCollapsibleContentNode(node) && !firstValidContainer) {
+            // Buscar primeiro por HeaderFieldNodes
+            const findFirstEditableArea = (node: LexicalNode): void => {
+              // Priorizar HeaderFieldNodes
+              if ($isHeaderFieldNode(node) && !firstHeaderField) {
+                firstHeaderField = node as HeaderFieldNode;
+                return;
+              }
+              
+              // Se não encontrou HeaderField, buscar CollapsibleContentNode
+              if ($isCollapsibleContentNode(node) && !firstValidContainer && !firstHeaderField) {
                 firstValidContainer = node;
                 return;
               }
@@ -173,15 +181,20 @@ export default function EditProtectionPlugin(): null {
               if ($isElementNode(node)) {
                 const children = node.getChildren();
                 for (const child of children) {
-                  findFirstValidContainer(child);
-                  if (firstValidContainer) break;
+                  findFirstEditableArea(child);
+                  if (firstHeaderField) break; // Parar se encontrou HeaderField
                 }
               }
             };
             
-            findFirstValidContainer(root);
+            findFirstEditableArea(root);
             
-            if (firstValidContainer && $isElementNode(firstValidContainer)) {
+            // Priorizar HeaderField se encontrado
+            if (firstHeaderField) {
+              console.log('📍 Focando em HeaderField');
+              // Não fazer nada aqui - deixar o campo do header manter seu foco natural
+              // Os campos do header gerenciam seu próprio foco através de seus inputs
+            } else if (firstValidContainer && $isElementNode(firstValidContainer)) {
               const elementNode = firstValidContainer as ElementNode;
               const firstChild = elementNode.getFirstChild();
               if (firstChild) {

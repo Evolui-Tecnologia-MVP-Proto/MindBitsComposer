@@ -1228,7 +1228,7 @@ function FocusPlugin({ initialEditorState }: { initialEditorState?: string }) {
             
             // Tentar focar múltiplas vezes com delays diferentes
             // Delays aumentados para ocorrer após o grace period do EditProtectionPlugin
-            setTimeout(focusField, 2100);  // Após 2s do grace period
+            setTimeout(focusField, 5100);  // Após 5s do grace period
             setTimeout(focusField, 2500);
             setTimeout(focusField, 3000);
           } else {
