@@ -191,6 +191,33 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
         const button = container?.querySelector('button');
         if (button) {
           console.log(`✅ Botão encontrado no DOM para campo "${node.getLabel()}"`);
+          
+          // Adicionar listener direto para debug
+          const testClick = (e: Event) => {
+            console.log('🎯 CLIQUE DIRETO NO BOTÃO VIA ADDEVENTLISTENER!', e);
+          };
+          button.addEventListener('click', testClick);
+          
+          // Verificar computed styles
+          const styles = window.getComputedStyle(button);
+          console.log(`🔍 Estilos do botão:`, {
+            pointerEvents: styles.pointerEvents,
+            visibility: styles.visibility,
+            display: styles.display,
+            opacity: styles.opacity,
+            position: styles.position,
+            zIndex: styles.zIndex
+          });
+          
+          // Verificar se algo está cobrindo o botão
+          const rect = button.getBoundingClientRect();
+          const elementAtPoint = document.elementFromPoint(rect.left + rect.width/2, rect.top + rect.height/2);
+          if (elementAtPoint !== button && !button.contains(elementAtPoint)) {
+            console.log(`⚠️ AVISO: O botão está sendo coberto por outro elemento:`, elementAtPoint);
+          }
+          
+          // Remover listener após 5 segundos
+          setTimeout(() => button.removeEventListener('click', testClick), 5000);
         } else {
           console.log(`❌ BOTÃO NÃO ENCONTRADO no DOM para campo "${node.getLabel()}" mesmo com mappingType: ${mappingType}`);
         }
