@@ -60,11 +60,11 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
     enabled: isOpen
   });
 
-  // Buscar documentos já em processo do usuário logado
+  // Buscar documentos já em processo do usuário logado (tabela documentos, não document_editions)
   const { data: documentosEmProcessoUsuario = [] } = useQuery({
-    queryKey: ["/api/document-editions-in-progress"],
+    queryKey: ["/api/documentos/user-in-process"],
     queryFn: async () => {
-      const res = await fetch("/api/document-editions-in-progress");
+      const res = await fetch("/api/documentos/user-in-process");
       if (res.ok) {
         return res.json();
       }

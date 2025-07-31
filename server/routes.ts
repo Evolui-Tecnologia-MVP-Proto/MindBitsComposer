@@ -956,6 +956,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get documents in process for logged user
+  app.get("/api/documentos/user-in-process", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      console.log("🔍 [API] Buscando documentos em processo do usuário:", req.user.id);
+      
+      // Buscar documentos com status "Em Processo" associados ao usuário logado
+      const documents = await db
+        .select()
+        .from(documentos)
+        .where(and(
+          eq(documentos.status, "Em Processo"),
+          eq(documentos.userId, req.user.id)
+        ))
+        .orderBy(desc(documentos.updatedAt));
+      
+      console.log("✅ [API] Documentos em processo encontrados para o usuário:", documents.length);
+      res.json(documents);
+    } catch (error: any) {
+      console.error("❌ [API] Erro ao buscar documentos em processo do usuário:", error);
+      res.status(500).send("Erro ao buscar documentos em processo do usuário");
+    }
+  });
+
   // System Parameters routes
   // Get all system parameters
   app.get("/api/system-params", async (req, res) => {
