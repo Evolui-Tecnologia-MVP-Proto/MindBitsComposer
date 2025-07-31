@@ -46,8 +46,8 @@ export const DELETE_COLLAPSIBLE_COMMAND: LexicalCommand<NodeKey> = createCommand
   'DELETE_COLLAPSIBLE_COMMAND',
 );
 
-export function $insertCollapsibleContainer(isOpen = true, fromToolbar = false): void {
-  const title = $createCollapsibleTitleNode('Container Colapsável');
+export function $insertCollapsibleContainer(isOpen = true, fromToolbar = false, titleText = 'Container Colapsível'): void {
+  const title = $createCollapsibleTitleNode(titleText);
   const content = $createCollapsibleContentNode();
   const paragraph = $createParagraphNode();
   content.append(paragraph);
@@ -73,7 +73,7 @@ export default function CollapsiblePlugin(): JSX.Element | null {
       INSERT_COLLAPSIBLE_COMMAND,
       (isOpen: boolean) => {
         editor.update(() => {
-          $insertCollapsibleContainer(isOpen, true); // fromToolbar=true para containers inseridos via toolbar
+          $insertCollapsibleContainer(isOpen, true, 'Sub Sessão'); // fromToolbar=true e título personalizado
         });
         return true;
       },
