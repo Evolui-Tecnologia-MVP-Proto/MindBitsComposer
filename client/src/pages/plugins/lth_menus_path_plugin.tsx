@@ -60,19 +60,20 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   const queryClient = useQueryClient();
 
   // Fetch plugin configuration
-  const { data: lthPlugin } = useQuery({
-    queryKey: ['/api/plugins/lth-menus-path'],
-    queryFn: async () => {
-      const plugins = await apiRequest("GET", "/api/plugins");
-      return plugins.find((p: any) => p.pageName === 'lth_menus_path_plugin');
-    }
+  const { data: plugins } = useQuery({
+    queryKey: ['/api/plugins']
   });
 
   useEffect(() => {
-    if (lthPlugin?.configuration) {
-      setPluginConfig(lthPlugin.configuration);
+    if (plugins && Array.isArray(plugins)) {
+      const lthPlugin = plugins.find((p: any) => p.pageName === 'lth_menus_path_plugin');
+      if (lthPlugin?.configuration) {
+        setPluginConfig(lthPlugin.configuration);
+      }
     }
-  }, [lthPlugin]);
+  }, [plugins]);
+
+
 
   // Get connections from plugin configuration
   const connections: Connection[] = pluginConfig?.connections || [
@@ -520,13 +521,26 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     setConnectionStatus('connecting');
     
     try {
-      const response = await apiRequest("POST", "/api/plugin/lth-auth", {
-        endpoint: connection.endpoint,
-        credentials: connection.credentials
+      const response = await fetch("/api/plugin/lth-auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          endpoint: connection.endpoint,
+          credentials: connection.credentials
+        })
       });
 
-      if (response.success) {
-        setAuthToken(response.token);
+      if (!response.ok) {
+        throw new Error(`Authentication failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setAuthToken(data.token);
         setConnectionStatus('connected');
         return true;
       } else {
@@ -546,17 +560,30 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
   // Function to fetch subsystems from API
   const fetchSubsystems = async () => {
-    if (!authToken || !selectedConnection) return;
+    if (!authToken || !selectedConnection) return [];
 
     try {
-      const response = await apiRequest("POST", "/api/plugin/lth-subsystems", {
-        connectionCode: selectedConnection,
-        authToken: authToken
+      const response = await fetch("/api/plugin/lth-subsystems", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          connectionCode: selectedConnection,
+          authToken: authToken
+        })
       });
 
-      if (response.subsystems) {
+      if (!response.ok) {
+        throw new Error(`Failed to fetch subsystems: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.subsystems) {
         // Update subsystems with API data
-        return response.subsystems;
+        return data.subsystems;
       }
     } catch (error) {
       console.error("Failed to fetch subsystems:", error);
@@ -592,20 +619,49 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     }
   };
 
+  // Auto-connect to PROD when modal opens (component mounts)
+  useEffect(() => {
+    // Small delay to ensure everything is initialized
+    const timer = setTimeout(() => {
+      if (!selectedConnection && connections.length > 0) {
+        // Find PROD connection or use first available
+        const prodConnection = connections.find(c => c.code === 'PROD');
+        if (prodConnection) {
+          handleConnectionChange('PROD');
+        }
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []); // Empty dependency array - only run on mount
+
   const handleSubsystemChange = async (subsystemCode: string) => {
     setSelectedSubsystem(subsystemCode);
     setIsLoading(true);
     
     try {
       if (authToken) {
-        const response = await apiRequest("POST", "/api/plugin/lth-menus", {
-          connectionCode: selectedConnection,
-          subsystemCode: subsystemCode,
-          authToken: authToken
+        const response = await fetch("/api/plugin/lth-menus", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            connectionCode: selectedConnection,
+            subsystemCode: subsystemCode,
+            authToken: authToken
+          })
         });
 
-        if (response.menuStructure) {
-          setMenuStructure(response.menuStructure);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch menus: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.menuStructure) {
+          setMenuStructure(data.menuStructure);
         }
       } else {
         // Fallback to mock data if not authenticated
