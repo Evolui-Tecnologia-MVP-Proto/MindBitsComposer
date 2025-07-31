@@ -199,12 +199,17 @@ export class CollapsibleTitleNode extends TextNode {
             console.log('📝 Span de texto encontrado:', textSpan);
             
             if (textSpan) {
-              const currentText = textSpan.textContent || '';
-              console.log('📄 Texto atual:', currentText);
+              const currentText = textSpan.textContent || textSpan.innerText || '';
+              console.log('📄 Texto atual (textContent):', textSpan.textContent);
+              console.log('📄 Texto atual (innerText):', textSpan.innerText);
+              console.log('📄 Texto final usado:', currentText);
+              console.log('📄 Span completo:', textSpan);
               
               // Criar input temporário
               const input = document.createElement('input');
               input.value = currentText;
+              console.log('🆕 Input criado com valor:', input.value);
+              
               input.className = 'bg-white dark:bg-gray-800 border-2 border-blue-500 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-white shadow-lg';
               input.style.minWidth = '200px';
               input.style.zIndex = '9999';
