@@ -1344,7 +1344,7 @@ function FocusDebugPlugin(): JSX.Element | null {
     const logFocusChange = (event: string, element: Element | null) => {
       const timestamp = Date.now();
       const elementDesc = element ? 
-        `${element.tagName}${element.className ? '.' + element.className.split(' ').join('.') : ''}${element.id ? '#' + element.id : ''}` : 
+        `${element.tagName}${element.className && typeof element.className === 'string' ? '.' + element.className.split(' ').join('.') : ''}${element.id ? '#' + element.id : ''}` : 
         'null';
       
       focusHistory.push({ timestamp, element: elementDesc, event });
