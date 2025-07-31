@@ -800,8 +800,8 @@ function ToolbarPlugin({
           <ChevronDown className="w-4 h-4" />
         </Button>
         
-        {/* Controles de edição de título do container - apenas quando um container inserido via toolbar está selecionado */}
-        {selectedContainerKey && selectedContainerFromToolbar && (
+        {/* Controles de edição de título do container - apenas quando um container inserido via toolbar está selecionado e nenhuma tabela está selecionada */}
+        {selectedContainerKey && selectedContainerFromToolbar && !selectedTableKey && (
           <div className="flex items-center gap-1 ml-2">
             <input
               type="text"
@@ -842,8 +842,8 @@ function ToolbarPlugin({
           </div>
         )}
         
-        {/* Botão de excluir container - apenas quando um container inserido via toolbar está selecionado */}
-        {selectedContainerKey && selectedContainerFromToolbar && (
+        {/* Botão de excluir container - apenas quando um container inserido via toolbar está selecionado e nenhuma tabela está selecionada */}
+        {selectedContainerKey && selectedContainerFromToolbar && !selectedTableKey && (
           <Button
             variant="ghost"
             size="sm"
@@ -865,8 +865,8 @@ function ToolbarPlugin({
           <Table className="w-4 h-4" />
         </Button>
         
-        {/* Controles de dimensionamento da tabela - apenas quando uma tabela está selecionada */}
-        {selectedTableKey && (
+        {/* Controles de dimensionamento da tabela - apenas quando uma tabela está selecionada e nenhum container está selecionado */}
+        {selectedTableKey && !selectedContainerKey && (
           <div className="flex items-center gap-1 ml-2 text-xs">
             <input
               type="number"
@@ -902,8 +902,8 @@ function ToolbarPlugin({
           </div>
         )}
         
-        {/* Botão para excluir tabela selecionada */}
-        {selectedTableKey && (
+        {/* Botão para excluir tabela selecionada - apenas quando nenhum container está selecionado */}
+        {selectedTableKey && !selectedContainerKey && (
           <Button
             variant="ghost"
             size="sm"
