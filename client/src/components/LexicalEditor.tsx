@@ -1176,10 +1176,37 @@ function FocusPlugin({ initialEditorState }: { initialEditorState?: string }) {
     if (initialEditorState) {
       // Aguardar um pouco para garantir que o conteúdo foi carregado
       const timeoutId = setTimeout(() => {
-        console.log('🎯 InitialFocusPlugin: Iniciando busca por campo de header');
+        console.log('🎯 InitialFocusPlugin: Verificando se deve aplicar foco inicial');
         
         editor.update(() => {
           const root = $getRoot();
+          
+          // Verificar se já existe conteúdo no documento (além do header)
+          let hasExistingContent = false;
+          
+          const checkForContent = (node: LexicalNode): void => {
+            // Se encontrar um CollapsibleContainerNode com conteúdo, há conteúdo existente
+            if ($isCollapsibleContainerNode(node)) {
+              hasExistingContent = true;
+              return;
+            }
+            
+            if ('getChildren' in node && typeof node.getChildren === 'function') {
+              const children = (node as any).getChildren();
+              for (const child of children) {
+                checkForContent(child);
+                if (hasExistingContent) break;
+              }
+            }
+          };
+          
+          checkForContent(root);
+          
+          // Se já há conteúdo no documento, NÃO aplicar foco automático
+          if (hasExistingContent) {
+            console.log('⚠️ Documento já possui conteúdo - NÃO vou aplicar foco automático');
+            return;
+          }
           
           // Procurar primeiro por HeaderFieldNodes
           let firstHeaderField: HeaderFieldNode | null = null;
@@ -1202,10 +1229,24 @@ function FocusPlugin({ initialEditorState }: { initialEditorState?: string }) {
           
           findFirstHeaderField(root);
           
-          // Se encontrou um HeaderFieldNode, focar nele
-          if (firstHeaderField) {
+          // Se encontrou um HeaderFieldNode E não há conteúdo existente, focar nele
+          if (firstHeaderField && !hasExistingContent) {
             // Aumentar delay e forçar foco múltiplas vezes
             const focusField = () => {
+              // Verificar se já há algum elemento com foco ativo (usuário está editando)
+              const activeElement = document.activeElement;
+              const isEditingInEditor = activeElement && (
+                activeElement.getAttribute('contenteditable') === 'true' ||
+                activeElement.tagName === 'INPUT' ||
+                activeElement.tagName === 'TEXTAREA'
+              );
+              
+              // Se o usuário já está editando algo, não interferir
+              if (isEditingInEditor) {
+                console.log('⚠️ Usuário já está editando, não vou transferir o foco');
+                return;
+              }
+              
               const headerLabel = firstHeaderField!.getLabel();
               const inputElement = document.querySelector(`[data-label="${headerLabel}"] input`) as HTMLInputElement;
               if (inputElement) {
@@ -1228,7 +1269,7 @@ function FocusPlugin({ initialEditorState }: { initialEditorState?: string }) {
             
             // Focar apenas uma vez após o grace period do EditProtectionPlugin
             setTimeout(focusField, 2100);  // Apenas uma vez, após 2.1s do grace period
-          } else {
+          } else if (!firstHeaderField) {
             console.log('❌ Nenhum HeaderFieldNode encontrado no documento');
             // Caso contrário, usar o comportamento padrão
             const lastChild = root.getLastChild();

@@ -188,66 +188,13 @@ export default function EditProtectionPlugin(): null {
     let isTyping = false;
     let typingTimeout: NodeJS.Timeout | null = null;
     
-    // Interceptar mudanças de seleção para posicionar cursor adequadamente
+    // COMPLETAMENTE DESABILITADO - Não interferir com mudanças de seleção
+    /*
     const handleSelectionChange = () => {
-      // Não fazer nada se a proteção ainda não está ativa
-      if (!protectionActive) return;
-      
-      // Se estamos digitando, não reposicionar o cursor
-      if (isTyping) return;
-      
-      // Se o foco está em um input do header field, não interferir
-      if (isHeaderFieldInputFocused()) return;
-      
-      // Verificar se clicamos em um botão - não interferir com cliques em botões
-      const activeElement = document.activeElement;
-      if (activeElement?.tagName === 'BUTTON' || activeElement?.closest('button')) {
-        return;
-      }
-      
-      editor.update(() => {
-        const selection = $getSelection();
-        if ($isRangeSelection(selection)) {
-          const anchor = selection.anchor.getNode();
-          
-          // Se a seleção está fora de um container válido, mover para o primeiro container válido
-          // MAS NÃO PARA O HEADER - apenas para CollapsibleContentNode
-          if (!isNodeInValidContainer(anchor) && selection.isCollapsed()) {
-            const root = $getRoot();
-            let firstValidContainer: LexicalNode | null = null;
-            
-            // Buscar apenas por CollapsibleContentNode (não HeaderField!)
-            const findFirstEditableArea = (node: LexicalNode): void => {
-              // Buscar APENAS CollapsibleContentNode
-              if ($isCollapsibleContentNode(node) && !firstValidContainer) {
-                firstValidContainer = node;
-                return;
-              }
-              
-              if ($isElementNode(node)) {
-                const children = node.getChildren();
-                for (const child of children) {
-                  findFirstEditableArea(child);
-                  if (firstValidContainer) break;
-                }
-              }
-            };
-            
-            findFirstEditableArea(root);
-            
-            // Focar apenas em container de conteúdo (não header!)
-            if (firstValidContainer && $isElementNode(firstValidContainer)) {
-              const elementNode = firstValidContainer as ElementNode;
-              const firstChild = elementNode.getFirstChild();
-              if (firstChild) {
-                firstChild.selectStart();
-                console.log('📍 Cursor reposicionado para container de conteúdo válido');
-              }
-            }
-          }
-        }
-      });
+      // Função desabilitada para evitar interferências
+      return;
     };
+    */
     
     // Detectar quando o usuário está digitando
     const handleBeforeInput = () => {

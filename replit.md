@@ -11,14 +11,12 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
-✓ COMPLETED: Fixed Focus Transfer Bug in EditProtectionPlugin (January 31, 2025)
-  - Fixed critical bug where editing inside containers was transferring focus to document header
-  - Root cause: EditProtectionPlugin was searching for HeaderFieldNodes and attempting to focus them
-  - Solution: Removed header field focus logic - plugin now only repositions to CollapsibleContentNode
-  - Added toast notifications when editing is blocked outside protected areas
-  - Protection activates after 2-second grace period on document load
-  - System now correctly maintains focus within active container during editing
-  - User confirmed issue was occurring - now resolved with targeted focus management
+✓ IN PROGRESS: Fixing Focus Transfer Bug When Editing Containers (January 31, 2025)
+  - Issue: Editing inside containers transfers focus to document header after 2.1 seconds
+  - Root cause: FocusPlugin in LexicalEditor.tsx has setTimeout(focusField, 2100) that forces focus to header
+  - First attempt: Modified FocusPlugin to check if user is already editing before transferring focus
+  - Added check for active element (contenteditable, INPUT, or TEXTAREA) to prevent interference
+  - User reported issue still persists - continuing investigation
 
 ✓ COMPLETED: Fixed Plugin Data Transfer to Header Fields (January 31, 2025)
   - Fixed issue where plugin button (unplug) wasn't updating header field values
