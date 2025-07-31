@@ -1,5 +1,5 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   $getSelection,
   $isRangeSelection,
@@ -21,10 +21,26 @@ import { $isCollapsibleContainerNode } from './CollapsibleNode';
 import { $isCollapsibleContentNode } from './CollapsibleContentNode';
 import { $isCollapsibleTitleNode } from './CollapsibleTitleNode';
 import { $isHeaderFieldNode, HeaderFieldNode } from './HeaderFieldNode';
+import { useToast } from '@/hooks/use-toast';
 
 // Plugin que protege contra edição fora dos containers colapsíveis
 export default function EditProtectionPlugin(): null {
   const [editor] = useLexicalComposerContext();
+  const { toast } = useToast();
+  const lastToastTime = useRef<number>(0);
+  
+  // Função para mostrar toast com debounce
+  const showProtectionToast = () => {
+    const now = Date.now();
+    if (now - lastToastTime.current > 2000) { // Mostrar no máximo 1 toast a cada 2 segundos
+      lastToastTime.current = now;
+      toast({
+        title: "Área protegida",
+        description: "A edição só é permitida dentro dos containers do documento",
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
     // Flag para controlar se a proteção está ativa
@@ -36,11 +52,11 @@ export default function EditProtectionPlugin(): null {
       return activeElement?.getAttribute('data-header-field-input') === 'true';
     };
     
-    // Ativar proteção após 5 segundos para permitir foco inicial e carregamento completo
+    // Ativar proteção após 2 segundos para permitir foco inicial e carregamento completo
     const activationTimeout = setTimeout(() => {
       protectionActive = true;
-      console.log('🛡️ EditProtectionPlugin: Proteção ativada após delay inicial de 5s');
-    }, 5000);
+      console.log('🛡️ EditProtectionPlugin: Proteção ativada após delay inicial de 2s');
+    }, 2000);
     
     // Função para verificar se a seleção atual está dentro de um container colapsível
     const isSelectionInValidContainer = (): boolean => {
@@ -95,12 +111,19 @@ export default function EditProtectionPlugin(): null {
     const handleInsertParagraph = () => {
       if (!protectionActive) return false; // Permitir durante grace period
       
+      let shouldBlock = false;
       editor.update(() => {
         if (!isSelectionInValidContainer()) {
           console.log('🚫 Edição bloqueada: tentativa de inserir parágrafo fora de container');
-          return true; // Bloquear comando
+          shouldBlock = true;
         }
       });
+      
+      if (shouldBlock) {
+        showProtectionToast();
+        return true; // Bloquear comando
+      }
+      
       return false; // Permitir comando
     };
 
@@ -115,6 +138,11 @@ export default function EditProtectionPlugin(): null {
           shouldBlock = true;
         }
       });
+      
+      if (shouldBlock) {
+        showProtectionToast();
+      }
+      
       return shouldBlock;
     };
 
@@ -129,6 +157,11 @@ export default function EditProtectionPlugin(): null {
           shouldBlock = true;
         }
       });
+      
+      if (shouldBlock) {
+        showProtectionToast();
+      }
+      
       return shouldBlock;
     };
 
@@ -143,6 +176,11 @@ export default function EditProtectionPlugin(): null {
           shouldBlock = true;
         }
       });
+      
+      if (shouldBlock) {
+        showProtectionToast();
+      }
+      
       return shouldBlock;
     };
 
@@ -270,11 +308,28 @@ export default function EditProtectionPlugin(): null {
       COMMAND_PRIORITY_HIGH
     );
 
-    // Registrar handler para detectar quando está digitando
+    // Registrar handler para detectar e bloquear inserção de texto fora de containers
     const unregisterTextInsertion = editor.registerCommand(
       CONTROLLED_TEXT_INSERTION_COMMAND,
       () => {
         handleBeforeInput();
+        
+        // Se a proteção está ativa, verificar se a edição é permitida
+        if (protectionActive) {
+          let shouldBlock = false;
+          editor.getEditorState().read(() => {
+            if (!isSelectionInValidContainer()) {
+              console.log('🚫 Edição bloqueada: tentativa de inserir texto fora de container');
+              shouldBlock = true;
+            }
+          });
+          
+          if (shouldBlock) {
+            showProtectionToast();
+            return true; // Bloquear inserção de texto
+          }
+        }
+        
         return false; // Permitir inserção de texto normal
       },
       COMMAND_PRIORITY_HIGH

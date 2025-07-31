@@ -2446,7 +2446,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <ImageEventListenerPlugin />
           <ImageIdAutoConvertPlugin />
           <TemplateSectionsPlugin sections={templateSections} mdFileOld={mdFileOld} />
-          {/* <EditProtectionPlugin /> - Temporariamente desabilitado para resolver problema dos campos do header */}
+          <EditProtectionPlugin />
           <HeaderFieldMappingPlugin templateMappings={templateMappings} documentData={documentData} />
           <EditorInstancePlugin setEditorInstance={(editor) => {
             setEditorInstance(editor);
