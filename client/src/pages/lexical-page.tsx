@@ -1642,11 +1642,17 @@ export default function LexicalPage() {
                   onClick={() => setViewMode('editor')}
                   variant={viewMode === 'editor' ? "default" : "outline"}
                   size="sm"
-                  className={viewMode === 'editor' ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
+                  className={`${
+                    viewMode === 'editor' 
+                      ? "bg-blue-600 text-white hover:bg-blue-700" 
+                      : !hasEditorContent 
+                        ? "opacity-50 text-gray-400 border-gray-300 cursor-not-allowed hover:bg-transparent" 
+                        : "text-blue-600 border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+                  }`}
                   title="Modo Editor"
                   disabled={!hasEditorContent}
                 >
-                  <Edit className={`w-4 h-4 ${viewMode === 'editor' ? "text-white" : ""}`} />
+                  <Edit className={`w-4 h-4 ${viewMode === 'editor' ? "text-white" : !hasEditorContent ? "text-gray-400" : "text-blue-600"}`} />
                 </Button>
                 <Button
                   onClick={() => {
@@ -1654,11 +1660,17 @@ export default function LexicalPage() {
                   }}
                   variant={viewMode === 'preview' ? "default" : "outline"}
                   size="sm"
-                  className={viewMode === 'preview' ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
+                  className={`${
+                    viewMode === 'preview' 
+                      ? "bg-blue-600 text-white hover:bg-blue-700" 
+                      : !hasEditorContent 
+                        ? "opacity-50 text-gray-400 border-gray-300 cursor-not-allowed hover:bg-transparent" 
+                        : "text-blue-600 border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+                  }`}
                   title="Visualizar Markdown Raw"
                   disabled={!hasEditorContent}
                 >
-                  <FileCode2 className={`w-4 h-4 ${viewMode === 'preview' ? "text-white" : ""}`} />
+                  <FileCode2 className={`w-4 h-4 ${viewMode === 'preview' ? "text-white" : !hasEditorContent ? "text-gray-400" : "text-blue-600"}`} />
                 </Button>
                 <Button
                   onClick={() => {
@@ -1667,11 +1679,17 @@ export default function LexicalPage() {
                   }}
                   variant={viewMode === 'mdx' ? "default" : "outline"}
                   size="sm"
-                  className={viewMode === 'mdx' ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
+                  className={`${
+                    viewMode === 'mdx' 
+                      ? "bg-blue-600 text-white hover:bg-blue-700" 
+                      : !hasEditorContent 
+                        ? "opacity-50 text-gray-400 border-gray-300 cursor-not-allowed hover:bg-transparent" 
+                        : "text-blue-600 border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+                  }`}
                   title="Preview MDX"
                   disabled={!hasEditorContent}
                 >
-                  <Eye className={`w-4 h-4 ${viewMode === 'mdx' ? "text-white" : ""}`} />
+                  <Eye className={`w-4 h-4 ${viewMode === 'mdx' ? "text-white" : !hasEditorContent ? "text-gray-400" : "text-blue-600"}`} />
                 </Button>
               </div>
             </div>
@@ -1683,21 +1701,33 @@ export default function LexicalPage() {
                   onClick={() => setShowDocumentList(!showDocumentList)}
                   variant={showDocumentList ? "default" : "outline"}
                   size="sm"
-                  className={showDocumentList ? "bg-blue-600 text-white hover:bg-blue-700" : ""}
+                  className={`${
+                    showDocumentList 
+                      ? "bg-blue-600 text-white hover:bg-blue-700" 
+                      : viewMode === 'preview' 
+                        ? "opacity-50 text-gray-400 border-gray-300 cursor-not-allowed hover:bg-transparent" 
+                        : "text-blue-600 border-blue-300 hover:bg-blue-50 hover:text-blue-700"
+                  }`}
                   title="Biblioteca"
                   disabled={viewMode === 'preview'}
                 >
-                  <FolderOpen className={`w-4 h-4 ${showDocumentList ? "text-white" : ""}`} />
+                  <FolderOpen className={`w-4 h-4 ${showDocumentList ? "text-white" : viewMode === 'preview' ? "text-gray-400" : "text-blue-600"}`} />
                 </Button>
                 <Button
                   onClick={() => setShowAttachments(!showAttachments)}
                   variant={showAttachments ? "default" : "outline"}
                   size="sm"
-                  className={showAttachments ? "bg-green-600 text-white hover:bg-green-700" : ""}
+                  className={`${
+                    showAttachments 
+                      ? "bg-green-600 text-white hover:bg-green-700" 
+                      : (viewMode === 'preview' || (selectedTemplate?.type === 'struct' && !currentDocumentId && !selectedEdition))
+                        ? "opacity-50 text-gray-400 border-gray-300 cursor-not-allowed hover:bg-transparent" 
+                        : "text-green-600 border-green-300 hover:bg-green-50 hover:text-green-700"
+                  }`}
                   title="Anexos"
                   disabled={viewMode === 'preview' || (selectedTemplate?.type === 'struct' && !currentDocumentId && !selectedEdition)}
                 >
-                  <Paperclip className={`w-4 h-4 ${showAttachments ? "text-white" : ""}`} />
+                  <Paperclip className={`w-4 h-4 ${showAttachments ? "text-white" : (viewMode === 'preview' || (selectedTemplate?.type === 'struct' && !currentDocumentId && !selectedEdition)) ? "text-gray-400" : "text-green-600"}`} />
                 </Button>
               </div>
             </div>
@@ -1709,39 +1739,56 @@ export default function LexicalPage() {
                   onClick={handleOpenLexicalFile}
                   variant="outline"
                   size="sm"
-                  className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
+                  className={`${
+                    (viewMode === 'preview' || !!selectedEdition)
+                      ? "opacity-50 text-gray-400 border-gray-300 cursor-not-allowed hover:bg-transparent"
+                      : "text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
+                  }`}
                   title={selectedEdition ? "Não disponível - editando documento da biblioteca" : "Abrir arquivo .lexical local"}
                   disabled={viewMode === 'preview' || !!selectedEdition}
                 >
-                  <FolderOpen className="w-4 h-4" />
+                  <FolderOpen className={`w-4 h-4 ${(viewMode === 'preview' || !!selectedEdition) ? "text-gray-400" : "text-green-600"}`} />
                 </Button>
                 <Button
                   onClick={handleDiscard}
                   variant="outline"
                   size="sm"
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                  className={`${
+                    (!hasEditorContent || viewMode === 'preview')
+                      ? "opacity-50 text-gray-400 border-gray-300 cursor-not-allowed hover:bg-transparent"
+                      : "text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                  }`}
                   disabled={!hasEditorContent || viewMode === 'preview'}
                   title="Descartar"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className={`w-4 h-4 ${(!hasEditorContent || viewMode === 'preview') ? "text-gray-400" : "text-red-600"}`} />
                 </Button>
                 <Button
                   onClick={() => handleSave()}
                   disabled={saveMutation.isPending || !hasEditorContent || viewMode === 'preview'}
                   size="sm"
+                  className={`${
+                    (saveMutation.isPending || !hasEditorContent || viewMode === 'preview')
+                      ? "opacity-50 bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed hover:bg-gray-200"
+                      : "bg-blue-600 text-white hover:bg-blue-700 border-blue-600"
+                  }`}
                   title={saveMutation.isPending ? "Salvando..." : "Salvar"}
                 >
-                  <Save className="w-4 h-4" />
+                  <Save className={`w-4 h-4 ${(saveMutation.isPending || !hasEditorContent || viewMode === 'preview') ? "text-gray-400" : "text-white"}`} />
                 </Button>
                 <Button
                   onClick={() => setShowFinalizeModal(true)}
                   variant="outline"
                   size="sm"
-                  className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                  className={`${
+                    (!selectedEdition || viewMode === 'preview')
+                      ? "opacity-50 bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed hover:bg-gray-200"
+                      : "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100"
+                  }`}
                   disabled={!selectedEdition || viewMode === 'preview'}
                   title="Finalizar"
                 >
-                  <BookOpenCheck className="w-4 h-4" />
+                  <BookOpenCheck className={`w-4 h-4 ${(!selectedEdition || viewMode === 'preview') ? "text-gray-400" : "text-blue-700"}`} />
                 </Button>
               </div>
             </div>
