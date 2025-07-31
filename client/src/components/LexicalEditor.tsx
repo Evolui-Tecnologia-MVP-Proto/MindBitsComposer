@@ -1421,10 +1421,11 @@ interface LexicalEditorProps {
   isEnabled?: boolean;
   documentData?: any; // Dados do documento para preenchimento automático
   templateMappings?: any; // Mapeamentos do template
+  onPluginOpen?: (plugin: any) => void; // Callback para abrir plugin
 }
 
 // Componente principal do editor Lexical completo
-export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, onEditorInstanceChange, className = '', templateSections, templateStructure, viewMode = 'editor', initialEditorState, markdownContent: mdxContent = '', mdFileOld = '', isEnabled = true, documentData, templateMappings }: LexicalEditorProps): JSX.Element {
+export default function LexicalEditor({ content = '', onChange, onEditorStateChange, onContentStatusChange, onEditorInstanceChange, className = '', templateSections, templateStructure, viewMode = 'editor', initialEditorState, markdownContent: mdxContent = '', mdFileOld = '', isEnabled = true, documentData, templateMappings, onPluginOpen }: LexicalEditorProps): JSX.Element {
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [tableRows, setTableRows] = useState(2);
   const [tableColumns, setTableColumns] = useState(3);
@@ -1848,9 +1849,12 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           // Também salvar no window para acesso do lexical-page
           (window as any).__currentFieldContext = { label, nodeKey };
           
-          // Abrir o modal do plugin
-          setSelectedPlugin(plugin);
-          setIsPluginModalOpen(true);
+          // Abrir o modal do plugin através do callback
+          if (onPluginOpen) {
+            onPluginOpen(plugin);
+          } else {
+            console.error('❌ onPluginOpen callback não foi fornecido');
+          }
         })
         .catch(error => {
           console.error('❌ Erro ao verificar plugin:', error);

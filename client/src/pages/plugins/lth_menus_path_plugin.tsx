@@ -682,6 +682,11 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       return;
     }
 
+    console.log('🎯 LTH Plugin - handleSalvar chamado');
+    console.log('🎯 LTH Plugin - selectedPath:', selectedPath);
+    console.log('🎯 LTH Plugin - selectedSubsystem:', selectedSubsystem);
+    console.log('🎯 LTH Plugin - onDataExchange:', typeof onDataExchange, onDataExchange);
+
     // Encontrar o item selecionado na estrutura
     const findSelectedItem = (items: MenuPath[]): MenuPath | null => {
       for (const item of items) {

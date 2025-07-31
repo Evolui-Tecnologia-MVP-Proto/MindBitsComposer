@@ -1917,6 +1917,7 @@ export default function LexicalPage() {
                     })()
                   } : undefined}
                   templateMappings={selectedTemplate?.mappings}
+                  onPluginOpen={handleOpenPlugin}
                 />
               </CardContent>
             </Card>
