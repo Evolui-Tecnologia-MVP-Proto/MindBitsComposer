@@ -1373,8 +1373,9 @@ function FocusDebugPlugin(): JSX.Element | null {
     };
     
     // Monitorar eventos de input
-    const handleInput = (e: InputEvent) => {
-      console.log('⌨️ INPUT EVENT:', e.target, 'data:', e.data, 'inputType:', e.inputType);
+    const handleInput = (e: Event) => {
+      const inputEvent = e as InputEvent;
+      console.log('⌨️ INPUT EVENT:', e.target, 'data:', inputEvent.data, 'inputType:', inputEvent.inputType);
       logFocusChange('INPUT', e.target as Element);
     };
     
@@ -2010,7 +2011,9 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                 
                 console.log('✅ DEBUG: Container de campos inserido com sucesso APÓS template!');
                 
-                // Posicionar cursor no primeiro campo após criação
+                // DESABILITADO: Posicionamento automático de cursor no primeiro campo após criação
+                // O usuário não quer NENHUM foco automático - o cursor deve ficar onde o usuário clicou
+                /*
                 setTimeout(() => {
                   try {
                     editorInstance.update(() => {
@@ -2036,17 +2039,20 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                       
                       if (firstHeaderField) {
                         console.log('✅ DEBUG: Posicionando cursor no primeiro campo do header');
-                        firstHeaderField.selectStart();
+                        firstHeaderField.selectStart(); // ESTAVA CAUSANDO FOCO AUTOMÁTICO!
                       }
                     });
                   } catch (error) {
                     console.error('❌ DEBUG: Erro ao posicionar cursor:', error);
                   }
-                }, 2100); // Delay após grace period do EditProtectionPlugin
+                }, 2100);
+                */
               } else {
                 console.log('⚠️ DEBUG: Container de campos já existe');
                 
-                // Se já existe, ainda assim tentar posicionar cursor no primeiro campo
+                // DESABILITADO: Posicionamento automático de cursor no primeiro campo quando container já existe
+                // O usuário não quer NENHUM foco automático - o cursor deve ficar onde o usuário clicou
+                /*
                 setTimeout(() => {
                   try {
                     editorInstance.update(() => {
@@ -2072,13 +2078,14 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                       
                       if (firstHeaderField) {
                         console.log('✅ DEBUG: Posicionando cursor no primeiro campo do header (container existente)');
-                        firstHeaderField.selectStart();
+                        firstHeaderField.selectStart(); // ESTAVA CAUSANDO FOCO AUTOMÁTICO!
                       }
                     });
                   } catch (error) {
                     console.error('❌ DEBUG: Erro ao posicionar cursor:', error);
                   }
-                }, 2100); // Delay após grace period do EditProtectionPlugin
+                }, 2100);
+                */
               }
             });
           } catch (error) {
