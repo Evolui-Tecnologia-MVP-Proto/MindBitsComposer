@@ -29,6 +29,7 @@ The system follows a monorepo structure with shared TypeScript schemas for type 
 - **System Parameters Management**: A dedicated table (`system_params`) provides a centralized mechanism for managing application-wide configuration parameters.
 - **Specialty-User Association**: Manages user associations with areas of expertise, allowing for fine-grained control over document access and workflow assignments.
 - **Dynamic Flow Filtering**: Implements an `application_filter` JSON criteria for documentation modals, allowing flows to be dynamically displayed based on document field values.
+- **Flow Actions Tracking**: The `flow_actions` table tracks individual actions within document flow executions, recording who performed each action, when it started and ended, and a description of the action. This enables detailed auditing and progress monitoring of workflow executions.
 
 ### Feature Specifications
 - **Toolbar-Based Container Editing**: Edit/delete functions for collapsible containers are integrated into the Lexical editor toolbar, appearing conditionally only for user-inserted containers (fromToolbar=true), not for template-created containers.

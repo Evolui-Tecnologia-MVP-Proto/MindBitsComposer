@@ -405,6 +405,28 @@ export const insertDocumentFlowExecutionSchema = createInsertSchema(documentFlow
 export type InsertDocumentFlowExecution = z.infer<typeof insertDocumentFlowExecutionSchema>;
 export type DocumentFlowExecution = typeof documentFlowExecutions.$inferSelect;
 
+// Flow Actions table
+export const flowActions = pgTable("flow_actions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  flowExecutionId: uuid("flow_execution_id").notNull().references(() => documentFlowExecutions.id, { onDelete: "cascade" }),
+  actionDescription: text("action_description").notNull(),
+  actor: integer("actor").notNull().references(() => users.id),
+  startedAt: timestamp("started_at").notNull(),
+  endAt: timestamp("end_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Flow Actions schema
+export const insertFlowActionSchema = createInsertSchema(flowActions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertFlowAction = z.infer<typeof insertFlowActionSchema>;
+export type FlowAction = typeof flowActions.$inferSelect;
+
 // Flow Types schema
 export const insertFlowTypeSchema = createInsertSchema(flowTypes).omit({
   id: true,
