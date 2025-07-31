@@ -95,14 +95,34 @@ export default function CollapsiblePlugin(): JSX.Element | null {
     const removeEditCollapsibleTitleCommand = editor.registerCommand(
       EDIT_COLLAPSIBLE_TITLE_COMMAND,
       (nodeKey: NodeKey) => {
+        console.log('🎯 EDIT_COLLAPSIBLE_TITLE_COMMAND executado com nodeKey:', nodeKey);
+        
         editor.update(() => {
           const node = $getNodeByKey(nodeKey);
+          console.log('🔍 Node encontrado:', node);
+          console.log('🔍 É CollapsibleTitleNode?', $isCollapsibleTitleNode(node));
+          
           if ($isCollapsibleTitleNode(node)) {
+            const currentText = node.getTextContent();
+            console.log('📝 Texto atual:', currentText);
+            
             // Fazer o título editável temporariamente
-            const newText = prompt('Digite o novo título:', node.getTextContent());
+            const newText = prompt('Digite o novo título:', currentText);
+            console.log('📝 Novo texto inserido:', newText);
+            
             if (newText !== null && newText.trim() !== '') {
               node.setTextContent(newText.trim());
+              console.log('✅ Texto definido para:', newText.trim());
+              
+              // Forçar atualização do DOM
+              editor.update(() => {
+                console.log('🔄 Forçando atualização do DOM');
+              });
+            } else {
+              console.log('❌ Novo texto inválido ou cancelado');
             }
+          } else {
+            console.log('❌ Node não é CollapsibleTitleNode');
           }
         });
         return true;
@@ -158,8 +178,12 @@ export default function CollapsiblePlugin(): JSX.Element | null {
 
     // Event listeners para eventos personalizados do DOM
     const handleEditCollapsibleTitle = (event: any) => {
+      console.log('📥 Evento editCollapsibleTitle recebido:', event.detail);
       if (event.detail && event.detail.nodeKey) {
+        console.log('🚀 Disparando EDIT_COLLAPSIBLE_TITLE_COMMAND com nodeKey:', event.detail.nodeKey);
         editor.dispatchCommand(EDIT_COLLAPSIBLE_TITLE_COMMAND, event.detail.nodeKey);
+      } else {
+        console.log('❌ Evento sem nodeKey válido');
       }
     };
 

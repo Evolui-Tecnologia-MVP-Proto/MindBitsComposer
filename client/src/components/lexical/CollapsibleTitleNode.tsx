@@ -181,12 +181,17 @@ export class CollapsibleTitleNode extends TextNode {
         editButton.appendChild(createLucideIcon('square-pen'));
         editButton.title = 'Editar título';
         editButton.onclick = (e) => {
+          console.log('🖱️ Botão de editar clicado');
           e.preventDefault();
           e.stopPropagation();
           // Disparar evento personalizado para editar título
+          const nodeKey = this.getKey();
+          console.log('🔑 NodeKey do título:', nodeKey);
+          
           const event = new CustomEvent('editCollapsibleTitle', {
-            detail: { nodeKey: this.getKey() }
+            detail: { nodeKey: nodeKey }
           });
+          console.log('📤 Disparando evento editCollapsibleTitle:', event.detail);
           document.dispatchEvent(event);
         };
         
