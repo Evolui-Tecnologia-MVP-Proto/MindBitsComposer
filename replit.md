@@ -11,6 +11,21 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
+🔧 IN PROGRESS: Header Field Editability Issue in Composer (January 31, 2025)
+  - Investigating critical bug where header fields are not editable when documents first load
+  - Attempted solutions:
+    1. Disabled SELECTION_CHANGE_COMMAND handler in EditProtectionPlugin
+    2. Completely removed EditProtectionPlugin from LexicalEditor
+    3. Added data-header-field-input attribute for field identification
+    4. Implemented click handlers and automatic focus with multiple retry delays
+    5. Changed from controlled to uncontrolled input (defaultValue)
+    6. Added stopPropagation to all input events
+    7. Applied inline CSS to force pointer-events and user-select
+  - Added comprehensive logging to track input interactions
+  - Issue persists despite multiple approaches - investigating further
+
+## Recent Updates (January 31, 2025)
+
 ✓ COMPLETED: Added Tsk.Status Column to Home Page Documents Table (January 31, 2025)
   - Added "Tsk.Status" column to "Meus Documentos em Processo" table on home page
   - Implemented complete task status badges with color-coded states matching em-processo tab

@@ -30,6 +30,12 @@ export default function EditProtectionPlugin(): null {
     // Flag para controlar se a proteção está ativa
     let protectionActive = false;
     
+    // Verificar se o foco está em um input do header field
+    const isHeaderFieldInputFocused = () => {
+      const activeElement = document.activeElement;
+      return activeElement?.getAttribute('data-header-field-input') === 'true';
+    };
+    
     // Ativar proteção após 5 segundos para permitir foco inicial e carregamento completo
     const activationTimeout = setTimeout(() => {
       protectionActive = true;
@@ -152,6 +158,9 @@ export default function EditProtectionPlugin(): null {
       // Se estamos digitando, não reposicionar o cursor
       if (isTyping) return;
       
+      // Se o foco está em um input do header field, não interferir
+      if (isHeaderFieldInputFocused()) return;
+      
       editor.update(() => {
         const selection = $getSelection();
         if ($isRangeSelection(selection)) {
@@ -265,7 +274,9 @@ export default function EditProtectionPlugin(): null {
       COMMAND_PRIORITY_HIGH
     );
     
+    // TEMPORARIAMENTE DESABILITADO: Está interferindo com os campos do header
     // Monitorar apenas mudanças de seleção (não a cada keystroke)
+    /*
     const unregisterSelectionListener = editor.registerCommand(
       SELECTION_CHANGE_COMMAND,
       () => {
@@ -274,6 +285,7 @@ export default function EditProtectionPlugin(): null {
       },
       COMMAND_PRIORITY_LOW
     );
+    */
 
     console.log('✅ Plugin de proteção de edição ativado');
 
@@ -289,7 +301,7 @@ export default function EditProtectionPlugin(): null {
       unregisterPaste();
       unregisterLineBreak();
       unregisterTextInsertion();
-      unregisterSelectionListener();
+      // unregisterSelectionListener(); // Desabilitado temporariamente
     };
   }, [editor]);
 

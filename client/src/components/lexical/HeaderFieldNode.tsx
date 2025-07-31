@@ -195,12 +195,61 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
     };
   }, [editor, node, value]);
 
+  // Focar automaticamente se for o primeiro campo
+  React.useEffect(() => {
+    const checkAndFocus = () => {
+      const allHeaderInputs = document.querySelectorAll('.header-field-input');
+      if (allHeaderInputs.length > 0 && inputRef.current === allHeaderInputs[0]) {
+        console.log('🎯 Focando automaticamente no primeiro campo do header');
+        console.log('🔍 Estado do input:', {
+          disabled: inputRef.current.disabled,
+          readOnly: inputRef.current.readOnly,
+          value: inputRef.current.value,
+          placeholder: inputRef.current.placeholder
+        });
+        inputRef.current.focus();
+        
+        // Verificar se conseguiu focar
+        setTimeout(() => {
+          if (document.activeElement === inputRef.current) {
+            console.log('✅ Campo focado com sucesso');
+          } else {
+            console.log('❌ Não conseguiu focar. Elemento ativo:', document.activeElement);
+          }
+        }, 100);
+      }
+    };
+    
+    // Tentar focar com delay
+    const timeouts = [100, 500, 1000, 2000];
+    const timers = timeouts.map(delay => setTimeout(checkAndFocus, delay));
+    
+    return () => {
+      timers.forEach(timer => clearTimeout(timer));
+    };
+  }, []);
+
   const handleChange = (newValue: string) => {
+    console.log('📝 handleChange chamado com:', newValue);
     setValue(newValue);
     editor.update(() => {
       node.setValue(newValue);
+      console.log('✅ Valor do nó atualizado para:', newValue);
     });
   };
+  
+  // Tentar focar após delay maior
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      if (inputRef.current) {
+        console.log('🎯 Tentando focar após 3 segundos...');
+        inputRef.current.focus();
+        inputRef.current.click();
+      }
+    }, 3000);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleRefresh = () => {
     console.log('🔄 Refresh clicked - mappingType:', mappingType, 'mappingValue:', mappingValue);
@@ -262,8 +311,38 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
     }, 50);
   };
 
+  // Ref para o input
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  
+  // Handler para clique no container
+  const handleContainerClick = (e: React.MouseEvent) => {
+    console.log('🎯 Container clicado', e.target);
+    // Se o clique não foi no input, focar no input
+    if (e.target !== inputRef.current && inputRef.current) {
+      console.log('🎯 Tentando focar no input');
+      inputRef.current.focus();
+      // Forçar seleção
+      inputRef.current.select();
+    }
+  };
+  
+  // Adicionar log quando o componente montar
+  React.useEffect(() => {
+    console.log('🔧 HeaderFieldComponent montado:', {
+      label: node.getLabel(),
+      value: value,
+      placeholder: node.__placeholder,
+      inputRef: inputRef.current
+    });
+  }, []);
+
   return (
-    <div className="flex items-center mb-3 border border-gray-300 dark:border-[#374151] rounded-md header-field-container" style={{ borderRadius: '6px' }}>
+    <div 
+      className="flex items-center mb-3 border border-gray-300 dark:border-[#374151] rounded-md header-field-container" 
+      style={{ borderRadius: '6px', cursor: 'text' }}
+      onClick={handleContainerClick}
+      contentEditable={false}
+    >
       <div 
         className="px-4 py-2 text-sm font-medium text-white min-w-[120px] flex-shrink-0 border-r border-white"
         style={{ backgroundColor: '#111827' }}
@@ -272,13 +351,48 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
       </div>
       <div className="flex-1 flex items-center bg-white dark:bg-[#0F172A]" style={{ borderTopRightRadius: '6px', borderBottomRightRadius: '6px' }}>
         <input
+          ref={inputRef}
           type="text"
-          value={value}
-          onChange={(e) => handleChange(e.target.value)}
+          defaultValue={value}
+          onInput={(e) => {
+            e.stopPropagation();
+            const newValue = e.currentTarget.value;
+            console.log('🎯 Input digitado (onInput):', newValue);
+            handleChange(newValue);
+          }}
+          onFocus={(e) => {
+            e.stopPropagation();
+            console.log('🎯 Input focado:', node.getLabel());
+          }}
+          onBlur={(e) => {
+            e.stopPropagation();
+            console.log('🎯 Input desfocado:', node.getLabel());
+          }}
+          onClick={(e) => {
+            e.stopPropagation();
+            console.log('🎯 Input clicado');
+          }}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            console.log('🎯 Mouse down no input');
+          }}
+          onKeyDown={(e) => {
+            e.stopPropagation();
+            console.log('🎯 Tecla pressionada:', e.key);
+          }}
           className="header-field-input flex-1 px-3 py-2 text-sm border-0 outline-none
                      bg-transparent text-gray-900 dark:text-gray-200
                      focus:ring-0 focus:border-0"
+          style={{
+            pointerEvents: 'auto',
+            userSelect: 'text',
+            cursor: 'text',
+            WebkitUserSelect: 'text',
+            MozUserSelect: 'text'
+          }}
           placeholder={node.__placeholder}
+          data-header-field-input="true"
+          autoComplete="off"
         />
         
         {/* Botões de ação baseados no tipo de mapeamento */}
