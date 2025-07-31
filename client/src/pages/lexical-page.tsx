@@ -1695,7 +1695,7 @@ export default function LexicalPage() {
                   size="sm"
                   className={showAttachments ? "bg-green-600 text-white hover:bg-green-700" : ""}
                   title="Anexos"
-                  disabled={viewMode === 'preview' || (selectedTemplate?.type === 'struct' && !currentDocumentId)}
+                  disabled={viewMode === 'preview' || (selectedTemplate?.type === 'struct' && !currentDocumentId && !selectedEdition)}
                 >
                   <Paperclip className={`w-4 h-4 ${showAttachments ? "text-white" : ""}`} />
                 </Button>
@@ -1906,7 +1906,7 @@ export default function LexicalPage() {
         )}
 
         {/* Editor principal */}
-        <div className={`flex-1 flex flex-col composer-editor-container ${!showDocumentList ? 'editor-left-rounded' : ''} ${!showAttachments || (selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) ? 'editor-right-rounded' : ''}`}>
+        <div className={`flex-1 flex flex-col composer-editor-container ${!showDocumentList ? 'editor-left-rounded' : ''} ${!showAttachments || (selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId && !selectedEdition) ? 'editor-right-rounded' : ''}`}>
           {/* Barra de ferramentas do editor integrada */}
           <div className="flex-1 pl-0 pr-0 pt-0 pb-0 min-h-0 overflow-hidden">
             <Card className="h-full composer-editor-card flex flex-col">
@@ -1958,7 +1958,7 @@ export default function LexicalPage() {
         </div>
 
         {/* Painel de Anexos - desabilitado apenas quando há template struct sem documento composer */}
-        {showAttachments && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) && (
+        {showAttachments && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId && !selectedEdition) && (
           <div className="w-80 border-l bg-gray-50 dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col composer-side-panel composer-attachments-panel rounded-tr-xl">
             {/* Header fixo */}
             <div className="p-4 border-b bg-gray-50 dark:bg-[#111827] border-gray-200 dark:border-[#374151] rounded-tr-xl">
@@ -1968,7 +1968,7 @@ export default function LexicalPage() {
                   <h3 className="font-semibold text-gray-900 dark:text-[#E5E7EB]">Anexos</h3>
                 </div>
                 {/* Combo de Plugins - apenas COMPOSER_ASSET ativos */}
-                {composerAssetPlugins.length > 0 && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId) && (
+                {composerAssetPlugins.length > 0 && !(selectedTemplate && selectedTemplate.type === 'struct' && !currentDocumentId && !selectedEdition) && (
                   <div className="flex items-center gap-2 ml-auto">
                     <Select value={pluginSelectValue} onValueChange={handleOpenPlugin}>
                       <SelectTrigger className="w-32 h-8 text-xs">
