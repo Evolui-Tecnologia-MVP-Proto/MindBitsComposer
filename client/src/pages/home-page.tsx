@@ -198,126 +198,129 @@ export default function HomePage() {
   return (
     <div className="fade-in p-6 bg-gray-50 dark:bg-[#1F2937] h-full flex flex-col">
       <div className="flex flex-col flex-1 min-h-0 space-y-8">
-        {/* Base de conhecimento OC */}
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-              Base de conhecimento OC
-            </h2>
-          </div>
-          
-          <div className="grid gap-4 md:grid-cols-3">
-            <Card className="bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151]">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                  Documentos a revisar
-                </CardTitle>
-                <Clock className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                  {documentosARevisar}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Aguardando revisão
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151]">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                  Documentos em revisão
-                </CardTitle>
-                <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                  {documentosEmRevisao}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Em processo de revisão
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151]">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                  Documentos Publicados
-                </CardTitle>
-                <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                  {documentosPublicados}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Concluídos e publicados
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Documentos MindBits_CT Integrados por Especialidade */}
-        {Object.keys(documentosPorEspecialidade).length > 0 && (
+        {/* Container para Base de conhecimento e MindBits_CT */}
+        <div className="space-y-8">
+          {/* Base de conhecimento OC */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              <BookOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                Documentos MindBits_CT - Integrados por Especialidade
+                Base de conhecimento OC
               </h2>
             </div>
             
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {Object.entries(documentosPorEspecialidade)
-                .sort(([, a], [, b]) => b - a) // Ordenar por quantidade (decrescente)
-                .map(([responsavel, quantidade]) => (
-                <Card key={responsavel} className="bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151]">
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300 truncate">
-                      {responsavel}
-                    </CardTitle>
-                    <CheckCircle2 className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0" />
-                  </CardHeader>
-                  <CardContent className="relative h-[80px]">
-                    <div className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-tight">
-                      {quantidade} {quantidade === 1 ? "Integrado" : "Integrados"}
-                      {documentosEmProcessoPorMimPorResponsavel[responsavel] && (
-                        <span className="text-blue-600 dark:text-blue-400">
-                          {" e "}{documentosEmProcessoPorMimPorResponsavel[responsavel]} em processo por mim
-                        </span>
-                      )}
-                    </div>
-                    <div className="absolute bottom-2 right-2">
-                      <Button
-                        size="sm"
-                        variant={isUserResponsibleForSpecialty(responsavel) ? "default" : "secondary"}
-                        disabled={!isUserResponsibleForSpecialty(responsavel)}
-                        className={`h-7 px-2 text-xs ${
-                          isUserResponsibleForSpecialty(responsavel) 
-                            ? "bg-blue-600 hover:bg-blue-700 text-white" 
-                            : "opacity-50 cursor-not-allowed"
-                        }`}
-                        onClick={() => {
-                          if (isUserResponsibleForSpecialty(responsavel)) {
-                            setSelectedResponsavel(responsavel);
-                            setReviewModalOpen(true);
-                          }
-                        }}
-                      >
-                        <Play className="h-3 w-3 mr-1" />
-                        Iniciar Revisão
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card className="bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151]">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                    Documentos a revisar
+                  </CardTitle>
+                  <Clock className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                    {documentosARevisar}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Aguardando revisão
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151]">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                    Documentos em revisão
+                  </CardTitle>
+                  <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                    {documentosEmRevisao}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Em processo de revisão
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151]">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                    Documentos Publicados
+                  </CardTitle>
+                  <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                    {documentosPublicados}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Concluídos e publicados
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           </div>
-        )}
+
+          {/* Documentos MindBits_CT Integrados por Especialidade */}
+          {Object.keys(documentosPorEspecialidade).length > 0 && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                  Documentos MindBits_CT - Integrados por Especialidade
+                </h2>
+              </div>
+              
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {Object.entries(documentosPorEspecialidade)
+                  .sort(([, a], [, b]) => b - a) // Ordenar por quantidade (decrescente)
+                  .map(([responsavel, quantidade]) => (
+                  <Card key={responsavel} className="bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151]">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300 truncate">
+                        {responsavel}
+                      </CardTitle>
+                      <CheckCircle2 className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                    </CardHeader>
+                    <CardContent className="relative h-[80px]">
+                      <div className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-tight">
+                        {quantidade} {quantidade === 1 ? "Integrado" : "Integrados"}
+                        {documentosEmProcessoPorMimPorResponsavel[responsavel] && (
+                          <span className="text-blue-600 dark:text-blue-400">
+                            {" e "}{documentosEmProcessoPorMimPorResponsavel[responsavel]} em processo por mim
+                          </span>
+                        )}
+                      </div>
+                      <div className="absolute bottom-2 right-2">
+                        <Button
+                          size="sm"
+                          variant={isUserResponsibleForSpecialty(responsavel) ? "default" : "secondary"}
+                          disabled={!isUserResponsibleForSpecialty(responsavel)}
+                          className={`h-7 px-2 text-xs ${
+                            isUserResponsibleForSpecialty(responsavel) 
+                              ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                              : "opacity-50 cursor-not-allowed"
+                          }`}
+                          onClick={() => {
+                            if (isUserResponsibleForSpecialty(responsavel)) {
+                              setSelectedResponsavel(responsavel);
+                              setReviewModalOpen(true);
+                            }
+                          }}
+                        >
+                          <Play className="h-3 w-3 mr-1" />
+                          Iniciar Revisão
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Seção de Meus Documentos em Processo */}
         <div className="flex-1 min-h-0 mt-6">

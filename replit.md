@@ -11,9 +11,23 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
+✓ COMPLETED: Grouped Knowledge Base Cards in Home Page UI (January 31, 2025)
+  - Grouped "Base de conhecimento OC" and "Documentos MindBits_CT - Integrados por Especialidade" sections in a single container div
+  - Maintained original layout and functionality while improving semantic structure
+  - Both sections now share a parent container for better component organization
+  - Applied consistent spacing and visual hierarchy within the grouped container
+
+✓ COMPLETED: Fixed Document Review Limit Control to Use Correct Data Source (January 31, 2025)
+  - CORRECTED: Changed from /api/document-editions-in-progress to /api/documentos/user-in-process endpoint
+  - Now properly counts documents from `documentos` table with status "Em Processo" and userId = logged user
+  - Previous implementation was incorrectly counting document_editions records instead of actual documents
+  - Created new endpoint /api/documentos/user-in-process that queries documentos table directly
+  - Fixed business logic: MAX_ITEMS_PER_REVISOR limits total documents a user can have "Em Processo" simultaneously
+  - Modal now accurately calculates available slots based on documentos table data, not document_editions
+  - Ensures users cannot exceed their document processing capacity as defined by system parameter
+
 ✓ COMPLETED: Document Review Limit Control Based on MAX_ITEMS_PER_REVISOR Parameter (January 31, 2025)
   - Implemented smart limit calculation in DocumentReviewModal considering user's documents already in process
-  - Added query to fetch current user's documents in process via /api/document-editions-in-progress endpoint
   - Logic: Available slots = MAX_ITEMS_PER_REVISOR - documents_already_in_process_by_user
   - Enhanced modal header with detailed limit information: maximum limit, items in process, available slots
   - Added visual feedback when limit is reached with amber alert and clear explanation
