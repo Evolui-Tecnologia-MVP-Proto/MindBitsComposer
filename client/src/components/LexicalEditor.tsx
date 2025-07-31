@@ -66,8 +66,7 @@ import {
   Eye,
   Edit,
   Undo,
-  Redo,
-  Save
+  Redo
 } from "lucide-react";
 
 // Tema simplificado para o Lexical
@@ -392,8 +391,6 @@ function ToolbarPlugin({
   const [isStrikethrough, setIsStrikethrough] = useState(false);
   const [isCode, setIsCode] = useState(false);
   const [selectedContainerKey, setSelectedContainerKey] = useState<string | null>(null);
-  const [containerTitle, setContainerTitle] = useState<string>('');
-  const [isEditingTitle, setIsEditingTitle] = useState(false);
   const { fileInputRef, openFileDialog, handleFileChange } = useImageUpload();
 
   // Detectar seleção de container colapsível
@@ -415,15 +412,6 @@ function ToolbarPlugin({
           while (currentNode) {
             if ($isCollapsibleContainerNode(currentNode)) {
               setSelectedContainerKey(currentNode.getKey());
-              
-              // Buscar o título do container
-              const children = currentNode.getChildren();
-              for (const child of children) {
-                if ($isCollapsibleTitleNode(child)) {
-                  setContainerTitle(child.getTextContent());
-                  break;
-                }
-              }
               return;
             }
             currentNode = currentNode.getParent();
@@ -432,7 +420,6 @@ function ToolbarPlugin({
         
         // Nenhum container encontrado
         setSelectedContainerKey(null);
-        setContainerTitle('');
       });
     });
   }, [editor]);
@@ -602,29 +589,7 @@ function ToolbarPlugin({
     });
   };
 
-  const saveContainerTitle = () => {
-    console.log('🔧 saveContainerTitle chamado');
-    console.log('📋 selectedContainerKey:', selectedContainerKey);
-    console.log('📝 containerTitle:', containerTitle);
-    
-    if (!selectedContainerKey || !containerTitle.trim()) {
-      console.log('❌ Saindo - selectedContainerKey ou containerTitle vazio');
-      return;
-    }
-    
-    console.log('🚀 Disparando evento updateCollapsibleTitle');
-    
-    // Usar o evento customizado para atualizar o título
-    const event = new CustomEvent('updateCollapsibleTitle', {
-      detail: {
-        nodeKey: selectedContainerKey,
-        newText: containerTitle.trim()
-      }
-    });
-    window.dispatchEvent(event);
-    
-    setIsEditingTitle(false);
-  };
+
 
   const editContainer = () => {
     if (!selectedContainerKey) return;
@@ -889,51 +854,7 @@ function ToolbarPlugin({
           </Button>
         )}
 
-        {/* Controles de edição de título do container - apenas quando um container está selecionado */}
-        {selectedContainerKey && (
-          <>
-            <div className="h-6 w-px bg-gray-300 mx-2"></div>
-            <div className="flex items-center gap-1 ml-2">
-              <span className="text-xs text-gray-600 dark:text-gray-400">Título do Container:</span>
-              <input
-                type="text"
-                value={containerTitle}
-                onChange={(e) => setContainerTitle(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    saveContainerTitle();
-                  } else if (e.key === 'Escape') {
-                    setIsEditingTitle(false);
-                    // Restaurar título original
-                    editor.getEditorState().read(() => {
-                      const node = $getNodeByKey(selectedContainerKey);
-                      if (node && $isCollapsibleContainerNode(node)) {
-                        const children = node.getChildren();
-                        for (const child of children) {
-                          if ($isCollapsibleTitleNode(child)) {
-                            setContainerTitle(child.getTextContent());
-                            break;
-                          }
-                        }
-                      }
-                    });
-                  }
-                }}
-                className="w-48 h-6 px-2 border border-blue-400 dark:border-blue-500 bg-white dark:bg-[#1E293B] text-gray-900 dark:text-[#E5E7EB] rounded text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-600 dark:focus:border-blue-400"
-                placeholder="Digite o título"
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 px-2 text-xs hover:bg-green-100 text-green-600 hover:text-green-700"
-                title="Salvar título"
-                onClick={saveContainerTitle}
-              >
-                <Save className="w-3 h-3" />
-              </Button>
-            </div>
-          </>
-        )}
+
 
       </div>
     </div>
