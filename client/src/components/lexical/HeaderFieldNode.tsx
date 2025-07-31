@@ -459,17 +459,20 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
             {(mappingType === 'field' || mappingType === 'formula') && (
               <button
                   onClick={(e) => {
+                    console.log('🎯 CLIQUE NO BOTÃO CAPTURADO!');
                     e.preventDefault();
                     e.stopPropagation();
                     handleRefresh();
                   }}
                   onMouseDown={(e) => {
+                    console.log('🎯 MOUSE DOWN NO BOTÃO!');
                     e.preventDefault();
                     e.stopPropagation();
                   }}
                   className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
                   title="Recarregar valor"
                   type="button"
+                  style={{ pointerEvents: 'auto', position: 'relative', zIndex: 10 }}
                 >
                   <RefreshCw className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                 </button>
