@@ -95,15 +95,15 @@ export function createMarkdownConverter() {
       if (child.getType() === 'text') {
         result += processTextNode(child);
       } else {
-        // Para outros tipos de nodes, processar recursivamente
-        result += processNode(child);
+        // Para outros tipos de nodes, processar recursivamente mantendo o nível atual
+        result += processNode(child, 1);
       }
     });
     
     return result;
   }
 
-  function processNode(node: any): string {
+  function processNode(node: any, currentLevel: number = 1): string {
     let markdown = '';
 
     if (node.getType() === 'heading') {
@@ -298,7 +298,7 @@ export function createMarkdownConverter() {
                         content += paragraphContent;
                       }
                     } else {
-                      const nodeContent = processNode(child).trim();
+                      const nodeContent = processNode(child, currentLevel).trim();
                       if (nodeContent) {
                         content += nodeContent;
                       }
@@ -431,7 +431,7 @@ export function createMarkdownConverter() {
                         }
                       } else {
                         // For other types, get formatted content
-                        const nodeContent = processNode(child).trim();
+                        const nodeContent = processNode(child, currentLevel).trim();
                         if (nodeContent) {
                           content += nodeContent;
                         }
@@ -476,25 +476,15 @@ export function createMarkdownConverter() {
         }
       }
     } else if (node.getType() === 'collapsible-container') {
-      // Process collapsible container
+      // Process collapsible container with hierarchical header levels
       const containerChildren = node.getChildren();
       containerChildren.forEach((child: any) => {
         if (child.getType() === 'collapsible-title') {
           const titleText = child.getTextContent();
           
-          // Determine if this is a header section or regular section
-          // Header sections contain template fields like "RAG Index", "Titulo", "Data", etc.
-          const isHeaderSection = titleText.includes('Header') || 
-                                 titleText.includes('HEADER') ||
-                                 titleText.includes('Cabeçalho') ||
-                                 titleText.includes('CABEÇALHO') ||
-                                 // Check for common header field patterns
-                                 /^(RAG Index|Titulo|Data|Sistema|Módulo|Caminho)$/i.test(titleText) ||
-                                 // Check if title contains header-like content
-                                 titleText.includes('Campo') || titleText.includes('Metadados');
-          
-          // Use # for header sections, ## for other sections
-          const headerLevel = isHeaderSection ? '#' : '##';
+          // Use hierarchical header level based on nesting
+          // currentLevel starts at 1, so first level containers get ##, second get ###, etc.
+          const headerLevel = '#'.repeat(Math.min(currentLevel + 1, 6)); // Max 6 levels in markdown
           markdown += `${headerLevel} ${titleText}\n\n`;
         } else if (child.getType() === 'collapsible-content') {
           // Check if this content contains HeaderFieldNode elements
@@ -522,9 +512,9 @@ export function createMarkdownConverter() {
             
             markdown += '\n';
           } else {
-            // Process content recursively if no HeaderField nodes found
+            // Process content recursively if no HeaderField nodes found, incrementing level for nested containers
             contentChildren.forEach((contentChild: any) => {
-              markdown += processNode(contentChild);
+              markdown += processNode(contentChild, currentLevel + 1);
             });
           }
         }
@@ -545,7 +535,7 @@ export function createMarkdownConverter() {
         children.forEach((child: any) => {
           // Skip nodes that were already processed for images
           if (child.getType() !== 'image-with-metadata' && child.getType() !== 'image') {
-            markdown += processNode(child);
+            markdown += processNode(child, currentLevel);
           }
         });
       }
@@ -564,7 +554,7 @@ export function createMarkdownConverter() {
       const children = rootNode.getChildren();
       
       children.forEach((child: any) => {
-        markdown += processNode(child);
+        markdown += processNode(child, 1);
       });
       
       return markdown.trim();
