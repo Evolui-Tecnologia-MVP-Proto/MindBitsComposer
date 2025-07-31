@@ -279,7 +279,9 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
     console.log('🔄 Disparando evento headerFieldRefresh:', event.detail);
     window.dispatchEvent(event);
     
-    // Verificar se o valor mudou após um delay maior
+    // REMOVIDO: setTimeout que chamava focus() após 500ms estava causando roubo de foco dos containers
+    // O usuário não quer NENHUMA mudança automática de foco
+    /*
     setTimeout(() => {
       console.log('🔍 Verificando após 500ms:');
       console.log('  - Valor no componente (state):', value);
@@ -287,14 +289,12 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
       console.log('  - Valor no input DOM:', inputElement?.value);
       
       if (inputElement) {
-        inputElement.focus();
-        // Posicionar cursor no final do texto
+        inputElement.focus(); // ESTAVA CAUSANDO ROUBO DE FOCO!
         inputElement.setSelectionRange(inputElement.value.length, inputElement.value.length);
-        
-        // Forçar o editor a reconhecer que estamos em uma área editável
-        editor.focus();
+        editor.focus(); // ESTAVA CAUSANDO ROUBO DE FOCO!
       }
     }, 500);
+    */
   };
 
   const handleUnplug = () => {
@@ -314,17 +314,17 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
     });
     window.dispatchEvent(event);
     
-    // Restaurar foco após um pequeno delay para garantir que a atualização foi concluída
+    // REMOVIDO: setTimeout que chamava focus() após 50ms estava causando roubo de foco dos containers
+    // O usuário não quer NENHUMA mudança automática de foco
+    /*
     setTimeout(() => {
       if (inputElement) {
-        inputElement.focus();
-        // Posicionar cursor no final do texto
+        inputElement.focus(); // ESTAVA CAUSANDO ROUBO DE FOCO!
         inputElement.setSelectionRange(inputElement.value.length, inputElement.value.length);
-        
-        // Forçar o editor a reconhecer que estamos em uma área editável
-        editor.focus();
+        editor.focus(); // ESTAVA CAUSANDO ROUBO DE FOCO!
       }
     }, 50);
+    */
   };
 
   // Ref para o input

@@ -15,8 +15,11 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - User was extremely frustrated with persistent focus stealing from containers to header fields
   - CRITICAL FIX: Completely removed FocusPlugin function (lines 1171-1307) that was using setTimeout(focusField, 2100)
   - CRITICAL FIX: Removed setInterval in HeaderFieldNode that called focus() every 1000ms (1 second)
+  - CRITICAL FIX: Found and disabled HeaderFieldMappingPlugin setTimeout(500ms) that was causing focus transfer after typing
+  - CRITICAL FIX: Removed two more setTimeout calls in HeaderFieldNode (500ms and 50ms delays) that called focus()
   - Removed AutoFocusPlugin import and usage completely
   - Removed all automatic focus() calls from refresh button and plugin data exchange handlers
+  - Root cause: Multiple hidden setTimeout mechanisms were detecting typing and transferring focus after delays
   - User can now type in containers without any automatic focus interference
   - Zero automatic focus behavior achieved - user has complete control over cursor placement
 

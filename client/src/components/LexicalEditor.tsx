@@ -1290,12 +1290,19 @@ function HeaderFieldMappingPlugin({ templateMappings, documentData }: { template
       });
     };
 
-    // Executar após um pequeno delay para garantir que o documento foi carregado
+    // TEMPORARIAMENTE DESABILITADO: setTimeout pode estar causando mudança de foco após digitação
+    // O usuário relatou que digitar nos containers causa transferência de foco após alguns segundos
+    // Este setTimeout de 500ms pode estar sendo a causa
+    /*
     const timeoutId = setTimeout(updateHeaderFieldsWithMapping, 500);
 
     return () => {
       clearTimeout(timeoutId);
     };
+    */
+    
+    // Executar imediatamente sem delay para testar se o setTimeout era o problema
+    updateHeaderFieldsWithMapping();
   }, [editor, templateMappings, documentData]);
 
   return null;
