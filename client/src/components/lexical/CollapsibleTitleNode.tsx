@@ -204,10 +204,19 @@ export class CollapsibleTitleNode extends TextNode {
               // Substituir o span pelo input temporariamente
               textSpan.style.display = 'none';
               textSpan.parentNode?.insertBefore(input, textSpan);
-              input.focus();
-              input.select();
+              
+              // Usar setTimeout para garantir que o foco funcione corretamente
+              setTimeout(() => {
+                input.focus();
+                input.select();
+              }, 10);
+              
+              let isEditing = true; // Flag para controlar se ainda está editando
               
               const finishEdit = () => {
+                if (!isEditing) return; // Evitar execução múltipla
+                isEditing = false;
+                
                 const newText = input.value.trim();
                 if (newText && newText !== currentText) {
                   // Atualizar apenas o texto do span
@@ -225,8 +234,11 @@ export class CollapsibleTitleNode extends TextNode {
               // Finalizar edição ao pressionar Enter ou perder foco
               input.addEventListener('keydown', (event) => {
                 if (event.key === 'Enter') {
+                  event.preventDefault();
                   finishEdit();
                 } else if (event.key === 'Escape') {
+                  event.preventDefault();
+                  isEditing = false;
                   if (input.parentNode) {
                     input.remove();
                   }
@@ -234,7 +246,12 @@ export class CollapsibleTitleNode extends TextNode {
                 }
               });
               
-              input.addEventListener('blur', finishEdit);
+              // Usar setTimeout para evitar blur imediato
+              setTimeout(() => {
+                if (isEditing) {
+                  input.addEventListener('blur', finishEdit);
+                }
+              }, 100);
             }
           }
         };
