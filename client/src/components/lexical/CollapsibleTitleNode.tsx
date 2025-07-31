@@ -234,14 +234,36 @@ export class CollapsibleTitleNode extends TextNode {
               input.setAttribute('data-editing-title', 'true');
               input.placeholder = 'Digite o título (Enter=salvar, Esc=cancelar)';
               
+              // Sistema agressivo para manter foco - reconquistar foco se perdido
+              let focusMaintainer: NodeJS.Timeout;
+              let isEditingActive = true;
+              
+              const maintainFocus = () => {
+                if (isEditingActive && document.activeElement !== input && input.parentNode) {
+                  console.log('🔄 Reconquistando foco roubado');
+                  input.focus();
+                }
+              };
+              
+              // Verificar e reconquistar foco a cada 100ms
+              focusMaintainer = setInterval(maintainFocus, 100);
+              
               // Timeout de segurança - salvar após 30 segundos sem interação
               let inactivityTimeout = setTimeout(() => {
                 console.log('⏰ Timeout - salvando automaticamente');
+                isEditingActive = false;
+                clearInterval(focusMaintainer);
                 finishEdit(true);
               }, 30000);
               
               const finishEdit = (save: boolean = true) => {
                 console.log('🏁 Finalizando edição, save:', save);
+                
+                // Parar sistema de manutenção de foco
+                isEditingActive = false;
+                if (focusMaintainer) {
+                  clearInterval(focusMaintainer);
+                }
                 
                 // Limpar timeout
                 if (inactivityTimeout) {
