@@ -11,6 +11,8 @@ import {
 } from 'lexical';
 import { $insertNodeToNearestRoot } from '@lexical/utils';
 import { useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 
 import {
   $createCollapsibleContainerNode,
@@ -58,6 +60,7 @@ export function $insertCollapsibleContainer(isOpen = true, fromToolbar = false):
 
 export default function CollapsiblePlugin(): JSX.Element | null {
   const [editor] = useLexicalComposerContext();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!editor.hasNodes([CollapsibleContainerNode, CollapsibleTitleNode, CollapsibleContentNode])) {
@@ -110,14 +113,42 @@ export default function CollapsiblePlugin(): JSX.Element | null {
     const removeDeleteCollapsibleCommand = editor.registerCommand(
       DELETE_COLLAPSIBLE_COMMAND,
       (nodeKey: NodeKey) => {
-        editor.update(() => {
-          const node = $getNodeByKey(nodeKey);
-          if (node && $isCollapsibleContainerNode(node)) {
-            if (confirm('Tem certeza que deseja excluir este container?')) {
+        // Mostrar toast de confirmação em vez de confirm() do navegador
+        const confirmDelete = () => {
+          editor.update(() => {
+            const node = $getNodeByKey(nodeKey);
+            if (node && $isCollapsibleContainerNode(node)) {
               node.remove();
             }
-          }
+          });
+        };
+
+        toast({
+          title: "Confirmação de Exclusão",
+          description: "A Exclusão do container excluira também todo o seu conteúdo. Confirma a exclusão?",
+          variant: "destructive",
+          action: (
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  // Toast se fecha automaticamente
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={confirmDelete}
+              >
+                Confirmar
+              </Button>
+            </div>
+          ),
         });
+        
         return true;
       },
       COMMAND_PRIORITY_EDITOR,

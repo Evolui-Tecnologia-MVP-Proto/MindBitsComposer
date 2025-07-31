@@ -23,6 +23,9 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
   - Enhanced updateDOM method to properly re-render buttons when container properties change
   - Buttons use Lucide icons (square-pen for edit, trash-2 for delete) with proper hover states and dark mode support
   - Replaced emoji with SVG-based Lucide icons for better visual consistency and scalability
+  - Replaced browser confirm dialog with custom toast confirmation featuring "Cancelar" and "Confirmar" buttons
+  - Toast displays message: "A Exclusão do container excluira também todo o seu conteúdo. Confirma a exclusão?"
+  - Enhanced user experience with styled confirmation UI instead of native browser dialogs
 
 ✓ COMPLETED: Enhanced Quote and Code Block Insertion with Line Spacing (January 31, 2025)
   - Modified insertQuote function to automatically add empty lines before and after quote blocks
