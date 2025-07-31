@@ -302,6 +302,8 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
 
   // Ref para o input
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const [hasFocus, setHasFocus] = React.useState(false);
+  const lastFocusTime = React.useRef<number>(0);
   
   // Handler para clique no container
   const handleContainerClick = (e: React.MouseEvent) => {
@@ -324,6 +326,28 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
       inputRef: inputRef.current
     });
   }, []);
+  
+  // Monitor para manter cursor visível
+  React.useEffect(() => {
+    if (!hasFocus) return;
+    
+    // Manter foco atualizado periodicamente quando o campo está ativo
+    const interval = setInterval(() => {
+      if (hasFocus && inputRef.current && document.activeElement === inputRef.current) {
+        // Campo ainda tem foco, garantir que cursor está visível
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount > 0) {
+          console.log('🔍 Cursor ainda visível no campo:', node.getLabel());
+        } else {
+          console.log('⚠️ Cursor pode ter desaparecido, restaurando seleção...');
+          inputRef.current.focus();
+          inputRef.current.setSelectionRange(inputRef.current.value.length, inputRef.current.value.length);
+        }
+      }
+    }, 1000); // Verificar a cada segundo
+    
+    return () => clearInterval(interval);
+  }, [hasFocus, node]);
 
   return (
     <div 
@@ -352,10 +376,26 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
           onFocus={(e) => {
             e.stopPropagation();
             console.log('🎯 Input focado:', node.getLabel());
+            setHasFocus(true);
+            lastFocusTime.current = Date.now();
           }}
           onBlur={(e) => {
             e.stopPropagation();
             console.log('🎯 Input desfocado:', node.getLabel());
+            setHasFocus(false);
+            
+            // Se perdeu o foco muito rapidamente (menos de 5 segundos), pode ser um bug
+            const focusDuration = Date.now() - lastFocusTime.current;
+            if (focusDuration < 5000 && inputRef.current) {
+              console.log('⚠️ Perda de foco inesperada após', focusDuration, 'ms. Tentando restaurar...');
+              // Tentar restaurar o foco após um pequeno delay
+              setTimeout(() => {
+                if (!hasFocus && inputRef.current && document.activeElement !== inputRef.current) {
+                  console.log('🔄 Restaurando foco no campo:', node.getLabel());
+                  inputRef.current.focus();
+                }
+              }, 100);
+            }
           }}
           onClick={(e) => {
             e.stopPropagation();

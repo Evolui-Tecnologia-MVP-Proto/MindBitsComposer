@@ -1255,10 +1255,10 @@ function FocusPlugin({ initialEditorState }: { initialEditorState?: string }) {
           }
         });
         
-        // Focar o editor após a atualização
-        setTimeout(() => {
-          editor.focus();
-        }, 50);
+        // Comentado - estava tirando o foco dos campos do header
+        // setTimeout(() => {
+        //   editor.focus();
+        // }, 50);
       }, 100);
       
       return () => clearTimeout(timeoutId);
