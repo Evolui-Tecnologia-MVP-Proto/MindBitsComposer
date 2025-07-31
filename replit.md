@@ -11,6 +11,13 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
 ## Recent Updates (January 31, 2025)
 
+✓ COMPLETED: Added Tsk.Status Column to Home Page Documents Table (January 31, 2025)
+  - Added "Tsk.Status" column to "Meus Documentos em Processo" table on home page
+  - Implemented complete task status badges with color-coded states matching em-processo tab
+  - Task states: Ação Pendente (yellow), Documentando (purple), Em aprovação (green), Concluído (blue), Bloqueado (red), Em revisão (orange)
+  - Imported Badge component and applied consistent dark mode theming
+  - Users can now see task progress status directly on home page table
+
 ✓ COMPLETED: Updated Knowledge Base Section Title (January 31, 2025)
   - Renamed "Base de conhecimento OC" to "Base de conhecimento CT → OC (Atendimento e Suporte)"
   - Better reflects the content flow from CT (Central de Tributária) to OC (Operational Center)

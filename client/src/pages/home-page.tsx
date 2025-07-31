@@ -11,6 +11,7 @@ import {
   User,
   Play
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { type Documento, type Specialty } from "@shared/schema";
 import { DocumentReviewModal } from "@/components/review/DocumentReviewModal";
 import { EmProcessoTab } from "@/refact/components/documentos/tables/EmProcessoTab";
@@ -144,6 +145,7 @@ export default function HomePage() {
                 <TableHead className="dark:text-gray-200">Responsável</TableHead>
                 <TableHead className="dark:text-gray-200">Cliente</TableHead>
                 <TableHead className="dark:text-gray-200">Atualizado</TableHead>
+                <TableHead className="dark:text-gray-200">Tsk.Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -170,6 +172,53 @@ export default function HomePage() {
                       <Clock className="mr-1.5 h-3.5 w-3.5" />
                       {formatDate(documento.updatedAt)}
                     </div>
+                  </TableCell>
+                  <TableCell className="dark:bg-[#0F172A]">
+                    {(() => {
+                      if (!documento.taskState || documento.taskState === '') {
+                        return (
+                          <Badge variant="secondary" className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 border-yellow-200 dark:border-yellow-600">
+                            Ação Pendente
+                          </Badge>
+                        );
+                      } else if (documento.taskState === 'in_doc') {
+                        return (
+                          <Badge variant="secondary" className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400 border-purple-200 dark:border-purple-600">
+                            Documentando
+                          </Badge>
+                        );
+                      } else if (documento.taskState === 'in_apr') {
+                        return (
+                          <Badge variant="secondary" className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 border-green-200 dark:border-green-600">
+                            Em aprovação
+                          </Badge>
+                        );
+                      } else if (documento.taskState === 'completed') {
+                        return (
+                          <Badge variant="secondary" className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 border-blue-200 dark:border-blue-600">
+                            Concluído
+                          </Badge>
+                        );
+                      } else if (documento.taskState === 'blocked') {
+                        return (
+                          <Badge variant="secondary" className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 border-red-200 dark:border-red-600">
+                            Bloqueado
+                          </Badge>
+                        );
+                      } else if (documento.taskState === 'review') {
+                        return (
+                          <Badge variant="secondary" className="bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400 border-orange-200 dark:border-orange-600">
+                            Em revisão
+                          </Badge>
+                        );
+                      } else {
+                        return (
+                          <Badge variant="secondary" className="bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400 border-gray-200 dark:border-gray-600">
+                            {documento.taskState}
+                          </Badge>
+                        );
+                      }
+                    })()}
                   </TableCell>
                 </TableRow>
               ))}
