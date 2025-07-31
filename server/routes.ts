@@ -5262,7 +5262,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Document Editions in Progress route
+  // Document Editions in Progress route - filtered by logged user
   app.get("/api/document-editions-in-progress", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
@@ -5288,8 +5288,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       .from(documentEditions)
       .innerJoin(documentos, eq(documentEditions.documentId, documentos.id))
       .innerJoin(templates, eq(documentEditions.templateId, templates.id))
-      .where(eq(documentEditions.status, 'in_progress'))
+      .where(and(
+        eq(documentEditions.status, 'in_progress'),
+        eq(documentEditions.startedBy, req.user.id)
+      ))
       .orderBy(desc(documentEditions.updatedAt));
+      
+      console.log(`🔍 [API] Buscando document_editions em progresso para usuário: ${req.user.id}`);
+      console.log(`✅ [API] Encontradas ${editionsInProgress.length} edições em progresso para o usuário`);
       
       res.json(editionsInProgress);
     } catch (error) {
