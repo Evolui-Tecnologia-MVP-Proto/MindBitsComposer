@@ -477,8 +477,6 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
             {(mappingType === 'field' || mappingType === 'formula') && (
               <button
                   onClick={(e) => {
-                    alert('REFRESH BUTTON CLICKED!');
-                    console.log('🎯🎯🎯 ONCLICK DO BOTÃO ACIONADO!');
                     e.preventDefault();
                     e.stopPropagation();
                     handleRefresh();

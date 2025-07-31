@@ -1739,6 +1739,8 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       const customEvent = event as CustomEvent;
       const { label, mappingType, mappingValue, nodeKey } = customEvent.detail;
       
+      alert(`EVENT RECEIVED! Field: ${label}, Mapping: ${mappingValue}`);
+      
       console.log('🔄 HeaderField Refresh Event:', customEvent.detail);
       console.log('📊 documentData atual:', documentData);
       console.log('📊 templateMappings atual:', templateMappings);
