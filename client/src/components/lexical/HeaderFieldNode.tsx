@@ -471,24 +471,13 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
           autoComplete="off"
         />
         
-        {/* BOTÃO DE TESTE SIMPLES */}
-        <button
-          onClick={() => {
-            console.log('🚨🚨🚨 TESTE BUTTON CLICKED!');
-            alert('TESTE - BOTÃO FUNCIONANDO!');
-          }}
-          className="px-2 py-1 mr-2 bg-red-500 text-white text-xs rounded"
-          type="button"
-        >
-          TESTE
-        </button>
-        
         {/* Botões de ação baseados no tipo de mapeamento */}
         {mappingType && (
           <div className="pr-2">
             {(mappingType === 'field' || mappingType === 'formula') && (
               <button
                   onClick={(e) => {
+                    alert('REFRESH BUTTON CLICKED!');
                     console.log('🎯🎯🎯 ONCLICK DO BOTÃO ACIONADO!');
                     e.preventDefault();
                     e.stopPropagation();
