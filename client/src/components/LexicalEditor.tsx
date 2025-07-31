@@ -1849,12 +1849,12 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           // Também salvar no window para acesso do lexical-page
           (window as any).__currentFieldContext = { label, nodeKey };
           
-          // Abrir o modal do plugin através do callback
-          if (onPluginOpen) {
-            onPluginOpen(plugin);
-          } else {
-            console.error('❌ onPluginOpen callback não foi fornecido');
-          }
+          // Abrir o modal do plugin
+          console.log('🚀 Abrindo modal do plugin no LexicalEditor');
+          console.log('🚀 Plugin:', plugin);
+          setSelectedPlugin(plugin);
+          setIsPluginModalOpen(true);
+          console.log('🚀 Modal state atualizado:', { isPluginModalOpen: true, selectedPlugin: plugin });
         })
         .catch(error => {
           console.error('❌ Erro ao verificar plugin:', error);
