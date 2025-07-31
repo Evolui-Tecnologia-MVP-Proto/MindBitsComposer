@@ -1436,116 +1436,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
   const [selectedPlugin, setSelectedPlugin] = useState<any>(null);
   const [currentFieldContext, setCurrentFieldContext] = useState<{label: string, nodeKey: string} | null>(null);
   const { toast } = useToast();
-
-  // Event listeners para refresh e unplug dos campos de header
-  useEffect(() => {
-    const handleHeaderFieldRefresh = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      const { label, mappingType, mappingValue, nodeKey } = customEvent.detail;
-      
-      console.log('🔄 HeaderField Refresh Event:', customEvent.detail);
-      
-      if (!editorInstance || !documentData || !templateMappings) {
-        console.log('❌ Cannot refresh: missing editor or data');
-        return;
-      }
-      
-      // Re-executar a lógica de preenchimento
-      const mappingInfo = populateFieldFromMapping(label);
-      
-      console.log('🔍 Mapping info result:', mappingInfo);
-      
-      // Sempre tentar atualizar, mesmo se o valor estiver vazio
-      editorInstance.update(() => {
-        const node = $getNodeByKey(nodeKey);
-        if (node && 'setValue' in node) {
-          const newValue = mappingInfo.value || '';
-          (node as any).setValue(newValue);
-          console.log(`✅ Campo ${label} atualizado com valor: "${newValue}"`);
-        } else {
-          console.log(`❌ Não foi possível encontrar o nó ${nodeKey} ou ele não tem método setValue`);
-        }
-      });
-    };
-    
-    const handleHeaderFieldUnplug = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      const { label, mappingType, mappingValue, nodeKey } = customEvent.detail;
-      
-      console.log('🔌 HeaderField Unplug Event:', customEvent.detail);
-      
-      // Verificar se é um mapeamento de plugin
-      if (mappingType !== 'plugin') {
-        console.log('❌ Mapeamento não é do tipo plugin');
-        return;
-      }
-      
-      // Buscar o plugin pelo ID (mappingValue)
-      const pluginId = mappingValue;
-      
-      // Fazer requisição para verificar o status do plugin
-      fetch(`/api/plugins/${pluginId}`)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Plugin não encontrado');
-          }
-          return response.json();
-        })
-        .then(plugin => {
-          console.log('🔍 Plugin encontrado:', plugin);
-          console.log('🔍 Status do plugin:', `"${plugin.status}"`, typeof plugin.status);
-          console.log('🔍 Comparação status:', plugin.status !== 'active', plugin.status === 'active');
-          
-          // Verificar se o plugin está ativo
-          if (plugin.status !== 'active') {
-            console.log('❌ Plugin não está ativo, status atual:', plugin.status);
-            toast({
-              title: "Plugin inativo",
-              description: `O plugin "${plugin.name}" está inativo e não pode ser executado.`,
-              variant: "destructive",
-            });
-            return;
-          }
-          
-          // Verificar se o plugin tem página de execução
-          if (!plugin.pageName || plugin.pageName.trim() === '') {
-            toast({
-              title: "Plugin sem execução",
-              description: `O plugin "${plugin.name}" não possui página de execução configurada.`,
-              variant: "destructive",
-            });
-            return;
-          }
-          
-          // Se chegou até aqui, o plugin está válido - abrir modal
-          console.log(`🚀 Abrindo plugin "${plugin.name}" para o campo "${label}"`);
-          
-          // Salvar o contexto do campo que invocou o plugin
-          setCurrentFieldContext({ label, nodeKey });
-          
-          // Abrir o modal do plugin
-          setSelectedPlugin(plugin);
-          setIsPluginModalOpen(true);
-        })
-        .catch(error => {
-          console.error('❌ Erro ao verificar plugin:', error);
-          toast({
-            title: "Erro no plugin",
-            description: "Não foi possível verificar o status do plugin.",
-            variant: "destructive",
-          });
-        });
-    };
-    
-    window.addEventListener('headerFieldRefresh', handleHeaderFieldRefresh);
-    window.addEventListener('headerFieldUnplug', handleHeaderFieldUnplug);
-    
-    return () => {
-      window.removeEventListener('headerFieldRefresh', handleHeaderFieldRefresh);
-      window.removeEventListener('headerFieldUnplug', handleHeaderFieldUnplug);
-    };
-  }, [editorInstance, documentData, templateMappings]);
-
+  
   // Função para processar fórmulas simples (SUBSTR, concatenação)
   const processFormula = (formula: string, data: any): string => {
     console.log(`🔍 DEBUG - processFormula: "${formula}"`);
@@ -1603,13 +1494,12 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
               const day = String(date.getDate()).padStart(2, '0');
               const month = String(date.getMonth() + 1).padStart(2, '0');
               const year = date.getFullYear();
-              const formattedDate = `${day}/${month}/${year}`;
+              value = `${day}/${month}/${year}`;
               
-              console.log(`📅 DEBUG - DateTime "${value}" formatado para "${formattedDate}"`);
-              return formattedDate;
+              console.log(`📅 DEBUG - DateTime "${fieldName}" formatado para "${value}"`);
             }
           } catch (error) {
-            console.log(`⚠️ DEBUG - Erro ao formatar datetime "${value}":`, error);
+            console.log(`⚠️ DEBUG - Erro ao formatar datetime "${fieldName}":`, error);
           }
         }
       }
@@ -1617,52 +1507,53 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       return value;
     };
     
-    // Primeiro, processar SUBSTR(campo, inicio, fim)
-    const substrRegex = /SUBSTR\((\w+),\s*(\d+),\s*(\d+)\)/g;
-    result = result.replace(substrRegex, (match, field, start, end) => {
-      const value = getFieldValue(field);
-      const substringResult = value.substring(parseInt(start), parseInt(end));
-      console.log(`🔍 DEBUG - SUBSTR(${field}): "${value}" -> substring(${start}, ${end}) = "${substringResult}"`);
+    // Processar funções SUBSTR
+    result = result.replace(/SUBSTR\(([^,]+),\s*(\d+),\s*(\d+)\)/g, (match, field, start, length) => {
+      const fieldName = field.trim();
+      const fieldValue = getFieldValue(fieldName);
+      const substringResult = fieldValue.substring(parseInt(start), parseInt(start) + parseInt(length));
+      console.log(`🔍 DEBUG - SUBSTR(${fieldName}, ${start}, ${length}) = "${substringResult}"`);
       return substringResult;
     });
     
-    console.log(`🔍 DEBUG - Após SUBSTR: "${result}"`);
-    
-    // Agora processar campos simples que restaram
-    // Fazer várias passadas para garantir que todos os campos sejam substituídos
-    let maxIterations = 5;
+    // Substituir campos por seus valores - múltiplas iterações
+    const maxIterations = 10;
     let currentIteration = 0;
     
     while (currentIteration < maxIterations) {
       let hadReplacement = false;
       
-      // Encontrar campos que são palavras simples (não dentro de aspas)
-      const fieldMatches = result.match(/\b[a-zA-Z_][a-zA-Z0-9_]*\b/g);
+      // Usar Object.keys para garantir que pegamos todos os campos disponíveis
+      const allFields = new Set([
+        ...Object.keys(data),
+        ...(data.general_columns ? Object.keys(data.general_columns) : [])
+      ]);
       
-      if (fieldMatches) {
-        console.log(`🔍 DEBUG - Iteração ${currentIteration + 1}, campos encontrados:`, fieldMatches);
-        
-        // Para cada campo encontrado, tentar substituir
-        fieldMatches.forEach(field => {
-          // Pular palavras-chave e números
-          if (['SUBSTR'].includes(field) || !isNaN(Number(field))) return;
-          
-          const fieldValue = getFieldValue(field);
-          
-          // Se encontrou um valor e é diferente do nome do campo
-          if (fieldValue && fieldValue !== field) {
-            // Substituir apenas ocorrências que são palavras completas
-            const fieldRegex = new RegExp(`\\b${field}\\b`, 'g');
-            const beforeReplace = result;
-            result = result.replace(fieldRegex, fieldValue);
-            
-            if (result !== beforeReplace) {
-              hadReplacement = true;
-              console.log(`✅ DEBUG - Campo "${field}" substituído por "${fieldValue}"`);
-              console.log(`🔍 DEBUG - Resultado após substituição: "${result}"`);
-            }
+      // Ordenar campos por tamanho decrescente para evitar substituições parciais
+      const sortedFields = Array.from(allFields).sort((a, b) => b.length - a.length);
+      
+      for (const fieldName of sortedFields) {
+        const regex = new RegExp(`\\b${fieldName}\\b`, 'g');
+        if (regex.test(result)) {
+          const fieldValue = getFieldValue(fieldName);
+          result = result.replace(regex, fieldValue);
+          hadReplacement = true;
+          console.log(`🔍 DEBUG - Substituindo campo "${fieldName}" por "${fieldValue}"`);
+        }
+      }
+      
+      // Verificar campos conhecidos adicionais
+      const knownFields = ['responsavel', 'id_origem_txt', 'modulo', 'sistema', 'created_at'];
+      for (const fieldName of knownFields) {
+        if (!allFields.has(fieldName)) {
+          const regex = new RegExp(`\\b${fieldName}\\b`, 'g');
+          if (regex.test(result)) {
+            const fieldValue = getFieldValue(fieldName);
+            result = result.replace(regex, fieldValue);
+            hadReplacement = true;
+            console.log(`🔍 DEBUG - Substituindo campo conhecido "${fieldName}" por "${fieldValue}"`);
           }
-        });
+        }
       }
       
       // Se não houve substituições nesta iteração, parar
@@ -1841,6 +1732,115 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
     
     return { value: String(value || ''), type: 'field', mappingValue: mappedColumn };
   };
+
+  // Event listeners para refresh e unplug dos campos de header
+  useEffect(() => {
+    const handleHeaderFieldRefresh = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { label, mappingType, mappingValue, nodeKey } = customEvent.detail;
+      
+      console.log('🔄 HeaderField Refresh Event:', customEvent.detail);
+      
+      if (!editorInstance || !documentData || !templateMappings) {
+        console.log('❌ Cannot refresh: missing editor or data');
+        return;
+      }
+      
+      // Re-executar a lógica de preenchimento
+      const mappingInfo = populateFieldFromMapping(label);
+      
+      console.log('🔍 Mapping info result:', mappingInfo);
+      
+      // Sempre tentar atualizar, mesmo se o valor estiver vazio
+      editorInstance.update(() => {
+        const node = $getNodeByKey(nodeKey);
+        if (node && 'setValue' in node) {
+          const newValue = mappingInfo.value || '';
+          (node as any).setValue(newValue);
+          console.log(`✅ Campo ${label} atualizado com valor: "${newValue}"`);
+        } else {
+          console.log(`❌ Não foi possível encontrar o nó ${nodeKey} ou ele não tem método setValue`);
+        }
+      });
+    };
+    
+    const handleHeaderFieldUnplug = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { label, mappingType, mappingValue, nodeKey } = customEvent.detail;
+      
+      console.log('🔌 HeaderField Unplug Event:', customEvent.detail);
+      
+      // Verificar se é um mapeamento de plugin
+      if (mappingType !== 'plugin') {
+        console.log('❌ Mapeamento não é do tipo plugin');
+        return;
+      }
+      
+      // Buscar o plugin pelo ID (mappingValue)
+      const pluginId = mappingValue;
+      
+      // Fazer requisição para verificar o status do plugin
+      fetch(`/api/plugins/${pluginId}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Plugin não encontrado');
+          }
+          return response.json();
+        })
+        .then(plugin => {
+          console.log('🔍 Plugin encontrado:', plugin);
+          console.log('🔍 Status do plugin:', `"${plugin.status}"`, typeof plugin.status);
+          console.log('🔍 Comparação status:', plugin.status !== 'active', plugin.status === 'active');
+          
+          // Verificar se o plugin está ativo
+          if (plugin.status !== 'active') {
+            console.log('❌ Plugin não está ativo, status atual:', plugin.status);
+            toast({
+              title: "Plugin inativo",
+              description: `O plugin "${plugin.name}" está inativo e não pode ser executado.`,
+              variant: "destructive",
+            });
+            return;
+          }
+          
+          // Verificar se o plugin tem página de execução
+          if (!plugin.pageName || plugin.pageName.trim() === '') {
+            toast({
+              title: "Plugin sem execução",
+              description: `O plugin "${plugin.name}" não possui página de execução configurada.`,
+              variant: "destructive",
+            });
+            return;
+          }
+          
+          // Se chegou até aqui, o plugin está válido - abrir modal
+          console.log(`🚀 Abrindo plugin "${plugin.name}" para o campo "${label}"`);
+          
+          // Salvar o contexto do campo que invocou o plugin
+          setCurrentFieldContext({ label, nodeKey });
+          
+          // Abrir o modal do plugin
+          setSelectedPlugin(plugin);
+          setIsPluginModalOpen(true);
+        })
+        .catch(error => {
+          console.error('❌ Erro ao verificar plugin:', error);
+          toast({
+            title: "Erro no plugin",
+            description: "Não foi possível verificar o status do plugin.",
+            variant: "destructive",
+          });
+        });
+    };
+    
+    window.addEventListener('headerFieldRefresh', handleHeaderFieldRefresh);
+    window.addEventListener('headerFieldUnplug', handleHeaderFieldUnplug);
+    
+    return () => {
+      window.removeEventListener('headerFieldRefresh', handleHeaderFieldRefresh);
+      window.removeEventListener('headerFieldUnplug', handleHeaderFieldUnplug);
+    };
+  }, [editorInstance, documentData, templateMappings, toast]);
 
   // Processar template structure e inserir campos do header no editor
   useEffect(() => {
