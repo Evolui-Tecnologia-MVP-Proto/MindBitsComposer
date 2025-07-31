@@ -184,7 +184,9 @@ function HeaderFieldComponent({ node }: { node: HeaderFieldNode }): JSX.Element 
     const unregister = editor.registerUpdateListener(() => {
       editor.getEditorState().read(() => {
         const nodeValue = node.getValue();
+        console.log(`🔄 HeaderFieldComponent sync - label: "${node.getLabel()}", nodeValue: "${nodeValue}", currentValue: "${value}"`);
         if (nodeValue !== value) {
+          console.log(`✅ Atualizando valor do componente de "${value}" para "${nodeValue}"`);
           setValue(nodeValue);
         }
       });

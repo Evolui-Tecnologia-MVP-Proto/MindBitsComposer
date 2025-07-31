@@ -1740,6 +1740,8 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       const { label, mappingType, mappingValue, nodeKey } = customEvent.detail;
       
       console.log('🔄 HeaderField Refresh Event:', customEvent.detail);
+      console.log('📊 documentData atual:', documentData);
+      console.log('📊 templateMappings atual:', templateMappings);
       
       if (!editorInstance || !documentData || !templateMappings) {
         console.log('❌ Cannot refresh: missing editor or data');
@@ -1750,14 +1752,24 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       const mappingInfo = populateFieldFromMapping(label);
       
       console.log('🔍 Mapping info result:', mappingInfo);
+      console.log('📝 Value to be set:', mappingInfo.value);
       
       // Sempre tentar atualizar, mesmo se o valor estiver vazio
       editorInstance.update(() => {
         const node = $getNodeByKey(nodeKey);
+        console.log('🔍 Node encontrado:', node);
+        console.log('🔍 Node type:', node?.getType());
+        console.log('🔍 Node tem setValue:', node && 'setValue' in node);
+        
         if (node && 'setValue' in node) {
           const newValue = mappingInfo.value || '';
+          console.log(`📝 Chamando setValue com valor: "${newValue}"`);
           (node as any).setValue(newValue);
           console.log(`✅ Campo ${label} atualizado com valor: "${newValue}"`);
+          
+          // Verificar se o valor foi realmente atualizado
+          const updatedValue = (node as any).getValue();
+          console.log(`🔍 Valor após atualização: "${updatedValue}"`);
         } else {
           console.log(`❌ Não foi possível encontrar o nó ${nodeKey} ou ele não tem método setValue`);
         }
