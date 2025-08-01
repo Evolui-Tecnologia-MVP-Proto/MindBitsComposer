@@ -38,6 +38,14 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 - Cleaned up corresponding routes in App.tsx to streamline navigation
 - Maintains only production-ready menu items for end users
 
+### Major Code Cleanup - documentos-page.tsx (August 2025)
+- Removed massive code duplication (~2,078 lines, 53% reduction)
+- File reduced from 3,932 to 1,854 lines
+- Eliminated duplicate FlowWithAutoFitView function definition
+- Removed duplicate component implementations and modals
+- DocsProcessEmbed now handles both "Em Processo" and "Concluídos" tabs via statusFilter prop
+- Significantly improved maintainability and performance
+
 ## System Architecture
 
 ### UI/UX Decisions
