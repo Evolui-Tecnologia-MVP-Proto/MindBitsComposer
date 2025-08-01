@@ -57,7 +57,7 @@ import { DeleteConfirmDialog } from "@/components/documentos/modals/DeleteConfir
 import { DeleteArtifactConfirmDialog } from "@/components/documentos/modals/DeleteArtifactConfirmDialog";
 import { DocumentosTable } from "@/components/documentos/tables/DocumentosTable";
 import { GitHubTab } from "@/components/documentos/tabs/GitHubTab";
-import { IncluirDocumentosTab } from "@/components/documentos/tabs/IncluirDocumentosTab";
+
 
 
 import { DocsProcessEmbed } from "@/components/documentos/tables/DocsProcessEmbed";
@@ -89,6 +89,8 @@ export default function DocumentosPage() {
   );
   const [artifactToDelete, setArtifactToDelete] = useState<string | null>(null);
   const [selectedArtifact, setSelectedArtifact] =
+    useState<DocumentArtifact | null>(null);
+  const [editingArtifact, setEditingArtifact] = 
     useState<DocumentArtifact | null>(null);
   const [githubRepoFiles, setGithubRepoFiles] = useState<any[]>([]);
   const [isLoadingRepo, setIsLoadingRepo] = useState(false);
@@ -253,12 +255,12 @@ export default function DocumentosPage() {
   });
 
   // Buscar fluxos disponíveis
-  const { data: documentsFlows = [] } = useQuery({
+  const { data: documentsFlows = [] } = useQuery<any[]>({
     queryKey: ["/api/documents-flows"],
   });
 
   // Buscar execuções de fluxo ativas
-  const { data: flowExecutions = [] } = useQuery({
+  const { data: flowExecutions = [] } = useQuery<any[]>({
     queryKey: ["/api/document-flow-executions"],
   });
 
@@ -303,7 +305,7 @@ export default function DocumentosPage() {
   });
 
   // Buscar mapeamentos Monday para obter as colunas
-  const { data: mondayMappings = [] } = useQuery({
+  const { data: mondayMappings = [] } = useQuery<any[]>({
     queryKey: ["/api/monday/mappings"],
   });
 
@@ -559,9 +561,9 @@ export default function DocumentosPage() {
       }
     } catch (error) {
       console.error("❌ Erro na requisição completa:", {
-        message: error.message,
-        name: error.name,
-        stack: error.stack
+        message: (error as any).message,
+        name: (error as any).name,
+        stack: (error as any).stack
       });
       return [];
     } finally {
@@ -606,8 +608,7 @@ export default function DocumentosPage() {
               subContents,
               token,
               owner,
-              repo,
-              item.path,
+              repo
             );
 
             tree.push({
@@ -1533,26 +1534,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             <TabsTrigger value="repositorio" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Repositório</TabsTrigger>
           </TabsList>
 
-          <IncluirDocumentosTab
-            documentos={documentos}
-            isLoading={isLoading}
-            artifactCounts={artifactCounts}
-            openViewModal={openViewModal}
-            openEditModal={openEditModal}
-            handleDeleteDocument={handleDeleteDocument}
-            onRefresh={() => {
-              queryClient.invalidateQueries({ queryKey: ['/api/documentos'] });
-              queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
-              toast({
-                title: "Dados atualizados",
-                description: "As informações das abas foram recarregadas com sucesso.",
-              });
-            }}
-            onCreateDocument={() => {
-              resetFormData();
-              setIsCreateModalOpen(true);
-            }}
-          />
+          <TabsContent value="incluidos" className="slide-in">
+            <DocsProcessEmbed 
+              className="w-full"
+              showFilters={showFilters}
+              activeTab="incluidos"
+              hideStatusColumn={false}
+              statusFilter="Incluido"
+            />
+          </TabsContent>
 
 
 
