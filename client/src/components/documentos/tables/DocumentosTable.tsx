@@ -263,7 +263,7 @@ export function DocumentosTable({
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end space-x-2">
-                      {activeTab === "integrados" && (
+                      {(activeTab === "integrados" || activeTab === "em-processo" || activeTab === "concluidos") && (
                         <>
                           <Button
                             variant="ghost"
