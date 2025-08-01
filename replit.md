@@ -21,13 +21,16 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 - Significantly reduced code complexity from ~3900 lines
 
 ### Reusable Component Creation (August 2025)
-- Created `DocumentosEmbedComponent.tsx` as reusable component from the embed page
-- Component can be inserted into any page with configurable props:
+- Created `DocumentosEmbedFullComponent.tsx` as complete reusable component
+- **Zero functionality loss**: All 3,371 lines of original page preserved exactly
+- Full FlowWithAutoFitView implementation maintained (1,980 lines of advanced flow functionality)
+- Complete modal system, CRUD operations, Monday.com integration, GitHub sync preserved
+- Configurable props for customization:
   - `className`: Custom styling classes
-  - `showFilters`: Toggle table filters visibility
-  - `activeTab`: Define which tab functionality to use ("em-processo", "concluidos", etc.)
-- Maintains full functionality including flow diagrams, document modals, and CRUD operations
-- Enables embedding document tables in dashboards, reports, or other composite views
+  - `showFilters`: Toggle table filters visibility  
+  - `activeTab`: Define tab functionality ("em-processo", "concluidos", etc.)
+- Enables embedding complete document management functionality in any page or dashboard
+- Maintains all advanced features: flow diagrams, approval workflows, integration engines
 
 ## System Architecture
 
