@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Upload, Loader2, FolderSync } from "lucide-react";
 import FileExplorer from "@/components/FileExplorer";
-import { useQueryClient } from "@tanstack/react-query";
+import { GitHubIntegration } from "@/components/documentos/github/GitHubIntegration";
 
 interface GitHubTabProps {
   syncFromGitHubMutation: any;
@@ -32,85 +31,14 @@ export function GitHubTab({
   fetchGithubRepoStructure,
   fetchFolderFiles,
 }: GitHubTabProps) {
-  const queryClient = useQueryClient();
   return (
     <div className="flex flex-col flex-1 bg-white dark:bg-[#0F172A]">
       <div className="bg-white dark:bg-[#0F172A] rounded-lg border dark:border-[#374151] p-6 flex-1 flex flex-col">
-        <div className="flex items-center justify-between mb-6 flex-shrink-0">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">
-              Integração com Repositório GitHub
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-[#9CA3AF] mt-1">
-              Gerencie documentos sincronizados com o repositório
-              configurado
-            </p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <Button
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-              size="sm"
-              onClick={() => {
-                // Update all repo structures to is_sync: true
-                fetch('/api/repo-structure/sync-all', {
-                  method: 'PATCH',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                })
-                .then(response => response.json())
-                .then(data => {
-                  console.log('Sync Ref completed:', data);
-                  // Refresh the repo structures
-                  queryClient.invalidateQueries({ queryKey: ['/api/repo-structure'] });
-                })
-                .catch(error => {
-                  console.error('Error in Sync Ref:', error);
-                });
-              }}
-            >
-              <FolderSync className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => syncFromGitHubMutation.mutate()}
-              disabled={syncFromGitHubMutation.isPending}
-            >
-              {syncFromGitHubMutation.isPending ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <Download className="h-4 w-4 mr-2" />
-              )}
-              Trazer do GitHub
-            </Button>
-            <Button
-              className="bg-green-600 hover:bg-green-700"
-              size="sm"
-              onClick={() => syncAllToGitHubMutation.mutate()}
-              disabled={
-                syncAllToGitHubMutation.isPending ||
-                repoStructures.filter(
-                  (folder: any) =>
-                    !folder.isSync &&
-                    (!folder.linkedTo ||
-                      repoStructures.some(
-                        (parent: any) => parent.uid === folder.linkedTo,
-                      )),
-                ).length === 0
-              }
-            >
-              {syncAllToGitHubMutation.isPending ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              ) : (
-                <Upload className="h-4 w-4 mr-2" />
-              )}
-              {syncAllToGitHubMutation.isPending
-                ? "Enviando..."
-                : `Enviar para GitHub (${repoStructures.filter((folder: any) => !folder.isSync && (!folder.linkedTo || repoStructures.some((parent: any) => parent.uid === folder.linkedTo))).length})`}
-            </Button>
-          </div>
-        </div>
+        <GitHubIntegration
+          syncFromGitHubMutation={syncFromGitHubMutation}
+          syncAllToGitHubMutation={syncAllToGitHubMutation}
+          repoStructures={repoStructures}
+        />
 
         <div className="border-t dark:border-[#374151] pt-6 bg-white dark:bg-[#0F172A] p-4 rounded-lg flex-1 flex flex-col min-h-0">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0">

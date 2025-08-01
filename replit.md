@@ -46,6 +46,13 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 - DocsProcessEmbed now handles both "Em Processo" and "Concluídos" tabs via statusFilter prop
 - Significantly improved maintainability and performance
 
+### GitHub Integration Component Extraction (August 2025)
+- Created `GitHubIntegration.tsx` as a reusable component from GitHubTab
+- Extracted the "Integração com Repositório GitHub" section with all functionality
+- Component handles sync operations, repository structure updates, and UI state
+- Reduces code duplication and enables reuse in other contexts
+- Maintains full functionality: sync refs, pull from GitHub, push to GitHub with unsynced count
+
 ## System Architecture
 
 ### UI/UX Decisions
