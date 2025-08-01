@@ -243,21 +243,21 @@ export default function HomePage() {
                       </CardTitle>
                       <CheckCircle2 className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0" />
                     </CardHeader>
-                    <CardContent className="pb-2">
-                      <div className="flex items-start justify-between">
-                        <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
-                          {quantidade} {quantidade === 1 ? "Integrado" : "Integrados"}
-                          {documentosEmProcessoPorMimPorResponsavel[responsavel] && (
-                            <span className="text-sm text-blue-600 dark:text-blue-400 block">
-                              {documentosEmProcessoPorMimPorResponsavel[responsavel]} em processo por mim
-                            </span>
-                          )}
-                        </div>
+                    <CardContent className="pb-2 relative">
+                      <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight pr-16">
+                        {quantidade} {quantidade === 1 ? "Integrado" : "Integrados"}
+                        {documentosEmProcessoPorMimPorResponsavel[responsavel] && (
+                          <span className="text-sm text-blue-600 dark:text-blue-400 block">
+                            {documentosEmProcessoPorMimPorResponsavel[responsavel]} em processo por mim
+                          </span>
+                        )}
+                      </div>
+                      <div className="absolute bottom-2 right-2">
                         <Button
                           size="sm"
                           variant={isUserResponsibleForSpecialty(responsavel) ? "default" : "secondary"}
                           disabled={!isUserResponsibleForSpecialty(responsavel)}
-                          className={`h-6 px-2 text-xs ml-2 ${
+                          className={`h-6 px-2 text-xs ${
                             isUserResponsibleForSpecialty(responsavel) 
                               ? "bg-blue-600 hover:bg-blue-700 text-white" 
                               : "opacity-50 cursor-not-allowed"
