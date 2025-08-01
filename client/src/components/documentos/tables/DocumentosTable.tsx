@@ -42,7 +42,6 @@ interface DocumentosTableProps {
   deleteDocumentoMutation: any;
   getActiveFlow: (documentId: string) => any;
   getConcludedFlow: (documentId: string) => any;
-  openFlowDiagramModal: (execution: any) => void;
   flowExecutions?: any[];
   showFilters?: boolean;
   hideStatusColumn?: boolean;
@@ -65,7 +64,6 @@ export function DocumentosTable({
   deleteDocumentoMutation,
   getActiveFlow,
   getConcludedFlow,
-  openFlowDiagramModal,
   flowExecutions = [],
   showFilters = true,
   hideStatusColumn = false,
