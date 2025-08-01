@@ -54,17 +54,17 @@ import { DeleteConfirmDialog } from "@/components/documentos/modals/DeleteConfir
 import { DeleteArtifactConfirmDialog } from "@/components/documentos/modals/DeleteArtifactConfirmDialog";
 import { DocumentosTable } from "@/components/documentos/tables/DocumentosTable";
 
-interface DocumentosEmbedFullComponentProps {
+interface DocsProcessEmbedProps {
   className?: string;
   showFilters?: boolean;
   activeTab?: string;
 }
 
-export function DocumentosEmbedFullComponent({ 
+export function DocsProcessEmbed({ 
   className = "",
   showFilters = true,
   activeTab = "em-processo"
-}: DocumentosEmbedFullComponentProps) {
+}: DocsProcessEmbedProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   

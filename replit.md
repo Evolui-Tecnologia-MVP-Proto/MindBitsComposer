@@ -21,7 +21,7 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 - Significantly reduced code complexity from ~3900 lines
 
 ### Reusable Component Creation (August 2025)
-- Created `DocumentosEmbedFullComponent.tsx` as complete reusable component
+- Created `DocsProcessEmbed.tsx` as complete reusable component
 - **Zero functionality loss**: All 3,371 lines of original page preserved exactly
 - Full FlowWithAutoFitView implementation maintained (1,980 lines of advanced flow functionality)
 - Complete modal system, CRUD operations, Monday.com integration, GitHub sync preserved
