@@ -3,6 +3,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   BookOpen, 
   Clock, 
@@ -24,6 +25,7 @@ export default function HomePage() {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedResponsavel, setSelectedResponsavel] = useState<string>("");
   const [showFilters, setShowFilters] = useState(true);
+  const [activeTab, setActiveTab] = useState("revisoes-ct-rag");
 
   // Buscar todos os documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
@@ -140,8 +142,32 @@ export default function HomePage() {
   return (
     <div className="fade-in px-3.5 py-1 bg-gray-50 dark:bg-[#1F2937] h-full flex flex-col">
       <div className="flex flex-col flex-1 min-h-0 space-y-6">
-        {/* Container para Base de conhecimento e MindBits_CT */}
-        <div className="space-y-6 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6">
+        
+        {/* Sistema de Tabs Principal */}
+        <Tabs 
+          defaultValue="revisoes-ct-rag" 
+          value={activeTab} 
+          onValueChange={setActiveTab}
+          className="w-full tabs-root flex flex-col flex-1 min-h-0"
+        >
+          <TabsList className="grid w-full grid-cols-4 bg-gray-100 dark:bg-[#0F172A] mb-6">
+            <TabsTrigger value="revisoes-ct-rag" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
+              Revisões CT → RAG
+            </TabsTrigger>
+            <TabsTrigger value="triagem" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
+              Triagem
+            </TabsTrigger>
+            <TabsTrigger value="projetos" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
+              Projetos
+            </TabsTrigger>
+            <TabsTrigger value="elicitacoes-dev" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
+              Elicitações DEV
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Tab Content: Revisões CT → RAG */}
+          <TabsContent value="revisoes-ct-rag" className="slide-in">
+            <div className="space-y-6 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6">
           {/* Base de conhecimento OC */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
@@ -262,7 +288,61 @@ export default function HomePage() {
               </div>
             </div>
           )}
-        </div>
+            </div>
+          </TabsContent>
+
+          {/* Tab Content: Triagem */}
+          <TabsContent value="triagem" className="slide-in">
+            <div className="space-y-6 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                  Triagem de Demandas
+                </h2>
+              </div>
+              <div className="text-center py-12">
+                <p className="text-gray-500 dark:text-gray-400">
+                  Conteúdo da tab Triagem será implementado em breve.
+                </p>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Tab Content: Projetos */}
+          <TabsContent value="projetos" className="slide-in">
+            <div className="space-y-6 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6">
+              <div className="flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-green-600 dark:text-green-400" />
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                  Gestão de Projetos
+                </h2>
+              </div>
+              <div className="text-center py-12">
+                <p className="text-gray-500 dark:text-gray-400">
+                  Conteúdo da tab Projetos será implementado em breve.
+                </p>
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Tab Content: Elicitações DEV */}
+          <TabsContent value="elicitacoes-dev" className="slide-in">
+            <div className="space-y-6 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6">
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                  Elicitações de Desenvolvimento
+                </h2>
+              </div>
+              <div className="text-center py-12">
+                <p className="text-gray-500 dark:text-gray-400">
+                  Conteúdo da tab Elicitações DEV será implementado em breve.
+                </p>
+              </div>
+            </div>
+          </TabsContent>
+
+        </Tabs>
 
         {/* Seção de Meus Documentos em Processo */}
         <div className="flex-1 min-h-0 mt-6">
