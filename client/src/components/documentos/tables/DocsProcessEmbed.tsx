@@ -1287,24 +1287,6 @@ export function DocsProcessEmbed({
           {/* Filtros */}
           {showFilters && (
             <div className="mb-6 p-4 bg-gray-50 dark:bg-[#0F172A] rounded-lg border dark:border-[#374151]">
-              <div className="flex items-center justify-end mb-3">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    setFiltros({
-                      responsavel: "",
-                      modulo: "",
-                      cliente: "",
-                      origem: "",
-                      nome: "",
-                    })
-                  }
-                  className="text-xs dark:border-gray-600 dark:hover:bg-[#1F2937] dark:text-gray-200"
-                >
-                  Limpar filtros
-                </Button>
-              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
                 {/* Filtro por Nome */}
                 <div>
@@ -1420,6 +1402,26 @@ export function DocsProcessEmbed({
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+
+                {/* Botão Limpar Filtros */}
+                <div className="flex items-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      setFiltros({
+                        responsavel: "",
+                        modulo: "",
+                        cliente: "",
+                        origem: "",
+                        nome: "",
+                      })
+                    }
+                    className="h-8 text-xs dark:border-gray-600 dark:hover:bg-[#1F2937] dark:text-gray-200"
+                  >
+                    Limpar filtros
+                  </Button>
                 </div>
               </div>
             </div>
