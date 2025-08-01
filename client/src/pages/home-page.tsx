@@ -345,7 +345,7 @@ export default function HomePage() {
         </Tabs>
 
         {/* Seção de Meus Documentos em Processo - sempre visível com 10px de distância */}
-        <div className="flex-1 min-h-0" style={{ marginTop: '10px' }}>
+        <div className="flex-1 min-h-0 mt-4">
           <div className="bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6 h-full flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
