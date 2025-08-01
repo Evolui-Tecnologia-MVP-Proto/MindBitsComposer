@@ -1,17 +1,11 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import ReactFlow, { 
-  useReactFlow, 
-  Controls, 
-  Background
-} from 'reactflow';
 
-// Importing icons for custom nodes
-import { Pin, X } from 'lucide-react';
-import 'reactflow/dist/style.css';
+
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import {
@@ -35,15 +29,7 @@ import {
   type InsertDocumentArtifact,
 } from "@shared/schema";
 
-// Import custom node components from separate file
-import {
-  StartNodeComponent,
-  EndNodeComponent,
-  ActionNodeComponent,
-  DocumentNodeComponent,
-  IntegrationNodeComponent,
-  SwitchNodeComponent
-} from "@/components/documentos/flow/FlowNodes";
+
 import { FlowDiagramModal } from "@/components/documentos/modals/FlowDiagramModal";
 
 import { ViewDocumentModal } from "@/components/documentos/modals/ViewDocumentModal";
@@ -101,11 +87,7 @@ export default function DocumentosPage() {
   // Estado para controlar visibilidade dos painéis de filtragem
   const [showFilters, setShowFilters] = useState(true);
   
-  const [isLoadingMondayAttachments, setIsLoadingMondayAttachments] =
-    useState(false);
-  const [mondayAttachmentsPreview, setMondayAttachmentsPreview] = useState<
-    any[]
-  >([]);
+
   
   const [artifactFormData, setArtifactFormData] =
     useState<InsertDocumentArtifact>({
@@ -118,18 +100,7 @@ export default function DocumentosPage() {
       type: "",
     });
 
-  // Estado para modal de visualização de arquivo
-  const [filePreviewModal, setFilePreviewModal] = useState<{
-    isOpen: boolean;
-    fileName: string;
-    mimeType: string;
-    fileUrl: string;
-  }>({
-    isOpen: false,
-    fileName: "",
-    mimeType: "",
-    fileUrl: "",
-  });
+
 
   // Estado para o sistema de aprovação
   const [showApprovalAlert, setShowApprovalAlert] = useState(false);
@@ -147,10 +118,7 @@ export default function DocumentosPage() {
     documentObject: "",
   });
   
-  // Estado simples para forçar re-render
-  const [isFlowModalOpen, setIsFlowModalOpen] = useState(false);
-  const [currentFlowData, setCurrentFlowData] = useState<any>(null);
-  const [currentDocTitle, setCurrentDocTitle] = useState("");
+
 
   // Estado para controlar o side panel do inspector
   const [showFlowInspector, setShowFlowInspector] = useState(false);
@@ -180,38 +148,7 @@ export default function DocumentosPage() {
     setIsPessoasExpanded(false); // Frames sempre recolhidos
   };
 
-  // Função para verificar se o MIME type é suportado pelo browser para visualização
-  const isMimeTypeViewable = (mimeType: string): boolean => {
-    const viewableMimeTypes = [
-      // Imagens
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/gif",
-      "image/webp",
-      "image/svg+xml",
-      // PDFs
-      "application/pdf",
-      // Texto
-      "text/plain",
-      "text/html",
-      "text/css",
-      "text/javascript",
-      "text/xml",
-      "application/json",
-      "application/xml",
-      // Vídeos (alguns browsers)
-      "video/mp4",
-      "video/webm",
-      "video/ogg",
-      // Áudios (alguns browsers)
-      "audio/mp3",
-      "audio/wav",
-      "audio/ogg",
-    ];
 
-    return viewableMimeTypes.includes(mimeType.toLowerCase());
-  };
 
   const [formData, setFormData] = useState<InsertDocumento>({
     origem: "CPx", // Sempre CPx para novos documentos
@@ -281,10 +218,7 @@ export default function DocumentosPage() {
     enabled: documentos.length > 0,
   });
 
-  // Buscar contagem de execuções de fluxo para todos os documentos
-  const { data: flowExecutionCounts = {} } = useQuery<Record<string, number>>({
-    queryKey: ["/api/document-flow-executions/count"],
-  });
+
 
 
 
@@ -292,73 +226,6 @@ export default function DocumentosPage() {
   const { data: mondayMappings = [] } = useQuery({
     queryKey: ["/api/monday/mappings"],
   });
-
-  // Buscar templates para exibir informações nos documentNodes
-  const { data: templatesList = [] } = useQuery({
-    queryKey: ['/api/templates/struct'],
-    enabled: true
-  });
-
-  // Função auxiliar para obter informações do template
-  const getTemplateInfo = (templateId: string) => {
-    if (!templatesList || !templateId) return null;
-    const template = (templatesList as any[]).find((t: any) => t.id === templateId);
-    return template ? { code: template.code, name: template.name } : null;
-  };
-
-  // Buscar todas as colunas Monday de todos os mapeamentos
-  const { data: allMondayColumns = [] } = useQuery({
-    queryKey: ["/api/monday/columns/all"],
-    queryFn: async () => {
-      const columns = [];
-      for (const mapping of mondayMappings) {
-        try {
-          const response = await fetch(
-            `/api/monday/mappings/${mapping.id}/columns`,
-          );
-          if (response.ok) {
-            const mappingColumns = await response.json();
-            columns.push(...mappingColumns);
-          }
-        } catch (error) {
-          console.warn(
-            `Erro ao buscar colunas do mapeamento ${mapping.id}:`,
-            error,
-          );
-        }
-      }
-      return columns;
-    },
-    enabled: mondayMappings.length > 0,
-  });
-
-  // Criar um mapa de columnId para title para lookup rápido
-  const columnTitleMap = useMemo(() => {
-    const map: Record<string, string> = {};
-    allMondayColumns.forEach((column: any) => {
-      map[column.columnId] = column.title;
-    });
-    return map;
-  }, [allMondayColumns]);
-
-  // Função para obter o título descritivo da coluna
-  const getColumnTitle = (columnId: string): string => {
-    return columnTitleMap[columnId] || columnId;
-  };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
