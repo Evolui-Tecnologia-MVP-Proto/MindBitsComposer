@@ -58,7 +58,7 @@ import { DocumentosTable } from "@/components/documentos/tables/DocumentosTable"
 import { GitHubTab } from "@/components/documentos/tabs/GitHubTab";
 import { IncluirDocumentosTab } from "@/components/documentos/tabs/IncluirDocumentosTab";
 import { IntegradosTab } from "@/components/documentos/tabs/IntegradosTab";
-import { ConcluidosTab } from "@/components/documentos/tabs/ConcluidosTab";
+
 import { DocsProcessEmbed } from "@/components/documentos/tables/DocsProcessEmbed";
 
 export default function DocumentosPage() {
@@ -1699,11 +1699,15 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             />
           </TabsContent>
 
-          <ConcluidosTab
-            isLoading={isLoading}
-            renderDocumentosTable={renderDocumentosTable}
-            documentosConcluidos={documentosConcluidos}
-          />
+          <TabsContent value="concluidos" className="slide-in">
+            <DocsProcessEmbed 
+              className="w-full"
+              showFilters={showFilters}
+              activeTab="concluidos"
+              hideStatusColumn={false}
+              statusFilter="Concluido" // DEFINE O STATUS
+            />
+          </TabsContent>
 
           <TabsContent value="repositorio" className="slide-in">
             <GitHubTab

@@ -59,13 +59,15 @@ interface DocsProcessEmbedProps {
   showFilters?: boolean;
   activeTab?: string;
   hideStatusColumn?: boolean;
+  statusFilter?: string; // NOVA PROP
 }
 
 export function DocsProcessEmbed({ 
   className = "",
   showFilters = true,
   activeTab = "em-processo",
-  hideStatusColumn = false
+  hideStatusColumn = false,
+  statusFilter
 }: DocsProcessEmbedProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -866,8 +868,8 @@ export function DocsProcessEmbed({
 
   // Filtrar documentos em processo
   const documentosProcessando = useMemo(
-    () => filteredAndSortedDocumentos.filter((doc) => doc.status === "Em Processo"),
-    [filteredAndSortedDocumentos],
+    () => filteredAndSortedDocumentos.filter((doc) => doc.status === (statusFilter || "Em Processo")),
+    [filteredAndSortedDocumentos, statusFilter],
   );
 
   const handleCreateDocument = () => {
