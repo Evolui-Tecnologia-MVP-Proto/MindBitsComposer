@@ -60,6 +60,13 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 - Maintains 100% of original functionality without any feature loss
 - Applied dark theme styling to CreateDocumentModal accordions (Escopo and Pessoas sections)
 
+### Component Standardization - "Incluídos" Tab (August 2025)
+- Replaced custom IncluirDocumentosTab implementation with DocsProcessEmbed component
+- Eliminated code duplication by using unified table component with `statusFilter="Incluido"`
+- Removed IncluirDocumentosTab import and implementation from documentos-page.tsx
+- All tabs now use the standardized DocsProcessEmbed component for consistency
+- Maintained 100% functionality while reducing code complexity
+
 ## System Architecture
 
 ### UI/UX Decisions
