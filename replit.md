@@ -67,6 +67,13 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 - All tabs now use the standardized DocsProcessEmbed component for consistency
 - Maintained 100% functionality while reducing code complexity
 
+### GitHub Code Cleanup - documentos-page.tsx (August 2025)
+- Removed unused GitHub-related queries: `serviceConnections` and `repoStructures`
+- Removed unused state: `selectedFlowId` (no longer needed after GitHubIntegration extraction)
+- Cleaned up dead code that was duplicated in GitHubIntegration.tsx component
+- Page now only contains code relevant to document management functionality
+- Reduced file complexity by removing ~10 lines of unused GitHub code
+
 ## System Architecture
 
 ### UI/UX Decisions

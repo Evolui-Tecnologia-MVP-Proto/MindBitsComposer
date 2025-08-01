@@ -78,7 +78,7 @@ export default function DocumentosPage() {
   const [isDocumentationModalOpen, setIsDocumentationModalOpen] =
     useState(false);
   const [optimisticSyncState, setOptimisticSyncState] = useState<string | null>(null);
-  const [selectedFlowId, setSelectedFlowId] = useState<string>("");
+
 
 
   const [editingDocument, setEditingDocument] = useState<Documento | null>(
@@ -233,7 +233,6 @@ export default function DocumentosPage() {
   // Função para fechar modal de documentação e atualizar tabela
   const handleCloseDocumentationModal = useCallback(() => {
     setIsDocumentationModalOpen(false);
-    setSelectedFlowId("");
     // Invalidar queries para atualizar tabela de documentos em processo
     queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
     queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
@@ -287,15 +286,7 @@ export default function DocumentosPage() {
     queryKey: ["/api/document-flow-executions/count"],
   });
 
-  // Buscar conexões de serviço para obter o repositório GitHub
-  const { data: serviceConnections = [] } = useQuery({
-    queryKey: ["/api/service-connections"],
-  });
 
-  // Buscar estrutura local do repositório
-  const { data: repoStructures = [] } = useQuery<any[]>({
-    queryKey: ["/api/repo-structure"],
-  });
 
   // Buscar mapeamentos Monday para obter as colunas
   const { data: mondayMappings = [] } = useQuery({
@@ -548,7 +539,6 @@ export default function DocumentosPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
       queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions/count"] });
       setIsDocumentationModalOpen(false);
-      setSelectedFlowId("");
       toast({
         title: "Documentação iniciada!",
         description: "O processo de documentação foi iniciado com sucesso.",
@@ -1333,8 +1323,6 @@ export default function DocumentosPage() {
         isOpen={isDocumentationModalOpen}
         onClose={handleCloseDocumentationModal}
         selectedDocument={selectedDocument}
-        selectedFlowId={selectedFlowId}
-        setSelectedFlowId={setSelectedFlowId}
         documentsFlows={documentsFlows}
         optimisticSyncState={optimisticSyncState}
         setOptimisticSyncState={setOptimisticSyncState}
