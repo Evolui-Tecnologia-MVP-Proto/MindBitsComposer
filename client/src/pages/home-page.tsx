@@ -179,42 +179,42 @@ export default function HomePage() {
             
             <div className="grid gap-4 md:grid-cols-3">
               <Card className="bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151]">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3">
                   <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
                     Documentos a revisar
                   </CardTitle>
                   <Clock className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <CardContent className="pb-3">
+                  <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
                     {documentosARevisar}
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151]">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3">
                   <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
                     Documentos em revisão
                   </CardTitle>
                   <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <CardContent className="pb-3">
+                  <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
                     {documentosEmRevisao}
                   </div>
                 </CardContent>
               </Card>
 
               <Card className="bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151]">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3">
                   <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
                     Documentos Publicados
                   </CardTitle>
                   <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
                 </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <CardContent className="pb-3">
+                  <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
                     {documentosPublicados}
                   </div>
                 </CardContent>
@@ -237,27 +237,27 @@ export default function HomePage() {
                   .sort(([, a], [, b]) => b - a) // Ordenar por quantidade (decrescente)
                   .map(([responsavel, quantidade]) => (
                   <Card key={responsavel} className="bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151]">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3">
                       <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300 truncate">
                         {responsavel}
                       </CardTitle>
                       <CheckCircle2 className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0" />
                     </CardHeader>
-                    <CardContent className="relative h-[80px]">
-                      <div className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-tight">
-                        {quantidade} {quantidade === 1 ? "Integrado" : "Integrados"}
-                        {documentosEmProcessoPorMimPorResponsavel[responsavel] && (
-                          <span className="text-blue-600 dark:text-blue-400">
-                            {" e "}{documentosEmProcessoPorMimPorResponsavel[responsavel]} em processo por mim
-                          </span>
-                        )}
-                      </div>
-                      <div className="absolute bottom-2 right-2">
+                    <CardContent className="pb-2">
+                      <div className="flex items-start justify-between">
+                        <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
+                          {quantidade} {quantidade === 1 ? "Integrado" : "Integrados"}
+                          {documentosEmProcessoPorMimPorResponsavel[responsavel] && (
+                            <span className="text-sm text-blue-600 dark:text-blue-400 block">
+                              {documentosEmProcessoPorMimPorResponsavel[responsavel]} em processo por mim
+                            </span>
+                          )}
+                        </div>
                         <Button
                           size="sm"
                           variant={isUserResponsibleForSpecialty(responsavel) ? "default" : "secondary"}
                           disabled={!isUserResponsibleForSpecialty(responsavel)}
-                          className={`h-7 px-2 text-xs ${
+                          className={`h-6 px-2 text-xs ml-2 ${
                             isUserResponsibleForSpecialty(responsavel) 
                               ? "bg-blue-600 hover:bg-blue-700 text-white" 
                               : "opacity-50 cursor-not-allowed"
@@ -270,7 +270,7 @@ export default function HomePage() {
                           }}
                         >
                           <Play className="h-3 w-3 mr-1" />
-                          Iniciar Revisão
+                          Iniciar
                         </Button>
                       </div>
                     </CardContent>
