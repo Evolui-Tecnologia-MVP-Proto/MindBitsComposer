@@ -355,7 +355,7 @@ export function DocumentosTable({
         <TableBody>
           {documentos.map((documento) => (
             <TableRow key={documento.id}>
-            <TableCell>
+            <TableCell className="dark:bg-[#0F172A]">
               <div className="flex items-center">
                 {documento.origem === "Monday" ? (
                   <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded text-xs font-medium">
@@ -368,26 +368,26 @@ export function DocumentosTable({
                 )}
               </div>
             </TableCell>
-            <TableCell className="font-medium">{documento.objeto}</TableCell>
-            <TableCell>
-              <div className="flex items-center text-gray-500 text-sm">
+            <TableCell className="font-medium dark:bg-[#0F172A] dark:text-gray-200">{documento.objeto}</TableCell>
+            <TableCell className="dark:bg-[#0F172A]">
+              <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
                 <Clock className="mr-1.5 h-3.5 w-3.5" />
                 {formatDate(documento.createdAt)}
               </div>
             </TableCell>
-            <TableCell>
-              <div className="flex items-center text-gray-500 text-sm">
+            <TableCell className="dark:bg-[#0F172A]">
+              <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
                 <Clock className="mr-1.5 h-3.5 w-3.5" />
                 {formatDate(documento.updatedAt)}
               </div>
             </TableCell>
             {activeTab === "em-processo" && (
-              <TableCell>
+              <TableCell className="dark:bg-[#0F172A]">
                 {(() => {
                   const activeFlow = getActiveFlow(documento.id);
                   if (activeFlow) {
                     return (
-                      <div className="flex items-center text-gray-500 text-sm">
+                      <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
                         [{activeFlow.flowCode}] - {activeFlow.flowName}
                       </div>
                     );
@@ -400,7 +400,7 @@ export function DocumentosTable({
                 })()}
               </TableCell>
             )}
-            <TableCell>
+            <TableCell className="dark:bg-[#0F172A]">
               <Badge
                 variant={getStatusBadgeVariant(documento.status) as any}
                 className="flex items-center gap-1 whitespace-nowrap"
@@ -410,7 +410,7 @@ export function DocumentosTable({
               </Badge>
             </TableCell>
             {activeTab === "em-processo" && (
-              <TableCell>
+              <TableCell className="dark:bg-[#0F172A]">
                 {(() => {
                   if (!documento.taskState || documento.taskState === '') {
                     return (
@@ -458,7 +458,7 @@ export function DocumentosTable({
                 })()}
               </TableCell>
             )}
-            <TableCell className="text-right">
+            <TableCell className="text-right dark:bg-[#0F172A]">
               <div className="flex justify-end space-x-2">
                 <Button
                   variant="ghost"
@@ -520,7 +520,7 @@ export function DocumentosTable({
           <TableRow>
             <TableCell
               colSpan={activeTab === "em-processo" ? 8 : 6}
-              className="text-center py-6 text-gray-500"
+              className="text-center py-6 text-gray-500 dark:text-gray-400 dark:bg-[#0F172A]"
             >
               Nenhum documento encontrado nesta categoria.
             </TableCell>
@@ -617,7 +617,7 @@ export function DocumentosTable({
         <TableBody>
           {documentos.map((documento) => (
             <TableRow key={documento.id}>
-              <TableCell>
+              <TableCell className="dark:bg-[#0F172A]">
                 <div className="flex items-center">
                   {documento.origem === "Monday" ? (
                     <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded text-xs font-medium">
@@ -630,20 +630,20 @@ export function DocumentosTable({
                   )}
                 </div>
               </TableCell>
-              <TableCell className="font-medium">{documento.objeto}</TableCell>
-              <TableCell>
-                <div className="flex items-center text-gray-500 text-sm">
+              <TableCell className="font-medium dark:bg-[#0F172A] dark:text-gray-200">{documento.objeto}</TableCell>
+              <TableCell className="dark:bg-[#0F172A]">
+                <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
                   <Clock className="mr-1.5 h-3.5 w-3.5" />
                   {formatDate(documento.createdAt)}
                 </div>
               </TableCell>
-              <TableCell>
-                <div className="flex items-center text-gray-500 text-sm">
+              <TableCell className="dark:bg-[#0F172A]">
+                <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
                   <Clock className="mr-1.5 h-3.5 w-3.5" />
                   {formatDate(documento.updatedAt)}
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell className="dark:bg-[#0F172A]">
                 <Badge
                   variant={getStatusBadgeVariant(documento.status) as any}
                   className="flex items-center gap-1 whitespace-nowrap"
@@ -652,7 +652,7 @@ export function DocumentosTable({
                   {documento.status}
                 </Badge>
               </TableCell>
-              <TableCell className="text-right">
+              <TableCell className="text-right dark:bg-[#0F172A]">
                 <div className="flex justify-end space-x-2">
                   <Button
                     variant="ghost"
@@ -687,7 +687,7 @@ export function DocumentosTable({
             <TableRow>
               <TableCell
                 colSpan={6}
-                className="text-center py-6 text-gray-500"
+                className="text-center py-6 text-gray-500 dark:text-gray-400 dark:bg-[#0F172A]"
               >
                 Nenhum documento encontrado nesta categoria.
               </TableCell>
