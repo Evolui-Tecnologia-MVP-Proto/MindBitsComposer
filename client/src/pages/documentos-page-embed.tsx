@@ -55,13 +55,9 @@ import { DocumentationModal } from "@/components/documentos/modals/Documentation
 import { DeleteConfirmDialog } from "@/components/documentos/modals/DeleteConfirmDialog";
 import { DeleteArtifactConfirmDialog } from "@/components/documentos/modals/DeleteArtifactConfirmDialog";
 import { DocumentosTable } from "@/components/documentos/tables/DocumentosTable";
-import { GitHubTab } from "@/components/documentos/tabs/GitHubTab";
-import { IncluirDocumentosTab } from "@/components/documentos/tabs/IncluirDocumentosTab";
-import { IntegradosTab } from "@/components/documentos/tabs/IntegradosTab";
-import { ConcluidosTab } from "@/components/documentos/tabs/ConcluidosTab";
 
 export default function DocumentosPageEmbed() {
-  const [activeTab, setActiveTab] = useState("incluidos");
+  const [activeTab, setActiveTab] = useState("em-processo");
   const [selectedDocument, setSelectedDocument] = useState<Documento | null>(
     null,
   );
@@ -364,361 +360,9 @@ export default function DocumentosPageEmbed() {
     return columnTitleMap[columnId] || columnId;
   };
 
-  // Mutation para sincronizar estrutura do GitHub para o banco local
-  const syncFromGitHubMutation = useMutation({
-    mutationFn: async () => {
-      const res = await apiRequest(
-        "POST",
-        "/api/repo-structure/sync-from-github",
-      );
-      return await res.json();
-    },
-    onSuccess: (data) => {
-      toast({
-        title: "Sincronização concluída!",
-        description: `${data.importedCount || 0} pasta(s) importadas e ${data.updatedCount || 0} pasta(s) atualizadas.`,
-      });
 
-      // Atualizar dados locais
-      queryClient.invalidateQueries({ queryKey: ["/api/repo-structure"] });
 
-      // Atualizar estrutura do GitHub também
-      fetchGithubRepoStructure();
 
-      // Forçar re-fetch após um pequeno delay
-      setTimeout(() => {
-        queryClient.refetchQueries({ queryKey: ["/api/repo-structure"] });
-        fetchGithubRepoStructure();
-      }, 1000);
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Erro na sincronização",
-        description: error.message || "Erro ao importar estrutura do GitHub",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Mutation para sincronizar todas as pastas não sincronizadas com GitHub
-  const syncAllToGitHubMutation = useMutation({
-    mutationFn: async () => {
-      const unsyncedFolders = repoStructures.filter(
-        (folder: any) =>
-          !folder.isSync &&
-          (!folder.linkedTo ||
-            repoStructures.some(
-              (parent: any) => parent.uid === folder.linkedTo,
-            )),
-      );
-      
-      const results = [];
-      for (const folder of unsyncedFolders) {
-        console.log(
-          `🚀 Sincronizando pasta: ${folder.folderName} (${folder.uid})`,
-        );
-        try {
-          const res = await apiRequest(
-            "POST",
-            `/api/repo-structure/${folder.uid}/sync-github`,
-          );
-          const result = await res.json();
-          results.push({
-            folder: folder.folderName,
-            success: true,
-            message: result.message,
-          });
-        } catch (error: any) {
-          results.push({
-            folder: folder.folderName,
-            success: false,
-            message: error.message,
-          });
-        }
-      }
-      return results;
-    },
-    onSuccess: (results) => {
-      const successCount = results.filter((r) => r.success).length;
-      const errorCount = results.filter((r) => !r.success).length;
-
-      if (successCount > 0) {
-        toast({
-          title: `${successCount} pasta(s) sincronizada(s)!`,
-          description:
-            errorCount > 0
-              ? `${errorCount} pasta(s) falharam na sincronização.`
-              : "Todas as pastas foram enviadas para o GitHub com sucesso.",
-        });
-      }
-
-      if (errorCount > 0) {
-        const failedFolders = results
-          .filter((r) => !r.success)
-          .map((r) => r.folder)
-          .join(", ");
-        toast({
-          title: "Algumas pastas falharam",
-          description: `Pastas com erro: ${failedFolders}`,
-          variant: "destructive",
-        });
-      }
-
-      // Atualizar imediatamente a estrutura local
-      queryClient.invalidateQueries({ queryKey: ["/api/repo-structure"] });
-
-      // Forçar múltiplas atualizações para garantir sincronização visual
-      setTimeout(() => {
-        queryClient.refetchQueries({ queryKey: ["/api/repo-structure"] });
-      }, 500);
-
-      setTimeout(() => {
-        queryClient.refetchQueries({ queryKey: ["/api/repo-structure"] });
-        fetchGithubRepoStructure();
-      }, 1500);
-
-      setTimeout(() => {
-        queryClient.refetchQueries({ queryKey: ["/api/repo-structure"] });
-      }, 3500);
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Erro na sincronização",
-        description: error.message || "Erro ao sincronizar pastas com GitHub.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Função para buscar arquivos de uma pasta específica no GitHub
-  const fetchFolderFiles = async (folderPath: string) => {
-    if (!folderPath) return;
-
-    setIsLoadingFolderFiles(true);
-    try {
-      const githubConnection = (serviceConnections as any[])?.find(
-        (conn: any) => conn.serviceName === "github",
-      );
-
-      if (!githubConnection) return;
-
-      const repo = githubConnection.parameters?.[0];
-      if (!repo) return;
-
-      const response = await fetch(
-        `https://api.github.com/repos/${repo}/contents/${folderPath}`,
-        {
-          headers: {
-            Authorization: `token ${githubConnection.token}`,
-            Accept: "application/vnd.github.v3+json",
-            "User-Agent": "EVO-MindBits-Composer",
-          },
-        },
-      );
-
-      if (response.ok) {
-        const files = await response.json();
-        // Filtrar arquivos, excluindo .gitkeep que são apenas para sincronização
-        const fileList = Array.isArray(files)
-          ? files.filter(
-              (item: any) => item.type === "file" && item.name !== ".gitkeep",
-            )
-          : [];
-        setSelectedFolderFiles(fileList);
-      } else if (response.status === 404) {
-        // Pasta vazia ou não existe - mostrar mensagem apropriada
-        setSelectedFolderFiles([]);
-      } else {
-        setSelectedFolderFiles([]);
-      }
-    } catch (error) {
-      setSelectedFolderFiles([]);
-    } finally {
-      setIsLoadingFolderFiles(false);
-    }
-  };
-
-  // Função para carregar visualização da estrutura do repositório
-  const fetchGithubRepoStructure = async () => {
-    setIsLoadingRepo(true);
-    try {
-      const response = await fetch("/api/github/repo/contents");
-
-      console.log("📊 Status da resposta:", response.status, response.statusText);
-
-      if (response.ok) {
-        const contents = await response.json();
-        console.log("✅ Conteúdo recebido:", contents.length, "itens");
-        const fileStructure = await buildSimpleFileTree(contents);
-        setGithubRepoFiles(fileStructure);
-        return fileStructure;
-      } else {
-        const errorData = await response.json();
-        console.error("❌ Erro na resposta:", {
-          status: response.status,
-          statusText: response.statusText,
-          error: errorData.error
-        });
-        return [];
-      }
-    } catch (error) {
-      console.error("❌ Erro na requisição completa:", {
-        message: error.message,
-        name: error.name,
-        stack: error.stack
-      });
-      return [];
-    } finally {
-      setIsLoadingRepo(false);
-    }
-  };
-
-  // Função simples para criar estrutura de visualização
-  const buildSimpleFileTree = async (items: any[]) => {
-    return items.map((item) => ({
-      name: item.name,
-      path: item.path,
-      type: item.type === "dir" ? "folder" : "file",
-      size: item.size || 0,
-      children: [],
-    }));
-  };
-
-  // Função para construir estrutura hierárquica
-  const buildFileTree = async (
-    items: any[],
-    token: string,
-    owner: string,
-    repo: string,
-  ) => {
-    const tree: any[] = [];
-
-    for (const item of items) {
-      if (item.type === "dir") {
-        // Para pastas, buscar conteúdo recursivamente
-        try {
-          const subResponse = await fetch(item.url, {
-            headers: {
-              Authorization: `token ${token}`,
-              Accept: "application/vnd.github.v3+json",
-            },
-          });
-
-          if (subResponse.ok) {
-            const subContents = await subResponse.json();
-            const children = await buildFileTree(
-              subContents,
-              token,
-              owner,
-              repo,
-              item.path,
-            );
-
-            tree.push({
-              id: item.path,
-              name: item.name,
-              type: "folder",
-              path: item.path,
-              children: children,
-            });
-          }
-        } catch (error) {
-          // Se falhar, adicionar pasta vazia
-          tree.push({
-            id: item.path,
-            name: item.name,
-            type: "folder",
-            path: item.path,
-            children: [],
-          });
-        }
-      } else {
-        // Para arquivos
-        tree.push({
-          id: item.path,
-          name: item.name,
-          type: "file",
-          path: item.path,
-          size: formatFileSize(item.size),
-          modified: new Date(item.sha).toLocaleDateString("pt-BR"),
-        });
-      }
-    }
-
-    return tree;
-  };
-
-  // Função para formatar tamanho do arquivo
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
-  };
-
-  // Função para criar arquivo README.md no repositório
-  const createReadmeFile = async (
-    token: string,
-    owner: string,
-    repo: string,
-  ) => {
-    const readmeContent = `# ${repo}
-
-Este repositório foi criado para armazenar documentação técnica e empresarial do sistema ${repo}.
-
-## Estrutura
-
-- \`docs/\` - Documentação técnica
-- \`specs/\` - Especificações e requisitos
-- \`templates/\` - Templates de documentos
-
-## EVO-MindBits Composer
-
-Este repositório está integrado com o EVO-MindBits Composer para gestão automatizada de documentação.
-`;
-
-    try {
-      const response = await fetch(
-        `https://api.github.com/repos/${owner}/${repo}/contents/README.md`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `token ${token}`,
-            Accept: "application/vnd.github.v3+json",
-            "User-Agent": "EVO-MindBits-Composer",
-          },
-          body: JSON.stringify({
-            message: "Criar README.md inicial via EVO-MindBits Composer",
-            content: btoa(readmeContent), // Base64 encode
-          }),
-        },
-      );
-
-      if (response.ok) {
-        console.log("README.md criado com sucesso!");
-        return true;
-      } else {
-        const errorText = await response.text();
-        console.error("Erro ao criar README.md:", response.status, errorText);
-        return false;
-      }
-    } catch (error) {
-      console.error("Erro na criação do README.md:", error);
-      return false;
-    }
-  };
-
-  // Carregar estrutura do repositório quando houver conexão GitHub
-  useEffect(() => {
-    if (
-      serviceConnections &&
-      serviceConnections.length > 0 &&
-      activeTab === "repositorio"
-    ) {
-      fetchGithubRepoStructure();
-    }
-  }, [serviceConnections, activeTab]);
 
   // Buscar artefatos do documento selecionado (para visualização ou edição)
   const currentDocumentId = selectedDocument?.id || editingDocument?.id;
@@ -1210,17 +854,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     return filtered;
   }, [documentos, filtros, artifactCounts]);
 
-  // Filtrar documentos por status aplicando os filtros
-  const documentosIntegrados = useMemo(
-    () => filteredAndSortedDocumentos.filter((doc) => doc.status === "Integrado"),
-    [filteredAndSortedDocumentos],
-  );
+  // Filtrar documentos em processo
   const documentosProcessando = useMemo(
     () => filteredAndSortedDocumentos.filter((doc) => doc.status === "Em Processo"),
-    [filteredAndSortedDocumentos],
-  );
-  const documentosConcluidos = useMemo(
-    () => filteredAndSortedDocumentos.filter((doc) => doc.status === "Concluido"),
     [filteredAndSortedDocumentos],
   );
 
@@ -1585,30 +1221,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     );
   };
 
-  // Obter listas únicas para os filtros
-  const responsaveisUnicos = useMemo(() => {
-    const responsaveis = documentos
-      .map((doc) => doc.responsavel)
-      .filter(Boolean);
-    return [...new Set(responsaveis)].sort();
-  }, [documentos]);
 
-  const modulosUnicos = useMemo(() => {
-    const modulos = documentos.map((doc) => doc.modulo).filter(Boolean);
-    return [...new Set(modulos)].sort();
-  }, [documentos]);
-
-  const clientesUnicos = useMemo(() => {
-    const clientes = documentos.map((doc) => doc.cliente).filter(Boolean);
-    return [...new Set(clientes)].sort();
-  }, [documentos]);
-
-  const origensUnicas = useMemo(() => {
-    const origens = documentos
-      .map((doc) => doc.origem)
-      .filter(Boolean);
-    return [...new Set(origens)].sort();
-  }, [documentos]);
 
    if (isLoading) {
     return (
@@ -1645,17 +1258,13 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         </div>
 
         <Tabs
-          defaultValue="incluidos"
+          defaultValue="em-processo"
           value={activeTab}
           onValueChange={setActiveTab}
           className="w-full tabs-root flex flex-col flex-1 min-h-0"
         >
-          <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-[#0F172A] mb-6">
-            <TabsTrigger value="incluidos" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Incluídos</TabsTrigger>
-            <TabsTrigger value="integrados" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Integrados</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-1 bg-gray-100 dark:bg-[#0F172A] mb-6">
             <TabsTrigger value="em-processo" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Em Processo</TabsTrigger>
-            <TabsTrigger value="concluidos" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Concluídos</TabsTrigger>
-            <TabsTrigger value="repositorio" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Repositório</TabsTrigger>
           </TabsList>
 
           <IncluirDocumentosTab
