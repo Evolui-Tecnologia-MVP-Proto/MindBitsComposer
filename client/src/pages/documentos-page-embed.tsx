@@ -1267,68 +1267,12 @@ export default function DocumentosPageEmbed() {
             <TabsTrigger value="em-processo" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Em Processo</TabsTrigger>
           </TabsList>
 
-          <IncluirDocumentosTab
-            documentos={documentos}
-            isLoading={isLoading}
-            artifactCounts={artifactCounts}
-            openViewModal={openViewModal}
-            openEditModal={openEditModal}
-            handleDeleteDocument={handleDeleteDocument}
-            onRefresh={() => {
-              queryClient.invalidateQueries({ queryKey: ['/api/documentos'] });
-              queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
-              toast({
-                title: "Dados atualizados",
-                description: "As informações das abas foram recarregadas com sucesso.",
-              });
-            }}
-            onCreateDocument={() => {
-              resetFormData();
-              setIsCreateModalOpen(true);
-            }}
-          />
-
-          <IntegradosTab
-            isLoading={isLoading}
-            filtros={filtros}
-            setFiltros={setFiltros}
-            responsaveisUnicos={responsaveisUnicos}
-            modulosUnicos={modulosUnicos}
-            clientesUnicos={clientesUnicos}
-            origensUnicas={origensUnicas}
-            renderDocumentosTable={renderDocumentosTable}
-            documentosIntegrados={documentosIntegrados}
-            showFilters={showFilters}
-          />
-
           <TabsContent value="em-processo" className="slide-in">
             {isLoading ? (
               <div className="text-center py-6">Carregando documentos...</div>
             ) : (
               renderDocumentosTable(documentosProcessando)
             )}
-          </TabsContent>
-
-          <ConcluidosTab
-            isLoading={isLoading}
-            renderDocumentosTable={renderDocumentosTable}
-            documentosConcluidos={documentosConcluidos}
-          />
-
-          <TabsContent value="repositorio" className="slide-in">
-            <GitHubTab
-              syncFromGitHubMutation={syncFromGitHubMutation}
-              syncAllToGitHubMutation={syncAllToGitHubMutation}
-              repoStructures={repoStructures}
-              githubRepoFiles={githubRepoFiles}
-              isLoadingRepo={isLoadingRepo}
-              selectedFolderPath={selectedFolderPath}
-              setSelectedFolderPath={setSelectedFolderPath}
-              selectedFolderFiles={selectedFolderFiles}
-              isLoadingFolderFiles={isLoadingFolderFiles}
-              fetchGithubRepoStructure={fetchGithubRepoStructure}
-              fetchFolderFiles={fetchFolderFiles}
-            />
           </TabsContent>
         </Tabs>
       </div>
