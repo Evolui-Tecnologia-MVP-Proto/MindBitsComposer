@@ -47,16 +47,18 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 - Significantly improved maintainability and performance
 
 ### GitHub Integration Component Extraction (August 2025)
-- Created `GitHubIntegration.tsx` as a reusable component with complete GitHub repository integration
-- Extracted the ENTIRE content from GitHubTab including:
+- Created `GitHubIntegration.tsx` as a completely self-sufficient component with internal state management
+- Extracted and refactored GitHubTab to remove all external dependencies:
+  - All GitHub-related states, queries, and mutations moved internally
   - Header section with sync operations (sync refs, pull from GitHub, push to GitHub)
   - Two-column grid layout with repository structure and file listing
   - FileExplorer integration for browsing repository folders
   - Real-time file listing for selected folders
   - All loading states, empty states, and error handling
-- GitHubTab.tsx now simply renders GitHubIntegration component (reduced from 226 to 17 lines)
-- Component is fully self-contained and reusable in any context
+- GitHubTab.tsx simplified to 4 lines (just renders GitHubIntegration component)
+- Component is completely autonomous and reusable in any context
 - Maintains 100% of original functionality without any feature loss
+- Applied dark theme styling to CreateDocumentModal accordions (Escopo and Pessoas sections)
 
 ## System Architecture
 

@@ -194,19 +194,19 @@ export function CreateDocumentModal({
                 </div>
               </div>
 
-              <div className="border rounded-lg p-4 bg-blue-50 border-blue-200">
+              <div className="border rounded-lg p-4 bg-blue-50 dark:bg-[#1E293B] border-blue-200 dark:border-[#374151]">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-medium text-blue-700">Escopo</h3>
+                  <h3 className="text-sm font-medium text-blue-700 dark:text-[#60A5FA]">Escopo</h3>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setIsEscopoExpanded(!isEscopoExpanded)}
-                    className="h-6 w-6 p-0 hover:bg-blue-100"
+                    className="h-6 w-6 p-0 hover:bg-blue-100 dark:hover:bg-[#374151]"
                   >
                     {isEscopoExpanded ? (
-                      <ChevronUp className="h-4 w-4 text-blue-600" />
+                      <ChevronUp className="h-4 w-4 text-blue-600 dark:text-[#60A5FA]" />
                     ) : (
-                      <ChevronDown className="h-4 w-4 text-blue-600" />
+                      <ChevronDown className="h-4 w-4 text-blue-600 dark:text-[#60A5FA]" />
                     )}
                   </Button>
                 </div>
@@ -254,19 +254,19 @@ export function CreateDocumentModal({
                 )}
               </div>
 
-              <div className="border rounded-lg p-4 bg-gray-50">
+              <div className="border rounded-lg p-4 bg-gray-50 dark:bg-[#1E293B] dark:border-[#374151]">
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-medium text-gray-700">Pessoas</h3>
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-[#E5E7EB]">Pessoas</h3>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setIsPessoasExpanded(!isPessoasExpanded)}
-                    className="h-6 w-6 p-0 hover:bg-gray-200"
+                    className="h-6 w-6 p-0 hover:bg-gray-200 dark:hover:bg-[#374151]"
                   >
                     {isPessoasExpanded ? (
-                      <ChevronUp className="h-4 w-4 text-gray-600" />
+                      <ChevronUp className="h-4 w-4 text-gray-600 dark:text-[#9CA3AF]" />
                     ) : (
-                      <ChevronDown className="h-4 w-4 text-gray-600" />
+                      <ChevronDown className="h-4 w-4 text-gray-600 dark:text-[#9CA3AF]" />
                     )}
                   </Button>
                 </div>
@@ -368,7 +368,7 @@ export function CreateDocumentModal({
                       {createdDocumentArtifacts.map((artifact) => (
                         <div
                           key={artifact.id}
-                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border"
+                          className="flex items-center justify-between p-3 bg-gray-50 dark:bg-[#1E293B] rounded-lg border dark:border-[#374151]"
                         >
                           <div className="flex items-center gap-3">
                             <File className="h-4 w-4 text-blue-500" />
@@ -414,24 +414,24 @@ export function CreateDocumentModal({
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-8 bg-green-50 rounded-lg border border-green-200">
+                    <div className="text-center py-8 bg-green-50 dark:bg-[#1E293B] rounded-lg border border-green-200 dark:border-[#16A34A]">
                       <Paperclip className="h-8 w-8 text-green-500 mx-auto mb-3" />
-                      <p className="text-sm text-green-700 mb-3">
+                      <p className="text-sm text-green-700 dark:text-[#4ADE80] mb-3">
                         ✅ Documento criado com sucesso!
                       </p>
-                      <p className="text-xs text-green-600">
+                      <p className="text-xs text-green-600 dark:text-[#22C55E]">
                         Adicione anexos clicando no botão acima
                       </p>
                     </div>
                   )}
                 </>
               ) : (
-                <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed">
-                  <Paperclip className="h-8 w-8 text-gray-400 mx-auto mb-3" />
-                  <p className="text-sm text-gray-500 mb-3">
+                <div className="text-center py-8 bg-gray-50 dark:bg-[#1E293B] rounded-lg border border-dashed dark:border-[#374151]">
+                  <Paperclip className="h-8 w-8 text-gray-400 dark:text-[#9CA3AF] mx-auto mb-3" />
+                  <p className="text-sm text-gray-500 dark:text-[#9CA3AF] mb-3">
                     Adicione anexos após criar o documento
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-400 dark:text-[#6B7280]">
                     Os anexos poderão ser gerenciados após a criação
                   </p>
                 </div>
