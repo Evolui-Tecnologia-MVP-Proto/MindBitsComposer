@@ -333,8 +333,8 @@ export function DocumentosTable({
   if (shouldUseScroll) {
     return (
       <>
-        <div className="border rounded-lg dark:border-[#374151] dark:bg-[#111827]">
-          <div className={`overflow-y-auto ${showFilters ? 'max-h-[calc(100vh-510px)]' : 'max-h-[calc(100vh-350px)]'}`}>
+        <div className="border rounded-lg dark:border-[#374151] dark:bg-[#111827] h-full flex flex-col">
+          <div className="flex-1 overflow-y-auto min-h-0">
             <Table>
               <TableHeader className="sticky top-0 bg-white dark:bg-[#111827] border-b dark:border-[#374151] z-10">
                 <TableRow>

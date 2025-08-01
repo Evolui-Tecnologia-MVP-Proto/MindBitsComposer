@@ -1232,11 +1232,13 @@ export function DocsProcessEmbed({
 
 
   return (
-    <div className={className}>
+    <div className={`${className} flex flex-col h-full`}>
       {isLoading ? (
         <div className="text-center py-6">Carregando documentos...</div>
       ) : (
-        renderDocumentosTable(documentosProcessando)
+        <div className="flex-1 min-h-0">
+          {renderDocumentosTable(documentosProcessando)}
+        </div>
       )}
 
       <ViewDocumentModal 
