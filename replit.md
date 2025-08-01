@@ -20,6 +20,15 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 - Maintained all core functionality (view, edit, delete documents, modals, flow diagrams)
 - Significantly reduced code complexity from ~3900 lines
 
+### Reusable Component Creation (August 2025)
+- Created `DocumentosEmbedComponent.tsx` as reusable component from the embed page
+- Component can be inserted into any page with configurable props:
+  - `className`: Custom styling classes
+  - `showFilters`: Toggle table filters visibility
+  - `activeTab`: Define which tab functionality to use ("em-processo", "concluidos", etc.)
+- Maintains full functionality including flow diagrams, document modals, and CRUD operations
+- Enables embedding document tables in dashboards, reports, or other composite views
+
 ## System Architecture
 
 ### UI/UX Decisions
