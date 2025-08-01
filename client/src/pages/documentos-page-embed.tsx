@@ -1199,7 +1199,6 @@ export default function DocumentosPageEmbed() {
     return (
       <DocumentosTable
         documentos={documentos}
-        activeTab={activeTab}
         flowExecutionCounts={flowExecutionCounts}
         getStatusBadgeVariant={getStatusBadgeVariant}
         getStatusIcon={getStatusIcon}

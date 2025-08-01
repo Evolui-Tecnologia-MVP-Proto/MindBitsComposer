@@ -9,6 +9,17 @@ EVO-MindBits Composer is an integrated technical and business documentation plat
 Preferred communication style: Simple, everyday language.
 Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 
+## Recent Changes
+
+### Document Management Page Refactoring (July 2025)
+- Created `documentos-page-embed.tsx` as simplified version of main documents page
+- Removed all tab implementations (incluidos, integrados, concluidos, repositorio) 
+- Removed tabs structure completely - displays documents directly
+- Cleaned up related states, imports, and GitHub integration code
+- Focused exclusively on "Em Processo" (In Process) documents with embedded FlowWithAutoFitView
+- Maintained all core functionality (view, edit, delete documents, modals, flow diagrams)
+- Significantly reduced code complexity from ~3900 lines
+
 ## System Architecture
 
 ### UI/UX Decisions
