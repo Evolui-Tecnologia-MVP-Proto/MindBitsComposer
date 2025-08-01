@@ -148,9 +148,9 @@ export default function HomePage() {
           defaultValue="revisoes-ct-rag" 
           value={activeTab} 
           onValueChange={setActiveTab}
-          className="w-full tabs-root flex flex-col flex-1 min-h-0"
+          className="w-full"
         >
-          <TabsList className="grid w-full grid-cols-4 bg-gray-100 dark:bg-[#0F172A] mb-6">
+          <TabsList className="grid w-full grid-cols-4 bg-gray-100 dark:bg-[#0F172A]">
             <TabsTrigger value="revisoes-ct-rag" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
               Revisões CT → RAG
             </TabsTrigger>
@@ -166,7 +166,7 @@ export default function HomePage() {
           </TabsList>
 
           {/* Tab Content: Revisões CT → RAG */}
-          <TabsContent value="revisoes-ct-rag" className="slide-in">
+          <TabsContent value="revisoes-ct-rag" className="slide-in mt-6">
             <div className="space-y-6 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6">
           {/* Base de conhecimento OC */}
           <div className="space-y-4">
@@ -292,7 +292,7 @@ export default function HomePage() {
           </TabsContent>
 
           {/* Tab Content: Triagem */}
-          <TabsContent value="triagem" className="slide-in">
+          <TabsContent value="triagem" className="slide-in mt-6">
             <div className="space-y-6 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6">
               <div className="flex items-center gap-2">
                 <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
@@ -309,7 +309,7 @@ export default function HomePage() {
           </TabsContent>
 
           {/* Tab Content: Projetos */}
-          <TabsContent value="projetos" className="slide-in">
+          <TabsContent value="projetos" className="slide-in mt-6">
             <div className="space-y-6 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6">
               <div className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5 text-green-600 dark:text-green-400" />
@@ -326,7 +326,7 @@ export default function HomePage() {
           </TabsContent>
 
           {/* Tab Content: Elicitações DEV */}
-          <TabsContent value="elicitacoes-dev" className="slide-in">
+          <TabsContent value="elicitacoes-dev" className="slide-in mt-6">
             <div className="space-y-6 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6">
               <div className="flex items-center gap-2">
                 <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
