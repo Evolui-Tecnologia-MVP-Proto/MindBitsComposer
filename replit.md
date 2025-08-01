@@ -32,6 +32,17 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 - Enables embedding complete document management functionality in any page or dashboard
 - Maintains all advanced features: flow diagrams, approval workflows, integration engines
 
+### Home Page Tab Control System (August 2025)
+- Implemented comprehensive tab control system on home page with 4 tabs:
+  - "Revisões CT → RAG" (contains existing content panels)
+  - "Triagem" (placeholder for future development)
+  - "Projetos" (placeholder for future development) 
+  - "Elicitações DEV" (placeholder for future development)
+- Moved "Base de conhecimento CT → OC" and "Documentos MindBits_CT - Integrados por Especialidade" panels to "Revisões CT → RAG" tab
+- "Meus Documentos em Processo" section positioned outside tabs, visible across all tabs with 10px spacing from tab content
+- Added filter toggle button to "Meus Documentos em Processo" section with show/hide functionality
+- Consistent dark theme styling (#0F172A) applied across all tab components
+
 ### Menu Cleanup (August 2025)
 - Removed "Tests & Refacts" section from main navigation menu
 - Removed access to experimental pages: documentos-refact and documentos-embed
