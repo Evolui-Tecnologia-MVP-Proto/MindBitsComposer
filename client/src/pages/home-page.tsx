@@ -243,13 +243,13 @@ export default function HomePage() {
                       </CardTitle>
                       <CheckCircle2 className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0" />
                     </CardHeader>
-                    <CardContent className="pb-2 relative">
-                      <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight pr-16">
+                    <CardContent className="pb-2 relative min-h-[70px]">
+                      <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight pr-16 pb-8">
                         {quantidade} {quantidade === 1 ? "Integrado" : "Integrados"}
                         {documentosEmProcessoPorMimPorResponsavel[responsavel] && (
-                          <span className="text-sm text-blue-600 dark:text-blue-400 block">
+                          <div className="text-sm text-blue-600 dark:text-blue-400 mt-1">
                             {documentosEmProcessoPorMimPorResponsavel[responsavel]} em processo por mim
-                          </span>
+                          </div>
                         )}
                       </div>
                       <div className="absolute bottom-2 right-2">
