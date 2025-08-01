@@ -135,7 +135,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="fade-in p-6 bg-gray-50 dark:bg-[#1F2937] h-full flex flex-col">
+    <div className="fade-in px-6 py-3.5 bg-gray-50 dark:bg-[#1F2937] h-full flex flex-col">
       <div className="flex flex-col flex-1 min-h-0 space-y-8">
         {/* Container para Base de conhecimento e MindBits_CT */}
         <div className="space-y-8 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6">
