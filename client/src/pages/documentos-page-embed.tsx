@@ -12,7 +12,7 @@ import ReactFlow, {
 // Importing icons for custom nodes
 import { Pin, X } from 'lucide-react';
 import 'reactflow/dist/style.css';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 
 import {
   Plus,
@@ -57,7 +57,7 @@ import { DeleteArtifactConfirmDialog } from "@/components/documentos/modals/Dele
 import { DocumentosTable } from "@/components/documentos/tables/DocumentosTable";
 
 export default function DocumentosPageEmbed() {
-  const [activeTab, setActiveTab] = useState("em-processo");
+
   const [selectedDocument, setSelectedDocument] = useState<Documento | null>(
     null,
   );
@@ -1257,24 +1257,13 @@ export default function DocumentosPageEmbed() {
           </Button>
         </div>
 
-        <Tabs
-          defaultValue="em-processo"
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="w-full tabs-root flex flex-col flex-1 min-h-0"
-        >
-          <TabsList className="grid w-full grid-cols-1 bg-gray-100 dark:bg-[#0F172A] mb-6">
-            <TabsTrigger value="em-processo" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Em Processo</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="em-processo" className="slide-in">
-            {isLoading ? (
-              <div className="text-center py-6">Carregando documentos...</div>
-            ) : (
-              renderDocumentosTable(documentosProcessando)
-            )}
-          </TabsContent>
-        </Tabs>
+        <div className="w-full flex flex-col flex-1 min-h-0">
+          {isLoading ? (
+            <div className="text-center py-6">Carregando documentos...</div>
+          ) : (
+            renderDocumentosTable(documentosProcessando)
+          )}
+        </div>
       </div>
 
       <ViewDocumentModal 
