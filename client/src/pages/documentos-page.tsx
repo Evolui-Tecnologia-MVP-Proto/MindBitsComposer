@@ -58,7 +58,7 @@ import { DeleteArtifactConfirmDialog } from "@/components/documentos/modals/Dele
 import { DocumentosTable } from "@/components/documentos/tables/DocumentosTable";
 import { GitHubTab } from "@/components/documentos/tabs/GitHubTab";
 import { IncluirDocumentosTab } from "@/components/documentos/tabs/IncluirDocumentosTab";
-import { IntegradosTab } from "@/components/documentos/tabs/IntegradosTab";
+
 
 import { DocsProcessEmbed } from "@/components/documentos/tables/DocsProcessEmbed";
 
@@ -245,14 +245,7 @@ export default function DocumentosPage() {
     queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions/count"] });
   }, [queryClient]);
 
-  // Estados dos filtros
-  const [filtros, setFiltros] = useState({
-    responsavel: "__todos__",
-    modulo: "__todos__",
-    cliente: "__todos__",
-    origem: "__todos__",
-    nome: "",
-  });
+
 
   // Buscar documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
@@ -1151,78 +1144,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     }
   };
 
-  // Função para filtrar e ordenar documentos
-  const filteredAndSortedDocumentos = useMemo(() => {
-    let filtered = documentos.filter((doc) => {
-      // Filtro por responsável
-      if (
-        filtros.responsavel !== "__todos__" &&
-        filtros.responsavel &&
-        !doc.responsavel
-          ?.toLowerCase()
-          .includes(filtros.responsavel.toLowerCase())
-      ) {
-        return false;
-      }
 
-      // Filtro por módulo
-      if (
-        filtros.modulo !== "__todos__" &&
-        filtros.modulo &&
-        !doc.modulo?.toLowerCase().includes(filtros.modulo.toLowerCase())
-      ) {
-        return false;
-      }
-
-      // Filtro por cliente
-      if (
-        filtros.cliente !== "__todos__" &&
-        filtros.cliente &&
-        !doc.cliente?.toLowerCase().includes(filtros.cliente.toLowerCase())
-      ) {
-        return false;
-      }
-
-      // Filtro por origem
-      if (
-        filtros.origem !== "__todos__" &&
-        filtros.origem &&
-        doc.origem !== filtros.origem
-      ) {
-        return false;
-      }
-
-      // Filtro por nome/objeto
-      if (
-        filtros.nome &&
-        !doc.objeto?.toLowerCase().includes(filtros.nome.toLowerCase())
-      ) {
-        return false;
-      }
-
-      return true;
-    });
-
-    // Ordenação alfabética por nome (objeto)
-    filtered.sort((a, b) => {
-      const nomeA = a.objeto?.toLowerCase() || "";
-      const nomeB = b.objeto?.toLowerCase() || "";
-      return nomeA.localeCompare(nomeB);
-    });
-
-    return filtered;
-  }, [documentos, filtros, artifactCounts]);
-
-  // Filtrar documentos por status aplicando os filtros
-  const documentosIntegrados = useMemo(
-    () => filteredAndSortedDocumentos.filter((doc) => doc.status === "Integrado"),
-    [filteredAndSortedDocumentos],
-  );
-
-  const documentosConcluidos = useMemo(
-    () => filteredAndSortedDocumentos.filter((doc) => doc.status === "Concluido"),
-    [filteredAndSortedDocumentos],
-  );
 
   const handleCreateDocument = () => {
     createDocumentoMutation.mutate(formData);
@@ -1559,56 +1481,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     return "outros";
   };
 
-  const renderDocumentosTable = (documentos: Documento[], showFilters: boolean = true) => {
-    return (
-      <DocumentosTable
-        documentos={documentos}
-        activeTab={activeTab}
-        flowExecutionCounts={flowExecutionCounts}
-        getStatusBadgeVariant={getStatusBadgeVariant}
-        getStatusIcon={getStatusIcon}
-        getStatusOrigemBadgeVariant={getStatusOrigemBadgeVariant}
-        formatDate={formatDate}
-        openViewModal={openViewModal}
-        openEditModal={openEditModal}
-        handleDeleteDocument={handleDeleteDocument}
-        setSelectedDocument={setSelectedDocument}
-        setIsDocumentationModalOpen={setIsDocumentationModalOpen}
-        isDocumentationModalOpen={isDocumentationModalOpen}
-        deleteDocumentoMutation={deleteDocumentoMutation}
-        getActiveFlow={getActiveFlow}
-        getConcludedFlow={getConcludedFlow}
-        openFlowDiagramModal={openFlowDiagramModal}
-        flowExecutions={flowExecutions}
-        showFilters={showFilters}
-      />
-    );
-  };
 
-  // Obter listas únicas para os filtros
-  const responsaveisUnicos = useMemo(() => {
-    const responsaveis = documentos
-      .map((doc) => doc.responsavel)
-      .filter(Boolean);
-    return [...new Set(responsaveis)].sort();
-  }, [documentos]);
 
-  const modulosUnicos = useMemo(() => {
-    const modulos = documentos.map((doc) => doc.modulo).filter(Boolean);
-    return [...new Set(modulos)].sort();
-  }, [documentos]);
 
-  const clientesUnicos = useMemo(() => {
-    const clientes = documentos.map((doc) => doc.cliente).filter(Boolean);
-    return [...new Set(clientes)].sort();
-  }, [documentos]);
-
-  const origensUnicas = useMemo(() => {
-    const origens = documentos
-      .map((doc) => doc.origem)
-      .filter(Boolean);
-    return [...new Set(origens)].sort();
-  }, [documentos]);
 
    if (isLoading) {
     return (
@@ -1650,9 +1525,8 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           onValueChange={setActiveTab}
           className="w-full tabs-root flex flex-col flex-1 min-h-0"
         >
-          <TabsList className="grid w-full grid-cols-6 bg-gray-100 dark:bg-[#0F172A] mb-6">
+          <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-[#0F172A] mb-6">
             <TabsTrigger value="incluidos" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Incluídos</TabsTrigger>
-            <TabsTrigger value="integrados" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Integrados</TabsTrigger>
             <TabsTrigger value="integrados-embed" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Integrados (Embed)</TabsTrigger>
             <TabsTrigger value="em-processo-embed" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Em Processo (Embed)</TabsTrigger>
             <TabsTrigger value="concluidos" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Concluídos</TabsTrigger>
@@ -1680,18 +1554,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             }}
           />
 
-          <IntegradosTab
-            isLoading={isLoading}
-            filtros={filtros}
-            setFiltros={setFiltros}
-            responsaveisUnicos={responsaveisUnicos}
-            modulosUnicos={modulosUnicos}
-            clientesUnicos={clientesUnicos}
-            origensUnicas={origensUnicas}
-            renderDocumentosTable={renderDocumentosTable}
-            documentosIntegrados={documentosIntegrados}
-            showFilters={showFilters}
-          />
+
 
           <TabsContent value="integrados-embed" className="slide-in">
             <DocsProcessEmbed 
