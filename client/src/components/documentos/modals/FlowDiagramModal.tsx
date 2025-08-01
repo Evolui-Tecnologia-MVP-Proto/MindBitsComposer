@@ -17,7 +17,6 @@ import {
   IntegrationNodeComponent,
   SwitchNodeComponent
 } from "@/components/documentos/flow/FlowNodes";
-import { FlowWithAutoFitView } from "@/components/documentos/flow/FlowWithAutoFitView";
 
 interface FlowDiagramModalData {
   isOpen: boolean;
@@ -36,7 +35,7 @@ interface FlowDiagramModalProps {
   showApprovalAlert: boolean;
   setShowApprovalAlert: (show: boolean) => void;
   isFlowInspectorPinned: boolean;
-  FlowWithAutoFitView?: any;
+  FlowWithAutoFitView: any;
 }
 
 export function FlowDiagramModal({
@@ -49,6 +48,7 @@ export function FlowDiagramModal({
   showApprovalAlert,
   setShowApprovalAlert,
   isFlowInspectorPinned,
+  FlowWithAutoFitView,
 }: FlowDiagramModalProps) {
   console.log("🔴 RENDERIZANDO MODAL:", flowDiagramModal);
   
