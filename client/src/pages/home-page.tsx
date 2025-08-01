@@ -141,7 +141,7 @@ export default function HomePage() {
 
   return (
     <div className="fade-in px-3.5 py-1 bg-gray-50 dark:bg-[#1F2937] h-full flex flex-col">
-      <div className="flex flex-col flex-1 min-h-0 gap-[5px]">
+      <div className="flex flex-col flex-1 min-h-0 gap-[10px]">
         
         {/* Sistema de Tabs Principal */}
         <Tabs 
