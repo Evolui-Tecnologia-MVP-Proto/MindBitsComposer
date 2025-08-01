@@ -1197,6 +1197,7 @@ export default function DocumentosPageEmbed() {
     return (
       <DocumentosTable
         documentos={documentos}
+        activeTab="em-processo"
         flowExecutionCounts={flowExecutionCounts}
         getStatusBadgeVariant={getStatusBadgeVariant}
         getStatusIcon={getStatusIcon}
