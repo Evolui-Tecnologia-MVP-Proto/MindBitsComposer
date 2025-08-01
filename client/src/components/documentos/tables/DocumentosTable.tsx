@@ -326,56 +326,32 @@ export function DocumentosTable({
     );
   }
 
-  return (
-    <>
-      <div className={(activeTab === "em-processo" || activeTab === "concluidos" || activeTab === "incluidos") ? "border rounded-lg dark:border-[#374151] dark:bg-[#111827]" : ""}>
-        <Table>
-          <TableHeader 
-            className={(activeTab === "em-processo" || activeTab === "concluidos" || activeTab === "incluidos") ? "sticky top-0 bg-white dark:bg-[#111827] z-10 shadow-sm" : ""}
-          >
-            <TableRow>
-              <TableHead 
-                className={(activeTab === "em-processo" || activeTab === "concluidos" || activeTab === "incluidos") ? "bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200" : ""}
-              >
-                Origem
-              </TableHead>
-              <TableHead 
-                className={(activeTab === "em-processo" || activeTab === "concluidos" || activeTab === "incluidos") ? "bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200" : ""}
-              >
-                Nome
-              </TableHead>
-              <TableHead 
-                className={(activeTab === "em-processo" || activeTab === "concluidos" || activeTab === "incluidos") ? "bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200" : ""}
-              >
-                Incluído
-              </TableHead>
-              <TableHead 
-                className={(activeTab === "em-processo" || activeTab === "concluidos" || activeTab === "incluidos") ? "bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200" : ""}
-              >
-                Iniciado
-              </TableHead>
-              {activeTab === "em-processo" && (
-                <TableHead className="bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
-                  Fluxo Atual
-                </TableHead>
-              )}
-              <TableHead 
-                className={(activeTab === "em-processo" || activeTab === "concluidos" || activeTab === "incluidos") ? "bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200" : ""}
-              >
-                Status
-              </TableHead>
-              {activeTab === "em-processo" && (
-                <TableHead className="w-[120px] bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200">
-                  Tsk.Status
-                </TableHead>
-              )}
-              <TableHead 
-                className={`text-right ${(activeTab === "em-processo" || activeTab === "concluidos" || activeTab === "incluidos") ? "bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200" : ""}`}
-              >
-                Ações
-              </TableHead>
-            </TableRow>
-          </TableHeader>
+  // Determinar se deve usar scroll interno
+  const shouldUseScroll = activeTab === "em-processo" || activeTab === "concluidos" || activeTab === "incluidos";
+  const headerClasses = shouldUseScroll ? "bg-gray-50 dark:bg-[#111827] border-b dark:border-[#374151] dark:text-gray-200" : "";
+  
+  if (shouldUseScroll) {
+    return (
+      <>
+        <div className="border rounded-lg dark:border-[#374151] dark:bg-[#111827]">
+          <div className={`overflow-y-auto ${showFilters ? 'max-h-[calc(100vh-510px)]' : 'max-h-[calc(100vh-350px)]'}`}>
+            <Table>
+              <TableHeader className="sticky top-0 bg-white dark:bg-[#111827] border-b dark:border-[#374151] z-10">
+                <TableRow>
+                  <TableHead className={headerClasses}>Origem</TableHead>
+                  <TableHead className={headerClasses}>Nome</TableHead>
+                  <TableHead className={headerClasses}>Incluído</TableHead>
+                  <TableHead className={headerClasses}>Iniciado</TableHead>
+                  {activeTab === "em-processo" && (
+                    <TableHead className={headerClasses}>Fluxo Atual</TableHead>
+                  )}
+                  <TableHead className={headerClasses}>Status</TableHead>
+                  {activeTab === "em-processo" && (
+                    <TableHead className={`w-[120px] ${headerClasses}`}>Tsk.Status</TableHead>
+                  )}
+                  <TableHead className={`text-right ${headerClasses}`}>Ações</TableHead>
+                </TableRow>
+              </TableHeader>
         <TableBody>
           {documentos.map((documento) => (
             <TableRow key={documento.id}>
@@ -515,7 +491,7 @@ export function DocumentosTable({
                     {flowExecutionCounts[documento.id]}
                   </Badge>
                 )}
-                {activeTab !== "integrados" && activeTab !== "em-processo" && activeTab !== "concluidos" && (
+                {activeTab === "incluidos" && (
                   <>
                     <Button
                       variant="ghost"
@@ -543,19 +519,20 @@ export function DocumentosTable({
         {documentos.length === 0 && (
           <TableRow>
             <TableCell
-              colSpan={activeTab === "integrados" ? 7 : activeTab === "em-processo" ? 8 : 6}
+              colSpan={activeTab === "em-processo" ? 8 : 6}
               className="text-center py-6 text-gray-500"
             >
               Nenhum documento encontrado nesta categoria.
             </TableCell>
           </TableRow>
         )}
-        </TableBody>
-      </Table>
-      </div>
+              </TableBody>
+            </Table>
+          </div>
+        </div>
 
-      {/* Dropdown de fluxos na posição do mouse */}
-      {dropdown.isOpen && (
+        {/* Dropdown de fluxos na posição do mouse */}
+        {dropdown.isOpen && (
         <div
           className="fixed bg-white dark:bg-[#0F172A] border border-gray-200 dark:border-[#374151] rounded-lg shadow-xl min-w-[250px] max-w-[400px]"
           style={{
@@ -619,6 +596,105 @@ export function DocumentosTable({
           </div>
         </div>
       )}
+    </>
+    );
+  }
+
+  // Versão sem scroll para outras tabs
+  return (
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Origem</TableHead>
+            <TableHead>Nome</TableHead>
+            <TableHead>Incluído</TableHead>
+            <TableHead>Iniciado</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="text-right">Ações</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {documentos.map((documento) => (
+            <TableRow key={documento.id}>
+              <TableCell>
+                <div className="flex items-center">
+                  {documento.origem === "Monday" ? (
+                    <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 px-2 py-1 rounded text-xs font-medium">
+                      Monday
+                    </div>
+                  ) : (
+                    <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400 px-2 py-1 rounded text-xs font-medium">
+                      {documento.origem}
+                    </div>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell className="font-medium">{documento.objeto}</TableCell>
+              <TableCell>
+                <div className="flex items-center text-gray-500 text-sm">
+                  <Clock className="mr-1.5 h-3.5 w-3.5" />
+                  {formatDate(documento.createdAt)}
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center text-gray-500 text-sm">
+                  <Clock className="mr-1.5 h-3.5 w-3.5" />
+                  {formatDate(documento.updatedAt)}
+                </div>
+              </TableCell>
+              <TableCell>
+                <Badge
+                  variant={getStatusBadgeVariant(documento.status) as any}
+                  className="flex items-center gap-1 whitespace-nowrap"
+                >
+                  {getStatusIcon(documento.status)}
+                  {documento.status}
+                </Badge>
+              </TableCell>
+              <TableCell className="text-right">
+                <div className="flex justify-end space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => openViewModal(documento)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => openEditModal(documento)}
+                  >
+                    <Pencil className="h-4 w-4 text-blue-500" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => handleDeleteDocument(documento)}
+                    disabled={deleteDocumentoMutation.isPending}
+                  >
+                    <Trash2 className="h-4 w-4 text-red-500" />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+          {documentos.length === 0 && (
+            <TableRow>
+              <TableCell
+                colSpan={6}
+                className="text-center py-6 text-gray-500"
+              >
+                Nenhum documento encontrado nesta categoria.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </>
   );
 }
