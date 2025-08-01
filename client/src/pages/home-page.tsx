@@ -12,7 +12,9 @@ import {
   User,
   Play,
   Filter,
-  FilterX
+  FilterX,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { type Documento, type Specialty } from "@shared/schema";
@@ -26,6 +28,14 @@ export default function HomePage() {
   const [selectedResponsavel, setSelectedResponsavel] = useState<string>("");
   const [showFilters, setShowFilters] = useState(true);
   const [activeTab, setActiveTab] = useState("revisoes-ct-rag");
+  const [tabContentCollapsed, setTabContentCollapsed] = useState(false);
+
+  // Função para alternar colapso do conteúdo da tab
+  const toggleTabContentCollapse = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setTabContentCollapsed(!tabContentCollapsed);
+  };
 
   // Buscar todos os documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
@@ -151,22 +161,55 @@ export default function HomePage() {
           className="w-full"
         >
           <TabsList className="grid w-full grid-cols-4 bg-gray-100 dark:bg-[#0F172A]">
-            <TabsTrigger value="revisoes-ct-rag" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
-              Revisões CT → RAG
+            <TabsTrigger value="revisoes-ct-rag" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] flex items-center justify-between px-3">
+              <span>Revisões CT → RAG</span>
+              {activeTab === "revisoes-ct-rag" && (
+                <button 
+                  onClick={toggleTabContentCollapse}
+                  className="ml-2 hover:bg-black/10 rounded p-1"
+                >
+                  {tabContentCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                </button>
+              )}
             </TabsTrigger>
-            <TabsTrigger value="triagem" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
-              Triagem
+            <TabsTrigger value="triagem" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] flex items-center justify-between px-3">
+              <span>Triagem</span>
+              {activeTab === "triagem" && (
+                <button 
+                  onClick={toggleTabContentCollapse}
+                  className="ml-2 hover:bg-black/10 rounded p-1"
+                >
+                  {tabContentCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                </button>
+              )}
             </TabsTrigger>
-            <TabsTrigger value="projetos" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
-              Projetos
+            <TabsTrigger value="projetos" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] flex items-center justify-between px-3">
+              <span>Projetos</span>
+              {activeTab === "projetos" && (
+                <button 
+                  onClick={toggleTabContentCollapse}
+                  className="ml-2 hover:bg-black/10 rounded p-1"
+                >
+                  {tabContentCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                </button>
+              )}
             </TabsTrigger>
-            <TabsTrigger value="elicitacoes-dev" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
-              Elicitações DEV
+            <TabsTrigger value="elicitacoes-dev" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] flex items-center justify-between px-3">
+              <span>Elicitações DEV</span>
+              {activeTab === "elicitacoes-dev" && (
+                <button 
+                  onClick={toggleTabContentCollapse}
+                  className="ml-2 hover:bg-black/10 rounded p-1"
+                >
+                  {tabContentCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                </button>
+              )}
             </TabsTrigger>
           </TabsList>
 
           {/* Tab Content: Revisões CT → RAG */}
-          <TabsContent value="revisoes-ct-rag" className="slide-in mt-6">
+          {!tabContentCollapsed && (
+            <TabsContent value="revisoes-ct-rag" className="slide-in mt-6">
             <div className="space-y-6 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6">
           {/* Base de conhecimento OC */}
           <div className="space-y-4">
@@ -276,11 +319,13 @@ export default function HomePage() {
               </div>
             </div>
           )}
-            </div>
+          </div>
           </TabsContent>
+          )}
 
           {/* Tab Content: Triagem */}
-          <TabsContent value="triagem" className="slide-in mt-6">
+          {!tabContentCollapsed && (
+            <TabsContent value="triagem" className="slide-in mt-6">
             <div className="space-y-6 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6">
               <div className="flex items-center gap-2">
                 <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
@@ -295,9 +340,11 @@ export default function HomePage() {
               </div>
             </div>
           </TabsContent>
+          )}
 
           {/* Tab Content: Projetos */}
-          <TabsContent value="projetos" className="slide-in mt-6">
+          {!tabContentCollapsed && (
+            <TabsContent value="projetos" className="slide-in mt-6">
             <div className="space-y-6 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6">
               <div className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5 text-green-600 dark:text-green-400" />
@@ -312,9 +359,11 @@ export default function HomePage() {
               </div>
             </div>
           </TabsContent>
+          )}
 
           {/* Tab Content: Elicitações DEV */}
-          <TabsContent value="elicitacoes-dev" className="slide-in mt-6">
+          {!tabContentCollapsed && (
+            <TabsContent value="elicitacoes-dev" className="slide-in mt-6">
             <div className="space-y-6 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6">
               <div className="flex items-center gap-2">
                 <User className="h-5 w-5 text-purple-600 dark:text-purple-400" />
@@ -329,6 +378,7 @@ export default function HomePage() {
               </div>
             </div>
           </TabsContent>
+          )}
 
         </Tabs>
 
