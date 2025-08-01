@@ -167,7 +167,9 @@ export default function HomePage() {
 
           {/* Tab Content: Revisões CT → RAG */}
           <TabsContent value="revisoes-ct-rag" className="slide-in">
-            <div className="space-y-6 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6">
+            <div className="space-y-6 flex flex-col flex-1 min-h-0">
+              {/* Container para Base de conhecimento e MindBits_CT */}
+              <div className="space-y-6 bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6">
           {/* Base de conhecimento OC */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
@@ -288,6 +290,43 @@ export default function HomePage() {
               </div>
             </div>
           )}
+              </div>
+              
+              {/* Seção de Meus Documentos em Processo */}
+              <div className="flex-1 min-h-0">
+                <div className="bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6 h-full flex flex-col">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                        Meus Documentos em Processo
+                      </h2>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowFilters(!showFilters)}
+                      className="h-9 w-9 p-0 rounded-full bg-white dark:bg-[#1E293B] border-gray-300 dark:border-[#374151] hover:bg-gray-50 dark:hover:bg-[#374151]"
+                      title={showFilters ? "Ocultar filtros" : "Mostrar filtros"}
+                    >
+                      {showFilters ? (
+                        <FilterX className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                      ) : (
+                        <Filter className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                      )}
+                    </Button>
+                  </div>
+                  
+                  <div className="flex-1 min-h-0">
+                    <DocsProcessEmbed
+                      className="h-full"
+                      showFilters={showFilters}
+                      activeTab="em-processo"
+                      hideStatusColumn={true}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </TabsContent>
 
@@ -342,43 +381,9 @@ export default function HomePage() {
             </div>
           </TabsContent>
 
-        </Tabs>
 
-        {/* Seção de Meus Documentos em Processo */}
-        <div className="flex-1 min-h-0 mt-6">
-          <div className="bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6 h-full flex flex-col">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                  Meus Documentos em Processo
-                </h2>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowFilters(!showFilters)}
-                className="h-9 w-9 p-0 rounded-full bg-white dark:bg-[#1E293B] border-gray-300 dark:border-[#374151] hover:bg-gray-50 dark:hover:bg-[#374151]"
-                title={showFilters ? "Ocultar filtros" : "Mostrar filtros"}
-              >
-                {showFilters ? (
-                  <FilterX className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-                ) : (
-                  <Filter className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-                )}
-              </Button>
-            </div>
-            
-            <div className="flex-1 min-h-0">
-              <DocsProcessEmbed
-                className="h-full"
-                showFilters={showFilters}
-                activeTab="em-processo"
-                hideStatusColumn={true}
-              />
-            </div>
-          </div>
-        </div>
+
+        </Tabs>
 
       </div>
 
