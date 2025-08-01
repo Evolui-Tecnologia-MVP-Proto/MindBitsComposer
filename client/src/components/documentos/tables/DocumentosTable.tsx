@@ -45,6 +45,7 @@ interface DocumentosTableProps {
   openFlowDiagramModal: (execution: any) => void;
   flowExecutions?: any[];
   showFilters?: boolean;
+  hideStatusColumn?: boolean;
 }
 
 export function DocumentosTable({
@@ -67,6 +68,7 @@ export function DocumentosTable({
   openFlowDiagramModal,
   flowExecutions = [],
   showFilters = true,
+  hideStatusColumn = false,
 }: DocumentosTableProps) {
   const [dropdown, setDropdown] = useState<{
     isOpen: boolean;
@@ -345,7 +347,9 @@ export function DocumentosTable({
                   {activeTab === "em-processo" && (
                     <TableHead className={headerClasses}>Fluxo Atual</TableHead>
                   )}
-                  <TableHead className={headerClasses}>Status</TableHead>
+                  {!hideStatusColumn && (
+                    <TableHead className={headerClasses}>Status</TableHead>
+                  )}
                   {activeTab === "em-processo" && (
                     <TableHead className={`w-[120px] ${headerClasses}`}>Tsk.Status</TableHead>
                   )}
@@ -400,15 +404,17 @@ export function DocumentosTable({
                 })()}
               </TableCell>
             )}
-            <TableCell className="dark:bg-[#0F172A]">
-              <Badge
-                variant={getStatusBadgeVariant(documento.status) as any}
-                className="flex items-center gap-1 whitespace-nowrap"
-              >
-                {getStatusIcon(documento.status)}
-                {documento.status}
-              </Badge>
-            </TableCell>
+            {!hideStatusColumn && (
+              <TableCell className="dark:bg-[#0F172A]">
+                <Badge
+                  variant={getStatusBadgeVariant(documento.status) as any}
+                  className="flex items-center gap-1 whitespace-nowrap"
+                >
+                  {getStatusIcon(documento.status)}
+                  {documento.status}
+                </Badge>
+              </TableCell>
+            )}
             {activeTab === "em-processo" && (
               <TableCell className="dark:bg-[#0F172A]">
                 {(() => {
@@ -519,7 +525,11 @@ export function DocumentosTable({
         {documentos.length === 0 && (
           <TableRow>
             <TableCell
-              colSpan={activeTab === "em-processo" ? 8 : 6}
+              colSpan={
+                hideStatusColumn
+                  ? (activeTab === "em-processo" ? 7 : 5)
+                  : (activeTab === "em-processo" ? 8 : 6)
+              }
               className="text-center py-6 text-gray-500 dark:text-gray-400 dark:bg-[#0F172A]"
             >
               Nenhum documento encontrado nesta categoria.
@@ -610,7 +620,9 @@ export function DocumentosTable({
             <TableHead>Nome</TableHead>
             <TableHead>Incluído</TableHead>
             <TableHead>Iniciado</TableHead>
-            <TableHead>Status</TableHead>
+            {!hideStatusColumn && (
+              <TableHead>Status</TableHead>
+            )}
             <TableHead className="text-right">Ações</TableHead>
           </TableRow>
         </TableHeader>
@@ -643,15 +655,17 @@ export function DocumentosTable({
                   {formatDate(documento.updatedAt)}
                 </div>
               </TableCell>
-              <TableCell className="dark:bg-[#0F172A]">
-                <Badge
-                  variant={getStatusBadgeVariant(documento.status) as any}
-                  className="flex items-center gap-1 whitespace-nowrap"
-                >
-                  {getStatusIcon(documento.status)}
-                  {documento.status}
-                </Badge>
-              </TableCell>
+              {!hideStatusColumn && (
+                <TableCell className="dark:bg-[#0F172A]">
+                  <Badge
+                    variant={getStatusBadgeVariant(documento.status) as any}
+                    className="flex items-center gap-1 whitespace-nowrap"
+                  >
+                    {getStatusIcon(documento.status)}
+                    {documento.status}
+                  </Badge>
+                </TableCell>
+              )}
               <TableCell className="text-right dark:bg-[#0F172A]">
                 <div className="flex justify-end space-x-2">
                   <Button
@@ -686,7 +700,7 @@ export function DocumentosTable({
           {documentos.length === 0 && (
             <TableRow>
               <TableCell
-                colSpan={6}
+                colSpan={hideStatusColumn ? 5 : 6}
                 className="text-center py-6 text-gray-500 dark:text-gray-400 dark:bg-[#0F172A]"
               >
                 Nenhum documento encontrado nesta categoria.

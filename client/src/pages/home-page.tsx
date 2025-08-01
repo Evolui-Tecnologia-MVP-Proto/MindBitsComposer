@@ -276,6 +276,7 @@ export default function HomePage() {
                 className="h-full"
                 showFilters={true}
                 activeTab="em-processo"
+                hideStatusColumn={true}
               />
             </div>
           </div>

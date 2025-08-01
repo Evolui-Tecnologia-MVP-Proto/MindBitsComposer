@@ -58,12 +58,14 @@ interface DocsProcessEmbedProps {
   className?: string;
   showFilters?: boolean;
   activeTab?: string;
+  hideStatusColumn?: boolean;
 }
 
 export function DocsProcessEmbed({ 
   className = "",
   showFilters = true,
-  activeTab = "em-processo"
+  activeTab = "em-processo",
+  hideStatusColumn = false
 }: DocsProcessEmbedProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -1225,6 +1227,7 @@ export function DocsProcessEmbed({
         openFlowDiagramModal={openFlowDiagramModal}
         flowExecutions={flowExecutions}
         showFilters={showFilters}
+        hideStatusColumn={hideStatusColumn}
       />
     );
   };
