@@ -241,37 +241,34 @@ export default function HomePage() {
                       <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300 truncate">
                         {responsavel}
                       </CardTitle>
-                      <CheckCircle2 className="h-4 w-4 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+                      <Button
+                        size="sm"
+                        variant={isUserResponsibleForSpecialty(responsavel) ? "default" : "secondary"}
+                        disabled={!isUserResponsibleForSpecialty(responsavel)}
+                        className={`h-6 px-2 text-xs ${
+                          isUserResponsibleForSpecialty(responsavel) 
+                            ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                            : "opacity-50 cursor-not-allowed"
+                        }`}
+                        onClick={() => {
+                          if (isUserResponsibleForSpecialty(responsavel)) {
+                            setSelectedResponsavel(responsavel);
+                            setReviewModalOpen(true);
+                          }
+                        }}
+                      >
+                        <Play className="h-3 w-3 mr-1" />
+                        Iniciar
+                      </Button>
                     </CardHeader>
-                    <CardContent className="pb-2 relative min-h-[70px]">
-                      <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight pr-16 pb-8">
+                    <CardContent className="pb-2">
+                      <div className="text-base font-bold text-gray-900 dark:text-gray-100 leading-tight">
                         {quantidade} {quantidade === 1 ? "Integrado" : "Integrados"}
                         {documentosEmProcessoPorMimPorResponsavel[responsavel] && (
                           <div className="text-sm text-blue-600 dark:text-blue-400 mt-1">
                             {documentosEmProcessoPorMimPorResponsavel[responsavel]} em processo por mim
                           </div>
                         )}
-                      </div>
-                      <div className="absolute bottom-2 right-2">
-                        <Button
-                          size="sm"
-                          variant={isUserResponsibleForSpecialty(responsavel) ? "default" : "secondary"}
-                          disabled={!isUserResponsibleForSpecialty(responsavel)}
-                          className={`h-6 px-2 text-xs ${
-                            isUserResponsibleForSpecialty(responsavel) 
-                              ? "bg-blue-600 hover:bg-blue-700 text-white" 
-                              : "opacity-50 cursor-not-allowed"
-                          }`}
-                          onClick={() => {
-                            if (isUserResponsibleForSpecialty(responsavel)) {
-                              setSelectedResponsavel(responsavel);
-                              setReviewModalOpen(true);
-                            }
-                          }}
-                        >
-                          <Play className="h-3 w-3 mr-1" />
-                          Iniciar
-                        </Button>
                       </div>
                     </CardContent>
                   </Card>
