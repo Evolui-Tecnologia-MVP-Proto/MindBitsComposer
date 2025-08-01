@@ -189,9 +189,6 @@ export default function HomePage() {
                   <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                     {documentosARevisar}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Aguardando revisão
-                  </p>
                 </CardContent>
               </Card>
 
@@ -206,9 +203,6 @@ export default function HomePage() {
                   <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                     {documentosEmRevisao}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Em processo de revisão
-                  </p>
                 </CardContent>
               </Card>
 
@@ -223,9 +217,6 @@ export default function HomePage() {
                   <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                     {documentosPublicados}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Concluídos e publicados
-                  </p>
                 </CardContent>
               </Card>
             </div>
