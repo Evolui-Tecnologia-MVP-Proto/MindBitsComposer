@@ -55,10 +55,13 @@ import { DeleteArtifactConfirmDialog } from "@/components/documentos/modals/Dele
 import { DocumentosTable } from "@/components/documentos/tables/DocumentosTable";
 
 export default function DocumentosPageEmbed() {
-
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  
   const [selectedDocument, setSelectedDocument] = useState<Documento | null>(
     null,
   );
+  const [editingArtifact, setEditingArtifact] = useState<DocumentArtifact | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -219,9 +222,14 @@ export default function DocumentosPageEmbed() {
     statusOrigem: "Manual", // Sempre "Manual" para novos documentos
   });
 
-  const queryClient = useQueryClient();
-
-  const { toast } = useToast();
+  // Função para obter informações do template
+  const getTemplateInfo = (templateId: string) => {
+    // Implementação placeholder - você pode substituir por lógica real
+    return {
+      name: "Template",
+      description: "Descrição do template"
+    };
+  };
 
   // Função para fechar modal de documentação e atualizar tabela
   const handleCloseDocumentationModal = useCallback(() => {
@@ -308,12 +316,7 @@ export default function DocumentosPageEmbed() {
     enabled: true
   });
 
-  // Função auxiliar para obter informações do template
-  const getTemplateInfo = (templateId: string) => {
-    if (!templatesList || !templateId) return null;
-    const template = (templatesList as any[]).find((t: any) => t.id === templateId);
-    return template ? { code: template.code, name: template.name } : null;
-  };
+
 
   // Buscar todas as colunas Monday de todos os mapeamentos
   const { data: allMondayColumns = [] } = useQuery({
@@ -1217,30 +1220,13 @@ export default function DocumentosPageEmbed() {
 
 
 
-   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-500">Carregando documentos...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto py-6 bg-background dark:bg-[#1F2937] text-foreground flex flex-col flex-1 min-h-0" data-page="documentos">
-      <div className="bg-[#F9FAFB] dark:bg-[#1F2937] flex flex-col flex-1 min-h-0 gap-6">
-
-
-        <div className="w-full flex flex-col flex-1 min-h-0">
-          {isLoading ? (
-            <div className="text-center py-6">Carregando documentos...</div>
-          ) : (
-            renderDocumentosTable(documentosProcessando)
-          )}
-        </div>
-      </div>
+    <>
+      {isLoading ? (
+        <div className="text-center py-6">Carregando documentos...</div>
+      ) : (
+        renderDocumentosTable(documentosProcessando)
+      )}
 
       <ViewDocumentModal 
         isOpen={isViewModalOpen}
@@ -1363,14 +1349,62 @@ export default function DocumentosPageEmbed() {
         showApprovalAlert={showApprovalAlert}
         setShowApprovalAlert={setShowApprovalAlert}
         isFlowInspectorPinned={isFlowInspectorPinned}
-        FlowWithAutoFitView={FlowWithAutoFitView}
+        FlowWithAutoFitView={(props: any) => (
+          <FlowWithAutoFitView 
+            {...props}
+            flowDiagramModal={flowDiagramModal}
+            setFlowDiagramModal={setFlowDiagramModal}
+            queryClient={queryClient}
+            toast={toast}
+            isFlowInspectorPinned={isFlowInspectorPinned}
+            setIsFlowInspectorPinned={setIsFlowInspectorPinned}
+            getTemplateInfo={getTemplateInfo}
+          />
+        )}
       />
-    </div>
+      <DeleteConfirmDialog
+        isOpen={isDeleteConfirmOpen}
+        onClose={closeDeleteConfirm}
+        documentToDelete={documentToDelete}
+        onConfirmDelete={confirmDeleteDocument}
+        isDeleting={deleteDocumentoMutation.isPending}
+      />
+      <DeleteArtifactConfirmDialog
+        isOpen={isDeleteArtifactConfirmOpen}
+        onClose={() => {
+          setIsDeleteArtifactConfirmOpen(false);
+          setArtifactToDelete(null);
+        }}
+        artifactToDelete={artifactToDelete}
+        onConfirmDelete={() => {
+          if (artifactToDelete) {
+            deleteArtifactMutation.mutate(artifactToDelete);
+          }
+        }}
+        isDeleting={deleteArtifactMutation.isPending}
+      />
+    </>
   );
-
+}
 
 // Componente interno que usa useReactFlow para fit view automático
-  function FlowWithAutoFitView({ flowData, showFlowInspector, setShowFlowInspector, setSelectedFlowNode, selectedFlowNode, showApprovalAlert, setShowApprovalAlert, isPinned }: any) {
+function FlowWithAutoFitView({ 
+  flowData, 
+  showFlowInspector, 
+  setShowFlowInspector, 
+  setSelectedFlowNode, 
+  selectedFlowNode, 
+  showApprovalAlert, 
+  setShowApprovalAlert, 
+  isPinned,
+  flowDiagramModal,
+  setFlowDiagramModal,
+  queryClient,
+  toast,
+  isFlowInspectorPinned,
+  setIsFlowInspectorPinned,
+  getTemplateInfo
+}: any) {
     const { fitView, getNodes, setNodes } = useReactFlow();
     
     // Estado para controlar os valores dos campos do formulário
@@ -3333,115 +3367,4 @@ export default function DocumentosPageEmbed() {
     );
   }
 
-  return (
-    <div className="container mx-auto py-6 bg-background text-foreground" data-page="documentos">
-      <EditDocumentModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        editingDocument={editingDocument}
-        currentCreatedDocumentId={currentCreatedDocumentId}
-        formData={formData}
-        setFormData={setFormData}
-        onOpenAddArtifactModal={() => {
-          setArtifactFormData({
-            documentoId: editingDocument?.id || "",
-            name: "",
-            fileData: "",
-            fileName: "",
-            fileSize: "",
-            mimeType: "",
-            type: "",
-          });
-          setIsAddArtifactModalOpen(true);
-        }}
-        onOpenEditArtifactModal={(artifact) => {
-          setEditingArtifact(artifact);
-          setArtifactFormData({
-            documentoId: artifact.documentoId,
-            name: artifact.name,
-            fileData: artifact.fileData || "",
-            fileName: artifact.fileName || "",
-            fileSize: artifact.fileSize || "",
-            mimeType: artifact.mimeType || "",
-            type: artifact.type || "",
-            originAssetId: artifact.originAssetId,
-            isImage: artifact.isImage,
-          });
-          setIsEditArtifactModalOpen(true);
-        }}
-        onDeleteArtifact={handleDeleteArtifact}
-        onUpdateDocument={handleUpdateDocument}
-        updateDocumentoMutation={updateDocumentoMutation}
-      />
-      <AddArtifactModal
-        isOpen={isAddArtifactModalOpen}
-        onClose={() => setIsAddArtifactModalOpen(false)}
-        artifactFormData={artifactFormData}
-        setArtifactFormData={setArtifactFormData}
-        onCreateArtifact={handleCreateArtifact}
-        createArtifactMutation={createArtifactMutation}
-        onFileUpload={handleFileUpload}
-      />
-      <DocumentationModal
-        isOpen={isDocumentationModalOpen}
-        onClose={handleCloseDocumentationModal}
-        selectedDocument={selectedDocument}
-        selectedFlowId={selectedFlowId}
-        setSelectedFlowId={setSelectedFlowId}
-        documentsFlows={documentsFlows}
-        optimisticSyncState={optimisticSyncState}
-        setOptimisticSyncState={setOptimisticSyncState}
-        onStartDocumentation={(data) => {
-          startDocumentationMutation.mutate(data);
-        }}
-        onIntegrateAttachments={(documentId) => {
-          integrateAttachmentsMutation.mutate(documentId);
-        }}
-        hasMondayItemValues={hasMondayItemValues}
-        startDocumentationMutation={startDocumentationMutation}
-        integrateAttachmentsMutation={integrateAttachmentsMutation}
-      />
-      <EditArtifactModal
-        isOpen={isEditArtifactModalOpen}
-        onClose={() => setIsEditArtifactModalOpen(false)}
-        artifactFormData={artifactFormData}
-        setArtifactFormData={setArtifactFormData}
-        onUpdateArtifact={handleUpdateArtifact}
-        updateArtifactMutation={updateArtifactMutation}
-      />
-      <FlowDiagramModal
-        flowDiagramModal={flowDiagramModal}
-        setFlowDiagramModal={setFlowDiagramModal}
-        showFlowInspector={showFlowInspector}
-        setShowFlowInspector={setShowFlowInspector}
-        selectedFlowNode={selectedFlowNode}
-        setSelectedFlowNode={setSelectedFlowNode}
-        showApprovalAlert={showApprovalAlert}
-        setShowApprovalAlert={setShowApprovalAlert}
-        isFlowInspectorPinned={isFlowInspectorPinned}
-        FlowWithAutoFitView={FlowWithAutoFitView}
-      />
-      <DeleteConfirmDialog
-        isOpen={isDeleteConfirmOpen}
-        onClose={closeDeleteConfirm}
-        documentToDelete={documentToDelete}
-        onConfirmDelete={confirmDeleteDocument}
-        isDeleting={deleteDocumentoMutation.isPending}
-      />
-      <DeleteArtifactConfirmDialog
-        isOpen={isDeleteArtifactConfirmOpen}
-        onClose={() => {
-          setIsDeleteArtifactConfirmOpen(false);
-          setArtifactToDelete(null);
-        }}
-        artifactToDelete={artifactToDelete}
-        onConfirmDelete={() => {
-          if (artifactToDelete) {
-            deleteArtifactMutation.mutate(artifactToDelete);
-          }
-        }}
-        isDeleting={deleteArtifactMutation.isPending}
-      />
-    </div>
-  );
-}
+
