@@ -32,6 +32,12 @@ Menu item naming: Change "Home" to "Principal" for Portuguese localization.
 - Enables embedding complete document management functionality in any page or dashboard
 - Maintains all advanced features: flow diagrams, approval workflows, integration engines
 
+### Menu Cleanup (August 2025)
+- Removed "Tests & Refacts" section from main navigation menu
+- Removed access to experimental pages: documentos-refact and documentos-embed
+- Cleaned up corresponding routes in App.tsx to streamline navigation
+- Maintains only production-ready menu items for end users
+
 ## System Architecture
 
 ### UI/UX Decisions

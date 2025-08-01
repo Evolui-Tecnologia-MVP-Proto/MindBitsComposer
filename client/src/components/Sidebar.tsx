@@ -136,35 +136,7 @@ export default function Sidebar({ isMobileOpen, setIsMobileOpen }: SidebarProps)
             </div>
           </div>
 
-          {/* Separador para Tests & Refacts */}
-          <div className="my-4 px-3">
-            <div className="border-t border-gray-200 dark:border-gray-700"></div>
-            <div className="mt-3 mb-2 px-1">
-              <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                Tests & Refacts
-              </span>
-            </div>
-          </div>
 
-          <div className="sidebar-item-container">
-            <div 
-              className={`sidebar-item ${activeItem === "documentos-refact" ? "sidebar-active" : ""}`}
-              onClick={() => handleNavigation("/documentos-refact")}
-            >
-              <FlaskConical className="mr-3 h-6 w-6" />
-              Documentos (Refact)
-            </div>
-          </div>
-
-          <div className="sidebar-item-container">
-            <div 
-              className={`sidebar-item ${activeItem === "documentos-embed" ? "sidebar-active" : ""}`}
-              onClick={() => handleNavigation("/documentos-embed")}
-            >
-              <FlaskConical className="mr-3 h-6 w-6" />
-              Documentos (Embed)
-            </div>
-          </div>
 
         </nav>
       </aside>
