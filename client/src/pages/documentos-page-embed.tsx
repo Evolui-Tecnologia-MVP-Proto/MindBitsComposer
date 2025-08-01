@@ -23,9 +23,7 @@ import {
   BookOpen,
   Zap,
   RefreshCw,
-  FileText,
-  Filter,
-  FilterX
+
 } from "lucide-react";
 
 import {
@@ -96,9 +94,6 @@ export default function DocumentosPageEmbed() {
   const [isPessoasExpanded, setIsPessoasExpanded] = useState(false);
   const [createModalActiveTab, setCreateModalActiveTab] =
     useState("dados-gerais");
-  
-  // Estado para controlar visibilidade dos painéis de filtragem
-  const [showFilters, setShowFilters] = useState(true);
   
   const [isLoadingMondayAttachments, setIsLoadingMondayAttachments] =
     useState(false);
@@ -1195,7 +1190,7 @@ export default function DocumentosPageEmbed() {
     return "outros";
   };
 
-  const renderDocumentosTable = (documentos: Documento[], showFilters: boolean = true) => {
+  const renderDocumentosTable = (documentos: Documento[]) => {
     return (
       <DocumentosTable
         documentos={documentos}
@@ -1215,7 +1210,7 @@ export default function DocumentosPageEmbed() {
         getConcludedFlow={getConcludedFlow}
         openFlowDiagramModal={openFlowDiagramModal}
         flowExecutions={flowExecutions}
-        showFilters={showFilters}
+        showFilters={true}
       />
     );
   };
@@ -1236,25 +1231,7 @@ export default function DocumentosPageEmbed() {
   return (
     <div className="container mx-auto py-6 bg-background dark:bg-[#1F2937] text-foreground flex flex-col flex-1 min-h-0" data-page="documentos">
       <div className="bg-[#F9FAFB] dark:bg-[#1F2937] flex flex-col flex-1 min-h-0 gap-6">
-        <div className="flex items-center justify-between p-6 rounded-lg bg-gray-50 dark:bg-[#0F172A]">
-          <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-[#6B7280] flex items-center gap-3">
-            <FileText className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-            Documentos
-          </h1>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowFilters(!showFilters)}
-            className="h-9 w-9 p-0 rounded-full bg-white dark:bg-[#1E293B] border-gray-300 dark:border-[#374151] hover:bg-gray-50 dark:hover:bg-[#374151]"
-            title={showFilters ? "Ocultar filtros" : "Mostrar filtros"}
-          >
-            {showFilters ? (
-              <FilterX className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-            ) : (
-              <Filter className="h-4 w-4 text-gray-600 dark:text-gray-300" />
-            )}
-          </Button>
-        </div>
+
 
         <div className="w-full flex flex-col flex-1 min-h-0">
           {isLoading ? (
