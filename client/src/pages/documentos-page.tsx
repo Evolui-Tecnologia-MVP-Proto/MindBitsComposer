@@ -57,6 +57,7 @@ import { DeleteArtifactConfirmDialog } from "@/components/documentos/modals/Dele
 import { DocumentosTable } from "@/components/documentos/tables/DocumentosTable";
 import { GitHubTab } from "@/components/documentos/tabs/GitHubTab";
 import { IncluirDocumentosTab } from "@/components/documentos/tabs/IncluirDocumentosTab";
+import { IntegradosTab } from "@/components/documentos/tabs/IntegradosTab";
 
 import { DocsProcessEmbed } from "@/components/documentos/tables/DocsProcessEmbed";
 
@@ -137,7 +138,18 @@ export default function DocumentosPage() {
   // Estado para o sistema de aprovação
   const [showApprovalAlert, setShowApprovalAlert] = useState(false);
 
-
+  // Estado para modal do diagrama de fluxo
+  const [flowDiagramModal, setFlowDiagramModal] = useState<{
+    isOpen: boolean;
+    flowData: any;
+    documentTitle: string;
+    documentObject?: string;
+  }>({
+    isOpen: false,
+    flowData: null,
+    documentTitle: "",
+    documentObject: "",
+  });
   
   // Estado simples para forçar re-render
   const [isFlowModalOpen, setIsFlowModalOpen] = useState(false);
@@ -1419,7 +1431,39 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     )[0];
   };
 
-
+  // Função para abrir modal do diagrama de fluxo
+  const openFlowDiagramModal = (execution: any) => {
+    console.log("🔴 Dados recebidos na função:", execution);
+    if (execution) {
+      // Buscar o documento correspondente na lista de documentos
+      const documento = documentos?.find(doc => doc.id === execution.documentId);
+      const documentObject = documento?.objeto || execution.document?.objeto || "";
+      
+      console.log("📄 Documento encontrado:", documento);
+      console.log("📋 Objeto do documento:", documentObject);
+      
+      // Garantir que o documentId e edges estão incluídos nos dados do fluxo
+      const baseFlowData = execution.flowTasks || execution;
+      const flowDataWithDocumentId = {
+        ...baseFlowData,
+        documentId: execution.documentId || execution.document_id || execution.id,
+        // Preservar edges explicitamente
+        edges: baseFlowData.edges || execution.edges || [],
+        nodes: baseFlowData.nodes || execution.nodes || [],
+        viewport: baseFlowData.viewport || execution.viewport || { x: 0, y: 0, zoom: 1 }
+      };
+      
+      console.log("🔗 Edges preservadas no modal:", flowDataWithDocumentId.edges);
+      
+      setFlowDiagramModal({
+        isOpen: true,
+        flowData: flowDataWithDocumentId,
+        documentTitle: execution.flowName || "Template de Fluxo",
+        documentObject: documentObject
+      });
+      console.log("🔴 Estado atualizado com documentObject:", documentObject);
+    }
+  };
 
   const handleDeleteDocument = (documento: Documento) => {
     setDocumentToDelete(documento);
@@ -1633,15 +1677,18 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             }}
           />
 
-          <TabsContent value="integrados" className="slide-in">
-            <DocsProcessEmbed 
-              className="w-full"
-              showFilters={showFilters}
-              activeTab="integrados"
-              hideStatusColumn={false}
-              statusFilter="Integrado" // DEFINE O STATUS
-            />
-          </TabsContent>
+          <IntegradosTab
+            isLoading={isLoading}
+            filtros={filtros}
+            setFiltros={setFiltros}
+            responsaveisUnicos={responsaveisUnicos}
+            modulosUnicos={modulosUnicos}
+            clientesUnicos={clientesUnicos}
+            origensUnicas={origensUnicas}
+            renderDocumentosTable={renderDocumentosTable}
+            documentosIntegrados={documentosIntegrados}
+            showFilters={showFilters}
+          />
 
           <TabsContent value="em-processo-embed" className="slide-in">
             <DocsProcessEmbed 
