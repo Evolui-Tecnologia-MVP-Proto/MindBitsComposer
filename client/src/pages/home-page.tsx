@@ -9,7 +9,9 @@ import {
   CheckCircle2, 
   AlertCircle,
   User,
-  Play
+  Play,
+  Filter,
+  FilterX
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { type Documento, type Specialty } from "@shared/schema";
@@ -21,6 +23,7 @@ export default function HomePage() {
   const { user } = useAuth();
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedResponsavel, setSelectedResponsavel] = useState<string>("");
+  const [showFilters, setShowFilters] = useState(true);
 
   // Buscar todos os documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
@@ -264,17 +267,32 @@ export default function HomePage() {
         {/* Seção de Meus Documentos em Processo */}
         <div className="flex-1 min-h-0 mt-6">
           <div className="bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6 h-full flex flex-col">
-            <div className="flex items-center gap-2 mb-4">
-              <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                Meus Documentos em Processo
-              </h2>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                  Meus Documentos em Processo
+                </h2>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFilters(!showFilters)}
+                className="h-9 w-9 p-0 rounded-full bg-white dark:bg-[#1E293B] border-gray-300 dark:border-[#374151] hover:bg-gray-50 dark:hover:bg-[#374151]"
+                title={showFilters ? "Ocultar filtros" : "Mostrar filtros"}
+              >
+                {showFilters ? (
+                  <FilterX className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                ) : (
+                  <Filter className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+                )}
+              </Button>
             </div>
             
             <div className="flex-1 min-h-0">
               <DocsProcessEmbed
                 className="h-full"
-                showFilters={true}
+                showFilters={showFilters}
                 activeTab="em-processo"
                 hideStatusColumn={true}
               />
