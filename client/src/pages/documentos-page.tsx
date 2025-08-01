@@ -44,6 +44,7 @@ import {
   IntegrationNodeComponent,
   SwitchNodeComponent
 } from "@/components/documentos/flow/FlowNodes";
+import { FlowDiagramModal } from "@/components/documentos/modals/FlowDiagramModal";
 
 import { ViewDocumentModal } from "@/components/documentos/modals/ViewDocumentModal";
 import { EditDocumentModal } from "@/components/documentos/modals/EditDocumentModal";
@@ -135,6 +136,31 @@ export default function DocumentosPage() {
     fileUrl: "",
   });
 
+  // Estado para o sistema de aprovação
+  const [showApprovalAlert, setShowApprovalAlert] = useState(false);
+
+  // Estado para modal do diagrama de fluxo
+  const [flowDiagramModal, setFlowDiagramModal] = useState<{
+    isOpen: boolean;
+    flowData: any;
+    documentTitle: string;
+    documentObject?: string;
+  }>({
+    isOpen: false,
+    flowData: null,
+    documentTitle: "",
+    documentObject: "",
+  });
+  
+  // Estado simples para forçar re-render
+  const [isFlowModalOpen, setIsFlowModalOpen] = useState(false);
+  const [currentFlowData, setCurrentFlowData] = useState<any>(null);
+  const [currentDocTitle, setCurrentDocTitle] = useState("");
+
+  // Estado para controlar o side panel do inspector
+  const [showFlowInspector, setShowFlowInspector] = useState(false);
+  const [selectedFlowNode, setSelectedFlowNode] = useState<any>(null);
+  const [isFlowInspectorPinned, setIsFlowInspectorPinned] = useState(false);
 
   // Função para resetar o formulário
   const resetFormData = () => {
@@ -1407,7 +1433,39 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     )[0];
   };
 
-
+  // Função para abrir modal do diagrama de fluxo
+  const openFlowDiagramModal = (execution: any) => {
+    console.log("🔴 Dados recebidos na função:", execution);
+    if (execution) {
+      // Buscar o documento correspondente na lista de documentos
+      const documento = documentos?.find(doc => doc.id === execution.documentId);
+      const documentObject = documento?.objeto || execution.document?.objeto || "";
+      
+      console.log("📄 Documento encontrado:", documento);
+      console.log("📋 Objeto do documento:", documentObject);
+      
+      // Garantir que o documentId e edges estão incluídos nos dados do fluxo
+      const baseFlowData = execution.flowTasks || execution;
+      const flowDataWithDocumentId = {
+        ...baseFlowData,
+        documentId: execution.documentId || execution.document_id || execution.id,
+        // Preservar edges explicitamente
+        edges: baseFlowData.edges || execution.edges || [],
+        nodes: baseFlowData.nodes || execution.nodes || [],
+        viewport: baseFlowData.viewport || execution.viewport || { x: 0, y: 0, zoom: 1 }
+      };
+      
+      console.log("🔗 Edges preservadas no modal:", flowDataWithDocumentId.edges);
+      
+      setFlowDiagramModal({
+        isOpen: true,
+        flowData: flowDataWithDocumentId,
+        documentTitle: execution.flowName || "Template de Fluxo",
+        documentObject: documentObject
+      });
+      console.log("🔴 Estado atualizado com documentObject:", documentObject);
+    }
+  };
 
   const handleDeleteDocument = (documento: Documento) => {
     setDocumentToDelete(documento);
@@ -1520,6 +1578,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         deleteDocumentoMutation={deleteDocumentoMutation}
         getActiveFlow={getActiveFlow}
         getConcludedFlow={getConcludedFlow}
+        openFlowDiagramModal={openFlowDiagramModal}
         flowExecutions={flowExecutions}
         showFilters={showFilters}
       />
@@ -1781,7 +1840,17 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
         startDocumentationMutation={startDocumentationMutation}
         integrateAttachmentsMutation={integrateAttachmentsMutation}
       />
-
+      <FlowDiagramModal
+        flowDiagramModal={flowDiagramModal}
+        setFlowDiagramModal={setFlowDiagramModal}
+        showFlowInspector={showFlowInspector}
+        setShowFlowInspector={setShowFlowInspector}
+        selectedFlowNode={selectedFlowNode}
+        setSelectedFlowNode={setSelectedFlowNode}
+        showApprovalAlert={showApprovalAlert}
+        setShowApprovalAlert={setShowApprovalAlert}
+        isFlowInspectorPinned={isFlowInspectorPinned}
+      />
     </div>
   );
 }
