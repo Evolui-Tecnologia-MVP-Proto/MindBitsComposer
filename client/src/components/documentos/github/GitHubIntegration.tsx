@@ -1,37 +1,262 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Download, Upload, Loader2, FolderSync } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import FileExplorer from "@/components/FileExplorer";
 
-interface GitHubIntegrationProps {
-  syncFromGitHubMutation: any;
-  syncAllToGitHubMutation: any;
-  repoStructures: any[];
-  githubRepoFiles: any[];
-  isLoadingRepo: boolean;
-  selectedFolderPath: string;
-  setSelectedFolderPath: (path: string) => void;
-  selectedFolderFiles: any[];
-  isLoadingFolderFiles: boolean;
-  fetchGithubRepoStructure: () => void;
-  fetchFolderFiles: (path: string) => void;
-}
-
-export function GitHubIntegration({
-  syncFromGitHubMutation,
-  syncAllToGitHubMutation,
-  repoStructures,
-  githubRepoFiles,
-  isLoadingRepo,
-  selectedFolderPath,
-  setSelectedFolderPath,
-  selectedFolderFiles,
-  isLoadingFolderFiles,
-  fetchGithubRepoStructure,
-  fetchFolderFiles,
-}: GitHubIntegrationProps) {
+export function GitHubIntegration() {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
+  
+  // Estados locais
+  const [githubRepoFiles, setGithubRepoFiles] = useState<any[]>([]);
+  const [isLoadingRepo, setIsLoadingRepo] = useState(false);
+  const [selectedFolderPath, setSelectedFolderPath] = useState<string>("");
+  const [selectedFolderFiles, setSelectedFolderFiles] = useState<any[]>([]);
+  const [isLoadingFolderFiles, setIsLoadingFolderFiles] = useState(false);
+
+  // Buscar estrutura local do repositório
+  const { data: repoStructures = [] } = useQuery<any[]>({
+    queryKey: ["/api/repo-structure"],
+  });
+
+  // Buscar conexões de serviço para obter o repositório GitHub
+  const { data: serviceConnections = [] } = useQuery({
+    queryKey: ["/api/service-connections"],
+  });
+
+  // Mutation para sincronizar estrutura do GitHub para o banco local
+  const syncFromGitHubMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest(
+        "POST",
+        "/api/repo-structure/sync-from-github",
+      );
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Sincronização concluída!",
+        description: `${data.importedCount || 0} pasta(s) importadas e ${data.updatedCount || 0} pasta(s) atualizadas.`,
+      });
+
+      // Atualizar dados locais
+      queryClient.invalidateQueries({ queryKey: ["/api/repo-structure"] });
+
+      // Atualizar estrutura do GitHub também
+      fetchGithubRepoStructure();
+
+      // Forçar re-fetch após um pequeno delay
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ["/api/repo-structure"] });
+        fetchGithubRepoStructure();
+      }, 1000);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro na sincronização",
+        description: error.message || "Erro ao importar estrutura do GitHub",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation para sincronizar todas as pastas não sincronizadas com GitHub
+  const syncAllToGitHubMutation = useMutation({
+    mutationFn: async () => {
+      const unsyncedFolders = repoStructures.filter(
+        (folder: any) =>
+          !folder.isSync &&
+          (!folder.linkedTo ||
+            repoStructures.some(
+              (parent: any) => parent.uid === folder.linkedTo,
+            )),
+      );
+      
+      const results = [];
+      for (const folder of unsyncedFolders) {
+        console.log(
+          `🚀 Sincronizando pasta: ${folder.folderName} (${folder.uid})`,
+        );
+        try {
+          const res = await apiRequest(
+            "POST",
+            `/api/repo-structure/${folder.uid}/sync-github`,
+          );
+          const result = await res.json();
+          results.push({
+            folder: folder.folderName,
+            success: true,
+            message: result.message,
+          });
+        } catch (error: any) {
+          results.push({
+            folder: folder.folderName,
+            success: false,
+            message: error.message,
+          });
+        }
+      }
+      return results;
+    },
+    onSuccess: (results) => {
+      const successCount = results.filter((r) => r.success).length;
+      const errorCount = results.filter((r) => !r.success).length;
+
+      if (successCount > 0) {
+        toast({
+          title: `${successCount} pasta(s) sincronizada(s)!`,
+          description:
+            errorCount > 0
+              ? `${errorCount} pasta(s) falharam na sincronização.`
+              : "Todas as pastas foram enviadas para o GitHub com sucesso.",
+        });
+      }
+
+      if (errorCount > 0) {
+        const failedFolders = results
+          .filter((r) => !r.success)
+          .map((r) => r.folder)
+          .join(", ");
+        toast({
+          title: "Algumas pastas falharam",
+          description: `Pastas com erro: ${failedFolders}`,
+          variant: "destructive",
+        });
+      }
+
+      // Atualizar imediatamente a estrutura local
+      queryClient.invalidateQueries({ queryKey: ["/api/repo-structure"] });
+
+      // Forçar múltiplas atualizações para garantir sincronização visual
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ["/api/repo-structure"] });
+      }, 500);
+
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ["/api/repo-structure"] });
+        fetchGithubRepoStructure();
+      }, 1500);
+
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ["/api/repo-structure"] });
+      }, 3500);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro na sincronização",
+        description: error.message || "Erro ao sincronizar pastas com GitHub.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Função para buscar arquivos de uma pasta específica no GitHub
+  const fetchFolderFiles = async (folderPath: string) => {
+    if (!folderPath) return;
+
+    setIsLoadingFolderFiles(true);
+    try {
+      const githubConnection = (serviceConnections as any[])?.find(
+        (conn: any) => conn.serviceName === "github",
+      );
+
+      if (!githubConnection) return;
+
+      const repo = githubConnection.parameters?.[0];
+      if (!repo) return;
+
+      const response = await fetch(
+        `https://api.github.com/repos/${repo}/contents/${folderPath}`,
+        {
+          headers: {
+            Authorization: `token ${githubConnection.token}`,
+            Accept: "application/vnd.github.v3+json",
+            "User-Agent": "EVO-MindBits-Composer",
+          },
+        },
+      );
+
+      if (response.ok) {
+        const files = await response.json();
+        // Filtrar arquivos, excluindo .gitkeep que são apenas para sincronização
+        const fileList = Array.isArray(files)
+          ? files.filter(
+              (item: any) => item.type === "file" && item.name !== ".gitkeep",
+            )
+          : [];
+        setSelectedFolderFiles(fileList);
+      } else if (response.status === 404) {
+        // Pasta vazia ou não existe - mostrar mensagem apropriada
+        setSelectedFolderFiles([]);
+      } else {
+        setSelectedFolderFiles([]);
+      }
+    } catch (error) {
+      setSelectedFolderFiles([]);
+    } finally {
+      setIsLoadingFolderFiles(false);
+    }
+  };
+
+  // Função para carregar visualização da estrutura do repositório
+  const fetchGithubRepoStructure = async () => {
+    setIsLoadingRepo(true);
+    try {
+      const response = await fetch("/api/github/repo/contents");
+
+      console.log("📊 Status da resposta:", response.status, response.statusText);
+
+      if (response.ok) {
+        const contents = await response.json();
+        console.log("✅ Conteúdo recebido:", contents.length, "itens");
+        const fileStructure = await buildSimpleFileTree(contents);
+        setGithubRepoFiles(fileStructure);
+        return fileStructure;
+      } else {
+        const errorData = await response.json();
+        console.error("❌ Erro na resposta:", {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData.error
+        });
+        return [];
+      }
+    } catch (error: any) {
+      console.error("❌ Erro na requisição completa:", {
+        message: error.message,
+        name: error.name,
+        stack: error.stack
+      });
+      return [];
+    } finally {
+      setIsLoadingRepo(false);
+    }
+  };
+
+  // Função simples para criar estrutura de visualização
+  const buildSimpleFileTree = async (items: any[]) => {
+    return items.map((item) => ({
+      name: item.name,
+      path: item.path,
+      type: item.type === "dir" ? "folder" : "file",
+      size: item.size || 0,
+      children: [],
+    }));
+  };
+
+  // Carregar estrutura do repositório quando houver conexão GitHub
+  useEffect(() => {
+    if (
+      serviceConnections &&
+      serviceConnections.length > 0
+    ) {
+      fetchGithubRepoStructure();
+    }
+  }, [serviceConnections]);
 
   const handleSyncRef = () => {
     // Update all repo structures to is_sync: true
