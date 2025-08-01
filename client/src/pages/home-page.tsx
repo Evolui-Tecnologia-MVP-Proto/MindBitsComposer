@@ -141,7 +141,7 @@ export default function HomePage() {
 
   return (
     <div className="fade-in px-3.5 py-1 bg-gray-50 dark:bg-[#1F2937] h-full flex flex-col">
-      <div className="flex flex-col flex-1 min-h-0 space-y-6">
+      <div className="flex flex-col flex-1 min-h-0 gap-[5px]">
         
         {/* Sistema de Tabs Principal */}
         <Tabs 
@@ -344,8 +344,8 @@ export default function HomePage() {
 
         </Tabs>
 
-        {/* Seção de Meus Documentos em Processo - sempre visível com 10px de distância */}
-        <div className="flex-1 min-h-0 mt-4">
+        {/* Seção de Meus Documentos em Processo - sempre visível com 5px de distância dinâmica */}
+        <div className="flex-1 min-h-0">
           <div className="bg-gray-50 dark:bg-[#0F172A] rounded-lg p-6 h-full flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
