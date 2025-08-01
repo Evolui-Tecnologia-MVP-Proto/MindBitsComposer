@@ -1216,10 +1216,7 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
     () => filteredAndSortedDocumentos.filter((doc) => doc.status === "Integrado"),
     [filteredAndSortedDocumentos],
   );
-  const documentosProcessando = useMemo(
-    () => filteredAndSortedDocumentos.filter((doc) => doc.status === "Em Processo"),
-    [filteredAndSortedDocumentos],
-  );
+
   const documentosConcluidos = useMemo(
     () => filteredAndSortedDocumentos.filter((doc) => doc.status === "Concluido"),
     [filteredAndSortedDocumentos],
@@ -1651,10 +1648,9 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
           onValueChange={setActiveTab}
           className="w-full tabs-root flex flex-col flex-1 min-h-0"
         >
-          <TabsList className="grid w-full grid-cols-6 bg-gray-100 dark:bg-[#0F172A] mb-6">
+          <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-[#0F172A] mb-6">
             <TabsTrigger value="incluidos" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Incluídos</TabsTrigger>
             <TabsTrigger value="integrados" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Integrados</TabsTrigger>
-            <TabsTrigger value="em-processo" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Em Processo</TabsTrigger>
             <TabsTrigger value="em-processo-embed" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Em Processo (Embed)</TabsTrigger>
             <TabsTrigger value="concluidos" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Concluídos</TabsTrigger>
             <TabsTrigger value="repositorio" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Repositório</TabsTrigger>
@@ -1693,14 +1689,6 @@ Este repositório está integrado com o EVO-MindBits Composer para gestão autom
             documentosIntegrados={documentosIntegrados}
             showFilters={showFilters}
           />
-
-          <TabsContent value="em-processo" className="slide-in">
-            {isLoading ? (
-              <div className="text-center py-6">Carregando documentos...</div>
-            ) : (
-              renderDocumentosTable(documentosProcessando)
-            )}
-          </TabsContent>
 
           <TabsContent value="em-processo-embed" className="slide-in">
             <DocsProcessEmbed 
