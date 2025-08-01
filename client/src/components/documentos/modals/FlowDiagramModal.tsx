@@ -17,6 +17,7 @@ import {
   IntegrationNodeComponent,
   SwitchNodeComponent
 } from "@/components/documentos/flow/FlowNodes";
+import { FlowWithAutoFitView } from "@/components/documentos/flow/FlowWithAutoFitView";
 
 interface FlowDiagramModalData {
   isOpen: boolean;
