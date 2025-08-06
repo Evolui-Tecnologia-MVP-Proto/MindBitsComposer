@@ -3226,7 +3226,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await db
             .update(documentEditions)
             .set({
-              // Keep templateId for MindBits_CT documents (don't set to null)
+              templateId: null, // Reset template_id to null for MindBits_CT documents
               status: 'draft',
               lexFile: '',
               jsonFile: {},
