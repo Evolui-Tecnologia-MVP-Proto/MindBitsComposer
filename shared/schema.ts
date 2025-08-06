@@ -411,6 +411,7 @@ export const flowActions = pgTable("flow_actions", {
   flowExecutionId: uuid("flow_execution_id").notNull().references(() => documentFlowExecutions.id, { onDelete: "cascade" }),
   actionDescription: text("action_description").notNull(),
   actor: integer("actor").notNull().references(() => users.id),
+  flowNode: text("flow_node"),
   startedAt: timestamp("started_at").notNull(),
   endAt: timestamp("end_at"),
   createdAt: timestamp("created_at").defaultNow(),
