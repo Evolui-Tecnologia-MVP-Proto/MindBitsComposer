@@ -1629,7 +1629,7 @@ function FlowWithAutoFitView({
     const fetchFlowActionsHistory = async (nodeId: string) => {
       try {
         // Buscar execução de fluxo para este documento
-        const documentId = flowDiagramModal.documentObject;
+        const documentId = flowDiagramModal.documentId;
         if (!documentId) return;
         
         const response = await fetch(`/api/flow-actions/history?documentId=${documentId}&flowNode=${nodeId}`);
