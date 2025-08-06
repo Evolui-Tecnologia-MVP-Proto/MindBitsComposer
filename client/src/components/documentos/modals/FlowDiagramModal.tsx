@@ -36,6 +36,7 @@ interface FlowDiagramModalProps {
   setShowApprovalAlert: (show: boolean) => void;
   isFlowInspectorPinned: boolean;
   FlowWithAutoFitView: any;
+  onClose?: () => void; // Callback para quando a modal for fechada
 }
 
 export function FlowDiagramModal({
@@ -49,6 +50,7 @@ export function FlowDiagramModal({
   setShowApprovalAlert,
   isFlowInspectorPinned,
   FlowWithAutoFitView,
+  onClose,
 }: FlowDiagramModalProps) {
   console.log("🔴 RENDERIZANDO MODAL:", flowDiagramModal);
   
@@ -123,6 +125,10 @@ export function FlowDiagramModal({
             flowData: null,
             documentTitle: "",
           });
+          // Chamar callback se fornecido
+          if (onClose) {
+            onClose();
+          }
         }
       }}
     >
@@ -171,6 +177,10 @@ export function FlowDiagramModal({
                   flowData: null,
                   documentTitle: "",
                 });
+                // Chamar callback se fornecido
+                if (onClose) {
+                  onClose();
+                }
               }}
             >
               Fechar

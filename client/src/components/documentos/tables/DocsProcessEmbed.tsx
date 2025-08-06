@@ -1641,6 +1641,12 @@ export function DocsProcessEmbed({
         showApprovalAlert={showApprovalAlert}
         setShowApprovalAlert={setShowApprovalAlert}
         isFlowInspectorPinned={isFlowInspectorPinned}
+        onClose={() => {
+          // Invalidar queries para atualizar a tabela quando modal for fechada
+          queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+          queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
+          queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions/count"] });
+        }}
         FlowWithAutoFitView={(props: any) => (
           <FlowWithAutoFitView 
             {...props}
