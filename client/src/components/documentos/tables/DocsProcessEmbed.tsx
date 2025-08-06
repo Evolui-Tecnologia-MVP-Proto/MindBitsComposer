@@ -253,11 +253,15 @@ export function DocsProcessEmbed({
 
   // Função para obter informações do template
   const getTemplateInfo = (templateId: string) => {
-    // Implementação placeholder - você pode substituir por lógica real
-    return {
-      name: "Template",
-      description: "Descrição do template"
-    };
+    const template = templatesList.find((t: any) => t.id === templateId);
+    if (template) {
+      return {
+        code: template.code,
+        name: template.name,
+        description: template.description
+      };
+    }
+    return null;
   };
 
   // Função para fechar modal de documentação e atualizar tabela
