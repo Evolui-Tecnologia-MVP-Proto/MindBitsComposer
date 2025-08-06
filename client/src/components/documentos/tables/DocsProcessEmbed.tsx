@@ -91,6 +91,7 @@ export function DocsProcessEmbed({
   const [isAddArtifactModalOpen, setIsAddArtifactModalOpen] = useState(false);
   const [isEditArtifactModalOpen, setIsEditArtifactModalOpen] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
   const [isDeleteArtifactConfirmOpen, setIsDeleteArtifactConfirmOpen] =
     useState(false);
   const [isDocumentationModalOpen, setIsDocumentationModalOpen] =
@@ -103,6 +104,9 @@ export function DocsProcessEmbed({
     null,
   );
   const [documentToDelete, setDocumentToDelete] = useState<Documento | null>(
+    null,
+  );
+  const [documentToReset, setDocumentToReset] = useState<Documento | null>(
     null,
   );
   const [artifactToDelete, setArtifactToDelete] = useState<string | null>(null);
@@ -537,6 +541,40 @@ export function DocsProcessEmbed({
       toast({
         title: "Documento excluído",
         description: "O documento foi excluído com sucesso.",
+      });
+    },
+  });
+
+  // Mutation para resetar documento
+  const resetDocumentoMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`/api/documentos/${id}/reset`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Erro ao resetar documento");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions/count"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/document-editions-in-progress"] });
+      setIsResetConfirmOpen(false);
+      setDocumentToReset(null);
+      toast({
+        title: "Documento resetado",
+        description: "O documento foi resetado ao estado inicial com sucesso.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao resetar documento",
+        description: error.message || "Falha ao resetar o documento",
+        variant: "destructive",
       });
     },
   });
@@ -1171,6 +1209,20 @@ export function DocsProcessEmbed({
     setDocumentToDelete(null);
   };
 
+  const handleResetDocument = (documento: Documento) => {
+    setDocumentToReset(documento);
+    setIsResetConfirmOpen(true);
+  };
+
+  const confirmResetDocument = (documento: Documento) => {
+    resetDocumentoMutation.mutate(documento.id);
+  };
+
+  const closeResetConfirm = () => {
+    setIsResetConfirmOpen(false);
+    setDocumentToReset(null);
+  };
+
   // Função para converter arquivo em Base64
   const convertFileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -1262,6 +1314,7 @@ export function DocsProcessEmbed({
         openViewModal={openViewModal}
         openEditModal={openEditModal}
         handleDeleteDocument={handleDeleteDocument}
+        handleResetDocument={handleResetDocument}
         setSelectedDocument={setSelectedDocument}
         setIsDocumentationModalOpen={setIsDocumentationModalOpen}
         isDocumentationModalOpen={isDocumentationModalOpen}
@@ -1573,6 +1626,16 @@ export function DocsProcessEmbed({
         documentToDelete={documentToDelete}
         onConfirmDelete={confirmDeleteDocument}
         isDeleting={deleteDocumentoMutation.isPending}
+      />
+      <DeleteConfirmDialog
+        isOpen={isResetConfirmOpen}
+        onClose={closeResetConfirm}
+        documentToDelete={documentToReset}
+        onConfirmDelete={confirmResetDocument}
+        isDeleting={resetDocumentoMutation.isPending}
+        title="Confirmar Reset do Documento"
+        message="Tem certeza de que deseja resetar este documento? Esta ação irá remover todo o histórico de processamento, fluxos executados e edições, retornando o documento ao estado inicial 'Integrado'. Esta operação não pode ser desfeita."
+        confirmText="Reset"
       />
       <DeleteArtifactConfirmDialog
         isOpen={isDeleteArtifactConfirmOpen}

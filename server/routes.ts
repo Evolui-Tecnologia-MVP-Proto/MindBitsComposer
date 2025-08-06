@@ -3190,6 +3190,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Reset document - remove all history and return to initial state
+  app.post("/api/documentos/:id/reset", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const documentId = req.params.id;
+      console.log(`🔄 Iniciando reset do documento: ${documentId}`);
+      
+      // Delete all document editions
+      await db.delete(documentEditions).where(eq(documentEditions.documentId, documentId));
+      console.log(`✅ Document editions removidas para documento: ${documentId}`);
+      
+      // Get all flow executions for this document first
+      const flowExecutionsToDelete = await db
+        .select({ id: documentFlowExecutions.id })
+        .from(documentFlowExecutions)
+        .where(eq(documentFlowExecutions.documentId, documentId));
+      
+      // Delete all flow actions for all executions of this document
+      if (flowExecutionsToDelete.length > 0) {
+        const executionIds = flowExecutionsToDelete.map(exec => exec.id);
+        await db.delete(flowActions).where(
+          sql`flow_execution_id = ANY(${executionIds})`
+        );
+        console.log(`✅ Flow actions removidas para ${executionIds.length} execuções do documento: ${documentId}`);
+      }
+      
+      // Delete all document flow executions
+      await db.delete(documentFlowExecutions).where(eq(documentFlowExecutions.documentId, documentId));
+      console.log(`✅ Document flow executions removidas para documento: ${documentId}`);
+      
+      // Reset document status and clear fields
+      const [updatedDocument] = await db
+        .update(documentos)
+        .set({
+          status: 'Integrado',
+          taskState: null,
+          userId: null,
+          updatedAt: new Date()
+        })
+        .where(eq(documentos.id, documentId))
+        .returning();
+      
+      console.log(`✅ Documento resetado com sucesso: ${documentId}`);
+      
+      res.json({
+        success: true,
+        message: "Documento resetado com sucesso",
+        document: updatedDocument
+      });
+      
+    } catch (error: any) {
+      console.error("❌ Erro ao resetar documento:", error);
+      res.status(500).json({ 
+        error: "Erro ao resetar documento",
+        details: error.message 
+      });
+    }
+  });
+
   // Rota para iniciar documentação
   app.post("/api/documentos/start-documentation", async (req: Request, res: Response) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");

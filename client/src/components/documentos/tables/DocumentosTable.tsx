@@ -21,6 +21,7 @@ import {
   BookOpen,
   Network,
   ChevronDown,
+  RotateCcw,
 } from "lucide-react";
 import { type Documento } from "@shared/schema";
 import { useQueryClient } from "@tanstack/react-query";
@@ -36,6 +37,7 @@ interface DocumentosTableProps {
   openViewModal: (documento: Documento) => void;
   openEditModal: (documento: Documento) => void;
   handleDeleteDocument: (documento: Documento) => void;
+  handleResetDocument?: (documento: Documento) => void;
   setSelectedDocument: (documento: Documento | null) => void;
   setIsDocumentationModalOpen: (isOpen: boolean) => void;
   isDocumentationModalOpen: boolean;
@@ -59,6 +61,7 @@ export function DocumentosTable({
   openViewModal,
   openEditModal,
   handleDeleteDocument,
+  handleResetDocument,
   setSelectedDocument,
   setIsDocumentationModalOpen,
   isDocumentationModalOpen,
@@ -486,6 +489,17 @@ export function DocumentosTable({
                     {(activeTab === "concluidos" || activeTab === "em-processo") && getDocumentFlows(documento.id).length > 1 && (
                       <ChevronDown className="h-3 w-3 ml-1 text-purple-500" />
                     )}
+                  </Button>
+                )}
+                {activeTab === "em-processo" && handleResetDocument && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => handleResetDocument(documento)}
+                    title="Reset documento - remove todo histórico e volta ao estado inicial"
+                  >
+                    <RotateCcw className="h-4 w-4 text-red-500" />
                   </Button>
                 )}
                 {(activeTab === "em-processo" || activeTab === "concluidos") && flowExecutionCounts[documento.id] && (
