@@ -3648,25 +3648,25 @@ function FlowWithAutoFitView({
                     <table className="w-full border-collapse">
                       <thead>
                         <tr className="border-b dark:border-[#374151]">
-                          <th className="text-left p-3 font-medium text-gray-700 dark:text-gray-300">Ação</th>
-                          <th className="text-left p-3 font-medium text-gray-700 dark:text-gray-300">Por</th>
-                          <th className="text-left p-3 font-medium text-gray-700 dark:text-gray-300">Iniciado em</th>
-                          <th className="text-left p-3 font-medium text-gray-700 dark:text-gray-300">Finalizado em</th>
+                          <th className="text-left p-3 font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-[#0F172A]">Ação</th>
+                          <th className="text-left p-3 font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-[#0F172A]">Por</th>
+                          <th className="text-left p-3 font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-[#0F172A]">Iniciado em</th>
+                          <th className="text-left p-3 font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-[#0F172A]">Finalizado em</th>
                         </tr>
                       </thead>
                       <tbody>
                         {flowActionsHistory.map((action, index) => (
                           <tr key={index} className="border-b dark:border-[#374151] hover:bg-gray-50 dark:hover:bg-[#1F2937]">
-                            <td className="p-3 text-sm dark:text-gray-200">
+                            <td className="p-3 text-sm text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-[#0F172A]">
                               {action.action_description || 'Ação'}
                             </td>
-                            <td className="p-3 text-sm dark:text-gray-200">
+                            <td className="p-3 text-sm text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-[#0F172A]">
                               {action.actor || '-'}
                             </td>
-                            <td className="p-3 text-sm dark:text-gray-200">
+                            <td className="p-3 text-sm text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-[#0F172A]">
                               {action.started_at ? new Date(action.started_at).toLocaleString('pt-BR') : '-'}
                             </td>
-                            <td className="p-3 text-sm dark:text-gray-200">
+                            <td className="p-3 text-sm text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-[#0F172A]">
                               {action.end_at ? new Date(action.end_at).toLocaleString('pt-BR') : '-'}
                             </td>
                           </tr>
