@@ -3198,9 +3198,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const documentId = req.params.id;
       console.log(`🔄 Iniciando reset do documento: ${documentId}`);
       
-      // Delete all document editions
-      await db.delete(documentEditions).where(eq(documentEditions.documentId, documentId));
-      console.log(`✅ Document editions removidas para documento: ${documentId}`);
+      // Get document info to check origem
+      const [document] = await db
+        .select({ origem: documentos.origem })
+        .from(documentos)
+        .where(eq(documentos.id, documentId));
+      
+      if (!document) {
+        return res.status(404).json({ error: "Documento não encontrado" });
+      }
+      
+      // Handle MindBits_CT documents differently - preserve document_editions but reset their fields
+      if (document.origem === "MindBits_CT") {
+        console.log(`📋 Documento MindBits_CT - preservando mas resetando document_editions`);
+        
+        // First get existing document_editions to copy md_file_old to md_file
+        const existingEditions = await db
+          .select({ 
+            id: documentEditions.id, 
+            mdFileOld: documentEditions.mdFileOld 
+          })
+          .from(documentEditions)
+          .where(eq(documentEditions.documentId, documentId));
+        
+        // Update each document_edition individually to handle md_file copying
+        for (const edition of existingEditions) {
+          await db
+            .update(documentEditions)
+            .set({
+              templateId: null,
+              status: 'draft',
+              lexFile: '',
+              jsonFile: {},
+              mdFile: edition.mdFileOld || '', // Copy md_file_old to md_file
+              mdFileOld: '', // Clear md_file_old after copying
+              init: null,
+              publish: null,
+              startedBy: null,
+              fluxNodeId: ''
+            })
+            .where(eq(documentEditions.id, edition.id));
+        }
+        
+        console.log(`✅ Document editions resetadas (preservadas) para documento MindBits_CT: ${documentId}`);
+      } else {
+        // For other documents, delete all document editions (original behavior)
+        await db.delete(documentEditions).where(eq(documentEditions.documentId, documentId));
+        console.log(`✅ Document editions removidas para documento padrão: ${documentId}`);
+      }
       
       // Get all flow executions for this document first
       const flowExecutionsToDelete = await db
