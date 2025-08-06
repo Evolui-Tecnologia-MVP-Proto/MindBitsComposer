@@ -1069,7 +1069,7 @@ export default function DocumentosPage() {
             />
           </TabsContent>
 
-          <TabsContent value="em-processo-embed" className="slide-in">
+          <TabsContent value="em-processo-embed" className="slide-in overflow-hidden" style={{ maxHeight: "calc(100vh - 240px)" }}>
             <DocsProcessEmbed 
               className="w-full"
               showFilters={showFilters}
