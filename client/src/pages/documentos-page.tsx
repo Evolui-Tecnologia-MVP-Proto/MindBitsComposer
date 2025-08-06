@@ -85,7 +85,7 @@ export default function DocumentosPage() {
     useState("dados-gerais");
   
   // Estado para controlar visibilidade dos painéis de filtragem
-  const [showFilters, setShowFilters] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
   
 
   
