@@ -463,6 +463,7 @@ export const documentEditions = pgTable("document_editions", {
   mdFileOld: text("md_file_old"), // Versão anterior do arquivo Markdown
   init: timestamp("init"), // Data/hora de início
   publish: timestamp("publish"), // Data/hora de publicação
+  fluxNodeId: text("flux_node_id"), // ID do nó de fluxo relacionado
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
