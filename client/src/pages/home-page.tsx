@@ -26,9 +26,9 @@ export default function HomePage() {
   const { user } = useAuth();
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedResponsavel, setSelectedResponsavel] = useState<string>("");
-  const [showFilters, setShowFilters] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
   const [activeTab, setActiveTab] = useState("revisoes-ct-rag");
-  const [tabContentCollapsed, setTabContentCollapsed] = useState(false);
+  const [tabContentCollapsed, setTabContentCollapsed] = useState(true);
 
   // Função para alternar colapso do conteúdo da tab
   const toggleTabContentCollapse = (e: React.MouseEvent) => {
