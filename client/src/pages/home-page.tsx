@@ -413,6 +413,7 @@ export default function HomePage() {
                 showFilters={showFilters}
                 activeTab="em-processo"
                 hideStatusColumn={true}
+                showResetButton={false}
               />
             </div>
           </div>
