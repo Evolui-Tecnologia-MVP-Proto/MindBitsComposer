@@ -5,7 +5,7 @@ import { storage } from "./storage";
 import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, templates, lexicalDocuments, insertLexicalDocumentSchema, specialties, insertSpecialtySchema, systemParams, insertSystemParamSchema, flowActions } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
-import { eq, sql, desc, asc, and, gte, lte, isNull, or, ne } from "drizzle-orm";
+import { eq, sql, desc, asc, and, gte, lte, isNull, or, ne, inArray } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { systemLogs } from "@shared/schema";
 import { ZodError } from "zod";
@@ -3257,7 +3257,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (flowExecutionsToDelete.length > 0) {
         const executionIds = flowExecutionsToDelete.map(exec => exec.id);
         await db.delete(flowActions).where(
-          sql`flow_execution_id = ANY(${executionIds})`
+          inArray(flowActions.flowExecutionId, executionIds)
         );
         console.log(`✅ Flow actions removidas para ${executionIds.length} execuções do documento: ${documentId}`);
       }
