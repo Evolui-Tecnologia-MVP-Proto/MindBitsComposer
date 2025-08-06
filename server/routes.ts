@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, templates, lexicalDocuments, insertLexicalDocumentSchema, specialties, insertSpecialtySchema, systemParams, insertSystemParamSchema } from "@shared/schema";
+import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, templates, lexicalDocuments, insertLexicalDocumentSchema, specialties, insertSpecialtySchema, systemParams, insertSystemParamSchema, flowActions } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc, asc, and, gte, lte, isNull, or, ne } from "drizzle-orm";
@@ -2025,6 +2025,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erro ao importar JSON do fluxo:", error);
       res.status(500).json({ error: "Erro ao importar JSON do fluxo" });
+    }
+  });
+
+  // Endpoint para buscar histórico de execuções de flow actions
+  app.get("/api/flow-actions/history", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { documentId, flowNode } = req.query;
+      
+      if (!documentId || !flowNode) {
+        return res.status(400).json({ error: "documentId e flowNode são obrigatórios" });
+      }
+      
+      // Buscar execução de fluxo para este documento
+      const flowExecution = await db
+        .select()
+        .from(documentFlowExecutions)
+        .where(eq(documentFlowExecutions.documentId, documentId as string))
+        .orderBy(desc(documentFlowExecutions.createdAt))
+        .limit(1);
+      
+      if (!flowExecution || flowExecution.length === 0) {
+        return res.json([]);
+      }
+      
+      // Buscar flow actions para esta execução e nó específico
+      const flowActionsHistory = await db
+        .select({
+          id: flowActions.id,
+          action_type: flowActions.actionDescription,
+          status: sql<string>`CASE 
+            WHEN ${flowActions.endAt} IS NOT NULL THEN 'completed'
+            ELSE 'in_progress'
+          END`,
+          description: flowActions.actionDescription,
+          executed_at: flowActions.startedAt,
+          executed_by: users.name,
+          flow_node: flowActions.flowNode,
+          result_data: sql<any>`NULL` // Placeholder para dados de resultado se necessário
+        })
+        .from(flowActions)
+        .leftJoin(users, eq(flowActions.actor, users.id))
+        .where(
+          and(
+            eq(flowActions.flowExecutionId, flowExecution[0].id),
+            eq(flowActions.flowNode, flowNode as string)
+          )
+        )
+        .orderBy(desc(flowActions.startedAt));
+      
+      res.json(flowActionsHistory);
+      
+    } catch (error) {
+      console.error("Erro ao buscar histórico de flow actions:", error);
+      res.status(500).json({ error: "Erro ao buscar histórico de execuções" });
     }
   });
 

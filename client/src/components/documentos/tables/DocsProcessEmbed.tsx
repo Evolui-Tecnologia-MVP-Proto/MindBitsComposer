@@ -19,7 +19,7 @@ import ReactFlow, {
 } from 'reactflow';
 
 // Importing icons for custom nodes
-import { Pin, X } from 'lucide-react';
+import { Pin, X, History } from 'lucide-react';
 import 'reactflow/dist/style.css';
 
 
@@ -1621,6 +1621,30 @@ function FlowWithAutoFitView({
       message: string;
     }>({ status: null, message: '' });
     
+    // Estado para controlar modal de histórico de execuções
+    const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+    const [flowActionsHistory, setFlowActionsHistory] = useState<any[]>([]);
+    
+    // Função para buscar histórico de execuções
+    const fetchFlowActionsHistory = async (nodeId: string) => {
+      try {
+        // Buscar execução de fluxo para este documento
+        const documentId = flowDiagramModal.documentObject;
+        if (!documentId) return;
+        
+        const response = await fetch(`/api/flow-actions/history?documentId=${documentId}&flowNode=${nodeId}`);
+        if (response.ok) {
+          const history = await response.json();
+          setFlowActionsHistory(history);
+        } else {
+          setFlowActionsHistory([]);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar histórico:', error);
+        setFlowActionsHistory([]);
+      }
+    };
+    
     // Carregar dados salvos quando um nó é selecionado
     useEffect(() => {
       if (selectedFlowNode && selectedFlowNode.data.formData) {
@@ -2562,6 +2586,17 @@ function FlowWithAutoFitView({
                     return typeMap[selectedFlowNode.type] || selectedFlowNode.type;
                   })()} - {selectedFlowNode.id}
                 </p>
+                {/* Botão de histórico de execuções */}
+                <button
+                  onClick={() => {
+                    fetchFlowActionsHistory(selectedFlowNode.id);
+                    setIsHistoryModalOpen(true);
+                  }}
+                  className="absolute top-0 right-8 p-1 rounded transition-colors text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-[#1F2937]"
+                  title="Histórico de execuções"
+                >
+                  <History className="w-4 h-4" />
+                </button>
                 <button
                   onClick={() => setIsFlowInspectorPinned(!isFlowInspectorPinned)}
                   className={`absolute top-0 right-0 p-1 rounded transition-colors ${
@@ -3562,6 +3597,91 @@ function FlowWithAutoFitView({
                     <div className="text-xs text-gray-500 dark:text-gray-400">
                       Status atual: {selectedFlowNode.data.isAproved || 'UNDEF'}
                     </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Modal de Histórico de Execuções */}
+        {isHistoryModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setIsHistoryModalOpen(false)}>
+            <div className="bg-white dark:bg-[#0F172A] rounded-lg shadow-lg max-w-4xl w-full max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between p-4 border-b dark:border-[#374151]">
+                <div>
+                  <h2 className="text-lg font-semibold dark:text-gray-200">Histórico de Execuções</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    Nó: {selectedFlowNode?.id} | Tipo: {(() => {
+                      const typeMap: { [key: string]: string } = {
+                        'startNode': 'Início',
+                        'endNode': 'Fim',
+                        'actionNode': 'Ação',
+                        'documentNode': 'Documento',
+                        'integrationNode': 'Integração',
+                        'switchNode': 'Condição'
+                      };
+                      return typeMap[selectedFlowNode?.type] || selectedFlowNode?.type;
+                    })()}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setIsHistoryModalOpen(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="p-4 overflow-y-auto max-h-[calc(80vh-120px)]">
+                {flowActionsHistory.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                    <History className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>Nenhum histórico de execução encontrado para este nó.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {flowActionsHistory.map((action, index) => (
+                      <div key={index} className="bg-gray-50 dark:bg-[#1F2937] border dark:border-[#374151] rounded-lg p-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3 mb-2">
+                              <span className="text-sm font-medium dark:text-gray-200">
+                                {action.action_type || 'Ação'}
+                              </span>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                action.status === 'completed' 
+                                  ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
+                                  : action.status === 'failed'
+                                  ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400'
+                                  : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400'
+                              }`}>
+                                {action.status || 'Pendente'}
+                              </span>
+                            </div>
+                            
+                            {action.description && (
+                              <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                                {action.description}
+                              </p>
+                            )}
+                            
+                            {action.result_data && (
+                              <div className="text-xs text-gray-500 dark:text-gray-400 font-mono bg-gray-100 dark:bg-[#374151] p-2 rounded">
+                                <pre className="whitespace-pre-wrap">{JSON.stringify(action.result_data, null, 2)}</pre>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <div className="text-right text-xs text-gray-500 dark:text-gray-400">
+                            <p>{new Date(action.executed_at).toLocaleString('pt-BR')}</p>
+                            {action.executed_by && (
+                              <p>Por: {action.executed_by}</p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
