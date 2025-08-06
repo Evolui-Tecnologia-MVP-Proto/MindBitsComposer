@@ -646,6 +646,42 @@ export default function LexicalPage() {
     }
   });
 
+  // Mutation para finalizar documento
+  const finalizeMutation = useMutation({
+    mutationFn: async (editionId: string) => {
+      return apiRequest("PATCH", `/api/document-editions/${editionId}/finalize`, {});
+    },
+    onSuccess: (data: any) => {
+      setShowFinalizeModal(false);
+      toast({
+        title: "Documento finalizado",
+        description: "O documento foi finalizado com sucesso e está disponível para a próxima fase do fluxo.",
+      });
+      // Invalidar queries relevantes
+      queryClient.invalidateQueries({ queryKey: ['/api/document-editions-in-progress'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/document-editions'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/documentos'] });
+      
+      // Limpar selectedEdition se foi finalizada
+      if (selectedEdition && selectedEdition.id === data.edition?.id) {
+        setSelectedEdition(null);
+        setTitle("Novo Documento");
+        setContent("");
+        setMarkdownContent("");
+        setInitialEditorState(undefined);
+        setEditorKey(prev => prev + 1); // Force re-render do editor
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro ao finalizar documento",
+        description: error.message || "Ocorreu um erro ao finalizar o documento.",
+        variant: "destructive",
+      });
+    }
+  });
+
   // Função para abrir o seletor de arquivos
   const handleFileUpload = () => {
     if (!selectedEdition) {
@@ -2479,12 +2515,14 @@ export default function LexicalPage() {
               </AlertDialogCancel>
               <AlertDialogAction 
                 onClick={() => {
-                  // TODO: Implementar funcionalidade de finalização
-                  setShowFinalizeModal(false);
+                  if (selectedEdition?.id) {
+                    finalizeMutation.mutate(selectedEdition.id);
+                  }
                 }}
+                disabled={finalizeMutation.isPending}
                 className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
               >
-                Confirmar
+                {finalizeMutation.isPending ? "Finalizando..." : "Confirmar"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

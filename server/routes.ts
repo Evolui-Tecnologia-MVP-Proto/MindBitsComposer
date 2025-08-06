@@ -5421,6 +5421,109 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Finalizar documento
+  app.patch("/api/document-editions/:id/finalize", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const editionId = req.params.id;
+      const userId = req.user!.id;
+      
+      // Buscar a edição atual
+      const edition = await db.select().from(documentEditions).where(eq(documentEditions.id, editionId)).limit(1);
+      
+      if (edition.length === 0) {
+        return res.status(404).json({ error: "Edição não encontrada" });
+      }
+      
+      const currentEdition = edition[0];
+      
+      if (!currentEdition.fluxNodeId) {
+        return res.status(400).json({ error: "Edição não possui flux_node_id associado" });
+      }
+      
+      // 1. Atualizar status da edição para "done"
+      const [updatedEdition] = await db
+        .update(documentEditions)
+        .set({ 
+          status: "done",
+          publish: new Date(),
+          updatedAt: new Date()
+        })
+        .where(eq(documentEditions.id, editionId))
+        .returning();
+      
+      console.log("✅ Status da edição atualizado para 'done':", updatedEdition.id);
+      
+      // 2. Buscar a execução de fluxo correspondente
+      const flowExecution = await db
+        .select()
+        .from(documentFlowExecutions)
+        .where(eq(documentFlowExecutions.documentId, currentEdition.documentId))
+        .limit(1);
+      
+      if (flowExecution.length > 0) {
+        const execution = flowExecution[0];
+        let flowTasks = execution.flowTasks as any;
+        
+        // 3. Atualizar o nó no fluxo
+        if (flowTasks && flowTasks.nodes) {
+          const nodeIndex = flowTasks.nodes.findIndex((node: any) => node.id === currentEdition.fluxNodeId);
+          
+          if (nodeIndex !== -1) {
+            flowTasks.nodes[nodeIndex] = {
+              ...flowTasks.nodes[nodeIndex],
+              data: {
+                ...flowTasks.nodes[nodeIndex].data,
+                isExecuted: true,
+                isInProcess: false
+              }
+            };
+            
+            // Atualizar a execução do fluxo
+            await db
+              .update(documentFlowExecutions)
+              .set({ 
+                flowTasks: flowTasks,
+                updatedAt: new Date()
+              })
+              .where(eq(documentFlowExecutions.id, execution.id));
+              
+            console.log(`✅ Nó ${currentEdition.fluxNodeId} atualizado: isExecuted=true, isInProcess=false`);
+          }
+        }
+        
+        // 4. Criar registro em flow_actions
+        const [flowAction] = await db
+          .insert(flowActions)
+          .values({
+            flowExecutionId: execution.id,
+            actionDescription: "Documento Finalizado",
+            actor: userId,
+            flowNode: currentEdition.fluxNodeId,
+            startedAt: new Date(),
+            endAt: new Date()
+          })
+          .returning();
+          
+        console.log("✅ Flow action criada:", flowAction.id);
+      }
+      
+      res.json({ 
+        success: true, 
+        edition: updatedEdition,
+        message: "Documento finalizado com sucesso"
+      });
+      
+    } catch (error) {
+      console.error("❌ Erro ao finalizar documento:", error);
+      res.status(500).json({ 
+        error: "Erro ao finalizar documento",
+        details: error.message 
+      });
+    }
+  });
+
   // Global Assets routes
   app.get("/api/global-assets", async (req: Request, res: Response) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
