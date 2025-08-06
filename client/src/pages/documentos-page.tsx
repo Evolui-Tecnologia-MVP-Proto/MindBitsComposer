@@ -1059,7 +1059,7 @@ export default function DocumentosPage() {
 
 
 
-          <TabsContent value="integrados-embed" className="slide-in -mb-5">
+          <TabsContent value="integrados-embed" className="slide-in -mb-10">
             <DocsProcessEmbed 
               className="w-full"
               showFilters={showFilters}
