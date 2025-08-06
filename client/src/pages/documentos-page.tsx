@@ -1059,7 +1059,7 @@ export default function DocumentosPage() {
 
 
 
-          <TabsContent value="integrados-embed" className="slide-in" style={{ marginBottom: "-40px", paddingBottom: "0" }}>
+          <TabsContent value="integrados-embed" className="slide-in overflow-hidden" style={{ maxHeight: "calc(100vh - 240px)" }}>
             <DocsProcessEmbed 
               className="w-full"
               showFilters={showFilters}
