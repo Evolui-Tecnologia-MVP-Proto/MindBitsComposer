@@ -2060,14 +2060,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const flowActionsHistory = await db
         .select({
           id: flowActions.id,
-          action_type: flowActions.actionDescription,
+          action_description: flowActions.actionDescription,
+          actor: users.name,
+          started_at: flowActions.startedAt,
+          end_at: flowActions.endAt,
           status: sql<string>`CASE 
             WHEN ${flowActions.endAt} IS NOT NULL THEN 'completed'
             ELSE 'in_progress'
           END`,
-          description: flowActions.actionDescription,
-          executed_at: flowActions.startedAt,
-          executed_by: users.name,
           flow_node: flowActions.flowNode,
           result_data: sql<any>`NULL` // Placeholder para dados de resultado se necessário
         })

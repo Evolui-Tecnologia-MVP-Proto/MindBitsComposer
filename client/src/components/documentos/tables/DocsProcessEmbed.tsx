@@ -3644,48 +3644,35 @@ function FlowWithAutoFitView({
                     <p>Nenhum histórico de execução encontrado para este nó.</p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
-                    {flowActionsHistory.map((action, index) => (
-                      <div key={index} className="bg-gray-50 dark:bg-[#1F2937] border dark:border-[#374151] rounded-lg p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-3 mb-2">
-                              <span className="text-sm font-medium dark:text-gray-200">
-                                {action.action_type || 'Ação'}
-                              </span>
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                action.status === 'completed' 
-                                  ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
-                                  : action.status === 'failed'
-                                  ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400'
-                                  : 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400'
-                              }`}>
-                                {action.status || 'Pendente'}
-                              </span>
-                            </div>
-                            
-                            {action.description && (
-                              <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                                {action.description}
-                              </p>
-                            )}
-                            
-                            {action.result_data && (
-                              <div className="text-xs text-gray-500 dark:text-gray-400 font-mono bg-gray-100 dark:bg-[#374151] p-2 rounded">
-                                <pre className="whitespace-pre-wrap">{JSON.stringify(action.result_data, null, 2)}</pre>
-                              </div>
-                            )}
-                          </div>
-                          
-                          <div className="text-right text-xs text-gray-500 dark:text-gray-400">
-                            <p>{new Date(action.executed_at).toLocaleString('pt-BR')}</p>
-                            {action.executed_by && (
-                              <p>Por: {action.executed_by}</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="border-b dark:border-[#374151]">
+                          <th className="text-left p-3 font-medium text-gray-700 dark:text-gray-300">Ação</th>
+                          <th className="text-left p-3 font-medium text-gray-700 dark:text-gray-300">Por</th>
+                          <th className="text-left p-3 font-medium text-gray-700 dark:text-gray-300">Iniciado em</th>
+                          <th className="text-left p-3 font-medium text-gray-700 dark:text-gray-300">Finalizado em</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {flowActionsHistory.map((action, index) => (
+                          <tr key={index} className="border-b dark:border-[#374151] hover:bg-gray-50 dark:hover:bg-[#1F2937]">
+                            <td className="p-3 text-sm dark:text-gray-200">
+                              {action.action_description || 'Ação'}
+                            </td>
+                            <td className="p-3 text-sm dark:text-gray-200">
+                              {action.actor || '-'}
+                            </td>
+                            <td className="p-3 text-sm dark:text-gray-200">
+                              {action.started_at ? new Date(action.started_at).toLocaleString('pt-BR') : '-'}
+                            </td>
+                            <td className="p-3 text-sm dark:text-gray-200">
+                              {action.end_at ? new Date(action.end_at).toLocaleString('pt-BR') : '-'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 )}
               </div>
