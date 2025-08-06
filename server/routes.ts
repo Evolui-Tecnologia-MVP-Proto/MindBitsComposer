@@ -5475,8 +5475,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
               ...flowTasks.nodes[nodeIndex],
               data: {
                 ...flowTasks.nodes[nodeIndex].data,
-                isExecuted: true,
-                isInProcess: false
+                isExecuted: 'TRUE',
+                isInProcess: 'FALSE'
               }
             };
             
@@ -5489,7 +5489,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               })
               .where(eq(documentFlowExecutions.id, execution.id));
               
-            console.log(`✅ Nó ${currentEdition.fluxNodeId} atualizado: isExecuted=true, isInProcess=false`);
+            console.log(`✅ Nó ${currentEdition.fluxNodeId} atualizado: isExecuted='TRUE', isInProcess='FALSE'`);
           }
         }
         
