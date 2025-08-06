@@ -3089,6 +3089,30 @@ function FlowWithAutoFitView({
                                         const editionData = await editionResponse.json();
                                         console.log('✅ Registro criado em document_editions:', editionData);
                                         console.log('✅ Task state atualizado para "in_doc" automaticamente');
+                                        
+                                        // Criar registro em flow_actions para rastrear o início da edição
+                                        try {
+                                          const flowActionResponse = await fetch('/api/flow-actions/create', {
+                                            method: 'POST',
+                                            headers: {
+                                              'Content-Type': 'application/json',
+                                            },
+                                            body: JSON.stringify({
+                                              documentId: documentId,
+                                              flowNode: selectedFlowNode.id,
+                                              actionDescription: 'Edição de documento iniciada'
+                                            }),
+                                          });
+                                          
+                                          if (flowActionResponse.ok) {
+                                            const flowActionData = await flowActionResponse.json();
+                                            console.log('✅ Flow action registrada:', flowActionData);
+                                          } else {
+                                            console.error('❌ Erro ao registrar flow action:', await flowActionResponse.text());
+                                          }
+                                        } catch (flowActionError) {
+                                          console.error('❌ Erro ao criar flow action:', flowActionError);
+                                        }
                                       } else {
                                         console.error('❌ Erro ao criar registro em document_editions:', await editionResponse.text());
                                       }

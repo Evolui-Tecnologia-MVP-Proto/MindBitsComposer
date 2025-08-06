@@ -2091,6 +2091,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint para criar flow action quando iniciar edição de documento
+  app.post("/api/flow-actions/create", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { documentId, flowNode, actionDescription } = req.body;
+      const userId = req.user?.id;
+      
+      console.log('📝 Criando flow action:', { documentId, flowNode, actionDescription, userId });
+      
+      if (!documentId || !flowNode || !actionDescription) {
+        return res.status(400).json({ error: "documentId, flowNode e actionDescription são obrigatórios" });
+      }
+      
+      // Buscar a execução de fluxo mais recente para este documento
+      const flowExecution = await db
+        .select()
+        .from(documentFlowExecutions)
+        .where(eq(documentFlowExecutions.documentId, documentId))
+        .orderBy(desc(documentFlowExecutions.createdAt))
+        .limit(1);
+      
+      if (!flowExecution || flowExecution.length === 0) {
+        console.log('❌ Nenhuma execução de fluxo encontrada para o documento:', documentId);
+        return res.status(404).json({ error: "Nenhuma execução de fluxo encontrada para este documento" });
+      }
+      
+      const now = new Date();
+      
+      // Criar o registro em flow_actions
+      const newFlowAction = await db.insert(flowActions).values({
+        id: crypto.randomUUID(),
+        flowExecutionId: flowExecution[0].id,
+        actionDescription: actionDescription,
+        actor: userId,
+        startedAt: now,
+        endAt: now, // Como solicitado, end_at = now()
+        flowNode: flowNode
+      }).returning();
+      
+      console.log('✅ Flow action criada:', newFlowAction[0]);
+      
+      res.json(newFlowAction[0]);
+      
+    } catch (error) {
+      console.error("Erro ao criar flow action:", error);
+      res.status(500).json({ error: "Erro ao criar flow action" });
+    }
+  });
+
   // Endpoint para listar arquivos JSON salvos
   app.get("/api/monday/saved-json-files", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
