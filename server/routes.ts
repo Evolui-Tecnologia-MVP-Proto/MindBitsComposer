@@ -5220,7 +5220,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             mdFileOld: existingRecord.mdFile, // Backup do md_file atual para md_file_old
             startedBy: req.user!.id, // Associar usuário atual
             init: new Date(), // Timestamp atual
-            updatedAt: new Date()
+            updatedAt: new Date(),
+            fluxNodeId: req.body.fluxNodeId || null // ID do nó de fluxo relacionado
           })
           .where(eq(documentEditions.id, existingRecord.id))
           .returning();
@@ -5241,7 +5242,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           lexFile: req.body.lexFile || null,
           jsonFile: req.body.jsonFile || {},
           mdFile: req.body.mdFile || null,
-          publish: req.body.publish || null
+          publish: req.body.publish || null,
+          fluxNodeId: req.body.fluxNodeId || null // ID do nó de fluxo relacionado
         };
         
         console.log("📋 Dados preparados para inserção:", JSON.stringify(insertData, null, 2));

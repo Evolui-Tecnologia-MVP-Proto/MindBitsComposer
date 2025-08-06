@@ -3081,7 +3081,8 @@ function FlowWithAutoFitView({
                                           documentId: documentId,
                                           templateId: templateId,
                                           status: 'in_progress',
-                                          init: new Date().toISOString()
+                                          init: new Date().toISOString(),
+                                          fluxNodeId: selectedFlowNode.id
                                         }),
                                       });
                                       
