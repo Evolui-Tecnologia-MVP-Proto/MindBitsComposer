@@ -1843,20 +1843,22 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           // Formatação de datetime para DD/MM/AAAA
           let formattedValue = String(fieldValue || '');
           if (formattedValue && formattedValue !== '') {
-            // Tentar detectar formato de datetime
+            // Detectar formatos específicos de datetime apenas com padrões rigorosos
             const datePatterns = [
-              /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/, // ISO datetime
-              /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}/, // SQL datetime
+              /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/, // ISO datetime completo
+              /^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}(\.\d{3})?$/, // SQL datetime
               /^\d{4}-\d{2}-\d{2}$/, // Data simples YYYY-MM-DD
+              /^\d{2}\/\d{2}\/\d{4}$/, // Data DD/MM/YYYY
+              /^\d{4}\/\d{2}\/\d{2}$/, // Data YYYY/MM/DD
             ];
             
-            const isDateTime = datePatterns.some(pattern => pattern.test(formattedValue)) || 
-                              (!isNaN(Date.parse(formattedValue)) && formattedValue.includes('-') && formattedValue.length > 8);
+            // Usar apenas padrões específicos, sem detecção genérica
+            const isDateTime = datePatterns.some(pattern => pattern.test(formattedValue.trim()));
             
             if (isDateTime) {
               try {
                 const date = new Date(formattedValue);
-                if (!isNaN(date.getTime())) {
+                if (!isNaN(date.getTime()) && date.getFullYear() > 1900 && date.getFullYear() < 2100) {
                   // Formatar para DD/MM/AAAA
                   const day = String(date.getDate()).padStart(2, '0');
                   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -1864,6 +1866,8 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
                   formattedValue = `${day}/${month}/${year}`;
                   
                   console.log(`📅 DEBUG - DateTime "${fieldValue}" formatado para "${formattedValue}"`);
+                } else {
+                  console.log(`⚠️ DEBUG - Data inválida ou fora do intervalo aceitável: "${fieldValue}"`);
                 }
               } catch (error) {
                 console.log(`⚠️ DEBUG - Erro ao formatar datetime "${fieldValue}":`, error);
