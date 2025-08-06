@@ -1059,9 +1059,9 @@ export default function DocumentosPage() {
 
 
 
-          <TabsContent value="integrados-embed" className="slide-in">
+          <TabsContent value="integrados-embed" className="slide-in" style={{ marginBottom: "-40px", paddingBottom: "0" }}>
             <DocsProcessEmbed 
-              className="w-full -mb-10"
+              className="w-full"
               showFilters={showFilters}
               activeTab="integrados"
               hideStatusColumn={false}
