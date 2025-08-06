@@ -5212,21 +5212,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const existingRecord = existingReadyToRevise[0];
         
         console.log("📝 Registro ready_to_revise encontrado, atualizando:", existingRecord.id);
+        console.log("🔍 DEBUG: fluxNodeId recebido:", req.body.fluxNodeId);
+        
+        const updateData = {
+          status: 'in_progress',
+          mdFileOld: existingRecord.mdFile, // Backup do md_file atual para md_file_old
+          startedBy: req.user!.id, // Associar usuário atual
+          init: new Date(), // Timestamp atual
+          updatedAt: new Date(),
+          fluxNodeId: req.body.fluxNodeId || null // ID do nó de fluxo relacionado
+        };
+        
+        console.log("🔍 DEBUG: Dados de atualização:", JSON.stringify(updateData, null, 2));
         
         const [updatedEdition] = await db
           .update(documentEditions)
-          .set({
-            status: 'in_progress',
-            mdFileOld: existingRecord.mdFile, // Backup do md_file atual para md_file_old
-            startedBy: req.user!.id, // Associar usuário atual
-            init: new Date(), // Timestamp atual
-            updatedAt: new Date(),
-            fluxNodeId: req.body.fluxNodeId || null // ID do nó de fluxo relacionado
-          })
+          .set(updateData)
           .where(eq(documentEditions.id, existingRecord.id))
           .returning();
         
         edition = updatedEdition;
+        
+        // WORKAROUND: Garantir que o fluxNodeId seja salvo
+        if (req.body.fluxNodeId) {
+          await db.execute(sql`UPDATE document_editions SET flux_node_id = ${req.body.fluxNodeId} WHERE id = ${existingRecord.id}`);
+          console.log("✅ WORKAROUND: fluxNodeId atualizado diretamente:", req.body.fluxNodeId);
+        }
+        
         console.log("✅ Registro ready_to_revise atualizado para in_progress:", edition.id);
         
       } else {
