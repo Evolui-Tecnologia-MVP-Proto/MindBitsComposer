@@ -3234,6 +3234,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
         .returning();
 
+      console.log("Criando registros de flow_actions para nós executados");
+      // Criar registros em flow_actions para cada nó com isExecuted = TRUE
+      if (updatedFlowTasks.nodes && Array.isArray(updatedFlowTasks.nodes)) {
+        const now = new Date();
+        const flowActionsToInsert = [];
+        
+        for (const node of updatedFlowTasks.nodes) {
+          if (node.data?.isExecuted === 'TRUE') {
+            flowActionsToInsert.push({
+              flowExecutionId: flowExecution[0].id,
+              actionDescription: "Fluxo Iniciado",
+              actor: req.user.id,
+              startedAt: now,
+              endAt: now,
+              flowNode: node.id // ex: startNode-1
+            });
+            console.log(`Criando flow_action para nó: ${node.id}`);
+          }
+        }
+        
+        if (flowActionsToInsert.length > 0) {
+          await db.insert(flowActions).values(flowActionsToInsert);
+          console.log(`${flowActionsToInsert.length} flow_actions criadas com sucesso`);
+        }
+      }
+
       console.log("Atualizando status do documento para 'Em Processo' e associando ao usuário");
       // Atualizar status do documento para "Em Processo" e associar ao usuário logado
       const updatedDocument = await storage.updateDocumento(documentId, { 

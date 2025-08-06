@@ -29,7 +29,7 @@ The system employs a monorepo structure with shared TypeScript schemas.
 - **System Parameters Management**: Centralized configuration via a `system_params` table.
 - **Specialty-User Association**: Manages user expertise associations for access and workflow assignments.
 - **Dynamic Flow Filtering**: Uses an `application_filter` JSON criteria for documentation modals to dynamically display flows based on document field values.
-- **Flow Actions Tracking**: The `flow_actions` table tracks individual actions within document flow executions for auditing and progress monitoring, including a `flow_node` field to identify the specific flow node where each action occurred.
+- **Flow Actions Tracking**: The `flow_actions` table tracks individual actions within document flow executions for auditing and progress monitoring, including a `flow_node` field to identify the specific flow node where each action occurred. When a documentation flow is initiated, the system automatically creates flow_action records for all nodes marked as executed (isExecuted = TRUE) in the flow definition.
 
 ### Feature Specifications
 - **Toolbar-Based Container Editing**: Edit/delete functions for collapsible containers integrated into the Lexical editor toolbar, appearing conditionally.
