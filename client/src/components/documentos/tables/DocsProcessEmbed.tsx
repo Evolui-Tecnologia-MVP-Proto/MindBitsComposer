@@ -558,13 +558,41 @@ export function DocsProcessEmbed({
       }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data, documentId) => {
+      // Invalidar todas as queries relacionadas aos documentos
       queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+      
+      // Invalidar queries relacionadas a fluxos
       queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
       queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions/count"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documents-flows"] });
+      
+      // Invalidar queries relacionadas a edições e artefatos
       queryClient.invalidateQueries({ queryKey: ["/api/document-editions-in-progress"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos/artifacts-count"] });
+      
+      // Invalidar artefatos específicos do documento resetado
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/documentos", documentId, "artifacts"] 
+      });
+      
+      // Invalidar todas as queries de artefatos que possam estar sendo usadas
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/documentos", currentDocumentId, "artifacts"] 
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/documentos", currentCreatedDocumentId, "artifacts"] 
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/documentos", selectedDocument?.id, "artifacts"] 
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: ["/api/documentos", editingDocument?.id, "artifacts"] 
+      });
+      
       setIsResetConfirmOpen(false);
       setDocumentToReset(null);
+      
       toast({
         title: "Documento resetado",
         description: "O documento foi resetado ao estado inicial com sucesso.",
