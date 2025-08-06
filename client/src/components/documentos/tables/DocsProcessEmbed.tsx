@@ -69,6 +69,7 @@ interface DocsProcessEmbedProps {
   activeTab?: string;
   hideStatusColumn?: boolean;
   statusFilter?: string; // NOVA PROP
+  showResetButton?: boolean; // Controla se o botão Reset deve aparecer
 }
 
 export function DocsProcessEmbed({ 
@@ -76,7 +77,8 @@ export function DocsProcessEmbed({
   showFilters = true,
   activeTab = "em-processo",
   hideStatusColumn = false,
-  statusFilter
+  statusFilter,
+  showResetButton
 }: DocsProcessEmbedProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -1342,7 +1344,7 @@ export function DocsProcessEmbed({
         openViewModal={openViewModal}
         openEditModal={openEditModal}
         handleDeleteDocument={handleDeleteDocument}
-        handleResetDocument={handleResetDocument}
+        handleResetDocument={showResetButton !== false && activeTab === "em-processo" ? handleResetDocument : undefined}
         setSelectedDocument={setSelectedDocument}
         setIsDocumentationModalOpen={setIsDocumentationModalOpen}
         isDocumentationModalOpen={isDocumentationModalOpen}
