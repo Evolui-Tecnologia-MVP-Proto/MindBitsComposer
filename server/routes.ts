@@ -3300,6 +3300,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         for (const node of updatedFlowTasks.nodes) {
           if (node.data?.isExecuted === 'TRUE') {
             flowActionsToInsert.push({
+              id: crypto.randomUUID(),
               flowExecutionId: flowExecution[0].id,
               actionDescription: "Fluxo Iniciado",
               actor: req.user.id,
