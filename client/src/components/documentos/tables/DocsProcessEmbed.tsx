@@ -1629,9 +1629,13 @@ function FlowWithAutoFitView({
     const fetchFlowActionsHistory = async (nodeId: string) => {
       try {
         // Buscar execução de fluxo para este documento
-        const documentId = flowDiagramModal.documentId;
-        if (!documentId) return;
+        const documentId = flowDiagramModal.flowData?.documentId || flowDiagramModal.documentId;
+        if (!documentId) {
+          console.log('❌ Erro: documentId não encontrado no flowDiagramModal');
+          return;
+        }
         
+        console.log('📋 Buscando histórico para:', { documentId, nodeId });
         const response = await fetch(`/api/flow-actions/history?documentId=${documentId}&flowNode=${nodeId}`);
         if (response.ok) {
           const history = await response.json();

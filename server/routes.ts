@@ -2035,6 +2035,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { documentId, flowNode } = req.query;
       
+      console.log('📋 API /flow-actions/history - Parâmetros recebidos:', { documentId, flowNode });
+      
       if (!documentId || !flowNode) {
         return res.status(400).json({ error: "documentId e flowNode são obrigatórios" });
       }
@@ -2047,7 +2049,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .orderBy(desc(documentFlowExecutions.createdAt))
         .limit(1);
       
+      console.log('🔍 Flow execution encontrada:', flowExecution.length > 0 ? flowExecution[0].id : 'Nenhuma');
+      
       if (!flowExecution || flowExecution.length === 0) {
+        console.log('❌ Nenhuma execução de fluxo encontrada para o documento:', documentId);
         return res.json([]);
       }
       
@@ -2075,6 +2080,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           )
         )
         .orderBy(desc(flowActions.startedAt));
+      
+      console.log(`✅ ${flowActionsHistory.length} flow actions encontradas para o nó ${flowNode}`);
       
       res.json(flowActionsHistory);
       
