@@ -226,7 +226,7 @@ export default function LexicalPage() {
 
   // Query para buscar document_editions em progresso - sempre ativa para detectar composer
   const { data: documentEditions = [], isLoading: isLoadingEditions } = useQuery({
-    queryKey: ['/api/document-editions-in-progress'],
+    queryKey: ['/api/document-editions-library'],
     enabled: true
   });
 
@@ -659,6 +659,7 @@ export default function LexicalPage() {
       });
       // Invalidar queries relevantes
       queryClient.invalidateQueries({ queryKey: ['/api/document-editions-in-progress'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/document-editions-library'] });
       queryClient.invalidateQueries({ queryKey: ['/api/document-editions'] });
       queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
       queryClient.invalidateQueries({ queryKey: ['/api/documentos'] });
@@ -1936,13 +1937,13 @@ export default function LexicalPage() {
                   <AccordionContent className="overflow-hidden">
                     <div className="space-y-2 pt-2 overflow-x-hidden">
                       {isLoadingEditions ? (
-                        <div className="text-center py-2 text-sm">Carregando documentos em progresso...</div>
+                        <div className="text-center py-2 text-sm">Carregando documentos...</div>
                       ) : (
                         <>
                           {!documentEditions || (Array.isArray(documentEditions) && documentEditions.length === 0) ? (
                             <div className="text-center py-4 text-gray-500 dark:text-[#6B7280]">
                               <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                              <p className="text-xs">Nenhum documento em progresso encontrado</p>
+                              <p className="text-xs">Nenhum documento encontrado</p>
                             </div>
                           ) : (
                             Array.isArray(documentEditions) && documentEditions.map((edition: any) => (
@@ -1953,16 +1954,29 @@ export default function LexicalPage() {
                                 }`}
                                 onClick={() => handleSelectEdition(edition)}
                               >
-                                {edition.lexFile && (
-                                  <div className="absolute top-2 right-2">
-                                    <Badge className="bg-blue-500 text-white text-xs px-2 py-1">
-                                      Edit
+                                {/* Badge para documentos em progresso ou finalizados */}
+                                <div className="absolute top-2 right-2">
+                                  {edition.status === 'done' ? (
+                                    <Badge className="bg-green-500 text-white text-xs px-2 py-1">
+                                      Finalizado
                                     </Badge>
-                                  </div>
-                                )}
+                                  ) : edition.lexFile ? (
+                                    <Badge className="bg-blue-500 text-white text-xs px-2 py-1">
+                                      Em Edição
+                                    </Badge>
+                                  ) : (
+                                    <Badge className="bg-yellow-500 text-white text-xs px-2 py-1">
+                                      Em Progresso
+                                    </Badge>
+                                  )}
+                                </div>
                                 <div className="flex justify-between items-start">
                                   <div className="flex-1 pr-8 overflow-hidden">
-                                    <h5 className="font-medium text-sm text-blue-600 dark:text-blue-400 truncate">
+                                    <h5 className={`font-medium text-sm truncate ${
+                                      edition.status === 'done' 
+                                        ? 'text-green-600 dark:text-green-400' 
+                                        : 'text-blue-600 dark:text-blue-400'
+                                    }`}>
                                       {edition.templateCode}
                                     </h5>
                                     <div className="mt-1 space-y-1">
@@ -1971,6 +1985,11 @@ export default function LexicalPage() {
                                       </p>
                                       <p className="text-xs text-gray-600 dark:text-[#9CA3AF] truncate">
                                         <span className="font-medium">Objeto:</span> {edition.objeto || 'N/A'}
+                                      </p>
+                                      <p className="text-xs text-gray-500 dark:text-[#6B7280] truncate">
+                                        <span className="font-medium">Status:</span> {
+                                          edition.status === 'done' ? 'Finalizado' : 'Em Progresso'
+                                        }
                                       </p>
                                     </div>
                                   </div>

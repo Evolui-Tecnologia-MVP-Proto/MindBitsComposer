@@ -5820,6 +5820,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Document Editions Library route - includes both in_progress and done documents for sidebar
+  app.get("/api/document-editions-library", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const libraryEditions = await db.select({
+        id: documentEditions.id,
+        documentId: documentEditions.documentId,
+        templateId: documentEditions.templateId,
+        status: documentEditions.status,
+        createdAt: documentEditions.createdAt,
+        updatedAt: documentEditions.updatedAt,
+        lexFile: documentEditions.lexFile,
+        mdFile: documentEditions.mdFile,
+        mdFileOld: documentEditions.mdFileOld,
+        origem: documentos.origem,
+        objeto: documentos.objeto,
+        sistema: documentos.sistema,
+        modulo: documentos.modulo,
+        responsavel: documentos.responsavel,
+        idOrigemTxt: documentos.idOrigemTxt,
+        templateCode: templates.code,
+        templateStructure: templates.structure
+      })
+      .from(documentEditions)
+      .innerJoin(documentos, eq(documentEditions.documentId, documentos.id))
+      .innerJoin(templates, eq(documentEditions.templateId, templates.id))
+      .where(and(
+        or(
+          eq(documentEditions.status, 'in_progress'),
+          eq(documentEditions.status, 'done')
+        ),
+        eq(documentEditions.startedBy, req.user.id)
+      ))
+      .orderBy(desc(documentEditions.updatedAt));
+      
+      console.log(`🔍 [API] Buscando document_editions para biblioteca do usuário: ${req.user.id}`);
+      console.log(`✅ [API] Encontradas ${libraryEditions.length} edições na biblioteca para o usuário`);
+      
+      res.json(libraryEditions);
+    } catch (error) {
+      console.error("Erro ao buscar document_editions da biblioteca:", error);
+      res.status(500).send("Erro ao buscar document_editions da biblioteca");
+    }
+  });
+
   // Update document edition lex_file
   app.put("/api/document-editions/:id/lex-file", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
