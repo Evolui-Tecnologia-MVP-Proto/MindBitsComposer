@@ -2216,24 +2216,9 @@ function FlowWithAutoFitView({
       }
     };
 
-    // Função para alterar o status de aprovação (altera estado imediatamente e mostra alerta)
+    // Função para alterar o status de aprovação (apenas atualiza o nó selecionado localmente, sem afetar o diagrama)
     const updateApprovalStatus = (nodeId: string, newStatus: string) => {
-      const currentNodes = getNodes();
-      const updatedNodes = currentNodes.map(node => {
-        if (node.id === nodeId) {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              isAproved: newStatus
-            }
-          };
-        }
-        return node;
-      });
-      setNodes(updatedNodes);
-      
-      // Atualizar também o nó selecionado para refletir a mudança no painel
+      // Atualizar apenas o nó selecionado para refletir a mudança no painel (não o diagrama completo)
       if (selectedFlowNode && selectedFlowNode.id === nodeId) {
         setSelectedFlowNode({
           ...selectedFlowNode,
@@ -2816,19 +2801,26 @@ function FlowWithAutoFitView({
       }
     };
 
-    // Effect para executar fit view quando o painel inspector é aberto/fechado
+    // Effect para executar fit view quando o painel inspector é aberto/fechado (não durante alterações no formulário)
+    const [lastInspectorState, setLastInspectorState] = useState(showFlowInspector);
+    
     useEffect(() => {
-      const timeoutId = setTimeout(() => {
-        fitView({
-          padding: 0.2,
-          minZoom: 0.1,
-          maxZoom: 2,
-          duration: 300
-        });
-      }, 100);
+      // Só executar fitView se realmente mudou o estado do inspector e não está durante edição de aprovação
+      if (lastInspectorState !== showFlowInspector && !showApprovalAlert) {
+        const timeoutId = setTimeout(() => {
+          fitView({
+            padding: 0.2,
+            minZoom: 0.1,
+            maxZoom: 2,
+            duration: 300
+          });
+        }, 100);
+        
+        setLastInspectorState(showFlowInspector);
 
-      return () => clearTimeout(timeoutId);
-    }, [showFlowInspector, fitView]);
+        return () => clearTimeout(timeoutId);
+      }
+    }, [showFlowInspector, fitView, lastInspectorState, showApprovalAlert]);
 
     // Implementar lógica de "pendente em processo"
     // Handle different data structures: flowData might be the flowTasks directly or have a flowTasks property
