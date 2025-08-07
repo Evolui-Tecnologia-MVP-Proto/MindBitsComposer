@@ -105,6 +105,7 @@ export default function BasicTextEditor() {
     position: number;
     sectionIndex?: number;
   } | null>(null);
+  const [editorKey, setEditorKey] = useState<number>(0);
 
   // Capturar cursor globalmente
   React.useEffect(() => {
@@ -176,6 +177,7 @@ export default function BasicTextEditor() {
     setIsMarkdownView(false);
     setActiveTab("richtext");
     setLastCursorInfo(null);
+    setEditorKey(prev => prev + 1); // Força re-render completo do LexicalEditor
     console.log("✅ Editor resetado com sucesso");
   };
 
@@ -358,7 +360,7 @@ export default function BasicTextEditor() {
         icon: "palette",
         pageName: "freehand-canvas-plugin",
         configuration: {},
-        endpoints: [],
+        endpoints: {},
         permissions: [],
         dependencies: [],
         createdAt: new Date(),
@@ -1428,6 +1430,7 @@ export default function BasicTextEditor() {
             {/* Editor Area */}
             <div className="flex-1 p-4 max-h-full overflow-y-auto">
               <LexicalEditor
+                key={editorKey}
                 content={content}
                 onChange={setContent}
                 className="w-full h-full"
