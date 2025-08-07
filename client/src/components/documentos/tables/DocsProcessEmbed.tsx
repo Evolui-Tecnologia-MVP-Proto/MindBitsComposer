@@ -498,71 +498,6 @@ export function DocsProcessEmbed({
                 );
               })}
             </div>
-            
-            {/* Botão para salvar os dados do formulário */}
-            <div className="mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
-              <button
-                className="w-full px-3 py-2 text-xs font-medium text-white bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400"
-                onClick={async () => {
-                  try {
-                    // Coletar dados dos campos do formulário
-                    const formElement = document.querySelector(`[data-node-form="${flowNode.id}"]`);
-                    const formInputs = formElement?.querySelectorAll('[data-field-name]') || [];
-                    const collectedData: Record<string, string> = {};
-                    
-                    formInputs.forEach((input: any) => {
-                      const fieldName = input.getAttribute('data-field-name');
-                      collectedData[fieldName] = input.value;
-                    });
-                    
-                    // Buscar o documentId correto
-                    const documentId = getCurrentFlowExecution()?.documentId || flowDiagramModal?.documentId;
-                    
-                    if (!documentId) {
-                      toast({
-                        title: "Erro",
-                        description: "Documento não identificado",
-                        variant: "destructive",
-                      });
-                      return;
-                    }
-                    
-                    // Salvar dados via API
-                    const response = await fetch(`/api/document-flow-executions/${documentId}/form-data`, {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                      },
-                      body: JSON.stringify({
-                        nodeId: flowNode.id,
-                        formData: collectedData
-                      })
-                    });
-                    
-                    if (response.ok) {
-                      toast({
-                        title: "Sucesso",
-                        description: "Dados salvos com sucesso!",
-                      });
-                      
-                      // Atualizar queries
-                      queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
-                    } else {
-                      throw new Error('Erro ao salvar dados');
-                    }
-                  } catch (error) {
-                    console.error('Erro ao salvar formulário:', error);
-                    toast({
-                      title: "Erro",
-                      description: "Erro ao salvar os dados do formulário",
-                      variant: "destructive",
-                    });
-                  }
-                }}
-              >
-                Salvar Dados do Formulário
-              </button>
-            </div>
           </div>
         </div>
       );
@@ -2869,7 +2804,37 @@ function FlowWithAutoFitView({
         console.log('Alterações salvas com sucesso');
         console.log('Atualizando estado local com:', updatedFlowTasks);
         
-        // Salvar dados do formulário dinâmico no executionData se existirem
+        // Coletar e salvar dados do formulário dinâmico se existir
+        const dynamicFormElement = document.querySelector(`[data-node-form="${selectedFlowNode.id}"]`);
+        if (dynamicFormElement) {
+          const formInputs = dynamicFormElement.querySelectorAll('[data-field-name]');
+          const collectedFormData: Record<string, string> = {};
+          
+          formInputs.forEach((input: any) => {
+            const fieldName = input.getAttribute('data-field-name');
+            collectedFormData[fieldName] = input.value;
+          });
+          
+          // Salvar dados do formulário se houver campos preenchidos
+          if (Object.keys(collectedFormData).length > 0) {
+            const formResponse = await fetch(`/api/document-flow-executions/${flowData.documentId}/form-data`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                nodeId: selectedFlowNode.id,
+                formData: collectedFormData
+              })
+            });
+            
+            if (formResponse.ok) {
+              console.log('✅ Dados do formulário dinâmico salvos no executionData');
+            }
+          }
+        }
+        
+        // Também salvar dynamicFormData se existir (dados já coletados anteriormente)
         if (Object.keys(dynamicFormData).length > 0) {
           const formResponse = await fetch(`/api/document-flow-executions/${flowData.documentId}/form-data`, {
             method: 'POST',
