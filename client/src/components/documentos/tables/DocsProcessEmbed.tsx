@@ -2869,96 +2869,100 @@ function FlowWithAutoFitView({
       }
     }
 
-    // Processar nós para adicionar destaque amarelo aos pendentes conectados
-    const processedNodes = nodes.map((node: any) => {
-      const isSelected = selectedFlowNode?.id === node.id;
-      
-      if (pendingConnectedNodes.has(node.id)) {
+    // Processar nós para adicionar destaque amarelo aos pendentes conectados (memoizado para evitar re-renders desnecessários)
+    const processedNodes = useMemo(() => {
+      return nodes.map((node: any) => {
+        const isSelected = selectedFlowNode?.id === node.id;
+        
+        if (pendingConnectedNodes.has(node.id)) {
+          return {
+            ...node,
+            selected: isSelected,
+            data: {
+              ...node.data,
+              isPendingConnected: true,
+              isReadonly: true
+            },
+          };
+        }
         return {
           ...node,
           selected: isSelected,
-          data: {
-            ...node.data,
-            isPendingConnected: true,
-            isReadonly: true
+          data: { ...node.data, isReadonly: true }
+        };
+      });
+    }, [nodes, pendingConnectedNodes, selectedFlowNode?.id]);
+
+    // Processar edges para colorir conexões e adicionar animação (memoizado para evitar re-renders desnecessários)
+    const processedEdges = useMemo(() => {
+      return edges.map((edge: any) => {
+        const sourceNode = nodes.find((n: any) => n.id === edge.source);
+        const targetNode = nodes.find((n: any) => n.id === edge.target);
+        
+        const sourceExecuted = sourceNode?.data?.isExecuted === 'TRUE';
+        const targetExecuted = targetNode?.data?.isExecuted === 'TRUE';
+        
+        const sourcePending = pendingConnectedNodes.has(edge.source);
+        const targetPending = pendingConnectedNodes.has(edge.target);
+        
+        let edgeColor = '#6b7280'; // cor padrão
+        let shouldAnimate = false; // nova variável para controlar animação
+        
+        // PRIMEIRA PRIORIDADE: Lógica de execução/pendência (sempre tem precedência)
+        // Se ambos os nós estão executados
+        if (sourceExecuted && targetExecuted) {
+          edgeColor = '#21639a';
+          shouldAnimate = true; // animar conexões executadas (azuis)
+        }
+        // Se há conexão entre executado e pendente conectado (PRIORIDADE MÁXIMA)
+        else if ((sourceExecuted && targetPending) || (sourcePending && targetExecuted)) {
+          edgeColor = '#fbbf24'; // amarelo
+          shouldAnimate = true; // animar conexões pendentes (amarelas)
+        }
+        // SEGUNDA PRIORIDADE: Verificar se a conexão parte de um SwitchNode e aplicar cor dinâmica do handle
+        else if (sourceNode?.type === 'switchNode') {
+          // Função para determinar cor do handle do switchNode
+          const getSwitchHandleColor = (switchValue: any) => {
+            if (!switchValue) return '#9ca3af'; // gray-400
+            
+            if (Array.isArray(switchValue)) {
+              const firstValue = switchValue[0];
+              if (firstValue === 'TRUE') return '#10b981'; // green-500
+              if (firstValue === 'FALSE') return '#ef4444'; // red-500
+              return '#9ca3af'; // gray-400
+            }
+            
+            if (switchValue === 'TRUE') return '#10b981'; // green-500
+            if (switchValue === 'FALSE') return '#ef4444'; // red-500
+            return '#9ca3af'; // gray-400
+          };
+
+          // Verificar qual handle está sendo usado baseado no sourceHandle e usar cores dinâmicas
+          if (edge.sourceHandle === 'a') {
+            // Handle direito - usar cor baseada em rightSwitch
+            edgeColor = getSwitchHandleColor(sourceNode.data.rightSwitch);
+          } else if (edge.sourceHandle === 'c') {
+            // Handle esquerdo - usar cor baseada em leftSwitch
+            edgeColor = getSwitchHandleColor(sourceNode.data.leftSwitch);
+          }
+        }
+        
+        return {
+          ...edge,
+          type: 'smoothstep', // garantir que o tipo seja definido
+          animated: shouldAnimate, // aplicar animação baseada na lógica
+          style: {
+            stroke: edgeColor,
+            strokeWidth: 3,
+            strokeDasharray: 'none'
+          },
+          markerEnd: {
+            type: 'arrowclosed',
+            color: edgeColor,
           },
         };
-      }
-      return {
-        ...node,
-        selected: isSelected,
-        data: { ...node.data, isReadonly: true }
-      };
-    });
-
-    // Processar edges para colorir conexões e adicionar animação
-    const processedEdges = edges.map((edge: any) => {
-      const sourceNode = nodes.find((n: any) => n.id === edge.source);
-      const targetNode = nodes.find((n: any) => n.id === edge.target);
-      
-      const sourceExecuted = sourceNode?.data?.isExecuted === 'TRUE';
-      const targetExecuted = targetNode?.data?.isExecuted === 'TRUE';
-      
-      const sourcePending = pendingConnectedNodes.has(edge.source);
-      const targetPending = pendingConnectedNodes.has(edge.target);
-      
-      let edgeColor = '#6b7280'; // cor padrão
-      let shouldAnimate = false; // nova variável para controlar animação
-      
-      // PRIMEIRA PRIORIDADE: Lógica de execução/pendência (sempre tem precedência)
-      // Se ambos os nós estão executados
-      if (sourceExecuted && targetExecuted) {
-        edgeColor = '#21639a';
-        shouldAnimate = true; // animar conexões executadas (azuis)
-      }
-      // Se há conexão entre executado e pendente conectado (PRIORIDADE MÁXIMA)
-      else if ((sourceExecuted && targetPending) || (sourcePending && targetExecuted)) {
-        edgeColor = '#fbbf24'; // amarelo
-        shouldAnimate = true; // animar conexões pendentes (amarelas)
-      }
-      // SEGUNDA PRIORIDADE: Verificar se a conexão parte de um SwitchNode e aplicar cor dinâmica do handle
-      else if (sourceNode?.type === 'switchNode') {
-        // Função para determinar cor do handle do switchNode
-        const getSwitchHandleColor = (switchValue: any) => {
-          if (!switchValue) return '#9ca3af'; // gray-400
-          
-          if (Array.isArray(switchValue)) {
-            const firstValue = switchValue[0];
-            if (firstValue === 'TRUE') return '#10b981'; // green-500
-            if (firstValue === 'FALSE') return '#ef4444'; // red-500
-            return '#9ca3af'; // gray-400
-          }
-          
-          if (switchValue === 'TRUE') return '#10b981'; // green-500
-          if (switchValue === 'FALSE') return '#ef4444'; // red-500
-          return '#9ca3af'; // gray-400
-        };
-
-        // Verificar qual handle está sendo usado baseado no sourceHandle e usar cores dinâmicas
-        if (edge.sourceHandle === 'a') {
-          // Handle direito - usar cor baseada em rightSwitch
-          edgeColor = getSwitchHandleColor(sourceNode.data.rightSwitch);
-        } else if (edge.sourceHandle === 'c') {
-          // Handle esquerdo - usar cor baseada em leftSwitch
-          edgeColor = getSwitchHandleColor(sourceNode.data.leftSwitch);
-        }
-      }
-      
-      return {
-        ...edge,
-        type: 'smoothstep', // garantir que o tipo seja definido
-        animated: shouldAnimate, // aplicar animação baseada na lógica
-        style: {
-          stroke: edgeColor,
-          strokeWidth: 3,
-          strokeDasharray: 'none'
-        },
-        markerEnd: {
-          type: 'arrowclosed',
-          color: edgeColor,
-        },
-      };
-    });
+      });
+    }, [edges, nodes, pendingConnectedNodes]);
 
     const nodeTypes = useMemo(() => ({
       startNode: StartNodeComponent,
@@ -2993,12 +2997,6 @@ function FlowWithAutoFitView({
             nodeTypes={nodeTypes}
             onNodeClick={onNodeClick}
             onPaneClick={onPaneClick}
-            fitView
-            fitViewOptions={{
-              padding: 0.2,
-              minZoom: 0.1,
-              maxZoom: 2
-            }}
             minZoom={0.1}
             maxZoom={2}
             attributionPosition="bottom-left"
