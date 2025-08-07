@@ -1864,6 +1864,10 @@ export function DocsProcessEmbed({
         isFlowInspectorPinned={isFlowInspectorPinned}
         getDynamicFormData={getDynamicFormData}
         renderDynamicForm={renderDynamicForm}
+        onFlowReady={(functions) => {
+          console.log("🎯 onFlowReady chamado, armazenando funções:", functions);
+          flowActionsRef.current = functions;
+        }}
         onClose={() => {
           console.log("🚪 Modal de fluxo sendo fechada");
           
