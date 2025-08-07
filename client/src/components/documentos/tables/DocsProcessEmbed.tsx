@@ -2097,6 +2097,17 @@ function FlowWithAutoFitView({
     // Estado para controlar os valores dos campos do formulário
     const [formValues, setFormValues] = useState<Record<string, string>>({});
     
+    // Estado separado para o valor de aprovação (não afeta o diagrama até salvar)
+    const [tempApprovalStatus, setTempApprovalStatus] = useState<string | null>(null);
+    
+    // Usar o status temporário se existir, senão usar o status do nó
+    const currentApprovalStatus = tempApprovalStatus || selectedFlowNode?.data?.isAproved;
+    
+    // Limpar o status temporário quando mudar de nó
+    useEffect(() => {
+      setTempApprovalStatus(null);
+    }, [selectedFlowNode?.id]);
+    
 
     
     // Estado separado para os dados iniciais do diagrama (não muda até salvar)
@@ -2324,21 +2335,13 @@ function FlowWithAutoFitView({
       }
     };
 
-    // Função para alterar o status de aprovação (apenas atualiza o nó selecionado localmente, sem afetar o diagrama)
+    // Função para alterar o status de aprovação (apenas atualiza estado temporário, sem afetar o diagrama)
     const updateApprovalStatus = (nodeId: string, newStatus: string) => {
-      // Atualizar apenas o nó selecionado para refletir a mudança no painel (não o diagrama completo)
-      if (selectedFlowNode && selectedFlowNode.id === nodeId) {
-        setSelectedFlowNode({
-          ...selectedFlowNode,
-          data: {
-            ...selectedFlowNode.data,
-            isAproved: newStatus
-          }
-        });
-      }
-
+      // Armazenar o status temporariamente sem afetar o selectedFlowNode ou o diagrama
+      setTempApprovalStatus(newStatus);
+      
       // Mostrar alerta para persistir alterações
-      console.log('🔴 Definindo showApprovalAlert para true');
+      console.log('🔴 Definindo showApprovalAlert para true - Status temporário:', newStatus);
       setShowApprovalAlert(true);
     };
 
@@ -2677,7 +2680,7 @@ function FlowWithAutoFitView({
             data: {
               ...updatedNodes[actionNodeIndex].data,
               isExecuted: 'TRUE',
-              isAproved: selectedFlowNode.data.isAproved, // Preservar o valor de aprovação
+              isAproved: tempApprovalStatus || selectedFlowNode.data.isAproved, // Usar o status temporário se existir
               formData: allFormData, // Salvar todos os dados do formulário
               isPendingConnected: false // Marcar como não mais editável
             }
@@ -2703,7 +2706,7 @@ function FlowWithAutoFitView({
                 data: {
                   ...targetNode.data,
                   isExecuted: 'TRUE',
-                  inputSwitch: selectedFlowNode.data.isAproved
+                  inputSwitch: tempApprovalStatus || selectedFlowNode.data.isAproved
                 }
               };
             } else {
@@ -2892,8 +2895,9 @@ function FlowWithAutoFitView({
           }
         });
 
-        // 8. Limpar o formValues para mostrar que foi salvo
+        // 8. Limpar o formValues e tempApprovalStatus para mostrar que foi salvo
         setFormValues({});
+        setTempApprovalStatus(null); // Limpar o status temporário após salvar
         
         console.log('Estado local atualizado');
 
@@ -3868,7 +3872,7 @@ function FlowWithAutoFitView({
                         }}
                         disabled={!selectedFlowNode.data.isPendingConnected}
                         className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all flex-1 justify-center ${
-                          selectedFlowNode.data.isAproved === 'TRUE'
+                          currentApprovalStatus === 'TRUE'
                             ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-600 text-green-800 dark:text-green-400'
                             : selectedFlowNode.data.isPendingConnected
                             ? 'bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151] text-gray-600 dark:text-gray-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:border-green-300 dark:hover:border-green-600 cursor-pointer'
@@ -3887,7 +3891,7 @@ function FlowWithAutoFitView({
                         }}
                         disabled={!selectedFlowNode.data.isPendingConnected}
                         className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all flex-1 justify-center ${
-                          selectedFlowNode.data.isAproved === 'FALSE'
+                          currentApprovalStatus === 'FALSE'
                             ? 'bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-600 text-red-800 dark:text-red-400'
                             : selectedFlowNode.data.isPendingConnected
                             ? 'bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151] text-gray-600 dark:text-gray-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-300 dark:hover:border-red-600 cursor-pointer'
@@ -3900,7 +3904,7 @@ function FlowWithAutoFitView({
                     </div>
                     
                     {/* Caixa de alerta para confirmação */}
-                    {showApprovalAlert && selectedFlowNode.data.isAproved !== 'UNDEF' && (
+                    {showApprovalAlert && currentApprovalStatus !== 'UNDEF' && (
                       <div className="mt-3 p-3 bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-600 rounded-lg">
                         <div className="flex items-start space-x-2">
                           <div className="flex-shrink-0">
