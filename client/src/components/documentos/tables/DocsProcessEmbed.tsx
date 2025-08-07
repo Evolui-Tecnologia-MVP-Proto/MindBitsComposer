@@ -3952,15 +3952,6 @@ function FlowWithAutoFitView({
                     <div className="text-xs text-gray-500 dark:text-gray-400">
                       Status atual: {selectedFlowNode.data.isAproved || 'UNDEF'}
                     </div>
-                    
-                    {/* Renderizar formulário dinâmico quando status muda */}
-                    {(() => {
-                      const formNode = {
-                        ...selectedFlowNode,
-                        type: 'actionNode' // Garantir que é tratado como actionNode
-                      };
-                      return renderDynamicForm(formNode);
-                    })()}
                   </div>
                 )}
               </div>
