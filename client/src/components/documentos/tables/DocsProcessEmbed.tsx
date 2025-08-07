@@ -184,6 +184,9 @@ export function DocsProcessEmbed({
   const [selectedFlowNode, setSelectedFlowNode] = useState<any>(null);
   const [isFlowInspectorPinned, setIsFlowInspectorPinned] = useState(false);
   
+  // Referência para as funções do ReactFlow (fitView, getViewport)
+  const flowActionsRef = useRef<{ fitView: () => void; getViewport: () => any } | null>(null);
+  
   // Estado para armazenar o documento atual sendo visualizado na modal de fluxo
   const [currentFlowDocumentId, setCurrentFlowDocumentId] = useState<string | null>(null);
   // Função para resetar o formulário
@@ -1862,6 +1865,19 @@ export function DocsProcessEmbed({
         getDynamicFormData={getDynamicFormData}
         renderDynamicForm={renderDynamicForm}
         onClose={() => {
+          // Fazer fitView e salvar viewport antes de fechar
+          if (flowActionsRef.current) {
+            console.log("🎯 Executando fitView antes de fechar modal");
+            flowActionsRef.current.fitView();
+            
+            // Salvar viewport atual
+            const currentViewport = flowActionsRef.current.getViewport();
+            console.log("💾 Salvando viewport:", currentViewport);
+            
+            // Salvar no localStorage para persistir entre sessões
+            localStorage.setItem('flowDiagramViewport', JSON.stringify(currentViewport));
+          }
+          
           // Limpar o documento atual para formulários dinâmicos
           setCurrentFlowDocumentId(null);
           console.log("📋 Documento limpo ao fechar modal de fluxo");
@@ -1883,6 +1899,10 @@ export function DocsProcessEmbed({
             getTemplateInfo={getTemplateInfo}
             getDynamicFormData={getDynamicFormData}
             renderDynamicForm={renderDynamicForm}
+            onFlowReady={(actions: { fitView: () => void; getViewport: () => any }) => {
+              flowActionsRef.current = actions;
+              console.log("🔗 Funções do ReactFlow conectadas ao onClose");
+            }}
           />
         )}
       />
@@ -2037,9 +2057,17 @@ function FlowWithAutoFitView({
   setIsFlowInspectorPinned,
   getTemplateInfo,
   getDynamicFormData,
-  renderDynamicForm
+  renderDynamicForm,
+  onFlowReady
 }: any) {
-    const { fitView, getNodes, setNodes } = useReactFlow();
+    const { fitView, getNodes, setNodes, getViewport } = useReactFlow();
+    
+    // Expor fitView e getViewport para o componente pai
+    useEffect(() => {
+      if (onFlowReady) {
+        onFlowReady({ fitView, getViewport });
+      }
+    }, [fitView, getViewport, onFlowReady]);
     
     // Estado para controlar os valores dos campos do formulário
     const [formValues, setFormValues] = useState<Record<string, string>>({});
