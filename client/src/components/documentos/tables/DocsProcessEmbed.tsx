@@ -2092,14 +2092,17 @@ function FlowWithAutoFitView({
       }
     }, [tempApprovalStatus, selectedFlowNode?.id]);
     
-    // Estado para controlar se já foi feito o fit inicial
-    const [hasInitialFit, setHasInitialFit] = useState(false);
+    // Usar useRef para controlar se já foi feito o fit inicial (evita loops)
+    const hasInitialFitRef = useRef(false);
     
     // Selecionar automaticamente nó pendente ou startNode ao abrir o fluxo
     useEffect(() => {
       // Só executar se o fluxo estiver aberto e ainda não tiver feito o fit inicial
-      if (flowDiagramModal?.isOpen && !hasInitialFit) {
+      if (flowDiagramModal?.isOpen && !hasInitialFitRef.current) {
         console.log('🎯 Fluxo aberto, procurando nó para selecionar...');
+        
+        // Marcar imediatamente como já executado para evitar loops
+        hasInitialFitRef.current = true;
         
         // Pequeno delay para garantir que os nós estejam renderizados
         const timeoutId = setTimeout(() => {
@@ -2136,22 +2139,21 @@ function FlowWithAutoFitView({
                 maxZoom: 1.5,
                 minZoom: 0.5
               });
-              setHasInitialFit(true);
             }, 200);
           }
         }, 300);
         
         return () => clearTimeout(timeoutId);
       }
-    }, [flowDiagramModal?.isOpen, hasInitialFit, getNodes, fitView, setSelectedFlowNode, setShowFlowInspector]);
+    }, [flowDiagramModal?.isOpen]); // Remover dependências desnecessárias para evitar loops
     
     // Resetar o flag quando a modal fechar
     useEffect(() => {
-      if (!flowDiagramModal?.isOpen && hasInitialFit) {
-        setHasInitialFit(false);
+      if (!flowDiagramModal?.isOpen) {
+        hasInitialFitRef.current = false;
         console.log('🎯 Modal fechada, resetando flag de fit inicial');
       }
-    }, [flowDiagramModal?.isOpen, hasInitialFit]);
+    }, [flowDiagramModal?.isOpen]);
     
 
     
