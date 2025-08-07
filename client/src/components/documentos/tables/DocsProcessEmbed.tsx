@@ -185,6 +185,11 @@ export function DocsProcessEmbed({
   
   // Estado para armazenar o documento atual sendo visualizado na modal de fluxo
   const [currentFlowDocumentId, setCurrentFlowDocumentId] = useState<string | null>(null);
+  // Estado para armazenar valores do formulário dinâmico
+  const [formValues, setFormValues] = useState<Record<string, string>>({});
+  // Estado para rastrear mudança de aprovação e forçar re-render
+  const [localApprovalStatus, setLocalApprovalStatus] = useState<string | null>(null);
+  
   // Função para resetar o formulário
   const resetFormData = () => {
     setFormData({
@@ -337,13 +342,46 @@ export function DocsProcessEmbed({
 
   // Função para renderizar formulário dinâmico
   const renderDynamicForm = (flowNode: any) => {
-    if (flowNode.type !== 'actionNode') return null;
+    console.log('🔄 renderDynamicForm chamada:', {
+      nodeType: flowNode.type,
+      nodeId: flowNode.id,
+      actionType: flowNode.data?.actionType,
+      isAproved: flowNode.data?.isAproved,
+      hasAttachedForm: !!(flowNode.data?.attached_Form || flowNode.data?.attached_form)
+    });
+    
+    if (flowNode.type !== 'actionNode') {
+      console.log('❌ Não é actionNode, retornando null');
+      return null;
+    }
     
     // Buscar dados dinâmicos da execução primeiro, depois fallback para dados do nó
     const dynamicFormData = getDynamicFormData(flowNode.id);
     let attachedFormData = dynamicFormData || flowNode.data.attached_Form || flowNode.data.attached_form;
     
-    if (!attachedFormData) return null;
+    // TESTE: Se não há dados de formulário e é um nó de aprovação, usar um JSON de exemplo
+    if (!attachedFormData && flowNode.data.actionType === 'Intern_Aprove') {
+      console.log('⚠️ Usando JSON de teste para actionNode de aprovação');
+      attachedFormData = JSON.stringify({
+        "Show_Condition": "FALSE",
+        "Fields": {
+          "Motivo de Recusa": ["Detalhamento insuficiente", "Ajustar parâmetros", "Revisar escopo"],
+          "Detalhamento": ["default:", "type:longText"]
+        }
+      });
+    }
+    
+    console.log('📋 Dados do formulário encontrados:', {
+      hasDynamicData: !!dynamicFormData,
+      hasStaticData: !!(flowNode.data.attached_Form || flowNode.data.attached_form),
+      dataContent: attachedFormData,
+      actionType: flowNode.data.actionType
+    });
+    
+    if (!attachedFormData) {
+      console.log('❌ Sem dados de formulário, retornando null');
+      return null;
+    }
 
     try {
       console.log('🔍 Dados do formulário (dinâmicos):', {
@@ -378,22 +416,37 @@ export function DocsProcessEmbed({
       const isApprovalNode = flowNode.data.actionType === 'Intern_Aprove';
       const approvalStatus = flowNode.data.isAproved;
       
+      console.log('🎯 Verificando condições de exibição do formulário:', {
+        showCondition,
+        isApprovalNode,
+        actionType: flowNode.data.actionType,
+        approvalStatus,
+        nodeData: flowNode.data
+      });
+      
       // Determina se deve mostrar o formulário baseado na condição
       let shouldShowForm = false;
       
       if (showCondition === "TRUE") {
         // Sempre mostra o formulário
         shouldShowForm = true;
+        console.log('✅ Formulário deve ser exibido: Show_Condition = TRUE');
       } else if (showCondition === "FALSE") {
         // Mostra apenas quando reprovado (condicional)
-        if (isApprovalNode && approvalStatus === 'FALSE') {
+        if (approvalStatus === 'FALSE') {
           shouldShowForm = true;
+          console.log('✅ Formulário deve ser exibido: Status reprovado (FALSE)');
+        } else {
+          console.log('❌ Formulário oculto: Status não é FALSE, atual:', approvalStatus);
         }
       }
       
       if (!shouldShowForm) {
+        console.log('❌ Formulário não será exibido');
         return null;
       }
+      
+      console.log('✅ Renderizando formulário dinâmico');
       
       // Renderiza o formulário com os campos dinâmicos
       return (
@@ -2218,6 +2271,8 @@ function FlowWithAutoFitView({
 
     // Função para alterar o status de aprovação (altera estado imediatamente e mostra alerta)
     const updateApprovalStatus = (nodeId: string, newStatus: string) => {
+      console.log(`📋 Atualizando status de aprovação para: ${newStatus}`);
+      
       const currentNodes = getNodes();
       const updatedNodes = currentNodes.map(node => {
         if (node.id === nodeId) {
@@ -2242,6 +2297,15 @@ function FlowWithAutoFitView({
             isAproved: newStatus
           }
         });
+      }
+      
+      // Atualizar o estado local para forçar re-render do formulário
+      setLocalApprovalStatus(newStatus);
+      
+      // Se o status for FALSE (reprovado), logar para debug
+      if (newStatus === 'FALSE') {
+        console.log('❌ Status mudou para FALSE - formulário dinâmico deve aparecer');
+        console.log('attached_Form:', selectedFlowNode?.data?.attached_Form);
       }
 
       // Mostrar alerta para persistir alterações
@@ -2816,6 +2880,14 @@ function FlowWithAutoFitView({
       }
     };
 
+    // Effect para resetar o status local quando o nó selecionado muda
+    useEffect(() => {
+      if (selectedFlowNode) {
+        setLocalApprovalStatus(selectedFlowNode.data.isAproved || null);
+        console.log('🔄 Nó selecionado mudou, resetando status local:', selectedFlowNode.data.isAproved);
+      }
+    }, [selectedFlowNode?.id]);
+    
     // Effect para executar fit view quando o painel inspector é aberto/fechado
     useEffect(() => {
       const timeoutId = setTimeout(() => {
@@ -3850,11 +3922,27 @@ function FlowWithAutoFitView({
                     
                     {/* Renderizar formulário dinâmico quando status muda */}
                     {(() => {
+                      // Usar o localApprovalStatus ou o valor do nó
+                      const currentStatus = localApprovalStatus || selectedFlowNode.data.isAproved;
+                      const key = `form-${selectedFlowNode.id}-${currentStatus}`;
                       const formNode = {
                         ...selectedFlowNode,
-                        type: 'actionNode' // Garantir que é tratado como actionNode
+                        type: 'actionNode', // Garantir que é tratado como actionNode
+                        data: {
+                          ...selectedFlowNode.data,
+                          isAproved: currentStatus // Usar o status atual
+                        }
                       };
-                      return renderDynamicForm(formNode);
+                      console.log('🔍 Tentando renderizar formulário após botões de aprovação:', {
+                        nodeId: selectedFlowNode.id,
+                        currentStatus,
+                        originalStatus: selectedFlowNode.data.isAproved,
+                        localApprovalStatus,
+                        actionType: selectedFlowNode.data.actionType,
+                        hasAttachedForm: !!selectedFlowNode.data.attached_Form,
+                        key
+                      });
+                      return <div key={key}>{renderDynamicForm(formNode)}</div>;
                     })()}
                   </div>
                 )}
