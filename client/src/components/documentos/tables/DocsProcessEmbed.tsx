@@ -3034,13 +3034,32 @@ function FlowWithAutoFitView({
     return (
       <div className="flex-1 flex h-full w-full">
         <div className="flex-1 h-full w-full">
-          <IsolatedDiagram 
+          <ReactFlow
             nodes={processedNodes}
             edges={processedEdges}
             nodeTypes={nodeTypes}
             onNodeClick={onNodeClick}
             onPaneClick={onPaneClick}
-          />
+            fitView
+            fitViewOptions={{
+              padding: 0.2,
+              minZoom: 0.1,
+              maxZoom: 2
+            }}
+            minZoom={0.1}
+            maxZoom={2}
+            attributionPosition="bottom-left"
+            nodesDraggable={false}
+            nodesConnectable={false}
+            elementsSelectable={true}
+            panOnDrag={true}
+            zoomOnScroll={true}
+            zoomOnPinch={true}
+            zoomOnDoubleClick={false}
+          >
+            <Controls />
+            <Background />
+          </ReactFlow>
         </div>
         {showFlowInspector && selectedFlowNode && (
           <div className="w-80 bg-white dark:bg-[#0F172A] border-l border-gray-200 dark:border-[#374151] p-4 overflow-y-auto relative">
