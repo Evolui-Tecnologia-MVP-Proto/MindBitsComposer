@@ -2092,53 +2092,48 @@ function FlowWithAutoFitView({
       }
     }, [tempApprovalStatus, selectedFlowNode?.id]);
     
-    // Usar useRef para controlar se já foi feita a seleção inicial
-    const hasInitialSelectionRef = useRef(false);
+    // Estado para controlar se a seleção inicial já foi feita (para evitar interferir com seleção manual)
+    const [hasInitialSelection, setHasInitialSelection] = useState(false);
     
-    // Selecionar automaticamente nó pendente ou startNode ao abrir o fluxo
+    // Fazer seleção automática inicial apenas uma vez quando o componente monta
     useEffect(() => {
-      // Só executar se o fluxo estiver aberto e ainda não tiver feito a seleção inicial
-      if (flowDiagramModal?.isOpen && !hasInitialSelectionRef.current) {
-        console.log('🎯 Fluxo aberto, procurando nó para selecionar...');
-        
-        // Marcar imediatamente como já executado para evitar loops
-        hasInitialSelectionRef.current = true;
-        
+      // Só executar uma vez quando o componente monta e há nós disponíveis
+      if (!hasInitialSelection) {
         // Pequeno delay para garantir que os nós estejam renderizados
         const timeoutId = setTimeout(() => {
           const currentNodes = getNodes();
-          console.log('🎯 Nós disponíveis:', currentNodes);
           
-          // Buscar primeiro nó pendente (isPendingConnected === true)
-          let nodeToSelect = currentNodes.find(node => 
-            node.data?.isPendingConnected === true
-          );
-          
-          // Se não houver nó pendente, buscar o startNode
-          if (!nodeToSelect) {
-            nodeToSelect = currentNodes.find(node => 
-              node.type === 'startNode'
+          if (currentNodes.length > 0) {
+            console.log('🎯 Fazendo seleção inicial automática...');
+            
+            // Buscar primeiro nó pendente (isPendingConnected === true)
+            let nodeToSelect = currentNodes.find(node => 
+              node.data?.isPendingConnected === true
             );
-            console.log('🎯 Nenhum nó pendente encontrado, selecionando startNode');
-          } else {
-            console.log('🎯 Nó pendente encontrado:', nodeToSelect.id);
+            
+            // Se não houver nó pendente, buscar o startNode
+            if (!nodeToSelect) {
+              nodeToSelect = currentNodes.find(node => 
+                node.type === 'startNode'
+              );
+              console.log('🎯 Nenhum nó pendente encontrado, selecionando startNode');
+            } else {
+              console.log('🎯 Nó pendente encontrado:', nodeToSelect.id);
+            }
+            
+            // Selecionar o nó e abrir o inspector apenas se encontrou um nó
+            if (nodeToSelect && !selectedFlowNode) {
+              console.log('🎯 Selecionando nó inicial:', nodeToSelect.id);
+              setSelectedFlowNode(nodeToSelect);
+              setShowFlowInspector(true);
+              setHasInitialSelection(true);
+            }
           }
-          
-          // Selecionar o nó e abrir o inspector
-          if (nodeToSelect) {
-            console.log('🎯 Selecionando nó:', nodeToSelect.id);
-            setSelectedFlowNode(nodeToSelect);
-            setShowFlowInspector(true);
-          }
-        }, 300);
+        }, 500);
         
         return () => clearTimeout(timeoutId);
-      } else if (!flowDiagramModal?.isOpen && hasInitialSelectionRef.current) {
-        // Resetar o flag quando a modal fechar
-        hasInitialSelectionRef.current = false;
-        console.log('🎯 Modal fechada, resetando flag de seleção inicial');
       }
-    }, [flowDiagramModal?.isOpen]); // Dependência apenas do estado de abertura
+    }, [hasInitialSelection]); // Executar apenas baseado no estado de seleção inicial
     
 
     
