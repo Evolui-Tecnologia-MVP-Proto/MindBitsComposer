@@ -2047,6 +2047,9 @@ function FlowWithAutoFitView({
     // Estado separado para o valor de aprovação (não afeta o diagrama até salvar)
     const [tempApprovalStatus, setTempApprovalStatus] = useState<string | null>(null);
     
+    // Estado para forçar re-renderização quando campos do formulário mudam
+    const [formFieldsValidation, setFormFieldsValidation] = useState(0);
+    
     // Usar o status temporário se existir, senão usar o status do nó
     const currentApprovalStatus = tempApprovalStatus || selectedFlowNode?.data?.isAproved;
     
@@ -2054,6 +2057,40 @@ function FlowWithAutoFitView({
     useEffect(() => {
       setTempApprovalStatus(null);
     }, [selectedFlowNode?.id]);
+    
+    // Monitorar mudanças nos campos do formulário quando NÃO está selecionado
+    useEffect(() => {
+      if (tempApprovalStatus === 'FALSE' && selectedFlowNode?.id) {
+        const checkFormFields = () => {
+          const formElement = document.querySelector(`[data-node-form="${selectedFlowNode.id}"]`);
+          if (formElement) {
+            // Forçar re-renderização para verificar campos
+            setFormFieldsValidation(prev => prev + 1);
+          }
+        };
+        
+        // Adicionar um pequeno delay para garantir que o formulário seja renderizado
+        const timeoutId = setTimeout(() => {
+          const formElement = document.querySelector(`[data-node-form="${selectedFlowNode.id}"]`);
+          if (formElement) {
+            formElement.addEventListener('input', checkFormFields);
+            formElement.addEventListener('change', checkFormFields);
+            
+            // Verificar inicialmente após o formulário ser renderizado
+            checkFormFields();
+          }
+        }, 100);
+        
+        return () => {
+          clearTimeout(timeoutId);
+          const formElement = document.querySelector(`[data-node-form="${selectedFlowNode.id}"]`);
+          if (formElement) {
+            formElement.removeEventListener('input', checkFormFields);
+            formElement.removeEventListener('change', checkFormFields);
+          }
+        };
+      }
+    }, [tempApprovalStatus, selectedFlowNode?.id]);
     
 
     
@@ -2187,81 +2224,141 @@ function FlowWithAutoFitView({
           return true;
         }
         
-        // Se selecionou NÃO, precisa validar o formulário
+        // Se selecionou NÃO, SEMPRE precisa validar o formulário se existir
         if (tempApprovalStatus === 'FALSE') {
           // Verifica se existe formulário anexado
           const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
           if (!attachedFormData) {
-            console.log('🔍 Aprovação NÃO sem formulário, botão habilitado');
+            console.log('🔍 Aprovação NÃO sem formulário anexado, botão habilitado');
             return true; // Sem formulário, pode salvar
           }
           
           try {
             // Parse do formulário anexado
             let formData;
-            if (typeof attachedFormData === 'string' && attachedFormData.includes('"Motivo de Recusa":') && attachedFormData.includes('"Detalhamento":')) {
-              // Converte o formato específico manualmente
-              formData = {
-                "Show_Condition": "FALSE",
-                "Fields": {
-                  "Motivo de Recusa": ["Incompatível com processo", "Forma de operação", "Configuração de Sistema"],
-                  "Detalhamento": ["default:", "type:longText"]
+            if (typeof attachedFormData === 'string') {
+              // Tentar fazer parse do JSON
+              try {
+                // Corrigir formato JSON malformado se necessário
+                let correctedData = attachedFormData;
+                if (attachedFormData.includes('["') && attachedFormData.includes('": [')) {
+                  correctedData = attachedFormData
+                    .replace(/"Fields":\s*\[/g, '"Fields":{')
+                    .replace(/\"([^"]+)\"\:\s*\[/g, '"$1":[')
+                    .replace(/\]\s*,\s*\"([^"]+)\"\:\s*\[/g, '],"$1":[')
+                    .replace(/\]\s*\]/g, ']}');
                 }
-              };
+                formData = JSON.parse(correctedData);
+              } catch (parseError) {
+                // Se falhar, tentar formato específico conhecido
+                if (attachedFormData.includes('"Motivo de Recusa":') && attachedFormData.includes('"Detalhamento":')) {
+                  formData = {
+                    "Show_Condition": "FALSE",
+                    "Fields": {
+                      "Motivo de Recusa": ["Incompatível com processo", "Forma de operação", "Configuração de Sistema"],
+                      "Detalhamento": ["default:", "type:longText"]
+                    }
+                  };
+                } else {
+                  console.log('🔍 Erro ao fazer parse do formulário:', parseError);
+                  return false;
+                }
+              }
             } else {
-              formData = JSON.parse(attachedFormData);
+              formData = attachedFormData;
             }
 
-            // Verifica se é um formulário com condição e se deve ser mostrado
-            if (formData.Show_Condition !== undefined && formData.Fields) {
+            // Verifica se o formulário deve ser mostrado para FALSE
+            if (formData.Show_Condition !== undefined) {
               const showCondition = formData.Show_Condition;
               
-              // Verifica se o formulário deve ser mostrado para NÃO
+              // Se o formulário NÃO aparece para FALSE, pode salvar direto
               if (showCondition === 'TRUE') {
-                // Formulário só aparece para SIM, então NÃO não precisa de validação
-                console.log('🔍 Formulário só aparece para SIM, NÃO pode salvar direto');
+                console.log('🔍 Formulário configurado apenas para SIM, NÃO pode salvar sem validação');
                 return true;
               }
               
-              // Se o formulário aparece para FALSE ou BOTH, precisa validar
+              // Se o formulário aparece para FALSE ou BOTH, DEVE validar os campos
               if (showCondition === 'FALSE' || showCondition === 'BOTH') {
+                console.log('🔍 Formulário deve aparecer para NÃO, validando campos...');
+                
                 // Verificar campos do formulário dinâmico diretamente do DOM
                 const formElement = document.querySelector(`[data-node-form="${selectedFlowNode.id}"]`);
-                const formInputs = formElement?.querySelectorAll('[data-field-name]') || [];
+                
+                if (!formElement) {
+                  console.log('🔍 Formulário não renderizado no DOM ainda, botão desabilitado');
+                  return false; // Se o formulário deve aparecer mas não está no DOM, não permite salvar
+                }
+                
+                const formInputs = formElement.querySelectorAll('[data-field-name]');
                 
                 console.log('🔍 Validação de campos para NÃO:', {
                   nodeId: selectedFlowNode.id,
-                  formFound: !!formElement,
+                  formFound: true,
                   inputsCount: formInputs.length
                 });
                 
-                // Se há campos dinâmicos, validar
-                if (formInputs.length > 0) {
-                  let allFieldsFilled = true;
-                  formInputs.forEach((input: any) => {
-                    const fieldName = input.getAttribute('data-field-name');
-                    const value = input.value;
-                    const isFilled = value && value.trim() !== '' && value !== 'Selecione uma opção...';
-                    
-                    console.log(`Campo dinâmico ${fieldName}: valor="${value}", preenchido=${isFilled}`);
-                    
-                    if (!isFilled) {
-                      allFieldsFilled = false;
-                    }
-                  });
-                  
-                  console.log('🔍 Todos os campos preenchidos?', allFieldsFilled);
-                  return allFieldsFilled;
+                // Se não há campos, permite salvar
+                if (formInputs.length === 0) {
+                  console.log('🔍 Formulário sem campos, pode salvar');
+                  return true;
                 }
                 
-                // Se não há campos visíveis no DOM, pode salvar
-                console.log('🔍 Sem campos dinâmicos visíveis, pode salvar');
-                return true;
+                // Validar todos os campos
+                let allFieldsFilled = true;
+                formInputs.forEach((input: any) => {
+                  const fieldName = input.getAttribute('data-field-name');
+                  const value = input.value;
+                  const isFilled = value && value.trim() !== '' && value !== 'Selecione uma opção...';
+                  
+                  console.log(`🔍 Campo "${fieldName}": valor="${value}", preenchido=${isFilled}`);
+                  
+                  if (!isFilled) {
+                    allFieldsFilled = false;
+                  }
+                });
+                
+                console.log('🔍 Resultado final - Todos os campos preenchidos?', allFieldsFilled);
+                return allFieldsFilled;
               }
             }
             
-            // Se não há condição específica, permite salvar
-            console.log('🔍 Sem condição de formulário, pode salvar');
+            // Se não há Show_Condition, mas há Fields, validar os campos
+            if (formData.Fields && Object.keys(formData.Fields).length > 0) {
+              console.log('🔍 Formulário sem condição específica, validando campos...');
+              
+              const formElement = document.querySelector(`[data-node-form="${selectedFlowNode.id}"]`);
+              
+              if (!formElement) {
+                console.log('🔍 Formulário não renderizado no DOM, botão desabilitado');
+                return false;
+              }
+              
+              const formInputs = formElement.querySelectorAll('[data-field-name]');
+              
+              if (formInputs.length === 0) {
+                console.log('🔍 Sem campos no formulário, pode salvar');
+                return true;
+              }
+              
+              let allFieldsFilled = true;
+              formInputs.forEach((input: any) => {
+                const fieldName = input.getAttribute('data-field-name');
+                const value = input.value;
+                const isFilled = value && value.trim() !== '' && value !== 'Selecione uma opção...';
+                
+                console.log(`🔍 Campo "${fieldName}": valor="${value}", preenchido=${isFilled}`);
+                
+                if (!isFilled) {
+                  allFieldsFilled = false;
+                }
+              });
+              
+              return allFieldsFilled;
+            }
+            
+            // Se não há campos definidos, permite salvar
+            console.log('🔍 Formulário sem campos definidos, pode salvar');
             return true;
           } catch (e) {
             console.log('🔍 Erro na validação do formulário:', e);
