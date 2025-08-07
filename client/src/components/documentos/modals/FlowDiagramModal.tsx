@@ -158,18 +158,23 @@ export function FlowDiagramModal({
         
         <div className="flex-1 w-full border rounded-lg overflow-hidden dark:border-[#374151] dark:bg-[#0F172A]">
           <ReactFlowProvider>
-            <FlowWithAutoFitView 
-              flowData={flowDiagramModal.flowData}
-              showFlowInspector={showFlowInspector}
-              setShowFlowInspector={setShowFlowInspector}
-              setSelectedFlowNode={setSelectedFlowNode}
-              selectedFlowNode={selectedFlowNode}
-              showApprovalAlert={showApprovalAlert}
-              setShowApprovalAlert={setShowApprovalAlert}
-              isPinned={isFlowInspectorPinned}
-              getDynamicFormData={getDynamicFormData}
-              renderDynamicForm={renderDynamicForm}
-            />
+            {FlowWithAutoFitView({
+              flowData: flowDiagramModal.flowData,
+              showFlowInspector,
+              setShowFlowInspector,
+              setSelectedFlowNode,
+              selectedFlowNode,
+              showApprovalAlert,
+              setShowApprovalAlert,
+              isPinned: isFlowInspectorPinned,
+              getDynamicFormData,
+              renderDynamicForm,
+              nodes,
+              edges,
+              nodeTypes,
+              onNodeClick,
+              onPaneClick
+            })}
           </ReactFlowProvider>
         </div>
         

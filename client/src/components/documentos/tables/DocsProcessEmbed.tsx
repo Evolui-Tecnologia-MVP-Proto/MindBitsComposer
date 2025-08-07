@@ -1865,17 +1865,27 @@ export function DocsProcessEmbed({
         getDynamicFormData={getDynamicFormData}
         renderDynamicForm={renderDynamicForm}
         onClose={() => {
+          console.log("🚪 Modal de fluxo sendo fechada");
+          
           // Fazer fitView e salvar viewport antes de fechar
           if (flowActionsRef.current) {
-            console.log("🎯 Executando fitView antes de fechar modal");
-            flowActionsRef.current.fitView();
-            
-            // Salvar viewport atual
-            const currentViewport = flowActionsRef.current.getViewport();
-            console.log("💾 Salvando viewport:", currentViewport);
-            
-            // Salvar no localStorage para persistir entre sessões
-            localStorage.setItem('flowDiagramViewport', JSON.stringify(currentViewport));
+            console.log("🎯 flowActionsRef encontrado, executando fitView");
+            try {
+              flowActionsRef.current.fitView();
+              console.log("✅ FitView executado com sucesso");
+              
+              // Salvar viewport atual
+              const currentViewport = flowActionsRef.current.getViewport();
+              console.log("💾 Viewport obtido:", currentViewport);
+              
+              // Salvar no localStorage para persistir entre sessões
+              localStorage.setItem('flowDiagramViewport', JSON.stringify(currentViewport));
+              console.log("💾 Viewport salvo no localStorage");
+            } catch (error) {
+              console.error("❌ Erro ao executar fitView ou salvar viewport:", error);
+            }
+          } else {
+            console.log("❌ flowActionsRef não encontrado - funções do ReactFlow não disponíveis");
           }
           
           // Limpar o documento atual para formulários dinâmicos
@@ -1900,8 +1910,12 @@ export function DocsProcessEmbed({
             getDynamicFormData={getDynamicFormData}
             renderDynamicForm={renderDynamicForm}
             onFlowReady={(actions: { fitView: () => void; getViewport: () => any }) => {
+              console.log("🔗 onFlowReady chamado com ações:", actions);
               flowActionsRef.current = actions;
-              console.log("🔗 Funções do ReactFlow conectadas ao onClose");
+              console.log("🔗 Funções do ReactFlow conectadas ao onClose", {
+                fitView: typeof actions.fitView,
+                getViewport: typeof actions.getViewport
+              });
             }}
           />
         )}
@@ -2008,7 +2022,7 @@ const StableReactFlow = memo(({
       onNodeClick={onNodeClick}
       onPaneClick={onPaneClick}
       defaultViewport={globalViewport}
-      onViewportChange={handleViewportChange}
+      onMove={handleViewportChange}
       minZoom={0.1}
       maxZoom={2}
       attributionPosition="bottom-left"
@@ -2064,8 +2078,17 @@ function FlowWithAutoFitView({
     
     // Expor fitView e getViewport para o componente pai
     useEffect(() => {
-      if (onFlowReady) {
+      console.log("📡 FlowWithAutoFitView useEffect executado", {
+        onFlowReady: !!onFlowReady,
+        fitView: !!fitView,
+        getViewport: !!getViewport
+      });
+      
+      if (onFlowReady && fitView && getViewport) {
+        console.log("📡 Chamando onFlowReady com funções disponíveis");
         onFlowReady({ fitView, getViewport });
+      } else {
+        console.log("❌ onFlowReady não pode ser chamado - verificar disponibilidade das funções");
       }
     }, [fitView, getViewport, onFlowReady]);
     
