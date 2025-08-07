@@ -2133,16 +2133,12 @@ function FlowWithAutoFitView({
         }, 300);
         
         return () => clearTimeout(timeoutId);
-      }
-    }, [flowDiagramModal?.isOpen]);
-    
-    // Resetar o flag quando a modal fechar
-    useEffect(() => {
-      if (!flowDiagramModal?.isOpen) {
+      } else if (!flowDiagramModal?.isOpen && hasInitialSelectionRef.current) {
+        // Resetar o flag quando a modal fechar
         hasInitialSelectionRef.current = false;
         console.log('🎯 Modal fechada, resetando flag de seleção inicial');
       }
-    }, [flowDiagramModal?.isOpen]);
+    }, [flowDiagramModal?.isOpen]); // Dependência apenas do estado de abertura
     
 
     
