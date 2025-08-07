@@ -1868,25 +1868,33 @@ export function DocsProcessEmbed({
           console.log("🚪 Modal de fluxo sendo fechada");
           
           // Fazer fitView e salvar viewport antes de fechar
-          if (flowActionsRef.current) {
+          if (flowActionsRef.current?.fitView && flowActionsRef.current?.getViewport) {
             console.log("🎯 flowActionsRef encontrado, executando fitView");
             try {
               flowActionsRef.current.fitView();
               console.log("✅ FitView executado com sucesso");
               
-              // Salvar viewport atual
+              // Salvar viewport atual com verificação de segurança
               const currentViewport = flowActionsRef.current.getViewport();
-              console.log("💾 Viewport obtido:", currentViewport);
-              
-              // Salvar no localStorage para persistir entre sessões
-              localStorage.setItem('flowDiagramViewport', JSON.stringify(currentViewport));
-              console.log("💾 Viewport salvo no localStorage");
+              if (currentViewport && typeof currentViewport === 'object' && 
+                  typeof currentViewport.x === 'number' && 
+                  typeof currentViewport.y === 'number' && 
+                  typeof currentViewport.zoom === 'number') {
+                console.log("💾 Viewport válido obtido:", currentViewport);
+                localStorage.setItem('flowDiagramViewport', JSON.stringify(currentViewport));
+                console.log("💾 Viewport salvo no localStorage");
+              } else {
+                console.log("⚠️ Viewport inválido, não salvando:", currentViewport);
+              }
             } catch (error) {
               console.error("❌ Erro ao executar fitView ou salvar viewport:", error);
             }
           } else {
-            console.log("❌ flowActionsRef não encontrado - funções do ReactFlow não disponíveis");
+            console.log("❌ flowActionsRef não disponível ou funções incompletas");
           }
+          
+          // Limpar referência para evitar memory leaks
+          flowActionsRef.current = null;
           
           // Limpar o documento atual para formulários dinâmicos
           setCurrentFlowDocumentId(null);
@@ -1997,6 +2005,26 @@ IsolatedDiagram.displayName = 'IsolatedDiagram';
 // Estado global para viewport - persiste durante toda a sessão do modal
 let globalViewport = { x: 0, y: 0, zoom: 1 };
 
+// Função para verificar se viewport é válido
+const isValidViewport = (viewport: any): viewport is { x: number; y: number; zoom: number } => {
+  return viewport && 
+         typeof viewport === 'object' && 
+         typeof viewport.x === 'number' && 
+         typeof viewport.y === 'number' && 
+         typeof viewport.zoom === 'number' &&
+         !isNaN(viewport.x) && 
+         !isNaN(viewport.y) && 
+         !isNaN(viewport.zoom);
+};
+
+// Função para obter viewport seguro
+const getSafeViewport = (viewport: any) => {
+  if (isValidViewport(viewport)) {
+    return viewport;
+  }
+  return { x: 0, y: 0, zoom: 1 };
+};
+
 // Componente ReactFlow com viewport estável
 const StableReactFlow = memo(({ 
   nodes, 
@@ -2005,13 +2033,17 @@ const StableReactFlow = memo(({
   onNodeClick,
   onPaneClick 
 }: any) => {
+  // Garantir que globalViewport sempre tenha valores válidos
+  const safeGlobalViewport = getSafeViewport(globalViewport);
+  
   // Usar o viewport global e atualizar quando mudar
-  const handleViewportChange = useCallback((viewport: Viewport) => {
-    globalViewport = viewport;
-    console.log("📍 Viewport atualizado:", viewport);
+  const handleViewportChange = useCallback((viewport: any) => {
+    const safeViewport = getSafeViewport(viewport);
+    globalViewport = safeViewport;
+    console.log("📍 Viewport atualizado com segurança:", safeViewport);
   }, []);
   
-  console.log("🎯 StableReactFlow renderizado com viewport:", globalViewport);
+  console.log("🎯 StableReactFlow renderizado com viewport seguro:", safeGlobalViewport);
   console.log("🎯 Nós com seleção:", nodes.filter((n: any) => n.selected).map((n: any) => n.id));
   
   return (
@@ -2021,7 +2053,7 @@ const StableReactFlow = memo(({
       nodeTypes={nodeTypes}
       onNodeClick={onNodeClick}
       onPaneClick={onPaneClick}
-      defaultViewport={globalViewport}
+      defaultViewport={safeGlobalViewport}
       onMove={handleViewportChange}
       minZoom={0.1}
       maxZoom={2}
