@@ -1447,6 +1447,10 @@ export function DocsProcessEmbed({
         documentObject: documentObject
       });
       console.log("🔴 Estado atualizado com documentObject:", documentObject);
+      
+      // Limpar nó selecionado ao abrir modal
+      setSelectedFlowNode(null);
+      console.log("🔴 Nó selecionado limpo ao abrir modal");
     }
   };
 
@@ -1903,6 +1907,10 @@ export function DocsProcessEmbed({
           // Limpar o documento atual para formulários dinâmicos
           setCurrentFlowDocumentId(null);
           console.log("📋 Documento limpo ao fechar modal de fluxo");
+          
+          // Limpar nó selecionado ao fechar modal
+          setSelectedFlowNode(null);
+          console.log("📋 Nó selecionado limpo ao fechar modal");
           
           // Invalidar queries para atualizar a tabela quando modal for fechada
           queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
@@ -3152,12 +3160,13 @@ function FlowWithAutoFitView({
       console.log('🔷 Node selecionado:', selectedFlowNode?.id);
       return staticDiagramData.nodes.map((node: any) => {
         // Determinar se este nó está selecionado
+        // Ao abrir modal, selectedFlowNode será null, então nenhum nó será selecionado
         const isSelected = selectedFlowNode?.id === node.id;
         
         if (pendingConnectedNodes.has(node.id)) {
           return {
             ...node,
-            selected: isSelected, // Manter seleção visual
+            selected: isSelected, // Será false quando selectedFlowNode for null
             data: {
               ...node.data,
               isPendingConnected: true,
@@ -3167,7 +3176,7 @@ function FlowWithAutoFitView({
         }
         return {
           ...node,
-          selected: isSelected, // Manter seleção visual
+          selected: isSelected, // Será false quando selectedFlowNode for null
           data: { ...node.data, isReadonly: true }
         };
       });
