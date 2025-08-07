@@ -2000,6 +2000,15 @@ function FlowWithAutoFitView({
     // Estado para controlar os valores dos campos do formulário
     const [formValues, setFormValues] = useState<Record<string, string>>({});
     
+    // Estado separado para os dados iniciais do diagrama (não muda até salvar)
+    const [staticDiagramData] = useState(() => {
+      // Clonar profundamente os dados iniciais do diagrama
+      return {
+        nodes: flowData?.flowTasks?.nodes || flowData?.nodes || [],
+        edges: flowData?.flowTasks?.edges || flowData?.edges || []
+      };
+    });
+    
     // Estado para controlar resultado da execução de integração
     const [integrationResult, setIntegrationResult] = useState<{
       status: 'success' | 'error' | null;
@@ -2034,7 +2043,7 @@ function FlowWithAutoFitView({
       }
     };
     
-    // Carregar dados salvos quando um nó é selecionado
+    // Carregar dados salvos quando um nó diferente é selecionado (só depende do ID do nó)
     useEffect(() => {
       if (selectedFlowNode && selectedFlowNode.data.formData) {
         console.log('🔄 Carregando dados salvos do formulário:', selectedFlowNode.data.formData);
@@ -2046,7 +2055,7 @@ function FlowWithAutoFitView({
       
       // Limpar resultado da integração ao mudar de nó
       setIntegrationResult({ status: null, message: '' });
-    }, [selectedFlowNode?.id, selectedFlowNode?.data.formData]);
+    }, [selectedFlowNode?.id]); // Removido selectedFlowNode?.data.formData para evitar re-renders
     
     // Função helper para extrair dados do formulário
     const getFormFields = () => {
@@ -2284,7 +2293,7 @@ function FlowWithAutoFitView({
         const updatedFlowTasks = {
           nodes: updatedNodes,
           edges: edges,
-          viewport: flowData.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
+          viewport: flowDiagramModal.flowData?.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
         };
 
         // Chamar API para transferir fluxo
@@ -2294,7 +2303,7 @@ function FlowWithAutoFitView({
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            currentDocumentId: flowData.documentId,
+            currentDocumentId: flowDiagramModal.flowData?.documentId,
             targetFlowId: selectedFlowNode.data.To_Flow_id,
             flowTasks: updatedFlowTasks
           }),
@@ -2801,83 +2810,68 @@ function FlowWithAutoFitView({
       }
     };
 
-    // Effect para executar fit view quando o painel inspector é aberto/fechado (não durante alterações no formulário)
-    const [lastInspectorState, setLastInspectorState] = useState(showFlowInspector);
+    // Effect comentado - não fazer fitView automático para evitar interferências
+    // const [lastInspectorState, setLastInspectorState] = useState(showFlowInspector);
     
-    useEffect(() => {
-      // Só executar fitView se realmente mudou o estado do inspector e não está durante edição de aprovação
-      if (lastInspectorState !== showFlowInspector && !showApprovalAlert) {
-        const timeoutId = setTimeout(() => {
-          fitView({
-            padding: 0.2,
-            minZoom: 0.1,
-            maxZoom: 2,
-            duration: 300
-          });
-        }, 100);
-        
-        setLastInspectorState(showFlowInspector);
+    // useEffect removido para evitar fitView automático que causa interferência no diagrama
 
-        return () => clearTimeout(timeoutId);
-      }
-    }, [showFlowInspector, fitView, lastInspectorState, showApprovalAlert]);
+    // Usar dados estáticos do diagrama para evitar refresh durante edição do formulário
+    const nodes = staticDiagramData.nodes;
+    const edges = staticDiagramData.edges;
 
-    // Implementar lógica de "pendente em processo"
-    // Handle different data structures: flowData might be the flowTasks directly or have a flowTasks property
-    const tasksData = flowData?.flowTasks || flowData;
-    const nodes = tasksData?.nodes || [];
-    const edges = tasksData?.edges || [];
+    // Memoizar pendingConnectedNodes para evitar recálculo desnecessário
+    const pendingConnectedNodes = useMemo(() => {
+      // Encontrar nós executados
+      const executedNodes = new Set(
+        nodes.filter((node: any) => node.data?.isExecuted === 'TRUE').map((node: any) => node.id)
+      );
 
-    // Encontrar nós executados
-    const executedNodes = new Set(
-      nodes.filter((node: any) => node.data?.isExecuted === 'TRUE').map((node: any) => node.id)
-    );
-
-    // Encontrar nós pendentes conectados aos executados
-    const pendingConnectedNodes = new Set<string>();
-    
-    for (const edge of edges) {
-      // Se o nó de origem está executado e o nó de destino não está executado
-      if (executedNodes.has(edge.source)) {
-        const sourceNode = nodes.find((n: any) => n.id === edge.source);
-        const targetNode = nodes.find((n: any) => n.id === edge.target);
-        
-        if (targetNode && targetNode.data?.isExecuted !== 'TRUE') {
-          // Verificar se o nó de origem é um switchNode
-          if (sourceNode?.type === 'switchNode') {
-            // Para switchNodes, verificar se a conexão está no handle correto
-            const { inputSwitch, leftSwitch, rightSwitch } = sourceNode.data;
-            
-            // Determinar qual handle deveria estar ativo baseado no inputSwitch
-            let shouldBeActive = false;
-            if (edge.sourceHandle === 'a' && inputSwitch === rightSwitch) {
-              shouldBeActive = true; // Handle direito ativo
-            } else if (edge.sourceHandle === 'c' && inputSwitch === leftSwitch) {
-              shouldBeActive = true; // Handle esquerdo ativo
+      // Encontrar nós pendentes conectados aos executados
+      const pendingNodes = new Set<string>();
+      
+      for (const edge of edges) {
+        // Se o nó de origem está executado e o nó de destino não está executado
+        if (executedNodes.has(edge.source)) {
+          const sourceNode = nodes.find((n: any) => n.id === edge.source);
+          const targetNode = nodes.find((n: any) => n.id === edge.target);
+          
+          if (targetNode && targetNode.data?.isExecuted !== 'TRUE') {
+            // Verificar se o nó de origem é um switchNode
+            if (sourceNode?.type === 'switchNode') {
+              // Para switchNodes, verificar se a conexão está no handle correto
+              const { inputSwitch, leftSwitch, rightSwitch } = sourceNode.data;
+              
+              // Determinar qual handle deveria estar ativo baseado no inputSwitch
+              let shouldBeActive = false;
+              if (edge.sourceHandle === 'a' && inputSwitch === rightSwitch) {
+                shouldBeActive = true; // Handle direito ativo
+              } else if (edge.sourceHandle === 'c' && inputSwitch === leftSwitch) {
+                shouldBeActive = true; // Handle esquerdo ativo
+              }
+              
+              // Apenas marcar como pendente se a conexão está no handle correto
+              if (shouldBeActive) {
+                pendingNodes.add(edge.target);
+              }
+            } else if (targetNode.type !== 'endNode') {
+              // Para outros tipos de nós (EXCETO endNodes), aplicar lógica normal
+              // EndNodes recebem conexões mas não propagam pendência
+              pendingNodes.add(edge.target);
             }
-            
-            // Apenas marcar como pendente se a conexão está no handle correto
-            if (shouldBeActive) {
-              pendingConnectedNodes.add(edge.target);
-            }
-          } else if (targetNode.type !== 'endNode') {
-            // Para outros tipos de nós (EXCETO endNodes), aplicar lógica normal
-            // EndNodes recebem conexões mas não propagam pendência
-            pendingConnectedNodes.add(edge.target);
           }
         }
       }
-    }
+      return pendingNodes;
+    }, [nodes, edges]); // Só recalcula quando nodes ou edges mudam
 
-    // Processar nós para adicionar destaque amarelo aos pendentes conectados (memoizado para evitar re-renders desnecessários)
+    // Processar nós para adicionar destaque amarelo aos pendentes conectados (memoizado sem depender de selectedFlowNode)
     const processedNodes = useMemo(() => {
+      console.log('🔷 Processando nodes do diagrama - Total:', nodes.length);
       return nodes.map((node: any) => {
-        const isSelected = selectedFlowNode?.id === node.id;
-        
         if (pendingConnectedNodes.has(node.id)) {
           return {
             ...node,
-            selected: isSelected,
+            selected: false, // Não usar selectedFlowNode aqui para evitar recriação
             data: {
               ...node.data,
               isPendingConnected: true,
@@ -2887,11 +2881,11 @@ function FlowWithAutoFitView({
         }
         return {
           ...node,
-          selected: isSelected,
+          selected: false, // Não usar selectedFlowNode aqui para evitar recriação
           data: { ...node.data, isReadonly: true }
         };
       });
-    }, [nodes, pendingConnectedNodes, selectedFlowNode?.id]);
+    }, [nodes, pendingConnectedNodes]); // Removido selectedFlowNode?.id para evitar re-renders
 
     // Processar edges para colorir conexões e adicionar animação (memoizado para evitar re-renders desnecessários)
     const processedEdges = useMemo(() => {
@@ -2985,8 +2979,9 @@ function FlowWithAutoFitView({
       }
     };
 
-    // Log para debug das edges com animação
-    console.log("🟢 FlowWithAutoFitView - Edges com animação:", processedEdges.filter(edge => edge.animated));
+    // Log para debug das edges com animação e quando o diagrama é renderizado
+    console.log("🟢 FlowWithAutoFitView - Edges com animação:", processedEdges.filter(edge => edge.animated).length);
+    console.log("🔴 Diagrama sendo renderizado - Nodes:", processedNodes.length, "Edges:", processedEdges.length);
 
     return (
       <div className="flex-1 flex h-full w-full">
