@@ -1683,6 +1683,7 @@ export function DocsProcessEmbed({
         showApprovalAlert={showApprovalAlert}
         setShowApprovalAlert={setShowApprovalAlert}
         isFlowInspectorPinned={isFlowInspectorPinned}
+        getDynamicFormData={getDynamicFormData}
         onClose={() => {
           // Limpar o documento atual para formulários dinâmicos
           setCurrentFlowDocumentId(null);
@@ -1703,6 +1704,7 @@ export function DocsProcessEmbed({
             isFlowInspectorPinned={isFlowInspectorPinned}
             setIsFlowInspectorPinned={setIsFlowInspectorPinned}
             getTemplateInfo={getTemplateInfo}
+            getDynamicFormData={getDynamicFormData}
           />
         )}
       />
