@@ -680,6 +680,12 @@ export default function LexicalPage() {
         setInitialEditorState(undefined);
         setEditorKey(prev => prev + 1); // Force re-render do editor
       }
+      
+      // Limpar o editor da página composer se disponível
+      if (typeof (window as any).resetComposerEditor === 'function') {
+        (window as any).resetComposerEditor();
+        console.log("🔄 Editor do composer resetado após finalização");
+      }
     },
     onError: (error: any) => {
       toast({

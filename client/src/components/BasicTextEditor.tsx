@@ -165,6 +165,31 @@ export default function BasicTextEditor() {
     setIsPluginModalOpen(true);
   };
 
+  // Função para resetar/limpar o editor
+  const resetEditor = () => {
+    console.log("🔄 Resetando editor...");
+    setContent("");
+    setSelectedTemplate("");
+    setSelectedDocumentEdition("");
+    setTemplateSections([]);
+    setHeaderFields([]);
+    setIsMarkdownView(false);
+    setActiveTab("richtext");
+    setLastCursorInfo(null);
+    console.log("✅ Editor resetado com sucesso");
+  };
+
+  // Função global para resetar o editor (pode ser chamada externamente)
+  React.useEffect(() => {
+    // Registrar função de reset no objeto global para acesso externo
+    (window as any).resetComposerEditor = resetEditor;
+    
+    // Limpar no unmount
+    return () => {
+      delete (window as any).resetComposerEditor;
+    };
+  }, []);
+
   // Funções de formatação para a barra de ferramentas
   // Função para salvar o documento
   const saveDocument = async () => {

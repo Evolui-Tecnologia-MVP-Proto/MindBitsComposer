@@ -2680,6 +2680,12 @@ function FlowWithAutoFitView({
 
           console.log('✅ Fluxo encerrado e documento marcado como concluído');
           
+          // Limpar o editor da página composer se disponível
+          if (typeof (window as any).resetComposerEditor === 'function') {
+            (window as any).resetComposerEditor();
+            console.log("🔄 Editor do composer resetado após conclusão do fluxo");
+          }
+          
           setIntegrationResult({
             status: 'success',
             message: 'Fluxo encerrado com sucesso! O documento foi marcado como concluído e enviado para a aba [Concluídos].'
