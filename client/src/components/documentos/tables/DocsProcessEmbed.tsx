@@ -3188,9 +3188,8 @@ function FlowWithAutoFitView({
               if (shouldBeActive) {
                 pendingNodes.add(edge.target);
               }
-            } else if (targetNode.type !== 'endNode') {
-              // Para outros tipos de nós (EXCETO endNodes), aplicar lógica normal
-              // EndNodes recebem conexões mas não propagam pendência
+            } else {
+              // Para todos outros tipos de nós (INCLUINDO endNodes), aplicar lógica normal
               pendingNodes.add(edge.target);
             }
           }
