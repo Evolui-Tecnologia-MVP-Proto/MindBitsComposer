@@ -38,6 +38,7 @@ interface FlowDiagramModalProps {
   FlowWithAutoFitView: any;
   onClose?: () => void; // Callback para quando a modal for fechada
   getDynamicFormData?: (nodeId: string) => any; // Função para buscar dados dinâmicos do formulário
+  renderDynamicForm?: (flowNode: any) => any; // Função para renderizar formulário dinâmico
 }
 
 export function FlowDiagramModal({
@@ -53,6 +54,7 @@ export function FlowDiagramModal({
   FlowWithAutoFitView,
   onClose,
   getDynamicFormData,
+  renderDynamicForm,
 }: FlowDiagramModalProps) {
   console.log("🔴 RENDERIZANDO MODAL:", flowDiagramModal);
   
@@ -166,6 +168,7 @@ export function FlowDiagramModal({
               setShowApprovalAlert={setShowApprovalAlert}
               isPinned={isFlowInspectorPinned}
               getDynamicFormData={getDynamicFormData}
+              renderDynamicForm={renderDynamicForm}
             />
           </ReactFlowProvider>
         </div>
