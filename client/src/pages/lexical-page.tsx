@@ -659,6 +659,10 @@ export default function LexicalPage() {
       return apiRequest("PATCH", `/api/document-editions/${editionId}/finalize`, {});
     },
     onSuccess: (data: any) => {
+      console.log("✅ Documento finalizado - response data:", data);
+      console.log("✅ selectedEdition:", selectedEdition);
+      console.log("✅ Comparação IDs:", selectedEdition?.id, "===", data.edition?.id);
+      
       setShowFinalizeModal(false);
       toast({
         title: "Documento finalizado",
@@ -671,15 +675,21 @@ export default function LexicalPage() {
       queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
       queryClient.invalidateQueries({ queryKey: ['/api/documentos'] });
       
-      // Limpar selectedEdition se foi finalizada
-      if (selectedEdition && selectedEdition.id === data.edition?.id) {
-        setSelectedEdition(null);
-        setTitle("Novo Documento");
-        setContent("");
-        setMarkdownContent("");
-        setInitialEditorState(undefined);
-        setEditorKey(prev => prev + 1); // Force re-render do editor
-      }
+      // Sempre limpar o editor após finalização (removendo a condição para debug)
+      console.log("🔄 Limpando editor após finalização...");
+      setSelectedEdition(null);
+      setSelectedTemplate(null); // Limpar template também
+      setTitle("Novo Documento");
+      setContent("");
+      setMarkdownContent("");
+      setInitialEditorState(undefined);
+      setCurrentDocumentId(null); // Limpar ID do documento atual
+      setEditorKey(prev => {
+        const newKey = prev + 1;
+        console.log("🔄 Novo editorKey:", newKey);
+        return newKey;
+      });
+      console.log("✅ Estado do editor limpo");
       
       // Limpar o editor da página composer se disponível
       if (typeof (window as any).resetComposerEditor === 'function') {
