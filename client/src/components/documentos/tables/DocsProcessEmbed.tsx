@@ -3040,12 +3040,6 @@ function FlowWithAutoFitView({
             nodeTypes={nodeTypes}
             onNodeClick={onNodeClick}
             onPaneClick={onPaneClick}
-            fitView
-            fitViewOptions={{
-              padding: 0.2,
-              minZoom: 0.1,
-              maxZoom: 2
-            }}
             minZoom={0.1}
             maxZoom={2}
             attributionPosition="bottom-left"
