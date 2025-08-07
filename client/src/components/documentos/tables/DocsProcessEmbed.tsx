@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback, memo } from "react";
+import { useState, useMemo, useEffect, useCallback, memo, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -2024,22 +2024,50 @@ const IsolatedDiagram = memo(({
 
 IsolatedDiagram.displayName = 'IsolatedDiagram';
 
-// Componente memoizado do ReactFlow para evitar re-renders desnecessários
-const MemoizedReactFlow = memo(({ 
-  nodes, 
-  edges, 
+// Componente completamente isolado do ReactFlow 
+const IsolatedReactFlow = memo(({ 
+  initialNodes, 
+  initialEdges, 
   nodeTypes, 
-  onNodeClick, 
-  onPaneClick 
+  onNodeClickHandler,
+  isPinnedHandler
 }: any) => {
-  console.log("📊 MemoizedReactFlow renderizado");
+  // Estado interno completamente isolado
+  const [internalNodes] = useState(initialNodes);
+  const [internalEdges] = useState(initialEdges);
+  
+  // Callback estável usando ref
+  const nodeClickRef = useRef(onNodeClickHandler);
+  const isPinnedRef = useRef(isPinnedHandler);
+  
+  useEffect(() => {
+    nodeClickRef.current = onNodeClickHandler;
+    isPinnedRef.current = isPinnedHandler;
+  });
+  
+  const handleNodeClick = useCallback((event: any, node: any) => {
+    if (nodeClickRef.current) {
+      nodeClickRef.current(node);
+    }
+  }, []);
+  
+  const handlePaneClick = useCallback(() => {
+    if (!isPinnedRef.current()) {
+      if (nodeClickRef.current) {
+        nodeClickRef.current(null);
+      }
+    }
+  }, []);
+  
+  console.log("📊 IsolatedReactFlow renderizado - isso só deve aparecer uma vez");
+  
   return (
     <ReactFlow
-      nodes={nodes}
-      edges={edges}
+      nodes={internalNodes}
+      edges={internalEdges}
       nodeTypes={nodeTypes}
-      onNodeClick={onNodeClick}
-      onPaneClick={onPaneClick}
+      onNodeClick={handleNodeClick}
+      onPaneClick={handlePaneClick}
       minZoom={0.1}
       maxZoom={2}
       attributionPosition="bottom-left"
@@ -2055,13 +2083,9 @@ const MemoizedReactFlow = memo(({
       <Background />
     </ReactFlow>
   );
-}, (prevProps, nextProps) => {
-  // Só re-renderizar se nodes ou edges mudarem estruturalmente
-  return JSON.stringify(prevProps.nodes) === JSON.stringify(nextProps.nodes) &&
-         JSON.stringify(prevProps.edges) === JSON.stringify(nextProps.edges);
 });
 
-MemoizedReactFlow.displayName = 'MemoizedReactFlow';
+IsolatedReactFlow.displayName = 'IsolatedReactFlow';
 
 // Componente interno que usa useReactFlow para fit view automático
 function FlowWithAutoFitView({ 
@@ -2957,6 +2981,7 @@ function FlowWithAutoFitView({
     // Processar nós para adicionar destaque amarelo aos pendentes conectados (memoizado sem depender de selectedFlowNode)
     const processedNodes = useMemo(() => {
       console.log('🔷 Processando nodes do diagrama - Total:', staticDiagramData.nodes.length);
+      console.log('🔷 selectedFlowNode mudou mas nodes não devem reprocessar');
       return staticDiagramData.nodes.map((node: any) => {
         if (pendingConnectedNodes.has(node.id)) {
           return {
@@ -3057,31 +3082,37 @@ function FlowWithAutoFitView({
       switchNode: SwitchNodeComponent
     }), []);
 
-    const onNodeClick = useCallback((event: any, node: any) => {
-      setSelectedFlowNode(node);
-      setShowFlowInspector(true);
-    }, [setSelectedFlowNode, setShowFlowInspector]);
 
-    const onPaneClick = useCallback(() => {
-      if (!isPinned) {
-        setShowFlowInspector(false);
-        setSelectedFlowNode(null);
-      }
-    }, [isPinned, setShowFlowInspector, setSelectedFlowNode]);
 
     // Log para debug das edges com animação e quando o diagrama é renderizado
     console.log("🟢 FlowWithAutoFitView - Edges com animação:", processedEdges.filter(edge => edge.animated).length);
     console.log("🔴 Diagrama sendo renderizado - Nodes:", processedNodes.length, "Edges:", processedEdges.length);
 
+    // Handler para clique em nó
+    const handleNodeClick = useCallback((node: any) => {
+      if (node) {
+        setSelectedFlowNode(node);
+        setShowFlowInspector(true);
+      } else {
+        setShowFlowInspector(false);
+        setSelectedFlowNode(null);
+      }
+    }, [setSelectedFlowNode, setShowFlowInspector]);
+    
+    // Handler para verificar se está pinado
+    const checkIsPinned = useCallback(() => {
+      return isPinned;
+    }, [isPinned]);
+
     return (
       <div className="flex-1 flex h-full w-full">
         <div className="flex-1 h-full w-full">
-          <MemoizedReactFlow
-            nodes={processedNodes}
-            edges={processedEdges}
+          <IsolatedReactFlow
+            initialNodes={processedNodes}
+            initialEdges={processedEdges}
             nodeTypes={nodeTypes}
-            onNodeClick={onNodeClick}
-            onPaneClick={onPaneClick}
+            onNodeClickHandler={handleNodeClick}
+            isPinnedHandler={checkIsPinned}
           />
         </div>
         {showFlowInspector && selectedFlowNode && (
