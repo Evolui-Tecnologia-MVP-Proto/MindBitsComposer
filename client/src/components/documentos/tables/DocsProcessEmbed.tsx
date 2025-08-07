@@ -1837,7 +1837,9 @@ function FlowWithAutoFitView({
   toast,
   isFlowInspectorPinned,
   setIsFlowInspectorPinned,
-  getTemplateInfo
+  getTemplateInfo,
+  getDynamicFormData,
+  renderDynamicForm
 }: any) {
     const { fitView, getNodes, setNodes } = useReactFlow();
     
