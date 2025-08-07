@@ -3055,12 +3055,14 @@ function FlowWithAutoFitView({
     }), []);
 
     const onNodeClick = (event: any, node: any) => {
+      console.log('🎯 Nó clicado:', node.id, node.type);
       setSelectedFlowNode(node);
       setShowFlowInspector(true);
     };
 
     const onPaneClick = () => {
-      if (!isPinned) {
+      console.log('🎯 Painel clicado, isPinned:', isFlowInspectorPinned);
+      if (!isFlowInspectorPinned) {
         setShowFlowInspector(false);
         setSelectedFlowNode(null);
       }
@@ -3084,10 +3086,13 @@ function FlowWithAutoFitView({
             nodesDraggable={false}
             nodesConnectable={false}
             elementsSelectable={true}
+            selectNodesOnDrag={false}
             panOnDrag={true}
+            panOnScroll={false}
             zoomOnScroll={true}
             zoomOnPinch={true}
             zoomOnDoubleClick={false}
+            preventScrolling={true}
           >
             <Controls />
             <Background />
