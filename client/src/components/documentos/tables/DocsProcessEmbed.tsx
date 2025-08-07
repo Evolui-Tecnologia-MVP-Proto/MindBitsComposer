@@ -2021,11 +2021,12 @@ const isValidViewport = (viewport: any): viewport is { x: number; y: number; zoo
          !isNaN(viewport.zoom);
 };
 
-// Função para obter viewport seguro
+// Função para obter viewport seguro - NÃO usar localStorage para evitar viewport deslocado
 const getSafeViewport = (viewport: any) => {
   if (isValidViewport(viewport)) {
     return viewport;
   }
+  // Sempre retornar viewport padrão - fitView será executado ao abrir
   return { x: 0, y: 0, zoom: 1 };
 };
 
@@ -2137,6 +2138,20 @@ function FlowWithAutoFitView({
         console.log("❌ onFlowReady não pode ser chamado - verificar disponibilidade das funções");
       }
     }, [fitView, getViewport, onFlowReady]);
+    
+    // Executar fitView automaticamente quando modal abre
+    useEffect(() => {
+      if (flowDiagramModal?.isOpen && fitView) {
+        console.log("🚀 Modal aberta - executando fitView automaticamente");
+        // Pequeno delay para garantir que o diagrama foi renderizado
+        const timer = setTimeout(() => {
+          fitView({ padding: 0.1, duration: 300 });
+          console.log("✅ FitView executado na abertura da modal");
+        }, 100);
+        
+        return () => clearTimeout(timer);
+      }
+    }, [flowDiagramModal?.isOpen, fitView]);
     
     // Estado para controlar os valores dos campos do formulário
     const [formValues, setFormValues] = useState<Record<string, string>>({});
