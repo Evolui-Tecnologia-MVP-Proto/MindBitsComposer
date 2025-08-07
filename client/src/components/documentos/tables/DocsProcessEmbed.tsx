@@ -1990,6 +1990,10 @@ export function DocsProcessEmbed({
             getTemplateInfo={getTemplateInfo}
             getDynamicFormData={getDynamicFormData}
             renderDynamicForm={renderDynamicForm}
+            localApprovalStatus={localApprovalStatus}
+            setLocalApprovalStatus={setLocalApprovalStatus}
+            formValues={formValues}
+            setFormValues={setFormValues}
           />
         )}
       />
@@ -2046,12 +2050,13 @@ function FlowWithAutoFitView({
   setIsFlowInspectorPinned,
   getTemplateInfo,
   getDynamicFormData,
-  renderDynamicForm
+  renderDynamicForm,
+  localApprovalStatus,
+  setLocalApprovalStatus,
+  formValues,
+  setFormValues
 }: any) {
     const { fitView, getNodes, setNodes } = useReactFlow();
-    
-    // Estado para controlar os valores dos campos do formulário
-    const [formValues, setFormValues] = useState<Record<string, string>>({});
     
     // Estado para controlar resultado da execução de integração
     const [integrationResult, setIntegrationResult] = useState<{
