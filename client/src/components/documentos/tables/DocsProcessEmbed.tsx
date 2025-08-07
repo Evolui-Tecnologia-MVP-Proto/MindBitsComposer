@@ -386,7 +386,8 @@ export function DocsProcessEmbed({
       // Verifica a condição de exibição
       const showCondition = formData.Show_Condition || "TRUE";
       const isApprovalNode = flowNode.data.actionType === 'Intern_Aprove';
-      const approvalStatus = flowNode.data.isAproved;
+      // Usar o status temporário se ele existir, senão usar o status do nó
+      const approvalStatus = tempApprovalStatus || flowNode.data.isAproved;
       
       // Determina se deve mostrar o formulário baseado na condição
       let shouldShowForm = false;
@@ -2042,6 +2043,7 @@ const StableReactFlow = memo(({
   }, []);
   
   console.log("🎯 StableReactFlow renderizado com viewport:", globalViewport);
+  console.log("🎯 Nós com seleção:", nodes.filter((n: any) => n.selected).map((n: any) => n.id));
   
   return (
     <ReactFlow
@@ -2068,6 +2070,16 @@ const StableReactFlow = memo(({
       <Background />
     </ReactFlow>
   );
+}, (prevProps, nextProps) => {
+  // Comparação customizada
+  // Retornar true = não re-renderizar, false = re-renderizar
+  
+  // Comparar nodes e edges completos (incluindo seleção)
+  const nodesEqual = JSON.stringify(prevProps.nodes) === JSON.stringify(nextProps.nodes);
+  const edgesEqual = JSON.stringify(prevProps.edges) === JSON.stringify(nextProps.edges);
+  
+  // Só evitar re-render se NADA mudou
+  return nodesEqual && edgesEqual;
 });
 
 StableReactFlow.displayName = 'StableReactFlow';
@@ -2967,16 +2979,18 @@ function FlowWithAutoFitView({
       return pendingNodes;
     }, [staticDiagramData.nodes, staticDiagramData.edges]); // Usar dados estáticos
 
-    // Processar nós para adicionar destaque amarelo aos pendentes conectados (memoizado sem depender de selectedFlowNode)
+    // Processar nós para adicionar destaque amarelo aos pendentes conectados
     const processedNodes = useMemo(() => {
       console.log('🔷 Processando nodes do diagrama - Total:', staticDiagramData.nodes.length);
-      console.log('🔷 staticDiagramData mudou?', staticDiagramData);
-      console.log('🔷 pendingConnectedNodes mudou?', pendingConnectedNodes);
+      console.log('🔷 Node selecionado:', selectedFlowNode?.id);
       return staticDiagramData.nodes.map((node: any) => {
+        // Determinar se este nó está selecionado
+        const isSelected = selectedFlowNode?.id === node.id;
+        
         if (pendingConnectedNodes.has(node.id)) {
           return {
             ...node,
-            selected: false, // Não usar selectedFlowNode aqui para evitar recriação
+            selected: isSelected, // Manter seleção visual
             data: {
               ...node.data,
               isPendingConnected: true,
@@ -2986,11 +3000,11 @@ function FlowWithAutoFitView({
         }
         return {
           ...node,
-          selected: false, // Não usar selectedFlowNode aqui para evitar recriação
+          selected: isSelected, // Manter seleção visual
           data: { ...node.data, isReadonly: true }
         };
       });
-    }, [staticDiagramData.nodes, pendingConnectedNodes]); // Usar dados estáticos
+    }, [staticDiagramData.nodes, pendingConnectedNodes, selectedFlowNode?.id]); // Incluir apenas o ID do nó selecionado
 
     // Processar edges para colorir conexões e adicionar animação (memoizado para evitar re-renders desnecessários)
     const processedEdges = useMemo(() => {
