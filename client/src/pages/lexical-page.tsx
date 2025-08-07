@@ -1976,19 +1976,19 @@ export default function LexicalPage() {
                                 }`}
                                 onClick={() => handleSelectEdition(edition)}
                               >
-                                {/* Badge para documentos em progresso ou finalizados */}
+                                {/* Badge para documentos com diferentes status */}
                                 <div className="absolute top-2 right-2">
                                   {edition.status === 'done' ? (
                                     <Badge className="bg-green-500 text-white text-xs px-2 py-1">
                                       Finalizado
                                     </Badge>
-                                  ) : edition.lexFile ? (
+                                  ) : edition.status === 'editing' ? (
                                     <Badge className="bg-blue-500 text-white text-xs px-2 py-1">
                                       Em Edição
                                     </Badge>
                                   ) : (
                                     <Badge className="bg-yellow-500 text-white text-xs px-2 py-1">
-                                      Em Progresso
+                                      Na Fila
                                     </Badge>
                                   )}
                                 </div>
