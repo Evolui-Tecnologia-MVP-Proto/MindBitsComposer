@@ -337,7 +337,7 @@ export function DocsProcessEmbed({
   };
 
   // Função para renderizar formulário dinâmico
-  const renderDynamicForm = (flowNode: any) => {
+  const renderDynamicForm = (flowNode: any, tempApprovalStatus?: string | null) => {
     if (flowNode.type !== 'actionNode') return null;
     
     // Buscar dados dinâmicos da execução primeiro, depois fallback para dados do nó
@@ -3238,7 +3238,7 @@ function FlowWithAutoFitView({
                 )}
 
                 {/* Formulário dinâmico baseado nos dados de execução */}
-                {renderDynamicForm(selectedFlowNode)}
+                {renderDynamicForm(selectedFlowNode, tempApprovalStatus)}
 
                 {/* Layout tabular para DocumentNode - 2 colunas */}
                 {selectedFlowNode.type === 'documentNode' && (
