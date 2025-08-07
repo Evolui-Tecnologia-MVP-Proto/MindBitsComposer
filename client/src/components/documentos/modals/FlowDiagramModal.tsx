@@ -59,6 +59,7 @@ export function FlowDiagramModal({
   renderDynamicForm,
 }: FlowDiagramModalProps) {
   console.log("🔴 RENDERIZANDO MODAL:", flowDiagramModal);
+  console.log("🔴 onFlowReady disponível:", !!onFlowReady);
   
   if (!flowDiagramModal.isOpen || !flowDiagramModal.flowData) {
     console.log("🔴 Modal fechada ou sem dados, não renderizando");

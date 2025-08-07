@@ -2110,7 +2110,17 @@ function FlowWithAutoFitView({
   renderDynamicForm,
   onFlowReady
 }: any) {
+    console.log("🔥 FlowWithAutoFitView EXECUTADO - props recebidas:", {
+      onFlowReady: !!onFlowReady,
+      flowData: !!flowData
+    });
+
     const { fitView, getNodes, setNodes, getViewport } = useReactFlow();
+    
+    console.log("🔥 useReactFlow hooks obtidos:", {
+      fitView: !!fitView,
+      getViewport: !!getViewport
+    });
     
     // Expor fitView e getViewport para o componente pai
     useEffect(() => {
