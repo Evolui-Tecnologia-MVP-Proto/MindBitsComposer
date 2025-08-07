@@ -2024,6 +2024,9 @@ const IsolatedDiagram = memo(({
 
 IsolatedDiagram.displayName = 'IsolatedDiagram';
 
+// Estado global para viewport - persiste durante toda a sessão do modal
+let globalViewport = { x: 0, y: 0, zoom: 1 };
+
 // Componente ReactFlow com viewport estável
 const StableReactFlow = memo(({ 
   nodes, 
@@ -2032,10 +2035,13 @@ const StableReactFlow = memo(({
   onNodeClick,
   onPaneClick 
 }: any) => {
-  // Estado interno do viewport que persiste entre re-renders
-  const [internalViewport, setInternalViewport] = useState({ x: 0, y: 0, zoom: 1 });
+  // Usar o viewport global e atualizar quando mudar
+  const handleViewportChange = useCallback((viewport: Viewport) => {
+    globalViewport = viewport;
+    console.log("📍 Viewport atualizado:", viewport);
+  }, []);
   
-  console.log("🎯 StableReactFlow renderizado");
+  console.log("🎯 StableReactFlow renderizado com viewport:", globalViewport);
   
   return (
     <ReactFlow
@@ -2044,8 +2050,8 @@ const StableReactFlow = memo(({
       nodeTypes={nodeTypes}
       onNodeClick={onNodeClick}
       onPaneClick={onPaneClick}
-      defaultViewport={internalViewport}
-      onViewportChange={setInternalViewport}
+      defaultViewport={globalViewport}
+      onViewportChange={handleViewportChange}
       minZoom={0.1}
       maxZoom={2}
       attributionPosition="bottom-left"
