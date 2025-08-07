@@ -2893,7 +2893,7 @@ function FlowWithAutoFitView({
       }
     }, [selectedFlowNode?.id]);
     
-    // Effect para executar fit view quando o painel inspector é aberto/fechado
+    // Effect para executar fit view apenas uma vez quando o componente monta
     useEffect(() => {
       const timeoutId = setTimeout(() => {
         fitView({
@@ -2905,7 +2905,7 @@ function FlowWithAutoFitView({
       }, 100);
 
       return () => clearTimeout(timeoutId);
-    }, [showFlowInspector, fitView]);
+    }, []); // Array vazio para executar apenas uma vez
 
     // Implementar lógica de "pendente em processo"
     // Handle different data structures: flowData might be the flowTasks directly or have a flowTasks property
@@ -3078,12 +3078,6 @@ function FlowWithAutoFitView({
             nodeTypes={nodeTypes}
             onNodeClick={onNodeClick}
             onPaneClick={onPaneClick}
-            fitView
-            fitViewOptions={{
-              padding: 0.2,
-              minZoom: 0.1,
-              maxZoom: 2
-            }}
             minZoom={0.1}
             maxZoom={2}
             attributionPosition="bottom-left"
@@ -3095,7 +3089,7 @@ function FlowWithAutoFitView({
             zoomOnPinch={true}
             zoomOnDoubleClick={false}
           >
-            <Controls showInteractive={false} />
+            <Controls />
             <Background />
           </ReactFlow>
         </div>
