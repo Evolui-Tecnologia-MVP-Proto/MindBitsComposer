@@ -2092,13 +2092,18 @@ function FlowWithAutoFitView({
       }
     }, [tempApprovalStatus, selectedFlowNode?.id]);
     
-    // Estado para controlar se a seleção inicial já foi feita (para evitar interferir com seleção manual)
-    const [hasInitialSelection, setHasInitialSelection] = useState(false);
+    // Usar ref para garantir que a seleção inicial só acontece uma vez
+    const hasInitialSelectionRef = useRef(false);
     
     // Fazer seleção automática inicial apenas uma vez quando o componente monta
     useEffect(() => {
-      // Só executar uma vez quando o componente monta e há nós disponíveis
-      if (!hasInitialSelection) {
+      // Só executar uma vez quando o componente monta, independente de outras mudanças
+      if (!hasInitialSelectionRef.current) {
+        console.log('🎯 Preparando seleção inicial automática...');
+        
+        // Marcar imediatamente como executado para evitar re-execuções
+        hasInitialSelectionRef.current = true;
+        
         // Pequeno delay para garantir que os nós estejam renderizados
         const timeoutId = setTimeout(() => {
           const currentNodes = getNodes();
@@ -2122,18 +2127,17 @@ function FlowWithAutoFitView({
             }
             
             // Selecionar o nó e abrir o inspector apenas se encontrou um nó
-            if (nodeToSelect && !selectedFlowNode) {
+            if (nodeToSelect) {
               console.log('🎯 Selecionando nó inicial:', nodeToSelect.id);
               setSelectedFlowNode(nodeToSelect);
               setShowFlowInspector(true);
-              setHasInitialSelection(true);
             }
           }
         }, 500);
         
         return () => clearTimeout(timeoutId);
       }
-    }, [hasInitialSelection]); // Executar apenas baseado no estado de seleção inicial
+    }, []); // Array vazio para executar apenas uma vez quando monta
     
 
     
