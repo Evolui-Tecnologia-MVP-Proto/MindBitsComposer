@@ -2001,11 +2001,6 @@ export default function LexicalPage() {
                                       <p className="text-xs text-gray-600 dark:text-[#9CA3AF] truncate">
                                         <span className="font-medium">Objeto:</span> {edition.objeto || 'N/A'}
                                       </p>
-                                      <p className="text-xs text-gray-500 dark:text-[#6B7280] truncate">
-                                        <span className="font-medium">Status:</span> {
-                                          edition.status === 'done' ? 'Finalizado' : 'Em Progresso'
-                                        }
-                                      </p>
                                     </div>
                                   </div>
                                 </div>
