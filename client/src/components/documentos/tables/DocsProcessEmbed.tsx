@@ -182,6 +182,9 @@ export function DocsProcessEmbed({
   const [showFlowInspector, setShowFlowInspector] = useState(false);
   const [selectedFlowNode, setSelectedFlowNode] = useState<any>(null);
   const [isFlowInspectorPinned, setIsFlowInspectorPinned] = useState(false);
+  
+  // Estado para armazenar o documento atual sendo visualizado na modal de fluxo
+  const [currentFlowDocumentId, setCurrentFlowDocumentId] = useState<string | null>(null);
   // Função para resetar o formulário
   const resetFormData = () => {
     setFormData({
@@ -297,6 +300,40 @@ export function DocsProcessEmbed({
   const { data: flowExecutions = [] } = useQuery({
     queryKey: ["/api/document-flow-executions"],
   });
+
+  // Função para buscar a execução de fluxo específica para o documento atual
+  const getCurrentFlowExecution = () => {
+    if (!currentFlowDocumentId || !flowExecutions.length) return null;
+    return flowExecutions.find((execution: any) => 
+      execution.documentId === currentFlowDocumentId
+    );
+  };
+
+  // Função para obter dados dinâmicos do formulário da execução
+  const getDynamicFormData = (nodeId: string) => {
+    const currentExecution = getCurrentFlowExecution();
+    if (!currentExecution || !currentExecution.flowTasks) return null;
+
+    try {
+      // Buscar no executionData primeiro
+      if (currentExecution.executionData && currentExecution.executionData[nodeId]) {
+        return currentExecution.executionData[nodeId].formData || currentExecution.executionData[nodeId].attached_Form;
+      }
+
+      // Buscar no flowTasks se não encontrar no executionData
+      if (currentExecution.flowTasks.nodes) {
+        const node = currentExecution.flowTasks.nodes.find((n: any) => n.id === nodeId);
+        if (node && (node.data.attached_Form || node.data.attached_form)) {
+          return node.data.attached_Form || node.data.attached_form;
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Erro ao buscar dados dinâmicos do formulário:', error);
+      return null;
+    }
+  };
 
   // Buscar contagem de anexos para todos os documentos
   const { data: artifactCounts = {} } = useQuery<Record<string, number>>({
@@ -1206,11 +1243,16 @@ export function DocsProcessEmbed({
       console.log("📄 Documento encontrado:", documento);
       console.log("📋 Objeto do documento:", documentObject);
       
+      // Definir o documento atual para busca de dados dinâmicos
+      const currentDocumentId = execution.documentId || execution.document_id || execution.id;
+      setCurrentFlowDocumentId(currentDocumentId);
+      console.log("📋 Documento definido para formulários dinâmicos:", currentDocumentId);
+      
       // Garantir que o documentId e edges estão incluídos nos dados do fluxo
       const baseFlowData = execution.flowTasks || execution;
       const flowDataWithDocumentId = {
         ...baseFlowData,
-        documentId: execution.documentId || execution.document_id || execution.id,
+        documentId: currentDocumentId,
         // Preservar edges explicitamente
         edges: baseFlowData.edges || execution.edges || [],
         nodes: baseFlowData.nodes || execution.nodes || [],
@@ -1642,6 +1684,10 @@ export function DocsProcessEmbed({
         setShowApprovalAlert={setShowApprovalAlert}
         isFlowInspectorPinned={isFlowInspectorPinned}
         onClose={() => {
+          // Limpar o documento atual para formulários dinâmicos
+          setCurrentFlowDocumentId(null);
+          console.log("📋 Documento limpo ao fechar modal de fluxo");
+          
           // Invalidar queries para atualizar a tabela quando modal for fechada
           queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
           queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
@@ -2785,14 +2831,25 @@ function FlowWithAutoFitView({
                   </div>
                 )}
 
-                {/* Formulário dinâmico baseado no attached_Form */}
-                {selectedFlowNode.type === 'actionNode' && (selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form) && (
+                {/* Formulário dinâmico baseado nos dados de execução */}
+                {selectedFlowNode.type === 'actionNode' && (() => {
+                  // Buscar dados dinâmicos da execução primeiro, depois fallback para dados do nó
+                  const dynamicFormData = getDynamicFormData(selectedFlowNode.id);
+                  const attachedFormData = dynamicFormData || selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+                  return attachedFormData;
+                })() && (
                   <div>
                     {(() => {
                       try {
-                        // Verifica tanto attached_Form (maiúsculo) quanto attached_form (minúsculo)
-                        let attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
-                        console.log('🔍 Dados brutos do formulário:', attachedFormData);
+                        // Buscar dados dinâmicos da execução primeiro, depois fallback para dados do nó
+                        const dynamicFormData = getDynamicFormData(selectedFlowNode.id);
+                        let attachedFormData = dynamicFormData || selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+                        console.log('🔍 Dados do formulário (dinâmicos):', {
+                          nodeId: selectedFlowNode.id,
+                          dynamicData: dynamicFormData,
+                          fallbackData: selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form,
+                          finalData: attachedFormData
+                        });
                         
                         // Corrige formato malformado do JSON se necessário
                         if (typeof attachedFormData === 'string' && attachedFormData.includes('"Motivo de Recusa":') && attachedFormData.includes('"Detalhamento":')) {
