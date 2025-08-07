@@ -2024,6 +2024,45 @@ const IsolatedDiagram = memo(({
 
 IsolatedDiagram.displayName = 'IsolatedDiagram';
 
+// Componente memoizado do ReactFlow para evitar re-renders desnecessários
+const MemoizedReactFlow = memo(({ 
+  nodes, 
+  edges, 
+  nodeTypes, 
+  onNodeClick, 
+  onPaneClick 
+}: any) => {
+  console.log("📊 MemoizedReactFlow renderizado");
+  return (
+    <ReactFlow
+      nodes={nodes}
+      edges={edges}
+      nodeTypes={nodeTypes}
+      onNodeClick={onNodeClick}
+      onPaneClick={onPaneClick}
+      minZoom={0.1}
+      maxZoom={2}
+      attributionPosition="bottom-left"
+      nodesDraggable={false}
+      nodesConnectable={false}
+      elementsSelectable={true}
+      panOnDrag={true}
+      zoomOnScroll={true}
+      zoomOnPinch={true}
+      zoomOnDoubleClick={false}
+    >
+      <Controls />
+      <Background />
+    </ReactFlow>
+  );
+}, (prevProps, nextProps) => {
+  // Só re-renderizar se nodes ou edges mudarem estruturalmente
+  return JSON.stringify(prevProps.nodes) === JSON.stringify(nextProps.nodes) &&
+         JSON.stringify(prevProps.edges) === JSON.stringify(nextProps.edges);
+});
+
+MemoizedReactFlow.displayName = 'MemoizedReactFlow';
+
 // Componente interno que usa useReactFlow para fit view automático
 function FlowWithAutoFitView({ 
   flowData, 
@@ -2049,23 +2088,7 @@ function FlowWithAutoFitView({
     // Estado para controlar os valores dos campos do formulário
     const [formValues, setFormValues] = useState<Record<string, string>>({});
     
-    // Estado para controlar a viewport e prevenir reset ao clicar em botões
-    // Inicializar com viewport salva ou valores padrão
-    const [currentViewport, setCurrentViewport] = useState<Viewport>(() => {
-      const initialViewport = flowData?.flowTasks?.viewport || 
-                             flowData?.viewport || 
-                             { x: 0, y: 0, zoom: 1 };
-      console.log('🎯 Viewport inicial:', initialViewport);
-      return initialViewport;
-    });
-    
-    // Detectar se o componente está sendo remontado
-    useEffect(() => {
-      console.log('🔄 FlowWithAutoFitView montado');
-      return () => {
-        console.log('🔄 FlowWithAutoFitView desmontado');
-      };
-    }, []);
+
     
     // Estado separado para os dados iniciais do diagrama (não muda até salvar)
     const [staticDiagramData] = useState(() => {
@@ -3045,43 +3068,21 @@ function FlowWithAutoFitView({
         setSelectedFlowNode(null);
       }
     }, [isPinned, setShowFlowInspector, setSelectedFlowNode]);
-    
-    // Callback para rastrear mudanças na viewport e evitar reset ao clicar em botões
-    const onViewportChange = useCallback((viewport: Viewport) => {
-      console.log('📍 Viewport mudou:', viewport);
-      setCurrentViewport(viewport);
-    }, []);
 
     // Log para debug das edges com animação e quando o diagrama é renderizado
     console.log("🟢 FlowWithAutoFitView - Edges com animação:", processedEdges.filter(edge => edge.animated).length);
     console.log("🔴 Diagrama sendo renderizado - Nodes:", processedNodes.length, "Edges:", processedEdges.length);
-    console.log("📐 Viewport atual sendo passada para ReactFlow:", currentViewport);
 
     return (
       <div className="flex-1 flex h-full w-full">
         <div className="flex-1 h-full w-full">
-          <ReactFlow
+          <MemoizedReactFlow
             nodes={processedNodes}
             edges={processedEdges}
             nodeTypes={nodeTypes}
             onNodeClick={onNodeClick}
             onPaneClick={onPaneClick}
-            onViewportChange={onViewportChange}
-            viewport={currentViewport}
-            minZoom={0.1}
-            maxZoom={2}
-            attributionPosition="bottom-left"
-            nodesDraggable={false}
-            nodesConnectable={false}
-            elementsSelectable={true}
-            panOnDrag={true}
-            zoomOnScroll={true}
-            zoomOnPinch={true}
-            zoomOnDoubleClick={false}
-          >
-            <Controls />
-            <Background />
-          </ReactFlow>
+          />
         </div>
         {showFlowInspector && selectedFlowNode && (
           <div className="w-80 bg-white dark:bg-[#0F172A] border-l border-gray-200 dark:border-[#374151] p-4 overflow-y-auto relative">
