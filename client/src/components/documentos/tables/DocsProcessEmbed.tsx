@@ -15,7 +15,8 @@ import {
 import ReactFlow, { 
   useReactFlow, 
   Controls, 
-  Background
+  Background,
+  type Viewport
 } from 'reactflow';
 
 // Importing icons for custom nodes
@@ -2048,6 +2049,24 @@ function FlowWithAutoFitView({
     // Estado para controlar os valores dos campos do formulário
     const [formValues, setFormValues] = useState<Record<string, string>>({});
     
+    // Estado para controlar a viewport e prevenir reset ao clicar em botões
+    // Inicializar com viewport salva ou valores padrão
+    const [currentViewport, setCurrentViewport] = useState<Viewport>(() => {
+      const initialViewport = flowData?.flowTasks?.viewport || 
+                             flowData?.viewport || 
+                             { x: 0, y: 0, zoom: 1 };
+      console.log('🎯 Viewport inicial:', initialViewport);
+      return initialViewport;
+    });
+    
+    // Detectar se o componente está sendo remontado
+    useEffect(() => {
+      console.log('🔄 FlowWithAutoFitView montado');
+      return () => {
+        console.log('🔄 FlowWithAutoFitView desmontado');
+      };
+    }, []);
+    
     // Estado separado para os dados iniciais do diagrama (não muda até salvar)
     const [staticDiagramData] = useState(() => {
       // Clonar profundamente os dados iniciais do diagrama
@@ -3026,10 +3045,17 @@ function FlowWithAutoFitView({
         setSelectedFlowNode(null);
       }
     }, [isPinned, setShowFlowInspector, setSelectedFlowNode]);
+    
+    // Callback para rastrear mudanças na viewport e evitar reset ao clicar em botões
+    const onViewportChange = useCallback((viewport: Viewport) => {
+      console.log('📍 Viewport mudou:', viewport);
+      setCurrentViewport(viewport);
+    }, []);
 
     // Log para debug das edges com animação e quando o diagrama é renderizado
     console.log("🟢 FlowWithAutoFitView - Edges com animação:", processedEdges.filter(edge => edge.animated).length);
     console.log("🔴 Diagrama sendo renderizado - Nodes:", processedNodes.length, "Edges:", processedEdges.length);
+    console.log("📐 Viewport atual sendo passada para ReactFlow:", currentViewport);
 
     return (
       <div className="flex-1 flex h-full w-full">
@@ -3040,6 +3066,8 @@ function FlowWithAutoFitView({
             nodeTypes={nodeTypes}
             onNodeClick={onNodeClick}
             onPaneClick={onPaneClick}
+            onViewportChange={onViewportChange}
+            viewport={currentViewport}
             minZoom={0.1}
             maxZoom={2}
             attributionPosition="bottom-left"
