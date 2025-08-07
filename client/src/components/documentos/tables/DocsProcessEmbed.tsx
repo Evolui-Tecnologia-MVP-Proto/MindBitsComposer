@@ -2024,50 +2024,28 @@ const IsolatedDiagram = memo(({
 
 IsolatedDiagram.displayName = 'IsolatedDiagram';
 
-// Componente completamente isolado do ReactFlow 
-const IsolatedReactFlow = memo(({ 
-  initialNodes, 
-  initialEdges, 
-  nodeTypes, 
-  onNodeClickHandler,
-  isPinnedHandler
+// Componente ReactFlow com viewport estável
+const StableReactFlow = memo(({ 
+  nodes, 
+  edges, 
+  nodeTypes,
+  onNodeClick,
+  onPaneClick 
 }: any) => {
-  // Estado interno completamente isolado
-  const [internalNodes] = useState(initialNodes);
-  const [internalEdges] = useState(initialEdges);
+  // Estado interno do viewport que persiste entre re-renders
+  const [internalViewport, setInternalViewport] = useState({ x: 0, y: 0, zoom: 1 });
   
-  // Callback estável usando ref
-  const nodeClickRef = useRef(onNodeClickHandler);
-  const isPinnedRef = useRef(isPinnedHandler);
-  
-  useEffect(() => {
-    nodeClickRef.current = onNodeClickHandler;
-    isPinnedRef.current = isPinnedHandler;
-  });
-  
-  const handleNodeClick = useCallback((event: any, node: any) => {
-    if (nodeClickRef.current) {
-      nodeClickRef.current(node);
-    }
-  }, []);
-  
-  const handlePaneClick = useCallback(() => {
-    if (!isPinnedRef.current()) {
-      if (nodeClickRef.current) {
-        nodeClickRef.current(null);
-      }
-    }
-  }, []);
-  
-  console.log("📊 IsolatedReactFlow renderizado - isso só deve aparecer uma vez");
+  console.log("🎯 StableReactFlow renderizado");
   
   return (
     <ReactFlow
-      nodes={internalNodes}
-      edges={internalEdges}
+      nodes={nodes}
+      edges={edges}
       nodeTypes={nodeTypes}
-      onNodeClick={handleNodeClick}
-      onPaneClick={handlePaneClick}
+      onNodeClick={onNodeClick}
+      onPaneClick={onPaneClick}
+      defaultViewport={internalViewport}
+      onViewportChange={setInternalViewport}
       minZoom={0.1}
       maxZoom={2}
       attributionPosition="bottom-left"
@@ -2078,6 +2056,7 @@ const IsolatedReactFlow = memo(({
       zoomOnScroll={true}
       zoomOnPinch={true}
       zoomOnDoubleClick={false}
+      proOptions={{ hideAttribution: true }}
     >
       <Controls />
       <Background />
@@ -2085,7 +2064,7 @@ const IsolatedReactFlow = memo(({
   );
 });
 
-IsolatedReactFlow.displayName = 'IsolatedReactFlow';
+StableReactFlow.displayName = 'StableReactFlow';
 
 // Componente interno que usa useReactFlow para fit view automático
 function FlowWithAutoFitView({ 
@@ -2981,7 +2960,8 @@ function FlowWithAutoFitView({
     // Processar nós para adicionar destaque amarelo aos pendentes conectados (memoizado sem depender de selectedFlowNode)
     const processedNodes = useMemo(() => {
       console.log('🔷 Processando nodes do diagrama - Total:', staticDiagramData.nodes.length);
-      console.log('🔷 selectedFlowNode mudou mas nodes não devem reprocessar');
+      console.log('🔷 staticDiagramData mudou?', staticDiagramData);
+      console.log('🔷 pendingConnectedNodes mudou?', pendingConnectedNodes);
       return staticDiagramData.nodes.map((node: any) => {
         if (pendingConnectedNodes.has(node.id)) {
           return {
@@ -3088,31 +3068,39 @@ function FlowWithAutoFitView({
     console.log("🟢 FlowWithAutoFitView - Edges com animação:", processedEdges.filter(edge => edge.animated).length);
     console.log("🔴 Diagrama sendo renderizado - Nodes:", processedNodes.length, "Edges:", processedEdges.length);
 
-    // Handler para clique em nó
-    const handleNodeClick = useCallback((node: any) => {
-      if (node) {
-        setSelectedFlowNode(node);
-        setShowFlowInspector(true);
-      } else {
+    // Criar refs para callbacks estáveis
+    const nodeClickHandlerRef = useRef<any>(null);
+    nodeClickHandlerRef.current = (event: any, node: any) => {
+      setSelectedFlowNode(node);
+      setShowFlowInspector(true);
+    };
+    
+    const paneClickHandlerRef = useRef<any>(null);
+    paneClickHandlerRef.current = () => {
+      if (!isPinned) {
         setShowFlowInspector(false);
         setSelectedFlowNode(null);
       }
-    }, [setSelectedFlowNode, setShowFlowInspector]);
+    };
+
+    // Callbacks estáveis que não mudam
+    const onNodeClick = useCallback((event: any, node: any) => {
+      nodeClickHandlerRef.current?.(event, node);
+    }, []);
     
-    // Handler para verificar se está pinado
-    const checkIsPinned = useCallback(() => {
-      return isPinned;
-    }, [isPinned]);
+    const onPaneClick = useCallback(() => {
+      paneClickHandlerRef.current?.();
+    }, []);
 
     return (
       <div className="flex-1 flex h-full w-full">
         <div className="flex-1 h-full w-full">
-          <IsolatedReactFlow
-            initialNodes={processedNodes}
-            initialEdges={processedEdges}
+          <StableReactFlow
+            nodes={processedNodes}
+            edges={processedEdges}
             nodeTypes={nodeTypes}
-            onNodeClickHandler={handleNodeClick}
-            isPinnedHandler={checkIsPinned}
+            onNodeClick={onNodeClick}
+            onPaneClick={onPaneClick}
           />
         </div>
         {showFlowInspector && selectedFlowNode && (
