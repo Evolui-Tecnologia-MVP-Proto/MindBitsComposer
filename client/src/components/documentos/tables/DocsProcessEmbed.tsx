@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, memo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -353,13 +353,22 @@ export function DocsProcessEmbed({
         finalData: attachedFormData
       });
       
-      // Parse dos dados do formulário
+      // Parse dos dados do formulário com tratamento de formato corrompido
       let formData: any;
       if (typeof attachedFormData === 'string') {
         try {
-          formData = JSON.parse(attachedFormData);
+          // Tentar corrigir formato JSON com campos arrays mal formatados
+          let fixedJson = attachedFormData;
+          if (attachedFormData.includes('["') && attachedFormData.includes('": [')) {
+            fixedJson = attachedFormData
+              .replace(/"Fields":\s*\[/g, '"Fields":{')
+              .replace(/\]\s*\}/g, '}}')
+              .replace(/\]\s*,\s*"([^"]+)":\s*\[/g, '],"$1":[');
+          }
+          formData = JSON.parse(fixedJson);
         } catch (e) {
           console.error('Erro ao fazer parse do JSON:', e);
+          console.error('JSON original:', attachedFormData);
           return null;
         }
       } else {
@@ -1975,6 +1984,45 @@ export function DocsProcessEmbed({
   );
 }
 
+// Componente do diagrama isolado - não re-renderiza com mudanças de estado
+const IsolatedDiagram = memo(({ 
+  nodes, 
+  edges, 
+  nodeTypes, 
+  onNodeClick, 
+  onPaneClick 
+}: any) => {
+  console.log("🔵 IsolatedDiagram renderizado - deve aparecer apenas 1 vez");
+  return (
+    <ReactFlow
+      nodes={nodes}
+      edges={edges}
+      nodeTypes={nodeTypes}
+      onNodeClick={onNodeClick}
+      onPaneClick={onPaneClick}
+      minZoom={0.1}
+      maxZoom={2}
+      attributionPosition="bottom-left"
+      nodesDraggable={false}
+      nodesConnectable={false}
+      elementsSelectable={true}
+      panOnDrag={true}
+      zoomOnScroll={true}
+      zoomOnPinch={true}
+      zoomOnDoubleClick={false}
+    >
+      <Controls showInteractive={false} />
+      <Background />
+    </ReactFlow>
+  );
+}, (prevProps, nextProps) => {
+  // Comparação customizada - só re-renderizar se nodes ou edges mudarem
+  return JSON.stringify(prevProps.nodes) === JSON.stringify(nextProps.nodes) &&
+         JSON.stringify(prevProps.edges) === JSON.stringify(nextProps.edges);
+});
+
+IsolatedDiagram.displayName = 'IsolatedDiagram';
+
 // Componente interno que usa useReactFlow para fit view automático
 function FlowWithAutoFitView({ 
   flowData, 
@@ -2862,12 +2910,12 @@ function FlowWithAutoFitView({
         }
       }
       return pendingNodes;
-    }, [nodes, edges]); // Só recalcula quando nodes ou edges mudam
+    }, [staticDiagramData.nodes, staticDiagramData.edges]); // Usar dados estáticos
 
     // Processar nós para adicionar destaque amarelo aos pendentes conectados (memoizado sem depender de selectedFlowNode)
     const processedNodes = useMemo(() => {
-      console.log('🔷 Processando nodes do diagrama - Total:', nodes.length);
-      return nodes.map((node: any) => {
+      console.log('🔷 Processando nodes do diagrama - Total:', staticDiagramData.nodes.length);
+      return staticDiagramData.nodes.map((node: any) => {
         if (pendingConnectedNodes.has(node.id)) {
           return {
             ...node,
@@ -2885,13 +2933,13 @@ function FlowWithAutoFitView({
           data: { ...node.data, isReadonly: true }
         };
       });
-    }, [nodes, pendingConnectedNodes]); // Removido selectedFlowNode?.id para evitar re-renders
+    }, [staticDiagramData.nodes, pendingConnectedNodes]); // Usar dados estáticos
 
     // Processar edges para colorir conexões e adicionar animação (memoizado para evitar re-renders desnecessários)
     const processedEdges = useMemo(() => {
-      return edges.map((edge: any) => {
-        const sourceNode = nodes.find((n: any) => n.id === edge.source);
-        const targetNode = nodes.find((n: any) => n.id === edge.target);
+      return staticDiagramData.edges.map((edge: any) => {
+        const sourceNode = staticDiagramData.nodes.find((n: any) => n.id === edge.source);
+        const targetNode = staticDiagramData.nodes.find((n: any) => n.id === edge.target);
         
         const sourceExecuted = sourceNode?.data?.isExecuted === 'TRUE';
         const targetExecuted = targetNode?.data?.isExecuted === 'TRUE';
@@ -2956,7 +3004,7 @@ function FlowWithAutoFitView({
           },
         };
       });
-    }, [edges, nodes, pendingConnectedNodes]);
+    }, [staticDiagramData.edges, staticDiagramData.nodes, pendingConnectedNodes]);
 
     const nodeTypes = useMemo(() => ({
       startNode: StartNodeComponent,
@@ -2967,17 +3015,17 @@ function FlowWithAutoFitView({
       switchNode: SwitchNodeComponent
     }), []);
 
-    const onNodeClick = (event: any, node: any) => {
+    const onNodeClick = useCallback((event: any, node: any) => {
       setSelectedFlowNode(node);
       setShowFlowInspector(true);
-    };
+    }, [setSelectedFlowNode, setShowFlowInspector]);
 
-    const onPaneClick = () => {
+    const onPaneClick = useCallback(() => {
       if (!isPinned) {
         setShowFlowInspector(false);
         setSelectedFlowNode(null);
       }
-    };
+    }, [isPinned, setShowFlowInspector, setSelectedFlowNode]);
 
     // Log para debug das edges com animação e quando o diagrama é renderizado
     console.log("🟢 FlowWithAutoFitView - Edges com animação:", processedEdges.filter(edge => edge.animated).length);
@@ -2986,26 +3034,13 @@ function FlowWithAutoFitView({
     return (
       <div className="flex-1 flex h-full w-full">
         <div className="flex-1 h-full w-full">
-          <ReactFlow
+          <IsolatedDiagram 
             nodes={processedNodes}
             edges={processedEdges}
             nodeTypes={nodeTypes}
             onNodeClick={onNodeClick}
             onPaneClick={onPaneClick}
-            minZoom={0.1}
-            maxZoom={2}
-            attributionPosition="bottom-left"
-            nodesDraggable={false}
-            nodesConnectable={false}
-            elementsSelectable={true}
-            panOnDrag={true}
-            zoomOnScroll={true}
-            zoomOnPinch={true}
-            zoomOnDoubleClick={false}
-          >
-            <Controls showInteractive={false} />
-            <Background />
-          </ReactFlow>
+          />
         </div>
         {showFlowInspector && selectedFlowNode && (
           <div className="w-80 bg-white dark:bg-[#0F172A] border-l border-gray-200 dark:border-[#374151] p-4 overflow-y-auto relative">
