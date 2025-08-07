@@ -1979,15 +1979,15 @@ export default function LexicalPage() {
                                 {/* Badge para documentos com diferentes status */}
                                 <div className="absolute top-2 right-2">
                                   {edition.status === 'done' ? (
-                                    <Badge className="bg-green-500 text-white text-xs px-2 py-1">
+                                    <Badge className="text-white text-xs px-2 py-1" style={{ backgroundColor: '#10b981' }}>
                                       Finalizado
                                     </Badge>
                                   ) : edition.status === 'editing' ? (
-                                    <Badge className="bg-blue-500 text-white text-xs px-2 py-1">
+                                    <Badge className="text-white text-xs px-2 py-1" style={{ backgroundColor: '#3b82f6' }}>
                                       Em Edição
                                     </Badge>
                                   ) : (
-                                    <Badge className="bg-yellow-500 text-white text-xs px-2 py-1">
+                                    <Badge className="text-white text-xs px-2 py-1" style={{ backgroundColor: '#eab308' }}>
                                       Na Fila
                                     </Badge>
                                   )}
