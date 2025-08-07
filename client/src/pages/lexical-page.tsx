@@ -499,7 +499,8 @@ export default function LexicalPage() {
         return apiRequest("PUT", `/api/document-editions/${data.editionId}/content`, {
           lexFile: data.editorState || data.content,
           jsonFile: jsonData,
-          mdFile: markdownContent
+          mdFile: markdownContent,
+          status: 'editing'
         });
       }
       // Caso contrário, salvar como documento lexical normal
@@ -511,9 +512,15 @@ export default function LexicalPage() {
     },
     onSuccess: (data: any, variables) => {
       if (variables.editionId) {
-        // Atualizar o selectedEdition com o novo lex_file
-        setSelectedEdition({ ...selectedEdition, lexFile: variables.editorState || variables.content });
+        // Atualizar o selectedEdition com o novo lex_file e status 
+        setSelectedEdition({ 
+          ...selectedEdition, 
+          lexFile: variables.editorState || variables.content,
+          status: 'editing'
+        });
+        // Invalidar queries para refletir mudança de status
         queryClient.invalidateQueries({ queryKey: ['/api/document-editions-in-progress'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/document-editions-library'] });
         toast({
           title: "Documento salvo",
           description: `Conteúdo salvo no documento "${selectedEdition?.origem} - ${selectedEdition?.objeto}".`,

@@ -5898,23 +5898,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      const { lexFile, jsonFile, mdFile } = req.body;
+      const { lexFile, jsonFile, mdFile, status } = req.body;
       const editionId = req.params.id;
       
       console.log('📄 Salvando conteúdo do documento:', { 
         editionId, 
         hasLexFile: !!lexFile, 
         hasJsonFile: !!jsonFile, 
-        hasMdFile: !!mdFile 
+        hasMdFile: !!mdFile,
+        status 
       });
       
+      // Construir objeto de atualização
+      const updateData: any = { 
+        lexFile: lexFile || null,
+        jsonFile: jsonFile || {},
+        mdFile: mdFile || null,
+        updatedAt: new Date()
+      };
+      
+      // Adicionar status se fornecido
+      if (status) {
+        updateData.status = status;
+      }
+      
       const [updatedEdition] = await db.update(documentEditions)
-        .set({ 
-          lexFile: lexFile || null,
-          jsonFile: jsonFile || {},
-          mdFile: mdFile || null,
-          updatedAt: new Date()
-        })
+        .set(updateData)
         .where(eq(documentEditions.id, editionId))
         .returning();
       
