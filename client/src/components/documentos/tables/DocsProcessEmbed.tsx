@@ -2236,14 +2236,33 @@ function FlowWithAutoFitView({
     
 
     
-    // Estado separado para os dados iniciais do diagrama (não muda até salvar)
-    const [staticDiagramData] = useState(() => {
+    // Estado separado para os dados iniciais do diagrama (atualizado após salvamento)
+    const [staticDiagramData, setStaticDiagramData] = useState(() => {
       // Clonar profundamente os dados iniciais do diagrama
       return {
         nodes: flowData?.flowTasks?.nodes || flowData?.nodes || [],
         edges: flowData?.flowTasks?.edges || flowData?.edges || []
       };
     });
+    
+    // Função para forçar atualização do diagrama após salvamento
+    const updateDiagramVisually = (updatedNodes: any[], updatedEdges: any[]) => {
+      console.log('🎨 Atualizando diagrama visualmente:', {
+        nodeCount: updatedNodes.length,
+        edgeCount: updatedEdges.length
+      });
+      
+      // Atualizar dados estáticos para forçar re-render
+      setStaticDiagramData({
+        nodes: updatedNodes,
+        edges: updatedEdges
+      });
+      
+      // Atualizar React Flow diretamente
+      setNodes(updatedNodes);
+      
+      console.log('✅ Diagrama atualizado visualmente');
+    };
     
     // Estado para controlar resultado da execução de integração
     const [integrationResult, setIntegrationResult] = useState<{
@@ -2612,6 +2631,9 @@ function FlowWithAutoFitView({
           }
         }));
 
+        // Atualizar diagrama visualmente
+        updateDiagramVisually(updatedNodes, currentEdges);
+
         // Mostrar resultado de sucesso
         setIntegrationResult({
           status: 'success',
@@ -2731,6 +2753,9 @@ function FlowWithAutoFitView({
             }
           }));
 
+          // Atualizar diagrama visualmente
+          updateDiagramVisually(updatedNodes, currentEdges);
+
           // Recarregar dados
           queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
           queryClient.invalidateQueries({ queryKey: ['/api/documentos'] });
@@ -2823,6 +2848,9 @@ function FlowWithAutoFitView({
                 flowTasks: finalFlowTasks
               }
             }));
+
+            // Atualizar diagrama visualmente
+            updateDiagramVisually(updatedNodes, currentEdges);
 
             // Recarregar dados
             queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
@@ -3127,7 +3155,10 @@ function FlowWithAutoFitView({
           }
         });
 
-        // 8. Limpar o formValues e tempApprovalStatus para mostrar que foi salvo
+        // 8. Atualizar diagrama visualmente
+        updateDiagramVisually(updatedNodes, currentEdges);
+
+        // 9. Limpar o formValues e tempApprovalStatus para mostrar que foi salvo
         setFormValues({});
         setTempApprovalStatus(null); // Limpar o status temporário após salvar
         
