@@ -2092,53 +2092,6 @@ function FlowWithAutoFitView({
       }
     }, [tempApprovalStatus, selectedFlowNode?.id]);
     
-    // Usar ref para rastrear se já foi feita a seleção inicial desta abertura
-    const hasAutoSelectedRef = useRef(false);
-    
-    // Fazer seleção inicial quando o diagrama abrir
-    useEffect(() => {
-      // Quando a modal abrir, resetar o flag e fazer seleção inicial
-      if (flowDiagramModal?.isOpen) {
-        // Se ainda não fez a seleção automática para esta abertura
-        if (!hasAutoSelectedRef.current) {
-          hasAutoSelectedRef.current = true; // Marcar como feito imediatamente
-          
-          // Pequeno delay para garantir que os nós estejam renderizados
-          const timeoutId = setTimeout(() => {
-            const currentNodes = getNodes();
-            
-            if (currentNodes.length > 0) {
-              console.log('🎯 Modal aberta, fazendo seleção inicial...');
-              
-              // Buscar primeiro nó pendente (isPendingConnected === true)
-              let nodeToSelect = currentNodes.find(node => 
-                node.data?.isPendingConnected === true
-              );
-              
-              // Se não houver nó pendente, buscar o startNode
-              if (!nodeToSelect) {
-                nodeToSelect = currentNodes.find(node => 
-                  node.type === 'startNode'
-                );
-              }
-              
-              // Selecionar o nó apenas se encontrou um
-              if (nodeToSelect) {
-                console.log('🎯 Selecionando nó inicial:', nodeToSelect.id);
-                setSelectedFlowNode(nodeToSelect);
-                setShowFlowInspector(true);
-              }
-            }
-          }, 300);
-          
-          return () => clearTimeout(timeoutId);
-        }
-      } else {
-        // Quando a modal fechar, resetar o flag para a próxima abertura
-        hasAutoSelectedRef.current = false;
-      }
-    }, [flowDiagramModal?.isOpen]); // Só observar mudanças na abertura da modal
-    
 
     
     // Estado separado para os dados iniciais do diagrama (não muda até salvar)
