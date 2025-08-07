@@ -2092,17 +2092,17 @@ function FlowWithAutoFitView({
       }
     }, [tempApprovalStatus, selectedFlowNode?.id]);
     
-    // Usar useRef para controlar se já foi feito o fit inicial (evita loops)
-    const hasInitialFitRef = useRef(false);
+    // Usar useRef para controlar se já foi feita a seleção inicial
+    const hasInitialSelectionRef = useRef(false);
     
     // Selecionar automaticamente nó pendente ou startNode ao abrir o fluxo
     useEffect(() => {
-      // Só executar se o fluxo estiver aberto e ainda não tiver feito o fit inicial
-      if (flowDiagramModal?.isOpen && !hasInitialFitRef.current) {
+      // Só executar se o fluxo estiver aberto e ainda não tiver feito a seleção inicial
+      if (flowDiagramModal?.isOpen && !hasInitialSelectionRef.current) {
         console.log('🎯 Fluxo aberto, procurando nó para selecionar...');
         
         // Marcar imediatamente como já executado para evitar loops
-        hasInitialFitRef.current = true;
+        hasInitialSelectionRef.current = true;
         
         // Pequeno delay para garantir que os nós estejam renderizados
         const timeoutId = setTimeout(() => {
@@ -2129,29 +2129,18 @@ function FlowWithAutoFitView({
             console.log('🎯 Selecionando nó:', nodeToSelect.id);
             setSelectedFlowNode(nodeToSelect);
             setShowFlowInspector(true);
-            
-            // Fazer fitView após a seleção
-            setTimeout(() => {
-              console.log('🎯 Fazendo fitView do diagrama');
-              fitView({ 
-                padding: 0.2,
-                duration: 800,
-                maxZoom: 1.5,
-                minZoom: 0.5
-              });
-            }, 200);
           }
         }, 300);
         
         return () => clearTimeout(timeoutId);
       }
-    }, [flowDiagramModal?.isOpen]); // Remover dependências desnecessárias para evitar loops
+    }, [flowDiagramModal?.isOpen]);
     
     // Resetar o flag quando a modal fechar
     useEffect(() => {
       if (!flowDiagramModal?.isOpen) {
-        hasInitialFitRef.current = false;
-        console.log('🎯 Modal fechada, resetando flag de fit inicial');
+        hasInitialSelectionRef.current = false;
+        console.log('🎯 Modal fechada, resetando flag de seleção inicial');
       }
     }, [flowDiagramModal?.isOpen]);
     
