@@ -353,61 +353,215 @@ export function DocsProcessEmbed({
         finalData: attachedFormData
       });
       
-      // Corrige formato malformado do JSON se necessário
-      if (typeof attachedFormData === 'string' && attachedFormData.includes('"Motivo de Recusa":') && attachedFormData.includes('"Detalhamento":')) {
-        // Converte o formato específico manualmente
-        const fixedJson = {
-          "Show_Condition": "FALSE",
-          "Fields": {
-            "Motivo de Recusa": ["Incompatível com processo", "Forma de operação", "Configuração de Sistema"],
-            "Detalhamento": ["default:", "type:longText"]
-          }
-        };
-        attachedFormData = JSON.stringify(fixedJson);
-      }
-      
-      console.log('🔍 Dados corrigidos:', attachedFormData);
-      const formData = JSON.parse(attachedFormData);
-      console.log('🔍 Dados parseados:', formData);
-      
-      // Verifica se é um formulário com condição
-      if (formData.Show_Condition !== undefined && formData.Fields) {
-        const showCondition = formData.Show_Condition;
-        const isApprovalNode = flowNode.data.actionType === 'Intern_Aprove';
-        const approvalStatus = flowNode.data.isAproved;
-        
-        // Determina se deve mostrar o formulário baseado na condição
-        let shouldShowForm = false;
-        if (isApprovalNode && approvalStatus !== 'UNDEF') {
-          if (showCondition === 'TRUE' && approvalStatus === 'TRUE') {
-            shouldShowForm = true;
-          } else if (showCondition === 'FALSE' && approvalStatus === 'FALSE') {
-            shouldShowForm = true;
-          } else if (showCondition === 'BOTH' && (approvalStatus === 'TRUE' || approvalStatus === 'FALSE')) {
-            shouldShowForm = true;
-          }
-        }
-        
-        if (!shouldShowForm) {
+      // Parse dos dados do formulário
+      let formData: any;
+      if (typeof attachedFormData === 'string') {
+        try {
+          formData = JSON.parse(attachedFormData);
+        } catch (e) {
+          console.error('Erro ao fazer parse do JSON:', e);
           return null;
         }
-        
-        // O resto da lógica de renderização do formulário...
-        return (
-          <div>
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Formulário de Ação</p>
-            {/* Renderização simplificada por enquanto */}
-            <div className="text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-[#1F2937] p-2 rounded border dark:border-[#374151]">
-              Formulário dinâmico carregado: {Object.keys(formData.Fields || {}).join(', ')}
-            </div>
-          </div>
-        );
+      } else {
+        formData = attachedFormData;
       }
       
-      return null;
+      console.log('🔍 Dados parseados:', formData);
+      
+      // Verifica se tem a estrutura esperada
+      if (!formData.Fields || Object.keys(formData.Fields).length === 0) {
+        return null;
+      }
+      
+      // Verifica a condição de exibição
+      const showCondition = formData.Show_Condition || "TRUE";
+      const isApprovalNode = flowNode.data.actionType === 'Intern_Aprove';
+      const approvalStatus = flowNode.data.isAproved;
+      
+      // Determina se deve mostrar o formulário baseado na condição
+      let shouldShowForm = false;
+      
+      if (showCondition === "TRUE") {
+        // Sempre mostra o formulário
+        shouldShowForm = true;
+      } else if (showCondition === "FALSE") {
+        // Mostra apenas quando reprovado (condicional)
+        if (isApprovalNode && approvalStatus === 'FALSE') {
+          shouldShowForm = true;
+        }
+      }
+      
+      if (!shouldShowForm) {
+        return null;
+      }
+      
+      // Renderiza o formulário com os campos dinâmicos
+      return (
+        <div className="w-full mt-4" data-node-form={flowNode.id}>
+          <div className="space-y-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 pb-2 border-b border-gray-200 dark:border-gray-700">
+              Formulário de Ação
+            </h4>
+            
+            <div className="space-y-3">
+              {Object.entries(formData.Fields).map(([fieldName, fieldConfig]: [string, any]) => {
+                // Verificar se é um array (pode ser lista de opções ou configuração)
+                if (Array.isArray(fieldConfig)) {
+                  // Verificar se tem configuração de tipo
+                  const hasTypeConfig = fieldConfig.some((item: any) => 
+                    typeof item === 'string' && (item.includes('type:') || item.includes('default:'))
+                  );
+                  
+                  if (hasTypeConfig) {
+                    // Campo de texto com configuração
+                    const typeConfig = fieldConfig.find((item: string) => 
+                      typeof item === 'string' && item.includes('type:')
+                    );
+                    const defaultConfig = fieldConfig.find((item: string) => 
+                      typeof item === 'string' && item.includes('default:')
+                    );
+                    
+                    const fieldType = typeConfig ? typeConfig.split('type:')[1].trim() : 'text';
+                    const defaultValue = defaultConfig ? defaultConfig.split('default:')[1].trim() : '';
+                    
+                    return (
+                      <div key={fieldName} className="w-full">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          {fieldName}
+                        </label>
+                        {fieldType === 'longText' ? (
+                          <textarea
+                            className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400 resize-y min-h-[80px]"
+                            placeholder={`Digite ${fieldName}...`}
+                            defaultValue={defaultValue}
+                            data-field-name={fieldName}
+                          />
+                        ) : (
+                          <input
+                            type="text"
+                            className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400"
+                            placeholder={`Digite ${fieldName}...`}
+                            defaultValue={defaultValue}
+                            data-field-name={fieldName}
+                          />
+                        )}
+                      </div>
+                    );
+                  } else {
+                    // Campo de seleção com lista de opções
+                    return (
+                      <div key={fieldName} className="w-full">
+                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                          {fieldName}
+                        </label>
+                        <select
+                          className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400"
+                          defaultValue=""
+                          data-field-name={fieldName}
+                        >
+                          <option value="">Selecione uma opção...</option>
+                          {fieldConfig.map((option: string, idx: number) => (
+                            <option key={`${option}-${idx}`} value={option}>
+                              {option}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    );
+                  }
+                }
+                
+                // Caso não seja array, trata como campo de texto simples
+                return (
+                  <div key={fieldName} className="w-full">
+                    <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
+                      {fieldName}
+                    </label>
+                    <input
+                      type="text"
+                      className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400"
+                      placeholder={`Digite ${fieldName}...`}
+                      data-field-name={fieldName}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* Botão para salvar os dados do formulário */}
+            <div className="mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
+              <button
+                className="w-full px-3 py-2 text-xs font-medium text-white bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400"
+                onClick={async () => {
+                  try {
+                    // Coletar dados dos campos do formulário
+                    const formElement = document.querySelector(`[data-node-form="${flowNode.id}"]`);
+                    const formInputs = formElement?.querySelectorAll('[data-field-name]') || [];
+                    const collectedData: Record<string, string> = {};
+                    
+                    formInputs.forEach((input: any) => {
+                      const fieldName = input.getAttribute('data-field-name');
+                      collectedData[fieldName] = input.value;
+                    });
+                    
+                    // Buscar o documentId correto
+                    const documentId = getCurrentFlowExecution()?.documentId || flowDiagramModal?.documentId;
+                    
+                    if (!documentId) {
+                      toast({
+                        title: "Erro",
+                        description: "Documento não identificado",
+                        variant: "destructive",
+                      });
+                      return;
+                    }
+                    
+                    // Salvar dados via API
+                    const response = await fetch(`/api/document-flow-executions/${documentId}/form-data`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        nodeId: flowNode.id,
+                        formData: collectedData
+                      })
+                    });
+                    
+                    if (response.ok) {
+                      toast({
+                        title: "Sucesso",
+                        description: "Dados salvos com sucesso!",
+                      });
+                      
+                      // Atualizar queries
+                      queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
+                    } else {
+                      throw new Error('Erro ao salvar dados');
+                    }
+                  } catch (error) {
+                    console.error('Erro ao salvar formulário:', error);
+                    toast({
+                      title: "Erro",
+                      description: "Erro ao salvar os dados do formulário",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+              >
+                Salvar Dados do Formulário
+              </button>
+            </div>
+          </div>
+        </div>
+      );
     } catch (error) {
       console.error('Erro ao processar dados do formulário:', error);
-      return null;
+      return (
+        <div className="text-xs text-red-600 dark:text-red-400 p-2 bg-red-50 dark:bg-red-900/20 rounded">
+          Erro ao carregar formulário: {error.message}
+        </div>
+      );
     }
   };
 

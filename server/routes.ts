@@ -5134,6 +5134,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Save form data in flow execution
+  app.post("/api/document-flow-executions/:documentId/form-data", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { documentId } = req.params;
+      const { nodeId, formData } = req.body;
+      
+      console.log('💾 Salvando dados do formulário dinâmico:', {
+        documentId,
+        nodeId,
+        formData
+      });
+      
+      // Buscar execução atual
+      const [execution] = await db.select()
+        .from(documentFlowExecutions)
+        .where(eq(documentFlowExecutions.documentId, documentId))
+        .limit(1);
+      
+      if (!execution) {
+        return res.status(404).json({ error: "Execução de fluxo não encontrada" });
+      }
+      
+      // Atualizar executionData com os dados do formulário
+      const currentExecutionData = execution.executionData || {};
+      const updatedExecutionData = {
+        ...currentExecutionData,
+        [nodeId]: {
+          ...currentExecutionData[nodeId],
+          formData,
+          updatedAt: new Date().toISOString()
+        }
+      };
+      
+      // Salvar no banco
+      const [updated] = await db.update(documentFlowExecutions)
+        .set({
+          executionData: updatedExecutionData,
+          updatedAt: new Date()
+        })
+        .where(eq(documentFlowExecutions.documentId, documentId))
+        .returning();
+      
+      console.log('✅ Dados do formulário salvos com sucesso');
+      res.json({
+        success: true,
+        data: updated
+      });
+    } catch (error) {
+      console.error("Erro ao salvar dados do formulário:", error);
+      res.status(500).json({ error: "Erro ao salvar dados do formulário" });
+    }
+  });
+
   // Transfer flow execution route
   app.post("/api/document-flow-executions/transfer", async (req: Request, res: Response) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
