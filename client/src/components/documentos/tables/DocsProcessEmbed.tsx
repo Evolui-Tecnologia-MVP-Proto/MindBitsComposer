@@ -2165,121 +2165,114 @@ function FlowWithAutoFitView({
     const areAllFieldsFilled = () => {
       // Só valida se há um nó selecionado e é um actionNode
       if (!selectedFlowNode || selectedFlowNode.type !== 'actionNode') {
-        return true;
+        return false;
       }
 
       // Só valida se o nó está pendente de execução
       if (!selectedFlowNode.data.isPendingConnected) {
-        return true;
+        return false;
       }
 
-      // Verifica se existe formulário anexado
-      const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
-      if (!attachedFormData) {
-        return true; // Sem formulário, pode salvar
-      }
-
-      try {
-        // Parse do formulário anexado
-        let formData;
-        if (typeof attachedFormData === 'string' && attachedFormData.includes('"Motivo de Recusa":') && attachedFormData.includes('"Detalhamento":')) {
-          // Converte o formato específico manualmente
-          formData = {
-            "Show_Condition": "FALSE",
-            "Fields": {
-              "Motivo de Recusa": ["Incompatível com processo", "Forma de operação", "Configuração de Sistema"],
-              "Detalhamento": ["default:", "type:longText"]
-            }
-          };
-        } else {
-          formData = JSON.parse(attachedFormData);
+      // Se é um nó de aprovação, verificar o status temporário
+      if (selectedFlowNode.data.actionType === 'Intern_Aprove') {
+        // Se tempApprovalStatus é null, não permite salvar
+        if (!tempApprovalStatus || tempApprovalStatus === 'UNDEF') {
+          console.log('🔍 Status de aprovação não definido, botão desabilitado');
+          return false;
         }
-
-        // Verifica se é um formulário com condição
-        if (formData.Show_Condition !== undefined && formData.Fields) {
-          const showCondition = formData.Show_Condition;
-          const isApprovalNode = selectedFlowNode.data.actionType === 'Intern_Aprove';
-          const approvalStatus = selectedFlowNode.data.isAproved;
-          
-          // Determina se deve mostrar o formulário baseado na condição
-          let shouldShowForm = false;
-          if (isApprovalNode && approvalStatus !== 'UNDEF') {
-            if (showCondition === 'TRUE' && approvalStatus === 'TRUE') {
-              shouldShowForm = true;
-            } else if (showCondition === 'FALSE' && approvalStatus === 'FALSE') {
-              shouldShowForm = true;
-            } else if (showCondition === 'BOTH' && (approvalStatus === 'TRUE' || approvalStatus === 'FALSE')) {
-              shouldShowForm = true;
-            }
+        
+        // Se selecionou SIM, permite salvar imediatamente
+        if (tempApprovalStatus === 'TRUE') {
+          console.log('🔍 Aprovação SIM selecionada, botão habilitado');
+          return true;
+        }
+        
+        // Se selecionou NÃO, precisa validar o formulário
+        if (tempApprovalStatus === 'FALSE') {
+          // Verifica se existe formulário anexado
+          const attachedFormData = selectedFlowNode.data.attached_Form || selectedFlowNode.data.attached_form;
+          if (!attachedFormData) {
+            console.log('🔍 Aprovação NÃO sem formulário, botão habilitado');
+            return true; // Sem formulário, pode salvar
           }
           
-          // Se o formulário não deve ser exibido devido à condição, permite salvar
-          if (!shouldShowForm) {
-            console.log('🔍 Formulário oculto por condição de aprovação, permitindo salvar');
+          try {
+            // Parse do formulário anexado
+            let formData;
+            if (typeof attachedFormData === 'string' && attachedFormData.includes('"Motivo de Recusa":') && attachedFormData.includes('"Detalhamento":')) {
+              // Converte o formato específico manualmente
+              formData = {
+                "Show_Condition": "FALSE",
+                "Fields": {
+                  "Motivo de Recusa": ["Incompatível com processo", "Forma de operação", "Configuração de Sistema"],
+                  "Detalhamento": ["default:", "type:longText"]
+                }
+              };
+            } else {
+              formData = JSON.parse(attachedFormData);
+            }
+
+            // Verifica se é um formulário com condição e se deve ser mostrado
+            if (formData.Show_Condition !== undefined && formData.Fields) {
+              const showCondition = formData.Show_Condition;
+              
+              // Verifica se o formulário deve ser mostrado para NÃO
+              if (showCondition === 'TRUE') {
+                // Formulário só aparece para SIM, então NÃO não precisa de validação
+                console.log('🔍 Formulário só aparece para SIM, NÃO pode salvar direto');
+                return true;
+              }
+              
+              // Se o formulário aparece para FALSE ou BOTH, precisa validar
+              if (showCondition === 'FALSE' || showCondition === 'BOTH') {
+                // Verificar campos do formulário dinâmico diretamente do DOM
+                const formElement = document.querySelector(`[data-node-form="${selectedFlowNode.id}"]`);
+                const formInputs = formElement?.querySelectorAll('[data-field-name]') || [];
+                
+                console.log('🔍 Validação de campos para NÃO:', {
+                  nodeId: selectedFlowNode.id,
+                  formFound: !!formElement,
+                  inputsCount: formInputs.length
+                });
+                
+                // Se há campos dinâmicos, validar
+                if (formInputs.length > 0) {
+                  let allFieldsFilled = true;
+                  formInputs.forEach((input: any) => {
+                    const fieldName = input.getAttribute('data-field-name');
+                    const value = input.value;
+                    const isFilled = value && value.trim() !== '' && value !== 'Selecione uma opção...';
+                    
+                    console.log(`Campo dinâmico ${fieldName}: valor="${value}", preenchido=${isFilled}`);
+                    
+                    if (!isFilled) {
+                      allFieldsFilled = false;
+                    }
+                  });
+                  
+                  console.log('🔍 Todos os campos preenchidos?', allFieldsFilled);
+                  return allFieldsFilled;
+                }
+                
+                // Se não há campos visíveis no DOM, pode salvar
+                console.log('🔍 Sem campos dinâmicos visíveis, pode salvar');
+                return true;
+              }
+            }
+            
+            // Se não há condição específica, permite salvar
+            console.log('🔍 Sem condição de formulário, pode salvar');
             return true;
+          } catch (e) {
+            console.log('🔍 Erro na validação do formulário:', e);
+            return false; // Em caso de erro, não permite salvar
           }
         }
-
-        // Se chegou até aqui, o formulário deve ser exibido, então valida os campos
-        // Verificar campos do formulário dinâmico diretamente do DOM
-        const formElement = document.querySelector(`[data-node-form="${selectedFlowNode.id}"]`);
-        const formInputs = formElement?.querySelectorAll('[data-field-name]') || [];
-        
-        console.log('🔍 Validação de campos dinâmicos:', {
-          nodeId: selectedFlowNode.id,
-          nodeType: selectedFlowNode.type,
-          isPending: selectedFlowNode.data.isPendingConnected,
-          formFound: !!formElement,
-          inputsCount: formInputs.length
-        });
-        
-        // Se não há campos dinâmicos, verificar campos estáticos
-        if (formInputs.length === 0) {
-          const fieldsData = getFormFields();
-          const fieldNames = Object.keys(fieldsData);
-          
-          console.log('🔍 Validação de campos estáticos:', {
-            fieldsData,
-            fieldNames,
-            formValues,
-            hasFields: fieldNames.length > 0
-          });
-          
-          // Se não há campos, permite salvar
-          if (fieldNames.length === 0) return true;
-          
-          // Verifica se todos os campos têm valores preenchidos
-          const allFilled = fieldNames.every(fieldName => {
-            const value = formValues[fieldName];
-            // Para campos select, verificar se não está vazio ou "Selecione uma opção"
-            const isFilled = value && value.trim() !== '' && value !== 'Selecione uma opção';
-            console.log(`Campo ${fieldName}: valor="${value}", preenchido=${isFilled}`);
-            return isFilled;
-          });
-          
-          return allFilled;
-        }
-        
-        // Validar campos dinâmicos do formulário
-        let allDynamicFieldsFilled = true;
-        formInputs.forEach((input: any) => {
-          const fieldName = input.getAttribute('data-field-name');
-          const value = input.value;
-          const isFilled = value && value.trim() !== '' && value !== '';
-          
-          console.log(`Campo dinâmico ${fieldName}: valor="${value}", preenchido=${isFilled}`);
-          
-          if (!isFilled) {
-            allDynamicFieldsFilled = false;
-          }
-        });
-        
-        console.log('🔍 Resultado da validação dinâmica:', allDynamicFieldsFilled);
-        return allDynamicFieldsFilled;
-      } catch (e) {
-        console.log('🔍 Erro na validação do formulário:', e);
-        return true; // Em caso de erro, permite salvar
       }
+      
+      // Para outros tipos de ação que não são aprovação, permite salvar
+      console.log('🔍 Não é nó de aprovação, pode salvar');
+      return true;
     };
 
     // Função para alterar o status de aprovação (apenas atualiza estado temporário, sem afetar o diagrama)
@@ -3846,6 +3839,7 @@ function FlowWithAutoFitView({
                       <button
                         onClick={() => {
                           if (selectedFlowNode.data.isPendingConnected) {
+                            console.log('🟢 Botão SIM clicado');
                             updateApprovalStatus(selectedFlowNode.id, 'TRUE');
                           }
                         }}
@@ -3865,6 +3859,7 @@ function FlowWithAutoFitView({
                       <button
                         onClick={() => {
                           if (selectedFlowNode.data.isPendingConnected) {
+                            console.log('🔴 Botão NÃO clicado');
                             updateApprovalStatus(selectedFlowNode.id, 'FALSE');
                           }
                         }}
