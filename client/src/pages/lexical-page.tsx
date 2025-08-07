@@ -1407,6 +1407,17 @@ export default function LexicalPage() {
 
   const executeSelectEdition = async (edition: any) => {
     console.log('Selecionando edition:', edition);
+    
+    // Verificar se o documento está finalizado e impedir a edição
+    if (edition.status === 'done') {
+      toast({
+        title: "Documento finalizado",
+        description: "Documentos finalizados não podem ser editados. Use a visualização para consultar o conteúdo.",
+        variant: "destructive",
+      });
+      return; // Interrompe a execução
+    }
+    
     setSelectedEdition(edition);
     setCurrentDocumentId(null);
     setLoadedFileName(null);
@@ -1949,8 +1960,12 @@ export default function LexicalPage() {
                             Array.isArray(documentEditions) && documentEditions.map((edition: any) => (
                               <div
                                 key={edition.id}
-                                className={`p-3 border rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E293B] dark:bg-[#111827] dark:border-[#374151] relative overflow-hidden ${
-                                  selectedEdition?.id === edition.id ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/30' : ''
+                                className={`p-3 border rounded-lg relative overflow-hidden dark:bg-[#111827] dark:border-[#374151] ${
+                                  edition.status === 'done' 
+                                    ? 'cursor-not-allowed opacity-60 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600' 
+                                    : `cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E293B] ${
+                                        selectedEdition?.id === edition.id ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/30' : ''
+                                      }`
                                 }`}
                                 onClick={() => handleSelectEdition(edition)}
                               >
