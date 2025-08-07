@@ -2155,33 +2155,61 @@ function FlowWithAutoFitView({
         }
 
         // Se chegou até aqui, o formulário deve ser exibido, então valida os campos
-        const fieldsData = getFormFields();
-        const fieldNames = Object.keys(fieldsData);
+        // Verificar campos do formulário dinâmico diretamente do DOM
+        const formElement = document.querySelector(`[data-node-form="${selectedFlowNode.id}"]`);
+        const formInputs = formElement?.querySelectorAll('[data-field-name]') || [];
         
-        console.log('🔍 Validação de campos:', {
+        console.log('🔍 Validação de campos dinâmicos:', {
           nodeId: selectedFlowNode.id,
           nodeType: selectedFlowNode.type,
           isPending: selectedFlowNode.data.isPendingConnected,
-          fieldsData,
-          fieldNames,
-          formValues,
-          hasFields: fieldNames.length > 0
+          formFound: !!formElement,
+          inputsCount: formInputs.length
         });
         
-        // Se não há campos, permite salvar
-        if (fieldNames.length === 0) return true;
+        // Se não há campos dinâmicos, verificar campos estáticos
+        if (formInputs.length === 0) {
+          const fieldsData = getFormFields();
+          const fieldNames = Object.keys(fieldsData);
+          
+          console.log('🔍 Validação de campos estáticos:', {
+            fieldsData,
+            fieldNames,
+            formValues,
+            hasFields: fieldNames.length > 0
+          });
+          
+          // Se não há campos, permite salvar
+          if (fieldNames.length === 0) return true;
+          
+          // Verifica se todos os campos têm valores preenchidos
+          const allFilled = fieldNames.every(fieldName => {
+            const value = formValues[fieldName];
+            // Para campos select, verificar se não está vazio ou "Selecione uma opção"
+            const isFilled = value && value.trim() !== '' && value !== 'Selecione uma opção';
+            console.log(`Campo ${fieldName}: valor="${value}", preenchido=${isFilled}`);
+            return isFilled;
+          });
+          
+          return allFilled;
+        }
         
-        // Verifica se todos os campos têm valores preenchidos
-        const allFilled = fieldNames.every(fieldName => {
-          const value = formValues[fieldName];
-          // Para campos select, verificar se não está vazio ou "Selecione uma opção"
-          const isFilled = value && value.trim() !== '' && value !== 'Selecione uma opção';
-          console.log(`Campo ${fieldName}: valor="${value}", preenchido=${isFilled}`);
-          return isFilled;
+        // Validar campos dinâmicos do formulário
+        let allDynamicFieldsFilled = true;
+        formInputs.forEach((input: any) => {
+          const fieldName = input.getAttribute('data-field-name');
+          const value = input.value;
+          const isFilled = value && value.trim() !== '' && value !== '';
+          
+          console.log(`Campo dinâmico ${fieldName}: valor="${value}", preenchido=${isFilled}`);
+          
+          if (!isFilled) {
+            allDynamicFieldsFilled = false;
+          }
         });
         
-        console.log('🔍 Resultado da validação:', allFilled);
-        return allFilled;
+        console.log('🔍 Resultado da validação dinâmica:', allDynamicFieldsFilled);
+        return allDynamicFieldsFilled;
       } catch (e) {
         console.log('🔍 Erro na validação do formulário:', e);
         return true; // Em caso de erro, permite salvar
@@ -2528,6 +2556,25 @@ function FlowWithAutoFitView({
       console.log('flowData:', flowData);
       
       try {
+        // Coletar dados do formulário dinâmico se existir
+        let dynamicFormData: Record<string, string> = {};
+        const formElement = document.querySelector(`[data-node-form="${selectedFlowNode.id}"]`);
+        const formInputs = formElement?.querySelectorAll('[data-field-name]') || [];
+        
+        if (formInputs.length > 0) {
+          formInputs.forEach((input: any) => {
+            const fieldName = input.getAttribute('data-field-name');
+            dynamicFormData[fieldName] = input.value;
+          });
+          console.log('📝 Dados do formulário dinâmico coletados:', dynamicFormData);
+        }
+        
+        // Combinar dados do formulário estático e dinâmico
+        const allFormData = {
+          ...formValues,
+          ...dynamicFormData
+        };
+        
         // 1. Marcar o actionNode atual como executado, preservar o isAproved e salvar formValues
         const updatedNodes = [...nodes];
         const actionNodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
@@ -2538,12 +2585,12 @@ function FlowWithAutoFitView({
               ...updatedNodes[actionNodeIndex].data,
               isExecuted: 'TRUE',
               isAproved: selectedFlowNode.data.isAproved, // Preservar o valor de aprovação
-              formData: formValues, // Salvar os dados do formulário
+              formData: allFormData, // Salvar todos os dados do formulário
               isPendingConnected: false // Marcar como não mais editável
             }
           };
           console.log('Nó atual atualizado com isAproved:', selectedFlowNode.data.isAproved);
-          console.log('Dados do formulário salvos:', formValues);
+          console.log('Dados do formulário salvos:', allFormData);
         }
 
         // 2. Encontrar nós conectados APENAS pelas conexões de SAÍDA do actionNode
@@ -2713,6 +2760,24 @@ function FlowWithAutoFitView({
 
         console.log('Alterações salvas com sucesso');
         console.log('Atualizando estado local com:', updatedFlowTasks);
+        
+        // Salvar dados do formulário dinâmico no executionData se existirem
+        if (Object.keys(dynamicFormData).length > 0) {
+          const formResponse = await fetch(`/api/document-flow-executions/${flowData.documentId}/form-data`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              nodeId: selectedFlowNode.id,
+              formData: dynamicFormData
+            })
+          });
+          
+          if (formResponse.ok) {
+            console.log('✅ Dados do formulário dinâmico salvos no executionData');
+          }
+        }
 
         // 6. Atualizar estado local e recarregar diagrama
         setFlowDiagramModal(prev => ({
@@ -3782,6 +3847,15 @@ function FlowWithAutoFitView({
                     <div className="text-xs text-gray-500 dark:text-gray-400">
                       Status atual: {selectedFlowNode.data.isAproved || 'UNDEF'}
                     </div>
+                    
+                    {/* Renderizar formulário dinâmico quando status muda */}
+                    {(() => {
+                      const formNode = {
+                        ...selectedFlowNode,
+                        type: 'actionNode' // Garantir que é tratado como actionNode
+                      };
+                      return renderDynamicForm(formNode);
+                    })()}
                   </div>
                 )}
               </div>
