@@ -1964,7 +1964,14 @@ export default function LexicalPage() {
                               <p className="text-xs">Nenhum documento encontrado</p>
                             </div>
                           ) : (
-                            Array.isArray(documentEditions) && documentEditions.map((edition: any) => (
+                            Array.isArray(documentEditions) && 
+                            // Ordenar documentos: Em Edição > Na Fila > Finalizado
+                            documentEditions
+                              .sort((a: any, b: any) => {
+                                const statusOrder = { 'editing': 1, 'in_progress': 2, 'done': 3 };
+                                return (statusOrder[a.status as keyof typeof statusOrder] || 2) - (statusOrder[b.status as keyof typeof statusOrder] || 2);
+                              })
+                              .map((edition: any) => (
                               <div
                                 key={edition.id}
                                 className={`p-3 border rounded-lg relative overflow-hidden dark:bg-[#111827] dark:border-[#374151] ${
