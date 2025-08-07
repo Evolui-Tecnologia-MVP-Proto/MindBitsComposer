@@ -2124,7 +2124,7 @@ function FlowWithAutoFitView({
       flowData: !!flowData
     });
 
-    const { fitView, getNodes, setNodes, getViewport } = useReactFlow();
+    const { fitView, getNodes, setNodes, getViewport, getEdges } = useReactFlow();
     
     console.log("🔥 useReactFlow hooks obtidos:", {
       fitView: !!fitView,
@@ -2146,6 +2146,28 @@ function FlowWithAutoFitView({
         console.log("❌ onFlowReady não pode ser chamado - verificar disponibilidade das funções");
       }
     }, [fitView, getViewport, onFlowReady]);
+    
+    // Expor edges atuais para o window object para uso em executeManualIntegration
+    useEffect(() => {
+      if (getEdges) {
+        const updateCurrentEdges = () => {
+          const currentEdges = getEdges();
+          (window as any).__currentFlowEdges = currentEdges;
+          console.log('🔗 Edges atuais expostas para window:', currentEdges.length, 'edges');
+        };
+        
+        // Atualizar imediatamente
+        updateCurrentEdges();
+        
+        // Atualizar sempre que o diagrama muda
+        const interval = setInterval(updateCurrentEdges, 500);
+        
+        return () => {
+          clearInterval(interval);
+          delete (window as any).__currentFlowEdges;
+        };
+      }
+    }, [getEdges]);
     
     // Executar fitView automaticamente quando modal abre
     useEffect(() => {
@@ -2549,9 +2571,13 @@ function FlowWithAutoFitView({
         }
 
         // Preparar dados atualizados do fluxo
+        // Obter edges atuais do React Flow (se disponível através de window)
+        const currentEdges = (window as any).__currentFlowEdges || edges;
+        console.log('🔗 Usando edges para transferência:', currentEdges.length, 'edges');
+        
         const updatedFlowTasks = {
           nodes: updatedNodes,
-          edges: edges,
+          edges: currentEdges,
           viewport: flowDiagramModal.flowData?.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
         };
 
@@ -2642,9 +2668,14 @@ function FlowWithAutoFitView({
           });
 
           // Salvar alterações no banco de dados - marcando como concluído
+          // Obter edges atuais do React Flow (se disponível através de window)
+          const currentEdges = (window as any).__currentFlowEdges || flowDiagramModal.flowData.flowTasks?.edges || [];
+          console.log('🔗 Usando edges para conclusão:', currentEdges.length, 'edges');
+          
           const finalFlowTasks = {
             ...flowDiagramModal.flowData.flowTasks,
-            nodes: updatedNodes
+            nodes: updatedNodes,
+            edges: currentEdges
           };
 
           const response = await fetch(`/api/document-flow-executions/${flowDiagramModal.flowData.documentId}`, {
@@ -2757,10 +2788,14 @@ function FlowWithAutoFitView({
 
           // Salvar alterações no banco de dados - atualizando fluxo completo
           try {
+            // Obter edges atuais do React Flow (se disponível através de window)
+            const currentEdges = (window as any).__currentFlowEdges || flowDiagramModal.flowData.flowTasks?.edges || [];
+            console.log('🔗 Usando edges para salvar integração:', currentEdges.length, 'edges');
+            
             const finalFlowTasks = {
               ...flowDiagramModal.flowData.flowTasks,
               nodes: updatedNodes,
-              edges: flowDiagramModal.flowData.flowTasks?.edges || [],
+              edges: currentEdges,
               viewport: flowDiagramModal.flowData.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
             };
 
@@ -2983,14 +3018,18 @@ function FlowWithAutoFitView({
         }
 
         // 6. Preparar dados para envio ao servidor - PRESERVAR EDGES DO ESTADO ATUAL
+        // Obter edges atuais do React Flow
+        const currentEdges = getEdges();
+        console.log('🔗 Usando edges atuais do React Flow:', currentEdges.length, 'edges');
+        
         const updatedFlowTasks = {
           nodes: updatedNodes,
-          edges: edges, // Usar edges do estado atual do React Flow
+          edges: currentEdges, // Usar edges atuais do React Flow
           viewport: flowData.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
         };
         
         console.log('🔗 Preservando edges do estado atual:', {
-          edgesCount: edges.length,
+          edgesCount: currentEdges.length,
           nodesCount: updatedNodes.length
         });
 
