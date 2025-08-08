@@ -439,6 +439,12 @@ export function DocumentosTable({
                         Em aprovação
                       </Badge>
                     );
+                  } else if (documento.taskState === 'ready_to_next') {
+                    return (
+                      <Badge variant="secondary" className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 border-blue-200 dark:border-blue-600">
+                        Edição Concluída
+                      </Badge>
+                    );
                   } else if (documento.taskState === 'completed') {
                     return (
                       <Badge variant="secondary" className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 border-blue-200 dark:border-blue-600">
