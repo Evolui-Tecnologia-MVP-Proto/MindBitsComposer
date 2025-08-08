@@ -2002,7 +2002,7 @@ const IsolatedDiagram = memo(({
       zoomOnPinch={true}
       zoomOnDoubleClick={false}
     >
-      {/* Controls removido da modal de diagrama de fluxo */}
+      <Controls showLock={false} />
       <Background />
     </ReactFlow>
   );
@@ -2080,7 +2080,7 @@ const StableReactFlow = memo(({
       zoomOnDoubleClick={false}
       proOptions={{ hideAttribution: true }}
     >
-      {/* Controls removido da modal de diagrama de fluxo */}
+      <Controls showLock={false} />
       <Background />
     </ReactFlow>
   );
