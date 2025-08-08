@@ -3273,18 +3273,20 @@ function FlowWithAutoFitView({
         let shouldAnimate = false; // nova variável para controlar animação
         
         // PRIMEIRA PRIORIDADE: Lógica de execução/pendência (sempre tem precedência)
-        // Se ambos os nós estão executados
-        if (sourceExecuted && targetExecuted) {
-          edgeColor = '#21639a';
-          shouldAnimate = true; // animar conexões executadas (azuis)
-        }
-        // Se há conexão entre executado e pendente conectado (PRIORIDADE MÁXIMA)
-        else if ((sourceExecuted && targetPending) || (sourcePending && targetExecuted)) {
+        // Se há conexão entre executado e pendente conectado (PRIORIDADE MÁXIMA - amarelo)
+        if ((sourceExecuted && targetPending) || (sourcePending && targetExecuted)) {
           edgeColor = '#fbbf24'; // amarelo
           shouldAnimate = true; // animar conexões pendentes (amarelas)
         }
-        // SEGUNDA PRIORIDADE: Verificar se a conexão parte de um SwitchNode e aplicar cor dinâmica do handle
-        else if (sourceNode?.type === 'switchNode') {
+        // REGRA: Edges azuis apenas quando AMBOS os nós estão executados
+        // (representa o caminho já percorrido no fluxo)
+        else if (sourceExecuted && targetExecuted) {
+          edgeColor = '#21639a';
+          shouldAnimate = true; // animar conexões entre nós executados (azuis)
+        }
+        // SEGUNDA PRIORIDADE: Verificar se a conexão parte de um SwitchNode NÃO executado
+        // (switchNodes executados não devem aplicar cores dinâmicas nas edges que saem deles)
+        else if (sourceNode?.type === 'switchNode' && !sourceExecuted) {
           // Função para determinar cor do handle do switchNode
           const getSwitchHandleColor = (switchValue: any) => {
             if (!switchValue) return '#9ca3af'; // gray-400
