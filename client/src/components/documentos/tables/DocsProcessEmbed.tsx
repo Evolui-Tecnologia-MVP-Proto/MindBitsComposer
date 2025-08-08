@@ -4080,42 +4080,59 @@ function FlowWithAutoFitView({
 
                 {/* Layout tabular para StartNode - 2 colunas */}
                 {selectedFlowNode.type === 'startNode' && (
-                  <table className="w-full text-xs execution-form-table">
-                    <thead>
-                      <tr>
-                        <th className="px-2 py-1.5 text-center font-medium text-xs">Status Exec.</th>
-                        <th className="px-2 py-1.5 text-center font-medium text-xs">Tipo</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="px-2 py-1.5 text-center">
-                          <div className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${
-                            selectedFlowNode.data.isExecuted === 'TRUE' 
-                              ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' 
-                              : selectedFlowNode.data.isPendingConnected
-                              ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400'
-                              : 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-200'
-                          }`}>
-                            {selectedFlowNode.data.isExecuted === 'TRUE' 
-                              ? 'Executado' 
-                              : selectedFlowNode.data.isPendingConnected
-                              ? 'Pendente'
-                              : 'N.Exec.'}
-                          </div>
-                        </td>
-                        <td className="px-2 py-1.5 text-center">
-                          {selectedFlowNode.data.FromType ? (
-                            <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
-                              {selectedFlowNode.data.FromType}
+                  <div>
+                    <table className="w-full text-xs execution-form-table">
+                      <thead>
+                        <tr>
+                          <th className="px-2 py-1.5 text-center font-medium text-xs">Status Exec.</th>
+                          <th className="px-2 py-1.5 text-center font-medium text-xs">Tipo</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="px-2 py-1.5 text-center">
+                            <div className={`inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium ${
+                              selectedFlowNode.data.isExecuted === 'TRUE' 
+                                ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400' 
+                                : selectedFlowNode.data.isPendingConnected
+                                ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400'
+                                : 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-200'
+                            }`}>
+                              {selectedFlowNode.data.isExecuted === 'TRUE' 
+                                ? 'Executado' 
+                                : selectedFlowNode.data.isPendingConnected
+                                ? 'Pendente'
+                                : 'N.Exec.'}
                             </div>
-                          ) : (
-                            <span className="text-gray-400 dark:text-gray-300 text-xs">-</span>
-                          )}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                          </td>
+                          <td className="px-2 py-1.5 text-center">
+                            {selectedFlowNode.data.FromType ? (
+                              <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
+                                {selectedFlowNode.data.FromType}
+                              </div>
+                            ) : (
+                              <span className="text-gray-400 dark:text-gray-300 text-xs">-</span>
+                            )}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    
+                    {/* Painel de informação para startNode tipo Init */}
+                    {selectedFlowNode.data.FromType === 'Init' && (
+                      <div className="mt-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-600 rounded-lg p-3">
+                        <div className="text-xs text-blue-800 dark:text-blue-300">
+                          <p className="mb-2 font-medium">Fluxo de iniciação direta (não foi iniciado por outro fluxo anterior).</p>
+                          <p>
+                            O processo de inicialização deste fluxo foi: 
+                            <span className="font-mono bg-white dark:bg-[#0F172A] px-2 py-1 rounded border dark:border-[#374151] ml-1">
+                              {selectedFlowNode.data.originData || '-'}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 )}
 
                 {/* Layout tabular para EndNode - 2 colunas */}
