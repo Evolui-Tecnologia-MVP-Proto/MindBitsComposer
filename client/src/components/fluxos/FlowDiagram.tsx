@@ -146,7 +146,7 @@ export const FlowDiagram = ({
                 maxZoom={2}
                 connectionLineType={ConnectionLineType.SmoothStep}
               >
-                <Controls />
+                <Controls showLock={false} />
                 {showGrid && <FlowGrid isDark={isDark} />}
                 {showMiniMap && <MiniMap />}
               </ReactFlow>
@@ -202,7 +202,7 @@ export const FlowDiagram = ({
             maxZoom={2}
             connectionLineType={ConnectionLineType.SmoothStep}
           >
-            <Controls />
+            <Controls showLock={false} />
             {showGrid && <FlowGrid isDark={isDark} />}
             {showMiniMap && <MiniMap />}
           </ReactFlow>

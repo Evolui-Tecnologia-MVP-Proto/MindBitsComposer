@@ -2002,7 +2002,7 @@ const IsolatedDiagram = memo(({
       zoomOnPinch={true}
       zoomOnDoubleClick={false}
     >
-      <Controls showInteractive={false} />
+      <Controls showInteractive={false} showLock={false} />
       <Background />
     </ReactFlow>
   );
