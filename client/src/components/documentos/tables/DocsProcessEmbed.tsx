@@ -3249,6 +3249,29 @@ function FlowWithAutoFitView({
           } catch (error) {
             console.error('❌ Erro ao criar flow action:', error);
           }
+
+          // Atualizar task_state do documento baseado no status de aprovação
+          const newTaskState = approvalStatus === 'TRUE' ? 'ready_to_publish' : 'to_refact';
+          
+          try {
+            const documentUpdateResponse = await fetch(`/api/documentos/${flowData.documentId}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                taskState: newTaskState
+              })
+            });
+
+            if (documentUpdateResponse.ok) {
+              console.log(`✅ Task state atualizado para: ${newTaskState}`);
+            } else {
+              console.error('❌ Erro ao atualizar task state do documento');
+            }
+          } catch (error) {
+            console.error('❌ Erro ao atualizar task state:', error);
+          }
         }
         console.log('Atualizando estado local com:', updatedFlowTasks);
         
