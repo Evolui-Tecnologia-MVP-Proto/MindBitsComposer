@@ -3643,6 +3643,9 @@ function FlowWithAutoFitView({
                                     }
                                   }));
 
+                                  // Atualizar diagrama visualmente
+                                  updateDiagramVisually(updatedNodes, currentEdges);
+
                                   // Criar registro em document_editions e atualizar task_state
                                   try {
                                     const templateId = selectedFlowNode.data.docType; // Este é o ID do template
