@@ -2856,27 +2856,72 @@ function FlowWithAutoFitView({
 
     // Registro de funções de integração disponíveis
     const integrationFunctions: Record<string, () => Promise<{ success: boolean; data?: any; error?: string }>> = {
-      // Função gth_publish_kbd - mocada para testes
+      // Função gth_publish_kbd - Publicação no GitHub
       gth_publish_kbd: async () => {
         console.log('🔄 Executando função gth_publish_kbd...');
         
-        // Simular processamento assíncrono
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Retorno mocado para testes
-        return {
-          success: true,
-          data: {
-            message: 'Documento publicado na base de conhecimento com sucesso',
-            documentId: flowDiagramModal.flowData.documentId,
-            timestamp: new Date().toISOString(),
-            metadata: {
-              publishedTo: 'Knowledge Base',
-              version: '1.0',
-              status: 'published'
+        try {
+          // Obter o documentId e nodeId atuais
+          const documentId = flowDiagramModal.flowData.documentId;
+          const nodeId = selectedFlowNode?.id;
+          const service = selectedFlowNode?.data?.service || 'GitHub';
+          
+          console.log('📄 Publicando documento:', documentId);
+          console.log('🔗 Node ID:', nodeId);
+          console.log('🔧 Serviço:', service);
+          
+          // Chamar a API de publicação
+          const response = await apiRequest('/api/github/publish', {
+            method: 'POST',
+            body: JSON.stringify({
+              documentId,
+              nodeId,
+              service
+            })
+          });
+          
+          if (response.success) {
+            console.log('✅ Documento publicado com sucesso:', response.data);
+            
+            // Atualizar o nó como executado
+            if (selectedFlowNode) {
+              const updatedNodes = [...nodes];
+              const nodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
+              if (nodeIndex !== -1) {
+                updatedNodes[nodeIndex] = {
+                  ...updatedNodes[nodeIndex],
+                  data: {
+                    ...updatedNodes[nodeIndex].data,
+                    isExecuted: 'TRUE'
+                  }
+                };
+                setNodes(updatedNodes);
+              }
             }
+            
+            // Refazer a query para atualizar os dados na interface
+            queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+            queryClient.invalidateQueries({ queryKey: ["/api/document-editions"] });
+            queryClient.invalidateQueries({ queryKey: ["/api/flow-actions"] });
+            
+            return {
+              success: true,
+              data: {
+                ...response.data,
+                documentId,
+                timestamp: new Date().toISOString()
+              }
+            };
+          } else {
+            throw new Error(response.error || 'Erro ao publicar documento');
           }
-        };
+        } catch (error) {
+          console.error('❌ Erro na publicação:', error);
+          return {
+            success: false,
+            error: error instanceof Error ? error.message : 'Erro desconhecido ao publicar documento'
+          };
+        }
       }
     };
 

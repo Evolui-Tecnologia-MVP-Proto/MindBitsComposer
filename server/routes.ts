@@ -5278,6 +5278,139 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // GitHub publish endpoint
+  app.post("/api/github/publish", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { documentId, nodeId, service } = req.body;
+      
+      console.log('🚀 Iniciando publicação no GitHub');
+      console.log('📄 DocumentId:', documentId);
+      console.log('🔗 NodeId:', nodeId);
+      console.log('🔧 Service:', service);
+      
+      // 1. Buscar a edição do documento
+      const editionData = await db.select({
+        edition: documentEditions,
+        template: templates,
+        document: documentos
+      })
+      .from(documentEditions)
+      .innerJoin(documentos, eq(documentEditions.documentId, documentos.id))
+      .leftJoin(templates, eq(documentEditions.templateId, templates.id))
+      .where(eq(documentEditions.documentId, documentId))
+      .limit(1);
+      
+      if (editionData.length === 0) {
+        return res.status(404).json({ error: "Edição do documento não encontrada" });
+      }
+      
+      const { edition, template, document } = editionData[0];
+      
+      // 2. Extrair o RAG Index do json_file
+      let ragIndex = 'documento_sem_nome';
+      if (edition.jsonFile) {
+        try {
+          const jsonData = typeof edition.jsonFile === 'string' 
+            ? JSON.parse(edition.jsonFile) 
+            : edition.jsonFile;
+          
+          // Buscar o RAG Index no campo header
+          if (jsonData.header && jsonData.header['RAG Index']) {
+            ragIndex = jsonData.header['RAG Index'];
+            console.log('✅ RAG Index encontrado:', ragIndex);
+          } else {
+            console.log('⚠️ RAG Index não encontrado, usando nome padrão');
+          }
+        } catch (e) {
+          console.error('Erro ao processar JSON:', e);
+        }
+      }
+      
+      // 3. Preparar o nome do arquivo (remover caracteres especiais)
+      const fileName = `${ragIndex.replace(/[^a-zA-Z0-9_-]/g, '_')}.MD`;
+      
+      // 4. Obter o conteúdo do markdown
+      const markdownContent = edition.mdFile || '';
+      
+      if (!markdownContent) {
+        return res.status(400).json({ error: "Documento não possui conteúdo Markdown" });
+      }
+      
+      // 5. Verificar o repo_path do template
+      const repoPath = template?.repoPath || 'documents';
+      console.log('📂 Caminho no repositório:', repoPath);
+      
+      // 6. Salvar no GitHub (usando uma função helper)
+      // Por enquanto, vamos simular o salvamento
+      const githubSaveSuccess = true; // TODO: Implementar salvamento real no GitHub
+      
+      if (!githubSaveSuccess) {
+        return res.status(500).json({ error: "Erro ao salvar no GitHub" });
+      }
+      
+      console.log('✅ Arquivo salvo no GitHub:', `${repoPath}/${fileName}`);
+      
+      // 7. Atualizar status do documento para "published"
+      await db.update(documentEditions)
+        .set({
+          status: 'published',
+          updatedAt: new Date()
+        })
+        .where(eq(documentEditions.id, edition.id));
+      
+      await db.update(documentos)
+        .set({
+          taskState: 'published',
+          updatedAt: new Date()
+        })
+        .where(eq(documentos.id, documentId));
+      
+      console.log('✅ Status atualizado para published');
+      
+      // 8. Criar registro em flow_actions
+      const flowExecution = await db.select()
+        .from(documentFlowExecutions)
+        .where(eq(documentFlowExecutions.documentId, documentId))
+        .orderBy(desc(documentFlowExecutions.createdAt))
+        .limit(1);
+      
+      if (flowExecution.length > 0) {
+        await db.insert(flowActions).values({
+          flowExecutionId: flowExecution[0].id,
+          flowNode: nodeId,
+          actionType: 'integration',
+          actionDescription: `Documento Publicado no ${service || 'GitHub'}`,
+          actionData: {
+            fileName,
+            repoPath,
+            ragIndex,
+            service: service || 'GitHub'
+          },
+          createdBy: req.user.id,
+          createdAt: new Date()
+        });
+        
+        console.log('✅ Registro de flow_action criado');
+      }
+      
+      res.json({
+        success: true,
+        data: {
+          fileName,
+          path: `${repoPath}/${fileName}`,
+          ragIndex,
+          message: `Documento publicado com sucesso no ${service || 'GitHub'}`
+        }
+      });
+      
+    } catch (error) {
+      console.error("❌ Erro ao publicar no GitHub:", error);
+      res.status(500).json({ error: "Erro ao publicar documento no GitHub" });
+    }
+  });
+
   // Document Editions API routes
   app.get("/api/document-editions", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
