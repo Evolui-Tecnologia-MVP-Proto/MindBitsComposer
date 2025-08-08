@@ -113,13 +113,17 @@ export function DocumentosTable({
     evento.preventDefault();
     evento.stopPropagation();
 
-
+    console.log("🔵 handleFlowButtonClick - activeTab:", activeTab);
+    console.log("🔵 handleFlowButtonClick - documento.id:", documento.id);
     
     if (activeTab === "concluidos" || activeTab === "em-processo") {
       const documentFlows = getDocumentFlows(documento.id);
+      console.log("🔵 handleFlowButtonClick - documentFlows:", documentFlows);
+      console.log("🔵 handleFlowButtonClick - documentFlows.length:", documentFlows.length);
       
       if (documentFlows.length > 1) {
         // Mostrar dropdown apenas quando há múltiplos fluxos
+        console.log("🔵 Abrindo dropdown com múltiplos fluxos");
         setDropdown({
           isOpen: true,
           documentId: documento.id,
@@ -128,12 +132,15 @@ export function DocumentosTable({
         });
       } else if (documentFlows.length === 1) {
         // Abrir diretamente quando há apenas um fluxo
+        console.log("🔵 Abrindo modal diretamente com fluxo único:", documentFlows[0]);
         openFlowDiagramModal(documentFlows[0]);
       } else {
         // Fallback para o método original
+        console.log("🔵 Nenhum fluxo encontrado, tentando fallback");
         const flowToShow = activeTab === "concluidos" 
           ? getConcludedFlow(documento.id)
           : getActiveFlow(documento.id);
+        console.log("🔵 Fallback flowToShow:", flowToShow);
         if (flowToShow) {
           openFlowDiagramModal({
             flowTasks: flowToShow,
