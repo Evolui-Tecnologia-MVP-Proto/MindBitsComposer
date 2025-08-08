@@ -658,7 +658,7 @@ export default function LexicalPage() {
     mutationFn: async (editionId: string) => {
       return apiRequest("PATCH", `/api/document-editions/${editionId}/finalize`, {});
     },
-    onSuccess: (data: any) => {
+    onSuccess: async (data: any) => {
       console.log("✅ Documento finalizado - response data:", data);
       console.log("✅ selectedEdition:", selectedEdition);
       console.log("✅ Comparação IDs:", selectedEdition?.id, "===", data.edition?.id);
@@ -668,12 +668,40 @@ export default function LexicalPage() {
         title: "Documento finalizado",
         description: "O documento foi finalizado com sucesso e está disponível para a próxima fase do fluxo.",
       });
+      
+      // Criar registro em flow_actions se os dados necessários estão disponíveis
+      if (selectedEdition?.documentId && selectedEdition?.fluxNodeId) {
+        try {
+          console.log("📝 Criando registro em flow_actions para finalização:", {
+            documentId: selectedEdition.documentId,
+            flowNode: selectedEdition.fluxNodeId
+          });
+          
+          const flowActionResponse = await apiRequest("POST", "/api/flow-actions/create", {
+            documentId: selectedEdition.documentId,
+            flowNode: selectedEdition.fluxNodeId,
+            actionDescription: "Finalização de edição do documento"
+          });
+          
+          console.log("✅ Flow action criada com sucesso:", flowActionResponse);
+        } catch (error) {
+          console.error("❌ Erro ao criar flow action:", error);
+          // Não bloquear o fluxo principal, apenas logar o erro
+        }
+      } else {
+        console.log("⚠️ Dados insuficientes para criar flow action:", {
+          documentId: selectedEdition?.documentId,
+          fluxNodeId: selectedEdition?.fluxNodeId
+        });
+      }
+      
       // Invalidar queries relevantes
       queryClient.invalidateQueries({ queryKey: ['/api/document-editions-in-progress'] });
       queryClient.invalidateQueries({ queryKey: ['/api/document-editions-library'] });
       queryClient.invalidateQueries({ queryKey: ['/api/document-editions'] });
       queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
       queryClient.invalidateQueries({ queryKey: ['/api/documentos'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/flow-actions'] }); // Invalidar também flow-actions
       
       // Sempre limpar o editor após finalização (removendo a condição para debug)
       console.log("🔄 Limpando editor após finalização...");
