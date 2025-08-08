@@ -4199,11 +4199,17 @@ function FlowWithAutoFitView({
                     )}
 
                     {/* Manual execution form para EndNode de Transferência para Fluxo */}
-                    {selectedFlowNode.data.FromType === 'flow_init' && selectedFlowNode.data.To_Flow_id && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
-                      <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-600 rounded-lg">
+                    {selectedFlowNode.data.To_Type === 'flow_Finish' && selectedFlowNode.data.To_Flow_id && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
+                      <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-600 rounded-lg">
                         <div className="mb-3">
-                          <p className="text-xs text-blue-800 dark:text-blue-300 mb-2">
-                            Ao pressionar o botão você confirma o encerramento deste fluxo e a abertura do novo fluxo vinculado. Ao confirmar, o sistema: 1- Encerra o fluxo corrente, 2- Cria uma nova instância com o fluxo indicado vinculado ao presente documento, 3- Inicia o fluxo no novo documento. Confirma estas ações?
+                          <p className="text-xs text-amber-800 dark:text-amber-300 mb-2 font-medium">
+                            <span className="font-semibold">ATENÇÃO:</span> Ao confirmar esta ação você estará encerrando este fluxo e encaminhando a execução para o fluxo{' '}
+                            <span className="font-mono bg-white dark:bg-[#0F172A] px-2 py-1 rounded border dark:border-[#374151] mx-1">
+                              {selectedFlowNode.data.To_Flow_code && selectedFlowNode.data.To_Flow_name 
+                                ? `[${selectedFlowNode.data.To_Flow_code}] - ${selectedFlowNode.data.To_Flow_name}`
+                                : selectedFlowNode.data.To_Flow_id}
+                            </span>
+                            . Confirma a transferência de fluxo?
                           </p>
                         </div>
 
@@ -4229,10 +4235,10 @@ function FlowWithAutoFitView({
                           className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                             selectedFlowNode.data.isExecuted === 'TRUE'
                               ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                              : 'bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+                              : 'bg-amber-600 text-white hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2'
                           }`}
                         >
-                          {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Transferência Concluída' : 'Transferir Fluxo'}
+                          {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Transferência Concluída' : 'Confirma Transferência'}
                         </button>
                       </div>
                     )}
