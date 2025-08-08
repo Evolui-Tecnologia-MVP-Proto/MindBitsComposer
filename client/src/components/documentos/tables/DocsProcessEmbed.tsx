@@ -4105,9 +4105,14 @@ function FlowWithAutoFitView({
                           </div>
                         </td>
                         <td className="px-2 py-1.5 text-center">
-                          <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
-                            Início Direto
-                          </div>
+                          {selectedFlowNode.data.FromType ? (
+                            <div className="inline-flex px-1.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400">
+                              {selectedFlowNode.data.FromType === 'Direct_start' ? 'Início Direto' : 
+                               selectedFlowNode.data.FromType === 'flow_init' ? 'Início por Fluxo' : selectedFlowNode.data.FromType}
+                            </div>
+                          ) : (
+                            <span className="text-gray-400 dark:text-gray-300 text-xs">-</span>
+                          )}
                         </td>
                       </tr>
                     </tbody>
