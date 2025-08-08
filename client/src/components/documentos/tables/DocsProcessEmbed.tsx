@@ -2854,6 +2854,32 @@ function FlowWithAutoFitView({
       }
     };
 
+    // Registro de funções de integração disponíveis
+    const integrationFunctions: Record<string, () => Promise<{ success: boolean; data?: any; error?: string }>> = {
+      // Função gth_publish_kbd - mocada para testes
+      gth_publish_kbd: async () => {
+        console.log('🔄 Executando função gth_publish_kbd...');
+        
+        // Simular processamento assíncrono
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Retorno mocado para testes
+        return {
+          success: true,
+          data: {
+            message: 'Documento publicado na base de conhecimento com sucesso',
+            documentId: flowDiagramModal.flowData.documentId,
+            timestamp: new Date().toISOString(),
+            metadata: {
+              publishedTo: 'Knowledge Base',
+              version: '1.0',
+              status: 'published'
+            }
+          }
+        };
+      }
+    };
+
     // Função para executar integração manual
     const executeManualIntegration = async () => {
       if (!selectedFlowNode || selectedFlowNode.type !== 'integrationNode') {
@@ -2862,91 +2888,112 @@ function FlowWithAutoFitView({
       }
 
       console.log('Executando integração manual...');
+      console.log('JobId do nó:', selectedFlowNode.data.jobId);
       
-      // Simular execução - 70% chance de sucesso
-      const isSuccess = Math.random() > 0.3;
+      // Verificar se existe uma função de integração definida
+      const functionName = selectedFlowNode.data.jobId || selectedFlowNode.data.callType;
       
-      if (isSuccess) {
-        setIntegrationResult({
-          status: 'success',
-          message: `Integração executada com sucesso! A função ${selectedFlowNode.data.callType || 'callJob'} foi processada e ${selectedFlowNode.data.integrType || 'dados'} foram sincronizados com o serviço ${selectedFlowNode.data.service || 'externo'}.`
-        });
-        
-        // Marcar o nó como executado
-        const updatedNodes = [...nodes];
-        const nodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
-        if (nodeIndex !== -1) {
-          updatedNodes[nodeIndex] = {
-            ...updatedNodes[nodeIndex],
-            data: {
-              ...updatedNodes[nodeIndex].data,
-              isExecuted: 'TRUE',
-              isPendingConnected: false
-            }
-          };
-          setNodes(updatedNodes);
+      if (functionName && integrationFunctions[functionName]) {
+        // Função existe - executar
+        try {
+          console.log(`✅ Função de integração '${functionName}' encontrada. Executando...`);
           
-          // Atualizar nó selecionado
-          setSelectedFlowNode({
-            ...selectedFlowNode,
-            data: {
-              ...selectedFlowNode.data,
-              isExecuted: 'TRUE',
-              isPendingConnected: false
-            }
-          });
-
-          // Salvar alterações no banco de dados - atualizando fluxo completo
-          try {
-            // Obter edges atuais do React Flow (se disponível através de window)
-            const currentEdges = (window as any).__currentFlowEdges || flowDiagramModal.flowData.flowTasks?.edges || [];
-            console.log('🔗 Usando edges para salvar integração:', currentEdges.length, 'edges');
-            
-            const finalFlowTasks = {
-              ...flowDiagramModal.flowData.flowTasks,
-              nodes: updatedNodes,
-              edges: currentEdges,
-              viewport: flowDiagramModal.flowData.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
-            };
-
-            const response = await fetch(`/api/document-flow-executions/${flowDiagramModal.flowData.documentId}`, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                flowTasks: finalFlowTasks
-              }),
+          const result = await integrationFunctions[functionName]();
+          
+          if (result.success) {
+            setIntegrationResult({
+              status: 'success',
+              message: `Integração executada com sucesso! ${result.data?.message || `A função ${functionName} foi processada.`}`
             });
-
-            if (!response.ok) {
-              throw new Error('Erro ao salvar alterações no banco');
-            }
-
-            console.log('✅ Alterações da integração manual salvas no banco de dados');
             
-            // Atualizar estado local
-            setFlowDiagramModal(prev => ({
-              ...prev,
-              flowData: {
-                ...prev.flowData,
-                flowTasks: finalFlowTasks
-              }
-            }));
-
-            // Atualizar diagrama visualmente
-            updateDiagramVisually(updatedNodes, currentEdges);
-
-            // Recarregar dados
-            queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
-          } catch (error) {
-            console.error('❌ Erro ao salvar integração manual:', error);
+            // Log detalhado do resultado
+            console.log('📊 Resultado da integração:', result.data);
+          } else {
+            setIntegrationResult({
+              status: 'error',
+              message: `Falha na execução da integração: ${result.error || 'Erro desconhecido'}`
+            });
           }
+          
+          // Se sucesso, marcar nó como executado
+          if (result.success) {
+            // Marcar o nó como executado
+            const updatedNodes = [...nodes];
+            const nodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
+            if (nodeIndex !== -1) {
+              updatedNodes[nodeIndex] = {
+                ...updatedNodes[nodeIndex],
+                data: {
+                  ...updatedNodes[nodeIndex].data,
+                  isExecuted: 'TRUE',
+                  isPendingConnected: false
+                }
+              };
+              setNodes(updatedNodes);
+              
+              // Atualizar nó selecionado
+              setSelectedFlowNode({
+                ...selectedFlowNode,
+                data: {
+                  ...selectedFlowNode.data,
+                  isExecuted: 'TRUE',
+                  isPendingConnected: false
+                }
+              });
+
+              // Salvar alterações no banco de dados
+              const currentEdges = (window as any).__currentFlowEdges || flowDiagramModal.flowData.flowTasks?.edges || [];
+              
+              const finalFlowTasks = {
+                ...flowDiagramModal.flowData.flowTasks,
+                nodes: updatedNodes,
+                edges: currentEdges,
+                viewport: flowDiagramModal.flowData.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
+              };
+
+              const response = await fetch(`/api/document-flow-executions/${flowDiagramModal.flowData.documentId}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  flowTasks: finalFlowTasks
+                }),
+              });
+
+              if (response.ok) {
+                console.log('✅ Alterações da integração salvas no banco de dados');
+                
+                // Atualizar estado local
+                setFlowDiagramModal(prev => ({
+                  ...prev,
+                  flowData: {
+                    ...prev.flowData,
+                    flowTasks: finalFlowTasks
+                  }
+                }));
+
+                // Atualizar diagrama visualmente
+                updateDiagramVisually(updatedNodes, currentEdges);
+
+                // Recarregar dados
+                queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
+              }
+            }
+          }
+        } catch (error) {
+          console.error('❌ Erro ao executar função de integração:', error);
+          setIntegrationResult({
+            status: 'error',
+            message: `Erro ao executar a função ${functionName}: ${error}`
+          });
         }
       } else {
+        // Função não encontrada
+        console.error(`❌ Função de integração '${functionName}' não localizada`);
         setIntegrationResult({
           status: 'error',
-          message: `Falha na execução da integração. Erro ao executar a função ${selectedFlowNode.data.callType || 'callJob'}. Verifique a conectividade com o serviço ${selectedFlowNode.data.service || 'externo'} e tente novamente.`
+          message: 'Função de integração não localizada!'
         });
       }
     };
