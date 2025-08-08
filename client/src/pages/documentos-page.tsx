@@ -1084,7 +1084,7 @@ export default function DocumentosPage() {
               showFilters={showFilters}
               activeTab="concluidos"
               hideStatusColumn={false}
-              statusFilter="Concluido" // DEFINE O STATUS
+              statusFilter="Encerrado" // DEFINE O STATUS
             />
           </TabsContent>
 
