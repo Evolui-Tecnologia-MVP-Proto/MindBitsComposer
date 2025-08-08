@@ -3175,6 +3175,34 @@ function FlowWithAutoFitView({
         }
 
         console.log('Alterações salvas com sucesso');
+
+        // Criar registro flow_actions para actionNode do tipo Intern_Aprove
+        if (selectedFlowNode.data.actionType === 'Intern_Aprove') {
+          const approvalStatus = tempApprovalStatus || selectedFlowNode.data.isAproved;
+          const parecer = approvalStatus === 'TRUE' ? 'APROVADO' : 'REPROVADO';
+          
+          try {
+            const flowActionResponse = await fetch('/api/flow-actions/create', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                documentId: flowData.documentId,
+                flowNode: selectedFlowNode.id,
+                actionDescription: `Ação de análise executada, parecer: ${parecer}`
+              })
+            });
+
+            if (flowActionResponse.ok) {
+              console.log('✅ Flow action criada para Intern_Aprove:', parecer);
+            } else {
+              console.error('❌ Erro ao criar flow action para Intern_Aprove');
+            }
+          } catch (error) {
+            console.error('❌ Erro ao criar flow action:', error);
+          }
+        }
         console.log('Atualizando estado local com:', updatedFlowTasks);
         
         // Coletar e salvar dados do formulário dinâmico se existir
