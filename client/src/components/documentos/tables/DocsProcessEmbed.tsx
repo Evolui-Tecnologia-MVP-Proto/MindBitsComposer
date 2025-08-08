@@ -409,13 +409,34 @@ export function DocsProcessEmbed({
         return null;
       }
       
+      // Verificar se o formulário deve ser readonly
+      // Quando o nó está executado e teve aprovação "NÃO"
+      const isReadOnly = flowNode.data.isExecuted === 'TRUE' && 
+                        isApprovalNode && 
+                        approvalStatus === 'FALSE';
+      
+      console.log('📝 Estado do formulário:', {
+        nodeId: flowNode.id,
+        isExecuted: flowNode.data.isExecuted,
+        isApprovalNode,
+        approvalStatus,
+        isReadOnly
+      });
+      
       // Renderiza o formulário com os campos dinâmicos
       return (
         <div className="w-full mt-4" data-node-form={flowNode.id}>
           <div className="space-y-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
-            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 pb-2 border-b border-gray-200 dark:border-gray-700">
-              Formulário de Ação
-            </h4>
+            <div className="flex items-center justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Formulário de Ação
+              </h4>
+              {isReadOnly && (
+                <span className="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded">
+                  Somente Leitura
+                </span>
+              )}
+            </div>
             
             <div className="space-y-3">
               {Object.entries(formData.Fields).map(([fieldName, fieldConfig]: [string, any]) => {
@@ -445,18 +466,28 @@ export function DocsProcessEmbed({
                         </label>
                         {fieldType === 'longText' ? (
                           <textarea
-                            className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400 resize-y min-h-[80px]"
+                            className={`w-full px-3 py-2 text-xs rounded border ${
+                              isReadOnly 
+                                ? 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 cursor-not-allowed' 
+                                : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400'
+                            } text-gray-900 dark:text-gray-100 resize-y min-h-[80px]`}
                             placeholder={`Digite ${fieldName}...`}
                             defaultValue={defaultValue}
                             data-field-name={fieldName}
+                            disabled={isReadOnly}
                           />
                         ) : (
                           <input
                             type="text"
-                            className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400"
+                            className={`w-full px-3 py-2 text-xs rounded border ${
+                              isReadOnly 
+                                ? 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 cursor-not-allowed' 
+                                : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400'
+                            } text-gray-900 dark:text-gray-100`}
                             placeholder={`Digite ${fieldName}...`}
                             defaultValue={defaultValue}
                             data-field-name={fieldName}
+                            disabled={isReadOnly}
                           />
                         )}
                       </div>
@@ -469,9 +500,14 @@ export function DocsProcessEmbed({
                           {fieldName}
                         </label>
                         <select
-                          className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400"
+                          className={`w-full px-3 py-2 text-xs rounded border ${
+                            isReadOnly 
+                              ? 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 cursor-not-allowed' 
+                              : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400'
+                          } text-gray-900 dark:text-gray-100`}
                           defaultValue=""
                           data-field-name={fieldName}
+                          disabled={isReadOnly}
                         >
                           <option value="">Selecione uma opção...</option>
                           {fieldConfig.map((option: string, idx: number) => (
@@ -493,9 +529,14 @@ export function DocsProcessEmbed({
                     </label>
                     <input
                       type="text"
-                      className="w-full px-3 py-2 text-xs rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400"
+                      className={`w-full px-3 py-2 text-xs rounded border ${
+                        isReadOnly 
+                          ? 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 cursor-not-allowed' 
+                          : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400'
+                      } text-gray-900 dark:text-gray-100`}
                       placeholder={`Digite ${fieldName}...`}
                       data-field-name={fieldName}
+                      disabled={isReadOnly}
                     />
                   </div>
                 );
