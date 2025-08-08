@@ -185,30 +185,32 @@ export function FlowDiagramModal({
         <div className="flex-shrink-0 border-t bg-white dark:bg-[#111827] dark:border-[#374151] p-4 mt-4">
           <div className="flex justify-between items-start">
             {/* Legenda alinhada à esquerda */}
-            <div className="flex flex-col space-y-2 text-xs text-gray-600 dark:text-gray-400">
-              <div className="font-medium text-gray-700 dark:text-gray-300 mb-1">Legenda:</div>
-              <div className="flex flex-wrap gap-x-4 gap-y-1">
-                <div className="flex items-center space-x-1">
-                  <div className="w-3 h-3 rounded-sm bg-gray-200 dark:bg-gray-600 border border-gray-300 dark:border-gray-500"></div>
-                  <span>A executar</span>
+            <div className="border border-black dark:border-white rounded-lg p-3 bg-white dark:bg-gray-800">
+              <div className="flex flex-col space-y-2 text-xs text-gray-600 dark:text-gray-400">
+                <div className="font-medium text-gray-700 dark:text-gray-300 mb-1">Legenda:</div>
+                <div className="flex flex-wrap gap-x-4 gap-y-1">
+                  <div className="flex items-center space-x-1">
+                    <div className="w-3 h-3 rounded-sm bg-gray-200 dark:bg-gray-600 border border-gray-300 dark:border-gray-500"></div>
+                    <span>A executar</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <div className="w-3 h-3 rounded-sm bg-yellow-300 dark:bg-yellow-600"></div>
+                    <span>Atual/Próxima Ação (pendente)</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <div className="w-3 h-3 rounded-sm bg-blue-400 dark:bg-blue-500"></div>
+                    <span>Ação/Caminho já executado</span>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-1">
-                  <div className="w-3 h-3 rounded-sm bg-yellow-300 dark:bg-yellow-600"></div>
-                  <span>Atual/Próxima Ação (pendente)</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <div className="w-3 h-3 rounded-sm bg-blue-400 dark:bg-blue-500"></div>
-                  <span>Ação/Caminho já executado</span>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-x-4 gap-y-1">
-                <div className="flex items-center space-x-1">
-                  <div className="w-4 h-0.5 bg-green-500"></div>
-                  <span>Conexão TRUE</span>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <div className="w-4 h-0.5 bg-red-500"></div>
-                  <span>Conexão FALSE</span>
+                <div className="flex flex-wrap gap-x-4 gap-y-1">
+                  <div className="flex items-center space-x-1">
+                    <div className="w-4 h-0.5 bg-green-500"></div>
+                    <span>Conexão TRUE</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <div className="w-4 h-0.5 bg-red-500"></div>
+                    <span>Conexão FALSE</span>
+                  </div>
                 </div>
               </div>
             </div>
