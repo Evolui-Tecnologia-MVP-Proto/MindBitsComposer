@@ -349,12 +349,20 @@ export function DocsProcessEmbed({
     
     if (!attachedFormData) return null;
 
+    // Carregar valores salvos do formulário se existirem
+    const savedFormValues = flowNode.data.formData || {};
+    
     try {
-      console.log('🔍 Dados do formulário (dinâmicos):', {
+      console.log('📋 Renderizando formulário dinâmico:', {
         nodeId: flowNode.id,
+        nodeType: flowNode.type,
+        isExecuted: flowNode.data.isExecuted,
+        isAproved: flowNode.data.isAproved,
+        hasSavedFormData: !!flowNode.data.formData,
+        savedFormDataKeys: Object.keys(savedFormValues),
+        savedFormDataValues: savedFormValues,
         dynamicData: dynamicFormData,
-        fallbackData: flowNode.data.attached_Form || flowNode.data.attached_form,
-        finalData: attachedFormData
+        attachedFormData: attachedFormData
       });
       
       // Parse dos dados do formulário com tratamento de formato corrompido
@@ -458,6 +466,16 @@ export function DocsProcessEmbed({
                     
                     const fieldType = typeConfig ? typeConfig.split('type:')[1].trim() : 'text';
                     const defaultValue = defaultConfig ? defaultConfig.split('default:')[1].trim() : '';
+                    // Usar valor salvo se existir, senão usar defaultValue
+                    const fieldValue = savedFormValues[fieldName] || defaultValue;
+                    
+                    console.log(`📝 Campo ${fieldName}:`, {
+                      fieldType,
+                      defaultValue,
+                      savedValue: savedFormValues[fieldName],
+                      finalValue: fieldValue,
+                      isReadOnly
+                    });
                     
                     return (
                       <div key={fieldName} className="w-full">
@@ -472,7 +490,7 @@ export function DocsProcessEmbed({
                                 : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400'
                             } text-gray-900 dark:text-gray-100 resize-y min-h-[80px]`}
                             placeholder={`Digite ${fieldName}...`}
-                            defaultValue={defaultValue}
+                            {...(isReadOnly ? { value: fieldValue, readOnly: true } : { defaultValue: fieldValue })}
                             data-field-name={fieldName}
                             disabled={isReadOnly}
                           />
@@ -485,7 +503,7 @@ export function DocsProcessEmbed({
                                 : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400'
                             } text-gray-900 dark:text-gray-100`}
                             placeholder={`Digite ${fieldName}...`}
-                            defaultValue={defaultValue}
+                            {...(isReadOnly ? { value: fieldValue, readOnly: true } : { defaultValue: fieldValue })}
                             data-field-name={fieldName}
                             disabled={isReadOnly}
                           />
@@ -494,6 +512,15 @@ export function DocsProcessEmbed({
                     );
                   } else {
                     // Campo de seleção com lista de opções
+                    const selectValue = savedFormValues[fieldName] || "";
+                    
+                    console.log(`📝 Campo Select ${fieldName}:`, {
+                      options: fieldConfig,
+                      savedValue: savedFormValues[fieldName],
+                      finalValue: selectValue,
+                      isReadOnly
+                    });
+                    
                     return (
                       <div key={fieldName} className="w-full">
                         <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
@@ -505,7 +532,7 @@ export function DocsProcessEmbed({
                               ? 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 cursor-not-allowed' 
                               : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400'
                           } text-gray-900 dark:text-gray-100`}
-                          defaultValue=""
+                          {...(isReadOnly ? { value: selectValue } : { defaultValue: selectValue })}
                           data-field-name={fieldName}
                           disabled={isReadOnly}
                         >
@@ -522,6 +549,8 @@ export function DocsProcessEmbed({
                 }
                 
                 // Caso não seja array, trata como campo de texto simples
+                const textValue = savedFormValues[fieldName] || "";
+                
                 return (
                   <div key={fieldName} className="w-full">
                     <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
@@ -535,6 +564,7 @@ export function DocsProcessEmbed({
                           : 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-teal-500 dark:focus:ring-teal-400'
                       } text-gray-900 dark:text-gray-100`}
                       placeholder={`Digite ${fieldName}...`}
+                      defaultValue={textValue}
                       data-field-name={fieldName}
                       disabled={isReadOnly}
                     />
@@ -1478,6 +1508,20 @@ export function DocsProcessEmbed({
         nodes: baseFlowData.nodes || execution.nodes || [],
         viewport: baseFlowData.viewport || execution.viewport || { x: 0, y: 0, zoom: 1 }
       };
+      
+      // Log detalhado para verificar se formData está presente nos nós
+      console.log("📊 Analisando dados do fluxo ao abrir modal:");
+      flowDataWithDocumentId.nodes.forEach((node: any) => {
+        if (node.type === 'actionNode' && node.data.isExecuted === 'TRUE') {
+          console.log(`📌 Nó ${node.id}:`, {
+            isExecuted: node.data.isExecuted,
+            isAproved: node.data.isAproved,
+            hasFormData: !!node.data.formData,
+            formDataKeys: node.data.formData ? Object.keys(node.data.formData) : [],
+            formDataValues: node.data.formData || {}
+          });
+        }
+      });
       
       console.log("🔗 Edges preservadas no modal:", flowDataWithDocumentId.edges);
       
@@ -2952,8 +2996,13 @@ function FlowWithAutoFitView({
               isPendingConnected: false // Marcar como não mais editável
             }
           };
-          console.log('Nó atual atualizado com isAproved:', selectedFlowNode.data.isAproved);
-          console.log('Dados do formulário salvos:', allFormData);
+          console.log('✅ Nó atualizado com aprovação:', {
+            nodeId: selectedFlowNode.id,
+            isAproved: tempApprovalStatus || selectedFlowNode.data.isAproved,
+            formDataSaved: allFormData,
+            formDataKeys: Object.keys(allFormData),
+            formDataValues: Object.values(allFormData)
+          });
         }
 
         // 2. Encontrar nós conectados APENAS pelas conexões de SAÍDA do actionNode
