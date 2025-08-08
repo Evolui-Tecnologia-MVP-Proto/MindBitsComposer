@@ -5564,9 +5564,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("✅ Flow action criada:", flowAction.id);
       }
       
+      // 5. Atualizar task_state do documento para "ready_to_next"
+      const [updatedDocument] = await db
+        .update(documentos)
+        .set({
+          taskState: 'ready_to_next',
+          updatedAt: new Date()
+        })
+        .where(eq(documentos.id, currentEdition.documentId))
+        .returning();
+        
+      console.log(`✅ Document task_state atualizado para 'ready_to_next':`, updatedDocument.id);
+      
       res.json({ 
         success: true, 
         edition: updatedEdition,
+        document: updatedDocument,
         message: "Documento finalizado com sucesso"
       });
       
