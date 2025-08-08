@@ -3272,20 +3272,42 @@ function FlowWithAutoFitView({
         let edgeColor = '#6b7280'; // cor padrão
         let shouldAnimate = false; // nova variável para controlar animação
         
-        // PRIMEIRA PRIORIDADE: Lógica de execução/pendência (sempre tem precedência)
-        // Se há conexão entre executado e pendente conectado (PRIORIDADE MÁXIMA - amarelo)
-        if ((sourceExecuted && targetPending) || (sourcePending && targetExecuted)) {
+        // REGRA ESPECIAL PARA SWITCHNODE EXECUTADO (PRIORIDADE MÁXIMA)
+        // Se a origem é um switchNode executado, verificar qual caminho foi selecionado
+        if (sourceNode?.type === 'switchNode' && sourceExecuted) {
+          const { inputSwitch, leftSwitch, rightSwitch } = sourceNode.data;
+          
+          // Determinar se esta edge está no caminho selecionado
+          let isSelectedPath = false;
+          if (edge.sourceHandle === 'a' && inputSwitch === rightSwitch) {
+            isSelectedPath = true; // Handle direito foi selecionado
+          } else if (edge.sourceHandle === 'c' && inputSwitch === leftSwitch) {
+            isSelectedPath = true; // Handle esquerdo foi selecionado
+          }
+          
+          // Apenas aplicar cor amarela se:
+          // 1. Esta edge está no caminho selecionado
+          // 2. O nó de destino é pendente
+          if (isSelectedPath && targetPending) {
+            edgeColor = '#fbbf24'; // amarelo
+            shouldAnimate = true;
+          } else if (isSelectedPath && targetExecuted) {
+            edgeColor = '#21639a'; // azul se o destino também está executado
+            shouldAnimate = true;
+          }
+          // Se não é o caminho selecionado, mantém a cor padrão cinza
+        }
+        // SEGUNDA PRIORIDADE: Lógica de execução/pendência para outros tipos de nós
+        else if ((sourceExecuted && targetPending) || (sourcePending && targetExecuted)) {
           edgeColor = '#fbbf24'; // amarelo
           shouldAnimate = true; // animar conexões pendentes (amarelas)
         }
-        // REGRA: Edges azuis apenas quando AMBOS os nós estão executados
-        // (representa o caminho já percorrido no fluxo)
+        // TERCEIRA PRIORIDADE: Edges azuis quando ambos os nós estão executados
         else if (sourceExecuted && targetExecuted) {
           edgeColor = '#21639a';
           shouldAnimate = true; // animar conexões entre nós executados (azuis)
         }
-        // SEGUNDA PRIORIDADE: Verificar se a conexão parte de um SwitchNode NÃO executado
-        // (switchNodes executados não devem aplicar cores dinâmicas nas edges que saem deles)
+        // QUARTA PRIORIDADE: Verificar se a conexão parte de um SwitchNode NÃO executado
         else if (sourceNode?.type === 'switchNode' && !sourceExecuted) {
           // Função para determinar cor do handle do switchNode
           const getSwitchHandleColor = (switchValue: any) => {
