@@ -1472,7 +1472,7 @@ export function DocsProcessEmbed({
       console.log("🔴 DEBUG: Verificando execução:", execution);
       console.log("🔴 DEBUG: execution.documentId:", execution.documentId);
       console.log("🔴 DEBUG: execution.status:", execution.status);
-      return execution.documentId === documentId && (execution.status === "concluded" || execution.status === "completed");
+      return execution.documentId === documentId && (execution.status === "concluded" || execution.status === "completed" || execution.status === "finished");
     });
     
     
