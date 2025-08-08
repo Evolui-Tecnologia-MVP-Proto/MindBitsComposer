@@ -310,6 +310,15 @@ export default function LexicalPage() {
     setSelectedPlugin(null);
   };
 
+  // useEffect para atualizar listas da biblioteca ao acessar a página do Composer Editor
+  useEffect(() => {
+    // Invalidar queries da biblioteca para garantir dados atualizados
+    queryClient.invalidateQueries({ queryKey: ['/api/document-editions-library'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/lexical-documents'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/templates/struct'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/global-assets'] });
+  }, []); // Executar apenas na montagem do componente
+
   // useEffect para abrir painel quando há documentos composer disponíveis (apenas na inicialização)
   const [hasInitializedPanel, setHasInitializedPanel] = useState(false);
   
