@@ -3859,8 +3859,8 @@ function FlowWithAutoFitView({
                     <div className="mb-3">
                       <p className="text-xs text-yellow-800 dark:text-yellow-300 mb-2">
                         {(() => {
-                          // Extrair informações do jobId
-                          let functionCaption = selectedFlowNode.data.callType || 'callJob';
+                          // Extrair informações do jobId (prioridade sobre callType)
+                          let functionCaption = 'callJob';
                           let functionName = '';
                           
                           if (selectedFlowNode.data.jobId) {
@@ -3870,10 +3870,18 @@ function FlowWithAutoFitView({
                               if (firstKey) {
                                 functionCaption = firstKey;
                                 functionName = jobData[firstKey];
+                              } else {
+                                // Se jobId não tem dados estruturados, usar o próprio valor
+                                functionCaption = selectedFlowNode.data.jobId;
                               }
                             } catch (e) {
-                              console.log('Erro ao fazer parse do jobId:', e);
+                              // Se não conseguiu fazer parse JSON, usar o jobId como string simples
+                              functionCaption = selectedFlowNode.data.jobId;
+                              console.log('jobId não é JSON, usando como string:', selectedFlowNode.data.jobId);
                             }
+                          } else {
+                            // Fallback para callType apenas se jobId não existir
+                            functionCaption = selectedFlowNode.data.callType || 'callJob';
                           }
                           
                           const displayName = functionName ? `${functionCaption} [${functionName}]` : functionCaption;
