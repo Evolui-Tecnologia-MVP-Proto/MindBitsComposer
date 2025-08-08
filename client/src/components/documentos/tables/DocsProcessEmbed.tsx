@@ -2740,7 +2740,7 @@ function FlowWithAutoFitView({
 
     // Função para executar encerramento direto do fluxo
     const executeDirectFlowConclusion = async () => {
-      if (!selectedFlowNode || selectedFlowNode.type !== 'endNode' || selectedFlowNode.data.FromType !== 'Init') {
+      if (!selectedFlowNode || selectedFlowNode.type !== 'endNode' || selectedFlowNode.data.To_Type !== 'Direct_finish') {
         console.log('Nenhum endNode de encerramento direto selecionado');
         return;
       }
@@ -2792,7 +2792,7 @@ function FlowWithAutoFitView({
             },
             body: JSON.stringify({
               flowTasks: finalFlowTasks,
-              status: 'concluded',
+              status: 'finished',
               completedAt: new Date().toISOString()
             }),
           });
@@ -2808,7 +2808,7 @@ function FlowWithAutoFitView({
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              status: 'Concluido'
+              status: 'Encerrado'
             }),
           });
 
@@ -2816,7 +2816,7 @@ function FlowWithAutoFitView({
             throw new Error('Erro ao atualizar status do documento');
           }
 
-          console.log('✅ Fluxo encerrado e documento marcado como concluído');
+          console.log('✅ Fluxo encerrado e documento marcado como Encerrado');
           
           // Limpar o editor da página composer se disponível
           if (typeof (window as any).resetComposerEditor === 'function') {
@@ -4342,11 +4342,11 @@ function FlowWithAutoFitView({
                     )}
 
                     {/* Manual execution form para EndNode de Encerramento Direto */}
-                    {selectedFlowNode.data.FromType === 'Init' && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
+                    {selectedFlowNode.data.To_Type === 'Direct_finish' && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
                       <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-600 rounded-lg">
                         <div className="mb-3">
-                          <p className="text-xs text-red-800 dark:text-red-300 mb-2">
-                            Ao pressionar o botão você encerrará este fluxo vinculado ao documento, bem como marcará o documento como encerrado e o enviará para a tab [Concluídos] da página [Documentos]. Pressione para continuar.
+                          <p className="text-xs text-red-800 dark:text-red-300 mb-2 font-medium">
+                            <span className="font-semibold">ATENÇÃO:</span> Confirmando este processo o fluxo é concluido e o documento arquivado, confirma a ação?
                           </p>
                         </div>
 
@@ -4375,7 +4375,7 @@ function FlowWithAutoFitView({
                               : 'bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                           }`}
                         >
-                          {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Já Concluído' : 'Concluir Fluxo'}
+                          {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Processo Concluído' : 'Confirma Conclusão'}
                         </button>
                       </div>
                     )}
