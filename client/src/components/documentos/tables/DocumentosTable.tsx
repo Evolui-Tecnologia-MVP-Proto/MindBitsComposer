@@ -463,6 +463,18 @@ export function DocumentosTable({
                         Em revisão
                       </Badge>
                     );
+                  } else if (documento.taskState === 'ready_to_publish') {
+                    return (
+                      <Badge variant="secondary" className="bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 border-green-200 dark:border-green-600">
+                        Pronto para Publicar
+                      </Badge>
+                    );
+                  } else if (documento.taskState === 'to_refact') {
+                    return (
+                      <Badge variant="secondary" className="bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400 border-red-200 dark:border-red-600">
+                        Necessária Revisão
+                      </Badge>
+                    );
                   } else {
                     return (
                       <Badge variant="secondary" className="bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400 border-gray-200 dark:border-gray-600">
