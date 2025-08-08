@@ -3258,11 +3258,70 @@ function FlowWithAutoFitView({
         setShowApprovalAlert(false);
         
         // Recarregar a lista de execuções de fluxo para atualizar dados
-        queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
+        await queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
+        
+        // Aguardar um momento para garantir que os dados foram atualizados
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Forçar recarga dos dados de execução para atualizar o formulário dinâmico
+        const updatedExecutions = await queryClient.fetchQuery({ 
+          queryKey: ['/api/document-flow-executions'] 
+        });
+        
+        console.log('📋 Execuções recarregadas:', updatedExecutions);
+        
+        // Atualizar o nó selecionado com os dados atualizados do servidor
+        const updatedExecution = updatedExecutions.find((exec: any) => 
+          exec.documentId === flowData.documentId
+        );
+        
+        if (updatedExecution && updatedExecution.flowTasks) {
+          const updatedSelectedNode = updatedExecution.flowTasks.nodes.find((n: any) => 
+            n.id === selectedFlowNode.id
+          );
+          
+          if (updatedSelectedNode) {
+            // Atualizar o nó selecionado com os dados completos do servidor
+            setSelectedFlowNode(updatedSelectedNode);
+            
+            // Atualizar também os dados estáticos do diagrama
+            setStaticDiagramData({
+              nodes: updatedExecution.flowTasks.nodes,
+              edges: updatedExecution.flowTasks.edges || currentEdges
+            });
+            
+            // Atualizar o modal com os novos dados
+            setFlowDiagramModal(prev => ({
+              ...prev,
+              flowData: {
+                ...prev.flowData,
+                flowTasks: updatedExecution.flowTasks
+              }
+            }));
+            
+            console.log('✅ Formulário e diagrama atualizados com dados do servidor:', updatedSelectedNode);
+          }
+        }
+        
+        // Forçar re-renderização do painel de inspeção
+        setShowFlowInspector(false);
+        setTimeout(() => {
+          setShowFlowInspector(true);
+        }, 100);
+        
+        // Mostrar mensagem de sucesso
+        toast({
+          title: "Sucesso",
+          description: "Alterações salvas e formulário atualizado!",
+        });
         
       } catch (error) {
         console.error('Erro ao salvar alterações:', error);
-        // Aqui poderia mostrar um toast de erro
+        toast({
+          title: "Erro",
+          description: "Erro ao salvar alterações. Por favor, tente novamente.",
+          variant: "destructive"
+        });
       }
     };
 
