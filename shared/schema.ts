@@ -412,6 +412,7 @@ export const flowActions = pgTable("flow_actions", {
   actionDescription: text("action_description").notNull(),
   actor: integer("actor").notNull().references(() => users.id),
   flowNode: text("flow_node"),
+  actionParams: json("action_params"),
   startedAt: timestamp("started_at").notNull(),
   endAt: timestamp("end_at"),
   createdAt: timestamp("created_at").defaultNow(),
