@@ -2080,7 +2080,7 @@ const StableReactFlow = memo(({
       zoomOnDoubleClick={false}
       proOptions={{ hideAttribution: true }}
     >
-      <Controls />
+      <Controls showLock={false} />
       <Background />
     </ReactFlow>
   );
