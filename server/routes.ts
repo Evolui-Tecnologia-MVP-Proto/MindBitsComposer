@@ -5025,7 +5025,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           eq(documentFlowExecutions.status, "initiated"),
           eq(documentFlowExecutions.status, "completed"),
           eq(documentFlowExecutions.status, "concluded"),
-          eq(documentFlowExecutions.status, "transfered")
+          eq(documentFlowExecutions.status, "transfered"),
+          eq(documentFlowExecutions.status, "finished")
         ));
       
       res.json(executions);
