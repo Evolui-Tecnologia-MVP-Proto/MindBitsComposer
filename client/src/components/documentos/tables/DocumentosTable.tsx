@@ -105,7 +105,7 @@ export function DocumentosTable({
 
     return flowExecutions.filter(execution => 
       execution.documentId === documentId && 
-      (execution.status === "concluded" || execution.status === "initiated" || execution.status === "completed" || execution.status === "transfered")
+      (execution.status === "concluded" || execution.status === "initiated" || execution.status === "completed" || execution.status === "transfered" || execution.status === "finished")
     );
   };
 
@@ -612,6 +612,8 @@ export function DocumentosTable({
                         <span className={`text-xs px-2 py-1 rounded-full ${
                           flow.status === "concluded" 
                             ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400" 
+                            : flow.status === "finished"
+                            ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
                             : flow.status === "initiated"
                             ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400"
                             : flow.status === "transfered"
@@ -621,6 +623,7 @@ export function DocumentosTable({
                           {flow.status === "concluded" ? "Concluído" : 
                            flow.status === "initiated" ? "Em andamento" :
                            flow.status === "transfered" ? "Transferido" : 
+                           flow.status === "finished" ? "Encerrado" :
                            flow.status}
                         </span>
                         {flow.createdAt && (
