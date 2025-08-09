@@ -5420,80 +5420,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // 3. Extrair o RAG Index do json_file
       let ragIndex = 'documento_sem_nome';
+      
+      // Função recursiva para buscar RAG Index na estrutura aninhada
+      const findRAGIndexRecursive = (obj: any): string | null => {
+        if (!obj) return null;
+        
+        // Se é um objeto com label e value, verificar se é o RAG Index
+        if (obj.label === 'RAG Index' && obj.value) {
+          return obj.value;
+        }
+        
+        // Se tem children, buscar recursivamente
+        if (obj.children && Array.isArray(obj.children)) {
+          for (const child of obj.children) {
+            const found = findRAGIndexRecursive(child);
+            if (found) return found;
+          }
+        }
+        
+        // Se é um objeto, verificar todas as propriedades
+        if (typeof obj === 'object' && !Array.isArray(obj)) {
+          for (const key in obj) {
+            const found = findRAGIndexRecursive(obj[key]);
+            if (found) return found;
+          }
+        }
+        
+        // Se é um array, verificar todos os elementos
+        if (Array.isArray(obj)) {
+          for (const item of obj) {
+            const found = findRAGIndexRecursive(item);
+            if (found) return found;
+          }
+        }
+        
+        return null;
+      };
+      
       if (edition.jsonFile) {
         try {
           const jsonData = typeof edition.jsonFile === 'string' 
             ? JSON.parse(edition.jsonFile) 
             : edition.jsonFile;
           
-          console.log('📋 Chaves principais do jsonFile:', Object.keys(jsonData));
+          console.log('🔍 Buscando RAG Index recursivamente no json_file...');
           
-          // Tentar diferentes localizações do RAG Index
-          // 1. Tentar direto no root do JSON
-          if (jsonData['RAG Index']) {
-            ragIndex = jsonData['RAG Index'];
-            console.log('✅ RAG Index encontrado no root:', ragIndex);
-          }
-          // 2. Tentar no header
-          else if (jsonData.header) {
-            console.log('🔍 Chaves do header:', Object.keys(jsonData.header));
+          // Buscar recursivamente o RAG Index
+          const foundRagIndex = findRAGIndexRecursive(jsonData);
+          
+          if (foundRagIndex) {
+            ragIndex = foundRagIndex;
+            console.log('✅ RAG Index encontrado:', ragIndex);
+          } else {
+            console.log('⚠️ RAG Index não encontrado na estrutura aninhada');
             
-            // Buscar exatamente "RAG Index"
-            if (jsonData.header['RAG Index']) {
-              ragIndex = jsonData.header['RAG Index'];
-              console.log('✅ RAG Index encontrado no header:', ragIndex);
-            }
-            // Buscar chave que contenha "rag" e "index" (case insensitive)
-            else {
-              const ragIndexKey = Object.keys(jsonData.header).find(key => 
-                key.toLowerCase().includes('rag') && key.toLowerCase().includes('index')
-              );
-              
-              if (ragIndexKey && jsonData.header[ragIndexKey]) {
-                ragIndex = jsonData.header[ragIndexKey];
-                console.log('✅ RAG Index encontrado com chave:', ragIndexKey, 'valor:', ragIndex);
-              }
-            }
-          }
-          // 3. Tentar em sections
-          else if (jsonData.sections && Array.isArray(jsonData.sections)) {
-            for (const section of jsonData.sections) {
-              if (section.title === 'RAG Index' && section.content) {
-                ragIndex = section.content;
-                console.log('✅ RAG Index encontrado em sections:', ragIndex);
-                break;
-              }
-            }
-          }
-          
-          // Se ainda não encontrou, tentar em headerFields
-          if (ragIndex === 'documento_sem_nome' && jsonData.headerFields) {
-            console.log('🔍 Buscando em headerFields...');
-            const ragField = jsonData.headerFields.find((field: any) => 
-              field.label === 'RAG Index' || 
-              (field.label && field.label.toLowerCase().includes('rag') && field.label.toLowerCase().includes('index'))
-            );
-            
-            if (ragField && ragField.value) {
-              ragIndex = ragField.value;
-              console.log('✅ RAG Index encontrado em headerFields:', ragIndex);
-            }
-          }
-          
-          // Fallback final: usar título ou objeto
-          if (ragIndex === 'documento_sem_nome') {
-            if (jsonData.header && (jsonData.header['Titulo'] || jsonData.header['Título'])) {
-              ragIndex = jsonData.header['Titulo'] || jsonData.header['Título'];
-              console.log('📝 Usando Título como fallback:', ragIndex);
-            } else if (document.objeto) {
+            // Fallback: tentar usar título ou objeto do documento
+            if (document.objeto) {
               ragIndex = document.objeto;
               console.log('📝 Usando objeto do documento como fallback:', ragIndex);
             }
           }
           
-          console.log('📊 RAG Index final:', ragIndex);
         } catch (e) {
-          console.error('Erro ao processar JSON:', e);
+          console.error('❌ Erro ao processar JSON:', e);
           // Usar objeto do documento como fallback em caso de erro
           if (document.objeto) {
             ragIndex = document.objeto;
@@ -5505,6 +5494,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ragIndex = document.objeto;
         console.log('📝 Usando objeto do documento (sem jsonFile):', ragIndex);
       }
+      
+      console.log('📊 RAG Index final:', ragIndex);
       
       // 4. Preparar o nome do arquivo (remover caracteres especiais)
       const fileName = `${ragIndex.replace(/[^a-zA-Z0-9_-]/g, '_')}.MD`;
