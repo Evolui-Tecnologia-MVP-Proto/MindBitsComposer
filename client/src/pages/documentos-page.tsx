@@ -803,6 +803,8 @@ export default function DocumentosPage() {
         return <Loader2 className="h-3 w-3 animate-spin" />;
       case "Concluido":
         return <CircleCheck className="h-3 w-3" />;
+      case "published":
+        return <BookOpen className="h-3 w-3" />;
       default:
         return <AlertCircle className="h-3 w-3" />;
     }
@@ -816,6 +818,8 @@ export default function DocumentosPage() {
         return "secondary";
       case "Concluido":
         return "outline";
+      case "published":
+        return "secondary"; // Amarelo será definido via CSS customizado
       default:
         return "destructive";
     }

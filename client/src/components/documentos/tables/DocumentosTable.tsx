@@ -473,6 +473,12 @@ export function DocumentosTable({
                         Necessária Revisão
                       </Badge>
                     );
+                  } else if (documento.taskState === 'published') {
+                    return (
+                      <Badge variant="secondary" className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400 border-yellow-200 dark:border-yellow-600 text-center flex justify-center">
+                        Publicado
+                      </Badge>
+                    );
                   } else {
                     return (
                       <Badge variant="secondary" className="bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400 border-gray-200 dark:border-gray-600 text-center flex justify-center">
