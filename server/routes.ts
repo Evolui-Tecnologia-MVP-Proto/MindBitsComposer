@@ -5280,23 +5280,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // GitHub publish endpoint
   app.post("/api/github/publish", async (req: Request, res: Response) => {
+    console.log('🔵 =========================');
+    console.log('🔵 GITHUB PUBLISH ENDPOINT CHAMADO');
+    console.log('🔵 =========================');
+    
     try {
-      console.log('🔵 Endpoint /api/github/publish chamado');
-      console.log('🔵 Body:', req.body);
-      
-      // Verificar autenticação de forma mais segura
-      let isAuthenticated = false;
-      try {
-        isAuthenticated = req.isAuthenticated && req.isAuthenticated();
-      } catch (authError) {
-        console.log('⚠️ Erro ao verificar autenticação:', authError);
-      }
-      
-      if (!isAuthenticated) {
-        console.log('⚠️ Usuário não autenticado, continuando mesmo assim para não bloquear publicação');
-      }
+      console.log('🔵 Body recebido:', JSON.stringify(req.body));
       
       const { documentId, nodeId, service } = req.body;
+      
+      if (!documentId) {
+        console.log('❌ DocumentId não fornecido');
+        return res.status(400).json({ error: "DocumentId é obrigatório" });
+      }
       
       console.log('🚀 Iniciando publicação no GitHub');
       console.log('📄 DocumentId:', documentId);
