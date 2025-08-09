@@ -5480,61 +5480,75 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('✅ Status atualizado para published');
       
-      // 9. Criar registro em flow_actions
-      const flowExecution = await db.select()
-        .from(documentFlowExecutions)
-        .where(eq(documentFlowExecutions.documentId, documentId))
-        .orderBy(desc(documentFlowExecutions.createdAt))
-        .limit(1);
-      
-      if (flowExecution.length > 0) {
-        // Buscar um usuário válido - primeiro da tabela users
-        let userId = 1; // Default fallback
+      // 9. Criar registro em flow_actions (opcional - não bloqueia publicação)
+      try {
+        const flowExecution = await db.select()
+          .from(documentFlowExecutions)
+          .where(eq(documentFlowExecutions.documentId, documentId))
+          .orderBy(desc(documentFlowExecutions.createdAt))
+          .limit(1);
         
-        try {
-          // Tentar pegar o usuário da sessão
-          if (req.user && req.user.id) {
-            userId = req.user.id;
-          } else if (flowExecution[0].startedBy) {
-            // Usar o usuário que iniciou o fluxo
+        if (flowExecution.length > 0) {
+          // Buscar um usuário válido
+          let userId: number | undefined;
+          
+          // Tentar pegar o usuário da sessão (req.user pode ter estrutura diferente)
+          if (req.user) {
+            console.log('👤 req.user object:', JSON.stringify(req.user));
+            userId = (req.user as any).id || (req.user as any).userId;
+          }
+          
+          // Se não tem usuário da sessão, usar o que iniciou o fluxo
+          if (!userId && flowExecution[0].startedBy) {
             userId = flowExecution[0].startedBy;
-          } else {
-            // Buscar o primeiro usuário válido do sistema
+            console.log('👤 Usando startedBy do fluxo:', userId);
+          }
+          
+          // Se ainda não tem, buscar o primeiro usuário do sistema
+          if (!userId) {
             const defaultUser = await db.select()
               .from(users)
               .limit(1);
             if (defaultUser.length > 0) {
               userId = defaultUser[0].id;
+              console.log('👤 Usando usuário padrão do sistema:', userId);
             }
           }
           
-          console.log('👤 User ID para flow_action:', userId);
-          
-          await db.insert(flowActions).values({
-            flowExecutionId: flowExecution[0].id,
-            flowNode: nodeId,
-            actionDescription: `Documento Publicado no ${service || 'GitHub'}`,
-            actor: userId,
-            actionParams: {
-              fileName,
-              repoPath: fullPath,
-              ragIndex,
-              service: service || 'GitHub',
-              repository: `${githubOwner}/${githubRepo}`
-            },
-            startedAt: new Date(),
-            endAt: new Date(),
-            createdAt: new Date(),
-            updatedAt: new Date()
-          });
-          
-          console.log('✅ Registro de flow_action criado');
-        } catch (flowActionError) {
-          console.error('⚠️ Erro ao criar flow_action (não crítico):', flowActionError);
-          // Não falhar a publicação por causa do flow_action
+          // Só criar flow_action se temos um userId válido
+          if (userId) {
+            console.log('👤 User ID final para flow_action:', userId);
+            
+            await db.insert(flowActions).values({
+              flowExecutionId: flowExecution[0].id,
+              flowNode: nodeId,
+              actionDescription: `Documento Publicado no ${service || 'GitHub'}`,
+              actor: userId,
+              actionParams: {
+                fileName,
+                repoPath: fullPath,
+                ragIndex,
+                service: service || 'GitHub',
+                repository: `${githubOwner}/${githubRepo}`
+              },
+              startedAt: new Date(),
+              endAt: new Date(),
+              createdAt: new Date(),
+              updatedAt: new Date()
+            });
+            
+            console.log('✅ Registro de flow_action criado com sucesso');
+          } else {
+            console.log('⚠️ Não foi possível determinar o userId para flow_action, mas a publicação foi bem-sucedida');
+          }
         }
+      } catch (flowActionError) {
+        // Log do erro mas não falha a operação principal
+        console.error('⚠️ Erro ao criar flow_action (não crítico):', flowActionError);
+        console.error('Detalhes:', JSON.stringify(flowActionError));
       }
       
+      // Retornar sucesso independentemente do flow_action
       res.json({
         success: true,
         data: {
