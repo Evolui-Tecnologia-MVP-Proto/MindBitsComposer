@@ -5286,8 +5286,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { documentId, nodeId, service } = req.body;
       
       console.log('🚀 Iniciando publicação no GitHub');
-      console.log('👤 User autenticado:', req.user);
-      console.log('👤 User ID:', req.user?.id);
       console.log('📄 DocumentId:', documentId);
       console.log('🔗 NodeId:', nodeId);
       console.log('🔧 Service:', service);
@@ -5490,29 +5488,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .limit(1);
       
       if (flowExecution.length > 0) {
-        // Garantir que temos um usuário válido
-        const userId = req.user?.id || flowExecution[0].startedBy || 1; // Usar ID do startedBy da execução ou ID 1 como fallback
-        console.log('👤 User ID para flow_action:', userId);
+        // Buscar um usuário válido - primeiro da tabela users
+        let userId = 1; // Default fallback
         
-        await db.insert(flowActions).values({
-          flowExecutionId: flowExecution[0].id,
-          flowNode: nodeId,
-          actionDescription: `Documento Publicado no ${service || 'GitHub'}`,
-          actor: userId,
-          actionParams: {
-            fileName,
-            repoPath: fullPath,
-            ragIndex,
-            service: service || 'GitHub',
-            repository: `${githubOwner}/${githubRepo}`
-          },
-          startedAt: new Date(),
-          endAt: new Date(),
-          createdAt: new Date(),
-          updatedAt: new Date()
-        });
-        
-        console.log('✅ Registro de flow_action criado');
+        try {
+          // Tentar pegar o usuário da sessão
+          if (req.user && req.user.id) {
+            userId = req.user.id;
+          } else if (flowExecution[0].startedBy) {
+            // Usar o usuário que iniciou o fluxo
+            userId = flowExecution[0].startedBy;
+          } else {
+            // Buscar o primeiro usuário válido do sistema
+            const defaultUser = await db.select()
+              .from(users)
+              .limit(1);
+            if (defaultUser.length > 0) {
+              userId = defaultUser[0].id;
+            }
+          }
+          
+          console.log('👤 User ID para flow_action:', userId);
+          
+          await db.insert(flowActions).values({
+            flowExecutionId: flowExecution[0].id,
+            flowNode: nodeId,
+            actionDescription: `Documento Publicado no ${service || 'GitHub'}`,
+            actor: userId,
+            actionParams: {
+              fileName,
+              repoPath: fullPath,
+              ragIndex,
+              service: service || 'GitHub',
+              repository: `${githubOwner}/${githubRepo}`
+            },
+            startedAt: new Date(),
+            endAt: new Date(),
+            createdAt: new Date(),
+            updatedAt: new Date()
+          });
+          
+          console.log('✅ Registro de flow_action criado');
+        } catch (flowActionError) {
+          console.error('⚠️ Erro ao criar flow_action (não crítico):', flowActionError);
+          // Não falhar a publicação por causa do flow_action
+        }
       }
       
       res.json({
