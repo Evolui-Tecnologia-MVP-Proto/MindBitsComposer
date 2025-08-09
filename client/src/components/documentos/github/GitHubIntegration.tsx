@@ -400,6 +400,8 @@ export function GitHubIntegration() {
                         folder.name,
                         "Expandida:",
                         isExpanded,
+                        "Path:",
+                        folder.path
                       );
                       if (isExpanded && folder.type === "folder") {
                         const buildFullPath = (folderName: string) => {
@@ -428,7 +430,12 @@ export function GitHubIntegration() {
 
                         const fullPath = buildFullPath(folder.name);
                         setSelectedFolderPath(fullPath);
-                        fetchFolderFiles(folder.path);
+                        
+                        // Usar o caminho completo se disponível no folder.path
+                        // Se não, usar o caminho construído sem as barras iniciais e finais
+                        const pathToFetch = folder.path || fullPath.replace(/^\/|\/$/g, '');
+                        console.log('📂 Caminho para buscar arquivos:', pathToFetch);
+                        fetchFolderFiles(pathToFetch);
                       }
                     }}
                   />

@@ -208,17 +208,20 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   };
 
   // Função recursiva para construir filhos
-  const buildChildrenRecursively = (parentUid: string): FileItem[] => {
+  const buildChildrenRecursively = (parentUid: string, parentPath: string = ''): FileItem[] => {
     const children: FileItem[] = [];
     const childStructures = repoStructures.filter((s: any) => s.linkedTo === parentUid);
     
     childStructures.forEach((childStructure: any) => {
+      // Construir o caminho completo
+      const fullPath = parentPath ? `${parentPath}/${childStructure.folderName}` : childStructure.folderName;
+      
       const childItem: FileItem = {
         id: childStructure.uid,
         name: childStructure.folderName,
         type: 'folder',
-        path: childStructure.folderName,
-        children: buildChildrenRecursively(childStructure.uid), // Recursão para filhos dos filhos
+        path: fullPath, // Usar caminho completo
+        children: buildChildrenRecursively(childStructure.uid, fullPath), // Passar o caminho para recursão
         syncStatus: childStructure.isSync ? 'synced' : 'unsynced'
       };
       children.push(childItem);
@@ -250,7 +253,8 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
         };
         
         // Construir hierarquia completa recursivamente
-        unifiedItem.children = buildChildrenRecursively(localStructure.uid);
+        // Usar o path do item do GitHub como base para os caminhos dos filhos
+        unifiedItem.children = buildChildrenRecursively(localStructure.uid, item.path);
         
         // Marcar todos os filhos como processados
         const markProcessed = (children: FileItem[]) => {
