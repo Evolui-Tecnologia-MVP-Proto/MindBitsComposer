@@ -5286,6 +5286,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { documentId, nodeId, service } = req.body;
       
       console.log('🚀 Iniciando publicação no GitHub');
+      console.log('👤 User autenticado:', req.user);
+      console.log('👤 User ID:', req.user?.id);
       console.log('📄 DocumentId:', documentId);
       console.log('🔗 NodeId:', nodeId);
       console.log('🔧 Service:', service);
@@ -5488,11 +5490,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .limit(1);
       
       if (flowExecution.length > 0) {
+        // Garantir que temos um usuário válido
+        const userId = req.user?.id || flowExecution[0].startedBy || 1; // Usar ID do startedBy da execução ou ID 1 como fallback
+        console.log('👤 User ID para flow_action:', userId);
+        
         await db.insert(flowActions).values({
           flowExecutionId: flowExecution[0].id,
           flowNode: nodeId,
           actionDescription: `Documento Publicado no ${service || 'GitHub'}`,
-          actor: req.user.id,
+          actor: userId,
           actionParams: {
             fileName,
             repoPath: fullPath,
