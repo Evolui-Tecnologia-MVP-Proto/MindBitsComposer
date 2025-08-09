@@ -2871,7 +2871,7 @@ function FlowWithAutoFitView({
           console.log('🔧 Serviço:', service);
           
           // Chamar a API de publicação
-          const response = await fetch('/api/github/publish', {
+          const fetchResponse = await fetch('/api/github/publish', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -2882,7 +2882,16 @@ function FlowWithAutoFitView({
               nodeId,
               service
             })
-          }).then(res => res.json());
+          });
+          
+          // Verificar se a resposta é OK antes de tentar fazer parse do JSON
+          if (!fetchResponse.ok) {
+            const errorText = await fetchResponse.text();
+            console.error('❌ Resposta de erro do servidor:', fetchResponse.status, errorText);
+            throw new Error(`Erro ${fetchResponse.status}: ${errorText || 'Falha na comunicação com o servidor'}`);
+          }
+          
+          const response = await fetchResponse.json();
           
           if (response.success) {
             console.log('✅ Documento publicado com sucesso:', response.data);
