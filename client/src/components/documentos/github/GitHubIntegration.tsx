@@ -158,44 +158,64 @@ export function GitHubIntegration() {
   const fetchFolderFiles = async (folderPath: string) => {
     if (!folderPath) return;
 
+    console.log('🔍 Buscando arquivos da pasta:', folderPath);
     setIsLoadingFolderFiles(true);
     try {
       const githubConnection = (serviceConnections as any[])?.find(
         (conn: any) => conn.serviceName === "github",
       );
 
-      if (!githubConnection) return;
+      if (!githubConnection) {
+        console.error('❌ Conexão GitHub não encontrada');
+        return;
+      }
 
       const repo = githubConnection.parameters?.[0];
-      if (!repo) return;
+      if (!repo) {
+        console.error('❌ Repositório não configurado');
+        return;
+      }
 
-      const response = await fetch(
-        `https://api.github.com/repos/${repo}/contents/${folderPath}`,
-        {
-          headers: {
-            Authorization: `token ${githubConnection.token}`,
-            Accept: "application/vnd.github.v3+json",
-            "User-Agent": "EVO-MindBits-Composer",
-          },
+      const apiUrl = `https://api.github.com/repos/${repo}/contents/${folderPath}`;
+      console.log('📡 Chamando API GitHub:', apiUrl);
+
+      const response = await fetch(apiUrl, {
+        headers: {
+          Authorization: `token ${githubConnection.token}`,
+          Accept: "application/vnd.github.v3+json",
+          "User-Agent": "EVO-MindBits-Composer",
         },
-      );
+      });
+
+      console.log('📊 Status da resposta:', response.status, response.statusText);
 
       if (response.ok) {
         const files = await response.json();
+        console.log('📁 Arquivos recebidos:', files);
+        
         // Filtrar arquivos, excluindo .gitkeep que são apenas para sincronização
         const fileList = Array.isArray(files)
           ? files.filter(
               (item: any) => item.type === "file" && item.name !== ".gitkeep",
             )
           : [];
+        
+        console.log('📋 Arquivos filtrados:', fileList.length, 'arquivos');
+        fileList.forEach((file: any) => {
+          console.log(`  - ${file.name} (${file.size} bytes)`);
+        });
+        
         setSelectedFolderFiles(fileList);
       } else if (response.status === 404) {
-        // Pasta vazia ou não existe - mostrar mensagem apropriada
+        console.log('⚠️ Pasta não encontrada ou vazia (404)');
         setSelectedFolderFiles([]);
       } else {
+        const errorText = await response.text();
+        console.error('❌ Erro na resposta:', response.status, errorText);
         setSelectedFolderFiles([]);
       }
     } catch (error) {
+      console.error('❌ Erro ao buscar arquivos:', error);
       setSelectedFolderFiles([]);
     } finally {
       setIsLoadingFolderFiles(false);
