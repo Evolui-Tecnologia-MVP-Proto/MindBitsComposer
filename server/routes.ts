@@ -5356,12 +5356,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ? JSON.parse(edition.jsonFile) 
             : edition.jsonFile;
           
-          // Buscar o RAG Index no campo header
-          if (jsonData.header && jsonData.header['RAG Index']) {
-            ragIndex = jsonData.header['RAG Index'];
-            console.log('✅ RAG Index encontrado:', ragIndex);
+          console.log('📋 Estrutura do jsonFile:', JSON.stringify(jsonData, null, 2).substring(0, 500));
+          
+          // Buscar o RAG Index no campo header (tentar diferentes formatos)
+          if (jsonData.header) {
+            const ragIndexKey = Object.keys(jsonData.header).find(key => 
+              key.toLowerCase().includes('rag') && key.toLowerCase().includes('index')
+            );
+            
+            if (ragIndexKey && jsonData.header[ragIndexKey]) {
+              ragIndex = jsonData.header[ragIndexKey];
+              console.log('✅ RAG Index encontrado com chave:', ragIndexKey, 'valor:', ragIndex);
+            } else if (jsonData.header['RAG Index']) {
+              ragIndex = jsonData.header['RAG Index'];
+              console.log('✅ RAG Index encontrado:', ragIndex);
+            } else {
+              console.log('⚠️ RAG Index não encontrado no header:', Object.keys(jsonData.header));
+              // Tentar usar o título ou objeto como fallback
+              if (jsonData.header['Titulo'] || jsonData.header['Título']) {
+                ragIndex = jsonData.header['Titulo'] || jsonData.header['Título'];
+                console.log('📝 Usando Título como fallback:', ragIndex);
+              }
+            }
           } else {
-            console.log('⚠️ RAG Index não encontrado, usando nome padrão');
+            console.log('⚠️ Campo header não encontrado no JSON');
           }
         } catch (e) {
           console.error('Erro ao processar JSON:', e);
@@ -5473,17 +5491,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await db.insert(flowActions).values({
           flowExecutionId: flowExecution[0].id,
           flowNode: nodeId,
-          actionType: 'integration',
           actionDescription: `Documento Publicado no ${service || 'GitHub'}`,
-          actionData: {
+          actor: req.user.id,
+          actionParams: {
             fileName,
             repoPath: fullPath,
             ragIndex,
             service: service || 'GitHub',
             repository: `${githubOwner}/${githubRepo}`
           },
-          createdBy: req.user.id,
-          createdAt: new Date()
+          startedAt: new Date(),
+          endAt: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date()
         });
         
         console.log('✅ Registro de flow_action criado');
