@@ -5864,6 +5864,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint para atualizar status de todas as edições de um documento
+  app.put("/api/documents/:documentId/editions/status", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { status } = req.body;
+      const documentId = req.params.documentId;
+      
+      console.log(`🔄 Atualizando status de todas as edições do documento ${documentId} para ${status}`);
+      
+      // Atualizar todas as edições do documento
+      const updatedEditions = await db
+        .update(documentEditions)
+        .set({ 
+          status: status,
+          updatedAt: new Date()
+        })
+        .where(eq(documentEditions.documentId, documentId))
+        .returning();
+      
+      console.log(`✅ ${updatedEditions.length} edições atualizadas para status ${status}`);
+      
+      res.json({ 
+        success: true, 
+        updatedCount: updatedEditions.length,
+        updatedEditions 
+      });
+    } catch (error) {
+      console.error("Erro ao atualizar status das edições do documento:", error);
+      res.status(500).send("Erro ao atualizar status das edições do documento");
+    }
+  });
+
   app.patch("/api/document-editions/:id/publish", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     

@@ -3026,6 +3026,49 @@ function FlowWithAutoFitView({
               if (response.ok) {
                 console.log('✅ Alterações da integração salvas no banco de dados');
                 
+                // Atualizar documento.task_state para "published"
+                try {
+                  const documentUpdateResponse = await fetch(`/api/documentos/${flowDiagramModal.flowData.documentId}`, {
+                    method: 'PUT',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      taskState: 'published'
+                    }),
+                  });
+                  
+                  if (documentUpdateResponse.ok) {
+                    console.log('✅ Documento task_state atualizado para "published"');
+                  } else {
+                    console.error('❌ Erro ao atualizar documento task_state');
+                  }
+                } catch (error) {
+                  console.error('❌ Erro ao atualizar documento task_state:', error);
+                }
+                
+                // Atualizar document_editions.status para "published"
+                try {
+                  const editionsUpdateResponse = await fetch(`/api/documents/${flowDiagramModal.flowData.documentId}/editions/status`, {
+                    method: 'PUT',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      status: 'published'
+                    }),
+                  });
+                  
+                  if (editionsUpdateResponse.ok) {
+                    const editionsResult = await editionsUpdateResponse.json();
+                    console.log(`✅ ${editionsResult.updatedCount} document editions atualizadas para status "published"`);
+                  } else {
+                    console.error('❌ Erro ao atualizar document editions status');
+                  }
+                } catch (error) {
+                  console.error('❌ Erro ao atualizar document editions status:', error);
+                }
+                
                 // Atualizar estado local
                 setFlowDiagramModal(prev => ({
                   ...prev,
@@ -3038,8 +3081,10 @@ function FlowWithAutoFitView({
                 // Atualizar diagrama visualmente
                 updateDiagramVisually(updatedNodes, currentEdges);
 
-                // Recarregar dados
+                // Recarregar dados para refletir as mudanças de status
                 queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
+                queryClient.invalidateQueries({ queryKey: ['/api/documentos'] });
+                queryClient.invalidateQueries({ queryKey: ['/api/document-editions'] });
               }
             }
           }
