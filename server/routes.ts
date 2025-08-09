@@ -5373,42 +5373,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let githubRepo = '';
       let githubOwner = '';
       
-      // Processar parâmetros do GitHub
-      if (githubConnection[0].parameters) {
-        try {
-          let params;
-          
-          // Verificar se parameters é string ou array
-          if (typeof githubConnection[0].parameters === 'string') {
-            params = JSON.parse(githubConnection[0].parameters);
-          } else if (Array.isArray(githubConnection[0].parameters) && githubConnection[0].parameters.length > 0) {
-            params = JSON.parse(githubConnection[0].parameters[0]);
-          } else if (typeof githubConnection[0].parameters === 'object') {
-            params = githubConnection[0].parameters;
-          }
-          
-          console.log('📋 Parâmetros processados:', params);
-          
-          if (params?.repository) {
-            // Formato esperado: "owner/repo"
-            if (params.repository.includes('/')) {
-              const [owner, repo] = params.repository.split('/');
-              githubOwner = owner || '';
-              githubRepo = repo || '';
-            } else {
-              // Talvez esteja em campos separados
-              githubOwner = params.owner || '';
-              githubRepo = params.repository || '';
-            }
-          }
-        } catch (e) {
-          console.error('Erro ao processar parâmetros do GitHub:', e);
-          console.error('Parâmetros brutos:', githubConnection[0].parameters);
+      // Processar parâmetros do GitHub - seguir o mesmo formato usado em GitHubIntegration.tsx
+      if (githubConnection[0].parameters && githubConnection[0].parameters.length > 0) {
+        // parameters[0] contém diretamente "owner/repo" como string
+        const repoString = githubConnection[0].parameters[0];
+        console.log('📋 Parâmetros brutos:', repoString);
+        
+        if (repoString && repoString.includes('/')) {
+          const [owner, repo] = repoString.split('/');
+          githubOwner = owner || '';
+          githubRepo = repo || '';
+          console.log('✅ Repositório configurado:', { githubOwner, githubRepo });
         }
       }
       
       if (!githubOwner || !githubRepo) {
-        console.log('❌ Owner ou Repo não configurados:', { githubOwner, githubRepo });
+        console.log('❌ Owner ou Repo não configurados:', { 
+          githubOwner, 
+          githubRepo,
+          parameters: githubConnection[0].parameters 
+        });
         return res.status(400).json({ 
           error: "Repositório do GitHub não configurado corretamente. Verifique as configurações em Administração > Integrações de Serviços." 
         });
