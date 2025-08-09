@@ -5280,7 +5280,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // GitHub publish endpoint
   app.post("/api/github/publish", async (req: Request, res: Response) => {
-    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    console.log('🔵 Endpoint /api/github/publish chamado');
+    console.log('🔵 Headers:', req.headers);
+    console.log('🔵 Body:', req.body);
+    console.log('🔵 User autenticado?:', req.isAuthenticated());
+    console.log('🔵 User object:', req.user);
+    
+    if (!req.isAuthenticated()) {
+      console.log('❌ Usuário não autenticado');
+      return res.status(401).send("Não autorizado");
+    }
     
     try {
       const { documentId, nodeId, service } = req.body;
