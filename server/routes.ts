@@ -5290,7 +5290,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('🔗 NodeId:', nodeId);
       console.log('🔧 Service:', service);
       
-      // 1. Buscar a edição do documento
+      // 1. Buscar configurações do GitHub na tabela service_connections
+      const githubConnection = await db.select()
+        .from(serviceConnections)
+        .where(eq(serviceConnections.serviceName, 'github'))
+        .limit(1);
+      
+      if (githubConnection.length === 0) {
+        return res.status(400).json({ 
+          error: "Configuração do GitHub não encontrada. Configure em Administração > Integrações de Serviços" 
+        });
+      }
+      
+      const githubToken = githubConnection[0].token;
+      let githubRepo = '';
+      let githubOwner = '';
+      
+      // Processar parâmetros do GitHub
+      if (githubConnection[0].parameters && githubConnection[0].parameters.length > 0) {
+        try {
+          // parameters é um array de texto, o primeiro elemento contém o JSON
+          const params = JSON.parse(githubConnection[0].parameters[0]);
+          if (params.repository) {
+            // Formato esperado: "owner/repo"
+            const [owner, repo] = params.repository.split('/');
+            githubOwner = owner || '';
+            githubRepo = repo || '';
+          }
+        } catch (e) {
+          console.error('Erro ao processar parâmetros do GitHub:', e);
+        }
+      }
+      
+      if (!githubOwner || !githubRepo) {
+        return res.status(400).json({ 
+          error: "Repositório do GitHub não configurado corretamente. Verifique as configurações." 
+        });
+      }
+      
+      console.log('🔧 Repositório GitHub:', `${githubOwner}/${githubRepo}`);
+      
+      // 2. Buscar a edição do documento
       const editionData = await db.select({
         edition: documentEditions,
         template: templates,
@@ -5308,7 +5348,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const { edition, template, document } = editionData[0];
       
-      // 2. Extrair o RAG Index do json_file
+      // 3. Extrair o RAG Index do json_file
       let ragIndex = 'documento_sem_nome';
       if (edition.jsonFile) {
         try {
@@ -5328,31 +5368,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // 3. Preparar o nome do arquivo (remover caracteres especiais)
+      // 4. Preparar o nome do arquivo (remover caracteres especiais)
       const fileName = `${ragIndex.replace(/[^a-zA-Z0-9_-]/g, '_')}.MD`;
       
-      // 4. Obter o conteúdo do markdown
+      // 5. Obter o conteúdo do markdown
       const markdownContent = edition.mdFile || '';
       
       if (!markdownContent) {
         return res.status(400).json({ error: "Documento não possui conteúdo Markdown" });
       }
       
-      // 5. Verificar o repo_path do template
+      // 6. Verificar o repo_path do template
       const repoPath = template?.repoPath || 'documents';
-      console.log('📂 Caminho no repositório:', repoPath);
+      const fullPath = `${repoPath}/${fileName}`;
+      console.log('📂 Caminho completo no repositório:', fullPath);
       
-      // 6. Salvar no GitHub (usando uma função helper)
-      // Por enquanto, vamos simular o salvamento
-      const githubSaveSuccess = true; // TODO: Implementar salvamento real no GitHub
-      
-      if (!githubSaveSuccess) {
-        return res.status(500).json({ error: "Erro ao salvar no GitHub" });
+      // 7. Salvar no GitHub usando a API
+      try {
+        // Codificar o conteúdo em base64
+        const contentBase64 = Buffer.from(markdownContent).toString('base64');
+        
+        // Verificar se o arquivo já existe
+        let sha = '';
+        try {
+          const checkResponse = await fetch(
+            `https://api.github.com/repos/${githubOwner}/${githubRepo}/contents/${fullPath}`,
+            {
+              headers: {
+                'Authorization': `Bearer ${githubToken}`,
+                'Accept': 'application/vnd.github.v3+json'
+              }
+            }
+          );
+          
+          if (checkResponse.ok) {
+            const existingFile = await checkResponse.json();
+            sha = existingFile.sha;
+            console.log('📝 Arquivo existente encontrado, será atualizado');
+          }
+        } catch (e) {
+          console.log('📝 Arquivo novo será criado');
+        }
+        
+        // Criar ou atualizar o arquivo
+        const githubResponse = await fetch(
+          `https://api.github.com/repos/${githubOwner}/${githubRepo}/contents/${fullPath}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${githubToken}`,
+              'Accept': 'application/vnd.github.v3+json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              message: `Publicação do documento: ${document.objeto || ragIndex}`,
+              content: contentBase64,
+              ...(sha ? { sha } : {})
+            })
+          }
+        );
+        
+        if (!githubResponse.ok) {
+          const errorData = await githubResponse.json();
+          console.error('Erro na API do GitHub:', errorData);
+          throw new Error(errorData.message || 'Erro ao salvar no GitHub');
+        }
+        
+        const githubResult = await githubResponse.json();
+        console.log('✅ Arquivo salvo no GitHub com sucesso');
+        console.log('🔗 URL:', githubResult.content.html_url);
+        
+      } catch (error) {
+        console.error('❌ Erro ao salvar no GitHub:', error);
+        return res.status(500).json({ 
+          error: `Erro ao salvar no GitHub: ${error instanceof Error ? error.message : 'Erro desconhecido'}` 
+        });
       }
       
-      console.log('✅ Arquivo salvo no GitHub:', `${repoPath}/${fileName}`);
-      
-      // 7. Atualizar status do documento para "published"
+      // 8. Atualizar status do documento para "published"
       await db.update(documentEditions)
         .set({
           status: 'published',
@@ -5369,7 +5462,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('✅ Status atualizado para published');
       
-      // 8. Criar registro em flow_actions
+      // 9. Criar registro em flow_actions
       const flowExecution = await db.select()
         .from(documentFlowExecutions)
         .where(eq(documentFlowExecutions.documentId, documentId))
@@ -5384,9 +5477,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           actionDescription: `Documento Publicado no ${service || 'GitHub'}`,
           actionData: {
             fileName,
-            repoPath,
+            repoPath: fullPath,
             ragIndex,
-            service: service || 'GitHub'
+            service: service || 'GitHub',
+            repository: `${githubOwner}/${githubRepo}`
           },
           createdBy: req.user.id,
           createdAt: new Date()
@@ -5399,7 +5493,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         data: {
           fileName,
-          path: `${repoPath}/${fileName}`,
+          path: fullPath,
+          repository: `${githubOwner}/${githubRepo}`,
           ragIndex,
           message: `Documento publicado com sucesso no ${service || 'GitHub'}`
         }

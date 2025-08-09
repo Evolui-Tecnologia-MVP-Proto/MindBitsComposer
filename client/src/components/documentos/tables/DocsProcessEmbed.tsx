@@ -2871,14 +2871,18 @@ function FlowWithAutoFitView({
           console.log('🔧 Serviço:', service);
           
           // Chamar a API de publicação
-          const response = await apiRequest('/api/github/publish', {
+          const response = await fetch('/api/github/publish', {
             method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
             body: JSON.stringify({
               documentId,
               nodeId,
               service
             })
-          });
+          }).then(res => res.json());
           
           if (response.success) {
             console.log('✅ Documento publicado com sucesso:', response.data);
