@@ -18,6 +18,18 @@ if (!fs.existsSync(uploadsDir)) {
 // Servir arquivos estáticos do diretório uploads
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
+// Middleware de debug para requisições POST ao GitHub
+app.use((req, res, next) => {
+  if (req.method === 'POST' && req.path === '/api/github/publish') {
+    console.log('🔴 ========================');
+    console.log('🔴 POST /api/github/publish INTERCEPTADO');
+    console.log('🔴 Headers:', req.headers);
+    console.log('🔴 Body:', req.body);
+    console.log('🔴 ========================');
+  }
+  next();
+});
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
