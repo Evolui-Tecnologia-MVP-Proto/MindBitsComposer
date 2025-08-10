@@ -52,6 +52,7 @@ export const users = pgTable("users", {
   status: text("status", { enum: ["ACTIVE", "INACTIVE", "PENDING"] }).notNull().default("ACTIVE"),
   avatarUrl: text("avatar_url").default(""),
   mustChangePassword: boolean("must_change_password").default(false),
+  flowProcessAcs: json("flow_process_acs").default([]),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

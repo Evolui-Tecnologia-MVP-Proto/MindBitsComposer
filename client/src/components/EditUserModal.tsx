@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { UserRole, UserStatus, User } from "@shared/schema";
+import { Badge } from "@/components/ui/badge";
+import { X, Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -41,7 +43,8 @@ const formSchema = z.object({
     message: "E-mail inválido."
   }),
   role: z.nativeEnum(UserRole),
-  status: z.nativeEnum(UserStatus)
+  status: z.nativeEnum(UserStatus),
+  flowProcessAcs: z.array(z.string()).default([])
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -55,6 +58,7 @@ type EditUserModalProps = {
 export default function EditUserModal({ isOpen, onClose, user }: EditUserModalProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newTag, setNewTag] = useState("");
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -63,7 +67,13 @@ export default function EditUserModal({ isOpen, onClose, user }: EditUserModalPr
       email: "",
       status: UserStatus.ACTIVE,
       role: UserRole.USER,
+      flowProcessAcs: [],
     },
+  });
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "flowProcessAcs",
   });
 
   // Atualizar valores do formulário quando o usuário mudar
@@ -74,9 +84,28 @@ export default function EditUserModal({ isOpen, onClose, user }: EditUserModalPr
         email: user.email,
         role: user.role as UserRole,
         status: user.status as UserStatus,
+        flowProcessAcs: Array.isArray(user.flowProcessAcs) ? user.flowProcessAcs : [],
       });
     }
   }, [user, isOpen, form]);
+
+  const handleAddTag = () => {
+    if (newTag.trim() && !form.getValues("flowProcessAcs")?.includes(newTag.trim())) {
+      append(newTag.trim() as any);
+      setNewTag("");
+    }
+  };
+
+  const handleRemoveTag = (index: number) => {
+    remove(index);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddTag();
+    }
+  };
 
   const updateUserMutation = useMutation({
     mutationFn: async (data: FormValues) => {
@@ -209,6 +238,59 @@ export default function EditUserModal({ isOpen, onClose, user }: EditUserModalPr
                       </FormItem>
                     </RadioGroup>
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="flowProcessAcs"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Acessos de Fluxo</FormLabel>
+                  <div className="space-y-3">
+                    {/* Tags existentes */}
+                    <div className="flex flex-wrap gap-2">
+                      {fields.map((field, index) => (
+                        <Badge
+                          key={field.id}
+                          variant="secondary"
+                          className="flex items-center gap-1 px-2 py-1"
+                        >
+                          <span>{form.getValues(`flowProcessAcs.${index}`)}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-4 w-4 p-0 hover:bg-transparent"
+                            onClick={() => handleRemoveTag(index)}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </Badge>
+                      ))}
+                    </div>
+                    
+                    {/* Campo para adicionar nova tag */}
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Digite um acesso de fluxo"
+                        value={newTag}
+                        onChange={(e) => setNewTag(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleAddTag}
+                        disabled={!newTag.trim()}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
