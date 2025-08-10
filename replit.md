@@ -31,6 +31,7 @@ The system employs a monorepo structure with shared TypeScript schemas.
 - **Specialty-User Association**: Manages user expertise associations for access and workflow assignments.
 - **Dynamic Flow Filtering**: Uses an `application_filter` JSON criteria for documentation modals to dynamically display flows based on document field values.
 - **Flow Actions Tracking**: The `flow_actions` table tracks individual actions within document flow executions for auditing and progress monitoring, including a `flow_node` field to identify the specific flow node where each action occurred. When a documentation flow is initiated, the system automatically creates flow_action records for all nodes marked as executed (isExecuted = TRUE) in the flow definition.
+- **Flow Access Control**: Implemented comprehensive access control system for flow node execution based on user permissions. The system validates user access rights using the `adminRoleAcs` field in flow nodes against the user's `flowProcessAcs` permissions. When unauthorized users attempt to access restricted nodes, the system displays a "ATENÇÃO: Seu usuário não possui direitos a operar ações neste processo" message and disables all action buttons.
 
 ### Feature Specifications
 - **Toolbar-Based Container Editing**: Edit/delete functions for collapsible containers integrated into the Lexical editor toolbar, appearing conditionally.

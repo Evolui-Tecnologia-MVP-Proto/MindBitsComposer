@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback, memo, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -83,6 +84,7 @@ export function DocsProcessEmbed({
 }: DocsProcessEmbedProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { user } = useAuth();
   
   const [selectedDocument, setSelectedDocument] = useState<Documento | null>(
     null,
@@ -313,6 +315,46 @@ export function DocsProcessEmbed({
     );
   };
 
+  // Função para verificar se o usuário tem acesso ao node baseado no adminRoleAcs
+  const checkUserAccessToNode = (flowNode: any): boolean => {
+    // Se não há usuário logado, não permitir acesso
+    if (!user) {
+      console.log('🔒 Usuário não logado - acesso negado');
+      return false;
+    }
+
+    // Se o node não tem adminRoleAcs definido, permitir acesso
+    if (!flowNode.data.adminRoleAcs) {
+      console.log('🔓 Node sem adminRoleAcs - acesso permitido');
+      return true;
+    }
+
+    // Se o usuário não tem flowProcessAcs definido, negar acesso
+    if (!user.flowProcessAcs || !Array.isArray(user.flowProcessAcs)) {
+      console.log('🔒 Usuário sem flowProcessAcs - acesso negado');
+      return false;
+    }
+
+    // Verificar se algum dos roleIds do usuário está no adminRoleAcs do node
+    const nodeRequiredRoles = Array.isArray(flowNode.data.adminRoleAcs) 
+      ? flowNode.data.adminRoleAcs 
+      : [flowNode.data.adminRoleAcs];
+    
+    const userRoleIds = user.flowProcessAcs;
+    const hasAccess = nodeRequiredRoles.some(requiredRole => 
+      userRoleIds.includes(requiredRole)
+    );
+
+    console.log('🔐 Verificação de acesso:', {
+      nodeId: flowNode.id,
+      nodeRequiredRoles,
+      userRoleIds,
+      hasAccess
+    });
+
+    return hasAccess;
+  };
+
   // Função para obter dados dinâmicos do formulário da execução
   const getDynamicFormData = (nodeId: string) => {
     const currentExecution = getCurrentFlowExecution();
@@ -342,6 +384,29 @@ export function DocsProcessEmbed({
   // Função para renderizar formulário dinâmico
   const renderDynamicForm = (flowNode: any, tempApprovalStatus?: string | null) => {
     if (flowNode.type !== 'actionNode') return null;
+    
+    // Verificar acesso do usuário ao node
+    const userHasAccess = checkUserAccessToNode(flowNode);
+    
+    // Se não tem acesso, mostrar mensagem de aviso e formulário readonly
+    if (!userHasAccess) {
+      return (
+        <div className="w-full mt-4">
+          <div className="space-y-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-700">
+            <div className="flex items-center space-x-2">
+              <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+              <h4 className="text-sm font-medium text-red-700 dark:text-red-300">
+                Acesso Restrito
+              </h4>
+            </div>
+            <p className="text-xs text-red-600 dark:text-red-400">
+              ATENÇÃO: Seu usuário não possui direitos a operar ações neste processo. 
+              Caso necessite acesso acione um administrador do sistema.
+            </p>
+          </div>
+        </div>
+      );
+    }
     
     // Buscar dados dinâmicos da execução primeiro, depois fallback para dados do nó
     const dynamicFormData = getDynamicFormData(flowNode.id);
@@ -4297,14 +4362,18 @@ function FlowWithAutoFitView({
 
                     <button
                       onClick={executeManualIntegration}
-                      disabled={selectedFlowNode.data.isExecuted === 'TRUE'}
+                      disabled={selectedFlowNode.data.isExecuted === 'TRUE' || !checkUserAccessToNode(selectedFlowNode)}
                       className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                        selectedFlowNode.data.isExecuted === 'TRUE'
+                        selectedFlowNode.data.isExecuted === 'TRUE' || !checkUserAccessToNode(selectedFlowNode)
                           ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                           : 'bg-yellow-600 text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2'
                       }`}
                     >
-                      {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Já Executado' : 'Executar'}
+                      {selectedFlowNode.data.isExecuted === 'TRUE' 
+                        ? 'Já Executado' 
+                        : !checkUserAccessToNode(selectedFlowNode)
+                        ? 'Acesso Negado'
+                        : 'Executar'}
                     </button>
                   </div>
                 )}
@@ -4462,14 +4531,18 @@ function FlowWithAutoFitView({
 
                         <button
                           onClick={executeFlowTransfer}
-                          disabled={selectedFlowNode.data.isExecuted === 'TRUE'}
+                          disabled={selectedFlowNode.data.isExecuted === 'TRUE' || !checkUserAccessToNode(selectedFlowNode)}
                           className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                            selectedFlowNode.data.isExecuted === 'TRUE'
+                            selectedFlowNode.data.isExecuted === 'TRUE' || !checkUserAccessToNode(selectedFlowNode)
                               ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                               : 'bg-amber-600 text-white hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2'
                           }`}
                         >
-                          {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Transferência Concluída' : 'Confirma Transferência'}
+                          {selectedFlowNode.data.isExecuted === 'TRUE' 
+                            ? 'Transferência Concluída'
+                            : !checkUserAccessToNode(selectedFlowNode)
+                            ? 'Acesso Negado'
+                            : 'Confirma Transferência'}
                         </button>
                       </div>
                     )}
@@ -4501,14 +4574,18 @@ function FlowWithAutoFitView({
 
                         <button
                           onClick={executeDirectFlowConclusion}
-                          disabled={selectedFlowNode.data.isExecuted === 'TRUE'}
+                          disabled={selectedFlowNode.data.isExecuted === 'TRUE' || !checkUserAccessToNode(selectedFlowNode)}
                           className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                            selectedFlowNode.data.isExecuted === 'TRUE'
+                            selectedFlowNode.data.isExecuted === 'TRUE' || !checkUserAccessToNode(selectedFlowNode)
                               ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                               : 'bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                           }`}
                         >
-                          {selectedFlowNode.data.isExecuted === 'TRUE' ? 'Processo Concluído' : 'Confirma Conclusão'}
+                          {selectedFlowNode.data.isExecuted === 'TRUE' 
+                            ? 'Processo Concluído'
+                            : !checkUserAccessToNode(selectedFlowNode)
+                            ? 'Acesso Negado'
+                            : 'Confirma Conclusão'}
                         </button>
                       </div>
                     )}
@@ -4629,9 +4706,9 @@ function FlowWithAutoFitView({
                             <div className="flex space-x-2">
                               <button
                                 onClick={saveChangesToDatabase}
-                                disabled={!areAllFieldsFilled()}
+                                disabled={!areAllFieldsFilled() || !checkUserAccessToNode(selectedFlowNode)}
                                 className={`px-3 py-1.5 text-white text-xs font-medium rounded transition-colors ${
-                                  areAllFieldsFilled()
+                                  areAllFieldsFilled() && checkUserAccessToNode(selectedFlowNode)
                                     ? 'bg-orange-600 dark:bg-[#1E40AF] hover:bg-orange-700 dark:hover:bg-[#1E3A8A]'
                                     : 'bg-gray-400 dark:bg-gray-600 cursor-not-allowed'
                                 }`}
