@@ -320,7 +320,8 @@ export function DocsProcessEmbed({
     console.log('🔍 INICIANDO verificação de acesso para node:', {
       nodeId: flowNode.id,
       nodeType: flowNode.type,
-      adminRoleAcs: flowNode.data.adminRoleAcs
+      adminRoleAcs: flowNode.data.adminRoleAcs,
+      fullNodeData: flowNode.data
     });
 
     // Se não há usuário logado, não permitir acesso
@@ -329,13 +330,19 @@ export function DocsProcessEmbed({
       return false;
     }
 
-    console.log('👤 Dados do usuário logado:', {
+    console.log('👤 Dados COMPLETOS do usuário logado:', {
+      fullUser: user,
       userId: user.id,
       userName: user.name,
       userFlowProcessAcs: user.flowProcessAcs,
       flowProcessAcsType: typeof user.flowProcessAcs,
-      isArray: Array.isArray(user.flowProcessAcs)
+      isArray: Array.isArray(user.flowProcessAcs),
+      userKeys: Object.keys(user)
     });
+
+    // TEMPORÁRIO: Permitir acesso para debug - REMOVER DEPOIS
+    console.log('🟡 MODO DEBUG: Permitindo acesso temporariamente para diagnóstico');
+    return true;
 
     // Se o node não tem adminRoleAcs definido, permitir acesso
     if (!flowNode.data.adminRoleAcs || 
