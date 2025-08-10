@@ -2020,6 +2020,10 @@ export default function LexicalPage() {
                                     <Badge className="text-xs px-2 py-1 font-medium" style={{ backgroundColor: '#3b82f6', color: '#1f2937' }}>
                                       Em Edição
                                     </Badge>
+                                  ) : edition.status === 'refact' ? (
+                                    <Badge className="text-xs px-2 py-1 font-medium" style={{ backgroundColor: '#dc2626', color: '#ffffff' }}>
+                                      Refatorar
+                                    </Badge>
                                   ) : (
                                     <Badge className="text-xs px-2 py-1 font-medium" style={{ backgroundColor: '#eab308', color: '#1f2937' }}>
                                       Na Fila
