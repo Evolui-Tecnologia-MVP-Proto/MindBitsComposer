@@ -317,21 +317,36 @@ export function DocsProcessEmbed({
 
   // Função para verificar se o usuário tem acesso ao node baseado no adminRoleAcs
   const checkUserAccessToNode = (flowNode: any): boolean => {
+    console.log('🔍 INICIANDO verificação de acesso para node:', {
+      nodeId: flowNode.id,
+      nodeType: flowNode.type,
+      adminRoleAcs: flowNode.data.adminRoleAcs
+    });
+
     // Se não há usuário logado, não permitir acesso
     if (!user) {
-      console.log('🔒 Usuário não logado - acesso negado');
+      console.log('🔒 ACESSO NEGADO: Usuário não logado');
       return false;
     }
 
+    console.log('👤 Dados do usuário logado:', {
+      userId: user.id,
+      userName: user.name,
+      userFlowProcessAcs: user.flowProcessAcs,
+      flowProcessAcsType: typeof user.flowProcessAcs,
+      isArray: Array.isArray(user.flowProcessAcs)
+    });
+
     // Se o node não tem adminRoleAcs definido, permitir acesso
-    if (!flowNode.data.adminRoleAcs) {
-      console.log('🔓 Node sem adminRoleAcs - acesso permitido');
+    if (!flowNode.data.adminRoleAcs || 
+        (Array.isArray(flowNode.data.adminRoleAcs) && flowNode.data.adminRoleAcs.length === 0)) {
+      console.log('🔓 ACESSO PERMITIDO: Node sem adminRoleAcs ou array vazio');
       return true;
     }
 
     // Se o usuário não tem flowProcessAcs definido, negar acesso
     if (!user.flowProcessAcs || !Array.isArray(user.flowProcessAcs)) {
-      console.log('🔒 Usuário sem flowProcessAcs - acesso negado');
+      console.log('🔒 ACESSO NEGADO: Usuário sem flowProcessAcs definido ou não é array');
       return false;
     }
 
@@ -341,18 +356,26 @@ export function DocsProcessEmbed({
       : [flowNode.data.adminRoleAcs];
     
     const userRoleIds = user.flowProcessAcs;
-    const hasAccess = nodeRequiredRoles.some(requiredRole => 
-      userRoleIds.includes(requiredRole)
-    );
-
-    console.log('🔐 Verificação de acesso:', {
-      nodeId: flowNode.id,
-      nodeRequiredRoles,
-      userRoleIds,
-      hasAccess
+    
+    console.log('🔍 Comparando roles:', {
+      nodeRequiredRoles: nodeRequiredRoles,
+      userRoleIds: userRoleIds,
+      nodeRequiredRolesLength: nodeRequiredRoles.length,
+      userRoleIdsLength: userRoleIds.length
     });
 
-    return hasAccess;
+    // Verificação detalhada role por role
+    for (const requiredRole of nodeRequiredRoles) {
+      const hasThisRole = userRoleIds.includes(requiredRole);
+      console.log(`🔍 Verificando role ${requiredRole}: ${hasThisRole ? '✅ TEM' : '❌ NÃO TEM'}`);
+      if (hasThisRole) {
+        console.log('🔓 ACESSO PERMITIDO: Usuário possui role necessária:', requiredRole);
+        return true;
+      }
+    }
+
+    console.log('🔒 ACESSO NEGADO: Usuário não possui nenhuma das roles necessárias');
+    return false;
   };
 
   // Função para obter dados dinâmicos do formulário da execução
@@ -396,7 +419,7 @@ export function DocsProcessEmbed({
             <div className="flex items-center space-x-2">
               <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
               <h4 className="text-sm font-medium text-red-700 dark:text-red-300">
-                Acesso Restrito
+                ATENÇÃO
               </h4>
             </div>
             <p className="text-xs text-red-600 dark:text-red-400">
