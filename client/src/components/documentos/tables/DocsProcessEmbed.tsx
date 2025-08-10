@@ -317,12 +317,11 @@ export function DocsProcessEmbed({
 
   // Função para verificar se o usuário tem acesso ao node baseado no adminRoleAcs
   const checkUserAccessToNode = (flowNode: any): boolean => {
-    console.log('🔍 INICIANDO verificação de acesso para node:', {
-      nodeId: flowNode.id,
-      nodeType: flowNode.type,
-      adminRoleAcs: flowNode.data.adminRoleAcs,
-      fullNodeData: flowNode.data
-    });
+    console.log('🔍 INICIANDO verificação de acesso para node:');
+    console.log('  - nodeId:', flowNode.id);
+    console.log('  - nodeType:', flowNode.type);
+    console.log('  - adminRoleAcs:', JSON.stringify(flowNode.data.adminRoleAcs));
+    console.log('  - fullNodeData:', JSON.stringify(flowNode.data, null, 2));
 
     // Se não há usuário logado, não permitir acesso
     if (!user) {
@@ -330,15 +329,14 @@ export function DocsProcessEmbed({
       return false;
     }
 
-    console.log('👤 Dados COMPLETOS do usuário logado:', {
-      fullUser: user,
-      userId: user.id,
-      userName: user.name,
-      userFlowProcessAcs: user.flowProcessAcs,
-      flowProcessAcsType: typeof user.flowProcessAcs,
-      isArray: Array.isArray(user.flowProcessAcs),
-      userKeys: Object.keys(user)
-    });
+    console.log('👤 Dados COMPLETOS do usuário logado:');
+    console.log('  - fullUser:', JSON.stringify(user, null, 2));
+    console.log('  - userId:', user.id);
+    console.log('  - userName:', user.name);
+    console.log('  - userFlowProcessAcs:', JSON.stringify(user.flowProcessAcs));
+    console.log('  - flowProcessAcsType:', typeof user.flowProcessAcs);
+    console.log('  - isArray:', Array.isArray(user.flowProcessAcs));
+    console.log('  - userKeys:', Object.keys(user));
 
     // TEMPORÁRIO: Permitir acesso para debug - REMOVER DEPOIS
     console.log('🟡 MODO DEBUG: Permitindo acesso temporariamente para diagnóstico');
