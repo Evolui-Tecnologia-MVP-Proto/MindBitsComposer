@@ -3988,6 +3988,20 @@ function FlowWithAutoFitView({
                 {/* Layout tabular para DocumentNode - 2 colunas */}
                 {selectedFlowNode.type === 'documentNode' && (
                   <div className="space-y-4">
+                    {/* Verificação de acesso para documentNode */}
+                    {!checkUserAccessToNode(selectedFlowNode) && (
+                      <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-700">
+                        <div className="flex items-center space-x-2">
+                          <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                          <h4 className="text-sm font-medium text-red-700 dark:text-red-300">
+                            ATENÇÃO
+                          </h4>
+                        </div>
+                        <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                          Seu usuário não possui direitos a operar ações neste processo. Caso necessite acesso acione um administrador do sistema.
+                        </p>
+                      </div>
+                    )}
                     <table className="w-full text-xs execution-form-table">
                       <thead>
                         <tr>
