@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { UserRole, UserStatus } from "@shared/schema";
@@ -37,6 +37,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+
 // Schema do formulário
 const formSchema = z.object({
   name: z.string().min(3, {
@@ -60,7 +61,7 @@ type NewUserModalProps = {
 export default function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [newTag, setNewTag] = useState("");
+  const [selectedRole, setSelectedRole] = useState("");
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -75,13 +76,27 @@ export default function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "flowProcessAcs",
+    name: "flowProcessAcs" as const,
   });
 
-  const handleAddTag = () => {
-    if (newTag.trim() && !form.getValues("flowProcessAcs")?.includes(newTag.trim())) {
-      append(newTag.trim() as any);
-      setNewTag("");
+  // Buscar roles do sistema
+  const { data: systemParams } = useQuery({
+    queryKey: ["/api/system-params/ADMIN_ACS_ROLES"],
+    enabled: isOpen,
+    retry: false,
+    select: (data: any) => {
+      try {
+        return data.paramValue ? JSON.parse(data.paramValue) : [];
+      } catch {
+        return [];
+      }
+    }
+  });
+
+  const handleAddRole = (roleId: string) => {
+    if (roleId && !form.getValues("flowProcessAcs")?.includes(roleId)) {
+      (append as any)(roleId);
+      setSelectedRole("");
     }
   };
 
@@ -89,11 +104,10 @@ export default function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
     remove(index);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAddTag();
-    }
+  const getRoleName = (roleId: string) => {
+    if (!systemParams) return roleId;
+    const role = systemParams.find((r: any) => r.roleId === roleId);
+    return role ? role.roleName : roleId;
   };
 
   const createUserMutation = useMutation({
@@ -239,40 +253,49 @@ export default function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
                   <div className="space-y-3">
                     {/* Tags existentes */}
                     <div className="flex flex-wrap gap-2">
-                      {fields.map((field, index) => (
-                        <Badge
-                          key={field.id}
-                          variant="secondary"
-                          className="flex items-center gap-1 px-2 py-1"
-                        >
-                          <span>{form.getValues(`flowProcessAcs.${index}`)}</span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            className="h-4 w-4 p-0 hover:bg-transparent"
-                            onClick={() => handleRemoveTag(index)}
+                      {fields.map((field, index) => {
+                        const roleId = form.getValues(`flowProcessAcs.${index}`);
+                        return (
+                          <Badge
+                            key={field.id}
+                            variant="secondary"
+                            className="flex items-center gap-1 px-2 py-1"
                           >
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </Badge>
-                      ))}
+                            <span>{getRoleName(roleId)}</span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="h-4 w-4 p-0 hover:bg-transparent"
+                              onClick={() => handleRemoveTag(index)}
+                            >
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </Badge>
+                        );
+                      })}
                     </div>
                     
-                    {/* Campo para adicionar nova tag */}
+                    {/* Campo para selecionar nova role */}
                     <div className="flex gap-2">
-                      <Input
-                        placeholder="Digite um acesso de fluxo"
-                        value={newTag}
-                        onChange={(e) => setNewTag(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                      />
+                      <Select value={selectedRole} onValueChange={setSelectedRole}>
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder="Selecione um acesso de fluxo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {systemParams?.map((role: any) => (
+                            <SelectItem key={role.roleId} value={role.roleId}>
+                              {role.roleName}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={handleAddTag}
-                        disabled={!newTag.trim()}
+                        onClick={() => handleAddRole(selectedRole)}
+                        disabled={!selectedRole}
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
