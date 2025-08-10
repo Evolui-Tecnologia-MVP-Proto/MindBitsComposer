@@ -317,11 +317,11 @@ export function DocsProcessEmbed({
 
   // Função para verificar se o usuário tem acesso ao node baseado no adminRoleAcs
   const checkUserAccessToNode = (flowNode: any): boolean => {
-    console.log('🔍 INICIANDO verificação de acesso para node:');
-    console.log('  - nodeId:', flowNode.id);
-    console.log('  - nodeType:', flowNode.type);
-    console.log('  - adminRoleAcs:', JSON.stringify(flowNode.data.adminRoleAcs));
-    console.log('  - fullNodeData:', JSON.stringify(flowNode.data, null, 2));
+    console.log('🔍 INICIANDO verificação de acesso para node:', {
+      nodeId: flowNode.id,
+      nodeType: flowNode.type,
+      adminRoleAcs: flowNode.data.adminRoleAcs
+    });
 
     // Se não há usuário logado, não permitir acesso
     if (!user) {
@@ -329,23 +329,15 @@ export function DocsProcessEmbed({
       return false;
     }
 
-    console.log('👤 Dados COMPLETOS do usuário logado:');
-    console.log('  - fullUser:', JSON.stringify(user, null, 2));
-    console.log('  - userId:', user.id);
-    console.log('  - userName:', user.name);
-    console.log('  - userFlowProcessAcs:', JSON.stringify(user.flowProcessAcs));
-    console.log('  - flowProcessAcsType:', typeof user.flowProcessAcs);
-    console.log('  - isArray:', Array.isArray(user.flowProcessAcs));
-    console.log('  - userKeys:', Object.keys(user));
-
-    // TEMPORÁRIO: Permitir acesso para debug - REMOVER DEPOIS
-    console.log('🟡 MODO DEBUG: Permitindo acesso temporariamente para diagnóstico');
-    return true;
+    console.log('👤 Dados do usuário logado:', {
+      userId: user.id,
+      userName: user.name,
+      userFlowProcessAcs: user.flowProcessAcs
+    });
 
     // Se o node não tem adminRoleAcs definido, permitir acesso
-    if (!flowNode.data.adminRoleAcs || 
-        (Array.isArray(flowNode.data.adminRoleAcs) && flowNode.data.adminRoleAcs.length === 0)) {
-      console.log('🔓 ACESSO PERMITIDO: Node sem adminRoleAcs ou array vazio');
+    if (!flowNode.data.adminRoleAcs) {
+      console.log('🔓 ACESSO PERMITIDO: Node sem adminRoleAcs definido');
       return true;
     }
 
@@ -355,21 +347,40 @@ export function DocsProcessEmbed({
       return false;
     }
 
-    // Verificar se algum dos roleIds do usuário está no adminRoleAcs do node
-    const nodeRequiredRoles = Array.isArray(flowNode.data.adminRoleAcs) 
-      ? flowNode.data.adminRoleAcs 
-      : [flowNode.data.adminRoleAcs];
+    // Converter adminRoleAcs de string JSON para array se necessário
+    let nodeRequiredRoles: string[] = [];
+    try {
+      if (typeof flowNode.data.adminRoleAcs === 'string') {
+        // Tentar parsear como JSON se for string
+        nodeRequiredRoles = JSON.parse(flowNode.data.adminRoleAcs);
+        console.log('🔄 adminRoleAcs parseado de string para array:', nodeRequiredRoles);
+      } else if (Array.isArray(flowNode.data.adminRoleAcs)) {
+        nodeRequiredRoles = flowNode.data.adminRoleAcs;
+        console.log('🔄 adminRoleAcs já é array:', nodeRequiredRoles);
+      } else {
+        nodeRequiredRoles = [flowNode.data.adminRoleAcs];
+        console.log('🔄 adminRoleAcs convertido para array:', nodeRequiredRoles);
+      }
+    } catch (error) {
+      console.error('❌ Erro ao parsear adminRoleAcs:', error);
+      console.log('🔒 ACESSO NEGADO: Erro ao processar adminRoleAcs');
+      return false;
+    }
+
+    // Verificar se array está vazio
+    if (nodeRequiredRoles.length === 0) {
+      console.log('🔓 ACESSO PERMITIDO: adminRoleAcs é array vazio');
+      return true;
+    }
     
     const userRoleIds = user.flowProcessAcs;
     
     console.log('🔍 Comparando roles:', {
       nodeRequiredRoles: nodeRequiredRoles,
-      userRoleIds: userRoleIds,
-      nodeRequiredRolesLength: nodeRequiredRoles.length,
-      userRoleIdsLength: userRoleIds.length
+      userRoleIds: userRoleIds
     });
 
-    // Verificação detalhada role por role
+    // Verificação detalhada role por role (lógica OR - usuário precisa ter PELO MENOS UMA das roles)
     for (const requiredRole of nodeRequiredRoles) {
       const hasThisRole = userRoleIds.includes(requiredRole);
       console.log(`🔍 Verificando role ${requiredRole}: ${hasThisRole ? '✅ TEM' : '❌ NÃO TEM'}`);
