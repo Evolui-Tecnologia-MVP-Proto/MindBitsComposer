@@ -6512,6 +6512,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User management routes
+  app.get("/api/users", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error: any) {
+      console.error("Erro ao buscar usuários:", error);
+      res.status(500).send("Erro ao buscar usuários");
+    }
+  });
+
+  app.get("/api/users/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      const user = await storage.getUser(parseInt(id));
+      if (!user) {
+        return res.status(404).send("Usuário não encontrado");
+      }
+      res.json(user);
+    } catch (error: any) {
+      console.error("Erro ao buscar usuário:", error);
+      res.status(500).send("Erro ao buscar usuário");
+    }
+  });
+
+  app.post("/api/users", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const user = await storage.createUser(req.body);
+      res.status(201).json(user);
+    } catch (error: any) {
+      console.error("Erro ao criar usuário:", error);
+      res.status(500).send("Erro ao criar usuário");
+    }
+  });
+
+  app.put("/api/users/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      // Verificar se o usuário existe
+      const existingUser = await storage.getUser(parseInt(id));
+      if (!existingUser) {
+        return res.status(404).send("Usuário não encontrado");
+      }
+      
+      // Se o email estiver sendo alterado, verificar duplicidade
+      if (req.body.email && req.body.email !== existingUser.email) {
+        const userWithEmail = await storage.getUserByEmail(req.body.email);
+        if (userWithEmail && userWithEmail.id !== parseInt(id)) {
+          return res.status(400).send("Já existe um usuário com este e-mail");
+        }
+      }
+      
+      const updatedUser = await storage.updateUser(parseInt(id), req.body);
+      res.json(updatedUser);
+    } catch (error: any) {
+      console.error("Erro ao atualizar usuário:", error);
+      res.status(500).send("Erro ao atualizar usuário");
+    }
+  });
+
+  app.delete("/api/users/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { id } = req.params;
+    
+    try {
+      // Verificar se o usuário existe
+      const existingUser = await storage.getUser(parseInt(id));
+      if (!existingUser) {
+        return res.status(404).send("Usuário não encontrado");
+      }
+      
+      // Verificar se não é o próprio usuário logado
+      if (req.user && req.user.id === parseInt(id)) {
+        return res.status(400).send("Não é possível excluir o próprio usuário");
+      }
+      
+      await storage.deleteUser(parseInt(id));
+      res.status(204).send();
+    } catch (error: any) {
+      console.error("Erro ao excluir usuário:", error);
+      res.status(500).send("Erro ao excluir usuário");
+    }
+  });
+
   // Generic tables routes
   app.get("/api/generic-tables/:name", async (req, res) => {
     console.log("🔍 [API] Requisição para generic-tables:", req.params.name);

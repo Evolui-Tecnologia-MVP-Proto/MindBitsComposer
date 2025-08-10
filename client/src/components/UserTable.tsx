@@ -17,6 +17,7 @@ import { User, UserStatus, UserRole } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import NewUserModal from "./NewUserModal";
+import EditUserModal from "./EditUserModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,6 +39,8 @@ import {
 export default function UserTable() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isNewUserModalOpen, setIsNewUserModalOpen] = useState(false);
+  const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
+  const [userToEdit, setUserToEdit] = useState<User | null>(null);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [userToResetPassword, setUserToResetPassword] = useState<User | null>(null);
   const { toast } = useToast();
@@ -266,7 +269,7 @@ export default function UserTable() {
                           <div className="flex items-center">
                             <div className="flex-shrink-0 h-10 w-10">
                               <Avatar>
-                                <AvatarImage src={user.avatarUrl} alt={user.name} />
+                                <AvatarImage src={user.avatarUrl || ''} alt={user.name} />
                                 <AvatarFallback className="bg-primary text-white">
                                   {getInitials(user.name)}
                                 </AvatarFallback>
@@ -281,12 +284,12 @@ export default function UserTable() {
                           <div className="text-sm text-gray-900 dark:text-gray-100">{user.email}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(user.status)}`}>
-                            {getTranslatedStatus(user.status)}
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(user.status as UserStatus)}`}>
+                            {getTranslatedStatus(user.status as UserStatus)}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                          {getTranslatedRole(user.role)}
+                          {getTranslatedRole(user.role as UserRole)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <DropdownMenu>
@@ -297,7 +300,10 @@ export default function UserTable() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="bg-white dark:bg-[#0F172A] border-gray-200 dark:border-gray-700">
                               <DropdownMenuItem
-                                onClick={() => console.log("Editar", user.id)}
+                                onClick={() => {
+                                  setUserToEdit(user);
+                                  setIsEditUserModalOpen(true);
+                                }}
                                 className="cursor-pointer text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800"
                               >
                                 <Edit className="mr-2 h-4 w-4" />
@@ -354,6 +360,15 @@ export default function UserTable() {
       <NewUserModal 
         isOpen={isNewUserModalOpen} 
         onClose={() => setIsNewUserModalOpen(false)} 
+      />
+
+      <EditUserModal 
+        isOpen={isEditUserModalOpen} 
+        onClose={() => {
+          setIsEditUserModalOpen(false);
+          setUserToEdit(null);
+        }} 
+        user={userToEdit}
       />
 
       {/* Diálogo de confirmação para excluir usuário */}

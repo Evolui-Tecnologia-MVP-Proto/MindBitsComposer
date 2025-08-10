@@ -484,12 +484,15 @@ export default function AdminPage() {
   // Carrega os mapeamentos de anexos salvos quando um mapeamento é selecionado
   useEffect(() => {
     if (selectedMapping && selectedMapping.assetsMappings) {
-      // Ensure all mappings have the required relationshipId property
-      const mappingsWithRelationshipId = selectedMapping.assetsMappings.map(mapping => ({
+      // Ensure all mappings have the required properties
+      const mappingsWithDefaults = selectedMapping.assetsMappings.map(mapping => ({
         ...mapping,
-        relationshipId: mapping.relationshipId || "documents_artifacts"
+        // Add default properties if missing
+        id: mapping.id,
+        columnId: mapping.columnId,
+        columnTitle: mapping.columnTitle
       }));
-      setAttachmentMappings(mappingsWithRelationshipId);
+      setAttachmentMappings(mappingsWithDefaults);
     } else {
       setAttachmentMappings([]);
     }
