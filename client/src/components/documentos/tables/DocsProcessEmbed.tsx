@@ -2715,6 +2715,27 @@ function FlowWithAutoFitView({
         
         console.log('✅ Transferência de fluxo concluída com sucesso pelo backend');
 
+        // Atualizar status das document_editions para "refact"
+        try {
+          const editionsResponse = await fetch(`/api/documents/${flowDiagramModal.flowData?.documentId}/editions/status`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              status: 'refact'
+            }),
+          });
+
+          if (editionsResponse.ok) {
+            console.log('✅ Status das document_editions atualizado para "refact"');
+          } else {
+            console.warn('⚠️ Falha ao atualizar status das document_editions');
+          }
+        } catch (error) {
+          console.warn('⚠️ Erro ao atualizar status das document_editions:', error);
+        }
+
         // Atualizar estado local
         setFlowDiagramModal(prev => ({
           ...prev,
@@ -2730,12 +2751,13 @@ function FlowWithAutoFitView({
         // Mostrar resultado de sucesso
         setIntegrationResult({
           status: 'success',
-          message: `Fluxo transferido com sucesso para "${result.targetFlowName}". Nova execução criada.`
+          message: `Fluxo transferido com sucesso para "${result.targetFlowName}". Nova execução criada e status atualizado para refatoração.`
         });
 
         // Recarregar dados
         queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
         queryClient.invalidateQueries({ queryKey: ['/api/documentos'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/document-editions'] });
         
       } catch (error) {
         console.error('❌ Erro ao transferir fluxo:', error);
