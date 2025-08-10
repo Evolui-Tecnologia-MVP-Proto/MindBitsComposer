@@ -5201,10 +5201,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('🔄 Documento atual:', currentDocumentId);
       console.log('🔄 Fluxo destino:', targetFlowId);
       
-      // 1. Marcar execução atual como transferida
+      // 1. Marcar execução atual como finalizada (finished)
       const currentExecution = await db.update(documentFlowExecutions)
         .set({
-          status: 'transfered',
+          status: 'finished',
           completedAt: new Date(),
           flowTasks,
           updatedAt: new Date()
@@ -5216,7 +5216,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Execução atual não encontrada" });
       }
       
-      console.log('✅ Execução atual marcada como transferida');
+      console.log('✅ Execução atual marcada como finalizada (finished)');
       
       // 2. Buscar dados do fluxo destino
       const targetFlow = await db.select()
@@ -5239,11 +5239,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           status: 'initiated',
           flowTasks: targetFlow[0].flowData,
           startedBy: req.user.id,
-          executionData: {
-            flowName: targetFlow[0].name,
-            transferredFrom: currentExecution[0].flowId,
-            transferredAt: new Date().toISOString()
-          },
+          executionData: targetFlow[0].flowData, // Gravar o flow_data do documento de fluxo
           completedAt: null,
           createdAt: new Date(),
           updatedAt: new Date()
