@@ -504,16 +504,18 @@ export function DocsProcessEmbed({
       }
       
       // Verificar se o formulário deve ser readonly
-      // Quando o nó está executado e teve aprovação "NÃO"
-      const isReadOnly = flowNode.data.isExecuted === 'TRUE' && 
-                        isApprovalNode && 
-                        approvalStatus === 'FALSE';
+      // Quando o nó está executado e teve aprovação "NÃO" OU quando o usuário não tem acesso
+      const isReadOnly = !userHasAccess || 
+                        (flowNode.data.isExecuted === 'TRUE' && 
+                         isApprovalNode && 
+                         approvalStatus === 'FALSE');
       
       console.log('📝 Estado do formulário:', {
         nodeId: flowNode.id,
         isExecuted: flowNode.data.isExecuted,
         isApprovalNode,
         approvalStatus,
+        userHasAccess,
         isReadOnly
       });
       
@@ -527,7 +529,7 @@ export function DocsProcessEmbed({
               </h4>
               {isReadOnly && (
                 <span className="text-xs px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded">
-                  Somente Leitura
+                  {!userHasAccess ? 'Acesso Negado' : 'Somente Leitura'}
                 </span>
               )}
             </div>
@@ -4084,6 +4086,10 @@ function FlowWithAutoFitView({
                             </p>
                             <Button
                               onClick={async () => {
+                                if (!checkUserAccessToNode(selectedFlowNode)) {
+                                  console.log('🔒 ACESSO NEGADO: Usuário não tem permissão para iniciar documentação');
+                                  return;
+                                }
                                 try {
                                   // Atualizar o nó para marcar como em processo
                                   const currentNodes = getNodes();
@@ -4241,8 +4247,11 @@ function FlowWithAutoFitView({
                                   });
                                 }
                               }}
+                              disabled={!checkUserAccessToNode(selectedFlowNode)}
                               size="sm"
-                              className="bg-blue-600 hover:bg-blue-700 text-white"
+                              className={checkUserAccessToNode(selectedFlowNode) 
+                                ? "bg-blue-600 hover:bg-blue-700 text-white" 
+                                : "bg-gray-400 text-gray-300 cursor-not-allowed"}
                             >
                               <BookOpen className="mr-1.5 h-3 w-3" />
                               Iniciar Edição
@@ -4768,16 +4777,16 @@ function FlowWithAutoFitView({
                     <div className="flex space-x-2 mb-2">
                       <button
                         onClick={() => {
-                          if (selectedFlowNode.data.isPendingConnected) {
+                          if (selectedFlowNode.data.isPendingConnected && checkUserAccessToNode(selectedFlowNode)) {
                             console.log('🟢 Botão SIM clicado');
                             updateApprovalStatus(selectedFlowNode.id, 'TRUE');
                           }
                         }}
-                        disabled={!selectedFlowNode.data.isPendingConnected}
+                        disabled={!selectedFlowNode.data.isPendingConnected || !checkUserAccessToNode(selectedFlowNode)}
                         className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all flex-1 justify-center ${
                           currentApprovalStatus === 'TRUE'
                             ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-600 text-green-800 dark:text-green-400'
-                            : selectedFlowNode.data.isPendingConnected
+                            : selectedFlowNode.data.isPendingConnected && checkUserAccessToNode(selectedFlowNode)
                             ? 'bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151] text-gray-600 dark:text-gray-200 hover:bg-green-50 dark:hover:bg-green-900/20 hover:border-green-300 dark:hover:border-green-600 cursor-pointer'
                             : 'bg-gray-50 dark:bg-[#1F2937] border-gray-200 dark:border-[#374151] text-gray-400 dark:text-gray-500 cursor-not-allowed'
                         }`}
@@ -4788,16 +4797,16 @@ function FlowWithAutoFitView({
                       
                       <button
                         onClick={() => {
-                          if (selectedFlowNode.data.isPendingConnected) {
+                          if (selectedFlowNode.data.isPendingConnected && checkUserAccessToNode(selectedFlowNode)) {
                             console.log('🔴 Botão NÃO clicado');
                             updateApprovalStatus(selectedFlowNode.id, 'FALSE');
                           }
                         }}
-                        disabled={!selectedFlowNode.data.isPendingConnected}
+                        disabled={!selectedFlowNode.data.isPendingConnected || !checkUserAccessToNode(selectedFlowNode)}
                         className={`flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all flex-1 justify-center ${
                           currentApprovalStatus === 'FALSE'
                             ? 'bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-600 text-red-800 dark:text-red-400'
-                            : selectedFlowNode.data.isPendingConnected
+                            : selectedFlowNode.data.isPendingConnected && checkUserAccessToNode(selectedFlowNode)
                             ? 'bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151] text-gray-600 dark:text-gray-200 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-300 dark:hover:border-red-600 cursor-pointer'
                             : 'bg-gray-50 dark:bg-[#1F2937] border-gray-200 dark:border-[#374151] text-gray-400 dark:text-gray-500 cursor-not-allowed'
                         }`}
