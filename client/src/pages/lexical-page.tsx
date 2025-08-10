@@ -110,6 +110,7 @@ export default function LexicalPage() {
   const [editorKey, setEditorKey] = useState<number>(0); // Chave para forçar re-render do editor
   const [editorInstance, setEditorInstance] = useState<any>(null);
   const [hasEditorContent, setHasEditorContent] = useState(false); // Estado para controlar se há conteúdo no editor
+  const [lastSavedContent, setLastSavedContent] = useState<string>(''); // Para rastrear o último conteúdo salvo
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [loadedFileName, setLoadedFileName] = useState<string | null>(null);
   const [isPluginModalOpen, setIsPluginModalOpen] = useState(false);
@@ -339,6 +340,9 @@ export default function LexicalPage() {
     setHasUnsavedChanges(hasUnsaved);
   }, [hasEditorContent, selectedEdition, currentDocumentId, setHasUnsavedChanges]);
 
+  // Monitorar se há mudanças reais no conteúdo desde a última salvamento
+  const hasRealChanges = editorState !== lastSavedContent && hasEditorContent;
+
   // Função para receber dados do plugin
   const handlePluginDataExchange = (data: any) => {
     console.log('Dados recebidos do plugin:', data);
@@ -527,6 +531,8 @@ export default function LexicalPage() {
           lexFile: variables.editorState || variables.content,
           status: 'editing'
         });
+        // Marcar o conteúdo atual como salvo
+        setLastSavedContent(variables.editorState || '');
         // Invalidar queries para refletir mudança de status
         queryClient.invalidateQueries({ queryKey: ['/api/document-editions-in-progress'] });
         queryClient.invalidateQueries({ queryKey: ['/api/document-editions-library'] });
@@ -536,6 +542,7 @@ export default function LexicalPage() {
         });
       } else {
         setCurrentDocumentId(data.id);
+        setLastSavedContent(variables.editorState || variables.content || '');
         queryClient.invalidateQueries({ queryKey: ['/api/lexical-documents'] });
         toast({
           title: "Documento salvo",
@@ -1013,6 +1020,7 @@ export default function LexicalPage() {
           
           // Carregar dados do arquivo
           setTitle(lexicalData.title);
+          setLastSavedContent(editorStateToUse);
           
           // Usar o editorState que contém o estado JSON serializado
           let editorStateToUse = lexicalData.editorState;
@@ -1389,6 +1397,7 @@ export default function LexicalPage() {
     setCurrentDocumentId(null);
     setTitle("Novo Documento");
     setContent("");
+    setLastSavedContent('');
   };
 
   const handleLoadDocument = (document: LexicalDocument) => {
@@ -1401,6 +1410,7 @@ export default function LexicalPage() {
           setCurrentDocumentId(document.id);
           setTitle(document.title);
           setContent(document.content);
+          setLastSavedContent(document.content);
           setSelectedTemplate(null); // Limpar template ao carregar documento
           setLoadedFileName(null); // Limpar arquivo carregado
           setSelectedEdition(null); // Limpar edition selecionada
@@ -1414,6 +1424,7 @@ export default function LexicalPage() {
       setCurrentDocumentId(document.id);
       setTitle(document.title);
       setContent(document.content);
+      setLastSavedContent(document.content);
       setSelectedTemplate(null); // Limpar template ao carregar documento
       setLoadedFileName(null); // Limpar arquivo carregado
       setSelectedEdition(null); // Limpar edition selecionada
@@ -1455,6 +1466,8 @@ export default function LexicalPage() {
     setSelectedEdition(edition);
     setCurrentDocumentId(null);
     setLoadedFileName(null);
+    // Resetar o controle de alterações para o novo documento
+    setLastSavedContent(edition.lexFile || '');
     
     // Se lex_file estiver vazio ou null, carregar o template
     if (!edition.lexFile || edition.lexFile.trim() === '') {
@@ -1662,6 +1675,7 @@ export default function LexicalPage() {
         setTitle('Documento sem título');
         setEditorState('');
         setInitialEditorState(undefined);
+        setLastSavedContent('');
         
         // Desassociar template e documento
         setSelectedTemplate(null);
@@ -1847,30 +1861,30 @@ export default function LexicalPage() {
                 </Button>
                 <Button
                   onClick={() => handleSave()}
-                  disabled={saveMutation.isPending || !hasEditorContent || viewMode === 'preview'}
+                  disabled={saveMutation.isPending || !hasRealChanges || viewMode === 'preview'}
                   size="sm"
                   className={`${
-                    (saveMutation.isPending || !hasEditorContent || viewMode === 'preview')
+                    (saveMutation.isPending || !hasRealChanges || viewMode === 'preview')
                       ? "opacity-50 bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed hover:bg-gray-200"
                       : "bg-blue-600 text-white hover:bg-blue-700 border-blue-600"
                   }`}
-                  title={saveMutation.isPending ? "Salvando..." : "Salvar"}
+                  title={saveMutation.isPending ? "Salvando..." : hasRealChanges ? "Salvar" : "Sem alterações para salvar"}
                 >
-                  <Save className={`w-4 h-4 ${(saveMutation.isPending || !hasEditorContent || viewMode === 'preview') ? "text-gray-400" : "text-white"}`} />
+                  <Save className={`w-4 h-4 ${(saveMutation.isPending || !hasRealChanges || viewMode === 'preview') ? "text-gray-400" : "text-white"}`} />
                 </Button>
                 <Button
                   onClick={() => setShowFinalizeModal(true)}
                   variant="outline"
                   size="sm"
                   className={`${
-                    (!selectedEdition || viewMode === 'preview' || (hasEditorContent && !saveMutation.isPending))
+                    (!selectedEdition || viewMode === 'preview' || hasRealChanges)
                       ? "opacity-50 bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed hover:bg-gray-200"
                       : "bg-purple-600 text-white border-purple-600 hover:bg-purple-700 shadow-md"
                   }`}
-                  disabled={!selectedEdition || viewMode === 'preview' || (hasEditorContent && !saveMutation.isPending)}
-                  title={hasEditorContent && !saveMutation.isPending ? "Salve o documento antes de finalizar" : "Finalizar"}
+                  disabled={!selectedEdition || viewMode === 'preview' || hasRealChanges}
+                  title={hasRealChanges ? "Salve o documento antes de finalizar" : "Finalizar"}
                 >
-                  <BookOpenCheck className={`w-4 h-4 ${(!selectedEdition || viewMode === 'preview' || (hasEditorContent && !saveMutation.isPending)) ? "text-gray-400" : "text-white"}`} />
+                  <BookOpenCheck className={`w-4 h-4 ${(!selectedEdition || viewMode === 'preview' || hasRealChanges) ? "text-gray-400" : "text-white"}`} />
                 </Button>
               </div>
             </div>
