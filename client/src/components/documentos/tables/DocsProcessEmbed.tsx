@@ -2634,8 +2634,12 @@ function FlowWithAutoFitView({
 
     // Função para executar transferência de fluxo
     const executeFlowTransfer = async () => {
-      if (!selectedFlowNode || selectedFlowNode.type !== 'endNode' || selectedFlowNode.data.FromType !== 'flow_init') {
-        console.log('Nenhum endNode de transferência selecionado');
+      if (!selectedFlowNode || selectedFlowNode.type !== 'endNode' || selectedFlowNode.data.To_Type !== 'flow_Finish') {
+        console.log('Nenhum endNode de transferência selecionado', {
+          hasNode: !!selectedFlowNode,
+          nodeType: selectedFlowNode?.type,
+          toType: selectedFlowNode?.data.To_Type
+        });
         return;
       }
 
