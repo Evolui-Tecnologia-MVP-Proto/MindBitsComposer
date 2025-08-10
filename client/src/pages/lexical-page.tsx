@@ -1863,14 +1863,14 @@ export default function LexicalPage() {
                   variant="outline"
                   size="sm"
                   className={`${
-                    (!selectedEdition || viewMode === 'preview')
+                    (!selectedEdition || viewMode === 'preview' || (hasEditorContent && !saveMutation.isPending))
                       ? "opacity-50 bg-gray-200 text-gray-400 border-gray-300 cursor-not-allowed hover:bg-gray-200"
                       : "bg-purple-600 text-white border-purple-600 hover:bg-purple-700 shadow-md"
                   }`}
-                  disabled={!selectedEdition || viewMode === 'preview'}
-                  title="Finalizar"
+                  disabled={!selectedEdition || viewMode === 'preview' || (hasEditorContent && !saveMutation.isPending)}
+                  title={hasEditorContent && !saveMutation.isPending ? "Salve o documento antes de finalizar" : "Finalizar"}
                 >
-                  <BookOpenCheck className={`w-4 h-4 ${(!selectedEdition || viewMode === 'preview') ? "text-gray-400" : "text-white"}`} />
+                  <BookOpenCheck className={`w-4 h-4 ${(!selectedEdition || viewMode === 'preview' || (hasEditorContent && !saveMutation.isPending)) ? "text-gray-400" : "text-white"}`} />
                 </Button>
               </div>
             </div>
