@@ -1,0 +1,1449 @@
+{
+  "database": {
+    "name": "EVO-MindBits Composer Database",
+    "description": "Sistema integrado de documentação técnica e empresarial com assistência de IA",
+    "version": "1.0.0",
+    "created_at": "2025-08-11",
+    "database_type": "PostgreSQL"
+  },
+  "enums": {
+    "UserRole": ["ADMIN", "EDITOR", "USER"],
+    "UserStatus": ["ACTIVE", "INACTIVE", "PENDING"],
+    "TemplateType": ["struct", "output"],
+    "PluginStatus": ["active", "inactive", "development"],
+    "PluginType": [
+      "DATA_SOURCE", "AI_AGENT", "CHART", "FORMATTER", "INTEGRATION",
+      "UTILITY", "WORKFLOW", "COMPOSER", "DOCUMENT", "COMPOSER_ASSET",
+      "DOCUMENT_PART", "FLUX_ANALISER", "FLUX_VALIDATOR"
+    ],
+    "DocumentFlowExecutionStatus": ["initiated", "in_progress", "completed", "failed", "transfered"],
+    "DocumentEditionStatus": ["draft", "in_progress", "review", "ready_to_revise", "published", "archived", "done"]
+  },
+  "tables": {
+    "users": {
+      "description": "Tabela de usuários do sistema",
+      "columns": {
+        "id": {
+          "type": "serial",
+          "constraints": ["PRIMARY KEY"],
+          "description": "ID único do usuário"
+        },
+        "name": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Nome completo do usuário"
+        },
+        "email": {
+          "type": "text",
+          "constraints": ["NOT NULL", "UNIQUE"],
+          "description": "Email único do usuário"
+        },
+        "password": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Senha criptografada"
+        },
+        "role": {
+          "type": "text",
+          "enum": ["ADMIN", "EDITOR", "USER"],
+          "constraints": ["NOT NULL"],
+          "default": "USER",
+          "description": "Papel do usuário no sistema"
+        },
+        "status": {
+          "type": "text",
+          "enum": ["ACTIVE", "INACTIVE", "PENDING"],
+          "constraints": ["NOT NULL"],
+          "default": "ACTIVE",
+          "description": "Status ativo/inativo do usuário"
+        },
+        "avatarUrl": {
+          "type": "text",
+          "default": "",
+          "description": "URL do avatar do usuário"
+        },
+        "mustChangePassword": {
+          "type": "boolean",
+          "default": false,
+          "description": "Flag para forçar mudança de senha"
+        },
+        "flowProcessAcs": {
+          "type": "json",
+          "default": "[]",
+          "description": "Array JSON com permissões de acesso a processos de fluxo"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()",
+          "description": "Data de criação"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()",
+          "description": "Data da última atualização"
+        }
+      }
+    },
+    "templates": {
+      "description": "Templates para estruturação de documentos",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()",
+          "description": "ID único do template"
+        },
+        "name": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Nome do template"
+        },
+        "code": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Código identificador do template"
+        },
+        "description": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Descrição do template"
+        },
+        "type": {
+          "type": "text",
+          "enum": ["struct", "output"],
+          "constraints": ["NOT NULL"],
+          "description": "Tipo do template (estrutura ou saída)"
+        },
+        "structure": {
+          "type": "json",
+          "constraints": ["NOT NULL"],
+          "description": "Estrutura JSON do template"
+        },
+        "mappings": {
+          "type": "json",
+          "default": "{}",
+          "description": "Mapeamentos de campos do template"
+        },
+        "repoPath": {
+          "type": "text",
+          "description": "Caminho no repositório"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "monday_mappings": {
+      "description": "Configurações de mapeamento com Monday.com",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Nome do mapeamento"
+        },
+        "description": {
+          "type": "text",
+          "default": "",
+          "description": "Descrição do mapeamento"
+        },
+        "board_id": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "ID do board no Monday.com"
+        },
+        "quadro_monday": {
+          "type": "text",
+          "default": "",
+          "description": "Nome do quadro Monday"
+        },
+        "status_column": {
+          "type": "text",
+          "default": "",
+          "description": "Coluna de status"
+        },
+        "responsible_column": {
+          "type": "text",
+          "default": "",
+          "description": "Coluna de responsável"
+        },
+        "mapping_filter": {
+          "type": "text",
+          "default": "",
+          "description": "Filtro de mapeamento"
+        },
+        "default_values": {
+          "type": "json",
+          "default": "{}",
+          "description": "Valores padrão JSON"
+        },
+        "assets_mappings": {
+          "type": "json",
+          "default": "[]",
+          "description": "Mapeamentos de assets"
+        },
+        "schedules_params": {
+          "type": "json",
+          "default": "{\"enabled\": false, \"frequency\": \"daily\", \"time\": \"09:00\", \"days\": []}",
+          "description": "Parâmetros de agendamento"
+        },
+        "last_sync": {
+          "type": "timestamp",
+          "description": "Data da última sincronização"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "monday_columns": {
+      "description": "Colunas dos boards do Monday.com",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "mapping_id": {
+          "type": "uuid",
+          "constraints": ["NOT NULL", "FOREIGN KEY"],
+          "references": "monday_mappings(id)",
+          "on_delete": "CASCADE"
+        },
+        "column_id": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "ID da coluna no Monday"
+        },
+        "title": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Título da coluna"
+        },
+        "type": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Tipo da coluna"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "mapping_columns": {
+      "description": "Mapeamento entre colunas Monday e campos CPx",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "mapping_id": {
+          "type": "uuid",
+          "constraints": ["NOT NULL", "FOREIGN KEY"],
+          "references": "monday_mappings(id)",
+          "on_delete": "CASCADE"
+        },
+        "monday_column_id": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "ID da coluna Monday"
+        },
+        "monday_column_title": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Título da coluna Monday"
+        },
+        "cpx_field": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Campo correspondente no CPx"
+        },
+        "transform_function": {
+          "type": "text",
+          "default": "",
+          "description": "Função de transformação"
+        },
+        "is_key": {
+          "type": "boolean",
+          "default": false,
+          "description": "Se é campo chave"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "service_connections": {
+      "description": "Conexões com serviços externos",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "service_name": {
+          "type": "text",
+          "constraints": ["NOT NULL", "UNIQUE"],
+          "description": "Nome único do serviço"
+        },
+        "token": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Token de acesso"
+        },
+        "description": {
+          "type": "text",
+          "default": "",
+          "description": "Descrição da conexão"
+        },
+        "parameters": {
+          "type": "text[]",
+          "default": "{}",
+          "description": "Array de parâmetros específicos"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "plugins": {
+      "description": "Sistema de plugins extensível",
+      "columns": {
+        "id": {
+          "type": "text",
+          "constraints": ["PRIMARY KEY"],
+          "default": "crypto.randomUUID()"
+        },
+        "name": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Nome do plugin"
+        },
+        "description": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Descrição do plugin"
+        },
+        "type": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Tipo do plugin (carregado dinamicamente)"
+        },
+        "status": {
+          "type": "text",
+          "enum": ["active", "inactive", "development"],
+          "constraints": ["NOT NULL"],
+          "default": "inactive"
+        },
+        "version": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "default": "1.0.0"
+        },
+        "author": {
+          "type": "text",
+          "description": "Autor do plugin"
+        },
+        "icon": {
+          "type": "text",
+          "default": "Puzzle",
+          "description": "Ícone do plugin"
+        },
+        "page_name": {
+          "type": "text",
+          "description": "Nome da página do plugin"
+        },
+        "configuration": {
+          "type": "json",
+          "default": "{}",
+          "description": "Configuração JSON do plugin"
+        },
+        "endpoints": {
+          "type": "json",
+          "default": "{}",
+          "description": "Endpoints do plugin"
+        },
+        "permissions": {
+          "type": "json",
+          "default": "[]",
+          "description": "Array de permissões"
+        },
+        "dependencies": {
+          "type": "json",
+          "default": "[]",
+          "description": "Array de dependências"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "constraints": ["NOT NULL"],
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "constraints": ["NOT NULL"],
+          "default": "NOW()"
+        }
+      }
+    },
+    "documentos": {
+      "description": "Tabela principal de documentos",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "origem": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Sistema de origem do documento"
+        },
+        "objeto": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Objeto/assunto do documento"
+        },
+        "tipo": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "default": "",
+          "description": "Tipo do documento"
+        },
+        "cliente": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Cliente relacionado"
+        },
+        "responsavel": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Responsável pelo documento"
+        },
+        "sistema": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Sistema relacionado"
+        },
+        "modulo": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Módulo do sistema"
+        },
+        "descricao": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Descrição detalhada"
+        },
+        "status": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "default": "Processando",
+          "description": "Status atual do documento"
+        },
+        "status_origem": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "default": "Incluido",
+          "description": "Status no sistema de origem"
+        },
+        "solicitante": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "default": "",
+          "description": "Solicitante do documento"
+        },
+        "aprovador": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "default": "",
+          "description": "Aprovador do documento"
+        },
+        "agente": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "default": "",
+          "description": "Agente responsável"
+        },
+        "task_state": {
+          "type": "text",
+          "description": "Estado da tarefa: null/branco='Ação Pendente', 'in_doc'='Documentando', 'in_apr'='Em aprovação'"
+        },
+        "id_origem": {
+          "type": "bigint",
+          "description": "ID de origem para mapeamento Monday.com"
+        },
+        "id_origem_txt": {
+          "type": "text",
+          "description": "ID de origem em formato texto"
+        },
+        "general_columns": {
+          "type": "json",
+          "default": "{}",
+          "description": "Dados extras do sistema de origem"
+        },
+        "monday_item_values": {
+          "type": "json",
+          "default": "{}",
+          "description": "Valores dos itens Monday.com"
+        },
+        "assets_synced": {
+          "type": "boolean",
+          "default": false,
+          "description": "Indica se anexos foram sincronizados"
+        },
+        "user_id": {
+          "type": "integer",
+          "constraints": ["FOREIGN KEY"],
+          "references": "users(id)",
+          "description": "Associação opcional com usuário"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "documents_artifacts": {
+      "description": "Artefatos/anexos dos documentos",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "documento_id": {
+          "type": "uuid",
+          "constraints": ["NOT NULL", "FOREIGN KEY"],
+          "references": "documentos(id)",
+          "on_delete": "CASCADE"
+        },
+        "name": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Nome do artefato"
+        },
+        "file_data": {
+          "type": "text",
+          "default": "",
+          "description": "Dados do arquivo em Base64"
+        },
+        "file_name": {
+          "type": "text",
+          "default": "",
+          "description": "Nome original do arquivo"
+        },
+        "file_size": {
+          "type": "text",
+          "description": "Tamanho do arquivo em bytes"
+        },
+        "mime_type": {
+          "type": "text",
+          "default": "application/octet-stream",
+          "description": "Tipo MIME do arquivo"
+        },
+        "type": {
+          "type": "text",
+          "default": "unknown",
+          "description": "Tipo do arquivo (doc, pdf, txt, json, imagem, etc.)"
+        },
+        "origin_asset_id": {
+          "type": "text",
+          "description": "ID do asset de origem (ex: Monday.com)"
+        },
+        "is_image": {
+          "type": "text",
+          "description": "Se é imagem (true/false)"
+        },
+        "monday_column": {
+          "type": "text",
+          "description": "Coluna Monday.com de origem"
+        },
+        "file_metadata": {
+          "type": "text",
+          "description": "Metadados específicos do arquivo"
+        },
+        "description": {
+          "type": "text",
+          "default": "",
+          "description": "Descrição do artefato"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "global_assets": {
+      "description": "Assets globais acessíveis no sistema todo",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Nome do asset"
+        },
+        "file_data": {
+          "type": "text",
+          "default": "",
+          "description": "Dados do arquivo em Base64"
+        },
+        "file_name": {
+          "type": "text",
+          "default": "",
+          "description": "Nome original do arquivo"
+        },
+        "file_size": {
+          "type": "text",
+          "description": "Tamanho em bytes"
+        },
+        "mime_type": {
+          "type": "text",
+          "default": "application/octet-stream",
+          "description": "Tipo MIME"
+        },
+        "type": {
+          "type": "text",
+          "default": "unknown",
+          "description": "Tipo do arquivo"
+        },
+        "is_image": {
+          "type": "text",
+          "default": "false",
+          "description": "Se é imagem (true/false)"
+        },
+        "uploaded_by": {
+          "type": "integer",
+          "constraints": ["FOREIGN KEY"],
+          "references": "users(id)",
+          "description": "Usuário que fez upload"
+        },
+        "description": {
+          "type": "text",
+          "default": "",
+          "description": "Descrição do asset"
+        },
+        "tags": {
+          "type": "text",
+          "default": "",
+          "description": "Tags separadas por vírgula"
+        },
+        "file_metadata": {
+          "type": "text",
+          "description": "Metadados específicos (tldraw, Mermaid, etc.)"
+        },
+        "editor": {
+          "type": "text",
+          "description": "Editor/plugin que criou o asset"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "app_logs": {
+      "description": "Logs do sistema",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "event_type": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Tipo de evento"
+        },
+        "message": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Mensagem do log"
+        },
+        "parameters": {
+          "type": "json",
+          "default": "{}",
+          "description": "Parâmetros em JSON"
+        },
+        "timestamp": {
+          "type": "timestamp",
+          "constraints": ["NOT NULL"],
+          "default": "NOW()",
+          "description": "Horário do evento"
+        },
+        "user_id": {
+          "type": "integer",
+          "constraints": ["FOREIGN KEY"],
+          "references": "users(id)",
+          "description": "Usuário que executou a ação"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "repo_structure": {
+      "description": "Estrutura de repositórios",
+      "columns": {
+        "uid": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "folder_name": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Nome da pasta"
+        },
+        "linked_to": {
+          "type": "uuid",
+          "constraints": ["FOREIGN KEY"],
+          "references": "repo_structure(uid)",
+          "on_delete": "CASCADE",
+          "description": "Referência para pasta pai"
+        },
+        "is_sync": {
+          "type": "boolean",
+          "default": false,
+          "description": "Se está sincronizado"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "flow_types": {
+      "description": "Tipos de fluxos de trabalho",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Nome do tipo de fluxo"
+        },
+        "description": {
+          "type": "text",
+          "default": "",
+          "description": "Descrição do tipo"
+        },
+        "node_metadata": {
+          "type": "json",
+          "default": "{}",
+          "description": "Metadados dos nós"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "documents_flows": {
+      "description": "Fluxos de trabalho para documentos",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Nome do fluxo"
+        },
+        "description": {
+          "type": "text",
+          "default": "",
+          "description": "Descrição do fluxo"
+        },
+        "code": {
+          "type": "text",
+          "constraints": ["NOT NULL", "UNIQUE"],
+          "description": "Código único do fluxo"
+        },
+        "flow_type_id": {
+          "type": "uuid",
+          "constraints": ["FOREIGN KEY"],
+          "references": "flow_types(id)",
+          "description": "Tipo do fluxo"
+        },
+        "flow_data": {
+          "type": "json",
+          "constraints": ["NOT NULL"],
+          "description": "Dados do fluxo (nós e conexões)"
+        },
+        "user_id": {
+          "type": "integer",
+          "constraints": ["NOT NULL", "FOREIGN KEY"],
+          "references": "users(id)"
+        },
+        "created_by": {
+          "type": "integer",
+          "constraints": ["NOT NULL", "FOREIGN KEY"],
+          "references": "users(id)"
+        },
+        "updated_by": {
+          "type": "integer",
+          "constraints": ["NOT NULL", "FOREIGN KEY"],
+          "references": "users(id)"
+        },
+        "is_locked": {
+          "type": "boolean",
+          "default": false,
+          "description": "Impede edição no editor"
+        },
+        "is_enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Controla se aparece em seleções"
+        },
+        "application_filter": {
+          "type": "json",
+          "default": "{}",
+          "description": "Filtragem de aplicação em JSON"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "document_flow_executions": {
+      "description": "Execuções de fluxos de documentos",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "document_id": {
+          "type": "uuid",
+          "constraints": ["NOT NULL", "FOREIGN KEY"],
+          "references": "documentos(id)",
+          "on_delete": "CASCADE"
+        },
+        "flow_id": {
+          "type": "uuid",
+          "constraints": ["NOT NULL", "FOREIGN KEY"],
+          "references": "documents_flows(id)",
+          "on_delete": "CASCADE"
+        },
+        "status": {
+          "type": "text",
+          "enum": ["initiated", "in_progress", "completed", "failed", "transfered"],
+          "constraints": ["NOT NULL"],
+          "default": "initiated"
+        },
+        "execution_data": {
+          "type": "json",
+          "default": "{}",
+          "description": "Dados da execução"
+        },
+        "flow_tasks": {
+          "type": "json",
+          "default": "{}",
+          "description": "Tarefas do fluxo"
+        },
+        "started_by": {
+          "type": "integer",
+          "constraints": ["NOT NULL", "FOREIGN KEY"],
+          "references": "users(id)"
+        },
+        "completed_at": {
+          "type": "timestamp",
+          "description": "Data de conclusão"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "flow_actions": {
+      "description": "Ações executadas nos fluxos",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "flow_execution_id": {
+          "type": "uuid",
+          "constraints": ["NOT NULL", "FOREIGN KEY"],
+          "references": "document_flow_executions(id)",
+          "on_delete": "CASCADE"
+        },
+        "action_description": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Descrição da ação executada"
+        },
+        "actor": {
+          "type": "integer",
+          "constraints": ["NOT NULL", "FOREIGN KEY"],
+          "references": "users(id)",
+          "description": "Usuário que executou a ação"
+        },
+        "flow_node": {
+          "type": "text",
+          "description": "ID do nó onde a ação foi executada"
+        },
+        "action_params": {
+          "type": "json",
+          "description": "Parâmetros da ação"
+        },
+        "started_at": {
+          "type": "timestamp",
+          "constraints": ["NOT NULL"],
+          "description": "Início da ação"
+        },
+        "end_at": {
+          "type": "timestamp",
+          "description": "Fim da ação"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "document_editions": {
+      "description": "Edições de documentos",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "document_id": {
+          "type": "uuid",
+          "constraints": ["NOT NULL", "FOREIGN KEY"],
+          "references": "documentos(id)",
+          "on_delete": "CASCADE"
+        },
+        "template_id": {
+          "type": "uuid",
+          "constraints": ["FOREIGN KEY"],
+          "references": "templates(id)",
+          "on_delete": "CASCADE"
+        },
+        "started_by": {
+          "type": "integer",
+          "constraints": ["FOREIGN KEY"],
+          "references": "users(id)",
+          "on_delete": "CASCADE"
+        },
+        "status": {
+          "type": "text",
+          "enum": ["draft", "in_progress", "review", "ready_to_revise", "published", "archived", "done"],
+          "constraints": ["NOT NULL"],
+          "default": "draft"
+        },
+        "lex_file": {
+          "type": "text",
+          "description": "Arquivo LEX em base64"
+        },
+        "json_file": {
+          "type": "json",
+          "default": "{}",
+          "description": "JSON estruturado"
+        },
+        "md_file": {
+          "type": "text",
+          "description": "Arquivo Markdown"
+        },
+        "md_file_old": {
+          "type": "text",
+          "description": "Versão anterior do Markdown"
+        },
+        "init": {
+          "type": "timestamp",
+          "description": "Data de início"
+        },
+        "publish": {
+          "type": "timestamp",
+          "description": "Data de publicação"
+        },
+        "flux_node_id": {
+          "type": "text",
+          "description": "ID do nó de fluxo relacionado"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "lexical_documents": {
+      "description": "Documentos do editor Lexical",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "title": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Título do documento"
+        },
+        "content": {
+          "type": "text",
+          "description": "JSON serializado do estado Lexical"
+        },
+        "plain_text": {
+          "type": "text",
+          "description": "Texto plano para busca"
+        },
+        "user_id": {
+          "type": "integer",
+          "constraints": ["NOT NULL", "FOREIGN KEY"],
+          "references": "users(id)",
+          "on_delete": "CASCADE"
+        },
+        "is_public": {
+          "type": "boolean",
+          "default": false,
+          "description": "Se é público"
+        },
+        "tags": {
+          "type": "text[]",
+          "default": "{}",
+          "description": "Array de tags"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "generic_tables": {
+      "description": "Tabelas genéricas para dados diversos",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Nome da tabela genérica"
+        },
+        "description": {
+          "type": "text",
+          "description": "Descrição"
+        },
+        "content": {
+          "type": "json",
+          "default": "{}",
+          "description": "Conteúdo JSON"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "specialties": {
+      "description": "Áreas de especialidade",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "code": {
+          "type": "text",
+          "constraints": ["NOT NULL", "UNIQUE"],
+          "description": "Código único da especialidade"
+        },
+        "name": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Nome da especialidade"
+        },
+        "description": {
+          "type": "text",
+          "description": "Descrição da especialidade"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    },
+    "specialty_users": {
+      "description": "Associação entre especialidades e usuários",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "specialty_id": {
+          "type": "uuid",
+          "constraints": ["NOT NULL", "FOREIGN KEY"],
+          "references": "specialties(id)",
+          "on_delete": "CASCADE"
+        },
+        "user_id": {
+          "type": "integer",
+          "constraints": ["NOT NULL", "FOREIGN KEY"],
+          "references": "users(id)",
+          "on_delete": "CASCADE"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      },
+      "unique_constraints": [
+        {
+          "name": "unique_specialty_user",
+          "columns": ["specialty_id", "user_id"],
+          "description": "Garante que um usuário não seja associado mais de uma vez à mesma especialidade"
+        }
+      ]
+    },
+    "system_params": {
+      "description": "Parâmetros de configuração do sistema",
+      "columns": {
+        "id": {
+          "type": "uuid",
+          "constraints": ["PRIMARY KEY"],
+          "default": "gen_random_uuid()"
+        },
+        "param_name": {
+          "type": "text",
+          "constraints": ["NOT NULL", "UNIQUE"],
+          "description": "Nome único do parâmetro"
+        },
+        "param_description": {
+          "type": "text",
+          "description": "Descrição do parâmetro"
+        },
+        "param_type": {
+          "type": "text",
+          "constraints": ["NOT NULL"],
+          "description": "Tipo do parâmetro"
+        },
+        "param_value": {
+          "type": "text",
+          "description": "Valor do parâmetro"
+        },
+        "created_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "default": "NOW()"
+        }
+      }
+    }
+  },
+  "relationships": {
+    "monday_columns": {
+      "mapping_id": {
+        "references": "monday_mappings.id",
+        "on_delete": "CASCADE",
+        "description": "Relação com o mapeamento Monday"
+      }
+    },
+    "mapping_columns": {
+      "mapping_id": {
+        "references": "monday_mappings.id",
+        "on_delete": "CASCADE",
+        "description": "Relação com o mapeamento Monday"
+      }
+    },
+    "documents_artifacts": {
+      "documento_id": {
+        "references": "documentos.id",
+        "on_delete": "CASCADE",
+        "description": "Relação com o documento"
+      }
+    },
+    "global_assets": {
+      "uploaded_by": {
+        "references": "users.id",
+        "description": "Usuário que fez upload do asset"
+      }
+    },
+    "app_logs": {
+      "user_id": {
+        "references": "users.id",
+        "description": "Usuário que gerou o log"
+      }
+    },
+    "documentos": {
+      "user_id": {
+        "references": "users.id",
+        "description": "Usuário associado ao documento"
+      }
+    },
+    "repo_structure": {
+      "linked_to": {
+        "references": "repo_structure.uid",
+        "on_delete": "CASCADE",
+        "description": "Auto-referência para estrutura hierárquica"
+      }
+    },
+    "documents_flows": {
+      "flow_type_id": {
+        "references": "flow_types.id",
+        "description": "Tipo do fluxo"
+      },
+      "user_id": {
+        "references": "users.id",
+        "description": "Usuário proprietário"
+      },
+      "created_by": {
+        "references": "users.id",
+        "description": "Usuário criador"
+      },
+      "updated_by": {
+        "references": "users.id",
+        "description": "Último usuário que editou"
+      }
+    },
+    "document_flow_executions": {
+      "document_id": {
+        "references": "documentos.id",
+        "on_delete": "CASCADE",
+        "description": "Documento sendo processado"
+      },
+      "flow_id": {
+        "references": "documents_flows.id",
+        "on_delete": "CASCADE",
+        "description": "Fluxo sendo executado"
+      },
+      "started_by": {
+        "references": "users.id",
+        "description": "Usuário que iniciou a execução"
+      }
+    },
+    "flow_actions": {
+      "flow_execution_id": {
+        "references": "document_flow_executions.id",
+        "on_delete": "CASCADE",
+        "description": "Execução do fluxo"
+      },
+      "actor": {
+        "references": "users.id",
+        "description": "Usuário que executou a ação"
+      }
+    },
+    "document_editions": {
+      "document_id": {
+        "references": "documentos.id",
+        "on_delete": "CASCADE",
+        "description": "Documento sendo editado"
+      },
+      "template_id": {
+        "references": "templates.id",
+        "on_delete": "CASCADE",
+        "description": "Template utilizado"
+      },
+      "started_by": {
+        "references": "users.id",
+        "on_delete": "CASCADE",
+        "description": "Usuário que iniciou a edição"
+      }
+    },
+    "lexical_documents": {
+      "user_id": {
+        "references": "users.id",
+        "on_delete": "CASCADE",
+        "description": "Proprietário do documento"
+      }
+    },
+    "specialty_users": {
+      "specialty_id": {
+        "references": "specialties.id",
+        "on_delete": "CASCADE",
+        "description": "Especialidade associada"
+      },
+      "user_id": {
+        "references": "users.id",
+        "on_delete": "CASCADE",
+        "description": "Usuário associado"
+      }
+    }
+  },
+  "indexes": {
+    "users_email_idx": {
+      "table": "users",
+      "columns": ["email"],
+      "type": "UNIQUE",
+      "description": "Índice único para email de usuário"
+    },
+    "monday_mappings_board_id_idx": {
+      "table": "monday_mappings", 
+      "columns": ["board_id"],
+      "type": "INDEX",
+      "description": "Índice para board_id do Monday"
+    },
+    "documentos_status_idx": {
+      "table": "documentos",
+      "columns": ["status"],
+      "type": "INDEX",
+      "description": "Índice para status do documento"
+    },
+    "documentos_task_state_idx": {
+      "table": "documentos",
+      "columns": ["task_state"],
+      "type": "INDEX",
+      "description": "Índice para task_state do documento"
+    },
+    "document_flow_executions_status_idx": {
+      "table": "document_flow_executions",
+      "columns": ["status"],
+      "type": "INDEX",
+      "description": "Índice para status da execução"
+    },
+    "flow_actions_flow_node_idx": {
+      "table": "flow_actions",
+      "columns": ["flow_node"],
+      "type": "INDEX",
+      "description": "Índice para flow_node das ações"
+    },
+    "document_editions_status_idx": {
+      "table": "document_editions",
+      "columns": ["status"],
+      "type": "INDEX",
+      "description": "Índice para status da edição"
+    }
+  },
+  "business_rules": {
+    "access_control": {
+      "description": "Sistema de controle de acesso baseado em roles e especialidades",
+      "implementation": "users.flowProcessAcs + specialty_users associations"
+    },
+    "workflow_management": {
+      "description": "Gerenciamento de fluxos de trabalho com estados e transições",
+      "implementation": "documents_flows + document_flow_executions + flow_actions"
+    },
+    "document_versioning": {
+      "description": "Versionamento de documentos com histórico",
+      "implementation": "document_editions.md_file_old stores previous versions"
+    },
+    "plugin_system": {
+      "description": "Sistema de plugins extensível com configuração dinâmica",
+      "implementation": "plugins table + system_params for dynamic types"
+    },
+    "monday_integration": {
+      "description": "Integração completa com Monday.com para sincronização de dados",
+      "implementation": "monday_mappings + monday_columns + mapping_columns"
+    },
+    "asset_management": {
+      "description": "Gerenciamento de assets globais e específicos de documentos",
+      "implementation": "global_assets + documents_artifacts with Base64 storage"
+    }
+  },
+  "technical_notes": {
+    "file_storage": {
+      "description": "Arquivos são armazenados como Base64 nas tabelas para evitar dependências externas",
+      "tables": ["documents_artifacts", "global_assets", "document_editions"]
+    },
+    "json_flexibility": {
+      "description": "Uso extensivo de campos JSON para flexibilidade de configuração",
+      "tables": ["plugins", "templates", "documents_flows", "system_params"]
+    },
+    "cascade_deletions": {
+      "description": "Relacionamentos com CASCADE para manter integridade referencial",
+      "examples": ["document deletion removes all artifacts", "user deletion removes associations"]
+    },
+    "uuid_primary_keys": {
+      "description": "Maioria das tabelas usa UUID como chave primária para distribuição",
+      "exception": "users table uses serial for legacy compatibility"
+    }
+  }
+}
