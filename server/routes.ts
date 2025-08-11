@@ -5958,25 +5958,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const nodeIndex = flowTasks.nodes.findIndex((node: any) => node.id === currentEdition.fluxNodeId);
           
           if (nodeIndex !== -1) {
-            flowTasks.nodes[nodeIndex] = {
-              ...flowTasks.nodes[nodeIndex],
-              data: {
-                ...flowTasks.nodes[nodeIndex].data,
-                isExecuted: 'TRUE',
-                isInProcess: 'FALSE'
-              }
-            };
+            // Criar cópia profunda para forçar detecção de mudança pelo PostgreSQL
+            const updatedFlowTasks = JSON.parse(JSON.stringify(flowTasks));
+            updatedFlowTasks.nodes[nodeIndex].data.isExecuted = 'TRUE';
+            updatedFlowTasks.nodes[nodeIndex].data.isInProcess = 'FALSE';
             
-            // Atualizar a execução do fluxo
-            await db
+            console.log(`🔄 Atualizando nó ${currentEdition.fluxNodeId}: isExecuted=${updatedFlowTasks.nodes[nodeIndex].data.isExecuted}`);
+            
+            // Atualizar a execução do fluxo com novo objeto
+            const updateResult = await db
               .update(documentFlowExecutions)
               .set({ 
-                flowTasks: flowTasks,
+                flowTasks: updatedFlowTasks,
                 updatedAt: new Date()
               })
-              .where(eq(documentFlowExecutions.id, execution.id));
+              .where(eq(documentFlowExecutions.id, execution.id))
+              .returning({ id: documentFlowExecutions.id });
               
-            console.log(`✅ Nó ${currentEdition.fluxNodeId} atualizado: isExecuted='TRUE', isInProcess='FALSE'`);
+            console.log(`✅ Nó ${currentEdition.fluxNodeId} atualizado: isExecuted='TRUE', isInProcess='FALSE' - Execution ID: ${updateResult[0]?.id}`);
+          } else {
+            console.log(`❌ Nó ${currentEdition.fluxNodeId} não encontrado na execução ${execution.id}`);
           }
         }
         
