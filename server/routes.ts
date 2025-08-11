@@ -2041,22 +2041,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "documentId e flowNode são obrigatórios" });
       }
       
-      // Buscar execução de fluxo para este documento
-      const flowExecution = await db
-        .select()
-        .from(documentFlowExecutions)
-        .where(eq(documentFlowExecutions.documentId, documentId as string))
-        .orderBy(desc(documentFlowExecutions.createdAt))
-        .limit(1);
-      
-      console.log('🔍 Flow execution encontrada:', flowExecution.length > 0 ? flowExecution[0].id : 'Nenhuma');
-      
-      if (!flowExecution || flowExecution.length === 0) {
-        console.log('❌ Nenhuma execução de fluxo encontrada para o documento:', documentId);
-        return res.json([]);
-      }
-      
-      // Buscar flow actions para esta execução e nó específico
+      // Buscar flow actions em TODAS as execuções do documento para o nó específico
       const flowActionsHistory = await db
         .select({
           id: flowActions.id,
@@ -2069,17 +2054,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
             ELSE 'in_progress'
           END`,
           flow_node: flowActions.flowNode,
+          execution_id: documentFlowExecutions.id,
           result_data: sql<any>`NULL` // Placeholder para dados de resultado se necessário
         })
         .from(flowActions)
+        .innerJoin(documentFlowExecutions, eq(flowActions.flowExecutionId, documentFlowExecutions.id))
         .leftJoin(users, eq(flowActions.actor, users.id))
         .where(
           and(
-            eq(flowActions.flowExecutionId, flowExecution[0].id),
+            eq(documentFlowExecutions.documentId, documentId as string),
             eq(flowActions.flowNode, flowNode as string)
           )
         )
         .orderBy(desc(flowActions.startedAt));
+      
+      console.log(`🔍 Buscando flow_actions para documento ${documentId} e nó ${flowNode}`);
       
       console.log(`✅ ${flowActionsHistory.length} flow actions encontradas para o nó ${flowNode}`);
       
