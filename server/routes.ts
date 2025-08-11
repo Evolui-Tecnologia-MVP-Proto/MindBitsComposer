@@ -5939,11 +5939,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("✅ Status da edição atualizado para 'done':", updatedEdition.id);
       
-      // 2. Buscar a execução de fluxo correspondente
+      // 2. Buscar a execução de fluxo correspondente (apenas com status 'initiated')
       const flowExecution = await db
         .select()
         .from(documentFlowExecutions)
-        .where(eq(documentFlowExecutions.documentId, currentEdition.documentId))
+        .where(and(
+          eq(documentFlowExecutions.documentId, currentEdition.documentId),
+          eq(documentFlowExecutions.status, 'initiated')
+        ))
         .limit(1);
       
       if (flowExecution.length > 0) {
