@@ -2070,7 +2070,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log(`🔍 Buscando flow_actions para documento ${documentId} e nó ${flowNode}`);
       
-      console.log(`✅ ${flowActionsHistory.length} flow actions encontradas para o nó ${flowNode}`);
+      // Debug: verificar todas as execuções do documento
+      const allExecutions = await db
+        .select()
+        .from(documentFlowExecutions)
+        .where(eq(documentFlowExecutions.documentId, documentId as string));
+      
+      console.log(`📊 Total de execuções para documento ${documentId}:`, allExecutions.length);
+      
+      // Debug: verificar todas as flow_actions
+      const allFlowActions = await db
+        .select()
+        .from(flowActions)
+        .innerJoin(documentFlowExecutions, eq(flowActions.flowExecutionId, documentFlowExecutions.id))
+        .where(eq(documentFlowExecutions.documentId, documentId as string));
+      
+      console.log(`📊 Total de flow_actions para documento ${documentId}:`, allFlowActions.length);
+      console.log(`📊 Flow_actions encontradas:`, allFlowActions.map(fa => ({
+        node: fa.flow_actions.flowNode, 
+        execution: fa.document_flow_executions.id,
+        description: fa.flow_actions.actionDescription
+      })));
+      
+      console.log(`✅ ${flowActionsHistory.length} flow actions encontradas para o nó específico ${flowNode}`);
       
       res.json(flowActionsHistory);
       
