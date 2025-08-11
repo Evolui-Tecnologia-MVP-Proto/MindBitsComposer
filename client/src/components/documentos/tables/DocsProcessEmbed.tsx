@@ -2938,6 +2938,29 @@ function FlowWithAutoFitView({
 
           console.log('✅ Fluxo encerrado e documento marcado como Encerrado');
           
+          // Criar registro flow_actions para documentar o encerramento do processo
+          try {
+            const flowActionResponse = await fetch('/api/flow-actions/create', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                documentId: flowDiagramModal.flowData.documentId,
+                flowNode: selectedFlowNode.id,
+                actionDescription: 'Fluxo de processo encerrado'
+              })
+            });
+
+            if (flowActionResponse.ok) {
+              console.log('✅ Registro de ação criado: Fluxo de processo encerrado');
+            } else {
+              console.warn('⚠️ Falha ao criar registro de ação para encerramento');
+            }
+          } catch (flowActionError) {
+            console.error('❌ Erro ao criar registro flow_actions:', flowActionError);
+          }
+          
           // Limpar o editor da página composer se disponível
           if (typeof (window as any).resetComposerEditor === 'function') {
             (window as any).resetComposerEditor();
