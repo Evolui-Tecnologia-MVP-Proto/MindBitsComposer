@@ -133,10 +133,8 @@ export function DocumentosTable({
           ? getConcludedFlow(documento.id)
           : getActiveFlow(documento.id);
         if (flowToShow) {
-          openFlowDiagramModal({
-            flowTasks: flowToShow,
-            document: { objeto: documento.objeto }
-          });
+          // Passar o objeto de execução completo, incluindo o ID
+          openFlowDiagramModal(flowToShow);
         }
       }
     } else {
@@ -146,10 +144,8 @@ export function DocumentosTable({
         : getActiveFlow(documento.id);
         
       if (flowToShow) {
-        openFlowDiagramModal({
-          flowTasks: flowToShow,
-          document: { objeto: documento.objeto }
-        });
+        // Passar o objeto de execução completo, incluindo o ID
+        openFlowDiagramModal(flowToShow);
       }
     }
   };

@@ -2041,9 +2041,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "documentId e flowNode são obrigatórios" });
       }
       
-      // Se executionId for fornecido, buscar apenas daquela execução específica
+      // Se executionId for fornecido e não for vazio, buscar apenas daquela execução específica
       // Caso contrário, buscar de todas as execuções (comportamento anterior)
-      const whereConditions = executionId 
+      const whereConditions = executionId && executionId !== ''
         ? and(
             eq(documentFlowExecutions.id, executionId as string),
             eq(flowActions.flowNode, flowNode as string)

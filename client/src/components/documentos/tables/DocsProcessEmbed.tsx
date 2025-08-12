@@ -1624,10 +1624,10 @@ export function DocsProcessEmbed({
         flowData: flowDataWithDocumentId,
         documentTitle: execution.flowName || "Template de Fluxo",
         documentObject: documentObject,
-        executionId: execution.id || ""
+        executionId: execution.id || execution.executionId || ""
       });
       console.log("🔴 Estado atualizado com documentObject:", documentObject);
-      console.log("🔴 ExecutionId adicionado:", execution.id);
+      console.log("🔴 ExecutionId adicionado:", execution.id || execution.executionId || "VAZIO - histórico mostrará todas as execuções");
       
       // Limpar nó selecionado ao abrir modal
       setSelectedFlowNode(null);
@@ -2472,15 +2472,19 @@ function FlowWithAutoFitView({
       try {
         // Buscar execução de fluxo para este documento
         const documentId = flowDiagramModal.flowData?.documentId || flowDiagramModal.documentId;
-        const executionId = flowDiagramModal.executionId;
+        const executionId = flowDiagramModal.executionId || '';
         
         if (!documentId) {
           console.log('❌ Erro: documentId não encontrado no flowDiagramModal');
           return;
         }
         
+        if (!executionId) {
+          console.log('⚠️ Aviso: executionId não encontrado no flowDiagramModal - buscando histórico para TODAS as execuções');
+        }
+        
         console.log('📋 Buscando histórico para:', { documentId, nodeId, executionId });
-        const response = await fetch(`/api/flow-actions/history?documentId=${documentId}&flowNode=${nodeId}&executionId=${executionId}`);
+        const response = await fetch(`/api/flow-actions/history?documentId=${documentId}&flowNode=${nodeId}&executionId=${executionId || ''}`);
         if (response.ok) {
           const history = await response.json();
           setFlowActionsHistory(history);
