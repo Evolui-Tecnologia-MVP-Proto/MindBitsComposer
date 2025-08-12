@@ -1092,7 +1092,7 @@ export default function DocumentosPage() {
             />
           </TabsContent>
 
-          <TabsContent value="repositorio" className="slide-in">
+          <TabsContent value="repositorio" className="slide-in flex-1 min-h-0 overflow-y-auto">
             <GitHubTab />
           </TabsContent>
         </Tabs>
