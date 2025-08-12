@@ -1579,6 +1579,13 @@ export function DocsProcessEmbed({
   // Função para abrir modal do diagrama de fluxo
   const openFlowDiagramModal = (execution: any) => {
     console.log("🔴 Dados recebidos na função:", execution);
+    console.log("🔴 Estrutura do execution:", {
+      hasId: !!execution?.id,
+      hasExecutionId: !!execution?.executionId,
+      idValue: execution?.id,
+      executionIdValue: execution?.executionId,
+      keys: execution ? Object.keys(execution) : []
+    });
     if (execution) {
       // Buscar o documento correspondente na lista de documentos
       const documento = documentos?.find(doc => doc.id === execution.documentId);

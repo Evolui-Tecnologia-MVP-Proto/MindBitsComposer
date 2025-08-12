@@ -5005,6 +5005,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const executions = await db.select({
+        id: documentFlowExecutions.id,  // Adicionar o ID da execução
         documentId: documentFlowExecutions.documentId,
         flowId: documentFlowExecutions.flowId,
         status: documentFlowExecutions.status,
