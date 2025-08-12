@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import ReactFlow, { 
   useReactFlow, 
   Controls, 
@@ -2462,6 +2463,7 @@ function FlowWithAutoFitView({
     
     // Estado para controlar modal de histórico de execuções
     const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+    const [showAllExecutions, setShowAllExecutions] = useState(false); // Toggle para mostrar todas as execuções
     const [flowActionsHistory, setFlowActionsHistory] = useState<{
       id: string;
       action_description: string;
@@ -2475,11 +2477,16 @@ function FlowWithAutoFitView({
     }[]>([]);
     
     // Função para buscar histórico de execuções
-    const fetchFlowActionsHistory = async (nodeId: string) => {
+    const fetchFlowActionsHistory = async (nodeId: string, forceAllExecutions?: boolean) => {
       try {
         // Buscar execução de fluxo para este documento
         const documentId = flowDiagramModal.flowData?.documentId || flowDiagramModal.documentId;
-        const executionId = flowDiagramModal.executionId || '';
+        let executionId = flowDiagramModal.executionId || '';
+        
+        // Se forceAllExecutions for true ou showAllExecutions estiver ativo, não passar executionId
+        if (forceAllExecutions || showAllExecutions) {
+          executionId = '';
+        }
         
         if (!documentId) {
           console.log('❌ Erro: documentId não encontrado no flowDiagramModal');
@@ -2487,7 +2494,9 @@ function FlowWithAutoFitView({
         }
         
         if (!executionId) {
-          console.log('⚠️ Aviso: executionId não encontrado no flowDiagramModal - buscando histórico para TODAS as execuções');
+          console.log('⚠️ Aviso: Mostrando histórico para TODAS as execuções do nó');
+        } else {
+          console.log('📋 Mostrando histórico apenas para a execução atual:', executionId);
         }
         
         console.log('📋 Buscando histórico para:', { documentId, nodeId, executionId });
@@ -4910,34 +4919,69 @@ function FlowWithAutoFitView({
         
         {/* Modal de Histórico de Execuções */}
         {isHistoryModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setIsHistoryModalOpen(false)}>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => {
+            setIsHistoryModalOpen(false);
+            setShowAllExecutions(false); // Resetar toggle ao clicar fora
+          }}>
             <div className="bg-white dark:bg-[#0F172A] rounded-lg shadow-lg max-w-4xl w-full max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between p-4 border-b dark:border-[#374151]">
-                <div>
-                  <h2 className="text-lg font-semibold dark:text-gray-200">Histórico de Execuções</h2>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
-                    Nó: {selectedFlowNode?.id} | Tipo: {(() => {
-                      const typeMap: { [key: string]: string } = {
-                        'startNode': 'Início',
-                        'endNode': 'Fim',
-                        'actionNode': 'Ação',
-                        'documentNode': 'Documento',
-                        'integrationNode': 'Integração',
-                        'switchNode': 'Condição'
-                      };
-                      return typeMap[selectedFlowNode?.type] || selectedFlowNode?.type;
-                    })()}
-                  </p>
+                <div className="flex-1">
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1">
+                      <h2 className="text-lg font-semibold dark:text-gray-200">Histórico de Execuções</h2>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        Nó: {selectedFlowNode?.id} | Tipo: {(() => {
+                          const typeMap: { [key: string]: string } = {
+                            'startNode': 'Início',
+                            'endNode': 'Fim',
+                            'actionNode': 'Ação',
+                            'documentNode': 'Documento',
+                            'integrationNode': 'Integração',
+                            'switchNode': 'Condição'
+                          };
+                          return typeMap[selectedFlowNode?.type] || selectedFlowNode?.type;
+                        })()}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="show-all-executions" className="text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">
+                        Mostrar todas execuções
+                      </Label>
+                      <Switch
+                        id="show-all-executions"
+                        checked={showAllExecutions}
+                        onCheckedChange={(checked) => {
+                          setShowAllExecutions(checked);
+                          // Re-buscar histórico com o novo estado
+                          fetchFlowActionsHistory(selectedFlowNode?.id, checked);
+                        }}
+                      />
+                    </div>
+                  </div>
                 </div>
                 <button
-                  onClick={() => setIsHistoryModalOpen(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded transition-colors"
+                  onClick={() => {
+                    setIsHistoryModalOpen(false);
+                    setShowAllExecutions(false); // Resetar toggle ao fechar
+                  }}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1 rounded transition-colors ml-4"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
               
               <div className="p-4 overflow-y-auto max-h-[calc(80vh-120px)]">
+                {/* Indicador visual do modo de visualização */}
+                {showAllExecutions && (
+                  <div className="mb-3 p-2 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md text-sm">
+                    Mostrando histórico de todas as execuções do nó
+                  </div>
+                )}
+                {!showAllExecutions && flowDiagramModal.executionId && (
+                  <div className="mb-3 p-2 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded-md text-sm">
+                    Mostrando apenas a execução atual: {flowDiagramModal.executionId.substring(0, 8)}...
+                  </div>
+                )}
                 {flowActionsHistory.length === 0 ? (
                   <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     <History className="w-12 h-12 mx-auto mb-4 opacity-50" />
