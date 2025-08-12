@@ -2033,15 +2033,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      const { documentId, flowNode } = req.query;
+      const { documentId, flowNode, executionId } = req.query;
       
-      console.log('📋 API /flow-actions/history - Parâmetros recebidos:', { documentId, flowNode });
+      console.log('📋 API /flow-actions/history - Parâmetros recebidos:', { documentId, flowNode, executionId });
       
       if (!documentId || !flowNode) {
         return res.status(400).json({ error: "documentId e flowNode são obrigatórios" });
       }
       
-      // Buscar flow actions em TODAS as execuções do documento para o nó específico
+      // Se executionId for fornecido, buscar apenas daquela execução específica
+      // Caso contrário, buscar de todas as execuções (comportamento anterior)
+      const whereConditions = executionId 
+        ? and(
+            eq(documentFlowExecutions.id, executionId as string),
+            eq(flowActions.flowNode, flowNode as string)
+          )
+        : and(
+            eq(documentFlowExecutions.documentId, documentId as string),
+            eq(flowActions.flowNode, flowNode as string)
+          );
+      
+      // Buscar flow actions baseado nas condições
       const flowActionsHistory = await db
         .select({
           id: flowActions.id,
@@ -2060,15 +2072,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .from(flowActions)
         .innerJoin(documentFlowExecutions, eq(flowActions.flowExecutionId, documentFlowExecutions.id))
         .leftJoin(users, eq(flowActions.actor, users.id))
-        .where(
-          and(
-            eq(documentFlowExecutions.documentId, documentId as string),
-            eq(flowActions.flowNode, flowNode as string)
-          )
-        )
+        .where(whereConditions)
         .orderBy(desc(flowActions.startedAt));
       
-      console.log(`✅ ${flowActionsHistory.length} flow actions encontradas para o nó ${flowNode}`);
+      console.log(`✅ ${flowActionsHistory.length} flow actions encontradas para o nó ${flowNode}${executionId ? ` na execução ${executionId}` : ' em todas as execuções'}`);
       
       res.json(flowActionsHistory);
       
