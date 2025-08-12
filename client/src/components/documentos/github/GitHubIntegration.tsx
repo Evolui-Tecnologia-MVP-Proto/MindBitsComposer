@@ -1,6 +1,16 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle 
+} from "@/components/ui/alert-dialog";
 import { Download, Upload, Loader2, FolderSync, Trash2 } from "lucide-react";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -17,6 +27,8 @@ export function GitHubIntegration() {
   const [selectedFolderPath, setSelectedFolderPath] = useState<string>("");
   const [selectedFolderFiles, setSelectedFolderFiles] = useState<any[]>([]);
   const [isLoadingFolderFiles, setIsLoadingFolderFiles] = useState(false);
+  const [fileToDelete, setFileToDelete] = useState<any>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Buscar estrutura local do repositório
   const { data: repoStructures = [] } = useQuery<any[]>({
@@ -297,15 +309,20 @@ export function GitHubIntegration() {
     });
   };
 
+  // Função para abrir dialog de confirmação
+  const openDeleteDialog = (file: any) => {
+    setFileToDelete(file);
+    setShowDeleteDialog(true);
+  };
+
   // Função para deletar arquivo do repositório GitHub
-  const handleDeleteFile = async (file: any) => {
-    if (!confirm(`Tem certeza que deseja excluir o arquivo "${file.name}"?`)) {
-      return;
-    }
+  const handleDeleteFile = async () => {
+    if (!fileToDelete) return;
 
     try {
-      const filePath = selectedFolderPath ? `${selectedFolderPath}/${file.name}` : file.name;
-      const response = await apiRequest("DELETE", `/api/github/repo/files`, {
+      const filePath = selectedFolderPath ? `${selectedFolderPath}/${fileToDelete.name}` : fileToDelete.name;
+      
+      const response = await apiRequest("DELETE", "/api/github/repo/files", {
         body: JSON.stringify({ path: filePath }),
         headers: { "Content-Type": "application/json" }
       });
@@ -313,20 +330,25 @@ export function GitHubIntegration() {
       if (response.ok) {
         toast({
           title: "Arquivo excluído!",
-          description: `O arquivo "${file.name}" foi removido do repositório.`,
+          description: `O arquivo "${fileToDelete.name}" foi removido do repositório.`,
         });
         
         // Recarregar a lista de arquivos da pasta
         fetchFolderFiles(selectedFolderPath);
       } else {
-        throw new Error("Erro ao excluir arquivo");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Erro ao excluir arquivo");
       }
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Erro ao deletar arquivo:", error);
       toast({
         title: "Erro",
-        description: "Não foi possível excluir o arquivo. Verifique suas permissões.",
+        description: error.message || "Não foi possível excluir o arquivo. Verifique suas permissões.",
         variant: "destructive",
       });
+    } finally {
+      setShowDeleteDialog(false);
+      setFileToDelete(null);
     }
   };
 
@@ -558,8 +580,9 @@ export function GitHubIntegration() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDeleteFile(file)}
+                          onClick={() => openDeleteDialog(file)}
                           className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                          title="Excluir arquivo"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -589,6 +612,33 @@ export function GitHubIntegration() {
           </div>
         </div>
       </div>
+
+      {/* Dialog de confirmação para exclusão */}
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir o arquivo "{fileToDelete?.name}"?
+              <br />
+              <span className="text-red-600 dark:text-red-400 font-medium">
+                Esta ação não pode ser desfeita.
+              </span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setShowDeleteDialog(false)}>
+              Cancelar
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteFile}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Excluir Arquivo
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
