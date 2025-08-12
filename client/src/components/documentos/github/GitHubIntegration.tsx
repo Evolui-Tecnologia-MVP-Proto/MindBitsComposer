@@ -344,8 +344,12 @@ export function GitHubIntegration() {
           description: `O arquivo "${fileToDelete.name}" foi removido do repositório.`,
         });
         
-        // Recarregar a lista de arquivos da pasta
-        fetchFolderFiles(selectedFolderPath);
+        // Recarregar a lista de arquivos da pasta atual
+        console.log('🔄 Recarregando lista de arquivos da pasta:', selectedFolderPath);
+        await fetchFolderFiles(selectedFolderPath);
+        
+        // Também recarregar a estrutura geral do repositório
+        await fetchGithubRepoStructure();
       } else {
         const errorData = await response.json();
         console.error('❌ Erro na resposta:', errorData);
