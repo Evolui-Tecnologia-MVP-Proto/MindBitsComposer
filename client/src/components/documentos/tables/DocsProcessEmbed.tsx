@@ -2483,8 +2483,8 @@ function FlowWithAutoFitView({
         const documentId = flowDiagramModal.flowData?.documentId || flowDiagramModal.documentId;
         let executionId = flowDiagramModal.executionId || '';
         
-        // Se forceAllExecutions for true ou showAllExecutions estiver ativo, não passar executionId
-        if (forceAllExecutions || showAllExecutions) {
+        // Se forceAllExecutions for true, não passar executionId para buscar todas as execuções
+        if (forceAllExecutions === true) {
           executionId = '';
         }
         
@@ -3952,7 +3952,7 @@ function FlowWithAutoFitView({
                 {/* Botão de histórico de execuções */}
                 <button
                   onClick={() => {
-                    fetchFlowActionsHistory(selectedFlowNode.id);
+                    fetchFlowActionsHistory(selectedFlowNode.id, false); // Inicializar sempre com execução atual
                     setIsHistoryModalOpen(true);
                   }}
                   className="absolute top-0 right-8 p-1 rounded transition-colors text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-[#1F2937]"
@@ -4951,8 +4951,9 @@ function FlowWithAutoFitView({
                         id="show-all-executions"
                         checked={showAllExecutions}
                         onCheckedChange={(checked) => {
+                          console.log('🔄 Toggle mudou para:', checked ? 'TODAS as execuções' : 'APENAS execução atual');
                           setShowAllExecutions(checked);
-                          // Re-buscar histórico com o novo estado
+                          // Re-buscar histórico com o parâmetro específico
                           fetchFlowActionsHistory(selectedFlowNode?.id, checked);
                         }}
                       />
