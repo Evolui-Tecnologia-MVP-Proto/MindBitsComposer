@@ -2099,17 +2099,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "documentId, flowNode e actionDescription são obrigatórios" });
       }
       
-      // Buscar a execução de fluxo mais recente para este documento
+      // Buscar a execução de fluxo com status "initiated" para este documento
       const flowExecution = await db
         .select()
         .from(documentFlowExecutions)
-        .where(eq(documentFlowExecutions.documentId, documentId))
-        .orderBy(desc(documentFlowExecutions.createdAt))
+        .where(and(
+          eq(documentFlowExecutions.documentId, documentId),
+          eq(documentFlowExecutions.status, 'initiated')
+        ))
         .limit(1);
       
       if (!flowExecution || flowExecution.length === 0) {
-        console.log('❌ Nenhuma execução de fluxo encontrada para o documento:', documentId);
-        return res.status(404).json({ error: "Nenhuma execução de fluxo encontrada para este documento" });
+        console.log('❌ Nenhuma execução de fluxo com status "initiated" encontrada para o documento:', documentId);
+        return res.status(404).json({ error: "Nenhuma execução de fluxo ativa encontrada para este documento" });
       }
       
       const now = new Date();
@@ -5588,8 +5590,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         const flowExecution = await db.select()
           .from(documentFlowExecutions)
-          .where(eq(documentFlowExecutions.documentId, documentId))
-          .orderBy(desc(documentFlowExecutions.createdAt))
+          .where(and(
+            eq(documentFlowExecutions.documentId, documentId),
+            eq(documentFlowExecutions.status, 'initiated')
+          ))
           .limit(1);
         
         if (flowExecution.length > 0) {
