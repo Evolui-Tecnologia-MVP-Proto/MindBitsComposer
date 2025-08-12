@@ -309,11 +309,8 @@ export function GitHubIntegration() {
   };
 
   return (
-    <div 
-      className="flex flex-col bg-white dark:bg-[#0F172A]" 
-      style={{ height: 'calc(100vh - 10px)', maxHeight: 'calc(100vh - 10px)', overflow: 'hidden' }}
-    >
-      <div className="bg-white dark:bg-[#0F172A] rounded-lg border dark:border-[#374151] p-6 h-full flex flex-col overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="bg-white dark:bg-[#0F172A] rounded-lg border dark:border-[#374151] p-6 flex-1 min-h-0 flex flex-col overflow-hidden">
         <div className="flex items-center justify-between mb-6 flex-shrink-0">
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">
@@ -366,9 +363,9 @@ export function GitHubIntegration() {
           </div>
         </div>
 
-        <div className="border-t dark:border-[#374151] pt-6 bg-white dark:bg-[#0F172A] p-4 rounded-lg flex-1 overflow-hidden">
+        <div className="border-t dark:border-[#374151] pt-6 bg-white dark:bg-[#0F172A] p-4 rounded-lg flex-1 min-h-0 overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
-            <div className="bg-white dark:bg-[#1F2937] p-4 rounded-lg flex flex-col overflow-hidden" style={{ height: 'calc(100vh - 180px)' }}>
+            <div className="bg-white dark:bg-[#1F2937] p-4 rounded-lg flex flex-col h-full overflow-hidden">
               <div className="flex items-center justify-between mb-4 flex-shrink-0">
                 <h4 className="font-medium text-gray-900 dark:text-[#E5E7EB]">
                   Estrutura do Repositório
@@ -390,7 +387,7 @@ export function GitHubIntegration() {
                 )}
               </div>
 
-              <div className="overflow-y-auto" style={{ height: 'calc(100vh - 240px)' }}>
+              <div className="flex-1 min-h-0 overflow-y-auto">
                 {githubRepoFiles.length > 0 ? (
                   <FileExplorer
                     data={githubRepoFiles}
@@ -486,7 +483,7 @@ export function GitHubIntegration() {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-[#1F2937] p-4 rounded-lg flex flex-col overflow-hidden" style={{ height: 'calc(100vh - 180px)' }}>
+            <div className="bg-white dark:bg-[#1F2937] p-4 rounded-lg flex flex-col h-full overflow-hidden">
               <h4 className="font-medium text-gray-900 dark:text-[#E5E7EB] mb-4 flex-shrink-0">
                 {selectedFolderPath ? (
                   <span>
@@ -499,7 +496,7 @@ export function GitHubIntegration() {
                   "Arquivos na pasta"
                 )}
               </h4>
-              <div className="overflow-y-auto space-y-3" style={{ height: 'calc(100vh - 240px)' }}>
+              <div className="flex-1 min-h-0 overflow-y-auto space-y-3">
                 {isLoadingFolderFiles ? (
                   <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
