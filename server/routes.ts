@@ -5004,9 +5004,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
+      console.log('🗑️ DELETE request body:', req.body);
       const { path: filePath } = req.body;
       
-      if (!filePath) {
+      console.log('🗑️ Extracted filePath:', filePath);
+      
+      if (!filePath || filePath.trim() === '') {
+        console.log('❌ Missing file path in request');
         return res.status(400).json({ error: "Caminho do arquivo é obrigatório" });
       }
 

@@ -320,7 +320,15 @@ export function GitHubIntegration() {
     if (!fileToDelete) return;
 
     try {
-      const filePath = selectedFolderPath ? `${selectedFolderPath}/${fileToDelete.name}` : fileToDelete.name;
+      // Usar o path completo do arquivo se disponível, senão construir
+      const filePath = fileToDelete.path || (selectedFolderPath ? `${selectedFolderPath}/${fileToDelete.name}` : fileToDelete.name);
+      
+      console.log('🗑️ Tentando deletar arquivo:', {
+        fileName: fileToDelete.name,
+        selectedFolderPath,
+        constructedPath: filePath,
+        fileObject: fileToDelete
+      });
       
       const response = await apiRequest("DELETE", "/api/github/repo/files", {
         body: JSON.stringify({ path: filePath }),
@@ -337,6 +345,7 @@ export function GitHubIntegration() {
         fetchFolderFiles(selectedFolderPath);
       } else {
         const errorData = await response.json();
+        console.error('❌ Erro na resposta:', errorData);
         throw new Error(errorData.error || "Erro ao excluir arquivo");
       }
     } catch (error: any) {
