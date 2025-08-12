@@ -309,8 +309,8 @@ export function GitHubIntegration() {
   };
 
   return (
-    <div className="flex flex-col flex-1 bg-white dark:bg-[#0F172A]">
-      <div className="bg-white dark:bg-[#0F172A] rounded-lg border dark:border-[#374151] p-6 flex-1 flex flex-col">
+    <div className="flex flex-col h-[calc(100vh-10rem)] bg-white dark:bg-[#0F172A]">
+      <div className="bg-white dark:bg-[#0F172A] rounded-lg border dark:border-[#374151] p-6 flex-1 flex flex-col overflow-hidden">
         <div className="flex items-center justify-between mb-6 flex-shrink-0">
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">
@@ -363,9 +363,9 @@ export function GitHubIntegration() {
           </div>
         </div>
 
-        <div className="border-t dark:border-[#374151] pt-6 bg-white dark:bg-[#0F172A] p-4 rounded-lg flex-1 flex flex-col min-h-0">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0">
-            <div className="space-y-4 bg-white dark:bg-[#1F2937] p-4 rounded-lg flex flex-col">
+        <div className="border-t dark:border-[#374151] pt-6 bg-white dark:bg-[#0F172A] p-4 rounded-lg flex-1 flex flex-col min-h-0 overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0 overflow-hidden">
+            <div className="bg-white dark:bg-[#1F2937] p-4 rounded-lg flex flex-col h-full overflow-hidden">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="font-medium text-gray-900 dark:text-[#E5E7EB]">
                   Estrutura do Repositório
@@ -387,7 +387,7 @@ export function GitHubIntegration() {
                 )}
               </div>
 
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto min-h-0 max-h-[calc(100vh-25rem)]">
                 {githubRepoFiles.length > 0 ? (
                   <FileExplorer
                     data={githubRepoFiles}
@@ -483,8 +483,8 @@ export function GitHubIntegration() {
               </div>
             </div>
 
-            <div className="space-y-4 bg-white dark:bg-[#1F2937] p-4 rounded-lg flex flex-col">
-              <h4 className="font-medium text-gray-900 dark:text-[#E5E7EB]">
+            <div className="bg-white dark:bg-[#1F2937] p-4 rounded-lg flex flex-col h-full overflow-hidden">
+              <h4 className="font-medium text-gray-900 dark:text-[#E5E7EB] mb-4 flex-shrink-0">
                 {selectedFolderPath ? (
                   <span>
                     Arquivos em:{" "}
@@ -496,7 +496,7 @@ export function GitHubIntegration() {
                   "Arquivos na pasta"
                 )}
               </h4>
-              <div className="flex-1 overflow-y-auto space-y-3">
+              <div className="flex-1 overflow-y-auto min-h-0 max-h-[calc(100vh-25rem)] space-y-3">
                 {isLoadingFolderFiles ? (
                   <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
