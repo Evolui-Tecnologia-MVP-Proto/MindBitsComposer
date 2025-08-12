@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Upload, Loader2, FolderSync } from "lucide-react";
+import { Download, Upload, Loader2, FolderSync, Trash2 } from "lucide-react";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -297,6 +297,39 @@ export function GitHubIntegration() {
     });
   };
 
+  // Função para deletar arquivo do repositório GitHub
+  const handleDeleteFile = async (file: any) => {
+    if (!confirm(`Tem certeza que deseja excluir o arquivo "${file.name}"?`)) {
+      return;
+    }
+
+    try {
+      const filePath = selectedFolderPath ? `${selectedFolderPath}/${file.name}` : file.name;
+      const response = await apiRequest("DELETE", `/api/github/repo/files`, {
+        body: JSON.stringify({ path: filePath }),
+        headers: { "Content-Type": "application/json" }
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Arquivo excluído!",
+          description: `O arquivo "${file.name}" foi removido do repositório.`,
+        });
+        
+        // Recarregar a lista de arquivos da pasta
+        fetchFolderFiles(selectedFolderPath);
+      } else {
+        throw new Error("Erro ao excluir arquivo");
+      }
+    } catch (error) {
+      toast({
+        title: "Erro",
+        description: "Não foi possível excluir o arquivo. Verifique suas permissões.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getUnsyncedCount = () => {
     return repoStructures.filter(
       (folder: any) =>
@@ -522,9 +555,14 @@ export function GitHubIntegration() {
                             </div>
                           </div>
                         </div>
-                        <Badge variant="secondary" className="text-xs">
-                          GitHub
-                        </Badge>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteFile(file)}
+                          className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     ),
                   )

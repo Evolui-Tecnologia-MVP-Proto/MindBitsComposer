@@ -4999,6 +4999,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Delete file from GitHub repository
+  app.delete("/api/github/repo/files", async (req: Request, res: Response) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const { path: filePath } = req.body;
+      
+      if (!filePath) {
+        return res.status(400).json({ error: "Caminho do arquivo é obrigatório" });
+      }
+
+      const githubConnection = await storage.getServiceConnection("github");
+      if (!githubConnection) {
+        return res.status(400).json({ error: "Conexão GitHub não encontrada" });
+      }
+
+      const [owner, repo] = githubConnection.parameters[0].split('/');
+      
+      // Primeiro, obter o SHA do arquivo
+      const getFileResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
+        headers: {
+          Authorization: `token ${githubConnection.token}`,
+          Accept: "application/vnd.github.v3+json",
+          "User-Agent": "EVO-MindBits-Composer",
+        },
+      });
+
+      if (!getFileResponse.ok) {
+        const errorText = await getFileResponse.text();
+        console.error("Erro ao buscar arquivo:", getFileResponse.status, errorText);
+        return res.status(getFileResponse.status).json({ error: "Arquivo não encontrado ou erro ao acessar" });
+      }
+
+      const fileData = await getFileResponse.json();
+      
+      // Agora deletar o arquivo usando o SHA
+      const deleteResponse = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `token ${githubConnection.token}`,
+          Accept: "application/vnd.github.v3+json",
+          "User-Agent": "EVO-MindBits-Composer",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: `Excluir arquivo ${filePath}`,
+          sha: fileData.sha
+        })
+      });
+
+      if (deleteResponse.ok) {
+        const result = await deleteResponse.json();
+        res.json({ 
+          success: true, 
+          message: `Arquivo ${filePath} excluído com sucesso`,
+          commit: result.commit
+        });
+      } else {
+        const errorText = await deleteResponse.text();
+        console.error("Erro ao deletar arquivo:", deleteResponse.status, errorText);
+        res.status(deleteResponse.status).json({ error: "Erro ao deletar arquivo do repositório" });
+      }
+    } catch (error) {
+      console.error("Erro ao deletar arquivo do GitHub:", error);
+      res.status(500).json({ error: "Erro interno do servidor" });
+    }
+  });
+
   // Get flow executions for documents (both active and concluded)
   app.get("/api/document-flow-executions", async (req: Request, res: Response) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
