@@ -330,9 +330,12 @@ export function GitHubIntegration() {
         fileObject: fileToDelete
       });
       
-      const response = await apiRequest("DELETE", "/api/github/repo/files", {
-        body: JSON.stringify({ path: filePath }),
-        headers: { "Content-Type": "application/json" }
+      const response = await fetch("/api/github/repo/files", {
+        method: "DELETE",
+        headers: { 
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ path: filePath })
       });
 
       if (response.ok) {

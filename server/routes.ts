@@ -5005,7 +5005,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       console.log('🗑️ DELETE request body:', req.body);
-      const { path: filePath } = req.body;
+      
+      // O body pode vir como string JSON ou objeto
+      let parsedBody = req.body;
+      if (typeof req.body.body === 'string') {
+        try {
+          parsedBody = JSON.parse(req.body.body);
+        } catch (e) {
+          console.log('❌ Error parsing JSON body:', e);
+          return res.status(400).json({ error: "Formato de dados inválido" });
+        }
+      }
+      
+      const { path: filePath } = parsedBody;
       
       console.log('🗑️ Extracted filePath:', filePath);
       
