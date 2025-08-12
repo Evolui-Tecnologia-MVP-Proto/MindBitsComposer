@@ -2455,7 +2455,17 @@ function FlowWithAutoFitView({
     
     // Estado para controlar modal de histórico de execuções
     const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
-    const [flowActionsHistory, setFlowActionsHistory] = useState<any[]>([]);
+    const [flowActionsHistory, setFlowActionsHistory] = useState<{
+      id: string;
+      action_description: string;
+      actor: string | null;
+      started_at: string;
+      end_at: string | null;
+      status: string;
+      flow_node: string;
+      execution_id: string;
+      result_data: any;
+    }[]>([]);
     
     // Função para buscar histórico de execuções
     const fetchFlowActionsHistory = async (nodeId: string) => {
@@ -4929,6 +4939,7 @@ function FlowWithAutoFitView({
                         <tr className="border-b dark:border-[#374151]">
                           <th className="text-left p-3 font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-[#0F172A]">Ação</th>
                           <th className="text-left p-3 font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-[#0F172A]">Por</th>
+                          <th className="text-left p-3 font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-[#0F172A]">Execução ID</th>
                           <th className="text-left p-3 font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-[#0F172A]">Iniciado em</th>
                           <th className="text-left p-3 font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-[#0F172A]">Finalizado em</th>
                         </tr>
@@ -4941,6 +4952,11 @@ function FlowWithAutoFitView({
                             </td>
                             <td className="p-3 text-sm text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-[#0F172A]">
                               {action.actor || '-'}
+                            </td>
+                            <td className="p-3 text-sm text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-[#0F172A]">
+                              <span className="font-mono text-xs text-blue-600 dark:text-blue-400" title={action.execution_id}>
+                                {action.execution_id ? action.execution_id.substring(0, 8) : '-'}
+                              </span>
                             </td>
                             <td className="p-3 text-sm text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-[#0F172A]">
                               {action.started_at ? new Date(action.started_at).toLocaleString('pt-BR') : '-'}
