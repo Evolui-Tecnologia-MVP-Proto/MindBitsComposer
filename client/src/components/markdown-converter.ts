@@ -126,7 +126,14 @@ export function createMarkdownConverter() {
       markdown += '\n';
     } else if (node.getType() === 'code') {
       const text = node.getTextContent();
-      markdown += '```\n' + text + '\n```\n\n';
+      // Check if the code node has a language specified
+      const language = node.getLanguage ? node.getLanguage() : '';
+      
+      if (language && language.trim() !== '') {
+        markdown += '```' + language + '\n' + text + '\n```\n\n';
+      } else {
+        markdown += '```\n' + text + '\n```\n\n';
+      }
     } else if (node.getType() === 'paragraph') {
       const paragraphImages = extractImagesRecursively(node);
       
