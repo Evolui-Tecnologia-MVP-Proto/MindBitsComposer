@@ -6332,6 +6332,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       .orderBy(desc(documentEditions.updatedAt));
       
       console.log(`🔍 [API] Buscando document_editions para biblioteca do usuário: ${req.user.id}`);
+      console.log(`🔍 [API] Status permitidos: in_progress, done, editing, refact, ready_to_next, published, to_refact`);
+      
+      // Debug: log específico para to_refact
+      const toRefactEditions = libraryEditions.filter(e => e.status === 'to_refact');
+      console.log(`🔍 [API] Edições com status to_refact: ${toRefactEditions.length}`);
+      if (toRefactEditions.length > 0) {
+        console.log(`🔍 [API] Edições to_refact:`, toRefactEditions.map(e => ({ id: e.id, documentId: e.documentId, status: e.status })));
+      }
+      
       console.log(`✅ [API] Encontradas ${libraryEditions.length} edições na biblioteca para o usuário`);
       
       res.json(libraryEditions);
