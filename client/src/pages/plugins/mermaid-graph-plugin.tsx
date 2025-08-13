@@ -110,7 +110,7 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
   });
 
   // Função para converter SVG para PNG e salvar
-  const handleSaveDiagram = async () => {
+  const handleSaveDiagram = async (location?: 'global' | 'myassets') => {
     if (!diagramName.trim()) {
       toast({
         title: "Nome obrigatório",
@@ -202,7 +202,7 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
         name: fileName, 
         imageData: base64Data,
         mermaidDefinition: mermaidCode,
-        location: saveLocation
+        location: location || saveLocation
       });
 
     } catch (error) {
@@ -399,7 +399,7 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
               className="w-48 h-8 text-sm dark:bg-[#0F172A] dark:border-[#374151] dark:text-[#E5E7EB] dark:placeholder-[#6B7280]"
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && diagramName.trim()) {
-                  handleSaveDiagram();
+                  handleSaveDiagram(saveLocation);
                 }
               }}
             />
@@ -424,8 +424,7 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
               <DropdownMenuContent align="end">
                 <DropdownMenuItem
                   onClick={() => {
-                    setSaveLocation('global');
-                    handleSaveDiagram();
+                    handleSaveDiagram('global');
                   }}
                   disabled={!diagramName.trim() || saveDiagramMutation.isPending}
                 >
@@ -433,8 +432,7 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
-                    setSaveLocation('myassets');
-                    handleSaveDiagram();
+                    handleSaveDiagram('myassets');
                   }}
                   disabled={!diagramName.trim() || !selectedEdition || saveDiagramMutation.isPending}
                 >
