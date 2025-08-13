@@ -1989,24 +1989,24 @@ export default function LexicalPage() {
                             </div>
                           ) : (
                             Array.isArray(documentEditions) && 
-                            // Ordenar documentos: Em Edição > Encaminhado > Na Fila > Finalizado
+                            // Ordenar documentos: Em Edição > Encaminhado > Publicado > Na Fila > Finalizado
                             documentEditions
                               .sort((a: any, b: any) => {
-                                const statusOrder = { 'editing': 1, 'ready_to_next': 2, 'in_progress': 3, 'refact': 4, 'done': 5 };
-                                return (statusOrder[a.status as keyof typeof statusOrder] || 3) - (statusOrder[b.status as keyof typeof statusOrder] || 3);
+                                const statusOrder = { 'editing': 1, 'ready_to_next': 2, 'published': 3, 'in_progress': 4, 'refact': 5, 'done': 6 };
+                                return (statusOrder[a.status as keyof typeof statusOrder] || 4) - (statusOrder[b.status as keyof typeof statusOrder] || 4);
                               })
                               .map((edition: any) => (
                               <div
                                 key={edition.id}
                                 className={`p-3 border rounded-lg relative overflow-hidden dark:bg-[#111827] dark:border-[#374151] ${
-                                  edition.status === 'done' || edition.status === 'ready_to_next' 
+                                  edition.status === 'done' || edition.status === 'ready_to_next' || edition.status === 'published'
                                     ? 'cursor-not-allowed opacity-60 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600' 
                                     : `cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E293B] ${
                                         selectedEdition?.id === edition.id ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/30' : ''
                                       }`
                                 }`}
                                 onClick={() => {
-                                  if (edition.status !== 'done' && edition.status !== 'ready_to_next') {
+                                  if (edition.status !== 'done' && edition.status !== 'ready_to_next' && edition.status !== 'published') {
                                     handleSelectEdition(edition);
                                   }
                                 }}
@@ -2029,8 +2029,12 @@ export default function LexicalPage() {
                                     <Badge className="text-xs px-2 py-1 font-medium" style={{ backgroundColor: '#f97316', color: '#ffffff' }}>
                                       Encaminhado
                                     </Badge>
-                                  ) : (
+                                  ) : edition.status === 'published' ? (
                                     <Badge className="text-xs px-2 py-1 font-medium" style={{ backgroundColor: '#eab308', color: '#1f2937' }}>
+                                      Publicado
+                                    </Badge>
+                                  ) : (
+                                    <Badge className="text-xs px-2 py-1 font-medium" style={{ backgroundColor: '#6b7280', color: '#ffffff' }}>
                                       Na Fila
                                     </Badge>
                                   )}
@@ -2042,6 +2046,8 @@ export default function LexicalPage() {
                                         ? 'text-green-600 dark:text-green-400' 
                                         : edition.status === 'ready_to_next'
                                         ? 'text-orange-500 dark:text-orange-400'
+                                        : edition.status === 'published'
+                                        ? 'text-yellow-600 dark:text-yellow-400'
                                         : 'text-blue-600 dark:text-blue-400'
                                     }`}>
                                       {edition.templateCode}
