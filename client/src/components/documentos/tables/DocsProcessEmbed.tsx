@@ -4537,7 +4537,7 @@ function FlowWithAutoFitView({
                       disabled={selectedFlowNode.data.isExecuted === 'TRUE' || !checkUserAccessToNode(selectedFlowNode)}
                       className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                         selectedFlowNode.data.isExecuted === 'TRUE' || !checkUserAccessToNode(selectedFlowNode)
-                          ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                          ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed flow-execution-btn-disabled'
                           : 'bg-yellow-600 text-white hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2'
                       }`}
                     >
@@ -4736,7 +4736,7 @@ function FlowWithAutoFitView({
                           disabled={selectedFlowNode.data.isExecuted === 'TRUE' || !checkUserAccessToNode(selectedFlowNode)}
                           className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                             selectedFlowNode.data.isExecuted === 'TRUE' || !checkUserAccessToNode(selectedFlowNode)
-                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                              ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed flow-execution-btn-disabled'
                               : 'bg-amber-600 text-white hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2'
                           }`}
                         >
@@ -4779,7 +4779,7 @@ function FlowWithAutoFitView({
                           disabled={selectedFlowNode.data.isExecuted === 'TRUE' || !checkUserAccessToNode(selectedFlowNode)}
                           className={`w-full px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                             selectedFlowNode.data.isExecuted === 'TRUE' || !checkUserAccessToNode(selectedFlowNode)
-                              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                              ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 cursor-not-allowed flow-execution-btn-disabled'
                               : 'bg-red-600 text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2'
                           }`}
                         >
