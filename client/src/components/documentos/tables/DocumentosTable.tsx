@@ -435,8 +435,8 @@ export function DocumentosTable({
                     );
                   } else if (documento.taskState === 'ready_to_next') {
                     return (
-                      <Badge variant="secondary" className="bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400 border-orange-200 dark:border-orange-600 text-center flex justify-center">
-                        [Encaminhado]
+                      <Badge variant="secondary" className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 border-blue-200 dark:border-blue-600 text-center flex justify-center">
+                        Edição Concluída
                       </Badge>
                     );
                   } else if (documento.taskState === 'completed') {

@@ -3539,8 +3539,8 @@ function FlowWithAutoFitView({
             console.error('❌ Erro ao criar flow action:', error);
           }
 
-          // Atualizar task_state e document_editions.status baseado no status de aprovação
-          const newTaskState = approvalStatus === 'TRUE' ? 'ready_to_next' : 'to_refact';
+          // Atualizar task_state do documento baseado no status de aprovação
+          const newTaskState = approvalStatus === 'TRUE' ? 'ready_to_publish' : 'to_refact';
           
           try {
             const documentUpdateResponse = await fetch(`/api/documentos/${flowData.documentId}`, {
@@ -3552,25 +3552,6 @@ function FlowWithAutoFitView({
                 taskState: newTaskState
               })
             });
-            
-            // Se aprovado, atualizar também o status das document_editions para ready_to_next
-            if (approvalStatus === 'TRUE') {
-              const editionsStatusResponse = await fetch(`/api/documents/${flowData.documentId}/editions/status`, {
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  status: 'ready_to_next'
-                })
-              });
-
-              if (editionsStatusResponse.ok) {
-                console.log('✅ Status das document_editions atualizado para "ready_to_next"');
-              } else {
-                console.error('❌ Erro ao atualizar status das document_editions');
-              }
-            }
 
             if (documentUpdateResponse.ok) {
               console.log(`✅ Task state atualizado para: ${newTaskState}`);
