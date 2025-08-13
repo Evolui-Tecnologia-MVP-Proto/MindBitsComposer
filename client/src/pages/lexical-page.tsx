@@ -1436,11 +1436,20 @@ export default function LexicalPage() {
   const executeSelectEdition = async (edition: any) => {
     console.log('Selecionando edition:', edition);
     
-    // Verificar se o documento está finalizado e impedir a edição
+    // Verificar se o documento está finalizado ou para refact e impedir a edição
     if (edition.status === 'done') {
       toast({
         title: "Documento finalizado",
         description: "Documentos finalizados não podem ser editados. Use a visualização para consultar o conteúdo.",
+        variant: "destructive",
+      });
+      return; // Interrompe a execução
+    }
+    
+    if (edition.status === 'to_refact') {
+      toast({
+        title: "Documento para refatoração",
+        description: "Documentos marcados para refatoração não podem ser editados no momento.",
         variant: "destructive",
       });
       return; // Interrompe a execução
@@ -1989,24 +1998,24 @@ export default function LexicalPage() {
                             </div>
                           ) : (
                             Array.isArray(documentEditions) && 
-                            // Ordenar documentos: Em Edição > Encaminhado > Publicado > Na Fila > Finalizado
+                            // Ordenar documentos: Em Edição > Encaminhado > Publicado > Na Fila > Para Refact > Refatorar > Finalizado
                             documentEditions
                               .sort((a: any, b: any) => {
-                                const statusOrder = { 'editing': 1, 'ready_to_next': 2, 'published': 3, 'in_progress': 4, 'refact': 5, 'done': 6 };
+                                const statusOrder = { 'editing': 1, 'ready_to_next': 2, 'published': 3, 'in_progress': 4, 'to_refact': 5, 'refact': 6, 'done': 7 };
                                 return (statusOrder[a.status as keyof typeof statusOrder] || 4) - (statusOrder[b.status as keyof typeof statusOrder] || 4);
                               })
                               .map((edition: any) => (
                               <div
                                 key={edition.id}
                                 className={`p-3 border rounded-lg relative overflow-hidden dark:bg-[#111827] dark:border-[#374151] ${
-                                  edition.status === 'done' || edition.status === 'ready_to_next' || edition.status === 'published'
+                                  edition.status === 'done' || edition.status === 'ready_to_next' || edition.status === 'published' || edition.status === 'to_refact'
                                     ? 'cursor-not-allowed opacity-60 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600' 
                                     : `cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E293B] ${
                                         selectedEdition?.id === edition.id ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/30' : ''
                                       }`
                                 }`}
                                 onClick={() => {
-                                  if (edition.status !== 'done' && edition.status !== 'ready_to_next' && edition.status !== 'published') {
+                                  if (edition.status !== 'done' && edition.status !== 'ready_to_next' && edition.status !== 'published' && edition.status !== 'to_refact') {
                                     handleSelectEdition(edition);
                                   }
                                 }}
@@ -2024,6 +2033,10 @@ export default function LexicalPage() {
                                   ) : edition.status === 'refact' ? (
                                     <Badge className="text-xs px-2 py-1 font-medium" style={{ backgroundColor: '#dc2626', color: '#ffffff' }}>
                                       Refatorar
+                                    </Badge>
+                                  ) : edition.status === 'to_refact' ? (
+                                    <Badge className="text-xs px-2 py-1 font-medium" style={{ backgroundColor: '#a855f7', color: '#ffffff' }}>
+                                      Para Refact.
                                     </Badge>
                                   ) : edition.status === 'ready_to_next' ? (
                                     <Badge className="text-xs px-2 py-1 font-medium" style={{ backgroundColor: '#f97316', color: '#ffffff' }}>
@@ -2048,6 +2061,8 @@ export default function LexicalPage() {
                                         ? 'text-orange-500 dark:text-orange-400'
                                         : edition.status === 'published'
                                         ? 'text-yellow-600 dark:text-yellow-400'
+                                        : edition.status === 'to_refact'
+                                        ? 'text-purple-600 dark:text-purple-400'
                                         : 'text-blue-600 dark:text-blue-400'
                                     }`}>
                                       {edition.templateCode}

@@ -3608,27 +3608,26 @@ function FlowWithAutoFitView({
           }
 
           // Atualizar document_editions.status baseado no status de aprovação
-          if (approvalStatus === 'TRUE') {
-            try {
-              const editionsUpdateResponse = await fetch(`/api/documents/${flowData.documentId}/editions/status`, {
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  status: 'ready_to_next'
-                }),
-              });
-              
-              if (editionsUpdateResponse.ok) {
-                const editionsResult = await editionsUpdateResponse.json();
-                console.log(`✅ ${editionsResult.updatedCount} document editions atualizadas para status "ready_to_next"`);
-              } else {
-                console.error('❌ Erro ao atualizar document editions status para ready_to_next');
-              }
-            } catch (error) {
-              console.error('❌ Erro ao atualizar document editions status:', error);
+          try {
+            const newEditionStatus = approvalStatus === 'TRUE' ? 'ready_to_next' : 'to_refact';
+            const editionsUpdateResponse = await fetch(`/api/documents/${flowData.documentId}/editions/status`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                status: newEditionStatus
+              }),
+            });
+            
+            if (editionsUpdateResponse.ok) {
+              const editionsResult = await editionsUpdateResponse.json();
+              console.log(`✅ ${editionsResult.updatedCount} document editions atualizadas para status "${newEditionStatus}"`);
+            } else {
+              console.error(`❌ Erro ao atualizar document editions status para ${newEditionStatus}`);
             }
+          } catch (error) {
+            console.error('❌ Erro ao atualizar document editions status:', error);
           }
         }
         console.log('Atualizando estado local com:', updatedFlowTasks);
