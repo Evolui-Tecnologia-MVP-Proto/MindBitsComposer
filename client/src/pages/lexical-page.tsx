@@ -1989,11 +1989,11 @@ export default function LexicalPage() {
                             </div>
                           ) : (
                             Array.isArray(documentEditions) && 
-                            // Ordenar documentos: Em Edição > Na Fila > Finalizado
+                            // Ordenar documentos: Em Edição > Encaminhado > Na Fila > Finalizado
                             documentEditions
                               .sort((a: any, b: any) => {
-                                const statusOrder = { 'editing': 1, 'in_progress': 2, 'done': 3 };
-                                return (statusOrder[a.status as keyof typeof statusOrder] || 2) - (statusOrder[b.status as keyof typeof statusOrder] || 2);
+                                const statusOrder = { 'editing': 1, 'ready_to_next': 2, 'in_progress': 3, 'refact': 4, 'done': 5 };
+                                return (statusOrder[a.status as keyof typeof statusOrder] || 3) - (statusOrder[b.status as keyof typeof statusOrder] || 3);
                               })
                               .map((edition: any) => (
                               <div
@@ -2020,6 +2020,10 @@ export default function LexicalPage() {
                                   ) : edition.status === 'refact' ? (
                                     <Badge className="text-xs px-2 py-1 font-medium" style={{ backgroundColor: '#dc2626', color: '#ffffff' }}>
                                       Refatorar
+                                    </Badge>
+                                  ) : edition.status === 'ready_to_next' ? (
+                                    <Badge className="text-xs px-2 py-1 font-medium" style={{ backgroundColor: '#f97316', color: '#ffffff' }}>
+                                      Encaminhado
                                     </Badge>
                                   ) : (
                                     <Badge className="text-xs px-2 py-1 font-medium" style={{ backgroundColor: '#eab308', color: '#1f2937' }}>
