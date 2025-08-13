@@ -43,11 +43,14 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
       if (data.location === 'global') {
         const globalAssetData = {
           name: data.name,
+          fileName: data.name,
           fileData: data.imageData,
           fileSize: Math.round(data.imageData.length * 0.75).toString(),
           mimeType: 'image/png',
+          type: 'png',
           isImage: 'true',
-          description: 'Diagrama Mermaid gerado'
+          description: 'Diagrama Mermaid gerado',
+          fileMetadata: data.mermaidDefinition
         };
 
         const response = await apiRequest('POST', '/api/global-assets', globalAssetData);

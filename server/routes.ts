@@ -6148,38 +6148,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const file = req.file;
-      const { name, description = "", tags = "", fileMetadata = null, editor = null } = req.body;
+      const { name, description = "", tags = "", fileMetadata = null, editor = null, fileData = null, fileName = null, fileSize = null, mimeType = null, type = null, isImage = null } = req.body;
       
-      if (!file) {
+      // Check if it's a multipart upload (traditional file upload) or JSON with base64 data
+      if (file) {
+        // Traditional file upload
+        const base64FileData = file.buffer.toString('base64');
+        const fileIsImage = file.mimetype.startsWith('image/') ? "true" : "false";
+        const fileType = file.mimetype.split('/')[1] || 'unknown';
+
+        const assetData = {
+          name: name || file.originalname,
+          fileData: base64FileData,
+          fileName: file.originalname,
+          fileSize: file.size.toString(),
+          mimeType: file.mimetype,
+          type: fileType,
+          isImage: fileIsImage,
+          uploadedBy: req.user.id,
+          description,
+          tags,
+          fileMetadata,
+          editor
+        };
+
+        const asset = await storage.createGlobalAsset(assetData);
+        res.status(201).json(asset);
+      } else if (fileData && fileName && fileSize && mimeType) {
+        // JSON upload with base64 data (for programmatic uploads like Mermaid)
+        const assetData = {
+          name: name || fileName,
+          fileData,
+          fileName,
+          fileSize,
+          mimeType,
+          type: type || mimeType.split('/')[1] || 'unknown',
+          isImage: isImage || (mimeType.startsWith('image/') ? "true" : "false"),
+          uploadedBy: req.user.id,
+          description,
+          tags,
+          fileMetadata,
+          editor
+        };
+
+        const asset = await storage.createGlobalAsset(assetData);
+        res.status(201).json(asset);
+      } else {
         return res.status(400).send("Arquivo é obrigatório");
       }
-
-      // Convert file to base64
-      const fileData = file.buffer.toString('base64');
-      
-      // Determine if it's an image
-      const isImage = file.mimetype.startsWith('image/') ? "true" : "false";
-      
-      // Get file type from mimetype
-      const type = file.mimetype.split('/')[1] || 'unknown';
-
-      const assetData = {
-        name: name || file.originalname,
-        fileData,
-        fileName: file.originalname,
-        fileSize: file.size.toString(),
-        mimeType: file.mimetype,
-        type,
-        isImage,
-        uploadedBy: req.user.id,
-        description,
-        tags,
-        fileMetadata,
-        editor
-      };
-
-      const asset = await storage.createGlobalAsset(assetData);
-      res.status(201).json(asset);
     } catch (error) {
       console.error("Erro ao criar asset global:", error);
       res.status(500).send("Erro ao criar asset global");
