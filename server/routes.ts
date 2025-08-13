@@ -6318,7 +6318,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           eq(documentEditions.status, 'in_progress'),
           eq(documentEditions.status, 'done'),
           eq(documentEditions.status, 'editing'),
-          eq(documentEditions.status, 'refact')
+          eq(documentEditions.status, 'refact'),
+          eq(documentEditions.status, 'ready_to_next')
         ),
         eq(documentEditions.startedBy, req.user.id)
       ))
