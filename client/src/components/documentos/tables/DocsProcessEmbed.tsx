@@ -2955,7 +2955,7 @@ function FlowWithAutoFitView({
             },
             body: JSON.stringify({
               flowTasks: finalFlowTasks,
-              status: 'completed',
+              status: 'finished',
               completedAt: new Date().toISOString()
             }),
           });
