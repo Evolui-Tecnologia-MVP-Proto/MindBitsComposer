@@ -2099,11 +2099,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "documentId, flowNode e actionDescription são obrigatórios" });
       }
       
-      // Buscar a execução de fluxo mais recente para este documento (qualquer status)
+      // Buscar a execução de fluxo com status "initiated" ou "finished" para este documento
       const flowExecution = await db
         .select()
         .from(documentFlowExecutions)
-        .where(eq(documentFlowExecutions.documentId, documentId))
+        .where(and(
+          eq(documentFlowExecutions.documentId, documentId),
+          or(
+            eq(documentFlowExecutions.status, 'initiated'),
+            eq(documentFlowExecutions.status, 'finished')
+          )
+        ))
         .orderBy(desc(documentFlowExecutions.createdAt))
         .limit(1);
       
