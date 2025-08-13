@@ -1999,13 +1999,17 @@ export default function LexicalPage() {
                               <div
                                 key={edition.id}
                                 className={`p-3 border rounded-lg relative overflow-hidden dark:bg-[#111827] dark:border-[#374151] ${
-                                  edition.status === 'done' 
+                                  edition.status === 'done' || edition.status === 'ready_to_next' 
                                     ? 'cursor-not-allowed opacity-60 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600' 
                                     : `cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E293B] ${
                                         selectedEdition?.id === edition.id ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/30' : ''
                                       }`
                                 }`}
-                                onClick={() => handleSelectEdition(edition)}
+                                onClick={() => {
+                                  if (edition.status !== 'done' && edition.status !== 'ready_to_next') {
+                                    handleSelectEdition(edition);
+                                  }
+                                }}
                               >
                                 {/* Badge para documentos com diferentes status */}
                                 <div className="absolute top-2 right-2">
@@ -2036,6 +2040,8 @@ export default function LexicalPage() {
                                     <h5 className={`font-medium text-sm truncate ${
                                       edition.status === 'done' 
                                         ? 'text-green-600 dark:text-green-400' 
+                                        : edition.status === 'ready_to_next'
+                                        ? 'text-orange-500 dark:text-orange-400'
                                         : 'text-blue-600 dark:text-blue-400'
                                     }`}>
                                       {edition.templateCode}
