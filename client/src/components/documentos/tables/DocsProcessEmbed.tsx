@@ -2826,6 +2826,29 @@ function FlowWithAutoFitView({
           viewport: flowDiagramModal.flowData?.flowTasks?.viewport || { x: 0, y: 0, zoom: 1 }
         };
 
+        // Criar registro flow_actions ANTES de transferir fluxo
+        try {
+          const flowActionResponse = await fetch('/api/flow-actions/create', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              documentId: flowDiagramModal.flowData?.documentId,
+              flowNode: selectedFlowNode.id,
+              actionDescription: 'Transferido controle para outro Fluxo'
+            })
+          });
+
+          if (flowActionResponse.ok) {
+            console.log('✅ Registro de ação criado: Transferido controle para outro Fluxo');
+          } else {
+            console.warn('⚠️ Falha ao criar registro de ação para transferência');
+          }
+        } catch (flowActionError) {
+          console.error('❌ Erro ao criar registro flow_actions:', flowActionError);
+        }
+
         // Chamar API para transferir fluxo
         const response = await fetch(`/api/document-flow-executions/transfer`, {
           method: 'POST',
