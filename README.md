@@ -1290,7 +1290,7 @@ erDiagram
 
 ### Tabelas Principais
 - **users**: Usuários com roles (ADMIN, EDITOR, USER) e status
-- **lexicalDocuments**: Documentos do editor com conteúdo serializado
+
 - **templates**: Templates estruturais e de output para documentos
 - **mondayMappings**: Configurações de sincronização Monday.com
 - **documentos**: Sistema empresarial de documentação

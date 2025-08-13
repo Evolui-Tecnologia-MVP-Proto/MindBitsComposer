@@ -25,18 +25,6 @@ import { $getRoot } from 'lexical';
 import PluginModal from '@/components/plugin-modal';
 import type { Plugin as PluginType } from '@shared/schema';
 
-interface LexicalDocument {
-  id: string;
-  title: string;
-  content: string;
-  plainText: string;
-  userId: number;
-  isPublic: boolean;
-  tags: string[];
-  createdAt: string;
-  updatedAt: string;
-}
-
 interface Template {
   id: string;
   name: string;
@@ -213,11 +201,6 @@ export default function LexicalPage() {
     return [];
   };
 
-  // Query para buscar documentos do usuário
-  const { data: documents = [], isLoading: isLoadingDocuments } = useQuery({
-    queryKey: ['/api/lexical-documents'],
-    enabled: showDocumentList
-  });
 
   // Query para buscar templates do tipo 'struct'
   const { data: structTemplates = [], isLoading: isLoadingTemplates } = useQuery({

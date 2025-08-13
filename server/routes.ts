@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, templates, lexicalDocuments, insertLexicalDocumentSchema, specialties, insertSpecialtySchema, systemParams, insertSystemParamSchema, flowActions, serviceConnections } from "@shared/schema";
+import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, templates, specialties, insertSpecialtySchema, systemParams, insertSystemParamSchema, flowActions, serviceConnections } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc, asc, and, gte, lte, isNull, or, ne, inArray } from "drizzle-orm";
@@ -6241,127 +6241,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erro ao excluir edição de documento:", error);
       res.status(500).send("Erro ao excluir edição de documento");
-    }
-  });
-
-  // Lexical Documents routes
-  app.get("/api/lexical-documents", async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
-    
-    try {
-      const documents = await db.select()
-        .from(lexicalDocuments)
-        .where(eq(lexicalDocuments.userId, req.user.id))
-        .orderBy(desc(lexicalDocuments.updatedAt));
-      
-      res.json(documents);
-    } catch (error) {
-      console.error("Erro ao buscar documentos Lexical:", error);
-      res.status(500).send("Erro ao buscar documentos Lexical");
-    }
-  });
-
-  app.get("/api/lexical-documents/:id", async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
-    
-    try {
-      const [document] = await db.select()
-        .from(lexicalDocuments)
-        .where(and(
-          eq(lexicalDocuments.id, req.params.id),
-          eq(lexicalDocuments.userId, req.user.id)
-        ));
-      
-      if (!document) {
-        return res.status(404).send("Documento não encontrado");
-      }
-      
-      res.json(document);
-    } catch (error) {
-      console.error("Erro ao buscar documento Lexical:", error);
-      res.status(500).send("Erro ao buscar documento Lexical");
-    }
-  });
-
-  app.post("/api/lexical-documents", async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
-    
-    try {
-      const documentData = insertLexicalDocumentSchema.parse({
-        ...req.body,
-        userId: req.user.id
-      });
-      
-      const [newDocument] = await db.insert(lexicalDocuments)
-        .values(documentData)
-        .returning();
-      
-      res.status(201).json(newDocument);
-    } catch (error) {
-      console.error("Erro ao criar documento Lexical:", error);
-      if (error instanceof ZodError) {
-        return res.status(400).json({ 
-          message: "Dados inválidos", 
-          errors: error.errors 
-        });
-      }
-      res.status(500).send("Erro ao criar documento Lexical");
-    }
-  });
-
-  app.put("/api/lexical-documents/:id", async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
-    
-    try {
-      const documentData = insertLexicalDocumentSchema.parse(req.body);
-      
-      const [updatedDocument] = await db.update(lexicalDocuments)
-        .set({
-          ...documentData,
-          updatedAt: new Date()
-        })
-        .where(and(
-          eq(lexicalDocuments.id, req.params.id),
-          eq(lexicalDocuments.userId, req.user.id)
-        ))
-        .returning();
-      
-      if (!updatedDocument) {
-        return res.status(404).send("Documento não encontrado");
-      }
-      
-      res.json(updatedDocument);
-    } catch (error) {
-      console.error("Erro ao atualizar documento Lexical:", error);
-      if (error instanceof ZodError) {
-        return res.status(400).json({ 
-          message: "Dados inválidos", 
-          errors: error.errors 
-        });
-      }
-      res.status(500).send("Erro ao atualizar documento Lexical");
-    }
-  });
-
-  app.delete("/api/lexical-documents/:id", async (req, res) => {
-    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
-    
-    try {
-      const [deletedDocument] = await db.delete(lexicalDocuments)
-        .where(and(
-          eq(lexicalDocuments.id, req.params.id),
-          eq(lexicalDocuments.userId, req.user.id)
-        ))
-        .returning();
-      
-      if (!deletedDocument) {
-        return res.status(404).send("Documento não encontrado");
-      }
-      
-      res.status(204).send();
-    } catch (error) {
-      console.error("Erro ao excluir documento Lexical:", error);
-      res.status(500).send("Erro ao excluir documento Lexical");
     }
   });
 

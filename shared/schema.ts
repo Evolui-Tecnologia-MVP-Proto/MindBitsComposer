@@ -480,31 +480,6 @@ export const insertDocumentEditionSchema = createInsertSchema(documentEditions).
 export type InsertDocumentEdition = z.infer<typeof insertDocumentEditionSchema>;
 export type DocumentEdition = typeof documentEditions.$inferSelect;
 
-// Lexical Documents table
-export const lexicalDocuments = pgTable("lexical_documents", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  title: text("title").notNull(),
-  content: text("content"), // JSON serializado do estado do editor Lexical
-  plainText: text("plain_text"), // Texto plano para busca e estatísticas
-  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
-  isPublic: boolean("is_public").default(false),
-  tags: text("tags").array().default([]),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-// Lexical Documents schema
-export const insertLexicalDocumentSchema = createInsertSchema(lexicalDocuments).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
-
-export type InsertLexicalDocument = z.infer<typeof insertLexicalDocumentSchema>;
-export type LexicalDocument = typeof lexicalDocuments.$inferSelect;
-
-
-
 // Generic Tables
 export const genericTables = pgTable("generic_tables", {
   id: uuid("id").defaultRandom().primaryKey(),

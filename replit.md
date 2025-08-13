@@ -23,6 +23,7 @@ The system employs a monorepo structure with shared TypeScript schemas.
 - **Plugin System**: Enables extensible functionality through various plugin types (data sources, AI agents, charts, formatters) with data exchange capabilities.
 - **Template Engine**: Standardizes document structures using JSON-based definitions for content organization and output formatting.
 - **Document Versioning**: Stores previous Markdown versions in the `md_file_old` column of the `document_editions` table.
+- **Cleaned Architecture**: Removed unused `lexical_documents` table and all related functionality (January 2025) - was partially implemented but never activated in production.
 - **Flow Integration**: Added `flux_node_id` field to the `document_editions` table to associate document editions with flow nodes. When a user clicks on a documentNode in the flow diagram and initiates editing ("Iniciar Documentação"), the system saves the node ID (e.g., "documentNode-3") in this field for proper tracking.
 - **Header Field Management**: Uses template mapping for automatic population, with action buttons for dynamic updates.
 - **Edit Protection**: Restricts editing to specified container areas within the Lexical editor.
