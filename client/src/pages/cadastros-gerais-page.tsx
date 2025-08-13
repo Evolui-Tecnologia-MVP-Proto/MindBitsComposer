@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Database, Building, Users, Tags, MapPin, Phone, GraduationCap } from "lucide-react";
+import { Database, Building } from "lucide-react";
 import { SpecialtiesTab } from "@/components/specialties/SpecialtiesTab";
 
 export default function CadastrosGeraisPage() {
@@ -24,98 +24,29 @@ export default function CadastrosGeraisPage() {
 
           {/* Tabs */}
           <Tabs defaultValue="especialidades" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-5 dark:bg-[#0F172A]">
+            <TabsList className="grid w-full grid-cols-2 dark:bg-[#0F172A]">
               <TabsTrigger value="especialidades">Áreas de Especialidade</TabsTrigger>
-              <TabsTrigger value="clientes">Clientes</TabsTrigger>
-              <TabsTrigger value="categorias">Categorias</TabsTrigger>
-              <TabsTrigger value="localizacoes">Localizações</TabsTrigger>
-              <TabsTrigger value="contatos">Contatos</TabsTrigger>
+              <TabsTrigger value="a_implementar">A Implementar</TabsTrigger>
             </TabsList>
 
             <TabsContent value="especialidades" className="space-y-4">
               <SpecialtiesTab />
             </TabsContent>
 
-            <TabsContent value="clientes" className="space-y-4">
+            <TabsContent value="a_implementar" className="space-y-4">
               <Card>
                 <CardHeader>
                   <div className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    <CardTitle>Clientes</CardTitle>
+                    <Building className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    <CardTitle>A Implementar</CardTitle>
                   </div>
                   <CardDescription>
-                    Cadastro e gerenciamento de clientes
+                    Funcionalidades e melhorias a serem implementadas
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="text-center py-8">
-                    <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 dark:text-gray-400">
-                      Funcionalidade em desenvolvimento
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="categorias" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center gap-2">
-                    <Tags className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    <CardTitle>Categorias</CardTitle>
-                  </div>
-                  <CardDescription>
-                    Cadastro e gerenciamento de categorias
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8">
-                    <Tags className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 dark:text-gray-400">
-                      Funcionalidade em desenvolvimento
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="localizacoes" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    <CardTitle>Localizações</CardTitle>
-                  </div>
-                  <CardDescription>
-                    Cadastro e gerenciamento de localizações
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8">
-                    <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 dark:text-gray-400">
-                      Funcionalidade em desenvolvimento
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="contatos" className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                    <CardTitle>Contatos</CardTitle>
-                  </div>
-                  <CardDescription>
-                    Cadastro e gerenciamento de contatos
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8">
-                    <Phone className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <Building className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-500 dark:text-gray-400">
                       Funcionalidade em desenvolvimento
                     </p>
