@@ -147,6 +147,20 @@ function ImageEventListenerPlugin(): JSX.Element | null {
       });
     };
 
+    const handleInsertCode = (event: CustomEvent) => {
+      const { code, language } = event.detail;
+      
+      editor.update(() => {
+        const selection = $getSelection();
+        if ($isRangeSelection(selection)) {
+          const codeNode = $createCodeNode(language || '');
+          const textNode = $createTextNode(code || '');
+          codeNode.append(textNode);
+          $insertNodes([codeNode]);
+        }
+      });
+    };
+
     const handleInsertMermaidTable = (event: CustomEvent) => {
       console.log('🎯 handleInsertMermaidTable event received:', event.detail);
       const { imageUrl, altText, artifactId, mermaidCode } = event.detail;
@@ -242,10 +256,12 @@ function ImageEventListenerPlugin(): JSX.Element | null {
 
     // Escutar eventos customizados
     window.addEventListener('insertImage', handleInsertImage as EventListener);
+    window.addEventListener('insertCode', handleInsertCode as EventListener);
     window.addEventListener('insertMermaidTable', handleInsertMermaidTable as EventListener);
 
     return () => {
       window.removeEventListener('insertImage', handleInsertImage as EventListener);
+      window.removeEventListener('insertCode', handleInsertCode as EventListener);
       window.removeEventListener('insertMermaidTable', handleInsertMermaidTable as EventListener);
     };
   }, [editor]);
