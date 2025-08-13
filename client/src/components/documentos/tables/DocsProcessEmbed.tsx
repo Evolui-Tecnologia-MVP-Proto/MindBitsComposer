@@ -3013,7 +3013,7 @@ function FlowWithAutoFitView({
               body: JSON.stringify({
                 documentId: flowDiagramModal.flowData.documentId,
                 flowNode: selectedFlowNode.id,
-                actionDescription: 'Fluxo de processo encerrado'
+                actionDescription: 'Fluxo de Processo Finalizado'
               })
             });
 
