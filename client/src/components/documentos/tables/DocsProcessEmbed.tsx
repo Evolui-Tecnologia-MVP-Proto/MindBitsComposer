@@ -2948,6 +2948,29 @@ function FlowWithAutoFitView({
             edges: currentEdges
           };
 
+          // Criar registro flow_actions ANTES de alterar status para "finished"
+          try {
+            const flowActionResponse = await fetch('/api/flow-actions/create', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                documentId: flowDiagramModal.flowData.documentId,
+                flowNode: selectedFlowNode.id,
+                actionDescription: 'Fluxo de Processo Finalizado'
+              })
+            });
+
+            if (flowActionResponse.ok) {
+              console.log('✅ Registro de ação criado: Fluxo de Processo Finalizado');
+            } else {
+              console.warn('⚠️ Falha ao criar registro de ação para finalização');
+            }
+          } catch (flowActionError) {
+            console.error('❌ Erro ao criar registro flow_actions:', flowActionError);
+          }
+
           const response = await fetch(`/api/document-flow-executions/${flowDiagramModal.flowData.documentId}`, {
             method: 'PUT',
             headers: {
@@ -3001,29 +3024,6 @@ function FlowWithAutoFitView({
             }
           } catch (error) {
             console.error('❌ Erro ao atualizar document editions status:', error);
-          }
-          
-          // Criar registro flow_actions para documentar o encerramento do processo
-          try {
-            const flowActionResponse = await fetch('/api/flow-actions/create', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                documentId: flowDiagramModal.flowData.documentId,
-                flowNode: selectedFlowNode.id,
-                actionDescription: 'Fluxo de Processo Finalizado'
-              })
-            });
-
-            if (flowActionResponse.ok) {
-              console.log('✅ Registro de ação criado: Fluxo de processo encerrado');
-            } else {
-              console.warn('⚠️ Falha ao criar registro de ação para encerramento');
-            }
-          } catch (flowActionError) {
-            console.error('❌ Erro ao criar registro flow_actions:', flowActionError);
           }
           
           // Limpar o editor da página composer se disponível
