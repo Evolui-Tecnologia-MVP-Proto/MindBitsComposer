@@ -2525,6 +2525,13 @@ function FlowWithAutoFitView({
       
       // Limpar resultado da integração ao mudar de nó
       setIntegrationResult({ status: null, message: '' });
+      
+      // Buscar histórico para verificar se deve mostrar botão
+      if (selectedFlowNode) {
+        fetchFlowActionsHistory(selectedFlowNode.id, false);
+      } else {
+        setFlowActionsHistory([]);
+      }
     }, [selectedFlowNode?.id]); // Removido selectedFlowNode?.data.formData para evitar re-renders
     
     // Função helper para extrair dados do formulário
@@ -3949,17 +3956,19 @@ function FlowWithAutoFitView({
                     return typeMap[selectedFlowNode.type] || selectedFlowNode.type;
                   })()} - {selectedFlowNode.id}
                 </p>
-                {/* Botão de histórico de execuções */}
-                <button
-                  onClick={() => {
-                    fetchFlowActionsHistory(selectedFlowNode.id, false); // Inicializar sempre com execução atual
-                    setIsHistoryModalOpen(true);
-                  }}
-                  className="absolute top-0 right-8 p-1 rounded transition-colors text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-[#1F2937]"
-                  title="Histórico de execuções"
-                >
-                  <History className="w-4 h-4" />
-                </button>
+                {/* Botão de histórico de execuções - só mostrar se houver registros */}
+                {flowActionsHistory.length > 0 && (
+                  <button
+                    onClick={() => {
+                      fetchFlowActionsHistory(selectedFlowNode.id, false); // Inicializar sempre com execução atual
+                      setIsHistoryModalOpen(true);
+                    }}
+                    className="absolute top-0 right-8 p-1 rounded transition-colors text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-[#1F2937]"
+                    title="Histórico de execuções"
+                  >
+                    <History className="w-4 h-4" />
+                  </button>
+                )}
                 <button
                   onClick={() => setIsFlowInspectorPinned(!isFlowInspectorPinned)}
                   className={`absolute top-0 right-0 p-1 rounded transition-colors ${
