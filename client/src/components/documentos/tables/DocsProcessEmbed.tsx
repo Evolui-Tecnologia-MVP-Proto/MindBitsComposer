@@ -2981,6 +2981,28 @@ function FlowWithAutoFitView({
 
           console.log('✅ Fluxo encerrado e documento marcado como Encerrado');
           
+          // Atualizar document_editions.status para "finished"
+          try {
+            const editionsUpdateResponse = await fetch(`/api/documents/${flowDiagramModal.flowData.documentId}/editions/status`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                status: 'finished'
+              }),
+            });
+            
+            if (editionsUpdateResponse.ok) {
+              const editionsResult = await editionsUpdateResponse.json();
+              console.log(`✅ ${editionsResult.updatedCount} document editions atualizadas para status "finished"`);
+            } else {
+              console.error('❌ Erro ao atualizar document editions status para finished');
+            }
+          } catch (error) {
+            console.error('❌ Erro ao atualizar document editions status:', error);
+          }
+          
           // Criar registro flow_actions para documentar o encerramento do processo
           try {
             const flowActionResponse = await fetch('/api/flow-actions/create', {
