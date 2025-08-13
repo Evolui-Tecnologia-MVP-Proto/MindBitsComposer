@@ -2099,7 +2099,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "documentId, flowNode e actionDescription são obrigatórios" });
       }
       
-      // Buscar a execução de fluxo com status "initiated" ou "finished" para este documento
+      // Buscar a execução de fluxo com status "initiated" ou "completed" para este documento
       const flowExecution = await db
         .select()
         .from(documentFlowExecutions)
@@ -2107,15 +2107,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           eq(documentFlowExecutions.documentId, documentId),
           or(
             eq(documentFlowExecutions.status, 'initiated'),
-            eq(documentFlowExecutions.status, 'finished')
+            eq(documentFlowExecutions.status, 'completed')
           )
         ))
         .orderBy(desc(documentFlowExecutions.createdAt))
         .limit(1);
       
       if (!flowExecution || flowExecution.length === 0) {
-        console.log('❌ Nenhuma execução de fluxo encontrada para o documento:', documentId);
-        return res.status(404).json({ error: "Nenhuma execução de fluxo encontrada para este documento" });
+        console.log('❌ Nenhuma execução de fluxo com status "initiated" ou "completed" encontrada para o documento:', documentId);
+        return res.status(404).json({ error: "Nenhuma execução de fluxo ativa encontrada para este documento" });
       }
       
       const now = new Date();
