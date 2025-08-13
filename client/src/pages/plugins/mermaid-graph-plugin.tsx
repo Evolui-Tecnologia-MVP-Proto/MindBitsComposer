@@ -1,11 +1,17 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { X, Save } from "lucide-react";
+import { X, Save, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import mermaid from "mermaid";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface MermaidGraphPluginProps {
   onDataExchange?: (data: any) => void;
@@ -28,12 +34,13 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
   const queryClient = useQueryClient();
   const [lastSvg, setLastSvg] = useState<string>('');
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
+  const [saveLocation, setSaveLocation] = useState<'global' | 'myassets'>('global');
 
   // Mutation para salvar diagram como imagem
   const saveDiagramMutation = useMutation({
-    mutationFn: async (data: { name: string; imageData: string; mermaidDefinition: string }) => {
-      // Se não há documento composer, salvar em global assets
-      if (!selectedEdition) {
+    mutationFn: async (data: { name: string; imageData: string; mermaidDefinition: string; location: 'global' | 'myassets' }) => {
+      // Se saveLocation é 'global' ou não há documento, salvar em global assets
+      if (data.location === 'global') {
         const globalAssetData = {
           name: data.name,
           fileData: data.imageData,
@@ -47,25 +54,29 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
         return response.json();
       }
 
-      // Se há documento composer, salvar como artifact
-      const artifactData = {
-        name: data.name,
-        fileData: data.imageData,
-        fileName: data.name,
-        fileSize: Math.round(data.imageData.length * 0.75).toString(),
-        mimeType: 'image/png',
-        type: 'png',
-        isImage: 'true',
-        originAssetId: 'Mermaid',
-        fileMetadata: data.mermaidDefinition
-      };
+      // Se saveLocation é 'myassets' e há documento composer, salvar como artifact
+      if (data.location === 'myassets' && selectedEdition) {
+        const artifactData = {
+          name: data.name,
+          fileData: data.imageData,
+          fileName: data.name,
+          fileSize: Math.round(data.imageData.length * 0.75).toString(),
+          mimeType: 'image/png',
+          type: 'png',
+          isImage: 'true',
+          originAssetId: 'Mermaid',
+          fileMetadata: data.mermaidDefinition
+        };
 
-      const response = await apiRequest('POST', `/api/document-editions/${selectedEdition.id}/artifacts`, artifactData);
-      return response.json();
+        const response = await apiRequest('POST', `/api/document-editions/${selectedEdition.id}/artifacts`, artifactData);
+        return response.json();
+      }
+
+      throw new Error('Configuração de salvamento inválida');
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       // Invalidate the appropriate cache based on where the diagram was saved
-      if (selectedEdition) {
+      if (variables.location === 'myassets' && selectedEdition) {
         queryClient.invalidateQueries({ queryKey: ['/api/document-editions', selectedEdition.id, 'artifacts'] });
         toast({
           title: "Diagrama salvo",
@@ -187,7 +198,8 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
       saveDiagramMutation.mutate({ 
         name: fileName, 
         imageData: base64Data,
-        mermaidDefinition: mermaidCode 
+        mermaidDefinition: mermaidCode,
+        location: saveLocation
       });
 
     } catch (error) {
@@ -388,21 +400,48 @@ export default function MermaidGraphPlugin({ onDataExchange, selectedEdition }: 
                 }
               }}
             />
-            <Button
-              size="sm"
-              onClick={handleSaveDiagram}
-              disabled={!diagramName.trim() || saveDiagramMutation.isPending}
-              className="h-8 px-3"
-            >
-              {saveDiagramMutation.isPending ? (
-                <>Salvando...</>
-              ) : (
-                <>
-                  <Save className="w-3 h-3 mr-1" />
-                  Salvar
-                </>
-              )}
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="sm"
+                  disabled={!diagramName.trim() || saveDiagramMutation.isPending}
+                  className="h-8 px-3"
+                >
+                  {saveDiagramMutation.isPending ? (
+                    <>Salvando...</>
+                  ) : (
+                    <>
+                      <Save className="w-3 h-3 mr-1" />
+                      Salvar
+                      <ChevronDown className="w-3 h-3 ml-1" />
+                    </>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSaveLocation('global');
+                    handleSaveDiagram();
+                  }}
+                  disabled={!diagramName.trim() || saveDiagramMutation.isPending}
+                >
+                  Global
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setSaveLocation('myassets');
+                    handleSaveDiagram();
+                  }}
+                  disabled={!diagramName.trim() || !selectedEdition || saveDiagramMutation.isPending}
+                >
+                  MyAssets
+                  {!selectedEdition && (
+                    <span className="text-xs text-gray-400 ml-2">(precisa de documento)</span>
+                  )}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
