@@ -3386,20 +3386,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
         cookies = fs.readFileSync(cookiePath, 'utf-8');
       }
 
-      // Se houver endpoint configurado para ListMenu
-      const listMenuEndpoint = endpoints && Array.isArray(endpoints) 
-        ? endpoints.find((ep: any) => ep.name === 'ListMenu')
+      // Usar o endpoint ListSubsystemMenusTree já disponível para obter os detalhes do menu
+      const menuTreeEndpoint = endpoints && Array.isArray(endpoints) 
+        ? endpoints.find((ep: any) => ep.name === 'ListSubsystemMenusTree')
         : null;
       
-      if (listMenuEndpoint) {
-        const baseUrl = connection.baseURL + listMenuEndpoint.path;
-        let fullUrl = replaceParameters(baseUrl, parameters);
+      if (menuTreeEndpoint) {
+        // Para funcionalidade de detalhes, ainda precisamos de um subsystemId
+        // Como não temos isso diretamente, vamos usar o primeiro subsistema disponível do select_data
+        let subsystemId = null;
+        if (config.select_data && config.select_data.subsystem && config.select_data.subsystem.length > 0) {
+          subsystemId = config.select_data.subsystem[0].id;
+        }
+        
+        if (!subsystemId) {
+          throw new Error("No subsystem available for menu details");
+        }
+
+        // Substituir parâmetros na URL incluindo subsystemId
+        const urlParams = { ...parameters, SUBSYSTEM_ID: subsystemId };
+        const baseUrl = connection.baseURL + menuTreeEndpoint.path;
         
         // Add query parameters if defined
-        if (listMenuEndpoint.query) {
+        let fullUrl = replaceParameters(baseUrl, urlParams);
+        if (menuTreeEndpoint.query) {
           const queryParams = new URLSearchParams();
-          Object.entries(listMenuEndpoint.query).forEach(([key, value]) => {
-            queryParams.append(key, replaceParameters(String(value), parameters));
+          Object.entries(menuTreeEndpoint.query).forEach(([key, value]) => {
+            queryParams.append(key, replaceParameters(String(value), urlParams));
           });
           fullUrl += '?' + queryParams.toString();
         }
@@ -3414,9 +3427,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         // Add endpoint-specific headers
-        if (listMenuEndpoint.headers) {
-          Object.entries(listMenuEndpoint.headers).forEach(([key, value]) => {
-            headers[key] = replaceParameters(String(value), parameters);
+        if (menuTreeEndpoint.headers) {
+          Object.entries(menuTreeEndpoint.headers).forEach(([key, value]) => {
+            headers[key] = replaceParameters(String(value), urlParams);
           });
         }
         
@@ -3434,7 +3447,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("LTH Menu Details Headers:", headers);
 
         const response = await fetch(fullUrl, {
-          method: listMenuEndpoint.method || "GET",
+          method: menuTreeEndpoint.method || "GET",
           headers
         });
 
@@ -3448,7 +3461,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         res.json(responseData);
       } else {
-        throw new Error("ListMenu endpoint not found in configuration");
+        throw new Error("ListSubsystemMenusTree endpoint not found in configuration");
       }
     } catch (error: any) {
       console.error("LTH menu details error:", error);
