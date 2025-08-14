@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronRight, ChevronDown, Folder, FolderOpen, FileText, Database, Settings, RefreshCw, X, Save, Check, Circle } from "lucide-react";
+import { ChevronRight, ChevronDown, Folder, FolderOpen, FileText, Database, Settings, RefreshCw, X, Save, Check, Circle, SquareCode } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -1054,8 +1054,15 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       {/* Selected Path Info */}
       {selectedPath && (
         <div className="mt-4 mb-2">
-          <div className="px-3 py-2 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-md text-sm font-mono border border-gray-300 dark:border-gray-600">
-            {getFullPath(selectedPath)}
+          <div className="flex items-center justify-between px-3 py-2 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-md text-sm font-mono border border-gray-300 dark:border-gray-600">
+            <span className="flex-1">{getFullPath(selectedPath)}</span>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0 ml-2 hover:bg-gray-200 dark:hover:bg-gray-700"
+            >
+              <SquareCode className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       )}
