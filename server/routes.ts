@@ -2844,7 +2844,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       let config = plugin[0].configuration as any;
-      if (!config || !config.connection || !config.parameters || !config.endpoints) {
+      if (!config || !config.connection || !config.parameters) {
         throw new Error("Configuração do plugin inválida");
       }
 
@@ -2868,9 +2868,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if dict_db is empty or doesn't exist
       if (!config.select_data || !config.select_data.dict_db || config.select_data.dict_db.length === 0) {
         console.log("dict_db is empty, fetching from ListLuthierConnections endpoint");
+        console.log("Endpoints config:", endpoints);
         
         // Find the ListLuthierConnections endpoint
-        const listConnectionsEndpoint = endpoints.endpoints?.find((ep: any) => ep.name === "ListLuthierConnections");
+        const listConnectionsEndpoint = endpoints?.endpoints?.find((ep: any) => ep.name === "ListLuthierConnections");
+        
+        console.log("Found ListLuthierConnections endpoint:", listConnectionsEndpoint);
         
         if (listConnectionsEndpoint) {
           const fullUrl = replaceParameters(connection.baseURL + listConnectionsEndpoint.path, parameters);
