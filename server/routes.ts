@@ -3306,6 +3306,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           throw new Error(`Failed to fetch menus: ${response.status} ${response.statusText}`);
         }
 
+        // Log the raw response to understand structure
+        console.log("=== RAW API RESPONSE ===");
+        console.log(JSON.stringify(responseData, null, 2).substring(0, 2000));
+        
         // Extract and transform the tree structure from API response
         const menuStructure = responseData.tree || responseData || [];
         console.log("LTH Menus API returned tree with", menuStructure.length, "items");
