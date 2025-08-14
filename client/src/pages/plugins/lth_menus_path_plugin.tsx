@@ -195,7 +195,19 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           
           // Check if this is a divider (caption is "--", "-", or ends with " - --")
           const isDivider = caption === "--" || caption === "-" || caption.endsWith(" - --") || caption.trim() === "--" || caption.trim() === "-";
-          const nodeType = isDivider ? "DIVIDER" : node.type;
+          
+          // Check if this is a leaf node (no children)
+          const isLeafNode = !node.children || node.children.length === 0;
+          
+          // Determine node type: DIVIDER, FUNCTION_CALL for leaf nodes, or original type
+          let nodeType;
+          if (isDivider) {
+            nodeType = "DIVIDER";
+          } else if (isLeafNode) {
+            nodeType = "FUNCTION_CALL";
+          } else {
+            nodeType = node.type;
+          }
           
           // Format as "ID - Caption" when both are available
           const label = nodeId && caption ? `${nodeId} - ${caption}` : caption || String(nodeId);
@@ -580,16 +592,18 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   };
 
   const handleItemClick = (item: MenuPath) => {
-    // Only allow selection of action items (funcionalidade)
-    if (item.type !== 'action') {
+    // Only allow selection of action items (funcionalidade) and FUNCTION_CALL items
+    if (item.type !== 'action' && item.type !== 'FUNCTION_CALL') {
       return;
     }
     
     // Single selection: if already selected, deselect; otherwise select
     if (selectedPath === item.id) {
       setSelectedPath(null);
+      setValue(''); // Clear the input value when deselecting
     } else {
       setSelectedPath(item.id);
+      setValue(item.label); // Set the input value to the selected item's label
     }
   };
 
@@ -616,7 +630,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       const isSelected = selectedPath === item.id;
       const hasChildren = item.children && item.children.length > 0;
       const paddingLeft = level * 24;
-      const isSelectable = item.type === 'action';
+      const isSelectable = item.type === 'action' || item.type === 'FUNCTION_CALL';
 
       return (
         <div key={item.id} className="select-none">
@@ -624,13 +638,15 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
             className={`flex items-center py-2 px-3 rounded-md transition-colors ${
               item.type === 'DIVIDER'
                 ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 cursor-default'
+                : item.type === 'FUNCTION_CALL'
+                ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/30 cursor-pointer'
                 : isSelectable 
                 ? 'hover:bg-gray-50 dark:hover:bg-[#1F2937] cursor-pointer' 
                 : 'cursor-default'
             } ${
               isSelected && item.type !== 'DIVIDER' ? 'bg-blue-50 dark:bg-blue-900/30 border-l-2 border-blue-500' : ''
             } ${
-              !isSelectable && item.type !== 'DIVIDER' ? 'opacity-75' : ''
+              !isSelectable && item.type !== 'DIVIDER' && item.type !== 'FUNCTION_CALL' ? 'opacity-75' : ''
             }`}
             style={{ paddingLeft: `${paddingLeft + 12}px` }}
             onClick={() => item.type !== 'DIVIDER' ? handleItemClick(item) : undefined}
@@ -663,6 +679,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
                 <div className={`text-sm font-medium truncate ${
                   item.type === 'DIVIDER' 
                     ? 'text-red-700 dark:text-red-400' 
+                    : item.type === 'FUNCTION_CALL'
+                    ? 'text-green-700 dark:text-green-400'
                     : 'text-gray-900 dark:text-gray-200'
                 }`}>
                   {item.label}
@@ -670,6 +688,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
                 <div className={`text-xs truncate ${
                   item.type === 'DIVIDER' 
                     ? 'text-red-600 dark:text-red-500' 
+                    : item.type === 'FUNCTION_CALL'
+                    ? 'text-green-600 dark:text-green-500'
                     : 'text-gray-500 dark:text-gray-400'
                 }`}>
                   {item.path}
@@ -680,15 +700,18 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
                 <span className={`px-2 py-1 rounded text-xs font-medium ${
                   item.type === 'DIVIDER'
                     ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400'
+                    : item.type === 'FUNCTION_CALL'
+                    ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
                     : item.type === 'menu' 
                     ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400'
                     : item.type === 'submenu'
                     ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400'
                     : item.type === 'action'
-                    ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
+                    ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400'
                     : 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400'
                 }`}>
                   {item.type === 'DIVIDER' ? 'DIVIDER' :
+                   item.type === 'FUNCTION_CALL' ? 'FUNCTION_CALL' :
                    item.type === 'menu' ? 'Menu' : 
                    item.type === 'submenu' ? 'Submenu' : 
                    item.type === 'action' ? 'Funcionalidade' : 
