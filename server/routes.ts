@@ -3095,7 +3095,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (listSubsystemsEndpoint) {
           // Include dictionary ID in parameters for substitution
           const urlParams = { ...parameters, LUTHIER_DB_ID: dictionaryId };
-          const fullUrl = replaceParameters(connection.baseURL + listSubsystemsEndpoint.path, urlParams);
+          
+          // Build full URL - connection.baseURL might already have placeholders
+          let baseUrl = replaceParameters(connection.baseURL, urlParams);
+          let endpointPath = replaceParameters(listSubsystemsEndpoint.path, urlParams);
+          let fullUrl = baseUrl + endpointPath;
           
           const headers: any = {};
           
