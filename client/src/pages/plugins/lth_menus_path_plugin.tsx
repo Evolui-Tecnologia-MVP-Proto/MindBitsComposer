@@ -238,21 +238,26 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   };
 
   // Function to fetch subsystems from API
-  const fetchSubsystems = async (dictionaryId?: string) => {
+  const fetchSubsystems = async (dictionaryId?: string, forceRefresh: boolean = false) => {
     if (!authToken || !pluginId) return [];
 
     try {
+      const requestBody = {
+        pluginId: pluginId,
+        authToken: authToken,
+        dictionaryId: dictionaryId || selectedDictionary,
+        forceRefresh
+      };
+
+      console.log(`🔍 fetchSubsystems called with forceRefresh=${forceRefresh} for dictionary=${dictionaryId || selectedDictionary}`);
+
       const response = await fetch("/api/plugin/lth-subsystems", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({
-          pluginId: pluginId,
-          authToken: authToken,
-          dictionaryId: dictionaryId || selectedDictionary
-        })
+        body: JSON.stringify(requestBody)
       });
 
       if (!response.ok) {
@@ -333,41 +338,22 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           const dictExists = dictionariesData.some((dict: any) => String(dict.id) === String(savedDictionaryId));
           if (dictExists) {
             setSelectedDictionary(String(savedDictionaryId));
-            // Load subsystems for the pre-selected dictionary
-            // Use forceRefresh to ensure fresh data on initial load
-            const response = await fetch("/api/plugin/lth-subsystems", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              credentials: "include",
-              body: JSON.stringify({ 
-                pluginId, 
-                dictionaryId: String(savedDictionaryId),
-                forceRefresh: false  // Initial load can use cache
-              })
-            });
-
-            if (response.ok) {
-              const data = await response.json();
-              const subsystemsData = data.subsystems || [];
-              setSubsystems(subsystemsData);
+            // Load subsystems for the pre-selected dictionary (initial load can use cache)
+            const subsystemsData = await fetchSubsystems(String(savedDictionaryId), false);
+            setSubsystems(subsystemsData);
             
-              // Pre-select subsystem if saved in parameters
-              if (pluginConfig?.plugin?.parameters?.SUBSYSTEM_ID) {
-                const savedSubsystemId = pluginConfig.plugin.parameters.SUBSYSTEM_ID;
-                console.log("Pre-selecting subsystem from SUBSYSTEM_ID:", savedSubsystemId);
-                
-                const subsystemExists = subsystemsData.some((sub: any) => String(sub.id) === String(savedSubsystemId));
-                if (subsystemExists) {
-                  setSelectedSubsystem(String(savedSubsystemId));
-                  // Load menu structure for the pre-selected subsystem
-                  const structure = await loadMenuStructure(String(savedSubsystemId));
-                  setMenuStructure(structure);
-                }
+            // Pre-select subsystem if saved in parameters
+            if (pluginConfig?.plugin?.parameters?.SUBSYSTEM_ID) {
+              const savedSubsystemId = pluginConfig.plugin.parameters.SUBSYSTEM_ID;
+              console.log("Pre-selecting subsystem from SUBSYSTEM_ID:", savedSubsystemId);
+              
+              const subsystemExists = subsystemsData.some((sub: any) => String(sub.id) === String(savedSubsystemId));
+              if (subsystemExists) {
+                setSelectedSubsystem(String(savedSubsystemId));
+                // Load menu structure for the pre-selected subsystem
+                const structure = await loadMenuStructure(String(savedSubsystemId));
+                setMenuStructure(structure);
               }
-            } else {
-              console.error("Failed to load initial subsystems");
             }
           }
         }
@@ -453,43 +439,14 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         // Clear existing subsystems state immediately
         setSubsystems([]);
         
-        // Force a fresh API call to load subsystems for this dictionary
-        // This will trigger the API to refresh data from the LTH API instead of using cached data
-        const requestBody = { 
-          pluginId, 
-          dictionaryId: dictionaryCode,
-          forceRefresh: true  // Flag to force API refresh
-        };
+        // Force a fresh API call using our fetchSubsystems function with forceRefresh=true
+        const subsystemsData = await fetchSubsystems(dictionaryCode, true);
         
-        console.log("📤 SENDING REQUEST with forceRefresh=true:", JSON.stringify(requestBody, null, 2));
+        console.log(`✅ Loaded ${subsystemsData.length} fresh subsystems for dictionary ${dictionaryCode}`);
+        setSubsystems(subsystemsData);
         
-        const response = await fetch("/api/plugin/lth-subsystems", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify(requestBody)
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const subsystemsData = data.subsystems || [];
-          
-          console.log(`✅ Loaded ${subsystemsData.length} fresh subsystems for dictionary ${dictionaryCode}`);
-          setSubsystems(subsystemsData);
-          
-          // Clear any previous subsystem selection since dictionary changed
-          // Don't pre-select subsystem - let user choose fresh
-          console.log("🔄 Dictionary changed - subsystem selection cleared");
-        } else {
-          console.error("Failed to fetch fresh subsystems:", response.status, response.statusText);
-          toast({
-            title: "Erro ao carregar subsistemas",
-            description: "Não foi possível carregar os subsistemas para o dicionário selecionado.",
-            variant: "destructive",
-          });
-        }
+        // Clear any previous subsystem selection since dictionary changed
+        console.log("🔄 Dictionary changed - subsystem selection cleared");
       } catch (error) {
         console.error("Error loading fresh subsystems for dictionary:", error);
         toast({
