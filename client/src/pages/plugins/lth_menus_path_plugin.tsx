@@ -23,6 +23,8 @@ interface MenuPath {
   subsystem?: string;
   icon?: string;
   description?: string;
+  actionType?: string;
+  action?: string;
   children?: MenuPath[];
 }
 
@@ -221,6 +223,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
             path: node.refKey || node.menuKey || `${node.code}`,
             type: nodeType,
             isDivider: isDivider,
+            actionType: node.actionType,
+            action: node.action,
             children: node.children ? transformTree(node.children) : []
           };
         });
@@ -764,48 +768,36 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     return findMenuCode(menuStructure, selectedId);
   };
 
-  // Função para buscar detalhes da função via backend API
+  // Função para buscar detalhes da função na estrutura já carregada
   const fetchFunctionDetails = async (menuCode: string) => {
-    if (!pluginId || !authToken || !selectedDictionary) {
-      throw new Error("Configuração ou token não disponível");
-    }
+    // Buscar na estrutura de menu já carregada ao invés de fazer nova chamada API
+    const findMenuInTree = (items: MenuPath[], targetCode: string): any => {
+      for (const item of items) {
+        // Extrair o código do label (formato: "1051 - Nome do Menu")
+        const match = item.label.match(/^(\d+)/);
+        if (match && match[1] === targetCode) {
+          return {
+            code: targetCode,
+            actionType: item.actionType || 'N/A',
+            action: item.action || 'N/A'
+          };
+        }
+        
+        if (item.children) {
+          const found = findMenuInTree(item.children, targetCode);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
 
-    const response = await fetch("/api/plugin/lth-menu-details", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        pluginId: pluginId,
-        dictionaryId: selectedDictionary,
-        authToken: authToken
-      })
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch menu details: ${response.status}`);
-    }
-
-    const data = await response.json();
-    
-    // ListMenus retorna um array plano de menus, não uma árvore
-    const menuItems = Array.isArray(data) ? data : [];
-    
-    // Buscar o menu pelo code
-    const menuItem = menuItems.find((item: any) => 
-      item.code && item.code.toString() === menuCode
-    );
+    const menuItem = findMenuInTree(menuStructure, menuCode);
     
     if (menuItem) {
-      return {
-        code: menuItem.code,
-        actionType: menuItem.actionType,
-        action: menuItem.action
-      };
+      return menuItem;
     }
     
-    throw new Error(`Menu com code ${menuCode} não encontrado`);
+    throw new Error(`Menu com code ${menuCode} não encontrado na estrutura atual`);
   };
 
   // Handler para o clique no botão SquareCode
