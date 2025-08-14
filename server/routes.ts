@@ -3093,39 +3093,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         if (listSubsystemsEndpoint) {
-          // Merge connection parameters with plugin parameters
-          // Connection parameters have BASE and API_KEY
-          // Plugin parameters have LUTHIER_DB_ID
-          const connectionParams = connection.parameters || {};
-          const pluginParams = parameters || {};
-          const urlParams = { 
-            ...connectionParams,  // BASE, API_KEY 
-            ...pluginParams,      // LUTHIER_DB_ID
-            LUTHIER_DB_ID: dictionaryId  // Override with the selected dictionary
-          };
-          
-          console.log("=== URL Building Debug ===");
-          console.log("Connection parameters:", connectionParams);
-          console.log("Plugin parameters:", pluginParams);
-          console.log("URL Params for substitution:", urlParams);
-          console.log("Connection baseURL before substitution:", connection.baseURL);
-          console.log("Endpoint path before substitution:", listSubsystemsEndpoint.path);
-          
-          // Build full URL - connection.baseURL might already have placeholders
-          let baseUrl = replaceParameters(connection.baseURL, urlParams);
-          let endpointPath = replaceParameters(listSubsystemsEndpoint.path, urlParams);
-          let fullUrl = baseUrl + endpointPath;
-          
-          console.log("Base URL after substitution:", baseUrl);
-          console.log("Endpoint path after substitution:", endpointPath);
-          console.log("Full URL:", fullUrl);
+          // COPIANDO EXATAMENTE A MESMA LÓGICA DO ENDPOINT DE DICIONÁRIOS QUE FUNCIONA
+          const fullUrl = replaceParameters(connection.baseURL + listSubsystemsEndpoint.path, parameters);
           
           const headers: any = {};
           
           // Add headers from endpoint configuration
           if (listSubsystemsEndpoint.headers) {
             Object.entries(listSubsystemsEndpoint.headers).forEach(([key, value]) => {
-              headers[key] = replaceParameters(String(value), urlParams);
+              headers[key] = replaceParameters(String(value), parameters);
             });
           }
           
@@ -3133,20 +3109,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           if (cookies) {
             headers["Cookie"] = cookies;
           }
+          
+          // Add X-LuthierDatabaseID header with the selected dictionary
+          headers["X-LuthierDatabaseID"] = dictionaryId;
 
           // Add query parameters if defined in the endpoint configuration
           let finalUrl = fullUrl;
           if (listSubsystemsEndpoint.query) {
             const queryParams = new URLSearchParams();
             Object.entries(listSubsystemsEndpoint.query).forEach(([key, value]) => {
-              queryParams.append(key, replaceParameters(String(value), urlParams));
+              queryParams.append(key, replaceParameters(String(value), parameters));
             });
             finalUrl = `${fullUrl}?${queryParams.toString()}`;
           }
 
           console.log("LTH Subsystems Request URL:", finalUrl);
           console.log("LTH Subsystems Headers:", headers);
-          console.log("Dictionary ID (X-LuthierDatabaseID):", dictionaryId);
 
           const response = await fetch(finalUrl, {
             method: listSubsystemsEndpoint.method || "GET",
