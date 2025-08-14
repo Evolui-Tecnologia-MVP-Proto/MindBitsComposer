@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, templates, specialties, insertSpecialtySchema, systemParams, insertSystemParamSchema, flowActions, serviceConnections } from "@shared/schema";
+import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, templates, specialties, insertSpecialtySchema, systemParams, insertSystemParamSchema, flowActions, serviceConnections, plugins } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc, asc, and, gte, lte, isNull, or, ne, inArray } from "drizzle-orm";
@@ -2701,19 +2701,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/plugin/lth-auth", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
-    const { endpoint, credentials } = req.body;
+    const { pluginId } = req.body;
     
     try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(credentials)
+      // Buscar configuração do plugin
+      const plugin = await db.select().from(plugins).where(eq(plugins.id, pluginId)).limit(1);
+      if (!plugin.length) {
+        throw new Error("Plugin não encontrado");
+      }
+
+      const config = plugin[0].config as any;
+      if (!config || !config.connection || !config.parameters) {
+        throw new Error("Configuração do plugin inválida");
+      }
+
+      // Função para substituir tags {{}} pelos valores dos parâmetros
+      const replaceParameters = (str: string, params: any): string => {
+        return str.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+          return params[key] || match;
+        });
+      };
+
+      // Processar a configuração de autenticação
+      const { connection, parameters } = config;
+      const { auth, baseURL, defaultHeaders } = connection;
+
+      if (!auth || auth.type !== "cookie") {
+        throw new Error("Tipo de autenticação não suportado");
+      }
+
+      // Construir URL completa
+      const fullUrl = replaceParameters(baseURL + auth.loginEndpoint, parameters);
+
+      // Preparar headers
+      const headers: any = {};
+      
+      // Adicionar headers padrão
+      if (defaultHeaders) {
+        Object.entries(defaultHeaders).forEach(([key, value]) => {
+          headers[key] = replaceParameters(String(value), parameters);
+        });
+      }
+
+      // Adicionar headers específicos da autenticação
+      if (auth.headers) {
+        Object.entries(auth.headers).forEach(([key, value]) => {
+          headers[key] = replaceParameters(String(value), parameters);
+        });
+      }
+
+      // Fazer a chamada de autenticação
+      console.log("LTH Auth Request URL:", fullUrl);
+      console.log("LTH Auth Headers:", headers);
+      console.log("LTH Auth Payload:", auth.payload);
+
+      const response = await fetch(fullUrl, {
+        method: auth.method || "POST",
+        headers,
+        body: JSON.stringify(auth.payload)
       });
 
+      const responseText = await response.text();
+      console.log("LTH Auth Response Status:", response.status);
+      console.log("LTH Auth Response Body:", responseText);
+
       if (!response.ok) {
-        throw new Error(`Authentication failed: ${response.status} ${response.statusText}`);
+        throw new Error(`Authentication failed: ${response.status} ${response.statusText} - ${responseText}`);
       }
 
       // Extract cookies from response headers
@@ -2729,15 +2782,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Store cookies in a file for this user session
-      const cookiePath = path.join(__dirname, `../cookies_${req.user?.id}.txt`);
+      const cookiePath = path.join(process.cwd(), `cookies_${req.user?.id}.txt`);
       fs.writeFileSync(cookiePath, cookies);
 
       res.json({ 
         success: true, 
         token: cookies,
-        message: "Authentication successful"
+        message: "Authentication successful",
+        responseData: responseText
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("LTH authentication error:", error);
       res.status(500).json({ 
         success: false, 
@@ -2749,28 +2803,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/plugin/lth-subsystems", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
-    const { connectionCode, authToken } = req.body;
+    const { pluginId, authToken } = req.body;
     
     try {
+      // Buscar configuração do plugin
+      const plugin = await db.select().from(plugins).where(eq(plugins.id, pluginId)).limit(1);
+      if (!plugin.length) {
+        throw new Error("Plugin não encontrado");
+      }
+
+      const config = plugin[0].config as any;
+      if (!config || !config.connection || !config.parameters) {
+        throw new Error("Configuração do plugin inválida");
+      }
+
+      // Função para substituir tags {{}} pelos valores dos parâmetros
+      const replaceParameters = (str: string, params: any): string => {
+        return str.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+          return params[key] || match;
+        });
+      };
+
+      const { connection, parameters, endpoints } = config;
+      
       // Read cookies from file
-      const cookiePath = path.join(__dirname, `../cookies_${req.user?.id}.txt`);
+      const cookiePath = path.join(process.cwd(), `cookies_${req.user?.id}.txt`);
       let cookies = authToken;
       
       if (fs.existsSync(cookiePath)) {
         cookies = fs.readFileSync(cookiePath, 'utf-8');
       }
 
-      // TODO: Replace with actual API endpoint when available
-      // For now, return mock data
-      const subsystems = [
-        { id: "DOC", name: "Documentação", description: "Sistema de documentação" },
-        { id: "FIN", name: "Financeiro", description: "Sistema financeiro" },
-        { id: "RH", name: "Recursos Humanos", description: "Sistema de RH" },
-        { id: "PROJ", name: "Projetos", description: "Sistema de projetos" }
-      ];
+      // Se houver endpoint configurado para subsistemas
+      if (endpoints && endpoints.subsystems) {
+        const fullUrl = replaceParameters(connection.baseURL + endpoints.subsystems.endpoint, parameters);
+        
+        const headers: any = {};
+        
+        // Adicionar headers padrão
+        if (connection.defaultHeaders) {
+          Object.entries(connection.defaultHeaders).forEach(([key, value]) => {
+            headers[key] = replaceParameters(String(value), parameters);
+          });
+        }
+        
+        // Adicionar cookies se necessário
+        if (cookies) {
+          headers["Cookie"] = cookies;
+        }
 
-      res.json({ subsystems });
-    } catch (error) {
+        console.log("LTH Subsystems Request URL:", fullUrl);
+        console.log("LTH Subsystems Headers:", headers);
+
+        const response = await fetch(fullUrl, {
+          method: endpoints.subsystems.method || "GET",
+          headers
+        });
+
+        const responseData = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch subsystems: ${response.status} ${response.statusText}`);
+        }
+
+        res.json({ subsystems: responseData });
+      } else {
+        // Fallback para dados mock se não houver endpoint configurado
+        const subsystems = [
+          { id: "DOC", name: "Documentação", description: "Sistema de documentação" },
+          { id: "FIN", name: "Financeiro", description: "Sistema financeiro" },
+          { id: "RH", name: "Recursos Humanos", description: "Sistema de RH" },
+          { id: "PROJ", name: "Projetos", description: "Sistema de projetos" }
+        ];
+
+        res.json({ subsystems });
+      }
+    } catch (error: any) {
       console.error("LTH subsystems error:", error);
       res.status(500).json({ 
         success: false, 
@@ -2782,42 +2890,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/plugin/lth-menus", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
-    const { connectionCode, subsystemCode, authToken } = req.body;
+    const { pluginId, subsystemCode, authToken } = req.body;
     
     try {
+      // Buscar configuração do plugin
+      const plugin = await db.select().from(plugins).where(eq(plugins.id, pluginId)).limit(1);
+      if (!plugin.length) {
+        throw new Error("Plugin não encontrado");
+      }
+
+      const config = plugin[0].config as any;
+      if (!config || !config.connection || !config.parameters) {
+        throw new Error("Configuração do plugin inválida");
+      }
+
+      // Função para substituir tags {{}} pelos valores dos parâmetros
+      const replaceParameters = (str: string, params: any): string => {
+        return str.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+          return params[key] || match;
+        });
+      };
+
+      const { connection, parameters, endpoints } = config;
+      
       // Read cookies from file
-      const cookiePath = path.join(__dirname, `../cookies_${req.user?.id}.txt`);
+      const cookiePath = path.join(process.cwd(), `cookies_${req.user?.id}.txt`);
       let cookies = authToken;
       
       if (fs.existsSync(cookiePath)) {
         cookies = fs.readFileSync(cookiePath, 'utf-8');
       }
 
-      // TODO: Replace with actual API endpoint when available
-      // For now, return mock menu structure
-      const menuStructure = [
-        {
-          id: "1",
-          label: "Cadastros",
-          path: `${subsystemCode}/cadastros`,
-          children: [
-            { id: "1.1", label: "Usuários", path: `${subsystemCode}/cadastros/usuarios` },
-            { id: "1.2", label: "Perfis", path: `${subsystemCode}/cadastros/perfis` }
-          ]
-        },
-        {
-          id: "2",
-          label: "Relatórios",
-          path: `${subsystemCode}/relatorios`,
-          children: [
-            { id: "2.1", label: "Gerenciais", path: `${subsystemCode}/relatorios/gerenciais` },
-            { id: "2.2", label: "Operacionais", path: `${subsystemCode}/relatorios/operacionais` }
-          ]
+      // Se houver endpoint configurado para menus
+      if (endpoints && endpoints.menus) {
+        // Substituir parâmetros na URL incluindo subsystemCode
+        const urlParams = { ...parameters, SUBSYSTEM_ID: subsystemCode };
+        const fullUrl = replaceParameters(connection.baseURL + endpoints.menus.endpoint, urlParams);
+        
+        const headers: any = {};
+        
+        // Adicionar headers padrão
+        if (connection.defaultHeaders) {
+          Object.entries(connection.defaultHeaders).forEach(([key, value]) => {
+            headers[key] = replaceParameters(String(value), parameters);
+          });
         }
-      ];
+        
+        // Adicionar cookies se necessário
+        if (cookies) {
+          headers["Cookie"] = cookies;
+        }
 
-      res.json({ menuStructure });
-    } catch (error) {
+        console.log("LTH Menus Request URL:", fullUrl);
+        console.log("LTH Menus Headers:", headers);
+
+        const response = await fetch(fullUrl, {
+          method: endpoints.menus.method || "GET",
+          headers
+        });
+
+        const responseData = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch menus: ${response.status} ${response.statusText}`);
+        }
+
+        res.json({ menuStructure: responseData });
+      } else {
+        // Fallback para estrutura mock se não houver endpoint configurado
+        const menuStructure = [
+          {
+            id: "1",
+            label: "Cadastros",
+            path: `${subsystemCode}/cadastros`,
+            children: [
+              { id: "1.1", label: "Usuários", path: `${subsystemCode}/cadastros/usuarios` },
+              { id: "1.2", label: "Perfis", path: `${subsystemCode}/cadastros/perfis` }
+            ]
+          },
+          {
+            id: "2",
+            label: "Relatórios",
+            path: `${subsystemCode}/relatorios`,
+            children: [
+              { id: "2.1", label: "Gerenciais", path: `${subsystemCode}/relatorios/gerenciais` },
+              { id: "2.2", label: "Operacionais", path: `${subsystemCode}/relatorios/operacionais` }
+            ]
+          }
+        ];
+
+        res.json({ menuStructure });
+      }
+    } catch (error: any) {
       console.error("LTH menus error:", error);
       res.status(500).json({ 
         success: false, 

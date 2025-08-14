@@ -55,6 +55,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   const [isLoading, setIsLoading] = useState(false);
   const [authToken, setAuthToken] = useState<string | null>(null);
   const [pluginConfig, setPluginConfig] = useState<any>(null);
+  const [pluginId, setPluginId] = useState<string | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -67,8 +68,11 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   useEffect(() => {
     if (plugins && Array.isArray(plugins)) {
       const lthPlugin = plugins.find((p: any) => p.pageName === 'lth_menus_path_plugin');
-      if (lthPlugin?.configuration) {
-        setPluginConfig(lthPlugin.configuration);
+      if (lthPlugin) {
+        setPluginId(lthPlugin.id);
+        if (lthPlugin.configuration) {
+          setPluginConfig(lthPlugin.configuration);
+        }
       }
     }
   }, [plugins]);
@@ -512,8 +516,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
   // Function to authenticate with the API
   const authenticateConnection = async (connectionCode: string) => {
-    const connection = connections.find(c => c.code === connectionCode);
-    if (!connection?.endpoint || !connection?.credentials) {
+    if (!pluginId) {
+      console.error("Plugin ID not available");
       setConnectionStatus('error');
       return false;
     }
@@ -528,13 +532,13 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         },
         credentials: "include",
         body: JSON.stringify({
-          endpoint: connection.endpoint,
-          credentials: connection.credentials
+          pluginId: pluginId
         })
       });
 
       if (!response.ok) {
-        throw new Error(`Authentication failed: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(`Authentication failed: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
@@ -542,9 +546,11 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       if (data.success) {
         setAuthToken(data.token);
         setConnectionStatus('connected');
+        console.log("Authentication successful:", data);
         return true;
       } else {
         setConnectionStatus('error');
+        console.error("Authentication failed:", data);
       }
     } catch (error) {
       console.error("Authentication failed:", error);
@@ -560,7 +566,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
   // Function to fetch subsystems from API
   const fetchSubsystems = async () => {
-    if (!authToken || !selectedConnection) return [];
+    if (!authToken || !pluginId) return [];
 
     try {
       const response = await fetch("/api/plugin/lth-subsystems", {
@@ -570,7 +576,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         },
         credentials: "include",
         body: JSON.stringify({
-          connectionCode: selectedConnection,
+          pluginId: pluginId,
           authToken: authToken
         })
       });
