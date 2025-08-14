@@ -114,7 +114,7 @@ export default function PluginModal({
         element.style.setProperty('width', '40vw', 'important');
         element.style.setProperty('height', '80vh', 'important');
         element.style.setProperty('position', 'fixed', 'important');
-        element.style.setProperty('top', '20vh', 'important');
+        element.style.setProperty('top', '10vh', 'important');
         element.style.setProperty('left', '30vw', 'important');
         element.style.setProperty('right', 'auto', 'important');
         element.style.setProperty('bottom', 'auto', 'important');
@@ -254,7 +254,7 @@ export default function PluginModal({
                   actualPluginName === 'vector-graph-plugin' ? '80vh' :
                   actualPluginName === 'simple-excalidraw-plugin' ? '90vh' : '100vh',
           position: 'fixed',
-          top: actualPluginName === 'lth_menus_path_plugin' ? '20vh' :
+          top: actualPluginName === 'lth_menus_path_plugin' ? '10vh' :
                actualPluginName === 'mermaid-graph-plugin' ? '10vh' : 
                actualPluginName === 'vector-graph-plugin' ? '10vh' :
                actualPluginName === 'simple-excalidraw-plugin' ? '5vh' : '0',

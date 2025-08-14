@@ -3299,7 +3299,7 @@ html.dark [data-radix-select-item][data-highlighted] {
   width: 40vw !important;
   height: 80vh !important;
   position: fixed !important;
-  top: 20vh !important;
+  top: 10vh !important;
   left: 30vw !important;
   right: auto !important;
   bottom: auto !important;
@@ -3317,7 +3317,7 @@ html.dark [data-radix-select-item][data-highlighted] {
   width: 40vw !important;
   height: 80vh !important;
   position: fixed !important;
-  top: 20vh !important;
+  top: 10vh !important;
   left: 30vw !important;
   right: auto !important;
   bottom: auto !important;
