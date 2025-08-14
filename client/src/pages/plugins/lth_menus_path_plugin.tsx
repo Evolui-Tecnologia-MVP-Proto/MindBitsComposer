@@ -14,12 +14,12 @@ interface LthMenusPathPluginProps {
 
 interface MenuPath {
   id: string;
-  name: string;
+  label: string;
   path: string;
   parentId?: string;
   level: number;
-  type: 'menu' | 'submenu' | 'action' | 'item';
-  subsystem: string;
+  type: 'menu' | 'submenu' | 'action' | 'item' | string;
+  subsystem?: string;
   icon?: string;
   description?: string;
   children?: MenuPath[];
@@ -651,7 +651,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
               
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium text-gray-900 dark:text-gray-200 truncate">
-                  {item.name}
+                  {item.label}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
                   {item.path}
@@ -740,7 +740,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   const getFullPath = (selectedId: string): string => {
     const findPathRecursively = (items: MenuPath[], targetId: string, currentPath: string[] = []): string[] | null => {
       for (const item of items) {
-        const newPath = [...currentPath, item.name];
+        const newPath = [...currentPath, item.label];
         
         if (item.id === targetId) {
           return newPath;
@@ -762,7 +762,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   const getFormattedPathForSave = (selectedId: string): string => {
     const findPathRecursively = (items: MenuPath[], targetId: string, currentPath: string[] = []): string[] | null => {
       for (const item of items) {
-        const newPath = [...currentPath, item.name];
+        const newPath = [...currentPath, item.label];
         
         if (item.id === targetId) {
           return newPath;
