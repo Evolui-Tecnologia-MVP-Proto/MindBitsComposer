@@ -163,6 +163,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     if (!authToken || !pluginId || !subsystemId) return [];
 
     try {
+      console.log("Loading menu structure for subsystem:", subsystemId);
       const response = await fetch("/api/plugin/lth-menus", {
         method: "POST",
         headers: {
@@ -181,7 +182,21 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       }
 
       const data = await response.json();
-      return data.menuStructure || [];
+      
+      // Transform API tree structure to frontend format
+      const transformTree = (nodes: any[]): any[] => {
+        return nodes.map(node => ({
+          id: String(node.code || node.menuCode || Math.random()),
+          label: node.caption || node.label || "",
+          path: node.refKey || node.menuKey || `${node.code}`,
+          type: node.type,
+          children: node.children ? transformTree(node.children) : []
+        }));
+      };
+      
+      const menuStructure = data.menuStructure ? transformTree(data.menuStructure) : [];
+      console.log("Menu structure loaded with", menuStructure.length, "top-level items");
+      return menuStructure;
     } catch (error) {
       console.error("Failed to fetch menu structure:", error);
       return [];

@@ -3220,7 +3220,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/plugin/lth-menus", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
-    const { pluginId, subsystemCode, authToken } = req.body;
+    const { pluginId, subsystemId, authToken } = req.body;
     
     try {
       // Buscar configuração do plugin
@@ -3230,7 +3230,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const config = plugin[0].configuration as any;
-      if (!config || !config.connection || !config.parameters) {
+      if (!config || !config.plugin || !config.plugin.connection || !config.plugin.parameters) {
         throw new Error("Configuração do plugin inválida");
       }
 
@@ -3241,7 +3241,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       };
 
-      const { connection, parameters, endpoints } = config;
+      const { connection, parameters, endpoints } = config.plugin;
       
       // Read cookies from file
       const cookiePath = path.join(process.cwd(), `cookies_${req.user?.id}.txt`);
@@ -3251,11 +3251,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         cookies = fs.readFileSync(cookiePath, 'utf-8');
       }
 
-      // Se houver endpoint configurado para menus
-      if (endpoints && endpoints.menus) {
-        // Substituir parâmetros na URL incluindo subsystemCode
-        const urlParams = { ...parameters, SUBSYSTEM_ID: subsystemCode };
-        const fullUrl = replaceParameters(connection.baseURL + endpoints.menus.endpoint, urlParams);
+      // Se houver endpoint configurado para menus (ListSubsystemMenusTree)
+      const menuTreeEndpoint = endpoints && Array.isArray(endpoints) 
+        ? endpoints.find((ep: any) => ep.name === 'ListSubsystemMenusTree')
+        : null;
+      
+      if (menuTreeEndpoint) {
+        // Substituir parâmetros na URL incluindo subsystemId
+        const urlParams = { ...parameters, SUBSYSTEM_ID: subsystemId };
+        const baseUrl = connection.baseURL + menuTreeEndpoint.path;
+        
+        // Add query parameters if defined
+        let fullUrl = replaceParameters(baseUrl, urlParams);
+        if (menuTreeEndpoint.query) {
+          const queryParams = new URLSearchParams();
+          Object.entries(menuTreeEndpoint.query).forEach(([key, value]) => {
+            queryParams.append(key, replaceParameters(String(value), urlParams));
+          });
+          fullUrl += '?' + queryParams.toString();
+        }
         
         const headers: any = {};
         
@@ -3263,6 +3277,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (connection.defaultHeaders) {
           Object.entries(connection.defaultHeaders).forEach(([key, value]) => {
             headers[key] = replaceParameters(String(value), parameters);
+          });
+        }
+        
+        // Add endpoint-specific headers
+        if (menuTreeEndpoint.headers) {
+          Object.entries(menuTreeEndpoint.headers).forEach(([key, value]) => {
+            headers[key] = replaceParameters(String(value), urlParams);
           });
         }
         
@@ -3275,7 +3296,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("LTH Menus Headers:", headers);
 
         const response = await fetch(fullUrl, {
-          method: endpoints.menus.method || "GET",
+          method: menuTreeEndpoint.method || "GET",
           headers
         });
 
@@ -3285,26 +3306,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
           throw new Error(`Failed to fetch menus: ${response.status} ${response.statusText}`);
         }
 
-        res.json({ menuStructure: responseData });
+        // Extract and transform the tree structure from API response
+        const menuStructure = responseData.tree || [];
+        console.log("LTH Menus API returned tree with", menuStructure.length, "items");
+        
+        res.json({ menuStructure });
       } else {
         // Fallback para estrutura mock se não houver endpoint configurado
         const menuStructure = [
           {
             id: "1",
             label: "Cadastros",
-            path: `${subsystemCode}/cadastros`,
+            path: `${subsystemId}/cadastros`,
             children: [
-              { id: "1.1", label: "Usuários", path: `${subsystemCode}/cadastros/usuarios` },
-              { id: "1.2", label: "Perfis", path: `${subsystemCode}/cadastros/perfis` }
+              { id: "1.1", label: "Usuários", path: `${subsystemId}/cadastros/usuarios` },
+              { id: "1.2", label: "Perfis", path: `${subsystemId}/cadastros/perfis` }
             ]
           },
           {
             id: "2",
             label: "Relatórios",
-            path: `${subsystemCode}/relatorios`,
+            path: `${subsystemId}/relatorios`,
             children: [
-              { id: "2.1", label: "Gerenciais", path: `${subsystemCode}/relatorios/gerenciais` },
-              { id: "2.2", label: "Operacionais", path: `${subsystemCode}/relatorios/operacionais` }
+              { id: "2.1", label: "Gerenciais", path: `${subsystemId}/relatorios/gerenciais` },
+              { id: "2.2", label: "Operacionais", path: `${subsystemId}/relatorios/operacionais` }
             ]
           }
         ];
