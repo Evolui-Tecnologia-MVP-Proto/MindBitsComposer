@@ -3352,6 +3352,113 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/plugin/lth-menu-details", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { pluginId, dictionaryId, authToken } = req.body;
+    
+    try {
+      // Buscar configuração do plugin
+      const plugin = await db.select().from(plugins).where(eq(plugins.id, pluginId)).limit(1);
+      if (!plugin.length) {
+        throw new Error("Plugin não encontrado");
+      }
+
+      const config = plugin[0].configuration as any;
+      if (!config || !config.plugin || !config.plugin.connection || !config.plugin.parameters) {
+        throw new Error("Configuração do plugin inválida");
+      }
+
+      // Função para substituir tags {{}} pelos valores dos parâmetros
+      const replaceParameters = (str: string, params: any): string => {
+        return str.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+          return params[key] || match;
+        });
+      };
+
+      const { connection, parameters, endpoints } = config.plugin;
+      
+      // Read cookies from file
+      const cookiePath = path.join(process.cwd(), `cookies_${req.user?.id}.txt`);
+      let cookies = authToken;
+      
+      if (fs.existsSync(cookiePath)) {
+        cookies = fs.readFileSync(cookiePath, 'utf-8');
+      }
+
+      // Se houver endpoint configurado para ListMenu
+      const listMenuEndpoint = endpoints && Array.isArray(endpoints) 
+        ? endpoints.find((ep: any) => ep.name === 'ListMenu')
+        : null;
+      
+      if (listMenuEndpoint) {
+        const baseUrl = connection.baseURL + listMenuEndpoint.path;
+        let fullUrl = replaceParameters(baseUrl, parameters);
+        
+        // Add query parameters if defined
+        if (listMenuEndpoint.query) {
+          const queryParams = new URLSearchParams();
+          Object.entries(listMenuEndpoint.query).forEach(([key, value]) => {
+            queryParams.append(key, replaceParameters(String(value), parameters));
+          });
+          fullUrl += '?' + queryParams.toString();
+        }
+        
+        const headers: any = {};
+        
+        // Adicionar headers padrão
+        if (connection.defaultHeaders) {
+          Object.entries(connection.defaultHeaders).forEach(([key, value]) => {
+            headers[key] = replaceParameters(String(value), parameters);
+          });
+        }
+        
+        // Add endpoint-specific headers
+        if (listMenuEndpoint.headers) {
+          Object.entries(listMenuEndpoint.headers).forEach(([key, value]) => {
+            headers[key] = replaceParameters(String(value), parameters);
+          });
+        }
+        
+        // Adicionar cabeçalho de database ID
+        if (dictionaryId) {
+          headers["X-LuthierDatabaseID"] = dictionaryId;
+        }
+        
+        // Adicionar cookies se necessário
+        if (cookies) {
+          headers["Cookie"] = cookies;
+        }
+
+        console.log("LTH Menu Details Request URL:", fullUrl);
+        console.log("LTH Menu Details Headers:", headers);
+
+        const response = await fetch(fullUrl, {
+          method: listMenuEndpoint.method || "GET",
+          headers
+        });
+
+        const responseData = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch menu details: ${response.status} ${response.statusText}`);
+        }
+
+        console.log("LTH Menu Details API returned:", JSON.stringify(responseData).substring(0, 200), "...");
+        
+        res.json(responseData);
+      } else {
+        throw new Error("ListMenu endpoint not found in configuration");
+      }
+    } catch (error: any) {
+      console.error("LTH menu details error:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+  });
+
   // Testar plugin
   app.post("/api/plugins/:id/test", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");

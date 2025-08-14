@@ -764,27 +764,23 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     return findMenuCode(menuStructure, selectedId);
   };
 
-  // Função para buscar detalhes da função via API ListMenu
+  // Função para buscar detalhes da função via backend API
   const fetchFunctionDetails = async (menuCode: string) => {
-    if (!pluginConfig?.plugin?.endpoints?.ListMenu || !authToken) {
-      throw new Error("Configuração de endpoint ou token não disponível");
+    if (!pluginId || !authToken || !selectedDictionary) {
+      throw new Error("Configuração ou token não disponível");
     }
 
-    const endpoint = pluginConfig.plugin.endpoints.ListMenu;
-    const baseUrl = pluginConfig.plugin.connection?.baseUrl || pluginConfig.plugin.connection?.endpoint;
-    const apiKey = pluginConfig.plugin.connection?.apiKey;
-    const databaseId = selectedDictionary;
-
-    const url = `${baseUrl}${endpoint}`;
-    
-    const response = await fetch(url, {
-      method: 'GET',
+    const response = await fetch("/api/plugin/lth-menu-details", {
+      method: "POST",
       headers: {
-        'x-api-key': apiKey,
-        'X-LuthierDatabaseID': databaseId,
-        'Cookie': authToken,
-        'Content-Type': 'application/json'
-      }
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        pluginId: pluginId,
+        dictionaryId: selectedDictionary,
+        authToken: authToken
+      })
     });
 
     if (!response.ok) {
