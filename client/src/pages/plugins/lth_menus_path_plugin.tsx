@@ -69,6 +69,12 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     if (plugins && Array.isArray(plugins)) {
       const lthPlugin = plugins.find((p: any) => p.pageName === 'lth_menus_path_plugin');
       if (lthPlugin) {
+        console.log("=== LTH PLUGIN CONFIG DEBUG ===");
+        console.log("Plugin found:", lthPlugin);
+        console.log("Configuration:", lthPlugin.configuration);
+        console.log("Has connections:", !!lthPlugin.configuration?.connections);
+        console.log("=== FIM DEBUG ===");
+        
         setPluginId(lthPlugin.id);
         if (lthPlugin.configuration) {
           setPluginConfig(lthPlugin.configuration);
@@ -80,7 +86,15 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
 
   // Get connections from plugin configuration
-  const connections: Connection[] = pluginConfig?.connections || [];
+  // TODO: Implementar carregamento de conexões da API
+  const connections: Connection[] = pluginConfig?.connections || [
+    { 
+      id: "1", 
+      name: "Conexão Principal", 
+      code: "MAIN", 
+      description: "Conexão principal LTH"
+    }
+  ];
 
   // Mock data for subsystems - em produção seria uma API
   const subsystems: Subsystem[] = [
