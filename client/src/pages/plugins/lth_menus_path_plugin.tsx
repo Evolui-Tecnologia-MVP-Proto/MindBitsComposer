@@ -188,7 +188,17 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         return nodes.map(node => {
           // The API returns 'caption' field with the full name
           const nodeId = node.code || node.menuCode || "";
-          const caption = node.caption || "";
+          let caption = node.caption || "";
+          
+          // Clean HTML entities and unwanted characters
+          caption = caption
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/&nbsp;/g, ' ')
+            .trim();
           
           // Format as "ID - Caption" when both are available
           const label = nodeId && caption ? `${nodeId} - ${caption}` : caption || String(nodeId);
