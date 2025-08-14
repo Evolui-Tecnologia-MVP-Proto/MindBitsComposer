@@ -191,12 +191,6 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       // Transform API tree structure to frontend format
       const transformTree = (nodes: any[]): any[] => {
         return nodes.map(node => {
-          // Debug: Log node structure to see what fields are available
-          if (node.code) {
-            console.log(`Node ${node.code} fields:`, Object.keys(node));
-            console.log(`Node ${node.code} data:`, node);
-          }
-          
           // The API returns 'caption' field with the full name
           const nodeId = node.code || node.menuCode || "";
           let caption = node.caption || "";
@@ -229,8 +223,9 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
             path: node.refKey || node.menuKey || `${node.code}`,
             type: nodeType,
             isDivider: isDivider,
-            actionType: node.actionType,
-            action: node.action,
+            // Capturar diferentes campos possíveis para ação
+            actionType: node.actionType || node.type || node.compType,
+            action: node.action || node.refKey || node.menuKey || '',
             children: node.children ? transformTree(node.children) : []
           };
         });
@@ -774,9 +769,9 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     return findMenuCode(menuStructure, selectedId);
   };
 
-  // Função para buscar detalhes da função na estrutura já carregada
+  // Função para buscar detalhes da função - abordagem híbrida
   const fetchFunctionDetails = async (menuCode: string) => {
-    // Buscar na estrutura de menu já carregada ao invés de fazer nova chamada API
+    // 1. Primeiro, buscar na estrutura já carregada
     const findMenuInTree = (items: MenuPath[], targetCode: string): any => {
       for (const item of items) {
         // Extrair o código do label (formato: "1051 - Nome do Menu")
@@ -784,8 +779,9 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         if (match && match[1] === targetCode) {
           return {
             code: targetCode,
-            actionType: item.actionType || 'N/A',
-            action: item.action || 'N/A'
+            actionType: item.actionType && item.actionType !== 'FUNCTION_CALL' ? item.actionType : null,
+            action: item.action && item.action !== '' ? item.action : null,
+            fromTree: true
           };
         }
         
@@ -797,13 +793,55 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       return null;
     };
 
-    const menuItem = findMenuInTree(menuStructure, menuCode);
+    let menuItem = findMenuInTree(menuStructure, menuCode);
     
-    if (menuItem) {
-      return menuItem;
+    // 2. Se não encontrou dados suficientes na árvore, buscar na API ListMenus
+    if (!menuItem || (!menuItem.actionType && !menuItem.action)) {
+      try {
+        const response = await fetch("/api/plugin/lth-menu-details", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            pluginId: pluginId,
+            dictionaryId: selectedDictionary,
+            authToken: authToken
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const menuItems = Array.isArray(data) ? data : [];
+          const apiMenuItem = menuItems.find((item: any) => 
+            item.code && item.code.toString() === menuCode
+          );
+          
+          if (apiMenuItem) {
+            menuItem = {
+              code: menuCode,
+              actionType: apiMenuItem.actionType || 'N/A',
+              action: apiMenuItem.action || 'N/A',
+              fromApi: true
+            };
+          }
+        }
+      } catch (error) {
+        console.warn("Falha ao buscar detalhes da API:", error);
+      }
     }
     
-    throw new Error(`Menu com code ${menuCode} não encontrado na estrutura atual`);
+    // 3. Retornar dados encontrados ou valores padrão
+    if (menuItem) {
+      return {
+        code: menuCode,
+        actionType: menuItem.actionType || 'N/A',
+        action: menuItem.action || 'N/A'
+      };
+    }
+    
+    throw new Error(`Menu com code ${menuCode} não encontrado`);
   };
 
   // Handler para o clique no botão SquareCode
