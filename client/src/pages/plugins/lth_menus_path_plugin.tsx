@@ -48,6 +48,7 @@ interface Subsystem {
 export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null | undefined) {
   const { onDataExchange, selectedEdition } = props || {};
 
+  const [selectedDictionary, setSelectedDictionary] = useState<string>("");
   const [selectedSubsystem, setSelectedSubsystem] = useState<string>("");
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
@@ -87,8 +88,38 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
 
 
-  // Real subsystems from API
+  // Real data from API
+  const [dictionaries, setDictionaries] = useState<Connection[]>([]);
   const [subsystems, setSubsystems] = useState<Subsystem[]>([]);
+
+  // Load dictionaries from API
+  const loadDictionaries = async () => {
+    if (!authToken || !pluginId) return [];
+
+    try {
+      const response = await fetch("/api/plugin/lth-dictionaries", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          pluginId: pluginId,
+          authToken: authToken
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch dictionaries: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.dictionaries || [];
+    } catch (error) {
+      console.error("Failed to fetch dictionaries:", error);
+      return [];
+    }
+  };
 
   // Load subsystems from API
   const loadSubsystems = async () => {
@@ -275,21 +306,35 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     testConnection();
   }, [pluginId]); // Executa quando pluginId estiver disponível
 
-  // Load subsystems when authentication token becomes available
+  // Load dictionaries and subsystems when authentication token becomes available
   useEffect(() => {
-    const loadSubsystemsData = async () => {
+    const loadData = async () => {
       if (!authToken || !pluginId) return;
       
       try {
+        // Load dictionaries first
+        const dictionariesData = await loadDictionaries();
+        setDictionaries(dictionariesData);
+        
+        // Then load subsystems
         const subsystemsData = await loadSubsystems();
         setSubsystems(subsystemsData);
       } catch (error) {
-        console.error("Failed to load subsystems:", error);
+        console.error("Failed to load data:", error);
       }
     };
 
-    loadSubsystemsData();
+    loadData();
   }, [authToken, pluginId]);
+
+  const handleDictionaryChange = (dictionaryCode: string) => {
+    setSelectedDictionary(dictionaryCode);
+    // Reset subsystem and menu structure when dictionary changes
+    setSelectedSubsystem("");
+    setMenuStructure([]);
+    setExpandedPaths(new Set());
+    setSelectedPath(null);
+  };
 
   const handleSubsystemChange = async (subsystemCode: string) => {
     setSelectedSubsystem(subsystemCode);
@@ -666,14 +711,33 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         </p>
       </div>
 
+      {/* Dictionary Selector */}
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Dicionário
+        </label>
+        <Select value={selectedDictionary} onValueChange={handleDictionaryChange} disabled={connectionStatus !== 'connected'}>
+          <SelectTrigger className="w-full bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151]">
+            <SelectValue placeholder={connectionStatus !== 'connected' ? "Aguardando conexão..." : "Selecione uma conexao de dicionário"} />
+          </SelectTrigger>
+          <SelectContent className="bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151]">
+            {dictionaries.map((dictionary) => (
+              <SelectItem key={dictionary.id} value={dictionary.code}>
+                <span className="font-medium">{dictionary.name}</span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Subsystem Selector */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Subsistema
         </label>
-        <Select value={selectedSubsystem} onValueChange={handleSubsystemChange} disabled={connectionStatus !== 'connected'}>
+        <Select value={selectedSubsystem} onValueChange={handleSubsystemChange} disabled={connectionStatus !== 'connected' || !selectedDictionary}>
           <SelectTrigger className="w-full bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151]">
-            <SelectValue placeholder={connectionStatus !== 'connected' ? "Aguardando conexão..." : "Selecione um subsistema..."} />
+            <SelectValue placeholder={connectionStatus !== 'connected' ? "Aguardando conexão..." : !selectedDictionary ? "Selecione um dicionário primeiro..." : "Selecione um subsistema..."} />
           </SelectTrigger>
           <SelectContent className="bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151]">
             {subsystems.map((subsystem) => (

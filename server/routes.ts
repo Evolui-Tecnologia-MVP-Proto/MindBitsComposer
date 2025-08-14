@@ -2831,6 +2831,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/plugin/lth-dictionaries", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { pluginId, authToken } = req.body;
+    
+    try {
+      // Buscar configuração do plugin
+      const plugin = await db.select().from(plugins).where(eq(plugins.id, pluginId)).limit(1);
+      if (!plugin.length) {
+        throw new Error("Plugin não encontrado");
+      }
+
+      const config = plugin[0].configuration as any;
+      if (!config || !config.connection || !config.parameters || !config.endpoints) {
+        throw new Error("Configuração do plugin inválida");
+      }
+
+      // Função para substituir tags {{}} pelos valores dos parâmetros
+      const replaceParameters = (str: string, params: any): string => {
+        return str.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+          return params[key] || match;
+        });
+      };
+
+      const { connection, parameters, endpoints } = config;
+      
+      // Read cookies from file
+      const cookiePath = path.join(process.cwd(), `cookies_${req.user?.id}.txt`);
+      let cookies = authToken;
+      
+      if (fs.existsSync(cookiePath)) {
+        cookies = fs.readFileSync(cookiePath, 'utf-8');
+      }
+
+      // Se houver endpoint configurado para dicionários (conexões)
+      if (endpoints && endpoints.dictionaries) {
+        const fullUrl = replaceParameters(connection.baseURL + endpoints.dictionaries.path, parameters);
+        
+        const headers: any = {};
+        
+        // Adicionar headers padrão
+        if (connection.defaultHeaders) {
+          Object.entries(connection.defaultHeaders).forEach(([key, value]) => {
+            headers[key] = replaceParameters(String(value), parameters);
+          });
+        }
+        
+        // Adicionar cookies se necessário
+        if (cookies) {
+          headers["Cookie"] = cookies;
+        }
+
+        console.log("LTH Dictionaries Request URL:", fullUrl);
+        console.log("LTH Dictionaries Headers:", headers);
+
+        const response = await fetch(fullUrl, {
+          method: endpoints.dictionaries.method || "GET",
+          headers
+        });
+
+        const responseData = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch dictionaries: ${response.status} ${response.statusText}`);
+        }
+
+        res.json({ dictionaries: responseData });
+      } else {
+        // Fallback para dados mock se não houver endpoint configurado
+        const dictionaries = [
+          { id: "dict_1", name: "Conexão Principal", code: "MAIN_DICT", description: "Conexão principal do sistema" },
+          { id: "dict_2", name: "Conexão Teste", code: "TEST_DICT", description: "Conexão de testes" }
+        ];
+
+        res.json({ dictionaries });
+      }
+    } catch (error: any) {
+      console.error("LTH dictionaries error:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+  });
+
   app.post("/api/plugin/lth-subsystems", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
