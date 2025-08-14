@@ -1206,17 +1206,17 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           <div className="space-y-4 overflow-y-auto flex-1 pr-2">
             {functionDetails && (
               <>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
+                <div className="grid grid-cols-2 gap-4 items-start">
+                  <div className="flex flex-col h-full">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Código:</label>
-                    <div className="mt-1 px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-md text-sm font-mono break-all">
+                    <div className="mt-1 px-3 py-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm font-mono break-all flex-1 min-h-[3rem] flex items-center">
                       {functionDetails.code || 'N/A'}
                     </div>
                   </div>
                   
-                  <div>
+                  <div className="flex flex-col h-full">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Ação:</label>
-                    <div className="mt-1 px-3 py-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm font-mono whitespace-pre-wrap max-h-40 overflow-y-auto break-all">
+                    <div className="mt-1 px-3 py-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm font-mono whitespace-pre-wrap max-h-40 overflow-y-auto break-all flex-1 min-h-[3rem]">
                       {functionDetails.actionType || 'N/A'}
                     </div>
                   </div>
