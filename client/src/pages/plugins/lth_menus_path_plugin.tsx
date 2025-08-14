@@ -384,6 +384,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       console.log("Existing root parameters:", existingRootParams);
       
       // Update the plugin configuration preserving all original data
+      // ONLY update plugin.parameters.LUTHIER_DB_ID, never create root-level parameters
       const updatedConfig = {
         ...pluginConfig,
         plugin: {
@@ -392,14 +393,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
             ...existingPluginParams,  // Preserve BASE, API_KEY, etc.
             LUTHIER_DB_ID: dictionaryCode  // Only update this one
           }
-        },
-        // Also preserve any root-level parameters if they exist
-        ...(existingRootParams && Object.keys(existingRootParams).length > 0 && {
-          parameters: {
-            ...existingRootParams,
-            LUTHIER_DB_ID: dictionaryCode
-          }
-        })
+        }
+        // DO NOT create root-level parameters - causes duplicates and overwrites connection params
       };
       
       console.log("Saving LUTHIER_DB_ID:", dictionaryCode);
