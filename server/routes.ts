@@ -3009,8 +3009,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error("Plugin não encontrado");
       }
 
-      const config = plugin[0].configuration as any;
-      if (!config || !config.connection || !config.parameters) {
+      let config = plugin[0].configuration as any;
+      
+      // Parse JSON if needed
+      if (typeof config === 'string') {
+        config = JSON.parse(config);
+      }
+      
+      // Extract configuration - structure is in plugin.connection, plugin.parameters, etc.
+      const connection = config.connection || config.plugin?.connection;
+      const parameters = config.parameters || config.plugin?.parameters;
+      const endpoints = config.endpoints || config.plugin?.endpoints;
+      
+      if (!connection || !parameters || !endpoints) {
         throw new Error("Configuração do plugin inválida");
       }
 
@@ -3020,8 +3031,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return params[key] || match;
         });
       };
-
-      const { connection, parameters, endpoints } = config;
       
       // Read cookies from file
       const cookiePath = path.join(process.cwd(), `cookies_${req.user?.id}.txt`);
