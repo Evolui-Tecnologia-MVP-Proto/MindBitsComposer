@@ -952,7 +952,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   console.log("🚀 COMPONENT RENDER - connectionStatus:", connectionStatus, "selectedDictionary:", selectedDictionary, "dictionaries.length:", dictionaries.length);
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-[#0F172A] p-6">
+    <div className="flex flex-col bg-white dark:bg-[#0F172A] p-6 max-h-[85vh] overflow-y-auto">
       {/* Header com título e descrição */}
       <div className="mb-6">
         <div className="flex items-center mb-2">
@@ -1012,7 +1012,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       </div>
 
       {/* Menu Structure Visualization */}
-      <div className="flex-1 flex flex-col min-h-0 space-y-4">
+      <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
             Estrutura Hierárquica
@@ -1024,7 +1024,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           )}
         </div>
 
-        <div className="flex-1 min-h-[300px] border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#111827] overflow-hidden">
+        <div className="h-[400px] border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#111827] overflow-hidden">
           {connectionStatus === 'connected' && selectedSubsystem && menuStructure.length > 0 ? (
             <div className="h-full p-4 overflow-y-auto overflow-x-hidden">
               <div className="space-y-1">
