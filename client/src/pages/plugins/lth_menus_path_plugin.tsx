@@ -250,8 +250,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         forceRefresh
       };
 
-      console.log(`🔍 fetchSubsystems called with forceRefresh=${forceRefresh} for dictionary=${dictionaryId || selectedDictionary}`);
-      console.log("📤 REQUEST BODY being sent:", JSON.stringify(requestBody, null, 2));
+
 
       const response = await fetch("/api/plugin/lth-subsystems", {
         method: "POST",
@@ -372,15 +371,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   }, [authToken, pluginId, pluginConfig]);
 
   const handleDictionaryChange = async (dictionaryCode: string) => {
-    console.log("🚨🚨🚨 HANDLE DICTIONARY CHANGE CALLED 🚨🚨🚨");
-    console.log("=== DICTIONARY CHANGE DEBUG ===");
-    console.log("Dictionary Code:", dictionaryCode);
-    console.log("Auth Token:", authToken ? "Present" : "Missing");
-    console.log("Plugin ID:", pluginId);
-    console.log("Plugin Config:", pluginConfig ? "Present" : "Missing");
-
     setSelectedDictionary(dictionaryCode);
-    // Reset subsystem and menu structure when dictionary changes
     setSelectedSubsystem("");
     setMenuStructure([]);
     setExpandedPaths(new Set());
@@ -388,30 +379,17 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     
     // Save dictionary selection to plugin.parameters.LUTHIER_DB_ID
     if (dictionaryCode && pluginId && pluginConfig) {
-      // PRESERVE ALL EXISTING PARAMETERS (BASE, API_KEY, etc.) and only update LUTHIER_DB_ID
-      const existingPluginParams = pluginConfig.plugin?.parameters || {};
-      const existingRootParams = pluginConfig.parameters || {};
-      
-      console.log("Existing plugin parameters:", existingPluginParams);
-      console.log("Existing root parameters:", existingRootParams);
-      
-      // Update the plugin configuration preserving all original data
-      // ONLY update plugin.parameters.LUTHIER_DB_ID, never create root-level parameters
       const updatedConfig = {
         ...pluginConfig,
         plugin: {
           ...pluginConfig.plugin,
           parameters: {
-            ...existingPluginParams,  // Preserve BASE, API_KEY, etc.
-            LUTHIER_DB_ID: dictionaryCode  // Only update this one
+            ...pluginConfig.plugin?.parameters,
+            LUTHIER_DB_ID: dictionaryCode
           }
         }
-        // DO NOT create root-level parameters - causes duplicates and overwrites connection params
       };
       
-      console.log("Saving LUTHIER_DB_ID:", dictionaryCode);
-      
-      // Save to database
       try {
         const response = await fetch(`/api/plugins/${pluginId}`, {
           method: "PUT",
@@ -426,36 +404,52 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         
         if (response.ok) {
           setPluginConfig(updatedConfig);
-          console.log("LUTHIER_DB_ID saved successfully");
-          
-          // Force refresh of plugins data
           queryClient.invalidateQueries({ queryKey: ['/api/plugins'] });
-        } else {
-          console.error("Failed to save LUTHIER_DB_ID");
         }
       } catch (error) {
         console.error("Error saving LUTHIER_DB_ID:", error);
       }
     }
     
-    // FORCE reload subsystems for the selected dictionary (clear cache and fetch fresh data)
+    // REGRA SIMPLES: Dictionary changed → Save to JSON → Load from JSON
     if (dictionaryCode && authToken && pluginId) {
-      console.log("🔄 Dictionary changed - FORCING fresh subsystem load for dictionary:", dictionaryCode);
-      
       try {
-        // Clear existing subsystems state immediately
         setSubsystems([]);
         
-        // Force a fresh API call using our fetchSubsystems function with forceRefresh=true
-        const subsystemsData = await fetchSubsystems(dictionaryCode, true);
+        // 1. SEMPRE salvar subsistemas no JSON primeiro (forceRefresh=true)
+        await fetch("/api/plugin/lth-subsystems", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            pluginId: pluginId,
+            authToken: authToken,
+            dictionaryId: dictionaryCode,
+            forceRefresh: true
+          })
+        });
         
-        console.log(`✅ Loaded ${subsystemsData.length} fresh subsystems for dictionary ${dictionaryCode}`);
-        setSubsystems(subsystemsData);
+        // 2. SEMPRE carregar subsistemas do JSON (forceRefresh=false)
+        const response = await fetch("/api/plugin/lth-subsystems", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            pluginId: pluginId,
+            authToken: authToken,
+            dictionaryId: dictionaryCode,
+            forceRefresh: false
+          })
+        });
         
-        // Clear any previous subsystem selection since dictionary changed
-        console.log("🔄 Dictionary changed - subsystem selection cleared");
+        if (response.ok) {
+          const data = await response.json();
+          if (data.subsystems) {
+            setSubsystems(data.subsystems);
+          }
+        }
       } catch (error) {
-        console.error("Error loading fresh subsystems for dictionary:", error);
+        console.error("Error loading subsystems:", error);
         toast({
           title: "Erro de conexão",
           description: "Erro ao conectar com o servidor para carregar subsistemas.",
