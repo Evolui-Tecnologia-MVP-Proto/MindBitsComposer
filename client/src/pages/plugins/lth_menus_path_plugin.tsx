@@ -1199,7 +1199,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
       {/* Modal de Detalhes da Função Chamada */}
       <Dialog open={showFunctionDetails} onOpenChange={setShowFunctionDetails}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle>Detalhes da Função Chamada</DialogTitle>
           </DialogHeader>
