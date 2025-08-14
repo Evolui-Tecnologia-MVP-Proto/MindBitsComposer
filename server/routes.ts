@@ -3073,9 +3073,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const possibleNames = ['ListSubsystems', 'listSubsystems', 'list_subsystems', 'LIST_SUBSYSTEMS'];
         console.log("Looking for endpoint with any of these names:", possibleNames);
         
-        const listSubsystemsEndpoint = endpointsArray?.find((ep: any) => 
-          possibleNames.includes(ep.name) || possibleNames.includes(ep.Name)
-        );
+        // Try to find the endpoint with more detailed logging
+        let listSubsystemsEndpoint = null;
+        for (const ep of endpointsArray) {
+          console.log(`Checking endpoint: name="${ep.name || ep.Name}", path="${ep.path}", method="${ep.method}"`);
+          if (possibleNames.includes(ep.name) || possibleNames.includes(ep.Name)) {
+            listSubsystemsEndpoint = ep;
+            console.log("Found ListSubsystems endpoint!");
+            break;
+          }
+        }
+        
+        if (!listSubsystemsEndpoint) {
+          console.log("ListSubsystems endpoint not found. Available endpoints:", endpointsArray.map(ep => ({
+            name: ep.name || ep.Name,
+            path: ep.path,
+            method: ep.method
+          })));
+        }
         
         if (listSubsystemsEndpoint) {
           // Include dictionary ID in parameters for substitution
