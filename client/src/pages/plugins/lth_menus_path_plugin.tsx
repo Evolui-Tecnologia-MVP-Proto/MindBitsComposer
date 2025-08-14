@@ -191,6 +191,12 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       // Transform API tree structure to frontend format
       const transformTree = (nodes: any[]): any[] => {
         return nodes.map(node => {
+          // Debug: Log node structure to see what fields are available
+          if (node.code) {
+            console.log(`Node ${node.code} fields:`, Object.keys(node));
+            console.log(`Node ${node.code} data:`, node);
+          }
+          
           // The API returns 'caption' field with the full name
           const nodeId = node.code || node.menuCode || "";
           let caption = node.caption || "";
