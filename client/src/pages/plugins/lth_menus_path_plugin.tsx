@@ -355,18 +355,29 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     setSelectedPath(null);
     
     // Save dictionary selection to plugin.parameters.LUTHIER_DB_ID
-    if (dictionaryCode && pluginId && pluginConfig) {
-      // Always update LUTHIER_DB_ID when selection changes
-      console.log("Saving LUTHIER_DB_ID:", dictionaryCode);
+    if (dictionaryCode && pluginId) {
+      console.log("=== SAVING DICTIONARY DEBUG ===");
+      console.log("Dictionary code to save:", dictionaryCode);
+      console.log("Plugin ID:", pluginId);
+      console.log("Current plugin config:", JSON.stringify(pluginConfig, null, 2));
+      console.log("Current LUTHIER_DB_ID:", pluginConfig?.parameters?.LUTHIER_DB_ID);
+      
+      // Ensure parameters exists in the config
+      const currentConfig = pluginConfig || {};
+      if (!currentConfig.parameters) {
+        currentConfig.parameters = {};
+      }
       
       // Update the plugin configuration with the selected dictionary ID
       const updatedConfig = {
-        ...pluginConfig,
+        ...currentConfig,
         parameters: {
-          ...pluginConfig.parameters,
+          ...currentConfig.parameters,
           LUTHIER_DB_ID: dictionaryCode
         }
       };
+      
+      console.log("Updated config to save:", JSON.stringify(updatedConfig, null, 2));
       
       // Save to database
       try {
@@ -382,6 +393,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         });
         
         if (response.ok) {
+          const savedData = await response.json();
+          console.log("Save response:", savedData);
           setPluginConfig(updatedConfig);
           console.log("LUTHIER_DB_ID saved successfully:", dictionaryCode);
           toast({
@@ -389,12 +402,19 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
             description: `Dicionário ${dictionaryCode} foi salvo nas configurações do plugin`,
             duration: 2000
           });
+          
+          // Force refresh of plugins data
+          queryClient.invalidateQueries({ queryKey: ['/api/plugins'] });
         } else {
-          console.error("Failed to save LUTHIER_DB_ID");
+          console.error("Failed to save LUTHIER_DB_ID, status:", response.status);
+          const errorText = await response.text();
+          console.error("Error response:", errorText);
         }
       } catch (error) {
         console.error("Error saving LUTHIER_DB_ID:", error);
       }
+    } else {
+      console.log("Missing required data - dictionaryCode:", dictionaryCode, "pluginId:", pluginId);
     }
     
     // Load subsystems for the selected dictionary
