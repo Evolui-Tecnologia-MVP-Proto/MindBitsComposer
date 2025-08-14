@@ -864,6 +864,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     }
   };
 
+  console.log("🚀 COMPONENT RENDER - connectionStatus:", connectionStatus, "selectedDictionary:", selectedDictionary, "dictionaries.length:", dictionaries.length);
+
   return (
     <div className="h-full flex flex-col bg-white dark:bg-[#0F172A] p-6">
       {/* Header com título e descrição */}
@@ -884,7 +886,14 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Dicionário
         </label>
-        <Select value={selectedDictionary} onValueChange={handleDictionaryChange} disabled={connectionStatus !== 'connected'}>
+        <Select 
+          value={selectedDictionary} 
+          onValueChange={(value) => {
+            console.log("🎯 SELECT onValueChange FIRED with value:", value);
+            handleDictionaryChange(value);
+          }} 
+          disabled={connectionStatus !== 'connected'}
+        >
           <SelectTrigger className="w-full bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151]">
             <SelectValue placeholder={connectionStatus !== 'connected' ? "Aguardando conexão..." : "Selecione uma conexao de dicionário"} />
           </SelectTrigger>
