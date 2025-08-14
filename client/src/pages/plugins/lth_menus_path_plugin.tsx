@@ -417,7 +417,11 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         setSubsystems([]);
         
         // 1. SEMPRE salvar subsistemas no JSON primeiro (forceRefresh=true)
-        console.log("STEP 1: Salvando subsistemas no JSON para dicionário:", dictionaryCode);
+        toast({
+          title: "Salvando subsistemas...",
+          description: `Gravando subsistemas do dicionário no banco de dados`,
+        });
+        
         const saveResponse = await fetch("/api/plugin/lth-subsystems", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -434,13 +438,15 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           throw new Error("Falha ao salvar subsistemas no JSON");
         }
         
-        console.log("STEP 1 CONCLUÍDO: Subsistemas salvos no JSON");
+        toast({
+          title: "✅ Subsistemas gravados!",
+          description: `Subsistemas do dicionário ${dictionaryCode} salvos no banco`,
+        });
         
         // Pequena pausa para garantir que salvou
         await new Promise(resolve => setTimeout(resolve, 100));
         
         // 2. SEMPRE carregar subsistemas do JSON (forceRefresh=false)
-        console.log("STEP 2: Carregando subsistemas do JSON para dicionário:", dictionaryCode);
         const loadResponse = await fetch("/api/plugin/lth-subsystems", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -456,8 +462,11 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         if (loadResponse.ok) {
           const data = await loadResponse.json();
           if (data.subsystems) {
-            console.log("STEP 2 CONCLUÍDO: Carregados", data.subsystems.length, "subsistemas do JSON");
             setSubsystems(data.subsystems);
+            toast({
+              title: "✅ Lista atualizada!",
+              description: `${data.subsystems.length} subsistemas carregados do banco de dados`,
+            });
           }
         } else {
           throw new Error("Falha ao carregar subsistemas do JSON");
