@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ChevronRight, ChevronDown, Folder, FolderOpen, FileText, Database, Settings, RefreshCw, X, Save, Check, Circle, SquareCode } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -59,6 +60,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   const [pluginConfig, setPluginConfig] = useState<any>(null);
   const [pluginId, setPluginId] = useState<string | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
+  const [showFunctionDetails, setShowFunctionDetails] = useState(false);
+  const [functionDetails, setFunctionDetails] = useState<{actionType?: string; action?: string; code?: string} | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -737,6 +740,123 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     });
   };
 
+  // Função para extrair o menuCode do último nível do path selecionado
+  const getLastLevelMenuCode = (selectedId: string): string | null => {
+    const findMenuCode = (items: MenuPath[], targetId: string): string | null => {
+      for (const item of items) {
+        if (item.id === targetId) {
+          // Se é um FUNCTION_CALL, extrair o código numérico do label
+          if (item.type === 'FUNCTION_CALL' && item.label) {
+            const match = item.label.match(/^(\d+)/);
+            return match ? match[1] : null;
+          }
+          return null;
+        }
+        
+        if (item.children) {
+          const found = findMenuCode(item.children, targetId);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    return findMenuCode(menuStructure, selectedId);
+  };
+
+  // Função para buscar detalhes da função via API ListMenu
+  const fetchFunctionDetails = async (menuCode: string) => {
+    if (!pluginConfig?.plugin?.endpoints?.ListMenu || !authToken) {
+      throw new Error("Configuração de endpoint ou token não disponível");
+    }
+
+    const endpoint = pluginConfig.plugin.endpoints.ListMenu;
+    const baseUrl = pluginConfig.plugin.connection?.baseUrl || pluginConfig.plugin.connection?.endpoint;
+    const apiKey = pluginConfig.plugin.connection?.apiKey;
+    const databaseId = selectedDictionary;
+
+    const url = `${baseUrl}${endpoint}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'x-api-key': apiKey,
+        'X-LuthierDatabaseID': databaseId,
+        'Cookie': authToken,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch menu details: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    // Buscar o objeto com o code igual ao menuCode
+    const findMenuByCode = (items: any[]): any => {
+      for (const item of items) {
+        if (item.code && item.code.toString() === menuCode) {
+          return item;
+        }
+        if (item.children && Array.isArray(item.children)) {
+          const found = findMenuByCode(item.children);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+
+    const menuItem = findMenuByCode(data.tree || data || []);
+    
+    if (menuItem) {
+      return {
+        code: menuItem.code,
+        actionType: menuItem.actionType,
+        action: menuItem.action
+      };
+    }
+    
+    throw new Error(`Menu com code ${menuCode} não encontrado`);
+  };
+
+  // Handler para o clique no botão SquareCode
+  const handleShowFunctionDetails = async () => {
+    if (!selectedPath) return;
+
+    try {
+      setIsLoading(true);
+      
+      // Extrair o menuCode do último nível
+      const menuCode = getLastLevelMenuCode(selectedPath);
+      
+      if (!menuCode) {
+        toast({
+          title: "Código não encontrado",
+          description: "Não foi possível extrair o código do menu selecionado.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Buscar detalhes da função
+      const details = await fetchFunctionDetails(menuCode);
+      
+      setFunctionDetails(details);
+      setShowFunctionDetails(true);
+      
+    } catch (error) {
+      console.error("Error fetching function details:", error);
+      toast({
+        title: "Erro ao buscar detalhes",
+        description: error instanceof Error ? error.message : "Erro desconhecido",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleAtualizar = async () => {
     if (connectionStatus !== 'connected') {
       toast({
@@ -1059,6 +1179,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
             <Button
               variant="ghost"
               size="sm"
+              onClick={handleShowFunctionDetails}
+              disabled={isLoading}
               className="h-6 w-6 p-0 ml-2 hover:bg-gray-200 dark:hover:bg-gray-700"
             >
               <SquareCode className="h-4 w-4" />
@@ -1087,6 +1209,50 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           Salvar
         </Button>
       </div>
+
+      {/* Modal de Detalhes da Função Chamada */}
+      <Dialog open={showFunctionDetails} onOpenChange={setShowFunctionDetails}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Detalhes da Função Chamada</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {functionDetails && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Código:</label>
+                  <div className="mt-1 px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-md text-sm font-mono">
+                    {functionDetails.code || 'N/A'}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Ação:</label>
+                  <div className="mt-1 px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-md text-sm">
+                    {functionDetails.actionType || 'N/A'}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Ação:</label>
+                  <div className="mt-1 px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-md text-sm font-mono">
+                    {functionDetails.action || 'N/A'}
+                  </div>
+                </div>
+              </>
+            )}
+            
+            <div className="flex justify-end pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowFunctionDetails(false)}
+              >
+                Fechar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
