@@ -3177,7 +3177,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Verificar se realmente salvou
           console.log("🔥 VERIFICANDO SE SALVOU - fazendo SELECT...");
           const checkPlugin = await db.select().from(plugins).where(eq(plugins.id, pluginId)).limit(1);
-          console.log("🔥 DADOS DO BANCO APÓS UPDATE:", checkPlugin[0]?.configuration);
+          const savedConfig = checkPlugin[0]?.configuration as any;
+          console.log("🔥 SUBSYSTEMS NO BANCO APÓS UPDATE:", savedConfig?.select_data?.subsystem?.length || 'undefined');
+          console.log("🔥 PRIMEIROS 3 SUBSYSTEMS SALVOS:", savedConfig?.select_data?.subsystem?.slice(0, 3));
           
           // Return subsystems for the select
           const subsystems = subsystemsForStorage.map((sub: any) => ({
