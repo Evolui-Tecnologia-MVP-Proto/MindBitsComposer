@@ -3446,17 +3446,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         console.log("LTH Menu Details API returned:", JSON.stringify(responseData).substring(0, 200), "...");
         
-        // Verificação específica para code = 1032
-        const item1032 = responseData.find((item: any) => item.code === 1032);
-        if (item1032) {
-          console.log("=== ITEM 1032 ENCONTRADO ===");
-          console.log("Dados completos do item 1032:", JSON.stringify(item1032, null, 2));
-        } else {
-          console.log("=== ITEM 1032 NÃO ENCONTRADO ===");
-          console.log("Códigos disponíveis (primeiros 20):", 
-            responseData.slice(0, 20).map((item: any) => item.code));
-        }
-        
         res.json(responseData);
       } else {
         throw new Error("ListMenus endpoint not found in configuration");

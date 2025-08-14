@@ -192,7 +192,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       const transformTree = (nodes: any[]): any[] => {
         return nodes.map(node => {
           // The API returns 'caption' field with the full name
-          const nodeId = node.code || node.menuCode || "";
+          const nodeId = node.menuCode || node.code || "";
           let caption = node.caption || "";
           
           // Remove only the & hotkey indicators
