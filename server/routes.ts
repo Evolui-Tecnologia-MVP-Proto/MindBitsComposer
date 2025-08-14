@@ -2845,31 +2845,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       let config = plugin[0].configuration as any;
       
+      // Parse JSON if needed
+      if (typeof config === 'string') {
+        config = JSON.parse(config);
+      }
+      
       console.log("=== LTH DICTIONARIES DEBUG ===");
-      console.log("Plugin configuration:", JSON.stringify(config, null, 2));
-      console.log("Has connection:", !!config?.connection);
-      console.log("Has parameters:", !!config?.parameters);
-      console.log("Has endpoints:", !!config?.endpoints);
-      console.log("=== END DEBUG ===");
+      console.log("Config select_data:", config?.select_data);
+      console.log("Config dict_db:", config?.select_data?.dict_db);
+      console.log("Dict_db length:", config?.select_data?.dict_db?.length || 0);
       
-      if (!config) {
-        throw new Error("Configuração do plugin não encontrada");
-      }
-      
-      // Try to find the structure - it might be nested differently
-      let actualConfig = config;
-      if (config.plugin) {
-        actualConfig = config.plugin;
-        console.log("Found config under 'plugin' key");
-      }
-      
-      if (!actualConfig.connection || !actualConfig.parameters) {
-        console.log("Missing connection or parameters in:", actualConfig);
-        throw new Error("Configuração do plugin inválida - faltam connection ou parameters");
-      }
-      
-      config = actualConfig;
-
       // Função para substituir tags {{}} pelos valores dos parâmetros
       const replaceParameters = (str: string, params: any): string => {
         return str.replace(/\{\{(\w+)\}\}/g, (match, key) => {
@@ -2877,7 +2862,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       };
 
-      const { connection, parameters, endpoints } = config;
+      // Extract configuration - might be nested under 'plugin' key
+      const connection = config.connection || config.plugin?.connection;
+      const parameters = config.parameters || config.plugin?.parameters; 
+      const endpoints = config.endpoints || config.plugin?.endpoints;
       
       // Read cookies from file
       const cookiePath = path.join(process.cwd(), `cookies_${req.user?.id}.txt`);
@@ -2890,14 +2878,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if dict_db is empty or doesn't exist
       if (!config.select_data || !config.select_data.dict_db || config.select_data.dict_db.length === 0) {
         console.log("dict_db is empty, fetching from ListLuthierConnections endpoint");
-        console.log("Endpoints structure:", JSON.stringify(endpoints, null, 2));
         
-        // Find the ListLuthierConnections endpoint - it's directly in endpoints array, not endpoints.endpoints
-        const listConnectionsEndpoint = endpoints?.find((ep: any) => ep.name === "ListLuthierConnections");
+        if (!endpoints) {
+          console.error("No endpoints configured");
+          return res.json({ dictionaries: [] });
+        }
         
-        console.log("Found ListLuthierConnections endpoint:", listConnectionsEndpoint);
+        // Find the ListLuthierConnections endpoint
+        const listConnectionsEndpoint = endpoints.find((ep: any) => ep.name === "ListLuthierConnections");
         
-        if (listConnectionsEndpoint) {
+        console.log("Found ListLuthierConnections endpoint:", !!listConnectionsEndpoint);
+        
+        if (listConnectionsEndpoint && connection && parameters) {
           const fullUrl = replaceParameters(connection.baseURL + listConnectionsEndpoint.path, parameters);
           
           const headers: any = {};
@@ -2915,61 +2907,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
 
           console.log("Fetching Luthier connections from:", fullUrl);
-          console.log("Headers:", headers);
 
-          const response = await fetch(fullUrl, {
-            method: listConnectionsEndpoint.method || "GET",
-            headers
-          });
-
-          if (response.ok) {
-            const luthierConnections = await response.json();
-            console.log("Received Luthier connections:", luthierConnections);
-            
-            // Format the data as requested: [{id1, identifier1}, {id2, identifier2}...]
-            const dictDb = luthierConnections.map((conn: any) => ({
-              id: conn.id,
-              identifier: conn.identifier
-            }));
-            
-            // Create a full config object to save
-            const updatedConfig = {
-              ...plugin[0].configuration,
-              select_data: {
-                ...plugin[0].configuration?.select_data,
-                dict_db: dictDb
-              }
-            };
-            
-            // Save the updated configuration back to the database
-            await db.update(plugins)
-              .set({ configuration: updatedConfig })
-              .where(eq(plugins.id, pluginId));
-            
-            console.log("Saved dict_db to plugin configuration:", dictDb);
-            
-            // Return the formatted dictionaries
-            const dictionaries = dictDb.map((dict: any) => ({
-              id: String(dict.id),
-              code: String(dict.id),
-              name: dict.identifier,
-              description: `Database ID: ${dict.id}`
-            }));
-            
-            return res.json({ 
-              dictionaries,
-              updatedConfig: updatedConfig
+          try {
+            const response = await fetch(fullUrl, {
+              method: listConnectionsEndpoint.method || "GET",
+              headers
             });
-          } else {
-            console.error("Failed to fetch Luthier connections:", response.status, response.statusText);
-            const errorBody = await response.text();
-            console.error("Error response body:", errorBody);
+
+            if (response.ok) {
+              const luthierConnections = await response.json();
+              console.log("Received Luthier connections count:", luthierConnections.length);
+              
+              // Format the data as requested: [{id, identifier}...]
+              const dictDb = luthierConnections.map((conn: any) => ({
+                id: conn.id,
+                identifier: conn.identifier
+              }));
+              
+              // Create the updated configuration object
+              const updatedConfig = {
+                ...config,
+                select_data: {
+                  ...config.select_data,
+                  dict_db: dictDb,
+                  subsystems: config.select_data?.subsystems || []
+                }
+              };
+              
+              console.log("Saving dict_db to database...");
+              
+              // Save the updated configuration back to the database
+              await db.update(plugins)
+                .set({ configuration: updatedConfig })
+                .where(eq(plugins.id, pluginId));
+              
+              console.log("Successfully saved dict_db with", dictDb.length, "items");
+              
+              // Return the formatted dictionaries
+              const dictionaries = dictDb.map((dict: any) => ({
+                id: String(dict.id),
+                code: String(dict.id),
+                name: dict.identifier,
+                description: `Database ID: ${dict.id}`
+              }));
+              
+              return res.json({ dictionaries });
+              
+            } else {
+              console.error("Failed to fetch Luthier connections:", response.status);
+              const errorBody = await response.text();
+              console.error("Error response:", errorBody);
+            }
+          } catch (fetchError) {
+            console.error("Error fetching from API:", fetchError);
           }
+        } else {
+          console.log("Missing required configuration for API call");
         }
       }
       
       // If dict_db exists, use it
       if (config.select_data?.dict_db && config.select_data.dict_db.length > 0) {
+        console.log("Using existing dict_db with", config.select_data.dict_db.length, "items");
         const dictionaries = config.select_data.dict_db.map((dict: any) => ({
           id: String(dict.id),
           code: String(dict.id), 
@@ -2981,7 +2980,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // No dictionaries available - return empty list
-      console.log("No dictionaries found in config and couldn't fetch from API");
+      console.log("No dictionaries found");
       res.json({ dictionaries: [] });
     } catch (error: any) {
       console.error("LTH dictionaries error:", error);
