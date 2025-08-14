@@ -334,21 +334,40 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           if (dictExists) {
             setSelectedDictionary(String(savedDictionaryId));
             // Load subsystems for the pre-selected dictionary
-            const subsystemsData = await fetchSubsystems(String(savedDictionaryId));
-            setSubsystems(subsystemsData);
+            // Use forceRefresh to ensure fresh data on initial load
+            const response = await fetch("/api/plugin/lth-subsystems", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              credentials: "include",
+              body: JSON.stringify({ 
+                pluginId, 
+                dictionaryId: String(savedDictionaryId),
+                forceRefresh: false  // Initial load can use cache
+              })
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              const subsystemsData = data.subsystems || [];
+              setSubsystems(subsystemsData);
             
-            // Pre-select subsystem if saved in parameters
-            if (pluginConfig?.plugin?.parameters?.SUBSYSTEM_ID) {
-              const savedSubsystemId = pluginConfig.plugin.parameters.SUBSYSTEM_ID;
-              console.log("Pre-selecting subsystem from SUBSYSTEM_ID:", savedSubsystemId);
-              
-              const subsystemExists = subsystemsData.some((sub: any) => String(sub.id) === String(savedSubsystemId));
-              if (subsystemExists) {
-                setSelectedSubsystem(String(savedSubsystemId));
-                // Load menu structure for the pre-selected subsystem
-                const structure = await loadMenuStructure(String(savedSubsystemId));
-                setMenuStructure(structure);
+              // Pre-select subsystem if saved in parameters
+              if (pluginConfig?.plugin?.parameters?.SUBSYSTEM_ID) {
+                const savedSubsystemId = pluginConfig.plugin.parameters.SUBSYSTEM_ID;
+                console.log("Pre-selecting subsystem from SUBSYSTEM_ID:", savedSubsystemId);
+                
+                const subsystemExists = subsystemsData.some((sub: any) => String(sub.id) === String(savedSubsystemId));
+                if (subsystemExists) {
+                  setSelectedSubsystem(String(savedSubsystemId));
+                  // Load menu structure for the pre-selected subsystem
+                  const structure = await loadMenuStructure(String(savedSubsystemId));
+                  setMenuStructure(structure);
+                }
               }
+            } else {
+              console.error("Failed to load initial subsystems");
             }
           }
         }

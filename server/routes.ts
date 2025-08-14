@@ -3017,8 +3017,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.log("=== LTH SUBSYSTEMS DEBUG ===");
+      console.log("Request body - pluginId:", pluginId);
+      console.log("Request body - dictionaryId:", dictionaryId);
+      console.log("Request body - forceRefresh:", forceRefresh);
       console.log("Config structure:", Object.keys(config));
       console.log("Config.plugin keys:", config.plugin ? Object.keys(config.plugin) : 'plugin is undefined');
+      console.log("Existing subsystems count:", config.select_data?.subsystem?.length || 0);
       
       // Check if we need to load subsystems from API and save to select_data
       const needsLoadFromAPI = forceRefresh || 
