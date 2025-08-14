@@ -3056,30 +3056,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         // Find the ListSubsystems endpoint configuration
-        // Debug the exact structure
-        console.log("Type of endpoints:", typeof endpoints);
-        console.log("Endpoints is array?", Array.isArray(endpoints));
-        console.log("Endpoints content:", JSON.stringify(endpoints, null, 2));
+        // The endpoints come as an object with numeric keys that need to be converted to array
+        let endpointsArray: any[] = [];
         
-        // Try to find endpoints in different possible locations
-        let endpointsArray = null;
         if (Array.isArray(endpoints)) {
           endpointsArray = endpoints;
         } else if (endpoints && typeof endpoints === 'object') {
-          // Check if it's an object with numeric keys (like an array converted to object)
-          const keys = Object.keys(endpoints);
-          if (keys.every(k => !isNaN(Number(k)))) {
-            // Convert object with numeric keys to array
-            endpointsArray = Object.values(endpoints);
-            console.log("Converted object to array, length:", endpointsArray.length);
-          }
+          // Convert object to array (handling both numeric keys and direct object values)
+          endpointsArray = Object.values(endpoints);
         }
         
-        if (endpointsArray) {
-          console.log("Available endpoints:", endpointsArray.map((ep: any) => ep.name || "unnamed"));
-        }
+        console.log("Converted endpoints to array, total:", endpointsArray.length);
+        console.log("Available endpoint names:", endpointsArray.map((ep: any) => ep.name || ep.Name || "unnamed"));
         
-        const listSubsystemsEndpoint = endpointsArray?.find((ep: any) => ep.name === "ListSubsystems");
+        // Look for ListSubsystems in different possible name formats
+        const possibleNames = ['ListSubsystems', 'listSubsystems', 'list_subsystems', 'LIST_SUBSYSTEMS'];
+        console.log("Looking for endpoint with any of these names:", possibleNames);
+        
+        const listSubsystemsEndpoint = endpointsArray?.find((ep: any) => 
+          possibleNames.includes(ep.name) || possibleNames.includes(ep.Name)
+        );
         
         if (listSubsystemsEndpoint) {
           // Include dictionary ID in parameters for substitution
