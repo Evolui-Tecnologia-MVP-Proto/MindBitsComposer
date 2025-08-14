@@ -251,6 +251,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       };
 
       console.log(`🔍 fetchSubsystems called with forceRefresh=${forceRefresh} for dictionary=${dictionaryId || selectedDictionary}`);
+      console.log("📤 REQUEST BODY being sent:", JSON.stringify(requestBody, null, 2));
 
       const response = await fetch("/api/plugin/lth-subsystems", {
         method: "POST",
@@ -335,9 +336,12 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           const savedDictionaryId = pluginConfig.plugin.parameters.LUTHIER_DB_ID;
           console.log("Pre-selecting dictionary from LUTHIER_DB_ID:", savedDictionaryId);
           
-          // Check if this ID exists in the loaded dictionaries
+          // Check if this ID exists in the loaded dictionaries AND is not already selected
           const dictExists = dictionariesData.some((dict: any) => String(dict.id) === String(savedDictionaryId));
-          if (dictExists) {
+          const isAlreadySelected = String(selectedDictionary) === String(savedDictionaryId);
+          
+          if (dictExists && !isAlreadySelected) {
+            console.log("📍 USEEFFECT: Dictionary not selected yet - selecting and loading subsystems");
             setSelectedDictionary(String(savedDictionaryId));
             // Load subsystems for the pre-selected dictionary (initial load can use cache)
             console.log("📍 USEEFFECT: Loading subsystems for pre-selected dictionary", savedDictionaryId, "with forceRefresh=false");
