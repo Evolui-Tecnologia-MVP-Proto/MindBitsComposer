@@ -2919,10 +2919,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
               console.log("Received Luthier connections count:", luthierConnections.length);
               
               // Format the data as requested: [{id, identifier}...]
-              const dictDb = luthierConnections.map((conn: any) => ({
-                id: conn.id,
-                identifier: conn.identifier
-              }));
+              // Filter only identifiers ending with "_TRUNK"
+              const dictDb = luthierConnections
+                .filter((conn: any) => conn.identifier && conn.identifier.endsWith('_TRUNK'))
+                .map((conn: any) => ({
+                  id: conn.id,
+                  identifier: conn.identifier
+                }));
               
               // Create the updated configuration object
               const updatedConfig = {
@@ -2966,16 +2969,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // If dict_db exists, use it
+      // If dict_db exists, use it (but filter for _TRUNK only)
       if (config.select_data?.dict_db && config.select_data.dict_db.length > 0) {
         console.log("Using existing dict_db with", config.select_data.dict_db.length, "items");
-        const dictionaries = config.select_data.dict_db.map((dict: any) => ({
-          id: String(dict.id),
-          code: String(dict.id), 
-          name: dict.identifier,
-          description: `Database ID: ${dict.id}`
-        }));
+        const dictionaries = config.select_data.dict_db
+          .filter((dict: any) => dict.identifier && dict.identifier.endsWith('_TRUNK'))
+          .map((dict: any) => ({
+            id: String(dict.id),
+            code: String(dict.id), 
+            name: dict.identifier,
+            description: `Database ID: ${dict.id}`
+          }));
         
+        console.log("Filtered to", dictionaries.length, "TRUNK dictionaries");
         return res.json({ dictionaries });
       }
 
