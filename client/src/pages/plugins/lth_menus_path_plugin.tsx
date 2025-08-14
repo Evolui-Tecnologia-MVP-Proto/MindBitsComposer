@@ -185,13 +185,20 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       
       // Transform API tree structure to frontend format
       const transformTree = (nodes: any[]): any[] => {
-        return nodes.map(node => ({
-          id: String(node.code || node.menuCode || Math.random()),
-          label: node.caption || node.label || "",
-          path: node.refKey || node.menuKey || `${node.code}`,
-          type: node.type,
-          children: node.children ? transformTree(node.children) : []
-        }));
+        return nodes.map(node => {
+          // Format label with ID - Caption
+          const nodeId = node.code || node.menuCode || "";
+          const caption = node.caption || node.label || "";
+          const label = nodeId ? `${nodeId} - ${caption}` : caption;
+          
+          return {
+            id: String(nodeId || Math.random()),
+            label: label,
+            path: node.refKey || node.menuKey || `${node.code}`,
+            type: node.type,
+            children: node.children ? transformTree(node.children) : []
+          };
+        });
       };
       
       const menuStructure = data.menuStructure ? transformTree(data.menuStructure) : [];
