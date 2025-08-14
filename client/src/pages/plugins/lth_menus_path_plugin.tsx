@@ -735,7 +735,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     const subsystemName = subsystems.find(s => s.code === selectedSubsystem)?.name || selectedSubsystem;
     const pathString = pathArray.join(' -> ');
     
-    return `[Subsystem: "${subsystemName}"] - ${pathString}`;
+    return `Subsystem: "${subsystemName}" - ${pathString}`;
   };
 
   const handleSalvar = () => {
@@ -825,7 +825,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         return (
           <Badge variant="secondary" className="ml-2">
             <Circle className="h-2 w-2 mr-1" fill="currentColor" />
-            [desconectado]
+            desconectado
           </Badge>
         );
       case 'connecting':
@@ -839,7 +839,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         return (
           <Badge variant="default" className="ml-2 bg-green-600 hover:bg-green-700">
             <Check className="h-2 w-2 mr-1" />
-            [Conectado]
+            Conectado
           </Badge>
         );
       case 'error':
