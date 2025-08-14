@@ -2711,6 +2711,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const config = plugin[0].config as any;
+      console.log("=== CONFIG DEBUG ===");
+      console.log("Config completo:", JSON.stringify(config, null, 2));
+      console.log("Config keys:", Object.keys(config || {}));
+      console.log("Has connection:", !!config?.connection);
+      console.log("Has parameters:", !!config?.parameters);
+      console.log("=== FIM CONFIG DEBUG ===");
+      
       if (!config || !config.connection || !config.parameters) {
         throw new Error("Configuração do plugin inválida");
       }
