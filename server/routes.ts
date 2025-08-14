@@ -3016,96 +3016,134 @@ export async function registerRoutes(app: Express): Promise<Server> {
         config = JSON.parse(config);
       }
       
-      // Extract configuration - structure is in plugin.connection, plugin.parameters, etc.
-      const connection = config.connection || config.plugin?.connection;
-      const parameters = config.parameters || config.plugin?.parameters;
-      const endpoints = config.endpoints || config.plugin?.endpoints;
+      console.log("=== LTH SUBSYSTEMS DEBUG ===");
+      console.log("Config structure:", Object.keys(config));
       
-      if (!connection || !parameters || !endpoints) {
-        throw new Error("Configuração do plugin inválida");
-      }
-
-      // Função para substituir tags {{}} pelos valores dos parâmetros
-      const replaceParameters = (str: string, params: any): string => {
-        return str.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-          return params[key] || match;
-        });
-      };
+      // Check if we need to load subsystems from API and save to select_data
+      const needsLoadFromAPI = !config.select_data?.subsystem || 
+                               (Array.isArray(config.select_data.subsystem) && config.select_data.subsystem.length === 0);
       
-      // Read cookies from file
-      const cookiePath = path.join(process.cwd(), `cookies_${req.user?.id}.txt`);
-      let cookies = authToken;
-      
-      if (fs.existsSync(cookiePath)) {
-        cookies = fs.readFileSync(cookiePath, 'utf-8');
-      }
-
-      // Find the ListSubsystems endpoint configuration
-      const listSubsystemsEndpoint = endpoints?.endpoints?.find((ep: any) => ep.name === "ListSubsystems");
-      
-      if (listSubsystemsEndpoint) {
-        // Include dictionary ID in parameters for substitution
-        const urlParams = { ...parameters, LUTHIER_DB_ID: dictionaryId };
-        const fullUrl = replaceParameters(connection.baseURL + listSubsystemsEndpoint.path, urlParams);
+      if (needsLoadFromAPI) {
+        console.log("Subsystem list empty or missing, loading from API...");
         
-        const headers: any = {};
+        // Extract configuration - structure is in plugin.connection, plugin.parameters, etc.
+        const connection = config.plugin?.connection || config.connection;
+        const parameters = config.plugin?.parameters || config.parameters;
+        const endpoints = config.plugin?.endpoints || config.endpoints;
         
-        // Add headers from endpoint configuration
-        if (listSubsystemsEndpoint.headers) {
-          Object.entries(listSubsystemsEndpoint.headers).forEach(([key, value]) => {
-            headers[key] = replaceParameters(String(value), urlParams);
+        if (!connection || !parameters || !endpoints) {
+          console.error("Invalid config - connection:", !!connection, "parameters:", !!parameters, "endpoints:", !!endpoints);
+          throw new Error("Configuração do plugin inválida");
+        }
+
+        // Função para substituir tags {{}} pelos valores dos parâmetros
+        const replaceParameters = (str: string, params: any): string => {
+          return str.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+            return params[key] || match;
           });
-        }
+        };
         
-        // Add cookies if necessary
-        if (cookies) {
-          headers["Cookie"] = cookies;
+        // Read cookies from file
+        const cookiePath = path.join(process.cwd(), `cookies_${req.user?.id}.txt`);
+        let cookies = authToken;
+        
+        if (fs.existsSync(cookiePath)) {
+          cookies = fs.readFileSync(cookiePath, 'utf-8');
         }
 
-        // Add query parameters if defined in the endpoint configuration
-        let finalUrl = fullUrl;
-        if (listSubsystemsEndpoint.query) {
-          const queryParams = new URLSearchParams();
-          Object.entries(listSubsystemsEndpoint.query).forEach(([key, value]) => {
-            queryParams.append(key, replaceParameters(String(value), urlParams));
+        // Find the ListSubsystems endpoint configuration
+        const listSubsystemsEndpoint = endpoints?.endpoints?.find((ep: any) => ep.name === "ListSubsystems");
+        
+        if (listSubsystemsEndpoint) {
+          // Include dictionary ID in parameters for substitution
+          const urlParams = { ...parameters, LUTHIER_DB_ID: dictionaryId };
+          const fullUrl = replaceParameters(connection.baseURL + listSubsystemsEndpoint.path, urlParams);
+          
+          const headers: any = {};
+          
+          // Add headers from endpoint configuration
+          if (listSubsystemsEndpoint.headers) {
+            Object.entries(listSubsystemsEndpoint.headers).forEach(([key, value]) => {
+              headers[key] = replaceParameters(String(value), urlParams);
+            });
+          }
+          
+          // Add cookies if necessary
+          if (cookies) {
+            headers["Cookie"] = cookies;
+          }
+
+          // Add query parameters if defined in the endpoint configuration
+          let finalUrl = fullUrl;
+          if (listSubsystemsEndpoint.query) {
+            const queryParams = new URLSearchParams();
+            Object.entries(listSubsystemsEndpoint.query).forEach(([key, value]) => {
+              queryParams.append(key, replaceParameters(String(value), urlParams));
+            });
+            finalUrl = `${fullUrl}?${queryParams.toString()}`;
+          }
+
+          console.log("LTH Subsystems Request URL:", finalUrl);
+          console.log("LTH Subsystems Headers:", headers);
+          console.log("Dictionary ID (X-LuthierDatabaseID):", dictionaryId);
+
+          const response = await fetch(finalUrl, {
+            method: listSubsystemsEndpoint.method || "GET",
+            headers
           });
-          finalUrl = `${fullUrl}?${queryParams.toString()}`;
+
+          const responseData = await response.json();
+          
+          if (!response.ok) {
+            throw new Error(`Failed to fetch subsystems: ${response.status} ${response.statusText}`);
+          }
+
+          // Format subsystems response for saving to select_data
+          const subsystemsForStorage = responseData.map((subsystem: any) => ({
+            id: subsystem.id || subsystem.code,
+            name: subsystem.name || subsystem.description || subsystem.id
+          }));
+          
+          // Initialize select_data if it doesn't exist
+          if (!config.select_data) {
+            config.select_data = {};
+          }
+          
+          // Save subsystems to config.select_data.subsystem
+          config.select_data.subsystem = subsystemsForStorage;
+          console.log("Saving", subsystemsForStorage.length, "subsystems to select_data");
+          
+          // Update plugin configuration in database
+          await db.update(plugins)
+            .set({ configuration: config })
+            .where(eq(plugins.id, pluginId));
+          
+          // Return subsystems for the select
+          const subsystems = subsystemsForStorage.map((sub: any) => ({
+            id: String(sub.id),
+            code: String(sub.id),
+            name: sub.name,
+            description: `Subsystem ID: ${sub.id}`
+          }));
+          
+          console.log("Subsystems loaded from API and saved");
+          return res.json({ subsystems });
+        } else {
+          throw new Error("ListSubsystems endpoint not found in configuration");
         }
-
-        console.log("LTH Subsystems Request URL:", finalUrl);
-        console.log("LTH Subsystems Headers:", headers);
-        console.log("Dictionary ID (X-LuthierDatabaseID):", dictionaryId);
-
-        const response = await fetch(finalUrl, {
-          method: listSubsystemsEndpoint.method || "GET",
-          headers
-        });
-
-        const responseData = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch subsystems: ${response.status} ${response.statusText}`);
-        }
-
-        // Format subsystems response
-        const subsystems = responseData.map((subsystem: any) => ({
-          id: subsystem.id || subsystem.code,
-          code: subsystem.code || subsystem.id,
-          name: subsystem.name || subsystem.description,
-          description: subsystem.description
-        }));
-
-        res.json({ subsystems });
       } else {
-        // Fallback para dados mock se não houver endpoint configurado
-        const subsystems = [
-          { id: "DOC", name: "Documentação", description: "Sistema de documentação" },
-          { id: "FIN", name: "Financeiro", description: "Sistema financeiro" },
-          { id: "RH", name: "Recursos Humanos", description: "Sistema de RH" },
-          { id: "PROJ", name: "Projetos", description: "Sistema de projetos" }
-        ];
-
-        res.json({ subsystems });
+        // Subsystems already exist in select_data, use them
+        console.log("Using existing subsystems from select_data");
+        const subsystems = config.select_data.subsystem
+          .map((sub: any) => ({
+            id: String(sub.id),
+            code: String(sub.id),
+            name: sub.name,
+            description: `Subsystem ID: ${sub.id}`
+          }));
+        
+        console.log("Returning", subsystems.length, "subsystems from cache");
+        return res.json({ subsystems });
       }
     } catch (error: any) {
       console.error("LTH subsystems error:", error);

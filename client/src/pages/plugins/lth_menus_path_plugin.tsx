@@ -336,6 +336,20 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
             // Load subsystems for the pre-selected dictionary
             const subsystemsData = await fetchSubsystems(String(savedDictionaryId));
             setSubsystems(subsystemsData);
+            
+            // Pre-select subsystem if saved in parameters
+            if (pluginConfig?.plugin?.parameters?.SUBSYSTEM_ID) {
+              const savedSubsystemId = pluginConfig.plugin.parameters.SUBSYSTEM_ID;
+              console.log("Pre-selecting subsystem from SUBSYSTEM_ID:", savedSubsystemId);
+              
+              const subsystemExists = subsystemsData.some((sub: any) => String(sub.id) === String(savedSubsystemId));
+              if (subsystemExists) {
+                setSelectedSubsystem(String(savedSubsystemId));
+                // Load menu structure for the pre-selected subsystem
+                const structure = await loadMenuStructure(String(savedSubsystemId));
+                setMenuStructure(structure);
+              }
+            }
           }
         }
       } catch (error) {
@@ -402,6 +416,18 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       try {
         const subsystemsData = await fetchSubsystems(dictionaryCode);
         setSubsystems(subsystemsData);
+        
+        // Pre-select subsystem if saved in parameters
+        if (pluginConfig?.plugin?.parameters?.SUBSYSTEM_ID) {
+          const savedSubsystemId = pluginConfig.plugin.parameters.SUBSYSTEM_ID;
+          const subsystemExists = subsystemsData.some((sub: any) => String(sub.id) === String(savedSubsystemId));
+          if (subsystemExists) {
+            setSelectedSubsystem(String(savedSubsystemId));
+            // Load menu structure for the pre-selected subsystem
+            const structure = await loadMenuStructure(String(savedSubsystemId));
+            setMenuStructure(structure);
+          }
+        }
       } catch (error) {
         console.error("Failed to load subsystems for dictionary:", error);
       }
@@ -411,6 +437,49 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   const handleSubsystemChange = async (subsystemCode: string) => {
     setSelectedSubsystem(subsystemCode);
     setIsLoading(true);
+    
+    // Save subsystem selection to plugin.parameters.SUBSYSTEM_ID
+    if (subsystemCode && pluginId && pluginConfig) {
+      // Update the plugin configuration with the selected subsystem ID
+      const updatedConfig = {
+        ...pluginConfig,
+        plugin: {
+          ...pluginConfig.plugin,
+          parameters: {
+            ...pluginConfig.plugin?.parameters,
+            SUBSYSTEM_ID: subsystemCode
+          }
+        }
+      };
+      
+      console.log("Saving SUBSYSTEM_ID:", subsystemCode);
+      
+      // Save to database
+      try {
+        const response = await fetch(`/api/plugins/${pluginId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            configuration: updatedConfig
+          })
+        });
+        
+        if (response.ok) {
+          setPluginConfig(updatedConfig);
+          console.log("SUBSYSTEM_ID saved successfully");
+          
+          // Force refresh of plugins data
+          queryClient.invalidateQueries({ queryKey: ['/api/plugins'] });
+        } else {
+          console.error("Failed to save SUBSYSTEM_ID");
+        }
+      } catch (error) {
+        console.error("Error saving SUBSYSTEM_ID:", error);
+      }
+    }
     
     try {
       const structure = await loadMenuStructure(subsystemCode);
