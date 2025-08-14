@@ -112,7 +112,7 @@ export default function PluginModal({
     const applyStyles = (element: HTMLElement) => {
       if (actualPluginName === 'lth_menus_path_plugin') {
         element.style.setProperty('width', '40vw', 'important');
-        element.style.setProperty('height', '60vh', 'important');
+        element.style.setProperty('height', '72vh', 'important');
         element.style.setProperty('position', 'fixed', 'important');
         element.style.setProperty('top', '20vh', 'important');
         element.style.setProperty('left', '30vw', 'important');
