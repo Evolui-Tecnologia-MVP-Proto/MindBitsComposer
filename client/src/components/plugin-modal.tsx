@@ -249,7 +249,7 @@ export default function PluginModal({
                  actualPluginName === 'mermaid-graph-plugin' ? '80vw' : 
                  actualPluginName === 'vector-graph-plugin' ? '80vw' :
                  actualPluginName === 'simple-excalidraw-plugin' ? '90vw' : '100vw',
-          height: actualPluginName === 'lth_menus_path_plugin' ? '60vh' :
+          height: actualPluginName === 'lth_menus_path_plugin' ? '72vh' :
                   actualPluginName === 'mermaid-graph-plugin' ? '80vh' : 
                   actualPluginName === 'vector-graph-plugin' ? '80vh' :
                   actualPluginName === 'simple-excalidraw-plugin' ? '90vh' : '100vh',
