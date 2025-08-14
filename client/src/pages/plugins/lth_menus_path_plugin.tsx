@@ -323,13 +323,28 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         // Load dictionaries only - subsystems will be loaded when dictionary is selected
         const dictionariesData = await loadDictionaries();
         setDictionaries(dictionariesData);
+        
+        // Pre-select dictionary from plugin.parameters.LUTHIER_DB_ID if available
+        if (pluginConfig?.parameters?.LUTHIER_DB_ID) {
+          const savedDictionaryId = pluginConfig.parameters.LUTHIER_DB_ID;
+          console.log("Pre-selecting dictionary from LUTHIER_DB_ID:", savedDictionaryId);
+          
+          // Check if this ID exists in the loaded dictionaries
+          const dictExists = dictionariesData.some((dict: any) => String(dict.id) === String(savedDictionaryId));
+          if (dictExists) {
+            setSelectedDictionary(String(savedDictionaryId));
+            // Load subsystems for the pre-selected dictionary
+            const subsystemsData = await fetchSubsystems(String(savedDictionaryId));
+            setSubsystems(subsystemsData);
+          }
+        }
       } catch (error) {
         console.error("Failed to load dictionaries:", error);
       }
     };
 
     loadData();
-  }, [authToken, pluginId]);
+  }, [authToken, pluginId, pluginConfig]);
 
   const handleDictionaryChange = async (dictionaryCode: string) => {
     setSelectedDictionary(dictionaryCode);
@@ -338,6 +353,46 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     setMenuStructure([]);
     setExpandedPaths(new Set());
     setSelectedPath(null);
+    
+    // Save dictionary selection to plugin.parameters.LUTHIER_DB_ID if it's empty
+    if (dictionaryCode && pluginId && pluginConfig) {
+      // Check if LUTHIER_DB_ID is empty or needs updating
+      if (!pluginConfig.parameters?.LUTHIER_DB_ID || pluginConfig.parameters.LUTHIER_DB_ID === "") {
+        console.log("Saving LUTHIER_DB_ID:", dictionaryCode);
+        
+        // Update the plugin configuration with the selected dictionary ID
+        const updatedConfig = {
+          ...pluginConfig,
+          parameters: {
+            ...pluginConfig.parameters,
+            LUTHIER_DB_ID: dictionaryCode
+          }
+        };
+        
+        // Save to database
+        try {
+          const response = await fetch(`/api/plugins/${pluginId}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              configuration: updatedConfig
+            })
+          });
+          
+          if (response.ok) {
+            setPluginConfig(updatedConfig);
+            console.log("LUTHIER_DB_ID saved successfully");
+          } else {
+            console.error("Failed to save LUTHIER_DB_ID");
+          }
+        } catch (error) {
+          console.error("Error saving LUTHIER_DB_ID:", error);
+        }
+      }
+    }
     
     // Load subsystems for the selected dictionary
     if (dictionaryCode && authToken && pluginId) {
