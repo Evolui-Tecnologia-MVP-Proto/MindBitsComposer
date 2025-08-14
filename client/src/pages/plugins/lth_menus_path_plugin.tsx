@@ -214,8 +214,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
             nodeType = node.type;
           }
           
-          // Show only caption, keep nodeId for internal use
-          const label = caption || String(nodeId);
+          // Format as "ID - Caption" when both are available
+          const label = nodeId && caption ? `${nodeId} - ${caption}` : caption || String(nodeId);
           
           return {
             id: String(nodeId || Math.random()),
@@ -698,15 +698,6 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
                     : 'text-gray-900 dark:text-gray-200'
                 }`}>
                   {item.label}
-                </div>
-                <div className={`text-xs truncate ${
-                  item.type === 'DIVIDER' 
-                    ? 'text-red-600 dark:text-red-500' 
-                    : item.type === 'FUNCTION_CALL'
-                    ? 'text-green-600 dark:text-green-500'
-                    : 'text-gray-500 dark:text-gray-400'
-                }`}>
-                  {item.path}
                 </div>
               </div>
               
