@@ -952,7 +952,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   console.log("🚀 COMPONENT RENDER - connectionStatus:", connectionStatus, "selectedDictionary:", selectedDictionary, "dictionaries.length:", dictionaries.length);
 
   return (
-    <div className="flex flex-col bg-white dark:bg-[#0F172A] p-6 max-h-[85vh] overflow-y-auto">
+    <div className="h-full flex flex-col bg-white dark:bg-[#0F172A] p-6">
       {/* Header com título e descrição */}
       <div className="mb-6">
         <div className="flex items-center mb-2">
@@ -1012,8 +1012,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       </div>
 
       {/* Menu Structure Visualization */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
+      <div className="flex-1 flex flex-col min-h-0 relative">
+        <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
             Estrutura Hierárquica
           </h3>
@@ -1024,9 +1024,9 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           )}
         </div>
 
-        <div className="h-[400px] border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#111827] overflow-hidden">
+        <div className="absolute inset-x-0 top-12 bottom-0 border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#111827] overflow-hidden">
           {connectionStatus === 'connected' && selectedSubsystem && menuStructure.length > 0 ? (
-            <div className="h-full p-4 overflow-y-auto overflow-x-hidden">
+            <div className="absolute inset-0 p-4 overflow-y-auto overflow-x-hidden">
               <div className="space-y-1">
                 {renderMenuTree(menuStructure)}
               </div>
@@ -1054,68 +1054,6 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
             </div>
           )}
         </div>
-
-        {/* Selected Path Details Card */}
-        {selectedPath && (() => {
-          const findSelectedItem = (items: MenuPath[]): MenuPath | null => {
-            for (const item of items) {
-              if (item.id === selectedPath) {
-                return item;
-              }
-              if (item.children) {
-                const found = findSelectedItem(item.children);
-                if (found) return found;
-              }
-            }
-            return null;
-          };
-
-          const selectedItem = findSelectedItem(menuStructure);
-          const subsystemName = subsystems.find(s => s.code === selectedSubsystem)?.name || selectedSubsystem;
-
-          return selectedItem ? (
-            <div className="border dark:border-[#374151] rounded-lg bg-white dark:bg-[#0F172A] p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
-                  Caminho Selecionado
-                </h4>
-                <Badge className={`${
-                  selectedItem.type === 'FUNCTION_CALL' 
-                    ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400' 
-                    : 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-400'
-                }`}>
-                  {selectedItem.type === 'FUNCTION_CALL' ? 'FUNCTION_CALL' : 'Funcionalidade'}
-                </Badge>
-              </div>
-              
-              <div className="space-y-3">
-                <div>
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Item:</label>
-                  <p className="text-gray-900 dark:text-gray-200 font-medium">{selectedItem.label}</p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Subsistema:</label>
-                  <p className="text-gray-900 dark:text-gray-200">{subsystemName}</p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Caminho Completo:</label>
-                  <p className="text-gray-900 dark:text-gray-200 font-mono text-sm bg-gray-50 dark:bg-gray-800 p-2 rounded border">
-                    {getFullPath(selectedPath)}
-                  </p>
-                </div>
-                
-                <div>
-                  <label className="text-sm font-medium text-gray-600 dark:text-gray-400">Formato para Envio:</label>
-                  <p className="text-gray-900 dark:text-gray-200 font-mono text-sm bg-blue-50 dark:bg-blue-900/20 p-2 rounded border border-blue-200 dark:border-blue-800">
-                    {getFormattedPathForSave(selectedPath)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ) : null;
-        })()}
       </div>
 
       {/* Action Buttons */}
