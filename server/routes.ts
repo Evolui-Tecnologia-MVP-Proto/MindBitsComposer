@@ -2844,9 +2844,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       let config = plugin[0].configuration as any;
-      if (!config || !config.connection || !config.parameters) {
-        throw new Error("Configuração do plugin inválida");
+      
+      console.log("=== LTH DICTIONARIES DEBUG ===");
+      console.log("Plugin configuration:", JSON.stringify(config, null, 2));
+      console.log("Has connection:", !!config?.connection);
+      console.log("Has parameters:", !!config?.parameters);
+      console.log("Has endpoints:", !!config?.endpoints);
+      console.log("=== END DEBUG ===");
+      
+      if (!config) {
+        throw new Error("Configuração do plugin não encontrada");
       }
+      
+      // Try to find the structure - it might be nested differently
+      let actualConfig = config;
+      if (config.plugin) {
+        actualConfig = config.plugin;
+        console.log("Found config under 'plugin' key");
+      }
+      
+      if (!actualConfig.connection || !actualConfig.parameters) {
+        console.log("Missing connection or parameters in:", actualConfig);
+        throw new Error("Configuração do plugin inválida - faltam connection ou parameters");
+      }
+      
+      config = actualConfig;
 
       // Função para substituir tags {{}} pelos valores dos parâmetros
       const replaceParameters = (str: string, params: any): string => {
