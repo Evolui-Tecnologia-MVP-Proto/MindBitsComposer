@@ -1013,15 +1013,10 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
       {/* Menu Structure Visualization */}
       <div className="flex-1 flex flex-col min-h-0 relative">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-200">
             Estrutura Hierárquica
           </h3>
-          {selectedPath && (
-            <span className="px-3 py-1 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-md text-sm font-mono border border-gray-300 dark:border-gray-600">
-              {getFullPath(selectedPath)}
-            </span>
-          )}
         </div>
 
         <div className="absolute inset-x-0 top-12 bottom-0 border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#111827] overflow-hidden">
@@ -1055,6 +1050,15 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           )}
         </div>
       </div>
+
+      {/* Selected Path Info */}
+      {selectedPath && (
+        <div className="mt-4 mb-2">
+          <div className="px-3 py-2 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-md text-sm font-mono border border-gray-300 dark:border-gray-600">
+            {getFullPath(selectedPath)}
+          </div>
+        </div>
+      )}
 
       {/* Action Buttons */}
       <div className="flex justify-end space-x-3 mt-6 pt-4 border-t dark:border-[#374151]">
