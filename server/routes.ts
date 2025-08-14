@@ -3056,12 +3056,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         // Find the ListSubsystems endpoint configuration
-        console.log("Looking for ListSubsystems in endpoints.endpoints:", endpoints?.endpoints ? endpoints.endpoints.length + " endpoints found" : "No endpoints array");
-        if (endpoints?.endpoints) {
-          console.log("Available endpoints:", endpoints.endpoints.map((ep: any) => ep.name));
+        // Check if endpoints is an array directly
+        const endpointsArray = Array.isArray(endpoints) ? endpoints : endpoints?.endpoints;
+        
+        console.log("Looking for ListSubsystems in endpoints:", endpointsArray ? endpointsArray.length + " endpoints found" : "No endpoints array");
+        if (endpointsArray) {
+          console.log("Available endpoints:", endpointsArray.map((ep: any) => ep.name));
         }
         
-        const listSubsystemsEndpoint = endpoints?.endpoints?.find((ep: any) => ep.name === "ListSubsystems");
+        const listSubsystemsEndpoint = endpointsArray?.find((ep: any) => ep.name === "ListSubsystems");
         
         if (listSubsystemsEndpoint) {
           // Include dictionary ID in parameters for substitution
