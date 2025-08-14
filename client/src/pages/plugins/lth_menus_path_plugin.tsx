@@ -193,6 +193,10 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           // Remove only the & hotkey indicators
           caption = caption.replace(/&/g, '').trim();
           
+          // Check if this is a divider
+          const isDivider = caption === "--";
+          const nodeType = isDivider ? "DIVIDER" : node.type;
+          
           // Format as "ID - Caption" when both are available
           const label = nodeId && caption ? `${nodeId} - ${caption}` : caption || String(nodeId);
           
@@ -200,7 +204,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
             id: String(nodeId || Math.random()),
             label: label,
             path: node.refKey || node.menuKey || `${node.code}`,
-            type: node.type,
+            type: nodeType,
+            isDivider: isDivider,
             children: node.children ? transformTree(node.children) : []
           };
         });
@@ -617,16 +622,18 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         <div key={item.id} className="select-none">
           <div
             className={`flex items-center py-2 px-3 rounded-md transition-colors ${
-              isSelectable 
+              item.type === 'DIVIDER'
+                ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 cursor-default'
+                : isSelectable 
                 ? 'hover:bg-gray-50 dark:hover:bg-[#1F2937] cursor-pointer' 
                 : 'cursor-default'
             } ${
-              isSelected ? 'bg-blue-50 dark:bg-blue-900/30 border-l-2 border-blue-500' : ''
+              isSelected && item.type !== 'DIVIDER' ? 'bg-blue-50 dark:bg-blue-900/30 border-l-2 border-blue-500' : ''
             } ${
-              !isSelectable ? 'opacity-75' : ''
+              !isSelectable && item.type !== 'DIVIDER' ? 'opacity-75' : ''
             }`}
             style={{ paddingLeft: `${paddingLeft + 12}px` }}
-            onClick={() => handleItemClick(item)}
+            onClick={() => item.type !== 'DIVIDER' ? handleItemClick(item) : undefined}
           >
             <div className="flex items-center flex-1 min-w-0">
               {hasChildren && (
@@ -653,17 +660,27 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
               </div>
               
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium text-gray-900 dark:text-gray-200 truncate">
+                <div className={`text-sm font-medium truncate ${
+                  item.type === 'DIVIDER' 
+                    ? 'text-red-700 dark:text-red-400' 
+                    : 'text-gray-900 dark:text-gray-200'
+                }`}>
                   {item.label}
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                <div className={`text-xs truncate ${
+                  item.type === 'DIVIDER' 
+                    ? 'text-red-600 dark:text-red-500' 
+                    : 'text-gray-500 dark:text-gray-400'
+                }`}>
                   {item.path}
                 </div>
               </div>
               
               <div className="ml-2 shrink-0">
                 <span className={`px-2 py-1 rounded text-xs font-medium ${
-                  item.type === 'menu' 
+                  item.type === 'DIVIDER'
+                    ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400'
+                    : item.type === 'menu' 
                     ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400'
                     : item.type === 'submenu'
                     ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-400'
@@ -671,7 +688,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
                     ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400'
                     : 'bg-gray-100 dark:bg-gray-900/30 text-gray-800 dark:text-gray-400'
                 }`}>
-                  {item.type === 'menu' ? 'Menu' : 
+                  {item.type === 'DIVIDER' ? 'DIVIDER' :
+                   item.type === 'menu' ? 'Menu' : 
                    item.type === 'submenu' ? 'Submenu' : 
                    item.type === 'action' ? 'Funcionalidade' : 
                    item.type.charAt(0).toUpperCase() + item.type.slice(1)}
