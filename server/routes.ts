@@ -3096,10 +3096,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Include dictionary ID in parameters for substitution
           const urlParams = { ...parameters, LUTHIER_DB_ID: dictionaryId };
           
+          console.log("=== URL Building Debug ===");
+          console.log("Parameters from config:", parameters);
+          console.log("URL Params for substitution:", urlParams);
+          console.log("Connection baseURL before substitution:", connection.baseURL);
+          console.log("Endpoint path before substitution:", listSubsystemsEndpoint.path);
+          
           // Build full URL - connection.baseURL might already have placeholders
           let baseUrl = replaceParameters(connection.baseURL, urlParams);
           let endpointPath = replaceParameters(listSubsystemsEndpoint.path, urlParams);
           let fullUrl = baseUrl + endpointPath;
+          
+          console.log("Base URL after substitution:", baseUrl);
+          console.log("Endpoint path after substitution:", endpointPath);
+          console.log("Full URL:", fullUrl);
           
           const headers: any = {};
           
