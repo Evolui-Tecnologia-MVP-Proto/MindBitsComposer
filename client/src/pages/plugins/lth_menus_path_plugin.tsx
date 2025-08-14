@@ -190,8 +190,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           const nodeId = node.code || node.menuCode || "";
           let caption = node.caption || "";
           
-          // Keep the caption as is, including & hotkey indicators
-          caption = caption.trim();
+          // Remove only the & hotkey indicators
+          caption = caption.replace(/&/g, '').trim();
           
           // Format as "ID - Caption" when both are available
           const label = nodeId && caption ? `${nodeId} - ${caption}` : caption || String(nodeId);
