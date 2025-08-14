@@ -769,79 +769,51 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     return findMenuCode(menuStructure, selectedId);
   };
 
-  // Função para buscar detalhes da função - abordagem híbrida
+  // Função para buscar detalhes da função diretamente na API ListMenus
   const fetchFunctionDetails = async (menuCode: string) => {
-    // 1. Primeiro, buscar na estrutura já carregada
-    const findMenuInTree = (items: MenuPath[], targetCode: string): any => {
-      for (const item of items) {
-        // Extrair o código do label (formato: "1051 - Nome do Menu")
-        const match = item.label.match(/^(\d+)/);
-        if (match && match[1] === targetCode) {
-          return {
-            code: targetCode,
-            actionType: item.actionType && item.actionType !== 'FUNCTION_CALL' ? item.actionType : null,
-            action: item.action && item.action !== '' ? item.action : null,
-            fromTree: true
-          };
-        }
-        
-        if (item.children) {
-          const found = findMenuInTree(item.children, targetCode);
-          if (found) return found;
-        }
-      }
-      return null;
-    };
-
-    let menuItem = findMenuInTree(menuStructure, menuCode);
-    
-    // 2. Se não encontrou dados suficientes na árvore, buscar na API ListMenus
-    if (!menuItem || (!menuItem.actionType && !menuItem.action)) {
-      try {
-        const response = await fetch("/api/plugin/lth-menu-details", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            pluginId: pluginId,
-            dictionaryId: selectedDictionary,
-            authToken: authToken
-          })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const menuItems = Array.isArray(data) ? data : [];
-          const apiMenuItem = menuItems.find((item: any) => 
-            item.code && item.code.toString() === menuCode
-          );
-          
-          if (apiMenuItem) {
-            menuItem = {
-              code: menuCode,
-              actionType: apiMenuItem.actionType || 'N/A',
-              action: apiMenuItem.action || 'N/A',
-              fromApi: true
-            };
-          }
-        }
-      } catch (error) {
-        console.warn("Falha ao buscar detalhes da API:", error);
-      }
+    if (!pluginId || !authToken || !selectedDictionary) {
+      throw new Error("Configuração ou token não disponível");
     }
-    
-    // 3. Retornar dados encontrados ou valores padrão
-    if (menuItem) {
-      return {
-        code: menuCode,
-        actionType: menuItem.actionType || 'N/A',
-        action: menuItem.action || 'N/A'
-      };
+
+    try {
+      const response = await fetch("/api/plugin/lth-menu-details", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          pluginId: pluginId,
+          dictionaryId: selectedDictionary,
+          authToken: authToken
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch menu details: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const menuItems = Array.isArray(data) ? data : [];
+      
+      // Buscar o menu pelo code
+      const menuItem = menuItems.find((item: any) => 
+        item.code && item.code.toString() === menuCode
+      );
+      
+      if (menuItem) {
+        return {
+          code: menuCode,
+          actionType: menuItem.actionType || '',
+          action: menuItem.action || ''
+        };
+      }
+      
+      throw new Error(`Menu com code ${menuCode} não encontrado na API`);
+    } catch (error) {
+      console.error("Erro ao buscar detalhes da função:", error);
+      throw error;
     }
-    
-    throw new Error(`Menu com code ${menuCode} não encontrado`);
   };
 
   // Handler para o clique no botão SquareCode
@@ -1252,14 +1224,14 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
                 
                 <div>
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Ação:</label>
-                  <div className="mt-1 px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-md text-sm">
+                  <div className="mt-1 px-3 py-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm font-mono whitespace-pre-wrap max-h-32 overflow-y-auto">
                     {functionDetails.actionType || 'N/A'}
                   </div>
                 </div>
                 
                 <div>
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Ação:</label>
-                  <div className="mt-1 px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-md text-sm font-mono">
+                  <div className="mt-1 px-3 py-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm font-mono whitespace-pre-wrap max-h-32 overflow-y-auto">
                     {functionDetails.action || 'N/A'}
                   </div>
                 </div>
