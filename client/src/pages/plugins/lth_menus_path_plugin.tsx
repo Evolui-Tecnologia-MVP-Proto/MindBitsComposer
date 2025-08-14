@@ -789,21 +789,13 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
     const data = await response.json();
     
-    // Buscar o objeto com o code igual ao menuCode
-    const findMenuByCode = (items: any[]): any => {
-      for (const item of items) {
-        if (item.code && item.code.toString() === menuCode) {
-          return item;
-        }
-        if (item.children && Array.isArray(item.children)) {
-          const found = findMenuByCode(item.children);
-          if (found) return found;
-        }
-      }
-      return null;
-    };
-
-    const menuItem = findMenuByCode(data.tree || data || []);
+    // ListMenus retorna um array plano de menus, não uma árvore
+    const menuItems = Array.isArray(data) ? data : [];
+    
+    // Buscar o menu pelo code
+    const menuItem = menuItems.find((item: any) => 
+      item.code && item.code.toString() === menuCode
+    );
     
     if (menuItem) {
       return {
