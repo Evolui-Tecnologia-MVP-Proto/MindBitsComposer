@@ -455,17 +455,21 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         
         // Force a fresh API call to load subsystems for this dictionary
         // This will trigger the API to refresh data from the LTH API instead of using cached data
+        const requestBody = { 
+          pluginId, 
+          dictionaryId: dictionaryCode,
+          forceRefresh: true  // Flag to force API refresh
+        };
+        
+        console.log("📤 SENDING REQUEST with forceRefresh=true:", JSON.stringify(requestBody, null, 2));
+        
         const response = await fetch("/api/plugin/lth-subsystems", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           credentials: "include",
-          body: JSON.stringify({ 
-            pluginId, 
-            dictionaryId: dictionaryCode,
-            forceRefresh: true  // Flag to force API refresh
-          })
+          body: JSON.stringify(requestBody)
         });
 
         if (response.ok) {
