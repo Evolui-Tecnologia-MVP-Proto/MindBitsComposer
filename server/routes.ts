@@ -3093,11 +3093,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         
         if (listSubsystemsEndpoint) {
-          // Include dictionary ID in parameters for substitution
-          const urlParams = { ...parameters, LUTHIER_DB_ID: dictionaryId };
+          // Merge connection parameters with plugin parameters
+          // Connection parameters have BASE and API_KEY
+          // Plugin parameters have LUTHIER_DB_ID
+          const connectionParams = connection.parameters || {};
+          const pluginParams = parameters || {};
+          const urlParams = { 
+            ...connectionParams,  // BASE, API_KEY 
+            ...pluginParams,      // LUTHIER_DB_ID
+            LUTHIER_DB_ID: dictionaryId  // Override with the selected dictionary
+          };
           
           console.log("=== URL Building Debug ===");
-          console.log("Parameters from config:", parameters);
+          console.log("Connection parameters:", connectionParams);
+          console.log("Plugin parameters:", pluginParams);
           console.log("URL Params for substitution:", urlParams);
           console.log("Connection baseURL before substitution:", connection.baseURL);
           console.log("Endpoint path before substitution:", listSubsystemsEndpoint.path);

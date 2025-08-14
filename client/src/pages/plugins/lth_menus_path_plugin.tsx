@@ -361,6 +361,12 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   }, [authToken, pluginId, pluginConfig]);
 
   const handleDictionaryChange = async (dictionaryCode: string) => {
+    console.log("=== DICTIONARY CHANGE DEBUG ===");
+    console.log("Dictionary Code:", dictionaryCode);
+    console.log("Auth Token:", authToken ? "Present" : "Missing");
+    console.log("Plugin ID:", pluginId);
+    console.log("Plugin Config:", pluginConfig ? "Present" : "Missing");
+    
     setSelectedDictionary(dictionaryCode);
     // Reset subsystem and menu structure when dictionary changes
     setSelectedSubsystem("");
