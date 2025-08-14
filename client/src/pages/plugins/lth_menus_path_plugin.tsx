@@ -193,8 +193,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           // Remove only the & hotkey indicators
           caption = caption.replace(/&/g, '').trim();
           
-          // Check if this is a divider
-          const isDivider = caption === "--";
+          // Check if this is a divider (caption is "--" or ends with " - --")
+          const isDivider = caption === "--" || caption.endsWith(" - --") || caption.trim() === "--";
           const nodeType = isDivider ? "DIVIDER" : node.type;
           
           // Format as "ID - Caption" when both are available
