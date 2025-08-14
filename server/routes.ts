@@ -3387,9 +3387,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Se houver endpoint configurado para ListMenus
+      console.log("=== DEBUGGING LISTMENUS ENDPOINT ===");
+      console.log("Endpoints available:", endpoints?.map((ep: any) => ep.name));
+      console.log("Looking for endpoint with name: 'ListMenus'");
+      
       const listMenusEndpoint = endpoints && Array.isArray(endpoints) 
         ? endpoints.find((ep: any) => ep.name === 'ListMenus')
         : null;
+      
+      console.log("Found ListMenus endpoint:", !!listMenusEndpoint);
+      if (listMenusEndpoint) {
+        console.log("ListMenus endpoint details:", JSON.stringify(listMenusEndpoint, null, 2));
+      }
+      console.log("=== END DEBUGGING ===");
       
       if (listMenusEndpoint) {
         const baseUrl = connection.baseURL + listMenusEndpoint.path;
