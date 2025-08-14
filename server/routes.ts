@@ -2750,10 +2750,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
 
-      // Fazer a chamada de autenticação
-      console.log("LTH Auth Request URL:", fullUrl);
-      console.log("LTH Auth Headers:", headers);
-      console.log("LTH Auth Payload:", auth.payload);
+      // Debug completo da configuração
+      console.log("=== LTH AUTH DEBUG ===");
+      console.log("Plugin Config:", JSON.stringify(config, null, 2));
+      console.log("BaseURL:", baseURL);
+      console.log("LoginEndpoint:", auth.loginEndpoint);
+      console.log("URL Final:", fullUrl);
+      console.log("Method:", auth.method || "POST");
+      console.log("Headers finais:", JSON.stringify(headers, null, 2));
+      console.log("Payload final:", JSON.stringify(auth.payload, null, 2));
+      console.log("Parameters:", JSON.stringify(parameters, null, 2));
+      
+      // Comparação com chamada esperada
+      const expectedUrl = "https://8q7nzrl13j.execute-api.us-east-1.amazonaws.com/prod/auth/login";
+      const expectedHeaders = {
+        "x-api-key": "mFN2mhH5W73E7rwibMJZo3l3KyqachBC29VNtzZx",
+        "Content-Type": "application/json"
+      };
+      const expectedPayload = {
+        "userType": "CUSTOM",
+        "login": "super", 
+        "password": "super@1234"
+      };
+      
+      console.log("=== COMPARAÇÃO COM ESPERADO ===");
+      console.log("URL Match:", fullUrl === expectedUrl);
+      console.log("Headers Match:", JSON.stringify(headers) === JSON.stringify(expectedHeaders));
+      console.log("Payload Match:", JSON.stringify(auth.payload) === JSON.stringify(expectedPayload));
+      console.log("=== FIM DEBUG ===");
 
       const response = await fetch(fullUrl, {
         method: auth.method || "POST",
