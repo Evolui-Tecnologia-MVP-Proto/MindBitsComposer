@@ -46,6 +46,7 @@ interface Subsystem {
 }
 
 export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null | undefined) {
+  console.log("🔧 LthMenusPathPlugin COMPONENT LOADED");
   const { onDataExchange, selectedEdition } = props || {};
 
   const [selectedDictionary, setSelectedDictionary] = useState<string>("");
@@ -339,6 +340,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           if (dictExists) {
             setSelectedDictionary(String(savedDictionaryId));
             // Load subsystems for the pre-selected dictionary (initial load can use cache)
+            console.log("📍 USEEFFECT: Loading subsystems for pre-selected dictionary", savedDictionaryId, "with forceRefresh=false");
             const subsystemsData = await fetchSubsystems(String(savedDictionaryId), false);
             setSubsystems(subsystemsData);
             
@@ -366,12 +368,13 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   }, [authToken, pluginId, pluginConfig]);
 
   const handleDictionaryChange = async (dictionaryCode: string) => {
+    console.log("🚨🚨🚨 HANDLE DICTIONARY CHANGE CALLED 🚨🚨🚨");
     console.log("=== DICTIONARY CHANGE DEBUG ===");
     console.log("Dictionary Code:", dictionaryCode);
     console.log("Auth Token:", authToken ? "Present" : "Missing");
     console.log("Plugin ID:", pluginId);
     console.log("Plugin Config:", pluginConfig ? "Present" : "Missing");
-    
+
     setSelectedDictionary(dictionaryCode);
     // Reset subsystem and menu structure when dictionary changes
     setSelectedSubsystem("");
