@@ -2834,7 +2834,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/plugin/lth-dictionaries", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
-    const { pluginId, authToken } = req.body;
+    const { pluginId, authToken, pluginConfig } = req.body;
     
     try {
       // Buscar configuração do plugin
@@ -2843,7 +2843,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error("Plugin não encontrado");
       }
 
-      const config = plugin[0].configuration as any;
+      let config = plugin[0].configuration as any;
       if (!config || !config.connection || !config.parameters || !config.endpoints) {
         throw new Error("Configuração do plugin inválida");
       }
@@ -2865,48 +2865,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
         cookies = fs.readFileSync(cookiePath, 'utf-8');
       }
 
-      // Se houver endpoint configurado para dicionários (conexões)
-      if (endpoints && endpoints.dictionaries) {
-        const fullUrl = replaceParameters(connection.baseURL + endpoints.dictionaries.path, parameters);
+      // Check if dict_db is empty or doesn't exist
+      if (!config.select_data || !config.select_data.dict_db || config.select_data.dict_db.length === 0) {
+        console.log("dict_db is empty, fetching from ListLuthierConnections endpoint");
         
-        const headers: any = {};
+        // Find the ListLuthierConnections endpoint
+        const listConnectionsEndpoint = endpoints.endpoints?.find((ep: any) => ep.name === "ListLuthierConnections");
         
-        // Adicionar headers padrão
-        if (connection.defaultHeaders) {
-          Object.entries(connection.defaultHeaders).forEach(([key, value]) => {
-            headers[key] = replaceParameters(String(value), parameters);
+        if (listConnectionsEndpoint) {
+          const fullUrl = replaceParameters(connection.baseURL + listConnectionsEndpoint.path, parameters);
+          
+          const headers: any = {};
+          
+          // Add default headers
+          if (listConnectionsEndpoint.headers) {
+            Object.entries(listConnectionsEndpoint.headers).forEach(([key, value]) => {
+              headers[key] = replaceParameters(String(value), parameters);
+            });
+          }
+          
+          // Add cookies if necessary
+          if (cookies) {
+            headers["Cookie"] = cookies;
+          }
+
+          console.log("Fetching Luthier connections from:", fullUrl);
+          console.log("Headers:", headers);
+
+          const response = await fetch(fullUrl, {
+            method: listConnectionsEndpoint.method || "GET",
+            headers
           });
+
+          if (response.ok) {
+            const luthierConnections = await response.json();
+            console.log("Received Luthier connections:", luthierConnections);
+            
+            // Format the data as requested: [{id1, identifier1}, {id2, identifier2}...]
+            const dictDb = luthierConnections.map((conn: any) => ({
+              id: conn.id,
+              identifier: conn.identifier
+            }));
+            
+            // Update the plugin configuration with dict_db
+            if (!config.select_data) {
+              config.select_data = {};
+            }
+            config.select_data.dict_db = dictDb;
+            
+            // Save the updated configuration back to the database
+            await db.update(plugins)
+              .set({ configuration: config })
+              .where(eq(plugins.id, pluginId));
+            
+            console.log("Saved dict_db to plugin configuration:", dictDb);
+            
+            // Return the formatted dictionaries
+            const dictionaries = dictDb.map((dict: any) => ({
+              id: String(dict.id),
+              code: String(dict.id),
+              name: dict.identifier,
+              description: `Database ID: ${dict.id}`
+            }));
+            
+            return res.json({ 
+              dictionaries,
+              updatedConfig: config
+            });
+          } else {
+            console.error("Failed to fetch Luthier connections:", response.status, response.statusText);
+          }
         }
-        
-        // Adicionar cookies se necessário
-        if (cookies) {
-          headers["Cookie"] = cookies;
-        }
-
-        console.log("LTH Dictionaries Request URL:", fullUrl);
-        console.log("LTH Dictionaries Headers:", headers);
-
-        const response = await fetch(fullUrl, {
-          method: endpoints.dictionaries.method || "GET",
-          headers
-        });
-
-        const responseData = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch dictionaries: ${response.status} ${response.statusText}`);
-        }
-
-        res.json({ dictionaries: responseData });
-      } else {
-        // Fallback para dados mock se não houver endpoint configurado
-        const dictionaries = [
-          { id: "dict_1", name: "Conexão Principal", code: "MAIN_DICT", description: "Conexão principal do sistema" },
-          { id: "dict_2", name: "Conexão Teste", code: "TEST_DICT", description: "Conexão de testes" }
-        ];
-
-        res.json({ dictionaries });
       }
+      
+      // If dict_db exists, use it
+      if (config.select_data?.dict_db && config.select_data.dict_db.length > 0) {
+        const dictionaries = config.select_data.dict_db.map((dict: any) => ({
+          id: String(dict.id),
+          code: String(dict.id), 
+          name: dict.identifier,
+          description: `Database ID: ${dict.id}`
+        }));
+        
+        return res.json({ dictionaries });
+      }
+
+      // Fallback
+      const dictionaries = [
+        { id: "dict_1", name: "Conexão Principal", code: "MAIN_DICT", description: "Conexão principal do sistema" },
+        { id: "dict_2", name: "Conexão Teste", code: "TEST_DICT", description: "Conexão de testes" }
+      ];
+
+      res.json({ dictionaries });
     } catch (error: any) {
       console.error("LTH dictionaries error:", error);
       res.status(500).json({ 
@@ -2919,7 +2969,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/plugin/lth-subsystems", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
-    const { pluginId, authToken } = req.body;
+    const { pluginId, authToken, dictionaryId } = req.body;
     
     try {
       // Buscar configuração do plugin
@@ -2928,7 +2978,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error("Plugin não encontrado");
       }
 
-      const config = plugin[0].config as any;
+      const config = plugin[0].configuration as any;
       if (!config || !config.connection || !config.parameters) {
         throw new Error("Configuração do plugin inválida");
       }
@@ -2950,29 +3000,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         cookies = fs.readFileSync(cookiePath, 'utf-8');
       }
 
-      // Se houver endpoint configurado para subsistemas
-      if (endpoints && endpoints.subsystems) {
-        const fullUrl = replaceParameters(connection.baseURL + endpoints.subsystems.endpoint, parameters);
+      // Find the ListSubsystems endpoint configuration
+      const listSubsystemsEndpoint = endpoints?.endpoints?.find((ep: any) => ep.name === "ListSubsystems");
+      
+      if (listSubsystemsEndpoint) {
+        // Include dictionary ID in parameters for substitution
+        const urlParams = { ...parameters, LUTHIER_DB_ID: dictionaryId };
+        const fullUrl = replaceParameters(connection.baseURL + listSubsystemsEndpoint.path, urlParams);
         
         const headers: any = {};
         
-        // Adicionar headers padrão
-        if (connection.defaultHeaders) {
-          Object.entries(connection.defaultHeaders).forEach(([key, value]) => {
-            headers[key] = replaceParameters(String(value), parameters);
+        // Add headers from endpoint configuration
+        if (listSubsystemsEndpoint.headers) {
+          Object.entries(listSubsystemsEndpoint.headers).forEach(([key, value]) => {
+            headers[key] = replaceParameters(String(value), urlParams);
           });
         }
         
-        // Adicionar cookies se necessário
+        // Add cookies if necessary
         if (cookies) {
           headers["Cookie"] = cookies;
         }
 
-        console.log("LTH Subsystems Request URL:", fullUrl);
-        console.log("LTH Subsystems Headers:", headers);
+        // Add query parameters if defined in the endpoint configuration
+        let finalUrl = fullUrl;
+        if (listSubsystemsEndpoint.query) {
+          const queryParams = new URLSearchParams();
+          Object.entries(listSubsystemsEndpoint.query).forEach(([key, value]) => {
+            queryParams.append(key, replaceParameters(String(value), urlParams));
+          });
+          finalUrl = `${fullUrl}?${queryParams.toString()}`;
+        }
 
-        const response = await fetch(fullUrl, {
-          method: endpoints.subsystems.method || "GET",
+        console.log("LTH Subsystems Request URL:", finalUrl);
+        console.log("LTH Subsystems Headers:", headers);
+        console.log("Dictionary ID (X-LuthierDatabaseID):", dictionaryId);
+
+        const response = await fetch(finalUrl, {
+          method: listSubsystemsEndpoint.method || "GET",
           headers
         });
 
@@ -2982,7 +3047,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           throw new Error(`Failed to fetch subsystems: ${response.status} ${response.statusText}`);
         }
 
-        res.json({ subsystems: responseData });
+        // Format subsystems response
+        const subsystems = responseData.map((subsystem: any) => ({
+          id: subsystem.id || subsystem.code,
+          code: subsystem.code || subsystem.id,
+          name: subsystem.name || subsystem.description,
+          description: subsystem.description
+        }));
+
+        res.json({ subsystems });
       } else {
         // Fallback para dados mock se não houver endpoint configurado
         const subsystems = [
@@ -3015,7 +3088,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error("Plugin não encontrado");
       }
 
-      const config = plugin[0].config as any;
+      const config = plugin[0].configuration as any;
       if (!config || !config.connection || !config.parameters) {
         throw new Error("Configuração do plugin inválida");
       }

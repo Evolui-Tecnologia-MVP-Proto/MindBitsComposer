@@ -105,7 +105,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         credentials: "include",
         body: JSON.stringify({
           pluginId: pluginId,
-          authToken: authToken
+          authToken: authToken,
+          pluginConfig: pluginConfig
         })
       });
 
@@ -114,6 +115,12 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       }
 
       const data = await response.json();
+      
+      // If we got updated plugin config, update it locally
+      if (data.updatedConfig) {
+        setPluginConfig(data.updatedConfig);
+      }
+      
       return data.dictionaries || [];
     } catch (error) {
       console.error("Failed to fetch dictionaries:", error);
@@ -231,7 +238,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   };
 
   // Function to fetch subsystems from API
-  const fetchSubsystems = async () => {
+  const fetchSubsystems = async (dictionaryId?: string) => {
     if (!authToken || !pluginId) return [];
 
     try {
@@ -243,7 +250,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         credentials: "include",
         body: JSON.stringify({
           pluginId: pluginId,
-          authToken: authToken
+          authToken: authToken,
+          dictionaryId: dictionaryId || selectedDictionary
         })
       });
 
@@ -306,34 +314,40 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     testConnection();
   }, [pluginId]); // Executa quando pluginId estiver disponível
 
-  // Load dictionaries and subsystems when authentication token becomes available
+  // Load dictionaries when authentication token becomes available
   useEffect(() => {
     const loadData = async () => {
       if (!authToken || !pluginId) return;
       
       try {
-        // Load dictionaries first
+        // Load dictionaries only - subsystems will be loaded when dictionary is selected
         const dictionariesData = await loadDictionaries();
         setDictionaries(dictionariesData);
-        
-        // Then load subsystems
-        const subsystemsData = await loadSubsystems();
-        setSubsystems(subsystemsData);
       } catch (error) {
-        console.error("Failed to load data:", error);
+        console.error("Failed to load dictionaries:", error);
       }
     };
 
     loadData();
   }, [authToken, pluginId]);
 
-  const handleDictionaryChange = (dictionaryCode: string) => {
+  const handleDictionaryChange = async (dictionaryCode: string) => {
     setSelectedDictionary(dictionaryCode);
     // Reset subsystem and menu structure when dictionary changes
     setSelectedSubsystem("");
     setMenuStructure([]);
     setExpandedPaths(new Set());
     setSelectedPath(null);
+    
+    // Load subsystems for the selected dictionary
+    if (dictionaryCode && authToken && pluginId) {
+      try {
+        const subsystemsData = await fetchSubsystems(dictionaryCode);
+        setSubsystems(subsystemsData);
+      } catch (error) {
+        console.error("Failed to load subsystems for dictionary:", error);
+      }
+    }
   };
 
   const handleSubsystemChange = async (subsystemCode: string) => {
