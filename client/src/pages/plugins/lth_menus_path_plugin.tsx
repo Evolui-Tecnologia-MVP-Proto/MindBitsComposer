@@ -376,16 +376,30 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     
     // Save dictionary selection to plugin.parameters.LUTHIER_DB_ID
     if (dictionaryCode && pluginId && pluginConfig) {
-      // Update the plugin configuration with the selected dictionary ID
+      // PRESERVE ALL EXISTING PARAMETERS (BASE, API_KEY, etc.) and only update LUTHIER_DB_ID
+      const existingPluginParams = pluginConfig.plugin?.parameters || {};
+      const existingRootParams = pluginConfig.parameters || {};
+      
+      console.log("Existing plugin parameters:", existingPluginParams);
+      console.log("Existing root parameters:", existingRootParams);
+      
+      // Update the plugin configuration preserving all original data
       const updatedConfig = {
         ...pluginConfig,
         plugin: {
           ...pluginConfig.plugin,
           parameters: {
-            ...pluginConfig.plugin?.parameters,
+            ...existingPluginParams,  // Preserve BASE, API_KEY, etc.
+            LUTHIER_DB_ID: dictionaryCode  // Only update this one
+          }
+        },
+        // Also preserve any root-level parameters if they exist
+        ...(existingRootParams && Object.keys(existingRootParams).length > 0 && {
+          parameters: {
+            ...existingRootParams,
             LUTHIER_DB_ID: dictionaryCode
           }
-        }
+        })
       };
       
       console.log("Saving LUTHIER_DB_ID:", dictionaryCode);
