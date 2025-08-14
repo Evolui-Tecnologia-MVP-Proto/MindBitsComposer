@@ -417,7 +417,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         setSubsystems([]);
         
         // 1. SEMPRE salvar subsistemas no JSON primeiro (forceRefresh=true)
-        await fetch("/api/plugin/lth-subsystems", {
+        console.log("STEP 1: Salvando subsistemas no JSON para dicionário:", dictionaryCode);
+        const saveResponse = await fetch("/api/plugin/lth-subsystems", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -429,8 +430,18 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           })
         });
         
+        if (!saveResponse.ok) {
+          throw new Error("Falha ao salvar subsistemas no JSON");
+        }
+        
+        console.log("STEP 1 CONCLUÍDO: Subsistemas salvos no JSON");
+        
+        // Pequena pausa para garantir que salvou
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
         // 2. SEMPRE carregar subsistemas do JSON (forceRefresh=false)
-        const response = await fetch("/api/plugin/lth-subsystems", {
+        console.log("STEP 2: Carregando subsistemas do JSON para dicionário:", dictionaryCode);
+        const loadResponse = await fetch("/api/plugin/lth-subsystems", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -442,11 +453,14 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           })
         });
         
-        if (response.ok) {
-          const data = await response.json();
+        if (loadResponse.ok) {
+          const data = await loadResponse.json();
           if (data.subsystems) {
+            console.log("STEP 2 CONCLUÍDO: Carregados", data.subsystems.length, "subsistemas do JSON");
             setSubsystems(data.subsystems);
           }
+        } else {
+          throw new Error("Falha ao carregar subsistemas do JSON");
         }
       } catch (error) {
         console.error("Error loading subsystems:", error);
