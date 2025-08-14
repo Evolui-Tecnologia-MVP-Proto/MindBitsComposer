@@ -3000,7 +3000,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/plugin/lth-subsystems", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
-    const { pluginId, authToken, dictionaryId } = req.body;
+    const { pluginId, authToken, dictionaryId, forceRefresh } = req.body;
     
     try {
       // Buscar configuração do plugin
@@ -3021,11 +3021,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Config.plugin keys:", config.plugin ? Object.keys(config.plugin) : 'plugin is undefined');
       
       // Check if we need to load subsystems from API and save to select_data
-      const needsLoadFromAPI = !config.select_data?.subsystem || 
+      const needsLoadFromAPI = forceRefresh || 
+                               !config.select_data?.subsystem || 
                                (Array.isArray(config.select_data.subsystem) && config.select_data.subsystem.length === 0);
       
       if (needsLoadFromAPI) {
-        console.log("Subsystem list empty or missing, loading from API...");
+        if (forceRefresh) {
+          console.log("🔄 FORCE REFRESH: Reloading subsystems from API (dictionary change)...");
+        } else {
+          console.log("Subsystem list empty or missing, loading from API...");
+        }
         
         // Extract configuration - look in both possible locations like in the dictionaries endpoint
         const connection = config.connection || config.plugin?.connection;

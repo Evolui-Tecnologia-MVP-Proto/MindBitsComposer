@@ -426,25 +426,54 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       }
     }
     
-    // Load subsystems for the selected dictionary
+    // FORCE reload subsystems for the selected dictionary (clear cache and fetch fresh data)
     if (dictionaryCode && authToken && pluginId) {
+      console.log("🔄 Dictionary changed - FORCING fresh subsystem load for dictionary:", dictionaryCode);
+      
       try {
-        const subsystemsData = await fetchSubsystems(dictionaryCode);
-        setSubsystems(subsystemsData);
+        // Clear existing subsystems state immediately
+        setSubsystems([]);
         
-        // Pre-select subsystem if saved in parameters
-        if (pluginConfig?.plugin?.parameters?.SUBSYSTEM_ID) {
-          const savedSubsystemId = pluginConfig.plugin.parameters.SUBSYSTEM_ID;
-          const subsystemExists = subsystemsData.some((sub: any) => String(sub.id) === String(savedSubsystemId));
-          if (subsystemExists) {
-            setSelectedSubsystem(String(savedSubsystemId));
-            // Load menu structure for the pre-selected subsystem
-            const structure = await loadMenuStructure(String(savedSubsystemId));
-            setMenuStructure(structure);
-          }
+        // Force a fresh API call to load subsystems for this dictionary
+        // This will trigger the API to refresh data from the LTH API instead of using cached data
+        const response = await fetch("/api/plugin/lth-subsystems", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ 
+            pluginId, 
+            dictionaryId: dictionaryCode,
+            forceRefresh: true  // Flag to force API refresh
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const subsystemsData = data.subsystems || [];
+          
+          console.log(`✅ Loaded ${subsystemsData.length} fresh subsystems for dictionary ${dictionaryCode}`);
+          setSubsystems(subsystemsData);
+          
+          // Clear any previous subsystem selection since dictionary changed
+          // Don't pre-select subsystem - let user choose fresh
+          console.log("🔄 Dictionary changed - subsystem selection cleared");
+        } else {
+          console.error("Failed to fetch fresh subsystems:", response.status, response.statusText);
+          toast({
+            title: "Erro ao carregar subsistemas",
+            description: "Não foi possível carregar os subsistemas para o dicionário selecionado.",
+            variant: "destructive",
+          });
         }
       } catch (error) {
-        console.error("Failed to load subsystems for dictionary:", error);
+        console.error("Error loading fresh subsystems for dictionary:", error);
+        toast({
+          title: "Erro de conexão",
+          description: "Erro ao conectar com o servidor para carregar subsistemas.",
+          variant: "destructive",
+        });
       }
     }
   };
