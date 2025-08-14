@@ -190,14 +190,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           const nodeId = node.code || node.menuCode || "";
           let caption = node.caption || "";
           
-          // Clean HTML entities and unwanted characters
-          const htmlDecode = (str: string) => {
-            const txt = document.createElement('textarea');
-            txt.innerHTML = str;
-            return txt.value;
-          };
-          
-          caption = htmlDecode(caption).trim();
+          // Keep the caption as is, including & hotkey indicators
+          caption = caption.trim();
           
           // Format as "ID - Caption" when both are available
           const label = nodeId && caption ? `${nodeId} - ${caption}` : caption || String(nodeId);
