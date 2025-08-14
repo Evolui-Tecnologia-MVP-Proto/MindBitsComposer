@@ -3056,17 +3056,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         // Find the ListSubsystems endpoint configuration
-        // The endpoints from config.plugin.endpoints is an array directly
+        // Debug the exact structure
+        console.log("Type of endpoints:", typeof endpoints);
         console.log("Endpoints is array?", Array.isArray(endpoints));
-        console.log("First endpoint:", endpoints?.[0]);
+        console.log("Endpoints content:", JSON.stringify(endpoints, null, 2));
         
+        // Try to find endpoints in different possible locations
+        let endpointsArray = null;
         if (Array.isArray(endpoints)) {
-          console.log("Available endpoints:", endpoints.map((ep: any) => ep.name || "unnamed"));
+          endpointsArray = endpoints;
+        } else if (endpoints && typeof endpoints === 'object') {
+          // Check if it's an object with numeric keys (like an array converted to object)
+          const keys = Object.keys(endpoints);
+          if (keys.every(k => !isNaN(Number(k)))) {
+            // Convert object with numeric keys to array
+            endpointsArray = Object.values(endpoints);
+            console.log("Converted object to array, length:", endpointsArray.length);
+          }
         }
         
-        const listSubsystemsEndpoint = Array.isArray(endpoints) 
-          ? endpoints.find((ep: any) => ep.name === "ListSubsystems")
-          : null;
+        if (endpointsArray) {
+          console.log("Available endpoints:", endpointsArray.map((ep: any) => ep.name || "unnamed"));
+        }
+        
+        const listSubsystemsEndpoint = endpointsArray?.find((ep: any) => ep.name === "ListSubsystems");
         
         if (listSubsystemsEndpoint) {
           // Include dictionary ID in parameters for substitution
