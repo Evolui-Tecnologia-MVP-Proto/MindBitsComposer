@@ -3307,8 +3307,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         // Extract and transform the tree structure from API response
-        const menuStructure = responseData.tree || [];
+        const menuStructure = responseData.tree || responseData || [];
         console.log("LTH Menus API returned tree with", menuStructure.length, "items");
+        
+        // Log the first item structure to understand the response format
+        if (menuStructure.length > 0) {
+          console.log("First menu item structure:", JSON.stringify(menuStructure[0], null, 2));
+        }
         
         res.json({ menuStructure });
       } else {

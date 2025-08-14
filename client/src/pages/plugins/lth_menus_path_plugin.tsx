@@ -186,10 +186,12 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       // Transform API tree structure to frontend format
       const transformTree = (nodes: any[]): any[] => {
         return nodes.map(node => {
+          console.log("Transforming node:", node); // Debug log
+          
           // Format label with ID - Caption
           const nodeId = node.code || node.menuCode || "";
-          const caption = node.caption || node.label || "";
-          const label = nodeId ? `${nodeId} - ${caption}` : caption;
+          const caption = node.caption || node.description || node.label || node.name || "";
+          const label = nodeId && caption ? `${nodeId} - ${caption}` : caption || String(nodeId);
           
           return {
             id: String(nodeId || Math.random()),
@@ -203,6 +205,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       
       const menuStructure = data.menuStructure ? transformTree(data.menuStructure) : [];
       console.log("Menu structure loaded with", menuStructure.length, "top-level items");
+      console.log("First item structure:", menuStructure[0]);
       return menuStructure;
     } catch (error) {
       console.error("Failed to fetch menu structure:", error);
