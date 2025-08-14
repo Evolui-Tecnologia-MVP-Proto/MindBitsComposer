@@ -3159,12 +3159,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           // Save subsystems to config.select_data.subsystem
           config.select_data.subsystem = subsystemsForStorage;
-          console.log("Saving", subsystemsForStorage.length, "subsystems to select_data");
+          console.log("🔥 ANTES DA GRAVAÇÃO:");
+          console.log("🔥 Plugin ID:", pluginId);  
+          console.log("🔥 subsystemsForStorage:", subsystemsForStorage);
+          console.log("🔥 config.select_data.subsystem:", config.select_data.subsystem);
+          console.log("🔥 Full config:", JSON.stringify(config, null, 2));
           
           // Update plugin configuration in database
-          await db.update(plugins)
+          console.log("🔥 EXECUTANDO UPDATE NO BANCO...");
+          const updateResult = await db.update(plugins)
             .set({ configuration: config })
             .where(eq(plugins.id, pluginId));
+          
+          console.log("🔥 DATABASE UPDATE CONCLUÍDO!");
+          console.log("🔥 UPDATE RESULT:", updateResult);
+          
+          // Verificar se realmente salvou
+          console.log("🔥 VERIFICANDO SE SALVOU - fazendo SELECT...");
+          const checkPlugin = await db.select().from(plugins).where(eq(plugins.id, pluginId)).limit(1);
+          console.log("🔥 DADOS DO BANCO APÓS UPDATE:", checkPlugin[0]?.configuration);
           
           // Return subsystems for the select
           const subsystems = subsystemsForStorage.map((sub: any) => ({
