@@ -443,6 +443,9 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           description: `Subsistemas do dicionário ${dictionaryCode} salvos no banco`,
         });
         
+        // Invalidar cache do plugin para recarregar dados atualizados
+        queryClient.invalidateQueries({ queryKey: ['/api/plugins'] });
+        
         // Pequena pausa para garantir que salvou
         await new Promise(resolve => setTimeout(resolve, 100));
         
