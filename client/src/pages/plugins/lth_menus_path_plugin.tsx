@@ -47,7 +47,7 @@ interface Subsystem {
 
 export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null | undefined) {
   const { onDataExchange, selectedEdition } = props || {};
-  const [selectedConnection, setSelectedConnection] = useState<string>("");
+
   const [selectedSubsystem, setSelectedSubsystem] = useState<string>("");
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
@@ -85,16 +85,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
 
 
-  // Get connections from plugin configuration
-  // TODO: Implementar carregamento de conexões da API
-  const connections: Connection[] = pluginConfig?.connections || [
-    { 
-      id: "1", 
-      name: "Conexão Principal", 
-      code: "MAIN", 
-      description: "Conexão principal LTH"
-    }
-  ];
+
 
   // Mock data for subsystems - em produção seria uma API
   const subsystems: Subsystem[] = [
@@ -595,33 +586,48 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     return [];
   };
 
-  const handleConnectionChange = async (connectionCode: string) => {
-    setSelectedConnection(connectionCode);
-    // Reset subsystem and related states when connection changes
-    setSelectedSubsystem("");
-    setMenuStructure([]);
-    setExpandedPaths(new Set());
-    setSelectedPath(null);
-    
-    // Reset connection status if empty selection
-    if (!connectionCode) {
-      setConnectionStatus('disconnected');
-      setAuthToken(null);
-      return;
-    }
-    
-    // Authenticate with the selected connection
-    const authenticated = await authenticateConnection(connectionCode);
 
-    if (authenticated) {
-      toast({
-        title: "Conexão estabelecida",
-        description: "Autenticação realizada com sucesso",
-      });
-    }
-  };
 
-  // No auto-connect - user must manually select a connection
+  // Auto-test connection when plugin loads
+  useEffect(() => {
+    const testConnection = async () => {
+      if (!pluginId) return;
+      
+      console.log("=== AUTO TESTING CONNECTION ===");
+      setConnectionStatus('connecting');
+      
+      try {
+        const response = await fetch("/api/plugin/lth-auth", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            pluginId: pluginId
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.token) {
+            setAuthToken(data.token);
+            setConnectionStatus('connected');
+            console.log("=== CONNECTION SUCCESS ===");
+          } else {
+            setConnectionStatus('error');
+          }
+        } else {
+          setConnectionStatus('error');
+        }
+      } catch (error) {
+        console.error("Auto connection test failed:", error);
+        setConnectionStatus('error');
+      }
+    };
+
+    testConnection();
+  }, [pluginId]); // Executa quando pluginId estiver disponível
 
   const handleSubsystemChange = async (subsystemCode: string) => {
     setSelectedSubsystem(subsystemCode);
@@ -760,10 +766,10 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   };
 
   const handleAtualizar = () => {
-    if (!selectedConnection) {
+    if (connectionStatus !== 'connected') {
       toast({
-        title: "Conexão não selecionada",
-        description: "Selecione uma conexão para atualizar os dados.",
+        title: "Conexão não estabelecida",
+        description: "Aguarde a conexão ser estabelecida para atualizar os dados.",
         variant: "destructive",
       });
       return;
@@ -837,11 +843,10 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     const pathArray = findPathRecursively(menuStructure, selectedId);
     if (!pathArray) return '';
 
-    const connectionName = connections.find(c => c.code === selectedConnection)?.name || selectedConnection;
     const subsystemName = subsystems.find(s => s.code === selectedSubsystem)?.name || selectedSubsystem;
     const pathString = pathArray.join(' -> ');
     
-    return `[Connection: ${selectedConnection}] [Subsystem: ${selectedSubsystem}] - ${pathString}`;
+    return `[Subsystem: "${subsystemName}"] - ${pathString}`;
   };
 
   const handleSalvar = () => {
@@ -855,7 +860,6 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     }
 
     console.log('🎯 LTH Plugin - handleSalvar chamado');
-    console.log('🎯 LTH Plugin - selectedConnection:', selectedConnection);
     console.log('🎯 LTH Plugin - selectedSubsystem:', selectedSubsystem);
     console.log('🎯 LTH Plugin - selectedPath:', selectedPath);
     console.log('🎯 LTH Plugin - onDataExchange:', typeof onDataExchange, onDataExchange);
@@ -915,7 +919,6 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
   const handleCancelar = () => {
     // Reset all states
-    setSelectedConnection("");
     setSelectedSubsystem("");
     setMenuStructure([]);
     setExpandedPaths(new Set());
@@ -975,33 +978,14 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         </p>
       </div>
 
-      {/* Connection Selector */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Conexão
-        </label>
-        <Select value={selectedConnection} onValueChange={handleConnectionChange}>
-          <SelectTrigger className="w-full bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151]">
-            <SelectValue placeholder="Selecione uma conexão..." />
-          </SelectTrigger>
-          <SelectContent className="bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151]">
-            {connections.map((connection) => (
-              <SelectItem key={connection.id} value={connection.code}>
-                <span className="font-medium">{connection.name}</span>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
       {/* Subsystem Selector */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           Subsistema
         </label>
-        <Select value={selectedSubsystem} onValueChange={handleSubsystemChange} disabled={!selectedConnection}>
+        <Select value={selectedSubsystem} onValueChange={handleSubsystemChange} disabled={connectionStatus !== 'connected'}>
           <SelectTrigger className="w-full bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151]">
-            <SelectValue placeholder={!selectedConnection ? "Selecione uma conexão primeiro..." : "Selecione um subsistema..."} />
+            <SelectValue placeholder={connectionStatus !== 'connected' ? "Aguardando conexão..." : "Selecione um subsistema..."} />
           </SelectTrigger>
           <SelectContent className="bg-white dark:bg-[#0F172A] border-gray-300 dark:border-[#374151]">
             {subsystems.map((subsystem) => (
@@ -1027,24 +1011,24 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         </div>
 
         <div className="absolute inset-x-0 top-12 bottom-0 border dark:border-[#374151] rounded-lg bg-gray-50 dark:bg-[#111827] overflow-hidden">
-          {selectedConnection && selectedSubsystem && menuStructure.length > 0 ? (
+          {connectionStatus === 'connected' && selectedSubsystem && menuStructure.length > 0 ? (
             <div className="absolute inset-0 p-4 overflow-y-auto overflow-x-hidden">
               <div className="space-y-1">
                 {renderMenuTree(menuStructure)}
               </div>
             </div>
-          ) : selectedConnection && selectedSubsystem ? (
+          ) : connectionStatus === 'connected' && selectedSubsystem ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center text-gray-500 dark:text-gray-400">
                 <Database className="h-12 w-12 mx-auto mb-3 opacity-50" />
                 <p>Nenhum menu encontrado para este subsistema</p>
               </div>
             </div>
-          ) : !selectedConnection ? (
+          ) : connectionStatus !== 'connected' ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center text-gray-500 dark:text-gray-400">
                 <Folder className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                <p>Selecione uma conexão para iniciar</p>
+                <p>Aguardando conexão...</p>
               </div>
             </div>
           ) : (
@@ -1063,7 +1047,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         <Button
           variant="outline"
           onClick={handleAtualizar}
-          disabled={!selectedConnection || !selectedSubsystem}
+          disabled={connectionStatus !== 'connected' || !selectedSubsystem}
           className="border-gray-300 dark:border-[#374151] hover:bg-gray-50 dark:hover:bg-[#1F2937]"
         >
           <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
