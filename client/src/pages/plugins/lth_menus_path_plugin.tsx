@@ -354,43 +354,46 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     setExpandedPaths(new Set());
     setSelectedPath(null);
     
-    // Save dictionary selection to plugin.parameters.LUTHIER_DB_ID if it's empty
+    // Save dictionary selection to plugin.parameters.LUTHIER_DB_ID
     if (dictionaryCode && pluginId && pluginConfig) {
-      // Check if LUTHIER_DB_ID is empty or needs updating
-      if (!pluginConfig.parameters?.LUTHIER_DB_ID || pluginConfig.parameters.LUTHIER_DB_ID === "") {
-        console.log("Saving LUTHIER_DB_ID:", dictionaryCode);
-        
-        // Update the plugin configuration with the selected dictionary ID
-        const updatedConfig = {
-          ...pluginConfig,
-          parameters: {
-            ...pluginConfig.parameters,
-            LUTHIER_DB_ID: dictionaryCode
-          }
-        };
-        
-        // Save to database
-        try {
-          const response = await fetch(`/api/plugins/${pluginId}`, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify({
-              configuration: updatedConfig
-            })
-          });
-          
-          if (response.ok) {
-            setPluginConfig(updatedConfig);
-            console.log("LUTHIER_DB_ID saved successfully");
-          } else {
-            console.error("Failed to save LUTHIER_DB_ID");
-          }
-        } catch (error) {
-          console.error("Error saving LUTHIER_DB_ID:", error);
+      // Always update LUTHIER_DB_ID when selection changes
+      console.log("Saving LUTHIER_DB_ID:", dictionaryCode);
+      
+      // Update the plugin configuration with the selected dictionary ID
+      const updatedConfig = {
+        ...pluginConfig,
+        parameters: {
+          ...pluginConfig.parameters,
+          LUTHIER_DB_ID: dictionaryCode
         }
+      };
+      
+      // Save to database
+      try {
+        const response = await fetch(`/api/plugins/${pluginId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            configuration: updatedConfig
+          })
+        });
+        
+        if (response.ok) {
+          setPluginConfig(updatedConfig);
+          console.log("LUTHIER_DB_ID saved successfully:", dictionaryCode);
+          toast({
+            title: "Dicionário salvo",
+            description: `Dicionário ${dictionaryCode} foi salvo nas configurações do plugin`,
+            duration: 2000
+          });
+        } else {
+          console.error("Failed to save LUTHIER_DB_ID");
+        }
+      } catch (error) {
+        console.error("Error saving LUTHIER_DB_ID:", error);
       }
     }
     
