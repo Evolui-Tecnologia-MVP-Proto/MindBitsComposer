@@ -214,8 +214,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
             nodeType = node.type;
           }
           
-          // Format as "ID - Caption" when both are available
-          const label = nodeId && caption ? `${nodeId} - ${caption}` : caption || String(nodeId);
+          // Show only caption, keep nodeId for internal use
+          const label = caption || String(nodeId);
           
           return {
             id: String(nodeId || Math.random()),
