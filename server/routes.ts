@@ -2714,11 +2714,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("=== CONFIG DEBUG ===");
       console.log("Config completo:", JSON.stringify(config, null, 2));
       console.log("Config keys:", Object.keys(config || {}));
-      console.log("Has connection:", !!config?.connection);
-      console.log("Has parameters:", !!config?.parameters);
+      console.log("Has plugin.connection:", !!config?.plugin?.connection);
+      console.log("Has plugin.parameters:", !!config?.plugin?.parameters);
       console.log("=== FIM CONFIG DEBUG ===");
       
-      if (!config || !config.connection || !config.parameters) {
+      if (!config || !config.plugin || !config.plugin.connection || !config.plugin.parameters) {
         throw new Error("Configuração do plugin inválida");
       }
 
@@ -2730,7 +2730,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       // Processar a configuração de autenticação
-      const { connection, parameters } = config;
+      const { connection, parameters } = config.plugin;
       const { auth, baseURL, defaultHeaders } = connection;
 
       if (!auth || auth.type !== "cookie") {
