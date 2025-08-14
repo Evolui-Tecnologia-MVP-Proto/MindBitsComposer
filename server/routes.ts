@@ -3018,6 +3018,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("=== LTH SUBSYSTEMS DEBUG ===");
       console.log("Config structure:", Object.keys(config));
+      console.log("Config.plugin keys:", config.plugin ? Object.keys(config.plugin) : 'plugin is undefined');
       
       // Check if we need to load subsystems from API and save to select_data
       const needsLoadFromAPI = !config.select_data?.subsystem || 
@@ -3026,10 +3027,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (needsLoadFromAPI) {
         console.log("Subsystem list empty or missing, loading from API...");
         
-        // Extract configuration - structure is in plugin.connection, plugin.parameters, etc.
-        const connection = config.plugin?.connection || config.connection;
-        const parameters = config.plugin?.parameters || config.parameters;
-        const endpoints = config.plugin?.endpoints || config.endpoints;
+        // Extract configuration - look in both possible locations like in the dictionaries endpoint
+        const connection = config.connection || config.plugin?.connection;
+        const parameters = config.parameters || config.plugin?.parameters;
+        const endpoints = config.endpoints || config.plugin?.endpoints;
+        
+        console.log("Looking for endpoints in config.plugin.endpoints:", !!endpoints);
+        console.log("Endpoints structure:", endpoints ? Object.keys(endpoints) : 'endpoints is undefined');
         
         if (!connection || !parameters || !endpoints) {
           console.error("Invalid config - connection:", !!connection, "parameters:", !!parameters, "endpoints:", !!endpoints);
@@ -3052,6 +3056,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         // Find the ListSubsystems endpoint configuration
+        console.log("Looking for ListSubsystems in endpoints.endpoints:", endpoints?.endpoints ? endpoints.endpoints.length + " endpoints found" : "No endpoints array");
+        if (endpoints?.endpoints) {
+          console.log("Available endpoints:", endpoints.endpoints.map((ep: any) => ep.name));
+        }
+        
         const listSubsystemsEndpoint = endpoints?.endpoints?.find((ep: any) => ep.name === "ListSubsystems");
         
         if (listSubsystemsEndpoint) {
