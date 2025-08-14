@@ -3306,25 +3306,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           throw new Error(`Failed to fetch menus: ${response.status} ${response.statusText}`);
         }
 
-        // Log the raw response to understand structure
-        console.log("=== RAW API RESPONSE TYPE ===", typeof responseData);
-        console.log("=== RAW API RESPONSE IS ARRAY ===", Array.isArray(responseData));
-        
-        // If it's an array, use it directly, otherwise look for tree property
-        let menuStructure = Array.isArray(responseData) ? responseData : (responseData.tree || []);
+        // The API returns an object with 'tree' property containing the menu structure
+        const menuStructure = responseData.tree || [];
         
         console.log("LTH Menus API returned tree with", menuStructure.length, "items");
         
-        // Log the complete first item to see all available fields
+        // Log structure for debugging
         if (menuStructure.length > 0) {
-          console.log("=== COMPLETE FIRST ITEM ===");
-          console.log(JSON.stringify(menuStructure[0], null, 2));
-          
-          // Check if there are children to see nested structure
-          if (menuStructure[0].children && menuStructure[0].children.length > 0) {
-            console.log("=== FIRST CHILD ITEM ===");
-            console.log(JSON.stringify(menuStructure[0].children[0], null, 2));
-          }
+          const firstItem = menuStructure[0];
+          console.log(`First item: code=${firstItem.code}, caption="${firstItem.caption}", type=${firstItem.type}, children=${firstItem.children?.length || 0}`);
         }
         
         res.json({ menuStructure });
