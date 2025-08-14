@@ -2710,7 +2710,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         throw new Error("Plugin não encontrado");
       }
 
-      const config = plugin[0].config as any;
+      const config = plugin[0].configuration as any;
       console.log("=== CONFIG DEBUG ===");
       console.log("Config completo:", JSON.stringify(config, null, 2));
       console.log("Config keys:", Object.keys(config || {}));
