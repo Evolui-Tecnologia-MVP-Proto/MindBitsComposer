@@ -600,10 +600,16 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     // Single selection: if already selected, deselect; otherwise select
     if (selectedPath === item.id) {
       setSelectedPath(null);
-      setValue(''); // Clear the input value when deselecting
+      // Notify parent component about the deselection
+      if (onDataExchange) {
+        onDataExchange({ selectedPath: null, selectedLabel: '' });
+      }
     } else {
       setSelectedPath(item.id);
-      setValue(item.label); // Set the input value to the selected item's label
+      // Notify parent component about the selection
+      if (onDataExchange) {
+        onDataExchange({ selectedPath: item.id, selectedLabel: item.label });
+      }
     }
   };
 
