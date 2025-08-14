@@ -87,420 +87,66 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
 
 
-  // Mock data for subsystems - em produção seria uma API
-  const subsystems: Subsystem[] = [
-    { id: "1", name: "Gestão de Documentos", code: "DOC", description: "Sistema de gestão documental" },
-    { id: "2", name: "Recursos Humanos", code: "RH", description: "Sistema de recursos humanos" },
-    { id: "3", name: "Financeiro", code: "FIN", description: "Sistema financeiro" },
-    { id: "4", name: "Tributário", code: "TRIB", description: "Sistema tributário" },
-    { id: "5", name: "Contábil", code: "CONT", description: "Sistema contábil" }
-  ];
+  // Real subsystems from API
+  const [subsystems, setSubsystems] = useState<Subsystem[]>([]);
 
-  // Mock data for menu structure - em produção seria uma API baseada no subsistema selecionado
-  const generateMenuStructure = (subsystemCode: string): MenuPath[] => {
-    const baseMenus: Record<string, MenuPath[]> = {
-      DOC: [
-        {
-          id: "doc_1",
-          name: "Documentos",
-          path: "/documentos",
-          level: 0,
-          type: "menu",
-          subsystem: "DOC",
-          icon: "FileText",
-          children: [
-            {
-              id: "doc_1_1",
-              name: "Consultar Documentos",
-              path: "/documentos/consultar",
-              parentId: "doc_1",
-              level: 1,
-              type: "submenu",
-              subsystem: "DOC",
-              icon: "Database",
-              children: [
-                {
-                  id: "doc_1_1_1",
-                  name: "Busca Avançada",
-                  path: "/documentos/consultar/busca-avancada",
-                  parentId: "doc_1_1",
-                  level: 2,
-                  type: "submenu",
-                  subsystem: "DOC",
-                  icon: "Settings",
-                  children: [
-                    {
-                      id: "doc_1_1_1_1",
-                      name: "Por Data de Criação",
-                      path: "/documentos/consultar/busca-avancada/data-criacao",
-                      parentId: "doc_1_1_1",
-                      level: 3,
-                      type: "action",
-                      subsystem: "DOC"
-                    },
-                    {
-                      id: "doc_1_1_1_2",
-                      name: "Por Tipo de Documento",
-                      path: "/documentos/consultar/busca-avancada/tipo-documento",
-                      parentId: "doc_1_1_1",
-                      level: 3,
-                      type: "submenu",
-                      subsystem: "DOC",
-                      children: [
-                        {
-                          id: "doc_1_1_1_2_1",
-                          name: "Contratos",
-                          path: "/documentos/consultar/busca-avancada/tipo-documento/contratos",
-                          parentId: "doc_1_1_1_2",
-                          level: 4,
-                          type: "action",
-                          subsystem: "DOC"
-                        },
-                        {
-                          id: "doc_1_1_1_2_2",
-                          name: "Relatórios",
-                          path: "/documentos/consultar/busca-avancada/tipo-documento/relatorios",
-                          parentId: "doc_1_1_1_2",
-                          level: 4,
-                          type: "submenu",
-                          subsystem: "DOC",
-                          children: [
-                            {
-                              id: "doc_1_1_1_2_2_1",
-                              name: "Financeiros",
-                              path: "/documentos/consultar/busca-avancada/tipo-documento/relatorios/financeiros",
-                              parentId: "doc_1_1_1_2_2",
-                              level: 5,
-                              type: "action",
-                              subsystem: "DOC"
-                            },
-                            {
-                              id: "doc_1_1_1_2_2_2",
-                              name: "Operacionais",
-                              path: "/documentos/consultar/busca-avancada/tipo-documento/relatorios/operacionais",
-                              parentId: "doc_1_1_1_2_2",
-                              level: 5,
-                              type: "action",
-                              subsystem: "DOC"
-                            }
-                          ]
-                        }
-                      ]
-                    },
-                    {
-                      id: "doc_1_1_1_3",
-                      name: "Por Status",
-                      path: "/documentos/consultar/busca-avancada/status",
-                      parentId: "doc_1_1_1",
-                      level: 3,
-                      type: "action",
-                      subsystem: "DOC"
-                    }
-                  ]
-                },
-                {
-                  id: "doc_1_1_2",
-                  name: "Filtros Personalizados",
-                  path: "/documentos/consultar/filtros",
-                  parentId: "doc_1_1",
-                  level: 2,
-                  type: "action",
-                  subsystem: "DOC"
-                }
-              ]
-            },
-            {
-              id: "doc_1_2",
-              name: "Incluir Documento",
-              path: "/documentos/incluir",
-              parentId: "doc_1",
-              level: 1,
-              type: "action",
-              subsystem: "DOC"
-            }
-          ]
+  // Load subsystems from API
+  const loadSubsystems = async () => {
+    if (!authToken || !pluginId) return [];
+
+    try {
+      const response = await fetch("/api/plugin/lth-subsystems", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-        {
-          id: "doc_2",
-          name: "Templates",
-          path: "/templates",
-          level: 0,
-          type: "menu",
-          subsystem: "DOC",
-          icon: "Settings",
-          children: [
-            {
-              id: "doc_2_1",
-              name: "Gerenciar Templates",
-              path: "/templates/gerenciar",
-              parentId: "doc_2",
-              level: 1,
-              type: "submenu",
-              subsystem: "DOC",
-              children: [
-                {
-                  id: "doc_2_1_1",
-                  name: "Criar Template",
-                  path: "/templates/gerenciar/criar",
-                  parentId: "doc_2_1",
-                  level: 2,
-                  type: "action",
-                  subsystem: "DOC"
-                },
-                {
-                  id: "doc_2_1_2",
-                  name: "Editar Template",
-                  path: "/templates/gerenciar/editar",
-                  parentId: "doc_2_1",
-                  level: 2,
-                  type: "action",
-                  subsystem: "DOC"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      RH: [
-        {
-          id: "rh_1",
-          name: "Funcionários",
-          path: "/funcionarios",
-          level: 0,
-          type: "menu",
-          subsystem: "RH",
-          icon: "FileText",
-          children: [
-            {
-              id: "rh_1_1",
-              name: "Cadastro",
-              path: "/funcionarios/cadastro",
-              parentId: "rh_1",
-              level: 1,
-              type: "submenu",
-              subsystem: "RH",
-              children: [
-                {
-                  id: "rh_1_1_1",
-                  name: "Dados Pessoais",
-                  path: "/funcionarios/cadastro/dados-pessoais",
-                  parentId: "rh_1_1",
-                  level: 2,
-                  type: "action",
-                  subsystem: "RH"
-                },
-                {
-                  id: "rh_1_1_2",
-                  name: "Dados Funcionais",
-                  path: "/funcionarios/cadastro/dados-funcionais",
-                  parentId: "rh_1_1",
-                  level: 2,
-                  type: "submenu",
-                  subsystem: "RH",
-                  children: [
-                    {
-                      id: "rh_1_1_2_1",
-                      name: "Cargo e Salário",
-                      path: "/funcionarios/cadastro/dados-funcionais/cargo-salario",
-                      parentId: "rh_1_1_2",
-                      level: 3,
-                      type: "action",
-                      subsystem: "RH"
-                    },
-                    {
-                      id: "rh_1_1_2_2",
-                      name: "Horário de Trabalho",
-                      path: "/funcionarios/cadastro/dados-funcionais/horario",
-                      parentId: "rh_1_1_2",
-                      level: 3,
-                      type: "action",
-                      subsystem: "RH"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              id: "rh_1_2",
-              name: "Consulta",
-              path: "/funcionarios/consulta",
-              parentId: "rh_1",
-              level: 1,
-              type: "action",
-              subsystem: "RH"
-            }
-          ]
-        }
-      ],
-      FIN: [
-        {
-          id: "fin_1",
-          name: "Contas a Pagar",
-          path: "/contas-pagar",
-          level: 0,
-          type: "menu",
-          subsystem: "FIN",
-          icon: "Database",
-          children: [
-            {
-              id: "fin_1_1",
-              name: "Lançamentos",
-              path: "/contas-pagar/lancamentos",
-              parentId: "fin_1",
-              level: 1,
-              type: "submenu",
-              subsystem: "FIN",
-              children: [
-                {
-                  id: "fin_1_1_1",
-                  name: "Manual",
-                  path: "/contas-pagar/lancamentos/manual",
-                  parentId: "fin_1_1",
-                  level: 2,
-                  type: "action",
-                  subsystem: "FIN"
-                },
-                {
-                  id: "fin_1_1_2",
-                  name: "Importação",
-                  path: "/contas-pagar/lancamentos/importacao",
-                  parentId: "fin_1_1",
-                  level: 2,
-                  type: "submenu",
-                  subsystem: "FIN",
-                  children: [
-                    {
-                      id: "fin_1_1_2_1",
-                      name: "Excel/CSV",
-                      path: "/contas-pagar/lancamentos/importacao/excel",
-                      parentId: "fin_1_1_2",
-                      level: 3,
-                      type: "action",
-                      subsystem: "FIN"
-                    },
-                    {
-                      id: "fin_1_1_2_2",
-                      name: "Integração Bancária",
-                      path: "/contas-pagar/lancamentos/importacao/bancaria",
-                      parentId: "fin_1_1_2",
-                      level: 3,
-                      type: "action",
-                      subsystem: "FIN"
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      TRIB: [
-        {
-          id: "trib_1",
-          name: "Obrigações",
-          path: "/obrigacoes",
-          level: 0,
-          type: "menu",
-          subsystem: "TRIB",
-          icon: "Settings",
-          children: [
-            {
-              id: "trib_1_1",
-              name: "DCTF",
-              path: "/obrigacoes/dctf",
-              parentId: "trib_1",
-              level: 1,
-              type: "submenu",
-              subsystem: "TRIB",
-              children: [
-                {
-                  id: "trib_1_1_1",
-                  name: "Gerar Arquivo",
-                  path: "/obrigacoes/dctf/gerar",
-                  parentId: "trib_1_1",
-                  level: 2,
-                  type: "action",
-                  subsystem: "TRIB"
-                },
-                {
-                  id: "trib_1_1_2",
-                  name: "Validar Arquivo",
-                  path: "/obrigacoes/dctf/validar",
-                  parentId: "trib_1_1",
-                  level: 2,
-                  type: "action",
-                  subsystem: "TRIB"
-                }
-              ]
-            }
-          ]
-        }
-      ],
-      CONT: [
-        {
-          id: "cont_1",
-          name: "Plano de Contas",
-          path: "/plano-contas",
-          level: 0,
-          type: "menu",
-          subsystem: "CONT",
-          icon: "FileText",
-          children: [
-            {
-              id: "cont_1_1",
-              name: "Gerenciar Contas",
-              path: "/plano-contas/gerenciar",
-              parentId: "cont_1",
-              level: 1,
-              type: "submenu",
-              subsystem: "CONT",
-              children: [
-                {
-                  id: "cont_1_1_1",
-                  name: "Contas Analíticas",
-                  path: "/plano-contas/gerenciar/analiticas",
-                  parentId: "cont_1_1",
-                  level: 2,
-                  type: "submenu",
-                  subsystem: "CONT",
-                  children: [
-                    {
-                      id: "cont_1_1_1_1",
-                      name: "Ativo",
-                      path: "/plano-contas/gerenciar/analiticas/ativo",
-                      parentId: "cont_1_1_1",
-                      level: 3,
-                      type: "action",
-                      subsystem: "CONT"
-                    },
-                    {
-                      id: "cont_1_1_1_2",
-                      name: "Passivo",
-                      path: "/plano-contas/gerenciar/analiticas/passivo",
-                      parentId: "cont_1_1_1",
-                      level: 3,
-                      type: "action",
-                      subsystem: "CONT"
-                    }
-                  ]
-                },
-                {
-                  id: "cont_1_1_2",
-                  name: "Contas Sintéticas",
-                  path: "/plano-contas/gerenciar/sinteticas",
-                  parentId: "cont_1_1",
-                  level: 2,
-                  type: "action",
-                  subsystem: "CONT"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    };
+        credentials: "include",
+        body: JSON.stringify({
+          pluginId: pluginId,
+          authToken: authToken
+        })
+      });
 
-    return baseMenus[subsystemCode] || [];
+      if (!response.ok) {
+        throw new Error(`Failed to fetch subsystems: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.subsystems || [];
+    } catch (error) {
+      console.error("Failed to fetch subsystems:", error);
+      return [];
+    }
+  };
+
+  // Load menu structure from API
+  const loadMenuStructure = async (subsystemId: string) => {
+    if (!authToken || !pluginId || !subsystemId) return [];
+
+    try {
+      const response = await fetch("/api/plugin/lth-menus", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          pluginId: pluginId,
+          authToken: authToken,
+          subsystemId: subsystemId
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch menu structure: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.menuStructure || [];
+    } catch (error) {
+      console.error("Failed to fetch menu structure:", error);
+      return [];
+    }
   };
 
   // Function to authenticate with the API
@@ -629,14 +275,42 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     testConnection();
   }, [pluginId]); // Executa quando pluginId estiver disponível
 
+  // Load subsystems when authentication token becomes available
+  useEffect(() => {
+    const loadSubsystemsData = async () => {
+      if (!authToken || !pluginId) return;
+      
+      try {
+        const subsystemsData = await loadSubsystems();
+        setSubsystems(subsystemsData);
+      } catch (error) {
+        console.error("Failed to load subsystems:", error);
+      }
+    };
+
+    loadSubsystemsData();
+  }, [authToken, pluginId]);
+
   const handleSubsystemChange = async (subsystemCode: string) => {
     setSelectedSubsystem(subsystemCode);
+    setIsLoading(true);
     
-    // Don't show loading spinner, just use mock data for now
-    const structure = generateMenuStructure(subsystemCode);
-    setMenuStructure(structure);
-    setExpandedPaths(new Set()); // Reset expanded state
-    setSelectedPath(null); // Reset selected state
+    try {
+      const structure = await loadMenuStructure(subsystemCode);
+      setMenuStructure(structure);
+      setExpandedPaths(new Set()); // Reset expanded state
+      setSelectedPath(null); // Reset selected state
+    } catch (error) {
+      console.error("Failed to load menu structure:", error);
+      setMenuStructure([]);
+      toast({
+        title: "Erro ao carregar estrutura",
+        description: "Não foi possível carregar a estrutura de menus do subsistema.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const toggleExpanded = (pathId: string) => {
@@ -765,7 +439,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     });
   };
 
-  const handleAtualizar = () => {
+  const handleAtualizar = async () => {
     if (connectionStatus !== 'connected') {
       toast({
         title: "Conexão não estabelecida",
@@ -790,14 +464,28 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       description: "Carregando estrutura atualizada do subsistema...",
     });
 
-    // Simular atualização de dados
-    setTimeout(() => {
-      handleSubsystemChange(selectedSubsystem);
+    try {
+      // Reload subsystems first
+      const subsystemsData = await loadSubsystems();
+      setSubsystems(subsystemsData);
+
+      // Then reload menu structure for the selected subsystem
+      await handleSubsystemChange(selectedSubsystem);
+      
       toast({
         title: "Dados atualizados",
         description: "A estrutura do subsistema foi recarregada com sucesso.",
       });
-    }, 1000);
+    } catch (error) {
+      console.error("Failed to update data:", error);
+      toast({
+        title: "Erro na atualização",
+        description: "Não foi possível atualizar os dados. Tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Função para construir o path completo hierárquico (display na badge)
