@@ -3297,7 +3297,7 @@ html.dark [data-radix-select-item][data-highlighted] {
 /* Plugin Modal Size Classes - Fixed positioning for immediate correct sizing */
 .plugin-modal-lth {
   width: 40vw !important;
-  height: 60vh !important;
+  height: 80vh !important;
   position: fixed !important;
   top: 20vh !important;
   left: 30vw !important;
@@ -3315,7 +3315,7 @@ html.dark [data-radix-select-item][data-highlighted] {
 /* Disable Radix UI animations for plugin modals */
 [data-radix-dialog-content].plugin-modal-lth {
   width: 40vw !important;
-  height: 60vh !important;
+  height: 80vh !important;
   position: fixed !important;
   top: 20vh !important;
   left: 30vw !important;
