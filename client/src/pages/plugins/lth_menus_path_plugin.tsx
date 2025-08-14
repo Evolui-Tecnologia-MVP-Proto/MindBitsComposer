@@ -1064,16 +1064,6 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       <div className="flex justify-end space-x-3 mt-6 pt-4 border-t dark:border-[#374151]">
         <Button
           variant="outline"
-          onClick={handleAtualizar}
-          disabled={connectionStatus !== 'connected' || !selectedSubsystem}
-          className="border-gray-300 dark:border-[#374151] hover:bg-gray-50 dark:hover:bg-[#1F2937]"
-        >
-          <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-          Atualizar
-        </Button>
-        
-        <Button
-          variant="outline"
           onClick={handleCancelar}
           className="border-gray-300 dark:border-[#374151] hover:bg-gray-50 dark:hover:bg-[#1F2937]"
         >
