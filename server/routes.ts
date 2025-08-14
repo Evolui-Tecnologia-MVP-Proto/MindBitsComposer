@@ -3056,15 +3056,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         // Find the ListSubsystems endpoint configuration
-        // Check if endpoints is an array directly
-        const endpointsArray = Array.isArray(endpoints) ? endpoints : endpoints?.endpoints;
+        // The endpoints from config.plugin.endpoints is an array directly
+        console.log("Endpoints is array?", Array.isArray(endpoints));
+        console.log("First endpoint:", endpoints?.[0]);
         
-        console.log("Looking for ListSubsystems in endpoints:", endpointsArray ? endpointsArray.length + " endpoints found" : "No endpoints array");
-        if (endpointsArray) {
-          console.log("Available endpoints:", endpointsArray.map((ep: any) => ep.name));
+        if (Array.isArray(endpoints)) {
+          console.log("Available endpoints:", endpoints.map((ep: any) => ep.name || "unnamed"));
         }
         
-        const listSubsystemsEndpoint = endpointsArray?.find((ep: any) => ep.name === "ListSubsystems");
+        const listSubsystemsEndpoint = Array.isArray(endpoints) 
+          ? endpoints.find((ep: any) => ep.name === "ListSubsystems")
+          : null;
         
         if (listSubsystemsEndpoint) {
           // Include dictionary ID in parameters for substitution
