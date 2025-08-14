@@ -80,23 +80,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
 
   // Get connections from plugin configuration
-  const connections: Connection[] = pluginConfig?.connections || [
-    { 
-      id: "1", 
-      name: "Produção Principal", 
-      code: "PROD", 
-      description: "Ambiente de produção principal",
-      endpoint: "https://portal.evoluitecnologia.com.br:8039/api/public/auth/login",
-      credentials: {
-        userType: "CUSTOM",
-        login: "super",
-        password: "super@1234"
-      }
-    },
-    { id: "2", name: "Homologação", code: "HOM", description: "Ambiente de homologação" },
-    { id: "3", name: "Desenvolvimento", code: "DEV", description: "Ambiente de desenvolvimento" },
-    { id: "4", name: "Teste Integrado", code: "TEST", description: "Ambiente de testes integrados" }
-  ];
+  const connections: Connection[] = pluginConfig?.connections || [];
 
   // Mock data for subsystems - em produção seria uma API
   const subsystems: Subsystem[] = [
@@ -623,21 +607,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     }
   };
 
-  // Auto-connect to PROD when modal opens (component mounts)
-  useEffect(() => {
-    // Small delay to ensure everything is initialized
-    const timer = setTimeout(() => {
-      if (!selectedConnection && connections.length > 0) {
-        // Find PROD connection or use first available
-        const prodConnection = connections.find(c => c.code === 'PROD');
-        if (prodConnection) {
-          handleConnectionChange('PROD');
-        }
-      }
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []); // Empty dependency array - only run on mount
+  // No auto-connect - user must manually select a connection
 
   const handleSubsystemChange = async (subsystemCode: string) => {
     setSelectedSubsystem(subsystemCode);
@@ -949,7 +919,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         return (
           <Badge variant="secondary" className="ml-2">
             <Circle className="h-2 w-2 mr-1" fill="currentColor" />
-            Desconectado
+            [desconectado]
           </Badge>
         );
       case 'connecting':
@@ -963,7 +933,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         return (
           <Badge variant="default" className="ml-2 bg-green-600 hover:bg-green-700">
             <Check className="h-2 w-2 mr-1" />
-            Conectado
+            [Conectado]
           </Badge>
         );
       case 'error':
