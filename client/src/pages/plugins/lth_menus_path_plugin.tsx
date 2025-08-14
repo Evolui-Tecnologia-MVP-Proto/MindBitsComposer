@@ -1199,44 +1199,44 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
       {/* Modal de Detalhes da Função Chamada */}
       <Dialog open={showFunctionDetails} onOpenChange={setShowFunctionDetails}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-hidden flex flex-col">
+          <DialogHeader className="flex-shrink-0">
             <DialogTitle>Detalhes da Função Chamada</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <div className="space-y-4 overflow-y-auto flex-1 pr-2">
             {functionDetails && (
               <>
                 <div>
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Código:</label>
-                  <div className="mt-1 px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-md text-sm font-mono">
+                  <div className="mt-1 px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-md text-sm font-mono break-all">
                     {functionDetails.code || 'N/A'}
                   </div>
                 </div>
                 
                 <div>
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Tipo de Ação:</label>
-                  <div className="mt-1 px-3 py-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm font-mono whitespace-pre-wrap max-h-32 overflow-y-auto">
+                  <div className="mt-1 px-3 py-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm font-mono whitespace-pre-wrap max-h-40 overflow-y-auto break-all">
                     {functionDetails.actionType || 'N/A'}
                   </div>
                 </div>
                 
                 <div>
                   <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Ação:</label>
-                  <div className="mt-1 px-3 py-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm font-mono whitespace-pre-wrap max-h-32 overflow-y-auto">
+                  <div className="mt-1 px-3 py-3 bg-gray-100 dark:bg-gray-800 rounded-md text-sm font-mono whitespace-pre-wrap max-h-60 overflow-y-auto break-all">
                     {functionDetails.action || 'N/A'}
                   </div>
                 </div>
               </>
             )}
-            
-            <div className="flex justify-end pt-4">
-              <Button
-                variant="outline"
-                onClick={() => setShowFunctionDetails(false)}
-              >
-                Fechar
-              </Button>
-            </div>
+          </div>
+          
+          <div className="flex justify-end pt-4 border-t dark:border-gray-700 flex-shrink-0">
+            <Button
+              variant="outline"
+              onClick={() => setShowFunctionDetails(false)}
+            >
+              Fechar
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
