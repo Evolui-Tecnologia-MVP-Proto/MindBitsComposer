@@ -544,6 +544,19 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                   overflow: hidden !important;
                 }
                 
+                /* FORCE all table elements to have same background - MAXIMUM SPECIFICITY */
+                .md-modal-content.markdown-preview table *,
+                .md-modal-content .markdown-preview table *,
+                .md-modal-content.markdown-preview table tr,
+                .md-modal-content .markdown-preview table tr,
+                .md-modal-content.markdown-preview table tbody,
+                .md-modal-content .markdown-preview table tbody,
+                .md-modal-content.markdown-preview table thead,
+                .md-modal-content .markdown-preview table thead {
+                  background-color: #020203 !important;
+                  background: #020203 !important;
+                }
+                
                 .md-modal-content.markdown-preview thead,
                 .md-modal-content .markdown-preview thead,
                 .md-modal-content.markdown-preview tbody,
@@ -562,8 +575,15 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                   padding: 12px 16px !important;
                 }
                 
+                /* FORCE uniform cell styling with MAXIMUM SPECIFICITY */
                 .md-modal-content.markdown-preview td,
-                .md-modal-content .markdown-preview td {
+                .md-modal-content .markdown-preview td,
+                .md-modal-content.markdown-preview table td,
+                .md-modal-content .markdown-preview table td,
+                .md-modal-content.markdown-preview tbody td,
+                .md-modal-content .markdown-preview tbody td,
+                .md-modal-content.markdown-preview tr td,
+                .md-modal-content .markdown-preview tr td {
                   background-color: #020203 !important;
                   background: #020203 !important;
                   color: #FFFFFF !important;
@@ -572,6 +592,36 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                   padding: 12px 16px !important;
                   min-height: 48px !important;
                   vertical-align: top !important;
+                }
+                
+                /* Override ANY prose/typography styles that might interfere */
+                .md-modal-content.prose td,
+                .md-modal-content .prose td,
+                .md-modal-content.prose table td,
+                .md-modal-content .prose table td {
+                  background-color: #020203 !important;
+                  background: #020203 !important;
+                  color: #FFFFFF !important;
+                }
+                
+                /* NUCLEAR OPTION - Force ALL possible combinations */
+                .md-modal-content td,
+                .md-modal-content th,
+                .md-modal-content table td,
+                .md-modal-content table th,
+                div.md-modal-content td,
+                div.md-modal-content th,
+                div.md-modal-content table td,
+                div.md-modal-content table th,
+                .md-modal-content.markdown-preview.prose td,
+                .md-modal-content.markdown-preview.prose th,
+                .md-modal-content.prose-gray td,
+                .md-modal-content.prose-gray th {
+                  background-color: #020203 !important;
+                  background: #020203 !important;
+                  color: #FFFFFF !important;
+                  border: 1px solid #FFFFFF !important;
+                  border-color: #FFFFFF !important;
                 }
                 
                 .md-modal-content.markdown-preview tr:hover,
@@ -709,6 +759,15 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                   border-spacing: 0 !important;
                   border-radius: 8px !important;
                   overflow: hidden !important;
+                }
+                
+                /* FORCE HTML table cells to be uniform */
+                .md-modal-content .table-html-container table *,
+                .md-modal-content .table-html-container tr *,
+                .md-modal-content .table-html-container tbody *,
+                .md-modal-content .table-html-container thead * {
+                  background-color: #020203 !important;
+                  background: #020203 !important;
                 }
                 .md-modal-content .table-html-container tbody {
                   background-color: #020203 !important;
