@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { FileText, RotateCcw } from 'lucide-react';
 import mermaid from 'mermaid';
+import { useTheme } from 'next-themes';
 
 interface DocumentMdModalProps {
   isOpen: boolean;
@@ -69,60 +70,173 @@ function MermaidDiagram({ chart }: { chart: string }) {
   return <div ref={elementRef} className="my-4 flex justify-center w-full" />;
 }
 
-// Process inline formatting (same as MarkdownPreview)
-function processInlineFormatting(text: string): React.ReactNode[] {
+// MDX Components (same as MarkdownPreview.tsx)
+const mdxComponents = {
+  h1: (props: any) => <h1 className="text-3xl font-bold mb-6 text-black dark:text-white border-b border-gray-200 dark:border-[#374151] pb-3" {...props} />,
+  h2: (props: any) => <h2 className="text-2xl font-semibold mb-4 text-black dark:text-white mt-8" {...props} />,
+  h3: (props: any) => <h3 className="text-xl font-medium mb-3 text-black dark:text-white mt-6" {...props} />,
+  h4: (props: any) => <h4 className="text-lg font-medium mb-2 text-black dark:text-white mt-4" {...props} />,
+  h5: (props: any) => <h5 className="text-base font-medium mb-2 text-black dark:text-white mt-3" {...props} />,
+  h6: (props: any) => <h6 className="text-sm font-medium mb-2 text-black dark:text-white mt-2" {...props} />,
+  p: (props: any) => <p className="mb-4 leading-relaxed text-black dark:text-white" {...props} />,
+  ul: (props: any) => <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />,
+  ol: (props: any) => <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />,
+  li: (props: any) => <li className="text-black dark:text-white" {...props} />,
+  blockquote: (props: any) => (
+    <blockquote className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 py-2 mb-4 bg-gray-50 dark:bg-[#1E293B] italic text-black dark:text-white" {...props} />
+  ),
+  code: (props: any) => {
+    // Inline code
+    if (!props.className) {
+      return <code className="bg-gray-100 dark:bg-[#1E293B] text-black dark:text-white px-2 py-1 rounded text-sm font-mono" {...props} />;
+    }
+    // Block code
+    return (
+      <pre className="bg-gray-900 dark:bg-[#111827] text-white p-4 rounded-lg mb-4 overflow-x-auto">
+        <code className="text-sm font-mono text-white" {...props} />
+      </pre>
+    );
+  },
+  pre: (props: any) => (
+    <pre className="bg-gray-900 dark:bg-[#111827] text-white p-4 rounded-lg mb-4 overflow-x-auto" {...props} />
+  ),
+  table: (props: any) => (
+    <div className="overflow-x-auto mb-4">
+      <table className="border-collapse border border-gray-300 dark:border-[#374151] rounded-lg" {...props} />
+    </div>
+  ),
+  thead: (props: any) => <thead className="bg-gray-50 dark:bg-[#111827]" {...props} />,
+  tbody: (props: any) => <tbody className="divide-y divide-gray-200 dark:divide-[#374151]" {...props} />,
+  tr: (props: any) => <tr className="hover:bg-gray-50 dark:hover:bg-[#1E293B]" {...props} />,
+  th: (props: any) => (
+    <th className="px-4 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider border-b border-gray-300 dark:border-[#374151] bg-gray-50 dark:bg-[#1B2028]" {...props} />
+  ),
+  td: (props: any) => <td className="px-4 py-3 text-sm text-black dark:text-white border-b border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1B2028]" {...props} />,
+  a: (props: any) => <a className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline" {...props} />,
+  img: (props: any) => <img className="max-w-full h-auto rounded-lg shadow-sm mb-4" {...props} />,
+  hr: (props: any) => <hr className="my-8 border-gray-300 dark:border-[#374151]" {...props} />,
+  strong: (props: any) => <strong className="font-semibold text-black dark:text-white" {...props} />,
+  em: (props: any) => <em className="italic text-black dark:text-white" {...props} />,
+  // Collapsible containers (details/summary elements)
+  details: (props: any) => (
+    <details className="mb-4 border border-gray-300 dark:border-[#374151] rounded-lg bg-white dark:bg-[#020203] overflow-hidden" {...props} />
+  ),
+  summary: (props: any) => (
+    <summary className="px-4 py-3 bg-gray-50 dark:bg-[#1E293B] border-b border-gray-300 dark:border-[#374151] cursor-pointer hover:bg-gray-100 dark:hover:bg-[#374151] font-medium text-black dark:text-white select-none" {...props} />
+  ),
+};
+
+// Process inline formatting like bold, italic, links, and inline images
+function processInlineFormatting(text: string): React.ReactNode {
   const parts: React.ReactNode[] = [];
   let remaining = text;
-  let keyCounter = 0;
+  let key = 0;
 
   while (remaining.length > 0) {
-    // Bold (**text**)
-    const boldMatch = remaining.match(/^([\s\S]*?)\*\*([\s\S]*?)\*\*([\s\S]*)/);
-    if (boldMatch) {
-      if (boldMatch[1]) parts.push(boldMatch[1]);
-      parts.push(<strong key={keyCounter++} className="font-bold">{boldMatch[2]}</strong>);
-      remaining = boldMatch[3];
-      continue;
-    }
-
-    // Italic (*text*)
-    const italicMatch = remaining.match(/^([\s\S]*?)\*([\s\S]*?)\*([\s\S]*)/);
-    if (italicMatch && !italicMatch[0].includes('**')) {
-      if (italicMatch[1]) parts.push(italicMatch[1]);
-      parts.push(<em key={keyCounter++} className="italic">{italicMatch[2]}</em>);
-      remaining = italicMatch[3];
-      continue;
-    }
-
-    // Inline code (`code`)
-    const codeMatch = remaining.match(/^([\s\S]*?)`([\s\S]*?)`([\s\S]*)/);
-    if (codeMatch) {
-      if (codeMatch[1]) parts.push(codeMatch[1]);
-      parts.push(<code key={keyCounter++} className="bg-gray-100 dark:bg-[#1E293B] text-black dark:text-white px-2 py-1 rounded text-sm font-mono">{codeMatch[2]}</code>);
-      remaining = codeMatch[3];
-      continue;
-    }
-
-    // Links [text](url)
-    const linkMatch = remaining.match(/^([\s\S]*?)\[([^\]]+)\]\(([^)]+)\)([\s\S]*)/);
-    
-    if (linkMatch) {
-      if (linkMatch[1]) parts.push(linkMatch[1]);
+    // Check for images first
+    const imageMatch = remaining.match(/!\[(.*?)\]\((.*?)\)/);
+    if (imageMatch) {
+      const beforeImage = remaining.substring(0, imageMatch.index);
+      if (beforeImage) {
+        parts.push(beforeImage);
+      }
+      const [, alt, src] = imageMatch;
       parts.push(
-        <a key={keyCounter++} href={linkMatch[3]} className="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">
-          {linkMatch[2]}
+        <img 
+          key={key++} 
+          src={src} 
+          alt={alt} 
+          className="inline max-w-full h-auto rounded shadow-sm mx-1" 
+          style={{ maxHeight: '200px' }}
+        />
+      );
+      remaining = remaining.substring((imageMatch.index || 0) + imageMatch[0].length);
+      continue;
+    }
+
+    // Check for links
+    const linkMatch = remaining.match(/\[([^\]]+)\]\(([^)]+)\)/);
+    if (linkMatch) {
+      const beforeLink = remaining.substring(0, linkMatch.index);
+      if (beforeLink) {
+        parts.push(beforeLink);
+      }
+      const [, linkText, linkUrl] = linkMatch;
+      parts.push(
+        <a 
+          key={key++} 
+          href={linkUrl} 
+          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline" 
+          target="_blank" 
+          rel="noopener noreferrer"
+        >
+          {linkText}
         </a>
       );
-      remaining = linkMatch[4];
+      remaining = remaining.substring((linkMatch.index || 0) + linkMatch[0].length);
       continue;
     }
 
-    // No more formatting found, add the rest
+    // Check for inline code
+    const inlineCodeMatch = remaining.match(/`([^`]+)`/);
+    if (inlineCodeMatch) {
+      const beforeCode = remaining.substring(0, inlineCodeMatch.index);
+      if (beforeCode) {
+        parts.push(beforeCode);
+      }
+      const [, codeText] = inlineCodeMatch;
+      parts.push(
+        <code 
+          key={key++} 
+          className="bg-gray-100 dark:bg-[#1E293B] text-black dark:text-white px-2 py-1 rounded text-sm font-mono"
+        >
+          {codeText}
+        </code>
+      );
+      remaining = remaining.substring((inlineCodeMatch.index || 0) + inlineCodeMatch[0].length);
+      continue;
+    }
+
+    // Check for bold **text**
+    const boldMatch = remaining.match(/\*\*([^*]+)\*\*/);
+    if (boldMatch) {
+      const beforeBold = remaining.substring(0, boldMatch.index);
+      if (beforeBold) {
+        parts.push(beforeBold);
+      }
+      const [, boldText] = boldMatch;
+      parts.push(
+        <strong key={key++} className="font-semibold text-black dark:text-white">
+          {boldText}
+        </strong>
+      );
+      remaining = remaining.substring((boldMatch.index || 0) + boldMatch[0].length);
+      continue;
+    }
+
+    // Check for italic *text* (but not **text**)
+    const italicMatch = remaining.match(/(?<!\*)\*([^*]+)\*(?!\*)/);
+    if (italicMatch) {
+      const beforeItalic = remaining.substring(0, italicMatch.index);
+      if (beforeItalic) {
+        parts.push(beforeItalic);
+      }
+      const [, italicText] = italicMatch;
+      parts.push(
+        <em key={key++} className="italic text-black dark:text-white">
+          {italicText}
+        </em>
+      );
+      remaining = remaining.substring((italicMatch.index || 0) + italicMatch[0].length);
+      continue;
+    }
+
+    // No more special formatting, add remaining text
     parts.push(remaining);
     break;
   }
 
-  return parts;
+  return <>{parts}</>;
 }
 
 // Parse markdown to React components (same logic as MarkdownPreview)
@@ -412,7 +526,84 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
         </DialogHeader>
         
         <div className="flex-1 overflow-y-auto border-t border-gray-200 dark:border-[#374151] mt-4 pt-4">
-          <div className="prose prose-lg max-w-none dark:prose-invert">
+          <div className={`markdown-preview markdown-content prose prose-gray dark:prose-invert max-w-none`}>
+            <style dangerouslySetInnerHTML={{
+              __html: `
+                .markdown-preview table td {
+                  vertical-align: top !important;
+                }
+                .markdown-preview table td img {
+                  display: block !important;
+                  max-width: 100% !important;
+                  height: auto !important;
+                  margin-top: 0 !important;
+                }
+                .markdown-preview table tbody td {
+                  vertical-align: top !important;
+                }
+                /* Force consistent text colors for all content */
+                .markdown-preview,
+                .markdown-preview *:not(img):not(svg):not(path):not(circle):not(rect) {
+                  color: #000000 !important;
+                }
+                .dark .markdown-preview,
+                .dark .markdown-preview *:not(img):not(svg):not(path):not(circle):not(rect) {
+                  color: #FFFFFF !important;
+                }
+                /* Force text colors for all content inside details elements */
+                .markdown-preview details,
+                .markdown-preview details *,
+                .markdown-preview details p,
+                .markdown-preview details span,
+                .markdown-preview details div,
+                .markdown-preview details li,
+                .markdown-preview details strong,
+                .markdown-preview details em {
+                  color: #000000 !important;
+                }
+                .dark .markdown-preview details,
+                .dark .markdown-preview details *,
+                .dark .markdown-preview details p,
+                .dark .markdown-preview details span,
+                .dark .markdown-preview details div,
+                .dark .markdown-preview details li,
+                .dark .markdown-preview details strong,
+                .dark .markdown-preview details em {
+                  color: #FFFFFF !important;
+                }
+                /* Ensure summary text follows the theme */
+                .markdown-preview summary,
+                .markdown-preview summary * {
+                  color: #000000 !important;
+                }
+                .dark .markdown-preview summary,
+                .dark .markdown-preview summary * {
+                  color: #FFFFFF !important;
+                }
+                /* Content inside details should have proper background and padding */
+                .markdown-preview details > *:not(summary) {
+                  padding: 16px !important;
+                  background-color: white !important;
+                  color: #000000 !important;
+                }
+                .dark .markdown-preview details > *:not(summary) {
+                  background-color: #020203 !important;
+                  color: #FFFFFF !important;
+                }
+                /* Ensure proper styling for code blocks inside details */
+                .markdown-preview details pre {
+                  background-color: #1f2937 !important;
+                  color: #e5e7eb !important;
+                  padding: 12px !important;
+                  border-radius: 6px !important;
+                  overflow-x: auto !important;
+                }
+                .dark .markdown-preview details pre {
+                  background-color: #111827 !important;
+                  color: #d1d5db !important;
+                }
+              `
+            }} />
             {parseMarkdownToReact(currentContent || '')}
           </div>
         </div>
