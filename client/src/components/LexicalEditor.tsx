@@ -1521,6 +1521,86 @@ function ImageIdAutoConvertPlugin() {
   return null;
 }
 
+// Plugin para escutar eventos de refresh de seções
+function SectionRefreshPlugin({ mdFileOld }: { mdFileOld?: string }): null {
+  const [editor] = useLexicalComposerContext();
+
+  React.useEffect(() => {
+    const handleRefreshSection = (event: CustomEvent) => {
+      const { sectionTitle } = event.detail;
+      console.log('🔄 RefreshSection: Recarregando seção:', sectionTitle);
+      
+      if (!mdFileOld || !sectionTitle) {
+        console.log('❌ RefreshSection: mdFileOld ou sectionTitle não disponível');
+        return;
+      }
+
+      editor.update(() => {
+        const root = $getRoot();
+        
+        // Parse do md_file_old para extrair seções
+        const mdSections = parseMdFileOldSections(mdFileOld);
+        
+        // Encontrar conteúdo correspondente no md_file_old
+        const matchingContent = findMatchingSectionContent(sectionTitle, mdSections);
+        
+        if (!matchingContent || matchingContent.trim() === '') {
+          console.log('❌ RefreshSection: Nenhum conteúdo encontrado para:', sectionTitle);
+          return;
+        }
+
+        // Encontrar o container da seção
+        const children = root.getChildren();
+        for (const child of children) {
+          if ($isCollapsibleContainerNode(child)) {
+            const childNodes = child.getChildren();
+            const title = childNodes[0];
+            if ($isCollapsibleTitleNode(title) && title.getTextContent() === sectionTitle) {
+              // Encontrou o container correto
+              const content = childNodes[1];
+              if ($isCollapsibleContentNode(content)) {
+                console.log('✅ RefreshSection: Container encontrado, atualizando conteúdo');
+                
+                // Limpar conteúdo atual
+                content.clear();
+                
+                try {
+                  // Converter markdown para Lexical nodes com formatação completa
+                  const lexicalNodes = convertMarkdownToLexicalNodes(matchingContent);
+                  
+                  // Adicionar todos os nodes convertidos ao container
+                  lexicalNodes.forEach(node => content.append(node));
+                  
+                  console.log(`✅ RefreshSection: Conteúdo atualizado para "${sectionTitle}" (${lexicalNodes.length} nodes)`);
+                } catch (error) {
+                  console.error(`❌ RefreshSection: Erro ao converter markdown na seção "${sectionTitle}":`, error);
+                  // Fallback: criar parágrafo vazio
+                  const paragraph = $createParagraphNode();
+                  content.append(paragraph);
+                }
+                
+                break;
+              }
+            }
+          }
+        }
+      });
+    };
+
+    // Registrar event listener
+    const editorElement = editor.getRootElement();
+    if (editorElement) {
+      editorElement.addEventListener('refreshSectionContent', handleRefreshSection as EventListener);
+      
+      return () => {
+        editorElement.removeEventListener('refreshSectionContent', handleRefreshSection as EventListener);
+      };
+    }
+  }, [editor, mdFileOld]);
+
+  return null;
+}
+
 // Plugin para enriquecer HeaderFieldNodes com informações de mapeamento
 function HeaderFieldMappingPlugin({ templateMappings, documentData }: { templateMappings?: any; documentData?: any }): null {
   const [editor] = useLexicalComposerContext();
@@ -2763,6 +2843,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <ImageEventListenerPlugin />
           <ImageIdAutoConvertPlugin />
           <TemplateSectionsPlugin sections={templateSections} mdFileOld={mdFileOld} />
+          <SectionRefreshPlugin mdFileOld={mdFileOld} />
           <EditProtectionPlugin />
           <HeaderFieldMappingPlugin templateMappings={templateMappings} documentData={documentData} />
           <CodeLineNumberPlugin />

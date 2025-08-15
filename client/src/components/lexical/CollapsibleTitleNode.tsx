@@ -102,6 +102,65 @@ export class CollapsibleTitleNode extends TextNode {
     
     dom.appendChild(leftContainer);
 
+    // Container direito para botões de ação (apenas para containers de template)
+    // Verificamos se é um container de template verificando se não é fromToolbar
+    const rightContainer = document.createElement('div');
+    rightContainer.classList.add('flex', 'items-center', 'gap-1');
+    
+    // Adicionar botão de refresh para containers de template
+    // O DOM ainda não tem acesso ao parent node, então vamos usar um timeout para verificar
+    setTimeout(() => {
+      // Encontrar o container pai CollapsibleContainerNode
+      const parentDetails = dom.closest('.Collapsible__container');
+      if (parentDetails) {
+        // Verificar se é um container de template (não inserido via toolbar)
+        // Vamos adicionar um atributo data para identificar
+        const isFromTemplate = !parentDetails.hasAttribute('data-from-toolbar');
+        
+        if (isFromTemplate) {
+          // Criar botão de refresh
+          const refreshButton = document.createElement('button');
+          refreshButton.classList.add(
+            'refresh-section-btn',
+            'ml-2',
+            'p-1',
+            'rounded',
+            'hover:bg-gray-200',
+            'dark:hover:bg-gray-600',
+            'transition-colors',
+            'opacity-70',
+            'hover:opacity-100'
+          );
+          refreshButton.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+              <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+              <path d="M21 21v-5h-5"/>
+            </svg>
+          `;
+          refreshButton.title = 'Recarregar conteúdo original desta seção';
+          
+          // Adicionar event listener para o refresh
+          refreshButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Disparar evento customizado para recarregar seção
+            const sectionTitle = textSpan.textContent || '';
+            const refreshEvent = new CustomEvent('refreshSectionContent', {
+              detail: { sectionTitle },
+              bubbles: true
+            });
+            dom.dispatchEvent(refreshEvent);
+          });
+          
+          rightContainer.appendChild(refreshButton);
+          dom.appendChild(rightContainer);
+        }
+      }
+    }, 100);
+
     return dom;
   }
 

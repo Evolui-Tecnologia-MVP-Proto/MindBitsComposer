@@ -68,6 +68,11 @@ export class CollapsibleContainerNode extends ElementNode {
     );
     dom.open = this.__open;
 
+    // Marcar containers inseridos via toolbar para diferenciá-los
+    if (this.__fromToolbar) {
+      dom.setAttribute('data-from-toolbar', 'true');
+    }
+
     return dom;
   }
 
