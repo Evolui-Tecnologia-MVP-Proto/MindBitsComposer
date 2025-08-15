@@ -153,15 +153,20 @@ export class CollapsibleTitleNode extends TextNode {
       e.preventDefault();
       e.stopPropagation();
       
-      console.log('🔄 RefreshButton: Clicado para seção:', textSpan.textContent);
+      const sectionTitle = textSpan.textContent || '';
+      console.log('🔄 RefreshButton: ==================== BOTÃO CLICADO ====================');
+      console.log('🔄 RefreshButton: Seção:', sectionTitle);
+      console.log('🔄 RefreshButton: Criando evento refreshSectionContent...');
       
       // Disparar evento customizado para recarregar seção
-      const sectionTitle = textSpan.textContent || '';
       const refreshEvent = new CustomEvent('refreshSectionContent', {
         detail: { sectionTitle },
         bubbles: true
       });
+      
+      console.log('🔄 RefreshButton: Disparando evento no DOM:', dom);
       dom.dispatchEvent(refreshEvent);
+      console.log('🔄 RefreshButton: Evento disparado! Aguardando processamento...');
     });
     
     rightContainer.appendChild(refreshButton);

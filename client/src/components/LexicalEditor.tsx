@@ -1527,12 +1527,19 @@ function SectionRefreshPlugin({ mdFileOld }: { mdFileOld?: string }): null {
   const [editor] = useLexicalComposerContext();
 
   React.useEffect(() => {
+    console.log('🔄 SectionRefreshPlugin: Inicializando com mdFileOld:', !!mdFileOld);
+    console.log('🔄 SectionRefreshPlugin: Primeiros 200 caracteres do mdFileOld:', mdFileOld?.substring(0, 200));
+    
     const handleRefreshSection = (event: CustomEvent) => {
       const { sectionTitle } = event.detail;
-      console.log('🔄 RefreshSection: Recarregando seção:', sectionTitle);
+      console.log('🔄 RefreshSection: Evento recebido para recarregar seção:', sectionTitle);
+      console.log('🔄 RefreshSection: mdFileOld disponível?', !!mdFileOld);
+      console.log('🔄 RefreshSection: mdFileOld length:', mdFileOld?.length);
       
       if (!mdFileOld || !sectionTitle) {
         console.log('❌ RefreshSection: mdFileOld ou sectionTitle não disponível');
+        console.log('❌ RefreshSection: mdFileOld:', mdFileOld);
+        console.log('❌ RefreshSection: sectionTitle:', sectionTitle);
         return;
       }
 
@@ -1540,13 +1547,19 @@ function SectionRefreshPlugin({ mdFileOld }: { mdFileOld?: string }): null {
         const root = $getRoot();
         
         // Parse do md_file_old para extrair seções
+        console.log('🔄 RefreshSection: Iniciando parse do mdFileOld...');
         const mdSections = parseMdFileOldSections(mdFileOld);
+        console.log('🔄 RefreshSection: Seções encontradas no mdFileOld:', Array.from(mdSections.keys()));
         
         // Encontrar conteúdo correspondente no md_file_old
+        console.log('🔄 RefreshSection: Procurando conteúdo para seção:', sectionTitle);
         const matchingContent = findMatchingSectionContent(sectionTitle, mdSections);
+        console.log('🔄 RefreshSection: Conteúdo encontrado?', !!matchingContent);
+        console.log('🔄 RefreshSection: Primeiros 100 caracteres do conteúdo:', matchingContent?.substring(0, 100));
         
         if (!matchingContent || matchingContent.trim() === '') {
           console.log('❌ RefreshSection: Nenhum conteúdo encontrado para:', sectionTitle);
+          console.log('❌ RefreshSection: Seções disponíveis:', Array.from(mdSections.keys()));
           return;
         }
 

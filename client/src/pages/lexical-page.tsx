@@ -1537,6 +1537,9 @@ export default function LexicalPage() {
 
   const executeSelectEdition = async (edition: any) => {
     console.log('Selecionando edition:', edition);
+    console.log('🔄 DEBUG: mdFileOld presente?', !!edition.mdFileOld);
+    console.log('🔄 DEBUG: mdFileOld length:', edition.mdFileOld?.length);
+    console.log('🔄 DEBUG: Primeiros 200 caracteres do mdFileOld:', edition.mdFileOld?.substring(0, 200));
     
     // Verificar se o documento está finalizado ou para refact e impedir a edição
     if (edition.status === 'done') {
@@ -2249,7 +2252,13 @@ export default function LexicalPage() {
                   viewMode={viewMode}
                   initialEditorState={initialEditorState}
                   markdownContent={markdownContent}
-                  mdFileOld={selectedEdition?.mdFileOld || ''}
+                  mdFileOld={(() => {
+                    const mdOld = selectedEdition?.mdFileOld || '';
+                    console.log('🔄 DEBUG LexicalEditor: mdFileOld sendo passado:', !!mdOld);
+                    console.log('🔄 DEBUG LexicalEditor: mdFileOld length:', mdOld.length);
+                    console.log('🔄 DEBUG LexicalEditor: Primeiros 200 caracteres:', mdOld.substring(0, 200));
+                    return mdOld;
+                  })()}
                   isEnabled={!!(currentDocumentId || selectedTemplate || selectedEdition || loadedFileName)}
                   documentData={selectedEdition ? {
                     // Campos diretos do selectedEdition
