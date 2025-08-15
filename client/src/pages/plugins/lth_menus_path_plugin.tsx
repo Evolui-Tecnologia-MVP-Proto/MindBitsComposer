@@ -1133,9 +1133,10 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
 
   const handleCancelar = () => {
     // Não resetar estados - manter o plugin no estado atual
-    // Apenas fechar o modal sem alterar o campo de edição
+    // Apenas fechar o modal sem enviar nenhum dado (não chamar onDataExchange com valor)
     if (onDataExchange) {
-      onDataExchange({ closeModal: true });
+      // Apenas fechar o modal sem enviar dados que possam alterar o campo
+      onDataExchange({ closeModal: true, cancelAction: true });
     }
   };
 

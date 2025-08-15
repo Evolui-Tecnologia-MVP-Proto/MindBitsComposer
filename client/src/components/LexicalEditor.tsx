@@ -3070,6 +3070,12 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           const { label, nodeKey } = currentFieldContext;
           console.log(`🎯 Atualizando campo "${label}" (nodeKey: ${nodeKey}) com dados do plugin`);
           
+          // Verificar se é uma ação de cancelamento - não atualizar o campo neste caso
+          if (data && typeof data === 'object' && data.cancelAction === true) {
+            console.log('🚫 Plugin cancelado - não atualizando o campo');
+            return;
+          }
+          
           // Extrair o valor do plugin dependendo do formato dos dados
           let pluginValue = '';
           if (typeof data === 'string') {
