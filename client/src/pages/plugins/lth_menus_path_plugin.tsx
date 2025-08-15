@@ -1046,10 +1046,10 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     const pathArray = findPathRecursively(menuStructure, selectedId);
     if (!pathArray) return '';
 
-    const subsystemName = subsystems.find(s => s.code === selectedSubsystem)?.name || selectedSubsystem;
+    // Retornar apenas o path sem duplicar o nome do subsystem
     const pathString = pathArray.join(' -> ');
     
-    return `Subsystem: "${subsystemName}" - ${pathString}`;
+    return pathString;
   };
 
   const handleSalvar = () => {
