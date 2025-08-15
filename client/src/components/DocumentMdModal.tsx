@@ -102,16 +102,16 @@ const mdxComponents = {
   ),
   table: (props: any) => (
     <div className="overflow-x-auto mb-4">
-      <table className="border-collapse border-2 border-white rounded-lg" {...props} />
+      <table className="border-collapse border border-gray-300 dark:border-[#374151] rounded-lg" {...props} />
     </div>
   ),
-  thead: (props: any) => <thead className="bg-black" {...props} />,
-  tbody: (props: any) => <tbody className="divide-y divide-white" {...props} />,
-  tr: (props: any) => <tr className="hover:bg-gray-800" {...props} />,
+  thead: (props: any) => <thead className="bg-gray-50 dark:bg-[#111827]" {...props} />,
+  tbody: (props: any) => <tbody className="divide-y divide-gray-200 dark:divide-[#374151]" {...props} />,
+  tr: (props: any) => <tr className="hover:bg-gray-50 dark:hover:bg-[#1E293B]" {...props} />,
   th: (props: any) => (
-    <th className="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border border-white bg-black" {...props} />
+    <th className="px-4 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider border-b border-gray-300 dark:border-[#374151] bg-gray-50 dark:bg-[#1B2028]" {...props} />
   ),
-  td: (props: any) => <td className="px-4 py-3 text-sm text-white border border-white bg-black" {...props} />,
+  td: (props: any) => <td className="px-4 py-3 text-sm text-black dark:text-white border-b border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1B2028]" {...props} />,
   a: (props: any) => <a className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline" {...props} />,
   img: (props: any) => <img className="max-w-full h-auto rounded-lg shadow-sm mb-4" {...props} />,
   hr: (props: any) => <hr className="my-8 border-gray-300 dark:border-[#374151]" {...props} />,
@@ -526,9 +526,53 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
         </DialogHeader>
         
         <div className="flex-1 overflow-y-auto border-t border-gray-200 dark:border-[#374151] mt-4 pt-4 bg-white dark:bg-[#0A0A0B]">
-          <div className={`markdown-preview markdown-content prose prose-gray dark:prose-invert max-w-none`}>
+          <div className={`md-modal-content markdown-preview markdown-content prose prose-gray dark:prose-invert max-w-none`}>
             <style dangerouslySetInnerHTML={{
               __html: `
+                /* Specific styles for tables ONLY in MD modal - High specificity */
+                .md-modal-content.markdown-preview table,
+                .md-modal-content .markdown-preview table {
+                  border-collapse: collapse !important;
+                  border: 2px solid #ffffff !important;
+                  border-radius: 8px !important;
+                  overflow: hidden !important;
+                  background-color: #000000 !important;
+                }
+                
+                .md-modal-content.markdown-preview thead,
+                .md-modal-content .markdown-preview thead,
+                .md-modal-content.markdown-preview tbody,
+                .md-modal-content .markdown-preview tbody {
+                  background-color: #000000 !important;
+                }
+                
+                .md-modal-content.markdown-preview th,
+                .md-modal-content .markdown-preview th {
+                  background-color: #000000 !important;
+                  border: 1px solid #ffffff !important;
+                  color: #ffffff !important;
+                  padding: 12px 16px !important;
+                }
+                
+                .md-modal-content.markdown-preview td,
+                .md-modal-content .markdown-preview td {
+                  background-color: #000000 !important;
+                  border: 1px solid #ffffff !important;
+                  color: #ffffff !important;
+                  padding: 12px 16px !important;
+                }
+                
+                .md-modal-content.markdown-preview tr:hover,
+                .md-modal-content .markdown-preview tr:hover {
+                  background-color: #1f2937 !important;
+                }
+                
+                .md-modal-content.markdown-preview tr:hover th,
+                .md-modal-content .markdown-preview tr:hover th,
+                .md-modal-content.markdown-preview tr:hover td,
+                .md-modal-content .markdown-preview tr:hover td {
+                  background-color: #1f2937 !important;
+                }
                 .markdown-preview table td {
                   vertical-align: top !important;
                 }
