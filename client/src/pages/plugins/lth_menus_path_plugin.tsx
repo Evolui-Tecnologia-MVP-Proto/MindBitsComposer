@@ -240,6 +240,71 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     }
   };
 
+  // Function to validate connection by testing ListLuthierConnections and ListSubsystems
+  const validateConnection = async (token: string): Promise<boolean> => {
+    if (!pluginId || !token) return false;
+    
+    console.log("=== VALIDATING CONNECTION WITH ADDITIONAL API CALLS ===");
+    
+    try {
+      // Test 1: ListLuthierConnections
+      const connectionsResponse = await fetch("/api/plugin/lth-list-connections", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          pluginId: pluginId,
+          authToken: token
+        })
+      });
+
+      if (!connectionsResponse.ok) {
+        console.log("ListLuthierConnections validation failed: non-200 response");
+        return false;
+      }
+
+      const connectionsData = await connectionsResponse.json();
+      if (!Array.isArray(connectionsData) && !Array.isArray(connectionsData.connections)) {
+        console.log("ListLuthierConnections validation failed: response is not an array");
+        return false;
+      }
+      console.log("✓ ListLuthierConnections validation passed");
+
+      // Test 2: ListSubsystems  
+      const subsystemsResponse = await fetch("/api/plugin/lth-list-subsystems", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          pluginId: pluginId,
+          authToken: token
+        })
+      });
+
+      if (!subsystemsResponse.ok) {
+        console.log("ListSubsystems validation failed: non-200 response");
+        return false;
+      }
+
+      const subsystemsData = await subsystemsResponse.json();
+      if (!Array.isArray(subsystemsData) && !Array.isArray(subsystemsData.subsystems)) {
+        console.log("ListSubsystems validation failed: response is not an array");
+        return false;
+      }
+      console.log("✓ ListSubsystems validation passed");
+
+      console.log("=== CONNECTION VALIDATION SUCCESSFUL ===");
+      return true;
+    } catch (error) {
+      console.error("Connection validation failed:", error);
+      return false;
+    }
+  };
+
   // Function to authenticate with the API
   const authenticateConnection = async (connectionCode: string) => {
     if (!pluginId) {
@@ -271,9 +336,18 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       
       if (data.success) {
         setAuthToken(data.token);
-        setConnectionStatus('connected');
-        console.log("Authentication successful:", data);
-        return true;
+        
+        // Validate connection with additional API calls
+        const isValid = await validateConnection(data.token);
+        if (isValid) {
+          setConnectionStatus('connected');
+          console.log("Authentication and validation successful:", data);
+        } else {
+          setConnectionStatus('error');
+          console.error("Connection validation failed - API returned non-array response");
+        }
+        
+        return isValid;
       } else {
         setConnectionStatus('error');
         console.error("Authentication failed:", data);
@@ -355,8 +429,16 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           const data = await response.json();
           if (data.success && data.token) {
             setAuthToken(data.token);
-            setConnectionStatus('connected');
-            console.log("=== CONNECTION SUCCESS ===");
+            
+            // Validate connection with additional API calls
+            const isValid = await validateConnection(data.token);
+            if (isValid) {
+              setConnectionStatus('connected');
+              console.log("=== CONNECTION SUCCESS ===");
+            } else {
+              setConnectionStatus('error');
+              console.error("=== CONNECTION VALIDATION FAILED ===");
+            }
           } else {
             setConnectionStatus('error');
           }
@@ -1050,7 +1132,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         return (
           <Badge variant="destructive" className="ml-2">
             <X className="h-2 w-2 mr-1" />
-            Erro
+            Connection Fail
           </Badge>
         );
     }

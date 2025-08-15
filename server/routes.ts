@@ -3459,6 +3459,208 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // LTH validation endpoint - ListLuthierConnections
+  app.post("/api/plugin/lth-list-connections", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { pluginId, authToken } = req.body;
+    
+    try {
+      // Buscar configuração do plugin
+      const plugin = await db.select().from(plugins).where(eq(plugins.id, pluginId)).limit(1);
+      if (!plugin.length) {
+        throw new Error("Plugin não encontrado");
+      }
+
+      let config = plugin[0].configuration as any;
+      
+      // Parse JSON if needed
+      if (typeof config === 'string') {
+        config = JSON.parse(config);
+      }
+      
+      // Extract configuration - look in both possible locations
+      const connection = config.connection || config.plugin?.connection;
+      const parameters = config.parameters || config.plugin?.parameters;
+      const endpoints = config.endpoints || config.plugin?.endpoints;
+      
+      if (!connection || !parameters || !endpoints) {
+        throw new Error("Configuração do plugin inválida");
+      }
+
+      // Função para substituir tags {{}} pelos valores dos parâmetros
+      const replaceParameters = (str: string, params: any): string => {
+        return str.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+          return params[key] || match;
+        });
+      };
+      
+      // Find the ListLuthierConnections endpoint
+      let endpointsArray: any[] = [];
+      if (Array.isArray(endpoints)) {
+        endpointsArray = endpoints;
+      } else if (endpoints && typeof endpoints === 'object') {
+        endpointsArray = Object.values(endpoints);
+      }
+      
+      const listConnectionsEndpoint = endpointsArray.find((ep: any) => 
+        ep.name === 'ListLuthierConnections' || ep.Name === 'ListLuthierConnections'
+      );
+      
+      if (!listConnectionsEndpoint) {
+        throw new Error("ListLuthierConnections endpoint not configured");
+      }
+      
+      const fullUrl = replaceParameters(connection.baseURL + listConnectionsEndpoint.path, parameters);
+      
+      const headers: any = {};
+      
+      // Add default headers
+      if (connection.defaultHeaders) {
+        Object.entries(connection.defaultHeaders).forEach(([key, value]) => {
+          headers[key] = replaceParameters(String(value), parameters);
+        });
+      }
+      
+      // Add endpoint-specific headers
+      if (listConnectionsEndpoint.headers) {
+        Object.entries(listConnectionsEndpoint.headers).forEach(([key, value]) => {
+          headers[key] = replaceParameters(String(value), parameters);
+        });
+      }
+      
+      // Add auth token as cookie if provided
+      if (authToken) {
+        headers["Cookie"] = authToken;
+      }
+      
+      console.log("=== LTH ListLuthierConnections Validation ===");
+      console.log("URL:", fullUrl);
+      
+      const response = await fetch(fullUrl, {
+        method: listConnectionsEndpoint.method || "GET",
+        headers
+      });
+
+      const responseData = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch connections: ${response.status}`);
+      }
+      
+      // Return the response data directly for validation
+      res.json(responseData);
+      
+    } catch (error: any) {
+      console.error("LTH list connections error:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+  });
+
+  // LTH validation endpoint - ListSubsystems
+  app.post("/api/plugin/lth-list-subsystems", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { pluginId, authToken } = req.body;
+    
+    try {
+      // Buscar configuração do plugin
+      const plugin = await db.select().from(plugins).where(eq(plugins.id, pluginId)).limit(1);
+      if (!plugin.length) {
+        throw new Error("Plugin não encontrado");
+      }
+
+      let config = plugin[0].configuration as any;
+      
+      // Parse JSON if needed
+      if (typeof config === 'string') {
+        config = JSON.parse(config);
+      }
+      
+      // Extract configuration - look in both possible locations
+      const connection = config.connection || config.plugin?.connection;
+      const parameters = config.parameters || config.plugin?.parameters;
+      const endpoints = config.endpoints || config.plugin?.endpoints;
+      
+      if (!connection || !parameters || !endpoints) {
+        throw new Error("Configuração do plugin inválida");
+      }
+
+      // Função para substituir tags {{}} pelos valores dos parâmetros
+      const replaceParameters = (str: string, params: any): string => {
+        return str.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+          return params[key] || match;
+        });
+      };
+      
+      // Find the ListSubsystems endpoint
+      let endpointsArray: any[] = [];
+      if (Array.isArray(endpoints)) {
+        endpointsArray = endpoints;
+      } else if (endpoints && typeof endpoints === 'object') {
+        endpointsArray = Object.values(endpoints);
+      }
+      
+      const listSubsystemsEndpoint = endpointsArray.find((ep: any) => 
+        ep.name === 'ListSubsystems' || ep.Name === 'ListSubsystems'
+      );
+      
+      if (!listSubsystemsEndpoint) {
+        throw new Error("ListSubsystems endpoint not configured");
+      }
+      
+      const fullUrl = replaceParameters(connection.baseURL + listSubsystemsEndpoint.path, parameters);
+      
+      const headers: any = {};
+      
+      // Add default headers
+      if (connection.defaultHeaders) {
+        Object.entries(connection.defaultHeaders).forEach(([key, value]) => {
+          headers[key] = replaceParameters(String(value), parameters);
+        });
+      }
+      
+      // Add endpoint-specific headers
+      if (listSubsystemsEndpoint.headers) {
+        Object.entries(listSubsystemsEndpoint.headers).forEach(([key, value]) => {
+          headers[key] = replaceParameters(String(value), parameters);
+        });
+      }
+      
+      // Add auth token as cookie if provided
+      if (authToken) {
+        headers["Cookie"] = authToken;
+      }
+      
+      console.log("=== LTH ListSubsystems Validation ===");
+      console.log("URL:", fullUrl);
+      
+      const response = await fetch(fullUrl, {
+        method: listSubsystemsEndpoint.method || "GET",
+        headers
+      });
+
+      const responseData = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch subsystems: ${response.status}`);
+      }
+      
+      // Return the response data directly for validation
+      res.json(responseData);
+      
+    } catch (error: any) {
+      console.error("LTH list subsystems error:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: error.message 
+      });
+    }
+  });
+
   // Testar plugin
   app.post("/api/plugins/:id/test", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
