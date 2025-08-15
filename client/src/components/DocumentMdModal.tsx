@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { FileText, RotateCcw } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import mermaid from 'mermaid';
 import { useTheme } from 'next-themes';
 
@@ -507,18 +506,23 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
             )}
             {hasOriginal && (
               <div className="flex items-center gap-2 ml-auto">
-                <Badge variant={showOriginal ? "secondary" : "default"}>
-                  {showOriginal ? "Versão Original" : "Versão Atual"}
-                </Badge>
                 <Button
-                  variant="outline"
+                  variant={!showOriginal ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setShowOriginal(!showOriginal)}
+                  onClick={() => setShowOriginal(false)}
                   className="h-8"
-                  title={showOriginal ? "Ver versão atual" : "Ver versão original"}
+                  title="Ver versão atual"
                 >
-                  <RotateCcw className="w-4 h-4 mr-1" />
-                  {showOriginal ? "Ver Atual" : "Ver Original"}
+                  Atual
+                </Button>
+                <Button
+                  variant={showOriginal ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setShowOriginal(true)}
+                  className="h-8"
+                  title="Ver versão original"
+                >
+                  Original
                 </Button>
               </div>
             )}
