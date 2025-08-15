@@ -109,88 +109,64 @@ export class CollapsibleTitleNode extends TextNode {
     // Adicionar o container direito imediatamente
     dom.appendChild(rightContainer);
     
-    // Adicionar botão de refresh para containers de template
-    // O DOM ainda não tem acesso ao parent node, então vamos usar um timeout para verificar
-    setTimeout(() => {
-      console.log('🔍 RefreshButton: Verificando container parent para:', textSpan.textContent);
+    // DEBUG: Adicionar botão de refresh em TODOS os containers para teste
+    // Criar botão de refresh diretamente sem verificações
+    console.log('🔍 RefreshButton DEBUG: Criando botão SEMPRE para:', textSpan.textContent);
+    
+    const refreshButton = document.createElement('button');
+    refreshButton.classList.add(
+      'refresh-section-btn',
+      'ml-2',
+      'p-1',
+      'rounded',
+      'bg-blue-100',
+      'dark:bg-blue-900',
+      'hover:bg-blue-200',
+      'dark:hover:bg-blue-800',
+      'transition-colors',
+      'text-blue-600',
+      'dark:text-blue-400',
+      'w-7',
+      'h-7',
+      'flex',
+      'items-center',
+      'justify-center',
+      'flex-shrink-0',
+      'border',
+      'border-blue-300',
+      'dark:border-blue-700'
+    );
+    refreshButton.innerHTML = `
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+        <path d="M3 3v5h5"/>
+        <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+        <path d="M21 21v-5h-5"/>
+      </svg>
+    `;
+    refreshButton.title = 'Recarregar conteúdo original desta seção';
+    refreshButton.style.visibility = 'visible';
+    refreshButton.style.display = 'flex';
+    
+    // Adicionar event listener para o refresh
+    refreshButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       
-      // Encontrar o container pai CollapsibleContainerNode
-      const parentDetails = dom.closest('.Collapsible__container');
-      console.log('🔍 RefreshButton: Parent details encontrado:', !!parentDetails);
+      console.log('🔄 RefreshButton: Clicado para seção:', textSpan.textContent);
       
-      if (parentDetails) {
-        // Verificar se é um container de template (não inserido via toolbar)
-        const hasFromToolbarAttr = parentDetails.hasAttribute('data-from-toolbar');
-        console.log('🔍 RefreshButton: Has data-from-toolbar:', hasFromToolbarAttr);
-        
-        const isFromTemplate = !hasFromToolbarAttr;
-        console.log('🔍 RefreshButton: É container de template?', isFromTemplate);
-        
-        if (isFromTemplate) {
-          console.log('✅ RefreshButton: Criando botão de refresh para:', textSpan.textContent);
-          
-          // Criar botão de refresh
-          const refreshButton = document.createElement('button');
-          refreshButton.classList.add(
-            'refresh-section-btn',
-            'ml-2',
-            'p-1',
-            'rounded',
-            'bg-blue-100',
-            'dark:bg-blue-900',
-            'hover:bg-blue-200',
-            'dark:hover:bg-blue-800',
-            'transition-colors',
-            'text-blue-600',
-            'dark:text-blue-400',
-            'w-7',
-            'h-7',
-            'flex',
-            'items-center',
-            'justify-center',
-            'flex-shrink-0',
-            'border',
-            'border-blue-300',
-            'dark:border-blue-700'
-          );
-          refreshButton.innerHTML = `
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-              <path d="M3 3v5h5"/>
-              <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
-              <path d="M21 21v-5h-5"/>
-            </svg>
-          `;
-          refreshButton.title = 'Recarregar conteúdo original desta seção';
-          refreshButton.style.visibility = 'visible';
-          refreshButton.style.display = 'flex';
-          
-          // Adicionar event listener para o refresh
-          refreshButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            console.log('🔄 RefreshButton: Clicado para seção:', textSpan.textContent);
-            
-            // Disparar evento customizado para recarregar seção
-            const sectionTitle = textSpan.textContent || '';
-            const refreshEvent = new CustomEvent('refreshSectionContent', {
-              detail: { sectionTitle },
-              bubbles: true
-            });
-            dom.dispatchEvent(refreshEvent);
-          });
-          
-          rightContainer.appendChild(refreshButton);
-          console.log('✅ RefreshButton: Botão adicionado com sucesso ao container:', rightContainer);
-          console.log('✅ RefreshButton: Container direito tem filhos:', rightContainer.children.length);
-        } else {
-          console.log('⚠️ RefreshButton: Container inserido via toolbar, não adicionando botão');
-        }
-      } else {
-        console.log('❌ RefreshButton: Container parent não encontrado');
-      }
-    }, 500);
+      // Disparar evento customizado para recarregar seção
+      const sectionTitle = textSpan.textContent || '';
+      const refreshEvent = new CustomEvent('refreshSectionContent', {
+        detail: { sectionTitle },
+        bubbles: true
+      });
+      dom.dispatchEvent(refreshEvent);
+    });
+    
+    rightContainer.appendChild(refreshButton);
+    console.log('✅ RefreshButton DEBUG: Botão adicionado SEMPRE ao container:', rightContainer);
+    console.log('✅ RefreshButton DEBUG: Container direito tem filhos:', rightContainer.children.length);
 
     return dom;
   }
