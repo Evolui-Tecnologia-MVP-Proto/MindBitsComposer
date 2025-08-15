@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { ObjectUploader } from "./ObjectUploader";
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
     confirmPassword: "",
   });
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [currentAvatarUrl, setCurrentAvatarUrl] = useState(user?.avatarUrl || "");
 
   const getInitials = (name: string) => {
     return name
@@ -119,6 +121,14 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
     onClose();
   };
 
+  const handleAvatarUpload = (newAvatarUrl: string) => {
+    setCurrentAvatarUrl(newAvatarUrl);
+    toast({
+      title: "Sucesso",
+      description: "Avatar atualizado com sucesso!",
+    });
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[480px] bg-white dark:bg-[#1F2937] border-gray-200 dark:border-gray-600 p-0">
@@ -133,18 +143,19 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
           <div className="flex flex-col items-center mb-8">
             <div className="relative mb-4">
               <Avatar className="h-20 w-20">
-                <AvatarImage src={user?.avatarUrl || ""} alt={user?.name || ""} />
+                <AvatarImage src={currentAvatarUrl || user?.avatarUrl || ""} alt={user?.name || ""} />
                 <AvatarFallback className="bg-primary text-white text-xl">
                   {user?.name ? getInitials(user.name) : "U"}
                 </AvatarFallback>
               </Avatar>
-              <Button
-                variant="outline"
-                size="sm"
-                className="absolute -bottom-1 -right-1 h-8 w-8 p-0 rounded-full bg-blue-600 border-blue-600 hover:bg-blue-700 hover:border-blue-700"
+              <ObjectUploader
+                maxFileSize={5242880}
+                onComplete={handleAvatarUpload}
+                userId={user?.id}
+                buttonClassName="absolute -bottom-1 -right-1 h-8 w-8 p-0 rounded-full bg-blue-600 border-blue-600 hover:bg-blue-700 hover:border-blue-700"
               >
                 <Camera className="h-4 w-4 text-white" />
-              </Button>
+              </ObjectUploader>
             </div>
             
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">

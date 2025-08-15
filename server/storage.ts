@@ -32,6 +32,7 @@ export interface IStorage {
   updateUserPassword(id: number, password: string): Promise<void>;
   updateUserStatus(id: number, status: UserStatus): Promise<User>;
   updateUserMustChangePassword(id: number, mustChange: boolean): Promise<void>;
+  updateUserAvatar(id: number, avatarUrl: string): Promise<User>;
   deleteUser(id: number): Promise<void>;
   
   // Template operations
@@ -235,6 +236,23 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ mustChangePassword })
       .where(eq(users.id, id));
+  }
+
+  async updateUserAvatar(id: number, avatarUrl: string): Promise<User> {
+    const [updatedUser] = await db
+      .update(users)
+      .set({ 
+        avatarUrl,
+        updatedAt: new Date()
+      })
+      .where(eq(users.id, id))
+      .returning();
+    
+    if (!updatedUser) {
+      throw new Error("User not found");
+    }
+    
+    return updatedUser;
   }
 
   async deleteUser(id: number): Promise<void> {

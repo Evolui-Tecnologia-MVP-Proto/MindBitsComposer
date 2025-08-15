@@ -15,6 +15,7 @@ import { SystemLogger, EventTypes } from "./logger";
 import path from "path";
 import fs from "fs";
 import multer from "multer";
+import { ObjectStorageService } from "./objectStorage";
 
 // Função compartilhada para executar mapeamento Monday
 async function executeMondayMapping(mappingId: string, userId?: number, isHeadless: boolean = false) {
@@ -494,6 +495,70 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Setup authentication and user management routes
   setupAuth(app);
+
+  // Avatar Upload Routes
+  const objectStorageService = new ObjectStorageService();
+
+  // Get upload URL for avatar
+  app.post("/api/objects/upload", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Não autorizado" });
+    }
+
+    try {
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Error getting upload URL:", error);
+      res.status(500).json({ error: "Erro ao obter URL de upload" });
+    }
+  });
+
+  // Update user avatar URL
+  app.put("/api/user/avatar", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Não autorizado" });
+    }
+
+    const { avatarUrl, userId } = req.body;
+
+    if (!avatarUrl || !userId) {
+      return res.status(400).json({ error: "avatarUrl e userId são obrigatórios" });
+    }
+
+    try {
+      // Normalize the object path
+      const normalizedPath = objectStorageService.normalizeObjectEntityPath(avatarUrl);
+      
+      // Update user avatar in database
+      const updatedUser = await storage.updateUserAvatar(userId, normalizedPath);
+
+      res.json({ 
+        success: true,
+        avatarUrl: normalizedPath,
+        user: updatedUser
+      });
+    } catch (error) {
+      console.error("Error updating avatar:", error);
+      res.status(500).json({ error: "Erro ao atualizar avatar" });
+    }
+  });
+
+  // Serve uploaded objects
+  app.get("/objects/:objectPath(*)", async (req, res) => {
+    const objectPath = `/objects/${req.params.objectPath}`;
+    
+    try {
+      const objectFile = await objectStorageService.getObjectEntityFile(objectPath);
+      await objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error serving object:", error);
+      if (error.name === "ObjectNotFoundError") {
+        return res.status(404).json({ error: "Arquivo não encontrado" });
+      }
+      res.status(500).json({ error: "Erro ao servir arquivo" });
+    }
+  });
 
   // DOCUMENTO UPDATE - PRIORIDADE MÁXIMA
   app.all("/api/doc-update/:id", async (req, res) => {
