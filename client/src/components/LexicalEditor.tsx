@@ -1616,7 +1616,7 @@ function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; vie
       return;
     }
 
-    // Executar independente do viewMode para testar
+    // Executar apenas se temos mdFileOld
     console.log('🔄 RefreshButtonsPlugin: Continuando execução...');
 
     // Função para adicionar botões
@@ -1679,24 +1679,22 @@ function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; vie
         refreshButton.classList.add(
           'refresh-section-btn',
           'ml-1',
-          'p-1',
+          'p-0.5',
           'rounded',
-          'bg-blue-100',
-          'hover:bg-blue-200',
-          'dark:bg-blue-800',
-          'dark:hover:bg-blue-700',
+          'hover:bg-gray-200',
+          'dark:hover:bg-gray-600',
           'transition-colors',
-          'border',
-          'border-blue-300',
-          'w-8',
-          'h-8',
+          'opacity-60',
+          'hover:opacity-100',
+          'w-6',
+          'h-6',
           'flex',
           'items-center',
           'justify-center',
           'flex-shrink-0'
         );
         refreshButton.innerHTML = `
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
             <path d="M3 3v5h5"/>
             <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
