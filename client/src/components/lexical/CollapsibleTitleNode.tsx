@@ -111,7 +111,8 @@ export class CollapsibleTitleNode extends TextNode {
     
     // Verificar se NÃO é o container de cabeçalho do documento
     const isDocumentHeader = textSpan.textContent?.includes('CABEÇALHO DO DOCUMENTO') || 
-                            textSpan.textContent?.includes('DOCUMENT HEADER');
+                            textSpan.textContent?.includes('DOCUMENT HEADER') ||
+                            textSpan.textContent?.includes('Document Header');
     
     if (!isDocumentHeader) {
       console.log('🔍 RefreshButton: Criando botão para seção:', textSpan.textContent);
@@ -211,7 +212,8 @@ export class CollapsibleTitleNode extends TextNode {
         
         // Verificar se NÃO é o container de cabeçalho do documento
         const isDocumentHeader = this.getTextContent().includes('CABEÇALHO DO DOCUMENTO') || 
-                                this.getTextContent().includes('DOCUMENT HEADER');
+                                this.getTextContent().includes('DOCUMENT HEADER') ||
+                                this.getTextContent().includes('Document Header');
         
         if (isFromTemplate && !isDocumentHeader) {
           console.log('✅ RefreshButton (updateDOM): Criando botão de refresh para:', this.getTextContent());
