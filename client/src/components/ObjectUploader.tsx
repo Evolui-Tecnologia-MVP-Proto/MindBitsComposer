@@ -91,13 +91,13 @@ export function ObjectUploader({
 
       const { uploadURL } = await uploadResponse.json();
 
-      // Upload file to object storage
+      // Upload file using FormData for local storage
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      
       const uploadResult = await fetch(uploadURL, {
         method: "PUT",
-        body: selectedFile,
-        headers: {
-          "Content-Type": selectedFile.type,
-        },
+        body: formData,
       });
 
       if (!uploadResult.ok) {
@@ -109,7 +109,7 @@ export function ObjectUploader({
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          avatarUrl: uploadURL.split("?")[0], // Remove query parameters
+          avatarUrl: uploadURL, // Use the full upload URL
           userId,
         }),
       });

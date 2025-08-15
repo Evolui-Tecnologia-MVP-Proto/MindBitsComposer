@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Camera } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ObjectUploader } from "./ObjectUploader";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ interface UserProfileModalProps {
 export default function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [passwords, setPasswords] = useState({
     currentPassword: "",
     newPassword: "",
@@ -123,6 +125,10 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
 
   const handleAvatarUpload = (newAvatarUrl: string) => {
     setCurrentAvatarUrl(newAvatarUrl);
+    
+    // Invalidar cache para atualizar dados do usuário
+    queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+    
     toast({
       title: "Sucesso",
       description: "Avatar atualizado com sucesso!",

@@ -514,6 +514,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Configure multer for avatar uploads
+  const avatarUpload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+    fileFilter: (req, file, cb) => {
+      // Only allow image files
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Only image files are allowed'), false);
+      }
+    }
+  });
+
+  // Handle avatar file upload
+  app.put("/api/upload/avatar/:objectId", avatarUpload.single('file'), async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Não autorizado" });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: "Nenhum arquivo enviado" });
+    }
+
+    try {
+      const { objectId } = req.params;
+      const avatarsDir = path.join(process.cwd(), 'uploads', 'avatars');
+      
+      // Ensure directory exists
+      if (!fs.existsSync(avatarsDir)) {
+        fs.mkdirSync(avatarsDir, { recursive: true });
+      }
+
+      // Get file extension from original file
+      const ext = path.extname(req.file.originalname) || '.jpg';
+      const filename = `${objectId}${ext}`;
+      const filePath = path.join(avatarsDir, filename);
+
+      // Save file to disk
+      fs.writeFileSync(filePath, req.file.buffer);
+
+      res.json({ success: true, filename });
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      res.status(500).json({ error: "Erro ao fazer upload do avatar" });
+    }
+  });
+
   // Update user avatar URL
   app.put("/api/user/avatar", async (req, res) => {
     if (!req.isAuthenticated()) {
@@ -531,7 +579,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const normalizedPath = objectStorageService.normalizeObjectEntityPath(avatarUrl);
       
       // Update user avatar in database
-      const updatedUser = await storage.updateUserAvatar(userId, normalizedPath);
+      const updatedUser = await storage.updateUserAvatar(parseInt(userId), normalizedPath);
 
       res.json({ 
         success: true,
@@ -544,19 +592,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Serve uploaded objects
-  app.get("/objects/:objectPath(*)", async (req, res) => {
-    const objectPath = `/objects/${req.params.objectPath}`;
-    
+  // Serve avatar images
+  app.get("/avatars/:filename", async (req, res) => {
     try {
-      const objectFile = await objectStorageService.getObjectEntityFile(objectPath);
-      await objectStorageService.downloadObject(objectFile, res);
+      const { filename } = req.params;
+      const avatarsDir = path.join(process.cwd(), 'uploads', 'avatars');
+      const filePath = path.join(avatarsDir, filename);
+      
+      await objectStorageService.downloadObject(filePath, res);
     } catch (error) {
-      console.error("Error serving object:", error);
+      console.error("Error serving avatar:", error);
       if (error.name === "ObjectNotFoundError") {
-        return res.status(404).json({ error: "Arquivo não encontrado" });
+        return res.status(404).json({ error: "Avatar não encontrado" });
       }
-      res.status(500).json({ error: "Erro ao servir arquivo" });
+      res.status(500).json({ error: "Erro ao servir avatar" });
     }
   });
 

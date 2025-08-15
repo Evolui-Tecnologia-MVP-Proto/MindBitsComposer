@@ -1,5 +1,7 @@
 import { Response } from "express";
 import { randomUUID } from "crypto";
+import path from "path";
+import fs from "fs";
 
 const REPLIT_SIDECAR_ENDPOINT = "http://127.0.0.1:1106";
 
@@ -54,64 +56,98 @@ export class ObjectStorageService {
   }
 
   // Downloads an object to the response.
-  async downloadObject(file: any, res: Response, cacheTtlSec: number = 3600) {
-    // Simplified implementation for avatar upload functionality
-    res.status(404).json({ error: "File not found" });
+  async downloadObject(filePath: string, res: Response, cacheTtlSec: number = 3600) {
+    try {
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).json({ error: "File not found" });
+      }
+
+      const stats = fs.statSync(filePath);
+      const ext = path.extname(filePath).toLowerCase();
+      
+      // Set appropriate headers
+      let contentType = "application/octet-stream";
+      switch (ext) {
+        case '.jpg':
+        case '.jpeg':
+          contentType = 'image/jpeg';
+          break;
+        case '.png':
+          contentType = 'image/png';
+          break;
+        case '.gif':
+          contentType = 'image/gif';
+          break;
+        case '.webp':
+          contentType = 'image/webp';
+          break;
+      }
+
+      res.set({
+        "Content-Type": contentType,
+        "Content-Length": stats.size.toString(),
+        "Cache-Control": `public, max-age=${cacheTtlSec}`,
+      });
+
+      // Stream the file
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+      
+    } catch (error) {
+      console.error("Error downloading file:", error);
+      res.status(500).json({ error: "Error downloading file" });
+    }
   }
 
   // Gets the upload URL for an object entity.
   async getObjectEntityUploadURL(): Promise<string> {
-    const privateObjectDir = this.getPrivateObjectDir();
-    if (!privateObjectDir) {
-      throw new Error(
-        "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
-          "tool and set PRIVATE_OBJECT_DIR env var."
-      );
-    }
-
+    // Generate unique filename for local storage
     const objectId = randomUUID();
-    const fullPath = `${privateObjectDir}/uploads/${objectId}`;
-
-    const { bucketName, objectName } = parseObjectPath(fullPath);
-
-    // Sign URL for PUT method with TTL
-    return signObjectURL({
-      bucketName,
-      objectName,
-      method: "PUT",
-      ttlSec: 900,
-    });
+    
+    // Create avatars directory if it doesn't exist
+    const avatarsDir = path.join(process.cwd(), 'uploads', 'avatars');
+    if (!fs.existsSync(avatarsDir)) {
+      fs.mkdirSync(avatarsDir, { recursive: true });
+    }
+    
+    // Return a local endpoint for upload
+    return `/api/upload/avatar/${objectId}`;
   }
 
   // Gets the object entity file from the object path.
-  async getObjectEntityFile(objectPath: string): Promise<any> {
-    // Simplified implementation for avatar upload functionality
-    throw new ObjectNotFoundError();
+  async getObjectEntityFile(objectPath: string): Promise<string> {
+    // Extract filename from object path
+    const parts = objectPath.split('/');
+    const filename = parts[parts.length - 1];
+    
+    const avatarsDir = path.join(process.cwd(), 'uploads', 'avatars');
+    const filePath = path.join(avatarsDir, filename);
+    
+    if (!fs.existsSync(filePath)) {
+      throw new ObjectNotFoundError();
+    }
+    
+    return filePath;
   }
 
   normalizeObjectEntityPath(
     rawPath: string,
   ): string {
-    if (!rawPath.startsWith("https://storage.googleapis.com/")) {
+    // If it's already a local path, return as is
+    if (rawPath.startsWith('/avatars/') || rawPath.startsWith('/objects/')) {
       return rawPath;
     }
-  
-    // Extract the path from the URL by removing query parameters and domain
-    const url = new URL(rawPath);
-    const rawObjectPath = url.pathname;
-  
-    let objectEntityDir = this.getPrivateObjectDir();
-    if (!objectEntityDir.endsWith("/")) {
-      objectEntityDir = `${objectEntityDir}/`;
+    
+    // If it's an upload endpoint path, convert to object path
+    if (rawPath.startsWith('/api/upload/avatar/')) {
+      const filename = rawPath.split('/').pop();
+      return `/avatars/${filename}`;
     }
-  
-    if (!rawObjectPath.startsWith(objectEntityDir)) {
-      return rawObjectPath;
-    }
-  
-    // Extract the entity ID from the path
-    const entityId = rawObjectPath.slice(objectEntityDir.length);
-    return `/objects/${entityId}`;
+    
+    // For any other format, try to extract filename
+    const parts = rawPath.split('/');
+    const filename = parts[parts.length - 1];
+    return `/avatars/${filename}`;
   }
 
   // Tries to set the ACL policy for the object entity and return the normalized path.
