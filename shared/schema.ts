@@ -558,3 +558,24 @@ export const insertSystemParamSchema = createInsertSchema(systemParams).omit({
 
 export type InsertSystemParam = z.infer<typeof insertSystemParamSchema>;
 export type SystemParam = typeof systemParams.$inferSelect;
+
+// User Roles table
+export const userRoles = pgTable("user_roles", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  active: boolean("active").notNull().default(true),
+  access: json("access").default({}),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User Roles schema
+export const insertUserRoleSchema = createInsertSchema(userRoles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertUserRole = z.infer<typeof insertUserRoleSchema>;
+export type UserRole = typeof userRoles.$inferSelect;

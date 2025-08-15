@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, templates, specialties, insertSpecialtySchema, systemParams, insertSystemParamSchema, flowActions, serviceConnections, plugins } from "@shared/schema";
+import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, templates, specialties, insertSpecialtySchema, systemParams, insertSystemParamSchema, flowActions, serviceConnections, plugins, userRoles, insertUserRoleSchema } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc, asc, and, gte, lte, isNull, or, ne, inArray } from "drizzle-orm";
@@ -7652,6 +7652,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("❌ [API] Erro ao buscar tabela genérica:", error);
       res.status(500).send("Erro ao buscar tabela genérica");
+    }
+  });
+
+  // User Roles routes
+  app.get("/api/user-roles", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const userRoles = await storage.getAllUserRoles();
+      res.json(userRoles);
+    } catch (error) {
+      console.error("Erro ao buscar user roles:", error);
+      res.status(500).send("Erro ao buscar user roles");
+    }
+  });
+
+  app.post("/api/user-roles", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const validatedData = insertUserRoleSchema.parse(req.body);
+      const userRole = await storage.createUserRole(validatedData);
+      res.json(userRole);
+    } catch (error) {
+      console.error("Erro ao criar user role:", error);
+      res.status(500).send("Erro ao criar user role");
+    }
+  });
+
+  app.put("/api/user-roles/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const id = parseInt(req.params.id);
+      const validatedData = insertUserRoleSchema.partial().parse(req.body);
+      const userRole = await storage.updateUserRole(id, validatedData);
+      res.json(userRole);
+    } catch (error) {
+      console.error("Erro ao atualizar user role:", error);
+      res.status(500).send("Erro ao atualizar user role");
+    }
+  });
+
+  app.delete("/api/user-roles/:id", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteUserRole(id);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Erro ao excluir user role:", error);
+      res.status(500).send("Erro ao excluir user role");
     }
   });
 

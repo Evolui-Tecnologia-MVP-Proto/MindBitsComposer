@@ -55,6 +55,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import UserTable from "@/components/UserTable";
+import { UserRolesTab } from "@/components/UserRolesTab";
 import { queryClient } from "@/lib/queryClient";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -1478,10 +1479,14 @@ export default function AdminPage() {
         </div>
         
         <Tabs defaultValue="usuarios" className="w-full mt-6">
-          <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-[#0F172A]">
+          <TabsList className="grid w-full grid-cols-6 bg-gray-100 dark:bg-[#0F172A]">
             <TabsTrigger value="usuarios" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
               <Users className="h-4 w-4 mr-2" />
               Usuários
+            </TabsTrigger>
+            <TabsTrigger value="user-roles" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
+              <Key className="h-4 w-4 mr-2" />
+              User Roles
             </TabsTrigger>
             <TabsTrigger value="monday" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
               <CalendarDays className="h-4 w-4 mr-2" />
@@ -1504,6 +1509,10 @@ export default function AdminPage() {
           <TabsContent value="usuarios" className="slide-in mt-6">
             {/* Conteúdo da aba de usuários */}
             <UserTable />
+          </TabsContent>
+
+          <TabsContent value="user-roles" className="slide-in mt-6">
+            <UserRolesTab />
           </TabsContent>
           
           <TabsContent value="monday" className="slide-in mt-6">
