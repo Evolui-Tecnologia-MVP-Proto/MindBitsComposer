@@ -525,7 +525,7 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
           </div>
         </DialogHeader>
         
-        <div className="flex-1 overflow-y-auto border-t border-gray-200 dark:border-[#374151] mt-4 pt-4">
+        <div className="flex-1 overflow-y-auto border-t border-gray-200 dark:border-[#374151] mt-4 pt-4 bg-white dark:bg-[#0A0A0B]">
           <div className={`markdown-preview markdown-content prose prose-gray dark:prose-invert max-w-none`}>
             <style dangerouslySetInnerHTML={{
               __html: `
@@ -589,6 +589,72 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                 .dark .markdown-preview details > *:not(summary) {
                   background-color: #020203 !important;
                   color: #FFFFFF !important;
+                }
+                /* Force list bullets and numbers to follow theme colors */
+                .markdown-preview ul li::marker,
+                .markdown-preview ol li::marker {
+                  color: #000000 !important;
+                }
+                .dark .markdown-preview ul li::marker,
+                .dark .markdown-preview ol li::marker {
+                  color: #FFFFFF !important;
+                }
+                /* Ensure list items and their content follow theme */
+                .markdown-preview ul,
+                .markdown-preview ol,
+                .markdown-preview ul li,
+                .markdown-preview ol li {
+                  color: #000000 !important;
+                }
+                .dark .markdown-preview ul,
+                .dark .markdown-preview ol,
+                .dark .markdown-preview ul li,
+                .dark .markdown-preview ol li {
+                  color: #FFFFFF !important;
+                }
+                /* Force nested lists to maintain colors */
+                .markdown-preview ul ul,
+                .markdown-preview ul ol,
+                .markdown-preview ol ul,
+                .markdown-preview ol ol,
+                .markdown-preview ul ul li,
+                .markdown-preview ul ol li,
+                .markdown-preview ol ul li,
+                .markdown-preview ol ol li {
+                  color: #000000 !important;
+                }
+                .dark .markdown-preview ul ul,
+                .dark .markdown-preview ul ol,
+                .dark .markdown-preview ol ul,
+                .dark .markdown-preview ol ol,
+                .dark .markdown-preview ul ul li,
+                .dark .markdown-preview ul ol li,
+                .dark .markdown-preview ol ul li,
+                .dark .markdown-preview ol ol li {
+                  color: #FFFFFF !important;
+                }
+                /* HTML Table Styling for dangerouslySetInnerHTML tables */
+                .table-html-container table {
+                  width: 100% !important;
+                  border-collapse: collapse !important;
+                  border: 1px solid #d1d5db !important;
+                  border-radius: 8px !important;
+                  overflow: hidden !important;
+                }
+                .dark .table-html-container table {
+                  border: 1px solid #374151 !important;
+                }
+                .table-html-container tbody {
+                  border: none !important;
+                }
+                .table-html-container tr {
+                  border: none !important;
+                }
+                .table-html-container tr:hover {
+                  background-color: #f9fafb !important;
+                }
+                .dark .table-html-container tr:hover {
+                  background-color: #1e293b !important;
                 }
                 /* Ensure proper styling for code blocks inside details */
                 .markdown-preview details pre {
