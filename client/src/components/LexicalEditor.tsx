@@ -1603,30 +1603,22 @@ function SectionRefreshPlugin({ mdFileOld }: { mdFileOld?: string }): null {
 }
 
 // Plugin para adicionar botões de refresh aos containers existentes
-function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; viewMode?: 'editor' | 'preview' | 'mdx' }): null {
+function RefreshButtonsPlugin({ mdFileOld }: { mdFileOld?: string }): null {
   const [editor] = useLexicalComposerContext();
 
   React.useEffect(() => {
-    console.log('🔄 RefreshButtonsPlugin: ==================== INICIANDO PLUGIN ====================');
-    console.log('🔄 RefreshButtonsPlugin: mdFileOld disponível:', !!mdFileOld);
-    console.log('🔄 RefreshButtonsPlugin: viewMode:', viewMode);
-    console.log('🔄 RefreshButtonsPlugin: editor:', !!editor);
+    console.log('🔄 RefreshButtonsPlugin: Iniciando plugin, mdFileOld disponível:', !!mdFileOld);
     
     if (!mdFileOld) {
       console.log('❌ RefreshButtonsPlugin: Sem mdFileOld, pulando execução');
       return;
     }
 
-    // Executar apenas se temos mdFileOld
-    console.log('🔄 RefreshButtonsPlugin: Continuando execução com todos os requisitos atendidos...');
-
     // Função para adicionar botões
     const addRefreshButtons = () => {
-      console.log('🔄 RefreshButtonsPlugin: ========== INICIANDO addRefreshButtons ==========');
+      console.log('🔄 RefreshButtonsPlugin: Executando addRefreshButtons');
       
       const editorElement = editor.getRootElement();
-      console.log('🔄 RefreshButtonsPlugin: editorElement encontrado:', !!editorElement);
-      
       if (!editorElement) {
         console.log('❌ RefreshButtonsPlugin: Editor element não encontrado');
         return;
@@ -1634,22 +1626,16 @@ function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; vie
 
       // Encontrar todos os containers collapsible
       const allContainers = editorElement.querySelectorAll('.Collapsible__container');
-      console.log(`🔄 RefreshButtonsPlugin: Total de containers .Collapsible__container: ${allContainers.length}`);
-      
-      // Log dos containers encontrados
-      allContainers.forEach((container, index) => {
-        const hasFromToolbar = container.hasAttribute('data-from-toolbar');
-        const summaryText = container.querySelector('summary')?.textContent || 'SEM TÍTULO';
-        console.log(`🔄 RefreshButtonsPlugin: Container ${index + 1}: "${summaryText}" - data-from-toolbar: ${hasFromToolbar}`);
-      });
+      console.log(`🔄 RefreshButtonsPlugin: Encontrados ${allContainers.length} containers collapsible total`);
 
       // Filtrar containers que NÃO são de toolbar (containers de template)
       const templateContainers = Array.from(allContainers).filter(container => {
         const hasFromToolbar = container.hasAttribute('data-from-toolbar');
+        console.log(`🔄 RefreshButtonsPlugin: Container tem data-from-toolbar: ${hasFromToolbar}`);
         return !hasFromToolbar;
       });
 
-      console.log(`🔄 RefreshButtonsPlugin: Containers de template (sem data-from-toolbar): ${templateContainers.length}`);
+      console.log(`🔄 RefreshButtonsPlugin: Encontrados ${templateContainers.length} containers de template`);
 
       templateContainers.forEach((container, index) => {
         const summaryElement = container.querySelector('summary');
@@ -1665,7 +1651,7 @@ function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; vie
           return;
         }
 
-        console.log(`🔄 RefreshButtonsPlugin: Adicionando botão ao container ${index + 1} - "${summaryElement.textContent}"`);
+        console.log(`🔄 RefreshButtonsPlugin: Adicionando botão ao container ${index + 1}`);
 
         // Encontrar ou criar container direito
         let rightContainer = summaryElement.querySelector('div:last-child');
@@ -1729,63 +1715,18 @@ function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; vie
     };
 
     // Executar imediatamente e depois com timeout para casos de renderização tardia
-    console.log('🔄 RefreshButtonsPlugin: Executando addRefreshButtons imediatamente...');
     addRefreshButtons();
     
-    console.log('🔄 RefreshButtonsPlugin: Agendando execuções com timeout...');
-    const timeoutId1 = setTimeout(() => {
-      console.log('🔄 RefreshButtonsPlugin: Executando após 200ms...');
-      addRefreshButtons();
-    }, 200);
-    const timeoutId2 = setTimeout(() => {
-      console.log('🔄 RefreshButtonsPlugin: Executando após 500ms...');
-      addRefreshButtons();
-    }, 500);
-    const timeoutId3 = setTimeout(() => {
-      console.log('🔄 RefreshButtonsPlugin: Executando após 1000ms...');
-      addRefreshButtons();
-    }, 1000);
-
-    // Configurar MutationObserver para detectar mudanças no DOM
-    const editorElement = editor.getRootElement();
-    let observer: MutationObserver | null = null;
-    
-    if (editorElement) {
-      observer = new MutationObserver((mutations) => {
-        // Verificar se houve mudanças relevantes (adição/remoção de containers)
-        const hasRelevantChanges = mutations.some(mutation => {
-          return mutation.type === 'childList' && (
-            Array.from(mutation.addedNodes).some(node => 
-              node instanceof HTMLElement && node.classList?.contains('Collapsible__container')
-            ) ||
-            Array.from(mutation.removedNodes).some(node => 
-              node instanceof HTMLElement && node.classList?.contains('Collapsible__container')
-            )
-          );
-        });
-
-        if (hasRelevantChanges) {
-          console.log('🔄 RefreshButtonsPlugin: DOM mudou, re-executando addRefreshButtons');
-          // Usar timeout pequeno para aguardar DOM estabilizar
-          setTimeout(addRefreshButtons, 100);
-        }
-      });
-
-      observer.observe(editorElement, {
-        childList: true,
-        subtree: true
-      });
-    }
+    const timeoutId1 = setTimeout(addRefreshButtons, 200);
+    const timeoutId2 = setTimeout(addRefreshButtons, 500);
+    const timeoutId3 = setTimeout(addRefreshButtons, 1000);
 
     return () => {
       clearTimeout(timeoutId1);
       clearTimeout(timeoutId2);
       clearTimeout(timeoutId3);
-      if (observer) {
-        observer.disconnect();
-      }
     };
-  }, [editor, mdFileOld, viewMode]); // Adicionar viewMode como dependência
+  }, [editor, mdFileOld]);
 
   return null;
 }
@@ -3033,7 +2974,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <ImageIdAutoConvertPlugin />
           <TemplateSectionsPlugin sections={templateSections} mdFileOld={mdFileOld} />
           <SectionRefreshPlugin mdFileOld={mdFileOld} />
-          <RefreshButtonsPlugin mdFileOld={mdFileOld} viewMode={viewMode} />
+          <RefreshButtonsPlugin mdFileOld={mdFileOld} />
           <EditProtectionPlugin />
           <HeaderFieldMappingPlugin templateMappings={templateMappings} documentData={documentData} />
           <CodeLineNumberPlugin />
