@@ -1603,7 +1603,7 @@ function SectionRefreshPlugin({ mdFileOld }: { mdFileOld?: string }): null {
 }
 
 // Plugin para adicionar botões de refresh aos containers existentes
-function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; viewMode?: 'edit' | 'preview' }): null {
+function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; viewMode?: 'editor' | 'preview' | 'mdx' }): null {
   const [editor] = useLexicalComposerContext();
 
   React.useEffect(() => {
@@ -1611,6 +1611,12 @@ function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; vie
     
     if (!mdFileOld) {
       console.log('❌ RefreshButtonsPlugin: Sem mdFileOld, pulando execução');
+      return;
+    }
+
+    // Só executar no modo editor
+    if (viewMode !== 'editor') {
+      console.log('🔄 RefreshButtonsPlugin: Não está no modo editor, pulando execução. ViewMode atual:', viewMode);
       return;
     }
 
