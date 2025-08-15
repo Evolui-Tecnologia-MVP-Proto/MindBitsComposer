@@ -240,10 +240,27 @@ export default function LexicalPage() {
     enabled: !!selectedEdition?.id
   });
 
-  // Query para buscar global assets
+  // Query para buscar parâmetro ENABLE_GLOBAL_ASSETS
+  const { data: globalAssetsParam } = useQuery({
+    queryKey: ['/api/system-params', 'ENABLE_GLOBAL_ASSETS'],
+    queryFn: async () => {
+      const response = await fetch('/api/system-params/ENABLE_GLOBAL_ASSETS');
+      if (!response.ok) {
+        // Se o parâmetro não existe, assumir false por padrão
+        if (response.status === 404) return { paramValue: 'FALSE' };
+        throw new Error('Erro ao buscar parâmetro ENABLE_GLOBAL_ASSETS');
+      }
+      return response.json();
+    },
+  });
+
+  // Verificar se Global Assets está habilitado
+  const isGlobalAssetsEnabled = globalAssetsParam?.paramValue?.toUpperCase() === 'TRUE';
+
+  // Query para buscar global assets (apenas se habilitado)
   const { data: globalAssets = [], isLoading: isLoadingGlobalAssets } = useQuery<GlobalAsset[]>({
     queryKey: ['/api/global-assets'],
-    enabled: showAttachments,
+    enabled: showAttachments && isGlobalAssetsEnabled,
   });
 
   // Query para buscar plugins ativos - sempre ativa para mostrar seletor quando editor está vazio
@@ -2318,8 +2335,9 @@ export default function LexicalPage() {
             {/* Área de conteúdo com scroll */}
             <div className="flex-1 overflow-y-auto p-4">
               <Accordion type="multiple" className="w-full space-y-2">
-                {/* Global Assets */}
-                <AccordionItem value="global-assets" className="border rounded-lg bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151]">
+                {/* Global Assets - apenas se habilitado */}
+                {isGlobalAssetsEnabled && (
+                  <AccordionItem value="global-assets" className="border rounded-lg bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151]">
                   <AccordionTrigger className="px-4 py-3 hover:no-underline dark:text-[#E5E7EB]">
                     <div className="flex items-center justify-between w-full pr-2">
                       <div className="flex items-center gap-2">
@@ -2435,6 +2453,7 @@ export default function LexicalPage() {
                     </div>
                   </AccordionContent>
                 </AccordionItem>
+                )}
 
                 {/* My Assets */}
                 {selectedEdition && (
