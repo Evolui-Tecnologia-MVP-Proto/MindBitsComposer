@@ -2131,6 +2131,7 @@ export function DocsProcessEmbed({
             getDynamicFormData={getDynamicFormData}
             renderDynamicForm={renderDynamicForm}
             checkUserAccessToNode={checkUserAccessToNode}
+            currentDocumentEditions={currentDocumentEditions}
             onFlowReady={(actions: { fitView: () => void; getViewport: () => any }) => {
               console.log("🔗 onFlowReady chamado com ações:", actions);
               flowActionsRef.current = actions;
@@ -2320,6 +2321,7 @@ function FlowWithAutoFitView({
   getDynamicFormData,
   renderDynamicForm,
   checkUserAccessToNode,
+  currentDocumentEditions,
   onFlowReady
 }: any) {
     console.log("🔥 FlowWithAutoFitView EXECUTADO - props recebidas:", {
