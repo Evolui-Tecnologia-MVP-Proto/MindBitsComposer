@@ -105,6 +105,8 @@ export function DocumentosTable({
         if (editions && editions.length > 0) {
           // Pegar a edição mais recente
           const latestEdition = editions[0];
+          console.log('DEBUG - latestEdition:', latestEdition);
+          console.log('DEBUG - mdFileOld:', latestEdition.mdFileOld);
           setMdModal({
             isOpen: true,
             document: {
