@@ -502,7 +502,7 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
           <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-200 dark:border-[#374151]">
             {!hasOriginal && (
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Este documento não possui versão original salva
+                Documento em versão única, ou com processo de revisão ainda não iniciado
               </p>
             )}
             {hasOriginal && (
