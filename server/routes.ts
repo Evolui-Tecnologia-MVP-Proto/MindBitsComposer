@@ -7241,14 +7241,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           eq(documentEditions.status, 'refact'),
           eq(documentEditions.status, 'ready_to_next'),
           eq(documentEditions.status, 'published'),
-          eq(documentEditions.status, 'to_refact')
+          eq(documentEditions.status, 'to_refact'),
+          eq(documentEditions.status, 'to_discart')
         ),
         eq(documentEditions.startedBy, req.user.id)
       ))
       .orderBy(desc(documentEditions.updatedAt));
       
       console.log(`🔍 [API] Buscando document_editions para biblioteca do usuário: ${req.user.id}`);
-      console.log(`🔍 [API] Status permitidos: in_progress, done, editing, refact, ready_to_next, published, to_refact`);
+      console.log(`🔍 [API] Status permitidos: in_progress, done, editing, refact, ready_to_next, published, to_refact, to_discart`);
       
       // Debug: log específico para to_refact
       const toRefactEditions = libraryEditions.filter(e => e.status === 'to_refact');
