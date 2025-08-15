@@ -98,15 +98,13 @@ export function DocumentosTable({
   // Handler para abrir modal MD
   const handleOpenMdModal = async (documento: Documento) => {
     try {
-      // Buscar dados das edições do documento para obter md_file e md_file_old
-      const response = await fetch(`/api/document-editions?documentId=${documento.id}`);
+      // Usar o endpoint correto para buscar edições por documentId
+      const response = await fetch(`/api/documents/${documento.id}/editions`);
       if (response.ok) {
         const editions = await response.json();
         if (editions && editions.length > 0) {
           // Pegar a edição mais recente
           const latestEdition = editions[0];
-          console.log('DEBUG - latestEdition:', latestEdition);
-          console.log('DEBUG - mdFileOld:', latestEdition.mdFileOld);
           setMdModal({
             isOpen: true,
             document: {

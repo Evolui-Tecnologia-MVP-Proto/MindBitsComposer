@@ -374,11 +374,6 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
 
   const currentContent = showOriginal ? document.md_file_old : document.md_file;
   const hasOriginal = document.md_file_old && document.md_file_old.trim() !== '';
-  
-  console.log('DEBUG - DocumentMdModal document:', document);
-  console.log('DEBUG - md_file_old:', document.md_file_old);
-  console.log('DEBUG - hasOriginal:', hasOriginal);
-  console.log('DEBUG - trimmed length:', document.md_file_old?.trim().length);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
