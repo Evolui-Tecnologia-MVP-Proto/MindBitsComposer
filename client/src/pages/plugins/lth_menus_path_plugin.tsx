@@ -1029,7 +1029,18 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   const getFormattedPathForSave = (selectedId: string): string => {
     const findPathRecursively = (items: MenuPath[], targetId: string, currentPath: string[] = []): string[] | null => {
       for (const item of items) {
-        const newPath = [...currentPath, item.label];
+        // Transformar o label para o novo formato: [código]-nome (sem espaços nos hífens)
+        let formattedLabel = item.label;
+        
+        // Detectar padrão "código - nome" e transformar para "[código]-nome"
+        const match = formattedLabel.match(/^(\d+)\s*-\s*(.+)$/);
+        if (match) {
+          const code = match[1];
+          const name = match[2].replace(/\s*-\s*/g, '-'); // Remove espaços ao redor dos hífens
+          formattedLabel = `[${code}]-${name}`;
+        }
+        
+        const newPath = [...currentPath, formattedLabel];
         
         if (item.id === targetId) {
           return newPath;
@@ -1046,7 +1057,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
     const pathArray = findPathRecursively(menuStructure, selectedId);
     if (!pathArray) return '';
 
-    // Retornar apenas o path sem duplicar o nome do subsystem
+    // Retornar apenas o path formatado
     const pathString = pathArray.join(' -> ');
     
     return pathString;
