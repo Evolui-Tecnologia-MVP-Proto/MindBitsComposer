@@ -191,6 +191,79 @@ export class CollapsibleTitleNode extends TextNode {
       }
     }
 
+    // Verificar se precisa adicionar botão de refresh (caso não exista ainda)
+    const existingRefreshButton = dom.querySelector('.refresh-section-btn');
+    if (!existingRefreshButton) {
+      console.log('🔍 RefreshButton (updateDOM): Verificando se precisa adicionar botão para:', this.getTextContent());
+      
+      // Encontrar o container pai CollapsibleContainerNode
+      const parentDetails = dom.closest('.Collapsible__container');
+      console.log('🔍 RefreshButton (updateDOM): Parent details encontrado:', !!parentDetails);
+      
+      if (parentDetails) {
+        // Verificar se é um container de template (não inserido via toolbar)
+        const hasFromToolbarAttr = parentDetails.hasAttribute('data-from-toolbar');
+        console.log('🔍 RefreshButton (updateDOM): Has data-from-toolbar:', hasFromToolbarAttr);
+        
+        const isFromTemplate = !hasFromToolbarAttr;
+        console.log('🔍 RefreshButton (updateDOM): É container de template?', isFromTemplate);
+        
+        if (isFromTemplate) {
+          console.log('✅ RefreshButton (updateDOM): Criando botão de refresh para:', this.getTextContent());
+          
+          // Encontrar ou criar container direito
+          let rightContainer = dom.querySelector('div:last-child');
+          if (!rightContainer || !rightContainer.classList.contains('flex')) {
+            rightContainer = document.createElement('div');
+            rightContainer.classList.add('flex', 'items-center', 'gap-1');
+            dom.appendChild(rightContainer);
+          }
+          
+          // Criar botão de refresh
+          const refreshButton = document.createElement('button');
+          refreshButton.classList.add(
+            'refresh-section-btn',
+            'ml-2',
+            'p-1',
+            'rounded',
+            'hover:bg-gray-200',
+            'dark:hover:bg-gray-600',
+            'transition-colors',
+            'opacity-70',
+            'hover:opacity-100'
+          );
+          refreshButton.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+              <path d="M3 3v5h5"/>
+              <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+              <path d="M21 21v-5h-5"/>
+            </svg>
+          `;
+          refreshButton.title = 'Recarregar conteúdo original desta seção';
+          
+          // Adicionar event listener para o refresh
+          refreshButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('🔄 RefreshButton (updateDOM): Clicado para seção:', this.getTextContent());
+            
+            // Disparar evento customizado para recarregar seção
+            const sectionTitle = this.getTextContent();
+            const refreshEvent = new CustomEvent('refreshSectionContent', {
+              detail: { sectionTitle },
+              bubbles: true
+            });
+            dom.dispatchEvent(refreshEvent);
+          });
+          
+          rightContainer.appendChild(refreshButton);
+          console.log('✅ RefreshButton (updateDOM): Botão adicionado com sucesso');
+        }
+      }
+    }
+
     return false;
   }
 

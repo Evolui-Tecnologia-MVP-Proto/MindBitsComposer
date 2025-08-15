@@ -1602,6 +1602,98 @@ function SectionRefreshPlugin({ mdFileOld }: { mdFileOld?: string }): null {
   return null;
 }
 
+// Plugin para adicionar botões de refresh aos containers existentes
+function RefreshButtonsPlugin({ mdFileOld }: { mdFileOld?: string }): null {
+  const [editor] = useLexicalComposerContext();
+
+  React.useEffect(() => {
+    if (!mdFileOld) return;
+
+    // Aguardar um pouco para garantir que o template foi carregado
+    const timeoutId = setTimeout(() => {
+      console.log('🔄 RefreshButtonsPlugin: Adicionando botões aos containers existentes');
+      
+      const editorElement = editor.getRootElement();
+      if (!editorElement) return;
+
+      // Encontrar todos os containers de template (sem data-from-toolbar)
+      const allContainers = editorElement.querySelectorAll('.Collapsible__container:not([data-from-toolbar])');
+      console.log(`🔄 RefreshButtonsPlugin: Encontrados ${allContainers.length} containers de template`);
+
+      allContainers.forEach((container, index) => {
+        const summaryElement = container.querySelector('summary');
+        if (!summaryElement) return;
+
+        // Verificar se já tem botão de refresh
+        const existingButton = summaryElement.querySelector('.refresh-section-btn');
+        if (existingButton) {
+          console.log(`🔄 RefreshButtonsPlugin: Container ${index + 1} já tem botão de refresh`);
+          return;
+        }
+
+        console.log(`🔄 RefreshButtonsPlugin: Adicionando botão ao container ${index + 1}`);
+
+        // Encontrar ou criar container direito
+        let rightContainer = summaryElement.querySelector('div:last-child');
+        if (!rightContainer || !rightContainer.classList.contains('flex')) {
+          rightContainer = document.createElement('div');
+          rightContainer.classList.add('flex', 'items-center', 'gap-1');
+          summaryElement.appendChild(rightContainer);
+        }
+
+        // Criar botão de refresh
+        const refreshButton = document.createElement('button');
+        refreshButton.classList.add(
+          'refresh-section-btn',
+          'ml-2',
+          'p-1',
+          'rounded',
+          'hover:bg-gray-200',
+          'dark:hover:bg-gray-600',
+          'transition-colors',
+          'opacity-70',
+          'hover:opacity-100'
+        );
+        refreshButton.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+            <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+            <path d="M21 21v-5h-5"/>
+          </svg>
+        `;
+        refreshButton.title = 'Recarregar conteúdo original desta seção';
+
+        // Adicionar event listener para o refresh
+        refreshButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+
+          // Encontrar o título da seção
+          const titleSpan = summaryElement.querySelector('span:last-child');
+          const sectionTitle = titleSpan ? titleSpan.textContent : '';
+          
+          console.log('🔄 RefreshButtonsPlugin: Clicado para seção:', sectionTitle);
+
+          // Disparar evento customizado para recarregar seção
+          const refreshEvent = new CustomEvent('refreshSectionContent', {
+            detail: { sectionTitle },
+            bubbles: true
+          });
+          summaryElement.dispatchEvent(refreshEvent);
+        });
+
+        rightContainer.appendChild(refreshButton);
+        console.log(`✅ RefreshButtonsPlugin: Botão adicionado ao container ${index + 1}`);
+      });
+    }, 500); // Aguardar 500ms após o template ser carregado
+
+    return () => clearTimeout(timeoutId);
+  }, [editor, mdFileOld]);
+
+  return null;
+}
+
 // Plugin para enriquecer HeaderFieldNodes com informações de mapeamento
 function HeaderFieldMappingPlugin({ templateMappings, documentData }: { templateMappings?: any; documentData?: any }): null {
   const [editor] = useLexicalComposerContext();
@@ -2845,6 +2937,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <ImageIdAutoConvertPlugin />
           <TemplateSectionsPlugin sections={templateSections} mdFileOld={mdFileOld} />
           <SectionRefreshPlugin mdFileOld={mdFileOld} />
+          <RefreshButtonsPlugin mdFileOld={mdFileOld} />
           <EditProtectionPlugin />
           <HeaderFieldMappingPlugin templateMappings={templateMappings} documentData={documentData} />
           <CodeLineNumberPlugin />
