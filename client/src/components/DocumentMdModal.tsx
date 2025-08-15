@@ -570,20 +570,8 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                   border: 1px solid #FFFFFF !important;
                   border-color: #FFFFFF !important;
                   padding: 12px 16px !important;
-                }
-                
-                /* Ensure empty cells don't show excess black space */
-                .md-modal-content.markdown-preview td:empty,
-                .md-modal-content .markdown-preview td:empty {
-                  min-height: 20px !important;
-                  height: auto !important;
-                }
-                
-                /* Handle cells with only whitespace */
-                .md-modal-content.markdown-preview td:empty::after,
-                .md-modal-content .markdown-preview td:empty::after {
-                  content: '\\u00A0' !important;
-                  color: transparent !important;
+                  min-height: 48px !important;
+                  vertical-align: top !important;
                 }
                 
                 .md-modal-content.markdown-preview tr:hover,
@@ -751,17 +739,7 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                   color: #FFFFFF !important;
                   padding: 12px !important;
                   vertical-align: top !important;
-                }
-                
-                /* Empty cells in HTML tables */
-                .md-modal-content .table-html-container td:empty {
-                  min-height: 20px !important;
-                  height: auto !important;
-                }
-                
-                .md-modal-content .table-html-container td:empty::after {
-                  content: '\\u00A0' !important;
-                  color: transparent !important;
+                  min-height: 48px !important;
                 }
                 /* Ensure proper styling for code blocks inside details */
                 .markdown-preview details pre {
