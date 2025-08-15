@@ -1603,14 +1603,20 @@ function SectionRefreshPlugin({ mdFileOld }: { mdFileOld?: string }): null {
 }
 
 // Plugin para adicionar botões de refresh aos containers existentes
-function RefreshButtonsPlugin({ mdFileOld }: { mdFileOld?: string }): null {
+function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; viewMode?: string }): null {
   const [editor] = useLexicalComposerContext();
 
   React.useEffect(() => {
-    console.log('🔄 RefreshButtonsPlugin: Iniciando plugin, mdFileOld disponível:', !!mdFileOld);
+    console.log('🔄 RefreshButtonsPlugin: Iniciando plugin, mdFileOld disponível:', !!mdFileOld, 'viewMode:', viewMode);
     
     if (!mdFileOld) {
       console.log('❌ RefreshButtonsPlugin: Sem mdFileOld, pulando execução');
+      return;
+    }
+
+    // Só executar quando estiver no modo editor
+    if (viewMode && viewMode !== 'editor') {
+      console.log('❌ RefreshButtonsPlugin: Não está no modo editor, pulando execução');
       return;
     }
 
@@ -1726,7 +1732,7 @@ function RefreshButtonsPlugin({ mdFileOld }: { mdFileOld?: string }): null {
       clearTimeout(timeoutId2);
       clearTimeout(timeoutId3);
     };
-  }, [editor, mdFileOld]);
+  }, [editor, mdFileOld, viewMode]);
 
   return null;
 }
@@ -2974,7 +2980,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <ImageIdAutoConvertPlugin />
           <TemplateSectionsPlugin sections={templateSections} mdFileOld={mdFileOld} />
           <SectionRefreshPlugin mdFileOld={mdFileOld} />
-          <RefreshButtonsPlugin mdFileOld={mdFileOld} />
+          <RefreshButtonsPlugin mdFileOld={mdFileOld} viewMode={viewMode} />
           <EditProtectionPlugin />
           <HeaderFieldMappingPlugin templateMappings={templateMappings} documentData={documentData} />
           <CodeLineNumberPlugin />
