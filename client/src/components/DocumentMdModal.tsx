@@ -529,49 +529,65 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
           <div className={`md-modal-content markdown-preview markdown-content prose prose-gray dark:prose-invert max-w-none`}>
             <style dangerouslySetInnerHTML={{
               __html: `
-                /* Specific styles for tables ONLY in MD modal - High specificity */
+                /* Apply EXACTLY the same table styling as Lexical editor to MD modal */
                 .md-modal-content.markdown-preview table,
                 .md-modal-content .markdown-preview table {
-                  border-collapse: collapse !important;
-                  border: 2px solid #ffffff !important;
+                  background-color: #020203 !important;
+                  background: #020203 !important;
+                  border: 2px solid #FFFFFF !important;
+                  border-collapse: separate !important;
+                  border-spacing: 0 !important;
                   border-radius: 8px !important;
                   overflow: hidden !important;
-                  background-color: #000000 !important;
                 }
                 
                 .md-modal-content.markdown-preview thead,
                 .md-modal-content .markdown-preview thead,
                 .md-modal-content.markdown-preview tbody,
                 .md-modal-content .markdown-preview tbody {
-                  background-color: #000000 !important;
+                  background-color: #020203 !important;
+                  background: #020203 !important;
                 }
                 
                 .md-modal-content.markdown-preview th,
                 .md-modal-content .markdown-preview th {
-                  background-color: #000000 !important;
-                  border: 1px solid #ffffff !important;
-                  color: #ffffff !important;
+                  background-color: #020203 !important;
+                  background: #020203 !important;
+                  color: #FFFFFF !important;
+                  border: 1px solid #FFFFFF !important;
+                  border-color: #FFFFFF !important;
                   padding: 12px 16px !important;
                 }
                 
                 .md-modal-content.markdown-preview td,
                 .md-modal-content .markdown-preview td {
-                  background-color: #000000 !important;
-                  border: 1px solid #ffffff !important;
-                  color: #ffffff !important;
+                  background-color: #020203 !important;
+                  background: #020203 !important;
+                  color: #FFFFFF !important;
+                  border: 1px solid #FFFFFF !important;
+                  border-color: #FFFFFF !important;
                   padding: 12px 16px !important;
                 }
                 
                 .md-modal-content.markdown-preview tr:hover,
                 .md-modal-content .markdown-preview tr:hover {
-                  background-color: #1f2937 !important;
+                  background-color: #020203 !important;
+                  background: #020203 !important;
                 }
                 
                 .md-modal-content.markdown-preview tr:hover th,
                 .md-modal-content .markdown-preview tr:hover th,
                 .md-modal-content.markdown-preview tr:hover td,
                 .md-modal-content .markdown-preview tr:hover td {
-                  background-color: #1f2937 !important;
+                  background-color: #020203 !important;
+                  background: #020203 !important;
+                  border-color: #FFFFFF !important;
+                }
+                
+                /* Force all table elements to maintain black background and white borders */
+                .md-modal-content.markdown-preview table *,
+                .md-modal-content .markdown-preview table * {
+                  border-color: #FFFFFF !important;
                 }
                 .markdown-preview table td {
                   vertical-align: top !important;
@@ -678,31 +694,44 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                   color: #FFFFFF !important;
                 }
                 /* HTML Table Styling for dangerouslySetInnerHTML tables */
-                .table-html-container table {
+                /* HTML Table Styling with same colors as Lexical editor */
+                .md-modal-content .table-html-container table {
                   width: 100% !important;
-                  border-collapse: collapse !important;
-                  border: 2px solid #ffffff !important;
+                  background-color: #020203 !important;
+                  background: #020203 !important;
+                  border: 2px solid #FFFFFF !important;
+                  border-collapse: separate !important;
+                  border-spacing: 0 !important;
                   border-radius: 8px !important;
                   overflow: hidden !important;
                 }
-                .table-html-container tbody {
+                .md-modal-content .table-html-container tbody {
+                  background-color: #020203 !important;
+                  background: #020203 !important;
                   border: none !important;
                 }
-                .table-html-container tr {
+                .md-modal-content .table-html-container tr {
+                  background-color: #020203 !important;
+                  background: #020203 !important;
                   border: none !important;
                 }
-                .table-html-container tr:hover {
-                  background-color: #1f2937 !important;
+                .md-modal-content .table-html-container tr:hover {
+                  background-color: #020203 !important;
+                  background: #020203 !important;
                 }
-                .table-html-container th {
-                  background-color: #000000 !important;
-                  border: 1px solid #ffffff !important;
-                  color: #ffffff !important;
+                .md-modal-content .table-html-container th {
+                  background-color: #020203 !important;
+                  background: #020203 !important;
+                  border: 1px solid #FFFFFF !important;
+                  border-color: #FFFFFF !important;
+                  color: #FFFFFF !important;
                 }
-                .table-html-container td {
-                  background-color: #000000 !important;
-                  border: 1px solid #ffffff !important;
-                  color: #ffffff !important;
+                .md-modal-content .table-html-container td {
+                  background-color: #020203 !important;
+                  background: #020203 !important;
+                  border: 1px solid #FFFFFF !important;
+                  border-color: #FFFFFF !important;
+                  color: #FFFFFF !important;
                 }
                 /* Ensure proper styling for code blocks inside details */
                 .markdown-preview details pre {
