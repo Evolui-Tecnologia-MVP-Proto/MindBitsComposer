@@ -509,17 +509,7 @@ export function DocumentosTable({
                     )}
                   </Button>
                 )}
-                {activeTab === "em-processo" && handleResetDocument && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => handleResetDocument(documento)}
-                    title="Reset documento - remove todo histórico e volta ao estado inicial"
-                  >
-                    <RotateCcw className="h-4 w-4 text-red-500" />
-                  </Button>
-                )}
+
                 {(activeTab === "em-processo" || activeTab === "concluidos") && flowExecutionCounts[documento.id] && (
                   <Badge 
                     variant="secondary" 
