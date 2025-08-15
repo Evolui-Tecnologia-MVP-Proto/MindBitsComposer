@@ -1603,11 +1603,11 @@ function SectionRefreshPlugin({ mdFileOld }: { mdFileOld?: string }): null {
 }
 
 // Plugin para adicionar botões de refresh aos containers existentes
-function RefreshButtonsPlugin({ mdFileOld }: { mdFileOld?: string }): null {
+function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; viewMode?: 'edit' | 'preview' }): null {
   const [editor] = useLexicalComposerContext();
 
   React.useEffect(() => {
-    console.log('🔄 RefreshButtonsPlugin: Iniciando plugin, mdFileOld disponível:', !!mdFileOld);
+    console.log('🔄 RefreshButtonsPlugin: Iniciando plugin, mdFileOld disponível:', !!mdFileOld, 'viewMode:', viewMode);
     
     if (!mdFileOld) {
       console.log('❌ RefreshButtonsPlugin: Sem mdFileOld, pulando execução');
@@ -1721,12 +1721,46 @@ function RefreshButtonsPlugin({ mdFileOld }: { mdFileOld?: string }): null {
     const timeoutId2 = setTimeout(addRefreshButtons, 500);
     const timeoutId3 = setTimeout(addRefreshButtons, 1000);
 
+    // Configurar MutationObserver para detectar mudanças no DOM
+    const editorElement = editor.getRootElement();
+    let observer: MutationObserver | null = null;
+    
+    if (editorElement) {
+      observer = new MutationObserver((mutations) => {
+        // Verificar se houve mudanças relevantes (adição/remoção de containers)
+        const hasRelevantChanges = mutations.some(mutation => {
+          return mutation.type === 'childList' && (
+            Array.from(mutation.addedNodes).some(node => 
+              node instanceof HTMLElement && node.classList?.contains('Collapsible__container')
+            ) ||
+            Array.from(mutation.removedNodes).some(node => 
+              node instanceof HTMLElement && node.classList?.contains('Collapsible__container')
+            )
+          );
+        });
+
+        if (hasRelevantChanges) {
+          console.log('🔄 RefreshButtonsPlugin: DOM mudou, re-executando addRefreshButtons');
+          // Usar timeout pequeno para aguardar DOM estabilizar
+          setTimeout(addRefreshButtons, 100);
+        }
+      });
+
+      observer.observe(editorElement, {
+        childList: true,
+        subtree: true
+      });
+    }
+
     return () => {
       clearTimeout(timeoutId1);
       clearTimeout(timeoutId2);
       clearTimeout(timeoutId3);
+      if (observer) {
+        observer.disconnect();
+      }
     };
-  }, [editor, mdFileOld]);
+  }, [editor, mdFileOld, viewMode]); // Adicionar viewMode como dependência
 
   return null;
 }
@@ -2974,7 +3008,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <ImageIdAutoConvertPlugin />
           <TemplateSectionsPlugin sections={templateSections} mdFileOld={mdFileOld} />
           <SectionRefreshPlugin mdFileOld={mdFileOld} />
-          <RefreshButtonsPlugin mdFileOld={mdFileOld} />
+          <RefreshButtonsPlugin mdFileOld={mdFileOld} viewMode={viewMode} />
           <EditProtectionPlugin />
           <HeaderFieldMappingPlugin templateMappings={templateMappings} documentData={documentData} />
           <CodeLineNumberPlugin />
