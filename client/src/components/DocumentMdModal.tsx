@@ -367,6 +367,11 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
 export default function DocumentMdModal({ isOpen, onClose, document }: DocumentMdModalProps) {
   const [showOriginal, setShowOriginal] = useState(false);
 
+  // Add null checks to prevent errors
+  if (!document) {
+    return null;
+  }
+
   const currentContent = showOriginal ? document.md_file_old : document.md_file;
   const hasOriginal = document.md_file_old && document.md_file_old.trim() !== '';
 
@@ -377,7 +382,7 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
           <div className="flex items-center justify-between">
             <DialogTitle className="text-lg font-semibold text-black dark:text-white flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              {document.titulo}
+              {document.titulo || 'Documento'}
             </DialogTitle>
             {hasOriginal && (
               <div className="flex items-center gap-2">

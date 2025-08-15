@@ -38,6 +38,7 @@ The system employs a monorepo structure with shared TypeScript schemas.
 - **Document Editions Status Schema**: Updated `document_editions.status` field enum to include all necessary status values: "draft", "in_progress", "review", "ready_to_revise", "published", "archived", "done", "to_discart", "discarted", "finished", "ready_to_next", "to_refact", "refact", "editing". This resolves issues where the finalization modal's "Marcar documento para descarte" option couldn't properly set the status to "to_discart" due to database constraints (January 2025).
 - **Document Filter Toggle**: Added toggle filter button in "Biblioteca" header allowing users to switch between viewing all documents vs only editable documents (in_progress, editing, refact statuses). Button uses Filter/FilterX icons with blue highlighting when active (January 2025).
 - **Reset Button Removal**: Removed "Reset documento" action button from documents "em processo" tab to prevent accidental document history removal and streamline the interface (January 2025).
+- **MD Viewer Modal**: Added DocumentMdModal component with same MDX configuration as composer preview for viewing document markdown content in "em processo" tab. Includes toggle between current (md_file) and original (md_file_old) versions, proper null checks, and full MDX rendering support including Mermaid diagrams (January 2025).
 
 ### Feature Specifications
 - **Toolbar-Based Container Editing**: Edit/delete functions for collapsible containers integrated into the Lexical editor toolbar, appearing conditionally.
