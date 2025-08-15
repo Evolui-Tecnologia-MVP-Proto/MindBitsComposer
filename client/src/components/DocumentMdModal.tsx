@@ -379,13 +379,20 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl w-full h-[85vh] flex flex-col">
         <DialogHeader className="flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-lg font-semibold text-black dark:text-white flex items-center gap-2">
-              <FileText className="w-5 h-5" />
-              {document.titulo || 'Documento'}
-            </DialogTitle>
+          <DialogTitle className="text-lg font-semibold text-black dark:text-white flex items-center gap-2">
+            <FileText className="w-5 h-5" />
+            {document.titulo || 'Documento'}
+          </DialogTitle>
+          
+          {/* Toolbar */}
+          <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-200 dark:border-[#374151]">
+            {!hasOriginal && (
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Este documento não possui versão original salva
+              </p>
+            )}
             {hasOriginal && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 ml-auto">
                 <Badge variant={showOriginal ? "secondary" : "default"}>
                   {showOriginal ? "Versão Original" : "Versão Atual"}
                 </Badge>
@@ -402,11 +409,6 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
               </div>
             )}
           </div>
-          {!hasOriginal && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Este documento não possui versão original salva
-            </p>
-          )}
         </DialogHeader>
         
         <div className="flex-1 overflow-y-auto border-t border-gray-200 dark:border-[#374151] mt-4 pt-4">
