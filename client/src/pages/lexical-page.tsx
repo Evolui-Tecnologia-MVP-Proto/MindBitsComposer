@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool, Eye, Edit, File, Image, Video, FileAudio, FileCode2, CircleChevronLeft, Globe, Split, FileInput, FileOutput, Puzzle, Palette, Settings, Database, Brain, BarChart, Zap, Wrench, Code, Cpu, Lock, Mail, Music, Calendar, Clock, Users, Star, Heart, Flag, Target, Bookmark, Search, BookOpenCheck, ChevronDown } from "lucide-react";
+import { Save, Download, Upload, FileText, Trash2, Plus, FolderOpen, ArrowLeft, Paperclip, PenTool, Eye, Edit, File, Image, Video, FileAudio, FileCode2, CircleChevronLeft, Globe, Split, FileInput, FileOutput, Puzzle, Palette, Settings, Database, Brain, BarChart, Zap, Wrench, Code, Cpu, Lock, Mail, Music, Calendar, Clock, Users, Star, Heart, Flag, Target, Bookmark, Search, BookOpenCheck, ChevronDown, Filter, FilterX } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -96,6 +96,7 @@ export default function LexicalPage() {
   const [selectedEdition, setSelectedEdition] = useState<any>(null);
   const [showFinalizeModal, setShowFinalizeModal] = useState(false);
   const [marcarParaDescartar, setMarcarParaDescartar] = useState(false);
+  const [showOnlyEditableDocuments, setShowOnlyEditableDocuments] = useState(false);
   const [editorState, setEditorState] = useState<string>('');
   const [initialEditorState, setInitialEditorState] = useState<string | undefined>(undefined);
   const [editorKey, setEditorKey] = useState<number>(0); // Chave para forçar re-render do editor
@@ -1992,9 +1993,24 @@ export default function LexicalPage() {
           <div className="w-80 border-r bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col composer-side-panel composer-library-panel rounded-tl-xl overflow-hidden">
             {/* Header fixo */}
             <div className="p-4 border-b bg-white dark:bg-[#111827] border-gray-200 dark:border-[#374151] rounded-tl-xl">
-              <div className="flex items-center gap-2">
-                <FolderOpen className="w-5 h-5" />
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">Biblioteca</h3>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <FolderOpen className="w-5 h-5" />
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">Biblioteca</h3>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowOnlyEditableDocuments(!showOnlyEditableDocuments)}
+                  className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  title={showOnlyEditableDocuments ? "Mostrar todos os documentos" : "Mostrar apenas documentos editáveis"}
+                >
+                  {showOnlyEditableDocuments ? (
+                    <FilterX className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  ) : (
+                    <Filter className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                  )}
+                </Button>
               </div>
             </div>
             
@@ -2101,6 +2117,12 @@ export default function LexicalPage() {
                             Array.isArray(documentEditions) && 
                             // Ordenar documentos: Em Edição > Encaminhado > Publicado > Na Fila > Para Refact > Para Descarte > Refatorar > Finalizado
                             documentEditions
+                              .filter((edition: any) => {
+                                if (!showOnlyEditableDocuments) return true;
+                                // Mostrar apenas documentos editáveis (não desabilitados)
+                                const editableStatuses = ['in_progress', 'editing', 'refact'];
+                                return editableStatuses.includes(edition.status);
+                              })
                               .sort((a: any, b: any) => {
                                 const statusOrder = { 'editing': 1, 'ready_to_next': 2, 'published': 3, 'in_progress': 4, 'to_refact': 5, 'to_discart': 6, 'refact': 7, 'done': 8 };
                                 return (statusOrder[a.status as keyof typeof statusOrder] || 4) - (statusOrder[b.status as keyof typeof statusOrder] || 4);
