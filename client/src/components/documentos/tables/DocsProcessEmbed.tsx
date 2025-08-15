@@ -727,6 +727,18 @@ export function DocsProcessEmbed({
     enabled: true
   });
 
+  // Buscar document_editions do documento atual no flow diagram modal
+  const { data: currentDocumentEditions = [] } = useQuery({
+    queryKey: ["/api/document-editions", flowDiagramModal.flowData?.documentId],
+    queryFn: async () => {
+      if (!flowDiagramModal.flowData?.documentId) return [];
+      const response = await fetch(`/api/document-editions?documentId=${flowDiagramModal.flowData.documentId}`);
+      if (!response.ok) throw new Error('Erro ao buscar edições do documento');
+      return response.json();
+    },
+    enabled: !!flowDiagramModal.flowData?.documentId && flowDiagramModal.isOpen
+  });
+
 
 
   // Buscar todas as colunas Monday de todos os mapeamentos
@@ -3179,6 +3191,81 @@ function FlowWithAutoFitView({
       console.log('Executando integração manual...');
       console.log('JobId do nó:', selectedFlowNode.data.jobId);
       
+      // Verificar se há edições marcadas para descarte
+      const hasDiscardStatus = currentDocumentEditions.some((edition: any) => edition.status === 'to_discart');
+      
+      if (hasDiscardStatus) {
+        console.log('📄 Documento marcado para descarte - processando descarte...');
+        
+        try {
+          const documentId = flowDiagramModal.flowData.documentId;
+          
+          // 1. Atualizar document_editions.status para "discarted"
+          const editionsResponse = await fetch(`/api/documents/${documentId}/editions/status`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+              status: 'discarted'
+            })
+          });
+          
+          // 2. Atualizar document.task_state para "to_discard"
+          const documentResponse = await fetch(`/api/documentos/${documentId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({
+              taskState: 'to_discard'
+            })
+          });
+          
+          if (editionsResponse.ok && documentResponse.ok) {
+            setIntegrationResult({
+              status: 'success',
+              message: 'Documento descartado com sucesso!'
+            });
+            
+            // Marcar o nó como executado
+            const updatedNodes = [...nodes];
+            const nodeIndex = updatedNodes.findIndex(n => n.id === selectedFlowNode.id);
+            if (nodeIndex !== -1) {
+              updatedNodes[nodeIndex] = {
+                ...updatedNodes[nodeIndex],
+                data: {
+                  ...updatedNodes[nodeIndex].data,
+                  isExecuted: 'TRUE'
+                }
+              };
+              setNodes(updatedNodes);
+            }
+            
+            // Invalidar queries para atualizar interface
+            queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+            queryClient.invalidateQueries({ queryKey: ["/api/document-editions"] });
+            queryClient.invalidateQueries({ queryKey: ["/api/flow-actions"] });
+            
+            console.log('✅ Documento descartado com sucesso');
+            
+          } else {
+            throw new Error('Erro ao processar descarte do documento');
+          }
+          
+        } catch (error) {
+          console.error('❌ Erro ao processar descarte:', error);
+          setIntegrationResult({
+            status: 'error',
+            message: `Erro ao processar descarte: ${error instanceof Error ? error.message : 'Erro desconhecido'}`
+          });
+        }
+        
+        return; // Sair da função sem executar integração normal
+      }
+      
       // Verificar se existe uma função de integração definida
       const functionName = selectedFlowNode.data.jobId || selectedFlowNode.data.callType;
       
@@ -4518,9 +4605,24 @@ function FlowWithAutoFitView({
                 {selectedFlowNode.data.callType?.toLowerCase() === 'manual' && (selectedFlowNode.data.isPendingConnected || selectedFlowNode.data.isExecuted === 'TRUE') && (
                   <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-600 rounded-lg">
                     <div className="mb-3">
-                      <p className="text-xs text-yellow-800 dark:text-yellow-300 mb-2">
+                      <p className={`text-xs mb-2 ${
+                        currentDocumentEditions.some((edition: any) => edition.status === 'to_discart')
+                          ? 'text-red-800 dark:text-red-300'
+                          : 'text-yellow-800 dark:text-yellow-300'
+                      }`}>
                         {(() => {
-                          // Extrair informações do jobId (prioridade sobre callType)
+                          // Verificar se há alguma edição marcada para descarte
+                          const hasDiscardStatus = currentDocumentEditions.some((edition: any) => edition.status === 'to_discart');
+                          
+                          if (hasDiscardStatus) {
+                            return (
+                              <>
+                                <span className="font-semibold">Documento marcado para descarte</span>, ao confirmar efetiva o descarte e não publicará o mesmo. <span className="font-semibold">Confirma?</span>
+                              </>
+                            );
+                          }
+                          
+                          // Lógica original para documentos não marcados para descarte
                           let functionCaption = 'callJob';
                           let functionName = '';
                           
