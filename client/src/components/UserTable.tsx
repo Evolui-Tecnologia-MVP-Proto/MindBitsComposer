@@ -269,7 +269,11 @@ export default function UserTable() {
                           <div className="flex items-center">
                             <div className="flex-shrink-0 h-10 w-10">
                               <Avatar>
-                                <AvatarImage src={user.avatarUrl || ''} alt={user.name} />
+                                <AvatarImage 
+                                  src={user.avatarUrl || ''} 
+                                  alt={user.name}
+                                  key={user.avatarUrl} // Force re-render when avatar changes
+                                />
                                 <AvatarFallback className="bg-primary text-white">
                                   {getInitials(user.name)}
                                 </AvatarFallback>

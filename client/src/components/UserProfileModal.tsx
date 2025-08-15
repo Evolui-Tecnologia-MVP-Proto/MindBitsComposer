@@ -124,10 +124,15 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
   };
 
   const handleAvatarUpload = (newAvatarUrl: string) => {
+    console.log("Avatar upload completed, new URL:", newAvatarUrl);
     setCurrentAvatarUrl(newAvatarUrl);
     
-    // Invalidar cache para atualizar dados do usuário
+    // Invalidar cache para atualizar dados do usuário em todos os locais
     queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/users'] });
+    
+    // Refetch explicitamente os dados do usuário
+    queryClient.refetchQueries({ queryKey: ['/api/user'] });
     
     toast({
       title: "Sucesso",
@@ -149,7 +154,11 @@ export default function UserProfileModal({ isOpen, onClose }: UserProfileModalPr
           <div className="flex flex-col items-center mb-8">
             <div className="relative mb-4">
               <Avatar className="h-20 w-20">
-                <AvatarImage src={currentAvatarUrl || user?.avatarUrl || ""} alt={user?.name || ""} />
+                <AvatarImage 
+                  src={currentAvatarUrl || user?.avatarUrl || ""} 
+                  alt={user?.name || ""} 
+                  key={currentAvatarUrl || user?.avatarUrl} // Force re-render when avatar changes
+                />
                 <AvatarFallback className="bg-primary text-white text-xl">
                   {user?.name ? getInitials(user.name) : "U"}
                 </AvatarFallback>

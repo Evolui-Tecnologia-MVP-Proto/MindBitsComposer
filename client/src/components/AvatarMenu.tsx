@@ -55,7 +55,11 @@ export default function AvatarMenu() {
         onClick={() => setIsOpen(!isOpen)}
       >
         <Avatar className="h-9 w-9">
-          <AvatarImage src={user?.avatarUrl || ""} alt={user?.name || ""} />
+          <AvatarImage 
+            src={user?.avatarUrl || ""} 
+            alt={user?.name || ""} 
+            key={user?.avatarUrl} // Force re-render when avatar changes
+          />
           <AvatarFallback className="bg-primary text-white">
             {user?.name ? getInitials(user.name) : "U"}
           </AvatarFallback>

@@ -104,21 +104,27 @@ export function ObjectUploader({
         throw new Error("Failed to upload file");
       }
 
-      // Update user avatar URL
+      const uploadResultData = await uploadResult.json();
+      console.log("Upload result:", uploadResultData);
+
+      // Update user avatar URL with the filename returned from upload
       const updateResponse = await fetch("/api/user/avatar", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          avatarUrl: uploadURL, // Use the full upload URL
+          avatarUrl: `/avatars/${uploadResultData.filename}`,
           userId,
         }),
       });
 
       if (!updateResponse.ok) {
+        const errorData = await updateResponse.json();
+        console.error("Update response error:", errorData);
         throw new Error("Failed to update avatar");
       }
 
       const { avatarUrl } = await updateResponse.json();
+      console.log("Avatar updated to:", avatarUrl);
 
       toast({
         title: "Sucesso",

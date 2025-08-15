@@ -554,6 +554,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Save file to disk
       fs.writeFileSync(filePath, req.file.buffer);
+      console.log("Avatar file saved:", filename, "at path:", filePath);
 
       res.json({ success: true, filename });
     } catch (error) {
@@ -579,7 +580,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const normalizedPath = objectStorageService.normalizeObjectEntityPath(avatarUrl);
       
       // Update user avatar in database
+      console.log("Updating avatar for user:", userId, "with path:", normalizedPath);
       const updatedUser = await storage.updateUserAvatar(parseInt(userId), normalizedPath);
+      console.log("Avatar updated successfully:", updatedUser.avatarUrl);
 
       res.json({ 
         success: true,
