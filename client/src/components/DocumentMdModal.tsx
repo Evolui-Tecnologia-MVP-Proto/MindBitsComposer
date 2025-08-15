@@ -681,8 +681,8 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                 html:not(.dark) .md-modal-content.prose code,
                 html:not(.dark) .md-modal-content .prose pre,
                 html:not(.dark) .md-modal-content .prose code {
-                  background-color: #383B42 !important;
-                  background: #383B42 !important;
+                  background-color: #F1F5F9 !important;
+                  background: #F1F5F9 !important;
                 }
 
                 /* LIGHT THEME - Inline code background */
@@ -696,8 +696,8 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                 html:not(.dark) .md-modal-content.prose li code,
                 html:not(.dark) .md-modal-content .prose p code,
                 html:not(.dark) .md-modal-content .prose li code {
-                  background-color: #383B42 !important;
-                  background: #383B42 !important;
+                  background-color: #F1F5F9 !important;
+                  background: #F1F5F9 !important;
                 }
                 
                 /* NUCLEAR OPTION - Force ALL possible combinations - DARK THEME ONLY */
