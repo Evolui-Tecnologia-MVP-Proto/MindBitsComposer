@@ -1607,9 +1607,10 @@ function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; vie
   const [editor] = useLexicalComposerContext();
 
   React.useEffect(() => {
-    console.log('🔄 RefreshButtonsPlugin: Iniciando plugin');
+    console.log('🔄 RefreshButtonsPlugin: ==================== INICIANDO PLUGIN ====================');
     console.log('🔄 RefreshButtonsPlugin: mdFileOld disponível:', !!mdFileOld);
     console.log('🔄 RefreshButtonsPlugin: viewMode:', viewMode);
+    console.log('🔄 RefreshButtonsPlugin: editor:', !!editor);
     
     if (!mdFileOld) {
       console.log('❌ RefreshButtonsPlugin: Sem mdFileOld, pulando execução');
@@ -1617,7 +1618,7 @@ function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; vie
     }
 
     // Executar apenas se temos mdFileOld
-    console.log('🔄 RefreshButtonsPlugin: Continuando execução...');
+    console.log('🔄 RefreshButtonsPlugin: Continuando execução com todos os requisitos atendidos...');
 
     // Função para adicionar botões
     const addRefreshButtons = () => {
@@ -1728,11 +1729,22 @@ function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; vie
     };
 
     // Executar imediatamente e depois com timeout para casos de renderização tardia
+    console.log('🔄 RefreshButtonsPlugin: Executando addRefreshButtons imediatamente...');
     addRefreshButtons();
     
-    const timeoutId1 = setTimeout(addRefreshButtons, 200);
-    const timeoutId2 = setTimeout(addRefreshButtons, 500);
-    const timeoutId3 = setTimeout(addRefreshButtons, 1000);
+    console.log('🔄 RefreshButtonsPlugin: Agendando execuções com timeout...');
+    const timeoutId1 = setTimeout(() => {
+      console.log('🔄 RefreshButtonsPlugin: Executando após 200ms...');
+      addRefreshButtons();
+    }, 200);
+    const timeoutId2 = setTimeout(() => {
+      console.log('🔄 RefreshButtonsPlugin: Executando após 500ms...');
+      addRefreshButtons();
+    }, 500);
+    const timeoutId3 = setTimeout(() => {
+      console.log('🔄 RefreshButtonsPlugin: Executando após 1000ms...');
+      addRefreshButtons();
+    }, 1000);
 
     // Configurar MutationObserver para detectar mudanças no DOM
     const editorElement = editor.getRootElement();
