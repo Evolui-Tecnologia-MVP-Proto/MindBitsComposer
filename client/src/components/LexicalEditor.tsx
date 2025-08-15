@@ -1607,24 +1607,25 @@ function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; vie
   const [editor] = useLexicalComposerContext();
 
   React.useEffect(() => {
-    console.log('🔄 RefreshButtonsPlugin: Iniciando plugin, mdFileOld disponível:', !!mdFileOld, 'viewMode:', viewMode);
+    console.log('🔄 RefreshButtonsPlugin: Iniciando plugin');
+    console.log('🔄 RefreshButtonsPlugin: mdFileOld disponível:', !!mdFileOld);
+    console.log('🔄 RefreshButtonsPlugin: viewMode:', viewMode);
     
     if (!mdFileOld) {
       console.log('❌ RefreshButtonsPlugin: Sem mdFileOld, pulando execução');
       return;
     }
 
-    // Só executar no modo editor
-    if (viewMode !== 'editor') {
-      console.log('🔄 RefreshButtonsPlugin: Não está no modo editor, pulando execução. ViewMode atual:', viewMode);
-      return;
-    }
+    // Executar independente do viewMode para testar
+    console.log('🔄 RefreshButtonsPlugin: Continuando execução...');
 
     // Função para adicionar botões
     const addRefreshButtons = () => {
-      console.log('🔄 RefreshButtonsPlugin: Executando addRefreshButtons');
+      console.log('🔄 RefreshButtonsPlugin: ========== INICIANDO addRefreshButtons ==========');
       
       const editorElement = editor.getRootElement();
+      console.log('🔄 RefreshButtonsPlugin: editorElement encontrado:', !!editorElement);
+      
       if (!editorElement) {
         console.log('❌ RefreshButtonsPlugin: Editor element não encontrado');
         return;
@@ -1632,16 +1633,22 @@ function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; vie
 
       // Encontrar todos os containers collapsible
       const allContainers = editorElement.querySelectorAll('.Collapsible__container');
-      console.log(`🔄 RefreshButtonsPlugin: Encontrados ${allContainers.length} containers collapsible total`);
+      console.log(`🔄 RefreshButtonsPlugin: Total de containers .Collapsible__container: ${allContainers.length}`);
+      
+      // Log dos containers encontrados
+      allContainers.forEach((container, index) => {
+        const hasFromToolbar = container.hasAttribute('data-from-toolbar');
+        const summaryText = container.querySelector('summary')?.textContent || 'SEM TÍTULO';
+        console.log(`🔄 RefreshButtonsPlugin: Container ${index + 1}: "${summaryText}" - data-from-toolbar: ${hasFromToolbar}`);
+      });
 
       // Filtrar containers que NÃO são de toolbar (containers de template)
       const templateContainers = Array.from(allContainers).filter(container => {
         const hasFromToolbar = container.hasAttribute('data-from-toolbar');
-        console.log(`🔄 RefreshButtonsPlugin: Container tem data-from-toolbar: ${hasFromToolbar}`);
         return !hasFromToolbar;
       });
 
-      console.log(`🔄 RefreshButtonsPlugin: Encontrados ${templateContainers.length} containers de template`);
+      console.log(`🔄 RefreshButtonsPlugin: Containers de template (sem data-from-toolbar): ${templateContainers.length}`);
 
       templateContainers.forEach((container, index) => {
         const summaryElement = container.querySelector('summary');
@@ -1657,7 +1664,7 @@ function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; vie
           return;
         }
 
-        console.log(`🔄 RefreshButtonsPlugin: Adicionando botão ao container ${index + 1}`);
+        console.log(`🔄 RefreshButtonsPlugin: Adicionando botão ao container ${index + 1} - "${summaryElement.textContent}"`);
 
         // Encontrar ou criar container direito
         let rightContainer = summaryElement.querySelector('div:last-child');
