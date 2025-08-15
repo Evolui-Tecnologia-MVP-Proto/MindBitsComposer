@@ -525,8 +525,11 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
           </div>
         </DialogHeader>
         
-        <div className="flex-1 overflow-y-auto border-t border-gray-200 dark:border-[#374151] mt-4 pt-4 bg-white dark:bg-[#0A0A0B]">
-          <div className={`md-modal-content markdown-preview markdown-content prose prose-gray dark:prose-invert max-w-none`}>
+        {/* MDX Preview Container - EXACTLY like composer editor */}
+        <div className="flex-1 overflow-y-auto border-t border-gray-200 dark:border-[#374151] mt-4 p-6 bg-slate-100 dark:bg-[#020203]">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white dark:bg-[#1B2028] rounded-lg shadow-sm border border-gray-200 dark:border-[#374151] p-6">
+              <div className={`md-modal-content markdown-preview markdown-content prose prose-gray dark:prose-invert max-w-none`}>
             <style dangerouslySetInnerHTML={{
               __html: `
                 /* Apply EXACTLY the same table styling as Lexical editor to MD modal */
@@ -745,9 +748,13 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                   background-color: #111827 !important;
                   color: #d1d5db !important;
                 }
-              `
-            }} />
-            {parseMarkdownToReact(currentContent || '')}
+                `
+                }} />
+                <div className="space-y-4">
+                  {parseMarkdownToReact(currentContent || '')}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </DialogContent>
