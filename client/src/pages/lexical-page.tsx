@@ -1993,24 +1993,26 @@ export default function LexicalPage() {
           <div className="w-80 border-r bg-white dark:bg-[#0F172A] border-gray-200 dark:border-[#374151] flex flex-col composer-side-panel composer-library-panel rounded-tl-xl overflow-hidden">
             {/* Header fixo */}
             <div className="p-4 border-b bg-white dark:bg-[#111827] border-gray-200 dark:border-[#374151] rounded-tl-xl">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2">
                   <FolderOpen className="w-5 h-5" />
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-[#E5E7EB]">Biblioteca</h3>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowOnlyEditableDocuments(!showOnlyEditableDocuments)}
-                  className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  title={showOnlyEditableDocuments ? "Mostrar todos os documentos" : "Mostrar apenas documentos editáveis"}
-                >
-                  {showOnlyEditableDocuments ? (
-                    <FilterX className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  ) : (
-                    <Filter className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                  )}
-                </Button>
+                <div className="ml-auto">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowOnlyEditableDocuments(!showOnlyEditableDocuments)}
+                    className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    title={showOnlyEditableDocuments ? "Mostrar todos os documentos" : "Mostrar apenas documentos editáveis"}
+                  >
+                    {showOnlyEditableDocuments ? (
+                      <FilterX className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    ) : (
+                      <Filter className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
             
