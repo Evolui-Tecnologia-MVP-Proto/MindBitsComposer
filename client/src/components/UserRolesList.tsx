@@ -26,18 +26,18 @@ import { Plus, Edit, Trash2, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { UserRoleModal } from "./UserRoleModal";
-import type { UserRole } from "@shared/schema";
+import type { UserRoleRecord } from "@shared/schema";
 
 export function UserRolesList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
+  const [selectedRole, setSelectedRole] = useState<UserRoleRecord | null>(null);
   const [modalMode, setModalMode] = useState<"create" | "edit">("create");
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: userRoles = [], isLoading } = useQuery<UserRole[]>({
+  const { data: userRoles = [], isLoading } = useQuery<UserRoleRecord[]>({
     queryKey: ["/api/user-roles"],
   });
 
@@ -73,7 +73,7 @@ export function UserRolesList() {
     setModalOpen(true);
   };
 
-  const handleEdit = (role: UserRole) => {
+  const handleEdit = (role: UserRoleRecord) => {
     setSelectedRole(role);
     setModalMode("edit");
     setModalOpen(true);

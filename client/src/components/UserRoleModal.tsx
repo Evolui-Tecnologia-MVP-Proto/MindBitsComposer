@@ -9,12 +9,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import type { UserRole } from "@shared/schema";
+import type { UserRoleRecord } from "@shared/schema";
 
 interface UserRoleModalProps {
   isOpen: boolean;
   onClose: () => void;
-  userRole?: UserRole | null;
+  userRole?: UserRoleRecord | null;
   mode: "create" | "edit";
 }
 

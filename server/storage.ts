@@ -8,7 +8,7 @@ import { users, templates, mondayMappings, mondayColumns, mappingColumns, servic
   type SystemLog, type InsertSystemLog, type DocumentEdition, type InsertDocumentEdition,
   type GenericTable, type InsertGenericTable, type Specialty, type InsertSpecialty,
   type SpecialtyUser, type InsertSpecialtyUser, type SystemParam, type InsertSystemParam,
-  type UserRole as UserRoleType, type InsertUserRole,
+  type UserRoleRecord, type InsertUserRole,
   UserStatus, UserRole, TemplateType, PluginStatus, PluginType } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, isNull, sql } from "drizzle-orm";
@@ -167,10 +167,10 @@ export interface IStorage {
   deleteSystemParam(paramName: string): Promise<void>;
   
   // User Roles operations
-  getUserRole(id: number): Promise<UserRoleType | undefined>;
-  getAllUserRoles(): Promise<UserRoleType[]>;
-  createUserRole(role: InsertUserRole): Promise<UserRoleType>;
-  updateUserRole(id: number, data: Partial<UserRoleType>): Promise<UserRoleType>;
+  getUserRole(id: number): Promise<UserRoleRecord | undefined>;
+  getAllUserRoles(): Promise<UserRoleRecord[]>;
+  createUserRole(role: InsertUserRole): Promise<UserRoleRecord>;
+  updateUserRole(id: number, data: Partial<UserRoleRecord>): Promise<UserRoleRecord>;
   deleteUserRole(id: number): Promise<void>;
 }
 
@@ -1211,16 +1211,16 @@ export class DatabaseStorage implements IStorage {
   }
 
   // User Roles operations
-  async getUserRole(id: number): Promise<UserRoleType | undefined> {
+  async getUserRole(id: number): Promise<UserRoleRecord | undefined> {
     const [role] = await db.select().from(userRoles).where(eq(userRoles.id, id));
     return role || undefined;
   }
 
-  async getAllUserRoles(): Promise<UserRoleType[]> {
+  async getAllUserRoles(): Promise<UserRoleRecord[]> {
     return await db.select().from(userRoles).orderBy(userRoles.name);
   }
 
-  async createUserRole(roleData: InsertUserRole): Promise<UserRoleType> {
+  async createUserRole(roleData: InsertUserRole): Promise<UserRoleRecord> {
     const [role] = await db
       .insert(userRoles)
       .values(roleData)
@@ -1228,7 +1228,7 @@ export class DatabaseStorage implements IStorage {
     return role;
   }
 
-  async updateUserRole(id: number, data: Partial<UserRoleType>): Promise<UserRoleType> {
+  async updateUserRole(id: number, data: Partial<UserRoleRecord>): Promise<UserRoleRecord> {
     const [updatedRole] = await db
       .update(userRoles)
       .set({
