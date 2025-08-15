@@ -1727,7 +1727,8 @@ function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; vie
           console.log(`🔍 RefreshButtonsPlugin: Verificação pós-inserção container ${index + 1} - botão existe:`, !!checkButton);
           if (checkButton) {
             console.log(`🔍 RefreshButtonsPlugin: Botão HTML:`, checkButton.outerHTML);
-            console.log(`🔍 RefreshButtonsPlugin: Botão visível:`, checkButton.offsetWidth > 0 && checkButton.offsetHeight > 0);
+            const htmlElement = checkButton as HTMLElement;
+            console.log(`🔍 RefreshButtonsPlugin: Botão visível:`, htmlElement.offsetWidth > 0 && htmlElement.offsetHeight > 0);
           }
         }, 100);
       });
@@ -3032,7 +3033,7 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
           <ImageIdAutoConvertPlugin />
           <TemplateSectionsPlugin sections={templateSections} mdFileOld={mdFileOld} />
           <SectionRefreshPlugin mdFileOld={mdFileOld} />
-          <RefreshButtonsPlugin mdFileOld={mdFileOld} viewMode={viewMode} />
+          {/* <RefreshButtonsPlugin mdFileOld={mdFileOld} viewMode={viewMode} /> */}
           <EditProtectionPlugin />
           <HeaderFieldMappingPlugin templateMappings={templateMappings} documentData={documentData} />
           <CodeLineNumberPlugin />
