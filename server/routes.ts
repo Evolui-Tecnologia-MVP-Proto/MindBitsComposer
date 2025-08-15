@@ -3300,10 +3300,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           headers
         });
 
-        const responseData = await response.json();
+        let responseData;
+        try {
+          responseData = await response.json();
+        } catch (parseError) {
+          responseData = { parseError: "Failed to parse JSON response" };
+        }
         
         if (!response.ok) {
-          throw new Error(`Failed to fetch menus: ${response.status} ${response.statusText}`);
+          return res.status(response.status).json({ 
+            success: false, 
+            error: `API returned ${response.status}`,
+            apiResponse: responseData,
+            statusCode: response.status,
+            statusText: response.statusText
+          });
         }
 
         // The API returns an object with 'tree' property containing the menu structure
@@ -3345,10 +3356,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error: any) {
       console.error("LTH menus error:", error);
-      res.status(500).json({ 
-        success: false, 
-        error: error.message 
-      });
+      // If it's a fetch error, try to extract more details
+      if (error.message && error.message.includes('Failed to fetch')) {
+        res.status(500).json({ 
+          success: false, 
+          error: error.message,
+          apiResponse: { networkError: "Unable to connect to external API" }
+        });
+      } else {
+        res.status(500).json({ 
+          success: false, 
+          error: error.message 
+        });
+      }
     }
   });
 
@@ -3678,10 +3698,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
     } catch (error: any) {
       console.error("LTH list subsystems error:", error);
-      res.status(500).json({ 
-        success: false, 
-        error: error.message 
-      });
+      // If it's a fetch error, try to extract more details
+      if (error.message && error.message.includes('Failed to fetch')) {
+        res.status(500).json({ 
+          success: false, 
+          error: error.message,
+          apiResponse: { networkError: "Unable to connect to external API" }
+        });
+      } else {
+        res.status(500).json({ 
+          success: false, 
+          error: error.message 
+        });
+      }
     }
   });
 
