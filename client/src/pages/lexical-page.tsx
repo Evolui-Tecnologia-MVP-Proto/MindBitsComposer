@@ -2099,24 +2099,24 @@ export default function LexicalPage() {
                             </div>
                           ) : (
                             Array.isArray(documentEditions) && 
-                            // Ordenar documentos: Em Edição > Encaminhado > Publicado > Na Fila > Para Refact > Refatorar > Finalizado
+                            // Ordenar documentos: Em Edição > Encaminhado > Publicado > Na Fila > Para Refact > Para Descarte > Refatorar > Finalizado
                             documentEditions
                               .sort((a: any, b: any) => {
-                                const statusOrder = { 'editing': 1, 'ready_to_next': 2, 'published': 3, 'in_progress': 4, 'to_refact': 5, 'refact': 6, 'done': 7 };
+                                const statusOrder = { 'editing': 1, 'ready_to_next': 2, 'published': 3, 'in_progress': 4, 'to_refact': 5, 'to_discart': 6, 'refact': 7, 'done': 8 };
                                 return (statusOrder[a.status as keyof typeof statusOrder] || 4) - (statusOrder[b.status as keyof typeof statusOrder] || 4);
                               })
                               .map((edition: any) => (
                               <div
                                 key={edition.id}
                                 className={`p-3 border rounded-lg relative overflow-hidden dark:bg-[#111827] dark:border-[#374151] ${
-                                  edition.status === 'done' || edition.status === 'ready_to_next' || edition.status === 'published' || edition.status === 'to_refact'
+                                  edition.status === 'done' || edition.status === 'ready_to_next' || edition.status === 'published' || edition.status === 'to_refact' || edition.status === 'to_discart'
                                     ? 'cursor-not-allowed opacity-60 bg-gray-100 dark:bg-gray-800 border-gray-300 dark:border-gray-600' 
                                     : `cursor-pointer hover:bg-gray-50 dark:hover:bg-[#1E293B] ${
                                         selectedEdition?.id === edition.id ? 'border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/30' : ''
                                       }`
                                 }`}
                                 onClick={() => {
-                                  if (edition.status !== 'done' && edition.status !== 'ready_to_next' && edition.status !== 'published' && edition.status !== 'to_refact') {
+                                  if (edition.status !== 'done' && edition.status !== 'ready_to_next' && edition.status !== 'published' && edition.status !== 'to_refact' && edition.status !== 'to_discart') {
                                     handleSelectEdition(edition);
                                   }
                                 }}
@@ -2147,6 +2147,10 @@ export default function LexicalPage() {
                                     <Badge className="text-xs px-2 py-1 font-medium" style={{ backgroundColor: '#eab308', color: '#1f2937' }}>
                                       Publicado
                                     </Badge>
+                                  ) : edition.status === 'to_discart' ? (
+                                    <Badge className="text-xs px-2 py-1 font-medium" style={{ backgroundColor: '#dc2626', color: '#ffffff' }}>
+                                      Para Descarte
+                                    </Badge>
                                   ) : (
                                     <Badge className="text-xs px-2 py-1 font-medium" style={{ backgroundColor: '#6b7280', color: '#ffffff' }}>
                                       Na Fila
@@ -2164,6 +2168,8 @@ export default function LexicalPage() {
                                         ? 'text-yellow-600 dark:text-yellow-400'
                                         : edition.status === 'to_refact'
                                         ? 'text-purple-600 dark:text-purple-400'
+                                        : edition.status === 'to_discart'
+                                        ? 'text-red-600 dark:text-red-400'
                                         : 'text-blue-600 dark:text-blue-400'
                                     }`}>
                                       {edition.templateCode}
