@@ -345,14 +345,20 @@ export const DocumentNodeComponent = (props: any) => {
       </svg>
     <FileText className="absolute top-1 left-1 h-6 w-6 text-purple-600 z-10" />
     
-    {/* Badge "In Progress" no canto superior direito quando isInProcess = TRUE */}
-    {props.data.isInProcess === 'TRUE' && (
+    {/* Badge no canto superior direito - Discarted tem prioridade sobre In Progress */}
+    {props.data.isDiscarted === 'TRUE' ? (
+      <div className="absolute -top-1 -right-1 z-20">
+        <div className="bg-red-500 text-white text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-sm shadow-md border border-red-600">
+          Discarted
+        </div>
+      </div>
+    ) : props.data.isInProcess === 'TRUE' ? (
       <div className="absolute -top-1 -right-1 z-20">
         <div className="bg-purple-500 text-white text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-sm shadow-md border border-purple-600">
           In Progress
         </div>
       </div>
-    )}
+    ) : null}
     
     <div className="absolute inset-0 flex items-center justify-center" style={{ pointerEvents: 'none' }}>
       <div className="text-center pt-2">
