@@ -12,6 +12,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useConfirmationToast } from "@/hooks/use-confirmation-toast";
 import { useNavigationGuard } from "@/hooks/use-navigation-guard";
@@ -94,6 +95,7 @@ export default function LexicalPage() {
   const [viewMode, setViewMode] = useState<'editor' | 'preview' | 'mdx'>('editor');
   const [selectedEdition, setSelectedEdition] = useState<any>(null);
   const [showFinalizeModal, setShowFinalizeModal] = useState(false);
+  const [marcarParaDescartar, setMarcarParaDescartar] = useState(false);
   const [editorState, setEditorState] = useState<string>('');
   const [initialEditorState, setInitialEditorState] = useState<string | undefined>(undefined);
   const [editorKey, setEditorKey] = useState<number>(0); // Chave para forçar re-render do editor
@@ -2729,10 +2731,33 @@ export default function LexicalPage() {
                 Confirmação de Finalização
               </AlertDialogTitle>
               <AlertDialogDescription asChild>
-                <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-600 rounded-lg p-4 mt-4">
-                  <p className="text-yellow-800 dark:text-yellow-400">
-                    <span className="font-bold">Atenção:</span> Finalizando a edição do documento você o libera para que seja processado para as fases consecutivas do fluxo definido. Esta ação não poderá ser desfeita caso alguma fase posterior seja processada. Confima a finalização do documento e efetiva disponibilização para a próxima fase?
-                  </p>
+                <div className="space-y-4">
+                  {/* Card de Atenção existente */}
+                  <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-600 rounded-lg p-4 mt-4">
+                    <p className="text-yellow-800 dark:text-yellow-400">
+                      <span className="font-bold">Atenção:</span> Finalizando a edição do documento você o libera para que seja processado para as fases consecutivas do fluxo definido. Esta ação não poderá ser desfeita caso alguma fase posterior seja processada. Confima a finalização do documento e efetiva disponibilização para a próxima fase?
+                    </p>
+                  </div>
+
+                  {/* Novo card vermelho para descarte */}
+                  <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-600 rounded-lg p-4">
+                    <p className="text-red-800 dark:text-red-400 mb-3">
+                      <span className="font-bold">Marcar este documento para descartar:</span> se marcada esta opção o documento será sinalizado como conteúdo irrelevante para tratamento de possível descarte nas fases futuras do processo.
+                    </p>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="marcar-descartar"
+                        checked={marcarParaDescartar}
+                        onCheckedChange={(checked) => setMarcarParaDescartar(checked as boolean)}
+                      />
+                      <Label
+                        htmlFor="marcar-descartar"
+                        className="text-sm font-medium text-red-800 dark:text-red-400 cursor-pointer"
+                      >
+                        Marcar documento para descarte
+                      </Label>
+                    </div>
+                  </div>
                 </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
