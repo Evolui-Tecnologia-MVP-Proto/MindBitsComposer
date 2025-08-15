@@ -265,14 +265,14 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         const errorData = await connectionsResponse.json();
         console.log("ListLuthierConnections validation failed: non-200 response", errorData);
         setConnectionError({
-          endpoint: "ListLuthierConnections",
-          error: errorData
+          endpoint: "ListLuthierConnections", 
+          error: errorData.apiResponse || errorData
         });
         return false;
       }
 
       const connectionsData = await connectionsResponse.json();
-      if (!Array.isArray(connectionsData) && !Array.isArray(connectionsData.connections)) {
+      if (!Array.isArray(connectionsData) && !Array.isArray(connectionsData.connections) && !Array.isArray(connectionsData.dict_db)) {
         console.log("ListLuthierConnections validation failed: response is not an array");
         setConnectionError({
           endpoint: "ListLuthierConnections",
@@ -300,13 +300,13 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         console.log("ListSubsystems validation failed: non-200 response", errorData);
         setConnectionError({
           endpoint: "ListSubsystems",
-          error: errorData
+          error: errorData.apiResponse || errorData
         });
         return false;
       }
 
       const subsystemsData = await subsystemsResponse.json();
-      if (!Array.isArray(subsystemsData) && !Array.isArray(subsystemsData.subsystems)) {
+      if (!Array.isArray(subsystemsData) && !Array.isArray(subsystemsData.subsystems) && !Array.isArray(subsystemsData.subsystem)) {
         console.log("ListSubsystems validation failed: response is not an array");
         setConnectionError({
           endpoint: "ListSubsystems",
@@ -1153,16 +1153,34 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
           </Badge>
         );
       case 'error':
+        const getErrorDetails = () => {
+          if (!connectionError) return 'Unknown error';
+          
+          const error = connectionError.error;
+          
+          // If it's an API response error, show the status and details
+          if (error && typeof error === 'object') {
+            if (error.statusCode && error.statusText) {
+              return `${error.statusCode} ${error.statusText}`;
+            }
+            if (error.message) {
+              return error.message;
+            }
+            return JSON.stringify(error).substring(0, 150);
+          }
+          
+          return String(error).substring(0, 150);
+        };
+        
         return (
-          <div className="ml-2 flex items-center gap-2">
+          <div className="ml-2 flex items-center gap-2 max-w-lg">
             <Badge variant="destructive">
               <X className="h-2 w-2 mr-1" />
               {connectionError ? connectionError.endpoint : 'Connection'} Fail
             </Badge>
             {connectionError && (
-              <span className="text-xs text-red-600 dark:text-red-400">
-                {JSON.stringify(connectionError.error).substring(0, 100)}
-                {JSON.stringify(connectionError.error).length > 100 ? '...' : ''}
+              <span className="text-xs text-red-600 dark:text-red-400 truncate">
+                {getErrorDetails()}
               </span>
             )}
           </div>

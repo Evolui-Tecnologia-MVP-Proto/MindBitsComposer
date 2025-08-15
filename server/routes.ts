@@ -3542,10 +3542,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         headers
       });
 
-      const responseData = await response.json();
+      let responseData;
+      try {
+        responseData = await response.json();
+      } catch (parseError) {
+        responseData = { parseError: "Failed to parse JSON response" };
+      }
       
       if (!response.ok) {
-        throw new Error(`Failed to fetch connections: ${response.status}`);
+        // Return the actual API error instead of throwing
+        return res.status(response.status).json({ 
+          success: false, 
+          error: `API returned ${response.status}`,
+          apiResponse: responseData,
+          statusCode: response.status,
+          statusText: response.statusText
+        });
       }
       
       // Return the response data directly for validation
@@ -3643,10 +3655,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         headers
       });
 
-      const responseData = await response.json();
+      let responseData;
+      try {
+        responseData = await response.json();
+      } catch (parseError) {
+        responseData = { parseError: "Failed to parse JSON response" };
+      }
       
       if (!response.ok) {
-        throw new Error(`Failed to fetch subsystems: ${response.status}`);
+        // Return the actual API error instead of throwing
+        return res.status(response.status).json({ 
+          success: false, 
+          error: `API returned ${response.status}`,
+          apiResponse: responseData,
+          statusCode: response.status,
+          statusText: response.statusText
+        });
       }
       
       // Return the response data directly for validation
