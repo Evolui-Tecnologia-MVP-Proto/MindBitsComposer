@@ -1456,7 +1456,8 @@ function TemplateSectionsPlugin({ sections, mdFileOld }: { sections?: string[], 
                 console.log(`🔍 MD_FILE_OLD: Nenhum conteúdo encontrado para seção "${sectionName}"`);
               }
 
-              const container = $createCollapsibleContainerNode(false);
+              // Criar container NÃO inserido via toolbar (template container)
+              const container = $createCollapsibleContainerNode(false, false); // open=false, fromToolbar=false
               container.append(title, content);
               
               root.append(container);

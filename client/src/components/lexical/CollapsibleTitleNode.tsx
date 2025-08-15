@@ -103,21 +103,32 @@ export class CollapsibleTitleNode extends TextNode {
     dom.appendChild(leftContainer);
 
     // Container direito para botões de ação (apenas para containers de template)
-    // Verificamos se é um container de template verificando se não é fromToolbar
     const rightContainer = document.createElement('div');
     rightContainer.classList.add('flex', 'items-center', 'gap-1');
+    
+    // Adicionar o container direito imediatamente
+    dom.appendChild(rightContainer);
     
     // Adicionar botão de refresh para containers de template
     // O DOM ainda não tem acesso ao parent node, então vamos usar um timeout para verificar
     setTimeout(() => {
+      console.log('🔍 RefreshButton: Verificando container parent para:', textSpan.textContent);
+      
       // Encontrar o container pai CollapsibleContainerNode
       const parentDetails = dom.closest('.Collapsible__container');
+      console.log('🔍 RefreshButton: Parent details encontrado:', !!parentDetails);
+      
       if (parentDetails) {
         // Verificar se é um container de template (não inserido via toolbar)
-        // Vamos adicionar um atributo data para identificar
-        const isFromTemplate = !parentDetails.hasAttribute('data-from-toolbar');
+        const hasFromToolbarAttr = parentDetails.hasAttribute('data-from-toolbar');
+        console.log('🔍 RefreshButton: Has data-from-toolbar:', hasFromToolbarAttr);
+        
+        const isFromTemplate = !hasFromToolbarAttr;
+        console.log('🔍 RefreshButton: É container de template?', isFromTemplate);
         
         if (isFromTemplate) {
+          console.log('✅ RefreshButton: Criando botão de refresh para:', textSpan.textContent);
+          
           // Criar botão de refresh
           const refreshButton = document.createElement('button');
           refreshButton.classList.add(
@@ -146,6 +157,8 @@ export class CollapsibleTitleNode extends TextNode {
             e.preventDefault();
             e.stopPropagation();
             
+            console.log('🔄 RefreshButton: Clicado para seção:', textSpan.textContent);
+            
             // Disparar evento customizado para recarregar seção
             const sectionTitle = textSpan.textContent || '';
             const refreshEvent = new CustomEvent('refreshSectionContent', {
@@ -156,10 +169,14 @@ export class CollapsibleTitleNode extends TextNode {
           });
           
           rightContainer.appendChild(refreshButton);
-          dom.appendChild(rightContainer);
+          console.log('✅ RefreshButton: Botão adicionado com sucesso');
+        } else {
+          console.log('⚠️ RefreshButton: Container inserido via toolbar, não adicionando botão');
         }
+      } else {
+        console.log('❌ RefreshButton: Container parent não encontrado');
       }
-    }, 100);
+    }, 200);
 
     return dom;
   }
