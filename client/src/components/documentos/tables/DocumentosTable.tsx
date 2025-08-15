@@ -22,9 +22,11 @@ import {
   Network,
   ChevronDown,
   RotateCcw,
+  FileText,
 } from "lucide-react";
 import { type Documento } from "@shared/schema";
 import { useQueryClient } from "@tanstack/react-query";
+import DocumentMdModal from "@/components/DocumentMdModal";
 
 interface DocumentosTableProps {
   documentos: Documento[];
@@ -84,6 +86,39 @@ export function DocumentosTable({
     position: { x: 0, y: 0 },
     flows: [],
   });
+
+  const [mdModal, setMdModal] = useState<{
+    isOpen: boolean;
+    document: any | null;
+  }>({
+    isOpen: false,
+    document: null,
+  });
+
+  // Handler para abrir modal MD
+  const handleOpenMdModal = async (documento: Documento) => {
+    try {
+      // Buscar dados das edições do documento para obter md_file e md_file_old
+      const response = await fetch(`/api/document-editions?documentId=${documento.id}`);
+      if (response.ok) {
+        const editions = await response.json();
+        if (editions && editions.length > 0) {
+          // Pegar a edição mais recente
+          const latestEdition = editions[0];
+          setMdModal({
+            isOpen: true,
+            document: {
+              titulo: documento.objeto,
+              md_file: latestEdition.mdFile,
+              md_file_old: latestEdition.mdFileOld,
+            },
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao buscar dados do documento:', error);
+    }
+  };
 
   // Fechar dropdown ao clicar fora
   useEffect(() => {
@@ -509,6 +544,17 @@ export function DocumentosTable({
                     )}
                   </Button>
                 )}
+                {activeTab === "em-processo" && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => handleOpenMdModal(documento)}
+                    title="Visualizar documento MD"
+                  >
+                    <FileText className="h-4 w-4 text-green-500" />
+                  </Button>
+                )}
 
                 {(activeTab === "em-processo" || activeTab === "concluidos") && flowExecutionCounts[documento.id] && (
                   <Badge 
@@ -631,6 +677,13 @@ export function DocumentosTable({
           </div>
         </div>
       )}
+
+      {/* Modal MD */}
+      <DocumentMdModal
+        isOpen={mdModal.isOpen}
+        onClose={() => setMdModal({ isOpen: false, document: null })}
+        document={mdModal.document}
+      />
     </>
     );
   }
@@ -734,6 +787,13 @@ export function DocumentosTable({
           )}
         </TableBody>
       </Table>
+
+      {/* Modal MD */}
+      <DocumentMdModal
+        isOpen={mdModal.isOpen}
+        onClose={() => setMdModal({ isOpen: false, document: null })}
+        document={mdModal.document}
+      />
     </>
   );
 }
