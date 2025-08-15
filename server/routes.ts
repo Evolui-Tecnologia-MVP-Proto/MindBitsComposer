@@ -6890,6 +6890,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const editionId = req.params.id;
       const userId = req.user!.id;
+      const { marcarParaDescartar } = req.body; // Receber o parâmetro do frontend
       
       // Buscar a edição atual
       const edition = await db.select().from(documentEditions).where(eq(documentEditions.id, editionId)).limit(1);
@@ -6904,18 +6905,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Edição não possui flux_node_id associado" });
       }
       
-      // 1. Atualizar status da edição para "done"
+      // 1. Atualizar status da edição - se marcarParaDescartar = true, usar "to_discart", senão usar "done"
+      const statusToSet = marcarParaDescartar ? "to_discart" : "done";
       const [updatedEdition] = await db
         .update(documentEditions)
         .set({ 
-          status: "done",
+          status: statusToSet,
           publish: new Date(),
           updatedAt: new Date()
         })
         .where(eq(documentEditions.id, editionId))
         .returning();
       
-      console.log("✅ Status da edição atualizado para 'done':", updatedEdition.id);
+      console.log(`✅ Status da edição atualizado para '${statusToSet}':`, updatedEdition.id);
       
       // 2. Buscar a execução de fluxo correspondente (apenas com status 'initiated')
       const flowExecution = await db
@@ -6941,7 +6943,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
             updatedFlowTasks.nodes[nodeIndex].data.isExecuted = 'TRUE';
             updatedFlowTasks.nodes[nodeIndex].data.isInProcess = 'FALSE';
             
-            console.log(`🔄 Atualizando nó ${currentEdition.fluxNodeId}: isExecuted=${updatedFlowTasks.nodes[nodeIndex].data.isExecuted}`);
+            // Se marcarParaDescartar = true, adicionar isDiscarted = 'TRUE'
+            if (marcarParaDescartar) {
+              updatedFlowTasks.nodes[nodeIndex].data.isDiscarted = 'TRUE';
+              console.log(`🔄 Atualizando nó ${currentEdition.fluxNodeId}: isExecuted='TRUE', isInProcess='FALSE', isDiscarted='TRUE'`);
+            } else {
+              console.log(`🔄 Atualizando nó ${currentEdition.fluxNodeId}: isExecuted='TRUE', isInProcess='FALSE'`);
+            }
             
             // Atualizar a execução do fluxo com novo objeto
             const updateResult = await db
@@ -6953,18 +6961,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
               .where(eq(documentFlowExecutions.id, execution.id))
               .returning({ id: documentFlowExecutions.id });
               
-            console.log(`✅ Nó ${currentEdition.fluxNodeId} atualizado: isExecuted='TRUE', isInProcess='FALSE' - Execution ID: ${updateResult[0]?.id}`);
+            const logMessage = marcarParaDescartar 
+              ? `✅ Nó ${currentEdition.fluxNodeId} atualizado: isExecuted='TRUE', isInProcess='FALSE', isDiscarted='TRUE' - Execution ID: ${updateResult[0]?.id}`
+              : `✅ Nó ${currentEdition.fluxNodeId} atualizado: isExecuted='TRUE', isInProcess='FALSE' - Execution ID: ${updateResult[0]?.id}`;
+            console.log(logMessage);
           } else {
             console.log(`❌ Nó ${currentEdition.fluxNodeId} não encontrado na execução ${execution.id}`);
           }
         }
         
         // 4. Criar registro em flow_actions
+        const actionDescription = marcarParaDescartar ? "Documento Marcado para Descarte" : "Documento Finalizado";
         const [flowAction] = await db
           .insert(flowActions)
           .values({
             flowExecutionId: execution.id,
-            actionDescription: "Documento Finalizado",
+            actionDescription: actionDescription,
             actor: userId,
             flowNode: currentEdition.fluxNodeId,
             startedAt: new Date(),

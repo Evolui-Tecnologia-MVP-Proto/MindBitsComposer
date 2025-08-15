@@ -754,7 +754,9 @@ export default function LexicalPage() {
   // Mutation para finalizar documento
   const finalizeMutation = useMutation({
     mutationFn: async (editionId: string) => {
-      return apiRequest("PATCH", `/api/document-editions/${editionId}/finalize`, {});
+      return apiRequest("PATCH", `/api/document-editions/${editionId}/finalize`, {
+        marcarParaDescartar
+      });
     },
     onSuccess: (data: any) => {
       console.log("✅ Documento finalizado - response data:", data);
