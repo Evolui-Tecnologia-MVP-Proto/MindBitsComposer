@@ -39,6 +39,7 @@ The system employs a monorepo structure with shared TypeScript schemas.
 - **Document Filter Toggle**: Added toggle filter button in "Biblioteca" header allowing users to switch between viewing all documents vs only editable documents (in_progress, editing, refact statuses). Button uses Filter/FilterX icons with blue highlighting when active (January 2025).
 - **Reset Button Removal**: Removed "Reset documento" action button from documents "em processo" tab to prevent accidental document history removal and streamline the interface (January 2025).
 - **MD Viewer Modal**: Added DocumentMdModal component with same MDX configuration as composer preview for viewing document markdown content in "em processo" tab. Includes toggle between current (md_file) and original (md_file_old) versions, proper null checks, and full MDX rendering support including Mermaid diagrams (January 2025).
+- **Mermaid Code Block Detection**: Enhanced convertMarkdownToLexicalNodes function to properly detect and process ```mermaid code blocks when loading md_file_old content into collapsible containers. Mermaid blocks now create structured tables with diagram placeholder and preserved code, while regular code blocks remain as CodeNode. Includes debug logging for conversion tracking (January 2025).
 
 ### Feature Specifications
 - **Toolbar-Based Container Editing**: Edit/delete functions for collapsible containers integrated into the Lexical editor toolbar, appearing conditionally.

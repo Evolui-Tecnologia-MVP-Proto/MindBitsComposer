@@ -1111,6 +1111,7 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
   const nodes: any[] = [];
   let isInCodeBlock = false;
   let codeBlockContent: string[] = [];
+  let codeBlockLanguage = '';
   
   for (const line of lines) {
     // Processar blocos de código
@@ -1118,12 +1119,56 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
       if (isInCodeBlock) {
         // Finalizar bloco de código
         const codeContent = codeBlockContent.join('\n');
-        const codeBlock = $createCodeNode(codeContent);
-        nodes.push(codeBlock);
+        
+        // Verificar se é um diagrama Mermaid
+        if (codeBlockLanguage === 'mermaid') {
+          console.log('🎯 MD_FILE_OLD: Detectado bloco Mermaid:', codeContent.substring(0, 50) + '...');
+          
+          // Para diagramas Mermaid, criar uma tabela com imagem + código como faz o sistema atual
+          const table = $createTableNode();
+          
+          // Linha de cabeçalho
+          const headerRow = $createTableRowNode();
+          const headerCell1 = $createTableCellNode(0);
+          const headerCell2 = $createTableCellNode(0);
+          headerCell1.append($createParagraphNode().append($createTextNode('Diagrama')));
+          headerCell2.append($createParagraphNode().append($createTextNode('Código Mermaid')));
+          headerRow.append(headerCell1, headerCell2);
+          
+          // Linha de conteúdo
+          const contentRow = $createTableRowNode();
+          
+          // Primeira célula: placeholder para imagem (será renderizada posteriormente)
+          const imageCell = $createTableCellNode(0);
+          const imageParagraph = $createParagraphNode();
+          imageParagraph.append($createTextNode('[Diagrama Mermaid será renderizado aqui]'));
+          imageCell.append(imageParagraph);
+          
+          // Segunda célula: código Mermaid
+          const codeCell = $createTableCellNode(0);
+          const codeNode = $createCodeNode();
+          codeNode.append($createTextNode(codeContent));
+          codeCell.append(codeNode);
+          
+          contentRow.append(imageCell, codeCell);
+          table.append(headerRow, contentRow);
+          
+          nodes.push(table);
+        } else {
+          // Code block regular
+          const codeBlock = $createCodeNode();
+          codeBlock.append($createTextNode(codeContent));
+          nodes.push(codeBlock);
+        }
+        
         codeBlockContent = [];
+        codeBlockLanguage = '';
         isInCodeBlock = false;
       } else {
-        // Iniciar bloco de código
+        // Iniciar bloco de código - extrair linguagem se especificada
+        const langMatch = line.trim().match(/^```(\w+)?/);
+        codeBlockLanguage = langMatch && langMatch[1] ? langMatch[1] : '';
+        console.log('🔍 MD_FILE_OLD: Iniciando code block, linguagem:', codeBlockLanguage);
         isInCodeBlock = true;
       }
       continue;
@@ -1162,8 +1207,47 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
   // Finalizar bloco de código se ainda estiver aberto
   if (isInCodeBlock && codeBlockContent.length > 0) {
     const codeContent = codeBlockContent.join('\n');
-    const codeBlock = $createCodeNode(codeContent);
-    nodes.push(codeBlock);
+    
+    // Verificar se é um diagrama Mermaid
+    if (codeBlockLanguage === 'mermaid') {
+      console.log('🎯 MD_FILE_OLD: Finalizando bloco Mermaid pendente:', codeContent.substring(0, 50) + '...');
+      
+      // Para diagramas Mermaid, criar uma tabela com imagem + código
+      const table = $createTableNode();
+      
+      // Linha de cabeçalho
+      const headerRow = $createTableRowNode();
+      const headerCell1 = $createTableCellNode(0);
+      const headerCell2 = $createTableCellNode(0);
+      headerCell1.append($createParagraphNode().append($createTextNode('Diagrama')));
+      headerCell2.append($createParagraphNode().append($createTextNode('Código Mermaid')));
+      headerRow.append(headerCell1, headerCell2);
+      
+      // Linha de conteúdo
+      const contentRow = $createTableRowNode();
+      
+      // Primeira célula: placeholder para imagem
+      const imageCell = $createTableCellNode(0);
+      const imageParagraph = $createParagraphNode();
+      imageParagraph.append($createTextNode('[Diagrama Mermaid será renderizado aqui]'));
+      imageCell.append(imageParagraph);
+      
+      // Segunda célula: código Mermaid
+      const codeCell = $createTableCellNode(0);
+      const codeNode = $createCodeNode();
+      codeNode.append($createTextNode(codeContent));
+      codeCell.append(codeNode);
+      
+      contentRow.append(imageCell, codeCell);
+      table.append(headerRow, contentRow);
+      
+      nodes.push(table);
+    } else {
+      // Code block regular
+      const codeBlock = $createCodeNode();
+      codeBlock.append($createTextNode(codeContent));
+      nodes.push(codeBlock);
+    }
   }
   
   return nodes;
