@@ -62,6 +62,7 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   const [pluginConfig, setPluginConfig] = useState<any>(null);
   const [pluginId, setPluginId] = useState<string | null>(null);
   const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
+  const [connectionError, setConnectionError] = useState<{endpoint: string; error: any} | null>(null);
   const [showFunctionDetails, setShowFunctionDetails] = useState(false);
   const [functionDetails, setFunctionDetails] = useState<{actionType?: string; action?: string; code?: string} | null>(null);
   const { toast } = useToast();
@@ -261,13 +262,22 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       });
 
       if (!connectionsResponse.ok) {
-        console.log("ListLuthierConnections validation failed: non-200 response");
+        const errorData = await connectionsResponse.json();
+        console.log("ListLuthierConnections validation failed: non-200 response", errorData);
+        setConnectionError({
+          endpoint: "ListLuthierConnections",
+          error: errorData
+        });
         return false;
       }
 
       const connectionsData = await connectionsResponse.json();
       if (!Array.isArray(connectionsData) && !Array.isArray(connectionsData.connections)) {
         console.log("ListLuthierConnections validation failed: response is not an array");
+        setConnectionError({
+          endpoint: "ListLuthierConnections",
+          error: connectionsData
+        });
         return false;
       }
       console.log("✓ ListLuthierConnections validation passed");
@@ -286,21 +296,35 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       });
 
       if (!subsystemsResponse.ok) {
-        console.log("ListSubsystems validation failed: non-200 response");
+        const errorData = await subsystemsResponse.json();
+        console.log("ListSubsystems validation failed: non-200 response", errorData);
+        setConnectionError({
+          endpoint: "ListSubsystems",
+          error: errorData
+        });
         return false;
       }
 
       const subsystemsData = await subsystemsResponse.json();
       if (!Array.isArray(subsystemsData) && !Array.isArray(subsystemsData.subsystems)) {
         console.log("ListSubsystems validation failed: response is not an array");
+        setConnectionError({
+          endpoint: "ListSubsystems",
+          error: subsystemsData
+        });
         return false;
       }
       console.log("✓ ListSubsystems validation passed");
 
       console.log("=== CONNECTION VALIDATION SUCCESSFUL ===");
+      setConnectionError(null); // Clear any previous errors
       return true;
     } catch (error) {
       console.error("Connection validation failed:", error);
+      setConnectionError({
+        endpoint: "Connection Validation",
+        error: error instanceof Error ? error.message : error
+      });
       return false;
     }
   };
@@ -1130,10 +1154,18 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
         );
       case 'error':
         return (
-          <Badge variant="destructive" className="ml-2">
-            <X className="h-2 w-2 mr-1" />
-            Connection Fail
-          </Badge>
+          <div className="ml-2 flex items-center gap-2">
+            <Badge variant="destructive">
+              <X className="h-2 w-2 mr-1" />
+              {connectionError ? connectionError.endpoint : 'Connection'} Fail
+            </Badge>
+            {connectionError && (
+              <span className="text-xs text-red-600 dark:text-red-400">
+                {JSON.stringify(connectionError.error).substring(0, 100)}
+                {JSON.stringify(connectionError.error).length > 100 ? '...' : ''}
+              </span>
+            )}
+          </div>
         );
     }
   };
