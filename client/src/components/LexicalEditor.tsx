@@ -999,6 +999,7 @@ interface LexicalEditorProps {
   viewMode?: 'editor' | 'preview' | 'mdx';
   initialEditorState?: string; // Estado serializado do Lexical para restaurar
   markdownContent?: string;
+  mdFileOld?: string; // Conteúdo original do documento para refresh de seções
 }
 
 // Função para converter conteúdo Lexical para markdown com limpeza
@@ -1122,38 +1123,13 @@ function convertMarkdownToLexicalNodes(markdownContent: string): any[] {
         
         // Verificar se é um diagrama Mermaid
         if (codeBlockLanguage === 'mermaid') {
-          console.log('🎯 MD_FILE_OLD: Detectado bloco Mermaid:', codeContent.substring(0, 50) + '...');
+          console.log('🎯 MD_FILE_OLD: Detectado bloco Mermaid, mantendo formato original:', codeContent.substring(0, 50) + '...');
           
-          // Para diagramas Mermaid, criar uma tabela com imagem + código como faz o sistema atual
-          const table = $createTableNode();
-          
-          // Linha de cabeçalho
-          const headerRow = $createTableRowNode();
-          const headerCell1 = $createTableCellNode(0);
-          const headerCell2 = $createTableCellNode(0);
-          headerCell1.append($createParagraphNode().append($createTextNode('Diagrama')));
-          headerCell2.append($createParagraphNode().append($createTextNode('Código Mermaid')));
-          headerRow.append(headerCell1, headerCell2);
-          
-          // Linha de conteúdo
-          const contentRow = $createTableRowNode();
-          
-          // Primeira célula: placeholder para imagem (será renderizada posteriormente)
-          const imageCell = $createTableCellNode(0);
-          const imageParagraph = $createParagraphNode();
-          imageParagraph.append($createTextNode('[Diagrama Mermaid será renderizado aqui]'));
-          imageCell.append(imageParagraph);
-          
-          // Segunda célula: código Mermaid
-          const codeCell = $createTableCellNode(0);
-          const codeNode = $createCodeNode();
-          codeNode.append($createTextNode(codeContent));
-          codeCell.append(codeNode);
-          
-          contentRow.append(imageCell, codeCell);
-          table.append(headerRow, contentRow);
-          
-          nodes.push(table);
+          // Para diagramas Mermaid, criar um CodeNode com linguagem "mermaid"
+          // Isso permitirá que o Mermaid seja renderizado diretamente no editor
+          const codeBlock = $createCodeNode('mermaid');
+          codeBlock.append($createTextNode(codeContent));
+          nodes.push(codeBlock);
         } else {
           // Code block regular
           const codeBlock = $createCodeNode();
