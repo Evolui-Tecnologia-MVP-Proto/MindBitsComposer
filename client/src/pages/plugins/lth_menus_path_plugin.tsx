@@ -755,16 +755,20 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
       return (
         <div key={item.id} className="select-none">
           <div
-            className={`flex items-center py-2 px-3 rounded-md transition-colors ${
+            className={`flex items-center py-2 px-3 rounded-md transition-all ${
               item.type === 'DIVIDER'
                 ? 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 cursor-default'
                 : item.type === 'FUNCTION_CALL'
-                ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/30 cursor-pointer'
+                ? `${isSelected 
+                    ? 'bg-blue-100 dark:bg-blue-900/40 border-2 border-blue-500 dark:border-blue-400 shadow-lg ring-2 ring-blue-300 dark:ring-blue-600' 
+                    : 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
+                  } hover:bg-green-100 dark:hover:bg-green-900/30 cursor-pointer`
                 : isSelectable 
-                ? 'hover:bg-gray-50 dark:hover:bg-[#1F2937] cursor-pointer' 
+                ? `${isSelected 
+                    ? 'bg-blue-100 dark:bg-blue-900/40 border-2 border-blue-500 dark:border-blue-400 shadow-lg ring-2 ring-blue-300 dark:ring-blue-600' 
+                    : 'hover:bg-gray-50 dark:hover:bg-[#1F2937]'
+                  } cursor-pointer` 
                 : 'cursor-default'
-            } ${
-              isSelected && item.type !== 'DIVIDER' ? 'bg-blue-50 dark:bg-blue-900/30 border-l-2 border-blue-500' : ''
             } ${
               !isSelectable && item.type !== 'DIVIDER' && item.type !== 'FUNCTION_CALL' ? 'opacity-75' : ''
             }`}
