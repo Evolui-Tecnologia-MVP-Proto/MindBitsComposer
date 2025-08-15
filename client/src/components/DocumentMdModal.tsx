@@ -535,8 +535,8 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                 /* DARK THEME - Table styling as Lexical editor */
                 .dark .md-modal-content.markdown-preview table,
                 .dark .md-modal-content .markdown-preview table {
-                  background-color: #020203 !important;
-                  background: #020203 !important;
+                  background-color: #1B2028 !important;
+                  background: #1B2028 !important;
                   border: 2px solid #FFFFFF !important;
                   border-collapse: separate !important;
                   border-spacing: 0 !important;
@@ -565,8 +565,8 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                 .dark .md-modal-content .markdown-preview table tbody,
                 .dark .md-modal-content.markdown-preview table thead,
                 .dark .md-modal-content .markdown-preview table thead {
-                  background-color: #020203 !important;
-                  background: #020203 !important;
+                  background-color: #1B2028 !important;
+                  background: #1B2028 !important;
                 }
 
                 /* LIGHT THEME - FORCE all table elements to have same white background */
@@ -586,15 +586,15 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                 .md-modal-content .markdown-preview thead,
                 .md-modal-content.markdown-preview tbody,
                 .md-modal-content .markdown-preview tbody {
-                  background-color: #020203 !important;
-                  background: #020203 !important;
+                  background-color: #1B2028 !important;
+                  background: #1B2028 !important;
                 }
                 
                 /* DARK THEME - Header cells */
                 .dark .md-modal-content.markdown-preview th,
                 .dark .md-modal-content .markdown-preview th {
-                  background-color: #020203 !important;
-                  background: #020203 !important;
+                  background-color: #1B2028 !important;
+                  background: #1B2028 !important;
                   color: #FFFFFF !important;
                   border: 1px solid #FFFFFF !important;
                   border-color: #FFFFFF !important;
@@ -621,8 +621,8 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                 .dark .md-modal-content .markdown-preview tbody td,
                 .dark .md-modal-content.markdown-preview tr td,
                 .dark .md-modal-content .markdown-preview tr td {
-                  background-color: #020203 !important;
-                  background: #020203 !important;
+                  background-color: #1B2028 !important;
+                  background: #1B2028 !important;
                   color: #FFFFFF !important;
                   border: 1px solid #FFFFFF !important;
                   border-color: #FFFFFF !important;
@@ -655,8 +655,8 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                 .dark .md-modal-content .prose td,
                 .dark .md-modal-content.prose table td,
                 .dark .md-modal-content .prose table td {
-                  background-color: #020203 !important;
-                  background: #020203 !important;
+                  background-color: #1B2028 !important;
+                  background: #1B2028 !important;
                   color: #FFFFFF !important;
                 }
 
@@ -713,8 +713,8 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                 .dark .md-modal-content.markdown-preview.prose th,
                 .dark .md-modal-content.prose-gray td,
                 .dark .md-modal-content.prose-gray th {
-                  background-color: #020203 !important;
-                  background: #020203 !important;
+                  background-color: #1B2028 !important;
+                  background: #1B2028 !important;
                   color: #FFFFFF !important;
                   border: 1px solid #FFFFFF !important;
                   border-color: #FFFFFF !important;
@@ -742,16 +742,16 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                 
                 .md-modal-content.markdown-preview tr:hover,
                 .md-modal-content .markdown-preview tr:hover {
-                  background-color: #020203 !important;
-                  background: #020203 !important;
+                  background-color: #1B2028 !important;
+                  background: #1B2028 !important;
                 }
                 
                 .md-modal-content.markdown-preview tr:hover th,
                 .md-modal-content .markdown-preview tr:hover th,
                 .md-modal-content.markdown-preview tr:hover td,
                 .md-modal-content .markdown-preview tr:hover td {
-                  background-color: #020203 !important;
-                  background: #020203 !important;
+                  background-color: #1B2028 !important;
+                  background: #1B2028 !important;
                   border-color: #FFFFFF !important;
                 }
                 
