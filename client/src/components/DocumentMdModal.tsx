@@ -669,6 +669,36 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                   background: #FFFFFF !important;
                   color: #000000 !important;
                 }
+
+                /* LIGHT THEME - Code blocks background */
+                html:not(.dark) .md-modal-content pre,
+                html:not(.dark) .md-modal-content code,
+                html:not(.dark) .md-modal-content .markdown-preview pre,
+                html:not(.dark) .md-modal-content .markdown-preview code,
+                html:not(.dark) .md-modal-content.markdown-preview pre,
+                html:not(.dark) .md-modal-content.markdown-preview code,
+                html:not(.dark) .md-modal-content.prose pre,
+                html:not(.dark) .md-modal-content.prose code,
+                html:not(.dark) .md-modal-content .prose pre,
+                html:not(.dark) .md-modal-content .prose code {
+                  background-color: #383B42 !important;
+                  background: #383B42 !important;
+                }
+
+                /* LIGHT THEME - Inline code background */
+                html:not(.dark) .md-modal-content p code,
+                html:not(.dark) .md-modal-content li code,
+                html:not(.dark) .md-modal-content .markdown-preview p code,
+                html:not(.dark) .md-modal-content .markdown-preview li code,
+                html:not(.dark) .md-modal-content.markdown-preview p code,
+                html:not(.dark) .md-modal-content.markdown-preview li code,
+                html:not(.dark) .md-modal-content.prose p code,
+                html:not(.dark) .md-modal-content.prose li code,
+                html:not(.dark) .md-modal-content .prose p code,
+                html:not(.dark) .md-modal-content .prose li code {
+                  background-color: #383B42 !important;
+                  background: #383B42 !important;
+                }
                 
                 /* NUCLEAR OPTION - Force ALL possible combinations - DARK THEME ONLY */
                 .dark .md-modal-content td,
