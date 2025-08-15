@@ -102,16 +102,16 @@ const mdxComponents = {
   ),
   table: (props: any) => (
     <div className="overflow-x-auto mb-4">
-      <table className="border-collapse border border-gray-300 dark:border-[#374151] rounded-lg" {...props} />
+      <table className="border-collapse border-2 border-white rounded-lg" {...props} />
     </div>
   ),
-  thead: (props: any) => <thead className="bg-gray-50 dark:bg-[#111827]" {...props} />,
-  tbody: (props: any) => <tbody className="divide-y divide-gray-200 dark:divide-[#374151]" {...props} />,
-  tr: (props: any) => <tr className="hover:bg-gray-50 dark:hover:bg-[#1E293B]" {...props} />,
+  thead: (props: any) => <thead className="bg-black" {...props} />,
+  tbody: (props: any) => <tbody className="divide-y divide-white" {...props} />,
+  tr: (props: any) => <tr className="hover:bg-gray-800" {...props} />,
   th: (props: any) => (
-    <th className="px-4 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider border-b border-gray-300 dark:border-[#374151] bg-gray-50 dark:bg-[#1B2028]" {...props} />
+    <th className="px-4 py-3 text-left text-xs font-medium text-white uppercase tracking-wider border border-white bg-black" {...props} />
   ),
-  td: (props: any) => <td className="px-4 py-3 text-sm text-black dark:text-white border-b border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1B2028]" {...props} />,
+  td: (props: any) => <td className="px-4 py-3 text-sm text-white border border-white bg-black" {...props} />,
   a: (props: any) => <a className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline" {...props} />,
   img: (props: any) => <img className="max-w-full h-auto rounded-lg shadow-sm mb-4" {...props} />,
   hr: (props: any) => <hr className="my-8 border-gray-300 dark:border-[#374151]" {...props} />,
@@ -637,12 +637,9 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                 .table-html-container table {
                   width: 100% !important;
                   border-collapse: collapse !important;
-                  border: 1px solid #d1d5db !important;
+                  border: 2px solid #ffffff !important;
                   border-radius: 8px !important;
                   overflow: hidden !important;
-                }
-                .dark .table-html-container table {
-                  border: 1px solid #374151 !important;
                 }
                 .table-html-container tbody {
                   border: none !important;
@@ -651,10 +648,17 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
                   border: none !important;
                 }
                 .table-html-container tr:hover {
-                  background-color: #f9fafb !important;
+                  background-color: #1f2937 !important;
                 }
-                .dark .table-html-container tr:hover {
-                  background-color: #1e293b !important;
+                .table-html-container th {
+                  background-color: #000000 !important;
+                  border: 1px solid #ffffff !important;
+                  color: #ffffff !important;
+                }
+                .table-html-container td {
+                  background-color: #000000 !important;
+                  border: 1px solid #ffffff !important;
+                  color: #ffffff !important;
                 }
                 /* Ensure proper styling for code blocks inside details */
                 .markdown-preview details pre {
