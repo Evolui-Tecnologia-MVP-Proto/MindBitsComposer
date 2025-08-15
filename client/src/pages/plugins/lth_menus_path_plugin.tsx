@@ -1132,13 +1132,8 @@ export default function LthMenusPathPlugin(props: LthMenusPathPluginProps | null
   };
 
   const handleCancelar = () => {
-    // Reset all states
-    setSelectedSubsystem("");
-    setMenuStructure([]);
-    setExpandedPaths(new Set());
-    setSelectedPath(null);
-    
-    // Close modal without toast notification
+    // Não resetar estados - manter o plugin no estado atual
+    // Apenas fechar o modal sem alterar o campo de edição
     if (onDataExchange) {
       onDataExchange({ closeModal: true });
     }
