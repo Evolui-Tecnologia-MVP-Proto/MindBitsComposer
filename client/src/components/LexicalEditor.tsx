@@ -1657,6 +1657,9 @@ function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; vie
           return;
         }
 
+        // Debug do estado atual do summary
+        console.log(`🔄 RefreshButtonsPlugin: Summary HTML do container ${index + 1}:`, summaryElement.outerHTML.substring(0, 200));
+
         console.log(`🔄 RefreshButtonsPlugin: Adicionando botão ao container ${index + 1}`);
 
         // Encontrar ou criar container direito
@@ -1717,6 +1720,16 @@ function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; vie
 
         rightContainer.appendChild(refreshButton);
         console.log(`✅ RefreshButtonsPlugin: Botão adicionado ao container ${index + 1}`);
+        
+        // Debug após adicionar botão
+        setTimeout(() => {
+          const checkButton = summaryElement.querySelector('.refresh-section-btn');
+          console.log(`🔍 RefreshButtonsPlugin: Verificação pós-inserção container ${index + 1} - botão existe:`, !!checkButton);
+          if (checkButton) {
+            console.log(`🔍 RefreshButtonsPlugin: Botão HTML:`, checkButton.outerHTML);
+            console.log(`🔍 RefreshButtonsPlugin: Botão visível:`, checkButton.offsetWidth > 0 && checkButton.offsetHeight > 0);
+          }
+        }, 100);
       });
     };
 
@@ -1727,10 +1740,49 @@ function RefreshButtonsPlugin({ mdFileOld, viewMode }: { mdFileOld?: string; vie
     const timeoutId2 = setTimeout(addRefreshButtons, 500);
     const timeoutId3 = setTimeout(addRefreshButtons, 1000);
 
+    // Configurar MutationObserver para detectar mudanças no DOM
+    const editorElement = editor.getRootElement();
+    let observer: MutationObserver | null = null;
+
+    if (editorElement) {
+      observer = new MutationObserver((mutations) => {
+        let shouldAddButtons = false;
+        
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'childList') {
+            // Verificar se foram adicionados novos containers collapsible
+            mutation.addedNodes.forEach((node) => {
+              if (node.nodeType === Node.ELEMENT_NODE) {
+                const element = node as Element;
+                if (element.classList?.contains('Collapsible__container') || 
+                    element.querySelector?.('.Collapsible__container')) {
+                  console.log('🔄 RefreshButtonsPlugin: MutationObserver detectou novo container');
+                  shouldAddButtons = true;
+                }
+              }
+            });
+          }
+        });
+
+        if (shouldAddButtons) {
+          // Aguardar um pouco para garantir que o DOM esteja estável
+          setTimeout(addRefreshButtons, 100);
+        }
+      });
+
+      observer.observe(editorElement, {
+        childList: true,
+        subtree: true
+      });
+    }
+
     return () => {
       clearTimeout(timeoutId1);
       clearTimeout(timeoutId2);
       clearTimeout(timeoutId3);
+      if (observer) {
+        observer.disconnect();
+      }
     };
   }, [editor, mdFileOld, viewMode]);
 
