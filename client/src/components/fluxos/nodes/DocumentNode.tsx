@@ -66,12 +66,20 @@ export const DocumentNode = memo(({ data, selected, ...nodeProps }: NodeProps) =
       {/* Ícone no canto superior esquerdo */}
       <FileText className="absolute top-1 left-1 h-6 w-6 text-purple-600 z-10" />
       
-      {/* Badge "In Progress" no canto superior direito */}
-      {data.isInProcess === "TRUE" && (
-        <div className="absolute -top-1 -right-1 bg-purple-500 text-white text-[8px] font-mono px-2 py-1 rounded-md shadow-md z-20 whitespace-nowrap">
-          In Progress
+      {/* Badge no canto superior direito - Discarted tem prioridade sobre In Progress */}
+      {data.isDiscarted === 'TRUE' ? (
+        <div className="absolute -top-1 -right-1 z-20">
+          <div className="bg-red-500 text-white text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-sm shadow-md border border-red-600">
+            Discarted
+          </div>
         </div>
-      )}
+      ) : data.isInProcess === 'TRUE' ? (
+        <div className="absolute -top-1 -right-1 z-20">
+          <div className="bg-purple-500 text-white text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-sm shadow-md border border-purple-600">
+            In Progress
+          </div>
+        </div>
+      ) : null}
       {/* Conteúdo do nó */}
       <div
         className={`absolute inset-0 flex items-center justify-center transition-all duration-200 ${
