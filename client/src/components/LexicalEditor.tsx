@@ -1607,22 +1607,42 @@ function RefreshButtonsPlugin({ mdFileOld }: { mdFileOld?: string }): null {
   const [editor] = useLexicalComposerContext();
 
   React.useEffect(() => {
-    if (!mdFileOld) return;
+    console.log('🔄 RefreshButtonsPlugin: Iniciando plugin, mdFileOld disponível:', !!mdFileOld);
+    
+    if (!mdFileOld) {
+      console.log('❌ RefreshButtonsPlugin: Sem mdFileOld, pulando execução');
+      return;
+    }
 
-    // Aguardar um pouco para garantir que o template foi carregado
-    const timeoutId = setTimeout(() => {
-      console.log('🔄 RefreshButtonsPlugin: Adicionando botões aos containers existentes');
+    // Função para adicionar botões
+    const addRefreshButtons = () => {
+      console.log('🔄 RefreshButtonsPlugin: Executando addRefreshButtons');
       
       const editorElement = editor.getRootElement();
-      if (!editorElement) return;
+      if (!editorElement) {
+        console.log('❌ RefreshButtonsPlugin: Editor element não encontrado');
+        return;
+      }
 
-      // Encontrar todos os containers de template (sem data-from-toolbar)
-      const allContainers = editorElement.querySelectorAll('.Collapsible__container:not([data-from-toolbar])');
-      console.log(`🔄 RefreshButtonsPlugin: Encontrados ${allContainers.length} containers de template`);
+      // Encontrar todos os containers collapsible
+      const allContainers = editorElement.querySelectorAll('.Collapsible__container');
+      console.log(`🔄 RefreshButtonsPlugin: Encontrados ${allContainers.length} containers collapsible total`);
 
-      allContainers.forEach((container, index) => {
+      // Filtrar containers que NÃO são de toolbar (containers de template)
+      const templateContainers = Array.from(allContainers).filter(container => {
+        const hasFromToolbar = container.hasAttribute('data-from-toolbar');
+        console.log(`🔄 RefreshButtonsPlugin: Container tem data-from-toolbar: ${hasFromToolbar}`);
+        return !hasFromToolbar;
+      });
+
+      console.log(`🔄 RefreshButtonsPlugin: Encontrados ${templateContainers.length} containers de template`);
+
+      templateContainers.forEach((container, index) => {
         const summaryElement = container.querySelector('summary');
-        if (!summaryElement) return;
+        if (!summaryElement) {
+          console.log(`❌ RefreshButtonsPlugin: Container ${index + 1} sem summary`);
+          return;
+        }
 
         // Verificar se já tem botão de refresh
         const existingButton = summaryElement.querySelector('.refresh-section-btn');
@@ -1686,9 +1706,20 @@ function RefreshButtonsPlugin({ mdFileOld }: { mdFileOld?: string }): null {
         rightContainer.appendChild(refreshButton);
         console.log(`✅ RefreshButtonsPlugin: Botão adicionado ao container ${index + 1}`);
       });
-    }, 500); // Aguardar 500ms após o template ser carregado
+    };
 
-    return () => clearTimeout(timeoutId);
+    // Executar imediatamente e depois com timeout para casos de renderização tardia
+    addRefreshButtons();
+    
+    const timeoutId1 = setTimeout(addRefreshButtons, 200);
+    const timeoutId2 = setTimeout(addRefreshButtons, 500);
+    const timeoutId3 = setTimeout(addRefreshButtons, 1000);
+
+    return () => {
+      clearTimeout(timeoutId1);
+      clearTimeout(timeoutId2);
+      clearTimeout(timeoutId3);
+    };
   }, [editor, mdFileOld]);
 
   return null;
