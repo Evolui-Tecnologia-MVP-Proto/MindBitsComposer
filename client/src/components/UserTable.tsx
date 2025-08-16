@@ -14,6 +14,7 @@ import {
   MoreHorizontal,
   ArrowRightLeft
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { User, UserStatus } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -172,19 +173,22 @@ export default function UserTable() {
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getStatusBadgeClass = (status: UserStatus | string) => {
+  const getStatusBadgeVariant = (status: UserStatus | string) => {
+    // Debug para ver o valor real do status
+    console.log('Badge status recebido:', status, 'Tipo:', typeof status);
+    
     // Garantir que a comparação funcione mesmo se vier como string
-    const statusStr = String(status);
+    const statusStr = String(status).toUpperCase();
     
     switch (statusStr) {
       case 'ACTIVE':
-        return "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200";
+        return "default" as const;
       case 'PENDING':
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200";
+        return "secondary" as const;
       case 'INACTIVE':
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800/40 dark:text-gray-200";
+        return "outline" as const;
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800/40 dark:text-gray-200";
+        return "outline" as const;
     }
   };
 
@@ -341,9 +345,19 @@ export default function UserTable() {
                           <div className="text-sm text-gray-900 dark:text-gray-100">{user.email}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(user.status)}`}>
-                            {getTranslatedStatus(user.status)}
-                          </span>
+                          {String(user.status).toUpperCase() === 'PENDING' ? (
+                            <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-yellow-200">
+                              Pendente
+                            </Badge>
+                          ) : String(user.status).toUpperCase() === 'ACTIVE' ? (
+                            <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200">
+                              Ativo
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline">
+                              {getTranslatedStatus(user.status)}
+                            </Badge>
+                          )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                           {getRoleName(user.roleId)}
