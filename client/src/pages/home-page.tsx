@@ -48,6 +48,11 @@ export default function HomePage() {
     enabled: !!user?.id
   });
 
+  // DEBUG: Vamos verificar todos os status disponíveis
+  console.log("🔍 DEBUG - Todos os documentos recebidos:", documentos.length);
+  console.log("🔍 DEBUG - Status únicos:", [...new Set(documentos.map(doc => doc.status))]);
+  console.log("🔍 DEBUG - Documentos com status 'encerrado':", documentos.filter(doc => doc.status === "encerrado"));
+
   // Calcular contadores para Base de conhecimento OC
   const documentosARevisar = documentos.filter(doc => 
     doc.origem === "MindBits_CT" && doc.status === "Integrado"
@@ -60,6 +65,8 @@ export default function HomePage() {
   const documentosPublicados = documentos.filter(doc => 
     doc.status === "encerrado"
   ).length;
+
+  console.log("🔍 DEBUG - Documentos finalizados calculado:", documentosPublicados);
 
   // Calcular documentos MindBits_CT Integrados agrupados por responsável
   const documentosMindBitsIntegrados = documentos.filter(doc => 
