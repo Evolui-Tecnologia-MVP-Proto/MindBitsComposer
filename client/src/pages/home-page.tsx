@@ -128,6 +128,9 @@ export default function HomePage() {
     return acc;
   }, {} as Record<string, number>);
 
+  // Calcular total de documentos em processo por mim (todas as especialidades)
+  const totalDocumentosEmProcessoPorMim = documentosEmProcessoPorMim.length;
+
   // Função para formatar data
   const formatDate = (date: Date | null) => {
     if (!date) return "-";
@@ -258,6 +261,11 @@ export default function HomePage() {
                 <CardContent className="pb-3">
                   <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
                     {documentosEmRevisao}
+                    {totalDocumentosEmProcessoPorMim > 0 && (
+                      <div className="text-sm text-yellow-600 dark:text-yellow-400 mt-1">
+                        {totalDocumentosEmProcessoPorMim} por mim
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

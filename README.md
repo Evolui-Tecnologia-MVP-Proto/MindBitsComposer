@@ -48,6 +48,7 @@ Uma plataforma avançada de sincronização de workflows empresariais que permit
   
 - **Card "Em Revisão"**  
   - Total de documentos com status "Em Processo"
+  - Inclui linha adicional "X por mim" mostrando documentos em processo iniciados pelo usuário logado
   - Ícone: AlertCircle
   - Cor: Amarelo
   
