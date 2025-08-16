@@ -108,9 +108,9 @@ const mdxComponents = {
   tbody: (props: any) => <tbody className="divide-y divide-gray-200 dark:divide-[#374151]" {...props} />,
   tr: (props: any) => <tr className="hover:bg-gray-50 dark:hover:bg-[#1E293B]" {...props} />,
   th: (props: any) => (
-    <th className="px-4 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider border-b border-gray-300 dark:border-[#111827] bg-gray-50 dark:bg-[#111827]" {...props} />
+    <th className="px-4 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider border-b border-gray-300 dark:border-[#374151] bg-gray-50 dark:bg-[#1B2028]" {...props} />
   ),
-  td: (props: any) => <td className="px-4 py-3 text-sm text-black dark:text-white border-b border-gray-200 dark:border-[#111827] bg-white dark:bg-[#111827]" {...props} />,
+  td: (props: any) => <td className="px-4 py-3 text-sm text-black dark:text-white border-b border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1B2028]" {...props} />,
   a: (props: any) => <a className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline" {...props} />,
   img: (props: any) => <img className="max-w-full h-auto rounded-lg shadow-sm mb-4" {...props} />,
   hr: (props: any) => <hr className="my-8 border-gray-300 dark:border-[#374151]" {...props} />,
@@ -727,7 +727,7 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
           </DialogTitle>
           
           {/* Toolbar */}
-          <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-200 dark:border-[#111827]">
+          <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-200 dark:border-[#374151]">
             <div className="flex items-center gap-2">
               {/* Botões de modo de visualização */}
               <Button
@@ -797,9 +797,9 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
         </DialogHeader>
         
         {/* MDX Preview Container - EXACTLY like composer editor */}
-        <div className="flex-1 overflow-y-auto border-t border-gray-200 dark:border-[#111827] mt-4 p-6 bg-slate-100 dark:bg-[#111827]">
+        <div className="flex-1 overflow-y-auto border-t border-gray-200 dark:border-[#374151] mt-4 p-6 bg-slate-100 dark:bg-[#020203]">
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white dark:bg-[#111827] rounded-lg shadow-sm border border-gray-200 dark:border-[#111827] p-6">
+            <div className="bg-white dark:bg-[#111827] rounded-lg shadow-sm border border-gray-200 dark:border-[#374151] p-6">
               {/* Renderização baseada no modo */}
               {viewMode === 'mdx' && (
                 <div className={`md-modal-content markdown-preview markdown-content prose prose-gray dark:prose-invert max-w-none`}>
