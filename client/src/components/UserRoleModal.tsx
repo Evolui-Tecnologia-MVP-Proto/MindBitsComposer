@@ -57,7 +57,7 @@ export function UserRoleModal({ isOpen, onClose, userRole, mode }: UserRoleModal
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      return await apiRequest("/api/user-roles", "POST", data);
+      return await apiRequest("POST", "/api/user-roles", data);
     },
     onSuccess: () => {
       toast({
@@ -79,7 +79,7 @@ export function UserRoleModal({ isOpen, onClose, userRole, mode }: UserRoleModal
 
   const updateMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      return await apiRequest(`/api/user-roles/${userRole?.id}`, "PUT", data);
+      return await apiRequest("PUT", `/api/user-roles/${userRole?.id}`, data);
     },
     onSuccess: () => {
       toast({
