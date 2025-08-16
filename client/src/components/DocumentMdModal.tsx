@@ -799,7 +799,7 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
         {/* MDX Preview Container - EXACTLY like composer editor */}
         <div className="flex-1 overflow-y-auto border-t border-gray-200 dark:border-[#374151] mt-4 p-6 bg-slate-100 dark:bg-[#020203]">
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white dark:bg-[#1B2028] rounded-lg shadow-sm border border-gray-200 dark:border-[#374151] p-6">
+            <div className="bg-white dark:bg-[#111827] rounded-lg shadow-sm border border-gray-200 dark:border-[#374151] p-6">
               {/* Renderização baseada no modo */}
               {viewMode === 'mdx' && (
                 <div className={`md-modal-content markdown-preview markdown-content prose prose-gray dark:prose-invert max-w-none`}>
