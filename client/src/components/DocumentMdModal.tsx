@@ -631,7 +631,7 @@ function RawTextView({ content }: { content: string }) {
         <tbody>
           {lines.map((line, index) => (
             <tr key={index}>
-              <td className="pr-4 text-gray-500 dark:text-gray-400 text-right select-none w-12 align-top">
+              <td className="pr-4 text-gray-500 dark:text-gray-400 text-right select-none w-12 align-top bg-[#1b2028]">
                 {index + 1}
               </td>
               <td className="text-gray-100 dark:text-gray-300 whitespace-pre-wrap break-words">
