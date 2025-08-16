@@ -34,7 +34,7 @@ function MermaidDiagram({ chart }: { chart: string }) {
           primaryBorderColor: '#FFFFFF',
           lineColor: '#FFFFFF',
           secondaryColor: '#1E293B',
-          tertiaryColor: '#374151',
+          tertiaryColor: '#111827',
           edgeLabelBackground: '#333B4D',
           labelBackground: '#333B4D',
           labelTextColor: '#FFFFFF',
@@ -319,21 +319,21 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
                 <thead key="thead" className="bg-gray-50 dark:bg-[#111827]">
                   <tr className="hover:bg-gray-50 dark:hover:bg-[#1E293B]">
                     {cells.map((cell, cellIndex) => (
-                      <th key={cellIndex} className="px-4 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider border-b border-gray-300 dark:border-[#374151] bg-gray-50 dark:bg-[#1B2028]">
+                      <th key={cellIndex} className="px-4 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider border-b border-gray-300 dark:border-[#111827] bg-gray-50 dark:bg-[#1B2028]">
                         {processInlineFormatting(cell)}
                       </th>
                     ))}
                   </tr>
                 </thead>
               );
-              tableElements.push(<tbody key="tbody" className="divide-y divide-gray-200 dark:divide-[#374151]" />);
+              tableElements.push(<tbody key="tbody" className="divide-y divide-gray-200 dark:divide-[#111827]" />);
               isFirstRow = false;
             } else {
               const tbody = tableElements[tableElements.length - 1] as React.ReactElement;
               const newRow = (
                 <tr key={index} className="hover:bg-gray-50 dark:hover:bg-[#1E293B]">
                   {cells.map((cell, cellIndex) => (
-                    <td key={cellIndex} className="px-4 py-3 text-sm text-black dark:text-white border-b border-gray-300 dark:border-[#374151]">
+                    <td key={cellIndex} className="px-4 py-3 text-sm text-black dark:text-white border-b border-gray-300 dark:border-[#111827]">
                       {processInlineFormatting(cell)}
                     </td>
                   ))}
@@ -350,7 +350,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
 
         elements.push(
           <div key={elements.length} className="overflow-x-auto mb-4">
-            <table className="border-collapse border border-gray-300 dark:border-[#374151] rounded-lg">
+            <table className="border-collapse border border-gray-300 dark:border-[#111827] rounded-lg">
               {tableElements}
             </table>
           </div>
@@ -405,7 +405,7 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
       const processedContent = processInlineFormatting(content);
       
       const headerClasses = {
-        1: "text-3xl font-bold mb-6 text-black dark:text-white border-b border-gray-200 dark:border-[#374151] pb-3",
+        1: "text-3xl font-bold mb-6 text-black dark:text-white border-b border-gray-200 dark:border-[#111827] pb-3",
         2: "text-2xl font-semibold mb-4 text-black dark:text-white mt-8",
         3: "text-xl font-medium mb-3 text-black dark:text-white mt-6",
         4: "text-lg font-medium mb-2 text-black dark:text-white mt-4",
