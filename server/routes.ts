@@ -8,7 +8,7 @@ import { db } from "./db";
 import { eq, sql, desc, asc, and, gte, lte, isNull, or, ne, inArray } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { systemLogs } from "@shared/schema";
-import { ZodError } from "zod";
+import { ZodError, z } from "zod";
 import fetch from "node-fetch";
 import { jobManager } from "./job-manager";
 import { SystemLogger, EventTypes } from "./logger";
@@ -7565,18 +7565,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      // Auto-generate password based on email (part before @ + "123")
-      const emailParts = req.body.email?.split('@');
-      if (!emailParts || emailParts.length < 2) {
-        return res.status(400).json({ message: "Email inválido" });
-      }
+      // Create validation schema without password requirement
+      const createUserSchema = z.object({
+        name: z.string().min(1, "Nome é obrigatório"),
+        email: z.string().email("Email inválido"),
+        roleId: z.number().optional().default(0),
+        status: z.string().optional().default("ACTIVE"),
+        flowProcessAcs: z.array(z.string()).optional().default([]),
+      });
       
+      // Validate request body
+      const validatedData = createUserSchema.parse(req.body);
+      
+      // Auto-generate password based on email (part before @ + "123")
+      const emailParts = validatedData.email.split('@');
       const generatedPassword = emailParts[0] + "123";
       
-      // Add the generated password to the request body
+      // Create complete user data with generated password
       const userData = {
-        ...req.body,
-        password: generatedPassword
+        ...validatedData,
+        password: generatedPassword,
+        mustChangePassword: true, // User must change password on first login
       };
       
       const user = await storage.createUser(userData);
@@ -7584,7 +7593,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error: any) {
       console.error("Erro ao criar usuário:", error);
       
-      // Check for validation errors and return structured response
+      // Check for Zod validation errors and return structured response
       if (error.issues) {
         return res.status(400).json({ 
           message: "Dados inválidos",
