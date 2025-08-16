@@ -48,18 +48,6 @@ export default function HomePage() {
     enabled: !!user?.id
   });
 
-  // DEBUG: Vamos verificar todos os status disponíveis
-  console.log("🔍 DEBUG - Todos os documentos recebidos:", documentos.length);
-  const statusUnicos = [...new Set(documentos.map(doc => doc.status))];
-  console.log("🔍 DEBUG - Status únicos encontrados:", statusUnicos);
-  console.log("🔍 DEBUG - Documentos com status 'encerrado':", documentos.filter(doc => doc.status === "encerrado"));
-  
-  // Vamos também verificar documentos com status semelhante
-  statusUnicos.forEach(status => {
-    const count = documentos.filter(doc => doc.status === status).length;
-    console.log(`📊 Status "${status}": ${count} documentos`);
-  });
-
   // Calcular contadores para Base de conhecimento OC
   const documentosARevisar = documentos.filter(doc => 
     doc.origem === "MindBits_CT" && doc.status === "Integrado"
@@ -70,10 +58,8 @@ export default function HomePage() {
   ).length;
 
   const documentosPublicados = documentos.filter(doc => 
-    doc.status === "encerrado"
+    doc.status === "Encerrado"
   ).length;
-
-  console.log("🔍 DEBUG - Documentos finalizados calculado:", documentosPublicados);
 
   // Calcular documentos MindBits_CT Integrados agrupados por responsável
   const documentosMindBitsIntegrados = documentos.filter(doc => 
@@ -147,8 +133,8 @@ export default function HomePage() {
 
   // Calcular documentos finalizados por mim
   const documentosFinalizadosPorMim = documentos.filter(doc => {
-    // Documento deve estar "encerrado"
-    if (doc.status !== "encerrado") return false;
+    // Documento deve estar "Encerrado"
+    if (doc.status !== "Encerrado") return false;
     
     // Verificar se o documento foi iniciado pelo usuário logado
     if (doc.userId === user?.id) return true;
