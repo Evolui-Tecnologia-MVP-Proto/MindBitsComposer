@@ -82,31 +82,31 @@ const mdxComponents = {
   ol: (props: any) => <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />,
   li: (props: any) => <li className="text-black dark:text-white" {...props} />,
   blockquote: (props: any) => (
-    <blockquote className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 py-2 mb-4 bg-gray-50 dark:bg-[#1E293B] italic text-black dark:text-white" {...props} />
+    <blockquote className="border-l-4 border-blue-500 dark:border-blue-400 pl-4 py-2 mb-4 bg-gray-50 dark:bg-[#1B2028] italic text-black dark:text-white" {...props} />
   ),
   code: (props: any) => {
     // Inline code
     if (!props.className) {
-      return <code className="bg-gray-100 dark:bg-[#1E293B] text-black dark:text-white px-2 py-1 rounded text-sm font-mono" {...props} />;
+      return <code className="bg-gray-100 dark:bg-[#1B2028] text-black dark:text-white px-2 py-1 rounded text-sm font-mono" {...props} />;
     }
     // Block code
     return (
-      <pre className="bg-gray-900 dark:bg-[#111827] text-white p-4 rounded-lg mb-4 overflow-x-auto">
+      <pre className="bg-gray-900 dark:bg-[#1B2028] text-white p-4 rounded-lg mb-4 overflow-x-auto">
         <code className="text-sm font-mono text-white" {...props} />
       </pre>
     );
   },
   pre: (props: any) => (
-    <pre className="bg-gray-900 dark:bg-[#111827] text-white p-4 rounded-lg mb-4 overflow-x-auto" {...props} />
+    <pre className="bg-gray-900 dark:bg-[#1B2028] text-white p-4 rounded-lg mb-4 overflow-x-auto" {...props} />
   ),
   table: (props: any) => (
     <div className="overflow-x-auto mb-4">
       <table className="border-collapse border border-gray-300 dark:border-[#111827] rounded-lg" {...props} />
     </div>
   ),
-  thead: (props: any) => <thead className="bg-gray-50 dark:bg-[#111827]" {...props} />,
+  thead: (props: any) => <thead className="bg-gray-50 dark:bg-[#1B2028]" {...props} />,
   tbody: (props: any) => <tbody className="divide-y divide-gray-200 dark:divide-[#111827]" {...props} />,
-  tr: (props: any) => <tr className="hover:bg-gray-50 dark:hover:bg-[#1E293B]" {...props} />,
+  tr: (props: any) => <tr className="hover:bg-gray-50 dark:hover:bg-[#1B2028]" {...props} />,
   th: (props: any) => (
     <th className="px-4 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider border-b border-gray-300 dark:border-[#111827] bg-gray-50 dark:bg-[#1B2028]" {...props} />
   ),
@@ -118,10 +118,10 @@ const mdxComponents = {
   em: (props: any) => <em className="italic text-black dark:text-white" {...props} />,
   // Collapsible containers (details/summary elements)
   details: (props: any) => (
-    <details className="mb-4 border border-gray-300 dark:border-[#111827] rounded-lg bg-white dark:bg-[#020203] overflow-hidden" {...props} />
+    <details className="mb-4 border border-gray-300 dark:border-[#111827] rounded-lg bg-white dark:bg-[#1B2028] overflow-hidden" {...props} />
   ),
   summary: (props: any) => (
-    <summary className="px-4 py-3 bg-gray-50 dark:bg-[#1E293B] border-b border-gray-300 dark:border-[#111827] cursor-pointer hover:bg-gray-100 dark:hover:bg-[#111827] font-medium text-black dark:text-white select-none" {...props} />
+    <summary className="px-4 py-3 bg-gray-50 dark:bg-[#1B2028] border-b border-gray-300 dark:border-[#111827] cursor-pointer hover:bg-gray-100 dark:hover:bg-[#1B2028] font-medium text-black dark:text-white select-none" {...props} />
   ),
 };
 
@@ -799,7 +799,7 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
         {/* MDX Preview Container - EXACTLY like composer editor */}
         <div className="flex-1 overflow-y-auto border-t border-gray-200 dark:border-[#111827] mt-4 p-6 bg-slate-100 dark:bg-[#020203]">
           <div className="max-w-4xl mx-auto">
-            <div className="dark:bg-[#111827] rounded-lg shadow-sm border border-gray-200 dark:border-[#111827] p-6 bg-[#1b2028]">
+            <div className="dark:bg-[#1B2028] rounded-lg shadow-sm border border-gray-200 dark:border-[#111827] p-6 bg-[#1b2028]">
               {/* Renderização baseada no modo */}
               {viewMode === 'mdx' && (
                 <div className={`md-modal-content markdown-preview markdown-content prose prose-gray dark:prose-invert max-w-none`}>
