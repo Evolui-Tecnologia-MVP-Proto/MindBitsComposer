@@ -65,39 +65,7 @@ const changePasswordSchema = z.object({
   newPassword: z.string().min(6),
 });
 
-// TEMPORARY: Override isAuthenticated for development/testing
-// TODO: Remove this when login is re-enabled
-function setupDevAuth(req: any) {
-  // Always enable bypass for testing (remove NODE_ENV check)
-  // Override the isAuthenticated method to always return true
-  const originalIsAuthenticated = req.isAuthenticated;
-  req.isAuthenticated = function() {
-    // Set a fake admin user if not already set
-    if (!req.user) {
-      req.user = {
-        id: 3,
-        name: "Administrador",
-        email: "admin@evoluitecnologia.com.br",
-        role: "ADMIN", // Garantir que o usuário fake tem role de admin
-        status: "ACTIVE",
-        mustChangePassword: false
-      };
-    }
-    return true;
-  };
-  
-  // Also ensure user is always set
-  if (!req.user) {
-    req.user = {
-      id: 3,
-      name: "Administrador",
-      email: "admin@evoluitecnologia.com.br",
-      role: "ADMIN",
-      status: "ACTIVE", 
-      mustChangePassword: false
-    };
-  }
-}
+
 
 export function setupAuth(app: Express) {
   const sessionSettings: session.SessionOptions = {
@@ -117,11 +85,7 @@ export function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // TEMPORARY: Enable dev auth bypass for User Roles testing
-  app.use((req, res, next) => {
-    setupDevAuth(req);
-    next();
-  });
+
 
   passport.use(
     new LocalStrategy(
