@@ -229,10 +229,7 @@ export default function EditUserModal({ isOpen, onClose, user }: EditUserModalPr
               )}
             />
 
-{/* Debug: verificar status do usuário */}
-            {console.log('EditUserModal - user:', user, 'status:', user?.status, 'UserStatus.PENDING:', UserStatus.PENDING)}
-            
-            {/* Campo Status - apenas para usuários ACTIVE/INACTIVE */}
+{/* Campo Status - apenas para usuários ACTIVE/INACTIVE */}
             {user && String(user.status).toUpperCase() !== 'PENDING' && (
               <FormField
                 control={form.control}

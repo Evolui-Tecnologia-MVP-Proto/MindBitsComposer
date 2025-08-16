@@ -7669,6 +7669,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/users/:id/reset-password", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).json({ message: "Não autorizado" });
+    
+    const { id } = req.params;
+    
+    try {
+      // Verificar se o usuário existe
+      const existingUser = await storage.getUser(parseInt(id));
+      if (!existingUser) {
+        return res.status(404).json({ message: "Usuário não encontrado" });
+      }
+      
+      // Reset password - email prefix + "123"
+      const emailPrefix = existingUser.email?.split('@')[0] || 'user';
+      const newPassword = `${emailPrefix}123`;
+      
+      // Update user with new password and force password change
+      await storage.updateUser(parseInt(id), { 
+        password: newPassword,
+        mustChangePassword: true 
+      });
+      
+      console.log(`✅ [API] Senha resetada para usuário ${id}: ${existingUser.name}`);
+      
+      res.json({ 
+        message: "Senha resetada com sucesso",
+        temporaryPassword: newPassword
+      });
+      
+    } catch (error: any) {
+      console.error("❌ [API] Erro ao resetar senha:", error);
+      res.status(500).json({ 
+        message: "Erro interno ao resetar senha",
+        details: error.message 
+      });
+    }
+  });
+
   app.post("/api/users/transfer", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
