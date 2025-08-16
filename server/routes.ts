@@ -7685,17 +7685,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const emailPrefix = existingUser.email?.split('@')[0] || 'user';
       const newPassword = `${emailPrefix}123`;
       
-      // Update user with new password and force password change
+      // Update user with new password, force password change, and set status to pending
       await storage.updateUser(parseInt(id), { 
         password: newPassword,
-        mustChangePassword: true 
+        mustChangePassword: true,
+        status: 'pending'
       });
       
-      console.log(`✅ [API] Senha resetada para usuário ${id}: ${existingUser.name}`);
+      console.log(`✅ [API] Senha resetada para usuário ${id}: ${existingUser.name} - Status alterado para PENDING`);
       
       res.json({ 
-        message: "Senha resetada com sucesso",
-        temporaryPassword: newPassword
+        message: "Senha resetada com sucesso. Usuário deve fazer login com a nova senha.",
+        temporaryPassword: newPassword,
+        newStatus: "pending"
       });
       
     } catch (error: any) {
