@@ -7695,8 +7695,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`✅ [API] Senha resetada para usuário ${id}: ${existingUser.name} - Status alterado para PENDING`);
       
       res.json({ 
-        message: "Senha resetada com sucesso. Usuário deve fazer login com a nova senha.",
-        temporaryPassword: newPassword,
+        message: "Senha resetada com sucesso. O usuário deve fazer login com a senha padrão (parte do email antes do @ + 123).",
         newStatus: "pending"
       });
       
