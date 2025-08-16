@@ -127,7 +127,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await apiRequest("POST", "/api/logout");
     },
     onSuccess: () => {
-      queryClient.setQueryData(["/api/user"], null);
+      // Limpa todo o cache do React Query para evitar dados do usuário anterior
+      queryClient.clear();
       navigate("/auth");
     },
     onError: (error: Error) => {
