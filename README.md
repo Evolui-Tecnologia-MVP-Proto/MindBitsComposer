@@ -54,6 +54,7 @@ Uma plataforma avançada de sincronização de workflows empresariais que permit
   
 - **Card "Finalizados"**
   - Total de documentos com status "Concluído"
+  - Inclui linha adicional "X por mim" mostrando documentos finalizados pelo usuário logado
   - Ícone: CheckCircle2
   - Cor: Verde
 

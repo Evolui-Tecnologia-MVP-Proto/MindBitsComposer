@@ -131,6 +131,26 @@ export default function HomePage() {
   // Calcular total de documentos em processo por mim (todas as especialidades)
   const totalDocumentosEmProcessoPorMim = documentosEmProcessoPorMim.length;
 
+  // Calcular documentos finalizados por mim
+  const documentosFinalizadosPorMim = documentos.filter(doc => {
+    // Documento deve estar "Concluido"
+    if (doc.status !== "Concluido") return false;
+    
+    // Verificar se o documento foi iniciado pelo usuário logado
+    if (doc.userId === user?.id) return true;
+    
+    // Verificar se há edições iniciadas pelo usuário logado
+    const userEditions = (documentEditions as any[]).filter((edition: any) => 
+      edition.documentId === doc.id && 
+      edition.startedBy === user?.id
+    );
+    
+    return userEditions.length > 0;
+  });
+
+  // Calcular total de documentos finalizados por mim (todas as especialidades)
+  const totalDocumentosFinalizadosPorMim = documentosFinalizadosPorMim.length;
+
   // Função para formatar data
   const formatDate = (date: Date | null) => {
     if (!date) return "-";
@@ -280,6 +300,11 @@ export default function HomePage() {
                 <CardContent className="pb-3">
                   <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
                     {documentosPublicados}
+                    {totalDocumentosFinalizadosPorMim > 0 && (
+                      <div className="text-sm text-green-600 dark:text-green-400 mt-1">
+                        {totalDocumentosFinalizadosPorMim} por mim
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
