@@ -58,7 +58,7 @@ export default function HomePage() {
   ).length;
 
   const documentosPublicados = documentos.filter(doc => 
-    doc.status === "Concluido"
+    doc.status === "encerrado"
   ).length;
 
   // Calcular documentos MindBits_CT Integrados agrupados por responsável
@@ -133,8 +133,8 @@ export default function HomePage() {
 
   // Calcular documentos finalizados por mim
   const documentosFinalizadosPorMim = documentos.filter(doc => {
-    // Documento deve estar "Concluido"
-    if (doc.status !== "Concluido") return false;
+    // Documento deve estar "encerrado"
+    if (doc.status !== "encerrado") return false;
     
     // Verificar se o documento foi iniciado pelo usuário logado
     if (doc.userId === user?.id) return true;
