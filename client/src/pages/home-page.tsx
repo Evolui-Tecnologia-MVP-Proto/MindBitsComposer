@@ -252,7 +252,7 @@ export default function HomePage() {
               <Card className="bg-white dark:bg-[#1E293B] border-gray-200 dark:border-[#374151]">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 pt-3">
                   <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                    Documentos Publicados
+                    Documentos Finalizados
                   </CardTitle>
                   <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
                 </CardHeader>

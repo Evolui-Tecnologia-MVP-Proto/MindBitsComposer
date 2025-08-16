@@ -50,7 +50,7 @@ Uma plataforma avançada de sincronização de workflows empresariais que permit
   - Ícone: AlertCircle
   - Cor: Amarelo
   
-- **Card "Publicados"**
+- **Card "Finalizados"**
   - Total de documentos com status "Concluído"
   - Ícone: CheckCircle2
   - Cor: Verde
