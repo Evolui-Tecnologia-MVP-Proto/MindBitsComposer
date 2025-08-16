@@ -878,6 +878,7 @@ export function DocsProcessEmbed({
     onSuccess: (data, variables) => {
       console.log("OnSuccess disparado:", data);
       queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos/user-in-process"] });
       queryClient.invalidateQueries({
         queryKey: ["/api/documentos/artifacts-count"],
       });
@@ -962,6 +963,7 @@ export function DocsProcessEmbed({
     onSuccess: (data, documentId) => {
       // Invalidar todas as queries relacionadas aos documentos
       queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos/user-in-process"] });
       
       // Invalidar queries relacionadas a fluxos
       queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
@@ -1024,6 +1026,7 @@ export function DocsProcessEmbed({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos/user-in-process"] });
       queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
       queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions/count"] });
       setIsDocumentationModalOpen(false);
@@ -3812,6 +3815,7 @@ function FlowWithAutoFitView({
         
         // Recarregar a lista de execuções de fluxo para atualizar dados
         await queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
+        await queryClient.invalidateQueries({ queryKey: ['/api/documentos/user-in-process'] });
         
         // Aguardar um momento para garantir que os dados foram atualizados
         await new Promise(resolve => setTimeout(resolve, 500));
