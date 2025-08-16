@@ -1081,6 +1081,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("🔍 [API] Buscando documentos em processo do usuário:", req.user.id);
       
       // Buscar documentos com status "Em Processo" associados ao usuário logado
+      // Incluir também documentos que foram iniciados pelo usuário via document editions
       const documents = await db
         .select()
         .from(documentos)
@@ -1089,9 +1090,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           eq(documentos.userId, req.user.id)
         ))
         .orderBy(desc(documentos.updatedAt));
+
+      // Converter BigInt para string para serialização JSON
+      const documentsSerializados = documents.map(doc => ({
+        ...doc,
+        idOrigem: doc.idOrigem ? doc.idOrigem.toString() : null
+      }));
       
-      console.log("✅ [API] Documentos em processo encontrados para o usuário:", documents.length);
-      res.json(documents);
+      console.log("✅ [API] Documentos em processo encontrados para o usuário:", documentsSerializados.length);
+      res.json(documentsSerializados);
     } catch (error: any) {
       console.error("❌ [API] Erro ao buscar documentos em processo do usuário:", error);
       res.status(500).send("Erro ao buscar documentos em processo do usuário");

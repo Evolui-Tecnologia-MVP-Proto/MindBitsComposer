@@ -298,9 +298,20 @@ export function DocsProcessEmbed({
   });
 
   // Buscar documentos
-  const { data: documentos = [], isLoading } = useQuery<Documento[]>({
-    queryKey: useUserFilter ? ["/api/documentos/user-in-process"] : ["/api/documentos"],
+  console.log("🔍 [DEBUG] DocsProcessEmbed useUserFilter:", useUserFilter);
+  console.log("🔍 [DEBUG] DocsProcessEmbed user:", user?.id, user?.name);
+  const endpoint = useUserFilter ? "/api/documentos/user-in-process" : "/api/documentos";
+  console.log("🔍 [DEBUG] DocsProcessEmbed endpoint:", endpoint);
+  
+  const { data: documentos = [], isLoading, error } = useQuery<Documento[]>({
+    queryKey: [endpoint],
+    staleTime: 0, // Desabilitar cache para debug
+    cacheTime: 0,
   });
+  
+  console.log("🔍 [DEBUG] DocsProcessEmbed documentos:", documentos.length, documentos);
+  console.log("🔍 [DEBUG] DocsProcessEmbed isLoading:", isLoading);
+  console.log("🔍 [DEBUG] DocsProcessEmbed error:", error);
 
   // Buscar fluxos disponíveis
   const { data: documentsFlows = [] } = useQuery({
