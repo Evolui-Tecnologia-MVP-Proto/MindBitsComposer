@@ -686,10 +686,10 @@ function DiffView({ oldContent, newContent }: { oldContent: string; newContent: 
         <tbody>
           {diffLines.map((line, index) => (
             <tr key={index} className={getLineStyle(line.type)}>
-              <td className="pr-2 text-gray-500 dark:text-gray-400 text-right select-none align-top bg-transparent dark:bg-[#1B2028]" style={{minWidth: '16px', maxWidth: '16px', width: '16px'}}>
+              <td className="pr-4 text-gray-500 dark:text-gray-400 text-right select-none align-top bg-transparent dark:bg-[#1B2028]" style={{minWidth: '24px', maxWidth: '24px', width: '24px'}}>
                 {line.lineNumber || ''}
               </td>
-              <td className="pr-2 text-gray-600 dark:text-gray-300 text-center select-none w-6 align-top bg-transparent dark:bg-[#1B2028]">
+              <td className="pr-2 text-gray-600 dark:text-gray-300 text-center select-none align-top bg-transparent dark:bg-[#1B2028]" style={{minWidth: '24px', maxWidth: '24px', width: '24px'}}>
                 {getLinePrefix(line.type)}
               </td>
               <td className="text-gray-100 dark:text-gray-300 whitespace-pre-wrap break-words pl-2 bg-transparent dark:bg-[#1B2028]">
