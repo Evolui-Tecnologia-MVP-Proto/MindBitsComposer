@@ -414,6 +414,7 @@ export default function HomePage() {
                 activeTab="em-processo"
                 hideStatusColumn={true}
                 showResetButton={false}
+                useUserFilter={true}
               />
             </div>
           </div>

@@ -73,6 +73,7 @@ interface DocsProcessEmbedProps {
   hideStatusColumn?: boolean;
   statusFilter?: string; // NOVA PROP
   showResetButton?: boolean; // Controla se o botão Reset deve aparecer
+  useUserFilter?: boolean; // NOVA PROP - filtra apenas documentos do usuário logado
 }
 
 export function DocsProcessEmbed({ 
@@ -81,7 +82,8 @@ export function DocsProcessEmbed({
   activeTab = "em-processo",
   hideStatusColumn = false,
   statusFilter,
-  showResetButton
+  showResetButton,
+  useUserFilter = false
 }: DocsProcessEmbedProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -297,7 +299,7 @@ export function DocsProcessEmbed({
 
   // Buscar documentos
   const { data: documentos = [], isLoading } = useQuery<Documento[]>({
-    queryKey: ["/api/documentos"],
+    queryKey: useUserFilter ? ["/api/documentos/user-in-process"] : ["/api/documentos"],
   });
 
   // Buscar fluxos disponíveis
