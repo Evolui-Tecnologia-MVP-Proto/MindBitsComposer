@@ -345,19 +345,30 @@ export default function UserTable() {
                           <div className="text-sm text-gray-900 dark:text-gray-100">{user.email}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {String(user.status).toUpperCase() === 'PENDING' ? (
-                            <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-yellow-200">
-                              Pendente
-                            </Badge>
-                          ) : String(user.status).toUpperCase() === 'ACTIVE' ? (
-                            <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200">
-                              Ativo
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline">
-                              {getTranslatedStatus(user.status)}
-                            </Badge>
-                          )}
+                          {(() => {
+                            const status = String(user.status).toUpperCase();
+                            console.log('Rendering badge for user:', user.name, 'status:', user.status, 'normalized:', status);
+                            
+                            if (status === 'PENDING') {
+                              return (
+                                <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-yellow-300 dark:bg-yellow-900 dark:text-yellow-100">
+                                  Pendente
+                                </Badge>
+                              );
+                            } else if (status === 'ACTIVE') {
+                              return (
+                                <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-green-300 dark:bg-green-900 dark:text-green-100">
+                                  Ativo
+                                </Badge>
+                              );
+                            } else {
+                              return (
+                                <Badge variant="outline">
+                                  {getTranslatedStatus(user.status)}
+                                </Badge>
+                              );
+                            }
+                          })()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                           {getRoleName(user.roleId)}
