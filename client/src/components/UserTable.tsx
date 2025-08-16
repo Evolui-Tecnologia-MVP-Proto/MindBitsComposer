@@ -172,13 +172,16 @@ export default function UserTable() {
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getStatusBadgeClass = (status: UserStatus) => {
-    switch (status) {
-      case UserStatus.ACTIVE:
+  const getStatusBadgeClass = (status: UserStatus | string) => {
+    // Garantir que a comparação funcione mesmo se vier como string
+    const statusStr = String(status);
+    
+    switch (statusStr) {
+      case 'ACTIVE':
         return "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-200";
-      case UserStatus.PENDING:
+      case 'PENDING':
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-200";
-      case UserStatus.INACTIVE:
+      case 'INACTIVE':
         return "bg-gray-100 text-gray-800 dark:bg-gray-800/40 dark:text-gray-200";
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-800/40 dark:text-gray-200";
@@ -196,16 +199,22 @@ export default function UserTable() {
     return role ? role.name : "Usuário";
   };
 
-  const getTranslatedStatus = (status: UserStatus) => {
-    switch (status) {
-      case UserStatus.ACTIVE:
+  const getTranslatedStatus = (status: UserStatus | string) => {
+    // Debug para ver o valor real do status
+    console.log('Status recebido:', status, 'Tipo:', typeof status);
+    
+    // Garantir que a comparação funcione mesmo se vier como string
+    const statusStr = String(status);
+    
+    switch (statusStr) {
+      case 'ACTIVE':
         return "Ativo";
-      case UserStatus.PENDING:
-        return "Pendente";
-      case UserStatus.INACTIVE:
+      case 'PENDING':
+        return "Pendente"; 
+      case 'INACTIVE':
         return "Inativo";
       default:
-        return status;
+        return statusStr;
     }
   };
 
@@ -332,8 +341,8 @@ export default function UserTable() {
                           <div className="text-sm text-gray-900 dark:text-gray-100">{user.email}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(user.status as UserStatus)}`}>
-                            {getTranslatedStatus(user.status as UserStatus)}
+                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(user.status)}`}>
+                            {getTranslatedStatus(user.status)}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
