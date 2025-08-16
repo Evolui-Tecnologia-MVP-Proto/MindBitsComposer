@@ -71,7 +71,7 @@ function MermaidDiagram({ chart }: { chart: string }) {
 
 // MDX Components (same as MarkdownPreview.tsx)
 const mdxComponents = {
-  h1: (props: any) => <h1 className="text-3xl font-bold mb-6 text-black dark:text-white border-b border-gray-200 dark:border-[#374151] pb-3" {...props} />,
+  h1: (props: any) => <h1 className="text-3xl font-bold mb-6 text-black dark:text-white border-b border-gray-200 dark:border-[#111827] pb-3" {...props} />,
   h2: (props: any) => <h2 className="text-2xl font-semibold mb-4 text-black dark:text-white mt-8" {...props} />,
   h3: (props: any) => <h3 className="text-xl font-medium mb-3 text-black dark:text-white mt-6" {...props} />,
   h4: (props: any) => <h4 className="text-lg font-medium mb-2 text-black dark:text-white mt-4" {...props} />,
@@ -101,27 +101,27 @@ const mdxComponents = {
   ),
   table: (props: any) => (
     <div className="overflow-x-auto mb-4">
-      <table className="border-collapse border border-gray-300 dark:border-[#374151] rounded-lg" {...props} />
+      <table className="border-collapse border border-gray-300 dark:border-[#111827] rounded-lg" {...props} />
     </div>
   ),
   thead: (props: any) => <thead className="bg-gray-50 dark:bg-[#111827]" {...props} />,
-  tbody: (props: any) => <tbody className="divide-y divide-gray-200 dark:divide-[#374151]" {...props} />,
+  tbody: (props: any) => <tbody className="divide-y divide-gray-200 dark:divide-[#111827]" {...props} />,
   tr: (props: any) => <tr className="hover:bg-gray-50 dark:hover:bg-[#1E293B]" {...props} />,
   th: (props: any) => (
-    <th className="px-4 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider border-b border-gray-300 dark:border-[#374151] bg-gray-50 dark:bg-[#1B2028]" {...props} />
+    <th className="px-4 py-3 text-left text-xs font-medium text-black dark:text-white uppercase tracking-wider border-b border-gray-300 dark:border-[#111827] bg-gray-50 dark:bg-[#1B2028]" {...props} />
   ),
-  td: (props: any) => <td className="px-4 py-3 text-sm text-black dark:text-white border-b border-gray-200 dark:border-[#374151] bg-white dark:bg-[#1B2028]" {...props} />,
+  td: (props: any) => <td className="px-4 py-3 text-sm text-black dark:text-white border-b border-gray-200 dark:border-[#111827] bg-white dark:bg-[#1B2028]" {...props} />,
   a: (props: any) => <a className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline" {...props} />,
   img: (props: any) => <img className="max-w-full h-auto rounded-lg shadow-sm mb-4" {...props} />,
-  hr: (props: any) => <hr className="my-8 border-gray-300 dark:border-[#374151]" {...props} />,
+  hr: (props: any) => <hr className="my-8 border-gray-300 dark:border-[#111827]" {...props} />,
   strong: (props: any) => <strong className="font-semibold text-black dark:text-white" {...props} />,
   em: (props: any) => <em className="italic text-black dark:text-white" {...props} />,
   // Collapsible containers (details/summary elements)
   details: (props: any) => (
-    <details className="mb-4 border border-gray-300 dark:border-[#374151] rounded-lg bg-white dark:bg-[#020203] overflow-hidden" {...props} />
+    <details className="mb-4 border border-gray-300 dark:border-[#111827] rounded-lg bg-white dark:bg-[#020203] overflow-hidden" {...props} />
   ),
   summary: (props: any) => (
-    <summary className="px-4 py-3 bg-gray-50 dark:bg-[#1E293B] border-b border-gray-300 dark:border-[#374151] cursor-pointer hover:bg-gray-100 dark:hover:bg-[#374151] font-medium text-black dark:text-white select-none" {...props} />
+    <summary className="px-4 py-3 bg-gray-50 dark:bg-[#1E293B] border-b border-gray-300 dark:border-[#111827] cursor-pointer hover:bg-gray-100 dark:hover:bg-[#111827] font-medium text-black dark:text-white select-none" {...props} />
   ),
 };
 
@@ -727,7 +727,7 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
           </DialogTitle>
           
           {/* Toolbar */}
-          <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-200 dark:border-[#374151]">
+          <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-200 dark:border-[#111827]">
             <div className="flex items-center gap-2">
               {/* Botões de modo de visualização */}
               <Button
@@ -797,9 +797,9 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
         </DialogHeader>
         
         {/* MDX Preview Container - EXACTLY like composer editor */}
-        <div className="flex-1 overflow-y-auto border-t border-gray-200 dark:border-[#374151] mt-4 p-6 bg-slate-100 dark:bg-[#020203]">
+        <div className="flex-1 overflow-y-auto border-t border-gray-200 dark:border-[#111827] mt-4 p-6 bg-slate-100 dark:bg-[#020203]">
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white dark:bg-[#111827] rounded-lg shadow-sm border border-gray-200 dark:border-[#374151] p-6">
+            <div className="bg-white dark:bg-[#111827] rounded-lg shadow-sm border border-gray-200 dark:border-[#111827] p-6">
               {/* Renderização baseada no modo */}
               {viewMode === 'mdx' && (
                 <div className={`md-modal-content markdown-preview markdown-content prose prose-gray dark:prose-invert max-w-none`}>
