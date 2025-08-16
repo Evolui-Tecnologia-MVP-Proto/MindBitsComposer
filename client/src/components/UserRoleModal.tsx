@@ -68,12 +68,12 @@ export function UserRoleModal({ isOpen, onClose, userRole, mode }: UserRoleModal
       onClose();
     },
     onError: (error) => {
+      console.error("Erro ao criar user role:", error);
       toast({
         title: "Erro",
-        description: "Erro ao criar User Role",
+        description: `Erro ao criar User Role: ${error.message}`,
         variant: "destructive",
       });
-      console.error("Erro ao criar user role:", error);
     },
   });
 
@@ -90,12 +90,12 @@ export function UserRoleModal({ isOpen, onClose, userRole, mode }: UserRoleModal
       onClose();
     },
     onError: (error) => {
+      console.error("Erro ao atualizar user role:", error);
       toast({
         title: "Erro",
-        description: "Erro ao atualizar User Role",
+        description: `Erro ao atualizar User Role: ${error.message}`,
         variant: "destructive",
       });
-      console.error("Erro ao atualizar user role:", error);
     },
   });
 
@@ -145,6 +145,10 @@ export function UserRoleModal({ isOpen, onClose, userRole, mode }: UserRoleModal
       ...formData,
       access: parsedAccess
     };
+
+    console.log("Submitting user role data:", finalData);
+    console.log("Mode:", mode);
+    console.log("User Role ID:", userRole?.id);
 
     if (mode === "create") {
       createMutation.mutate(finalData);
