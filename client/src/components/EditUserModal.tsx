@@ -229,7 +229,7 @@ export default function EditUserModal({ isOpen, onClose, user }: EditUserModalPr
               )}
             />
 
-{/* Campo Status - oculto para usuários PENDING */}
+{/* Campo Status - apenas para usuários ACTIVE/INACTIVE */}
             {user && user.status !== UserStatus.PENDING && (
               <FormField
                 control={form.control}
@@ -255,7 +255,7 @@ export default function EditUserModal({ isOpen, onClose, user }: EditUserModalPr
                           </FormControl>
                           <FormLabel className="font-normal">Inativo</FormLabel>
                         </FormItem>
-                        {/* PENDING removido das opções - apenas sistema pode definir */}
+                        {/* PENDING removido - apenas sistema pode definir */}
                       </RadioGroup>
                     </FormControl>
                     <FormMessage />
@@ -264,20 +264,7 @@ export default function EditUserModal({ isOpen, onClose, user }: EditUserModalPr
               />
             )}
             
-            {/* Indicador visual para usuários PENDING */}
-            {user && user.status === UserStatus.PENDING && (
-              <div className="space-y-2">
-                <FormLabel>Status</FormLabel>
-                <div className="flex items-center gap-2">
-                  <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-yellow-300">
-                    Pendente
-                  </Badge>
-                  <span className="text-sm text-muted-foreground">
-                    (Status controlado pelo sistema)
-                  </span>
-                </div>
-              </div>
-            )}
+            {/* Para usuários PENDING: nenhuma opção de status é exibida */}
 
             <FormField
               control={form.control}
