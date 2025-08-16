@@ -284,7 +284,7 @@ export const systemLogs = pgTable("app_logs", {
   message: text("message").notNull(), // Mensagem descritiva do log
   parameters: json("parameters").$type<Record<string, any>>().default({}), // Parâmetros em formato JSON
   timestamp: timestamp("timestamp").defaultNow().notNull(), // Horário do evento
-  userId: integer("user_id").references(() => users.id), // Usuário que executou a ação (opcional)
+  userId: integer("user_id").references(() => users.id, { onDelete: "cascade" }), // Usuário que executou a ação (opcional)
   createdAt: timestamp("created_at").defaultNow(),
 });
 
