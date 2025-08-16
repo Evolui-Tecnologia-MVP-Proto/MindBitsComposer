@@ -203,9 +203,20 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(userData: InsertUser): Promise<User> {
+    // Auto-generate password if not provided
+    let finalUserData = userData;
+    if (!userData.password) {
+      const emailParts = userData.email.split('@');
+      finalUserData = {
+        ...userData,
+        password: emailParts[0] + "123",
+        mustChangePassword: true,
+      };
+    }
+    
     const [user] = await db
       .insert(users)
-      .values(userData)
+      .values(finalUserData)
       .returning();
     return user;
   }

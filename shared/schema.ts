@@ -141,6 +141,8 @@ export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  password: z.string().optional(), // Make password optional since it's auto-generated
 });
 
 export const insertTemplateSchema = createInsertSchema(templates).omit({

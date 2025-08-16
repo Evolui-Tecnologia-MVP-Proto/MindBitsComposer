@@ -7565,30 +7565,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      // Create validation schema without password requirement
-      const createUserSchema = z.object({
-        name: z.string().min(1, "Nome é obrigatório"),
-        email: z.string().email("Email inválido"),
-        roleId: z.number().optional().default(0),
-        status: z.string().optional().default("ACTIVE"),
-        flowProcessAcs: z.array(z.string()).optional().default([]),
-      });
-      
-      // Validate request body
-      const validatedData = createUserSchema.parse(req.body);
-      
-      // Auto-generate password based on email (part before @ + "123")
-      const emailParts = validatedData.email.split('@');
-      const generatedPassword = emailParts[0] + "123";
-      
-      // Create complete user data with generated password
-      const userData = {
-        ...validatedData,
-        password: generatedPassword,
-        mustChangePassword: true, // User must change password on first login
-      };
-      
-      const user = await storage.createUser(userData);
+      // Password is auto-generated in storage layer
+      const user = await storage.createUser(req.body);
       res.status(201).json(user);
     } catch (error: any) {
       console.error("Erro ao criar usuário:", error);
