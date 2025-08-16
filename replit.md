@@ -45,6 +45,7 @@ The system employs a monorepo structure with shared TypeScript schemas.
 - **System Logs Foreign Key Constraint**: Changed `systemLogs.userId` constraint from RESTRICT to CASCADE to automatically remove user logs when users are deleted. This prevents log retention issues while maintaining system cleanup (January 2025).
 - **User Status Workflow Enhancement**: Implemented automatic user status management - new users are created with "pending" status and transition to "active" automatically when they complete their first login and mandatory password change. This ensures proper user lifecycle tracking and system access control (January 2025).
 - **User Transfer System**: Added comprehensive user dependency transfer functionality allowing administrators to transfer all user-related records (documents, flows, assets, logs, etc.) from one user to another before deletion. Includes intuitive modal interface and validates constraints across 10 database tables (January 2025).
+- **PENDING Status Control**: Enhanced user edit modal to strictly control PENDING status - users with PENDING status cannot have their status edited (field is hidden with informational badge), while ACTIVE/INACTIVE users can only toggle between those two states. PENDING status remains exclusively system-controlled for proper user lifecycle management (January 2025).
 
 ### Feature Specifications
 - **Toolbar-Based Container Editing**: Edit/delete functions for collapsible containers integrated into the Lexical editor toolbar, appearing conditionally.

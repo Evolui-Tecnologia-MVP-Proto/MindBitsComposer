@@ -229,42 +229,55 @@ export default function EditUserModal({ isOpen, onClose, user }: EditUserModalPr
               )}
             />
 
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Status</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      className="flex space-x-6"
-                    >
-                      <FormItem className="flex items-center space-x-2">
-                        <FormControl>
-                          <RadioGroupItem value={UserStatus.ACTIVE} />
-                        </FormControl>
-                        <FormLabel className="font-normal">Ativo</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-2">
-                        <FormControl>
-                          <RadioGroupItem value={UserStatus.INACTIVE} />
-                        </FormControl>
-                        <FormLabel className="font-normal">Inativo</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-2">
-                        <FormControl>
-                          <RadioGroupItem value={UserStatus.PENDING} />
-                        </FormControl>
-                        <FormLabel className="font-normal">Pendente</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+{/* Campo Status - oculto para usuários PENDING */}
+            {user && user.status !== UserStatus.PENDING && (
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel>Status</FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="flex space-x-6"
+                      >
+                        <FormItem className="flex items-center space-x-2">
+                          <FormControl>
+                            <RadioGroupItem value={UserStatus.ACTIVE} />
+                          </FormControl>
+                          <FormLabel className="font-normal">Ativo</FormLabel>
+                        </FormItem>
+                        <FormItem className="flex items-center space-x-2">
+                          <FormControl>
+                            <RadioGroupItem value={UserStatus.INACTIVE} />
+                          </FormControl>
+                          <FormLabel className="font-normal">Inativo</FormLabel>
+                        </FormItem>
+                        {/* PENDING removido das opções - apenas sistema pode definir */}
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            
+            {/* Indicador visual para usuários PENDING */}
+            {user && user.status === UserStatus.PENDING && (
+              <div className="space-y-2">
+                <FormLabel>Status</FormLabel>
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-yellow-300">
+                    Pendente
+                  </Badge>
+                  <span className="text-sm text-muted-foreground">
+                    (Status controlado pelo sistema)
+                  </span>
+                </div>
+              </div>
+            )}
 
             <FormField
               control={form.control}
