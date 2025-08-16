@@ -284,6 +284,7 @@ export function DocsProcessEmbed({
     setSelectedFlowId("");
     // Invalidar queries para atualizar tabela de documentos em processo
     queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/documentos/user-in-process"] });
     queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
     queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions/count"] });
   }, [queryClient]);
@@ -3093,6 +3094,7 @@ function FlowWithAutoFitView({
           // Recarregar dados
           queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
           queryClient.invalidateQueries({ queryKey: ['/api/documentos'] });
+          queryClient.invalidateQueries({ queryKey: ['/api/documentos/user-in-process'] });
         }
       } catch (error) {
         console.error('❌ Erro ao executar encerramento direto:', error);
@@ -3163,6 +3165,7 @@ function FlowWithAutoFitView({
             
             // Refazer a query para atualizar os dados na interface
             queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+            queryClient.invalidateQueries({ queryKey: ["/api/documentos/user-in-process"] });
             queryClient.invalidateQueries({ queryKey: ["/api/document-editions"] });
             queryClient.invalidateQueries({ queryKey: ["/api/flow-actions"] });
             
@@ -3252,6 +3255,7 @@ function FlowWithAutoFitView({
             
             // Invalidar queries para atualizar interface
             queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+            queryClient.invalidateQueries({ queryKey: ["/api/documentos/user-in-process"] });
             queryClient.invalidateQueries({ queryKey: ["/api/document-editions"] });
             queryClient.invalidateQueries({ queryKey: ["/api/flow-actions"] });
             
@@ -3404,6 +3408,7 @@ function FlowWithAutoFitView({
                 // Recarregar dados para refletir as mudanças de status
                 queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
                 queryClient.invalidateQueries({ queryKey: ['/api/documentos'] });
+                queryClient.invalidateQueries({ queryKey: ['/api/documentos/user-in-process'] });
                 queryClient.invalidateQueries({ queryKey: ['/api/document-editions'] });
               }
             }
