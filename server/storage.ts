@@ -9,7 +9,7 @@ import { users, templates, mondayMappings, mondayColumns, mappingColumns, servic
   type GenericTable, type InsertGenericTable, type Specialty, type InsertSpecialty,
   type SpecialtyUser, type InsertSpecialtyUser, type SystemParam, type InsertSystemParam,
   type UserRoleRecord, type InsertUserRole,
-  UserStatus, UserRole, TemplateType, PluginStatus, PluginType } from "@shared/schema";
+  UserStatus, TemplateType, PluginStatus, PluginType } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, isNull, sql } from "drizzle-orm";
 import session from "express-session";
@@ -1127,7 +1127,7 @@ export class DatabaseStorage implements IStorage {
           id: users.id,
           name: users.name,
           email: users.email,
-          role: users.role,
+          roleId: users.roleId,
           status: users.status,
           avatarUrl: users.avatarUrl,
           mustChangePassword: users.mustChangePassword,
@@ -1287,7 +1287,7 @@ export class MemStorage implements IStorage {
       name: "Administrador",
       email: "admin@exemplo.com",
       password: "senha-inicial",
-      role: "ADMIN",
+      roleId: 0,
       status: "ACTIVE",
       mustChangePassword: true,
     });
@@ -1326,7 +1326,7 @@ export class MemStorage implements IStorage {
       name: insertUser.name,
       email: insertUser.email,
       password: insertUser.password,
-      role: insertUser.role || UserRole.USER,
+      roleId: insertUser.roleId || 0,
       status: insertUser.status || UserStatus.ACTIVE,
       avatarUrl: insertUser.avatarUrl || "",
       mustChangePassword: insertUser.mustChangePassword ?? false,

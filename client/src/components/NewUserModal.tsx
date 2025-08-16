@@ -5,7 +5,7 @@ import { z } from "zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { UserRole, UserStatus } from "@shared/schema";
+import { UserStatus, UserRoleRecord } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { X, Plus } from "lucide-react";
 import {
@@ -46,7 +46,7 @@ const formSchema = z.object({
   email: z.string().email({
     message: "E-mail inválido."
   }),
-  role: z.nativeEnum(UserRole),
+  roleId: z.number().default(0),
   status: z.nativeEnum(UserStatus),
   flowProcessAcs: z.array(z.string()).default([])
 });
@@ -69,7 +69,7 @@ export default function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
       name: "",
       email: "",
       status: UserStatus.ACTIVE,
-      role: UserRole.USER,
+      roleId: 0,
       flowProcessAcs: [],
     },
   });
@@ -79,7 +79,14 @@ export default function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
     name: "flowProcessAcs" as const,
   });
 
-  // Buscar roles do sistema
+  // Buscar user roles do sistema
+  const { data: userRoles } = useQuery({
+    queryKey: ["/api/user-roles"],
+    enabled: isOpen,
+    retry: false,
+  });
+
+  // Buscar roles do sistema para flowProcessAcs
   const { data: systemParams } = useQuery({
     queryKey: ["/api/system-params/ADMIN_ACS_ROLES"],
     enabled: isOpen,
@@ -189,13 +196,13 @@ export default function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
 
             <FormField
               control={form.control}
-              name="role"
+              name="roleId"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Perfil</FormLabel>
                   <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    onValueChange={(value) => field.onChange(Number(value))}
+                    value={String(field.value)}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -203,9 +210,12 @@ export default function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value={UserRole.ADMIN}>Administrador</SelectItem>
-                      <SelectItem value={UserRole.EDITOR}>Editor</SelectItem>
-                      <SelectItem value={UserRole.USER}>Usuário</SelectItem>
+                      <SelectItem value="0">Super Administrador</SelectItem>
+                      {userRoles?.map((role: UserRoleRecord) => (
+                        <SelectItem key={role.id} value={String(role.id)}>
+                          {role.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />
