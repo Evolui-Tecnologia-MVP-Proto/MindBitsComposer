@@ -50,8 +50,15 @@ export default function HomePage() {
 
   // DEBUG: Vamos verificar todos os status disponíveis
   console.log("🔍 DEBUG - Todos os documentos recebidos:", documentos.length);
-  console.log("🔍 DEBUG - Status únicos:", [...new Set(documentos.map(doc => doc.status))]);
+  const statusUnicos = [...new Set(documentos.map(doc => doc.status))];
+  console.log("🔍 DEBUG - Status únicos encontrados:", statusUnicos);
   console.log("🔍 DEBUG - Documentos com status 'encerrado':", documentos.filter(doc => doc.status === "encerrado"));
+  
+  // Vamos também verificar documentos com status semelhante
+  statusUnicos.forEach(status => {
+    const count = documentos.filter(doc => doc.status === status).length;
+    console.log(`📊 Status "${status}": ${count} documentos`);
+  });
 
   // Calcular contadores para Base de conhecimento OC
   const documentosARevisar = documentos.filter(doc => 
