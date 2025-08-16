@@ -98,6 +98,8 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
         ...prev,
         [variables.documentId]: 'success'
       }));
+      // Invalidar queries para atualizar tabelas imediatamente
+      queryClient.invalidateQueries({ queryKey: ["/api/documentos/user-in-process"] });
     }
   });
 
@@ -365,6 +367,7 @@ export function DocumentReviewModal({ isOpen, onClose, responsavel }: DocumentRe
     
     // Invalidar queries relacionadas
     queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/documentos/user-in-process"] });
     queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
     queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions/count"] });
     queryClient.invalidateQueries({ queryKey: ["/api/documentos/review", responsavel] });
