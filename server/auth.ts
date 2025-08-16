@@ -189,6 +189,16 @@ export function setupAuth(app: Express) {
         
         req.login(user, (err) => {
           if (err) return next(err);
+          
+          // Check if user status is "pending" and force password change
+          if (user.status === 'pending' || user.mustChangePassword) {
+            return res.status(200).json({
+              ...user,
+              requiresPasswordChange: true,
+              message: "Para continuar, é necessário alterar sua senha."
+            });
+          }
+          
           return res.status(200).json(user);
         });
       })(req, res, next);

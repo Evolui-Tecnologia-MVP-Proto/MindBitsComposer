@@ -52,12 +52,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const res = await apiRequest("POST", "/api/login", credentials);
       return await res.json();
     },
-    onSuccess: (userData: SelectUser) => {
+    onSuccess: (userData: SelectUser & { requiresPasswordChange?: boolean; message?: string }) => {
       queryClient.setQueryData(["/api/user"], userData);
       
-      // Check if this is the first login (need to change password)
-      if (userData.mustChangePassword) {
+      // Check if this is the first login or user has pending status (need to change password)
+      if (userData.mustChangePassword || userData.requiresPasswordChange) {
         setIsFirstLogin(true);
+        
+        // Show toast message if provided by backend
+        if (userData.message) {
+          toast({
+            title: "Alteração de senha necessária",
+            description: userData.message,
+            variant: "default",
+          });
+        }
       } else {
         navigate("/");
       }
