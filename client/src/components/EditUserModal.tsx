@@ -5,7 +5,7 @@ import { z } from "zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { UserRole, UserStatus, User } from "@shared/schema";
+import { UserStatus, User, UserRoleRecord } from "@shared/schema";
 import { Badge } from "@/components/ui/badge";
 import { X, Plus } from "lucide-react";
 import {
@@ -43,7 +43,7 @@ const formSchema = z.object({
   email: z.string().email({
     message: "E-mail inválido."
   }),
-  role: z.nativeEnum(UserRole),
+  roleId: z.number().default(0),
   status: z.nativeEnum(UserStatus),
   flowProcessAcs: z.array(z.string()).default([])
 });
@@ -67,7 +67,7 @@ export default function EditUserModal({ isOpen, onClose, user }: EditUserModalPr
       name: "",
       email: "",
       status: UserStatus.ACTIVE,
-      role: UserRole.USER,
+      roleId: 0,
       flowProcessAcs: [],
     },
   });
@@ -77,7 +77,14 @@ export default function EditUserModal({ isOpen, onClose, user }: EditUserModalPr
     name: "flowProcessAcs" as const,
   });
 
-  // Buscar roles do sistema
+  // Buscar user roles do sistema
+  const { data: userRoles } = useQuery({
+    queryKey: ["/api/user-roles"],
+    enabled: isOpen,
+    retry: false,
+  });
+
+  // Buscar roles do sistema para flowProcessAcs
   const { data: systemParams } = useQuery({
     queryKey: ["/api/system-params/ADMIN_ACS_ROLES"],
     enabled: isOpen,
@@ -97,7 +104,7 @@ export default function EditUserModal({ isOpen, onClose, user }: EditUserModalPr
       form.reset({
         name: user.name,
         email: user.email,
-        role: user.role as UserRole,
+        roleId: user.roleId || 0,
         status: user.status as UserStatus,
         flowProcessAcs: Array.isArray(user.flowProcessAcs) ? user.flowProcessAcs : [],
       });
@@ -124,8 +131,7 @@ export default function EditUserModal({ isOpen, onClose, user }: EditUserModalPr
   const updateUserMutation = useMutation({
     mutationFn: async (data: FormValues) => {
       if (!user) throw new Error("Usuário não encontrado");
-      const res = await apiRequest("PUT", `/api/users/${user.id}`, data);
-      return res.json();
+      return await apiRequest("PUT", `/api/users/${user.id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
@@ -196,13 +202,13 @@ export default function EditUserModal({ isOpen, onClose, user }: EditUserModalPr
 
             <FormField
               control={form.control}
-              name="role"
+              name="roleId"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Perfil</FormLabel>
                   <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
+                    onValueChange={(value) => field.onChange(Number(value))}
+                    value={String(field.value)}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -210,9 +216,12 @@ export default function EditUserModal({ isOpen, onClose, user }: EditUserModalPr
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value={UserRole.ADMIN}>Administrador</SelectItem>
-                      <SelectItem value={UserRole.EDITOR}>Editor</SelectItem>
-                      <SelectItem value={UserRole.USER}>Usuário</SelectItem>
+                      <SelectItem value="0">Super Administrador</SelectItem>
+                      {userRoles?.map((role: UserRoleRecord) => (
+                        <SelectItem key={role.id} value={String(role.id)}>
+                          {role.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormMessage />

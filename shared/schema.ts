@@ -48,7 +48,7 @@ export const users = pgTable("users", {
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  role: text("role", { enum: ["ADMIN", "EDITOR", "USER"] }).notNull().default("USER"),
+  roleId: integer("role_id").default(0), // 0 = Super Administrador, outros valores = user_roles.id
   status: text("status", { enum: ["ACTIVE", "INACTIVE", "PENDING"] }).notNull().default("ACTIVE"),
   avatarUrl: text("avatar_url").default(""),
   mustChangePassword: boolean("must_change_password").default(false),
