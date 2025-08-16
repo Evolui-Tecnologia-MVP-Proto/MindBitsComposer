@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { FileText } from 'lucide-react';
+import { FileText, Code, GitCompare } from 'lucide-react';
 import mermaid from 'mermaid';
 import { useTheme } from 'next-themes';
 
@@ -477,8 +477,235 @@ function parseMarkdownToReact(markdown: string): React.ReactNode {
   return elements;
 }
 
+// Tipos para modos de visualização
+type ViewMode = 'mdx' | 'raw' | 'diff';
+
+// Interface para linha do diff
+interface DiffLine {
+  type: 'added' | 'removed' | 'unchanged' | 'modified';
+  content: string;
+  lineNumber?: number;
+  oldLineNumber?: number;
+  newLineNumber?: number;
+}
+
+// Função para calcular diff entre dois textos
+function calculateDiff(oldText: string, newText: string): DiffLine[] {
+  const oldLines = oldText.split('\n');
+  const newLines = newText.split('\n');
+  const result: DiffLine[] = [];
+  
+  let oldIndex = 0;
+  let newIndex = 0;
+  let oldLineNum = 1;
+  let newLineNum = 1;
+  
+  while (oldIndex < oldLines.length || newIndex < newLines.length) {
+    const oldLine = oldLines[oldIndex];
+    const newLine = newLines[newIndex];
+    
+    if (oldIndex >= oldLines.length) {
+      // Linhas adicionadas no final
+      result.push({
+        type: 'added',
+        content: newLine,
+        newLineNumber: newLineNum,
+        lineNumber: newLineNum
+      });
+      newIndex++;
+      newLineNum++;
+    } else if (newIndex >= newLines.length) {
+      // Linhas removidas no final
+      result.push({
+        type: 'removed',
+        content: oldLine,
+        oldLineNumber: oldLineNum,
+        lineNumber: oldLineNum
+      });
+      oldIndex++;
+      oldLineNum++;
+    } else if (oldLine === newLine) {
+      // Linhas iguais
+      result.push({
+        type: 'unchanged',
+        content: oldLine,
+        oldLineNumber: oldLineNum,
+        newLineNumber: newLineNum,
+        lineNumber: newLineNum
+      });
+      oldIndex++;
+      newIndex++;
+      oldLineNum++;
+      newLineNum++;
+    } else {
+      // Buscar por linhas correspondentes nas próximas linhas
+      let foundMatch = false;
+      
+      // Verificar se a linha atual do novo texto existe mais adiante no texto antigo
+      for (let i = oldIndex + 1; i < Math.min(oldIndex + 5, oldLines.length); i++) {
+        if (oldLines[i] === newLine) {
+          // Linha foi adicionada (todas as linhas entre oldIndex e i foram removidas)
+          for (let j = oldIndex; j < i; j++) {
+            result.push({
+              type: 'removed',
+              content: oldLines[j],
+              oldLineNumber: oldLineNum,
+              lineNumber: oldLineNum
+            });
+            oldLineNum++;
+          }
+          result.push({
+            type: 'unchanged',
+            content: newLine,
+            oldLineNumber: oldLineNum,
+            newLineNumber: newLineNum,
+            lineNumber: newLineNum
+          });
+          oldIndex = i + 1;
+          newIndex++;
+          oldLineNum++;
+          newLineNum++;
+          foundMatch = true;
+          break;
+        }
+      }
+      
+      if (!foundMatch) {
+        // Verificar se a linha atual do texto antigo existe mais adiante no novo texto
+        for (let i = newIndex + 1; i < Math.min(newIndex + 5, newLines.length); i++) {
+          if (newLines[i] === oldLine) {
+            // Linhas foram adicionadas
+            for (let j = newIndex; j < i; j++) {
+              result.push({
+                type: 'added',
+                content: newLines[j],
+                newLineNumber: newLineNum,
+                lineNumber: newLineNum
+              });
+              newLineNum++;
+            }
+            result.push({
+              type: 'unchanged',
+              content: oldLine,
+              oldLineNumber: oldLineNum,
+              newLineNumber: newLineNum,
+              lineNumber: newLineNum
+            });
+            oldIndex++;
+            newIndex = i + 1;
+            oldLineNum++;
+            newLineNum++;
+            foundMatch = true;
+            break;
+          }
+        }
+      }
+      
+      if (!foundMatch) {
+        // Linha modificada
+        result.push({
+          type: 'modified',
+          content: newLine,
+          oldLineNumber: oldLineNum,
+          newLineNumber: newLineNum,
+          lineNumber: newLineNum
+        });
+        oldIndex++;
+        newIndex++;
+        oldLineNum++;
+        newLineNum++;
+      }
+    }
+  }
+  
+  return result;
+}
+
+// Componente para visualização de texto puro com numeração
+function RawTextView({ content }: { content: string }) {
+  const lines = content.split('\n');
+  
+  return (
+    <div className="bg-gray-900 dark:bg-[#111827] text-gray-100 dark:text-gray-300 p-4 rounded-lg font-mono text-sm overflow-x-auto">
+      <table className="w-full border-collapse">
+        <tbody>
+          {lines.map((line, index) => (
+            <tr key={index}>
+              <td className="pr-4 text-gray-500 dark:text-gray-400 text-right select-none w-12 align-top">
+                {index + 1}
+              </td>
+              <td className="text-gray-100 dark:text-gray-300 whitespace-pre-wrap break-words">
+                {line || '\u00A0'}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// Componente para visualização de diff
+function DiffView({ oldContent, newContent }: { oldContent: string; newContent: string }) {
+  const diffLines = calculateDiff(oldContent, newContent);
+  
+  const getLineStyle = (type: DiffLine['type']) => {
+    switch (type) {
+      case 'added':
+        return 'bg-blue-100 dark:bg-blue-900/30 border-l-4 border-blue-500';
+      case 'removed':
+        return 'bg-red-100 dark:bg-red-900/30 border-l-4 border-red-500';
+      case 'modified':
+        return 'bg-yellow-100 dark:bg-yellow-900/30 border-l-4 border-yellow-500';
+      default:
+        return 'bg-gray-50 dark:bg-gray-800/50';
+    }
+  };
+  
+  const getLinePrefix = (type: DiffLine['type']) => {
+    switch (type) {
+      case 'added':
+        return '+';
+      case 'removed':
+        return '-';
+      case 'modified':
+        return '~';
+      default:
+        return ' ';
+    }
+  };
+  
+  return (
+    <div className="bg-gray-900 dark:bg-[#111827] text-gray-100 dark:text-gray-300 p-4 rounded-lg font-mono text-sm overflow-x-auto">
+      <div className="mb-4 text-xs text-gray-400 border-b border-gray-600 pb-2">
+        <span className="inline-block w-4 h-4 bg-blue-500 rounded mr-2"></span>Adicionado
+        <span className="inline-block w-4 h-4 bg-yellow-500 rounded mr-2 ml-4"></span>Modificado
+        <span className="inline-block w-4 h-4 bg-red-500 rounded mr-2 ml-4"></span>Removido
+      </div>
+      <table className="w-full border-collapse">
+        <tbody>
+          {diffLines.map((line, index) => (
+            <tr key={index} className={getLineStyle(line.type)}>
+              <td className="pr-2 text-gray-500 dark:text-gray-400 text-right select-none w-8 align-top">
+                {line.lineNumber || ''}
+              </td>
+              <td className="pr-2 text-gray-600 dark:text-gray-300 text-center select-none w-6 align-top">
+                {getLinePrefix(line.type)}
+              </td>
+              <td className="text-gray-100 dark:text-gray-300 whitespace-pre-wrap break-words pl-2">
+                {line.content || '\u00A0'}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default function DocumentMdModal({ isOpen, onClose, document }: DocumentMdModalProps) {
   const [showOriginal, setShowOriginal] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>('mdx');
 
   // Add null checks to prevent errors
   if (!document) {
@@ -487,6 +714,8 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
 
   const currentContent = showOriginal ? document.md_file_old : document.md_file;
   const hasOriginal = document.md_file_old && document.md_file_old.trim() !== '';
+  const hasBothVersions = document.md_file && document.md_file_old && 
+                          document.md_file.trim() !== '' && document.md_file_old.trim() !== '';
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -499,13 +728,51 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
           
           {/* Toolbar */}
           <div className="flex items-center justify-between mt-3 pt-2 border-t border-gray-200 dark:border-[#374151]">
-            {!hasOriginal && (
+            <div className="flex items-center gap-2">
+              {/* Botões de modo de visualização */}
+              <Button
+                variant={viewMode === 'mdx' ? "default" : "outline"}
+                size="sm"
+                onClick={() => setViewMode('mdx')}
+                className="h-8"
+                title="Visualização MDX renderizada"
+              >
+                <FileText className="w-4 h-4 mr-1" />
+                MDX
+              </Button>
+              <Button
+                variant={viewMode === 'raw' ? "default" : "outline"}
+                size="sm"
+                onClick={() => setViewMode('raw')}
+                className="h-8"
+                title="Visualização de texto puro com numeração"
+              >
+                <Code className="w-4 h-4 mr-1" />
+                Texto
+              </Button>
+              {hasBothVersions && (
+                <Button
+                  variant={viewMode === 'diff' ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setViewMode('diff')}
+                  className="h-8"
+                  title="Comparação entre versões (diff)"
+                >
+                  <GitCompare className="w-4 h-4 mr-1" />
+                  Diff
+                </Button>
+              )}
+            </div>
+            
+            {!hasOriginal && viewMode === 'mdx' && (
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Documento em versão única, ou com processo de revisão ainda não iniciado
               </p>
             )}
-            {hasOriginal && (
-              <div className="flex items-center gap-2 ml-auto">
+            
+            {/* Botões de versão - apenas para modo MDX e Raw */}
+            {hasOriginal && (viewMode === 'mdx' || viewMode === 'raw') && (
+              <div className="flex items-center gap-2">
                 <Button
                   variant={!showOriginal ? "default" : "outline"}
                   size="sm"
@@ -533,452 +800,59 @@ export default function DocumentMdModal({ isOpen, onClose, document }: DocumentM
         <div className="flex-1 overflow-y-auto border-t border-gray-200 dark:border-[#374151] mt-4 p-6 bg-slate-100 dark:bg-[#020203]">
           <div className="max-w-4xl mx-auto">
             <div className="bg-white dark:bg-[#1B2028] rounded-lg shadow-sm border border-gray-200 dark:border-[#374151] p-6">
-              <div className={`md-modal-content markdown-preview markdown-content prose prose-gray dark:prose-invert max-w-none`}>
-            <style dangerouslySetInnerHTML={{
-              __html: `
-                /* DARK THEME - Table styling as Lexical editor */
-                .dark .md-modal-content.markdown-preview table,
-                .dark .md-modal-content .markdown-preview table {
-                  background-color: #1B2028 !important;
-                  background: #1B2028 !important;
-                  border: 2px solid #FFFFFF !important;
-                  border-collapse: separate !important;
-                  border-spacing: 0 !important;
-                  border-radius: 8px !important;
-                  overflow: hidden !important;
-                }
-                
-                /* LIGHT THEME - White table styling */
-                html:not(.dark) .md-modal-content.markdown-preview table,
-                html:not(.dark) .md-modal-content .markdown-preview table {
-                  background-color: #FFFFFF !important;
-                  background: #FFFFFF !important;
-                  border: 2px solid #000000 !important;
-                  border-collapse: separate !important;
-                  border-spacing: 0 !important;
-                  border-radius: 8px !important;
-                  overflow: hidden !important;
-                }
-                
-                /* DARK THEME - FORCE all table elements to have same background */
-                .dark .md-modal-content.markdown-preview table *,
-                .dark .md-modal-content .markdown-preview table *,
-                .dark .md-modal-content.markdown-preview table tr,
-                .dark .md-modal-content .markdown-preview table tr,
-                .dark .md-modal-content.markdown-preview table tbody,
-                .dark .md-modal-content .markdown-preview table tbody,
-                .dark .md-modal-content.markdown-preview table thead,
-                .dark .md-modal-content .markdown-preview table thead {
-                  background-color: #1B2028 !important;
-                  background: #1B2028 !important;
-                }
-
-                /* LIGHT THEME - FORCE all table elements to have same white background */
-                html:not(.dark) .md-modal-content.markdown-preview table *,
-                html:not(.dark) .md-modal-content .markdown-preview table *,
-                html:not(.dark) .md-modal-content.markdown-preview table tr,
-                html:not(.dark) .md-modal-content .markdown-preview table tr,
-                html:not(.dark) .md-modal-content.markdown-preview table tbody,
-                html:not(.dark) .md-modal-content .markdown-preview table tbody,
-                html:not(.dark) .md-modal-content.markdown-preview table thead,
-                html:not(.dark) .md-modal-content .markdown-preview table thead {
-                  background-color: #FFFFFF !important;
-                  background: #FFFFFF !important;
-                }
-                
-                .md-modal-content.markdown-preview thead,
-                .md-modal-content .markdown-preview thead,
-                .md-modal-content.markdown-preview tbody,
-                .md-modal-content .markdown-preview tbody {
-                  background-color: #1B2028 !important;
-                  background: #1B2028 !important;
-                }
-                
-                /* DARK THEME - Header cells */
-                .dark .md-modal-content.markdown-preview th,
-                .dark .md-modal-content .markdown-preview th {
-                  background-color: #1B2028 !important;
-                  background: #1B2028 !important;
-                  color: #FFFFFF !important;
-                  border: 1px solid #FFFFFF !important;
-                  border-color: #FFFFFF !important;
-                  padding: 12px 16px !important;
-                }
-
-                /* LIGHT THEME - Header cells */
-                html:not(.dark) .md-modal-content.markdown-preview th,
-                html:not(.dark) .md-modal-content .markdown-preview th {
-                  background-color: #FFFFFF !important;
-                  background: #FFFFFF !important;
-                  color: #000000 !important;
-                  border: 1px solid #000000 !important;
-                  border-color: #000000 !important;
-                  padding: 12px 16px !important;
-                }
-                
-                /* DARK THEME - FORCE uniform cell styling with MAXIMUM SPECIFICITY */
-                .dark .md-modal-content.markdown-preview td,
-                .dark .md-modal-content .markdown-preview td,
-                .dark .md-modal-content.markdown-preview table td,
-                .dark .md-modal-content .markdown-preview table td,
-                .dark .md-modal-content.markdown-preview tbody td,
-                .dark .md-modal-content .markdown-preview tbody td,
-                .dark .md-modal-content.markdown-preview tr td,
-                .dark .md-modal-content .markdown-preview tr td {
-                  background-color: #1B2028 !important;
-                  background: #1B2028 !important;
-                  color: #FFFFFF !important;
-                  border: 1px solid #FFFFFF !important;
-                  border-color: #FFFFFF !important;
-                  padding: 12px 16px !important;
-                  min-height: 48px !important;
-                  vertical-align: top !important;
-                }
-
-                /* LIGHT THEME - FORCE uniform cell styling with MAXIMUM SPECIFICITY */
-                html:not(.dark) .md-modal-content.markdown-preview td,
-                html:not(.dark) .md-modal-content .markdown-preview td,
-                html:not(.dark) .md-modal-content.markdown-preview table td,
-                html:not(.dark) .md-modal-content .markdown-preview table td,
-                html:not(.dark) .md-modal-content.markdown-preview tbody td,
-                html:not(.dark) .md-modal-content .markdown-preview tbody td,
-                html:not(.dark) .md-modal-content.markdown-preview tr td,
-                html:not(.dark) .md-modal-content .markdown-preview tr td {
-                  background-color: #FFFFFF !important;
-                  background: #FFFFFF !important;
-                  color: #000000 !important;
-                  border: 1px solid #000000 !important;
-                  border-color: #000000 !important;
-                  padding: 12px 16px !important;
-                  min-height: 48px !important;
-                  vertical-align: top !important;
-                }
-                
-                /* DARK THEME - Override ANY prose/typography styles */
-                .dark .md-modal-content.prose td,
-                .dark .md-modal-content .prose td,
-                .dark .md-modal-content.prose table td,
-                .dark .md-modal-content .prose table td {
-                  background-color: #1B2028 !important;
-                  background: #1B2028 !important;
-                  color: #FFFFFF !important;
-                }
-
-                /* LIGHT THEME - Override ANY prose/typography styles */
-                html:not(.dark) .md-modal-content.prose td,
-                html:not(.dark) .md-modal-content .prose td,
-                html:not(.dark) .md-modal-content.prose table td,
-                html:not(.dark) .md-modal-content .prose table td {
-                  background-color: #FFFFFF !important;
-                  background: #FFFFFF !important;
-                  color: #000000 !important;
-                }
-
-                /* LIGHT THEME - Code blocks background */
-                html:not(.dark) .md-modal-content pre,
-                html:not(.dark) .md-modal-content code,
-                html:not(.dark) .md-modal-content .markdown-preview pre,
-                html:not(.dark) .md-modal-content .markdown-preview code,
-                html:not(.dark) .md-modal-content.markdown-preview pre,
-                html:not(.dark) .md-modal-content.markdown-preview code,
-                html:not(.dark) .md-modal-content.prose pre,
-                html:not(.dark) .md-modal-content.prose code,
-                html:not(.dark) .md-modal-content .prose pre,
-                html:not(.dark) .md-modal-content .prose code {
-                  background-color: #F1F5F9 !important;
-                  background: #F1F5F9 !important;
-                }
-
-                /* LIGHT THEME - Inline code background */
-                html:not(.dark) .md-modal-content p code,
-                html:not(.dark) .md-modal-content li code,
-                html:not(.dark) .md-modal-content .markdown-preview p code,
-                html:not(.dark) .md-modal-content .markdown-preview li code,
-                html:not(.dark) .md-modal-content.markdown-preview p code,
-                html:not(.dark) .md-modal-content.markdown-preview li code,
-                html:not(.dark) .md-modal-content.prose p code,
-                html:not(.dark) .md-modal-content.prose li code,
-                html:not(.dark) .md-modal-content .prose p code,
-                html:not(.dark) .md-modal-content .prose li code {
-                  background-color: #F1F5F9 !important;
-                  background: #F1F5F9 !important;
-                }
-                
-                /* NUCLEAR OPTION - Force ALL possible combinations - DARK THEME ONLY */
-                .dark .md-modal-content td,
-                .dark .md-modal-content th,
-                .dark .md-modal-content table td,
-                .dark .md-modal-content table th,
-                .dark div.md-modal-content td,
-                .dark div.md-modal-content th,
-                .dark div.md-modal-content table td,
-                .dark div.md-modal-content table th,
-                .dark .md-modal-content.markdown-preview.prose td,
-                .dark .md-modal-content.markdown-preview.prose th,
-                .dark .md-modal-content.prose-gray td,
-                .dark .md-modal-content.prose-gray th {
-                  background-color: #1B2028 !important;
-                  background: #1B2028 !important;
-                  color: #FFFFFF !important;
-                  border: 1px solid #FFFFFF !important;
-                  border-color: #FFFFFF !important;
-                }
-
-                /* LIGHT THEME - White background, black borders and text */
-                html:not(.dark) .md-modal-content td,
-                html:not(.dark) .md-modal-content th,
-                html:not(.dark) .md-modal-content table td,
-                html:not(.dark) .md-modal-content table th,
-                html:not(.dark) div.md-modal-content td,
-                html:not(.dark) div.md-modal-content th,
-                html:not(.dark) div.md-modal-content table td,
-                html:not(.dark) div.md-modal-content table th,
-                html:not(.dark) .md-modal-content.markdown-preview.prose td,
-                html:not(.dark) .md-modal-content.markdown-preview.prose th,
-                html:not(.dark) .md-modal-content.prose-gray td,
-                html:not(.dark) .md-modal-content.prose-gray th {
-                  background-color: #FFFFFF !important;
-                  background: #FFFFFF !important;
-                  color: #000000 !important;
-                  border: 1px solid #000000 !important;
-                  border-color: #000000 !important;
-                }
-                
-                .md-modal-content.markdown-preview tr:hover,
-                .md-modal-content .markdown-preview tr:hover {
-                  background-color: #1B2028 !important;
-                  background: #1B2028 !important;
-                }
-                
-                .md-modal-content.markdown-preview tr:hover th,
-                .md-modal-content .markdown-preview tr:hover th,
-                .md-modal-content.markdown-preview tr:hover td,
-                .md-modal-content .markdown-preview tr:hover td {
-                  background-color: #1B2028 !important;
-                  background: #1B2028 !important;
-                  border-color: #FFFFFF !important;
-                }
-                
-                /* Force all table elements to maintain black background and white borders */
-                .md-modal-content.markdown-preview table *,
-                .md-modal-content .markdown-preview table * {
-                  border-color: #FFFFFF !important;
-                }
-                .markdown-preview table td {
-                  vertical-align: top !important;
-                }
-                .markdown-preview table td img {
-                  display: block !important;
-                  max-width: 100% !important;
-                  height: auto !important;
-                  margin-top: 0 !important;
-                }
-                .markdown-preview table tbody td {
-                  vertical-align: top !important;
-                }
-                /* Force consistent text colors for all content */
-                .markdown-preview,
-                .markdown-preview *:not(img):not(svg):not(path):not(circle):not(rect) {
-                  color: #000000 !important;
-                }
-                .dark .markdown-preview,
-                .dark .markdown-preview *:not(img):not(svg):not(path):not(circle):not(rect) {
-                  color: #FFFFFF !important;
-                }
-                /* Force text colors for all content inside details elements */
-                .markdown-preview details,
-                .markdown-preview details *,
-                .markdown-preview details p,
-                .markdown-preview details span,
-                .markdown-preview details div,
-                .markdown-preview details li,
-                .markdown-preview details strong,
-                .markdown-preview details em {
-                  color: #000000 !important;
-                }
-                .dark .markdown-preview details,
-                .dark .markdown-preview details *,
-                .dark .markdown-preview details p,
-                .dark .markdown-preview details span,
-                .dark .markdown-preview details div,
-                .dark .markdown-preview details li,
-                .dark .markdown-preview details strong,
-                .dark .markdown-preview details em {
-                  color: #FFFFFF !important;
-                }
-                /* Ensure summary text follows the theme */
-                .markdown-preview summary,
-                .markdown-preview summary * {
-                  color: #000000 !important;
-                }
-                .dark .markdown-preview summary,
-                .dark .markdown-preview summary * {
-                  color: #FFFFFF !important;
-                }
-                /* Content inside details should have proper background and padding */
-                .markdown-preview details > *:not(summary) {
-                  padding: 16px !important;
-                  background-color: white !important;
-                  color: #000000 !important;
-                }
-                .dark .markdown-preview details > *:not(summary) {
-                  background-color: #020203 !important;
-                  color: #FFFFFF !important;
-                }
-                /* Force list bullets and numbers to follow theme colors */
-                .markdown-preview ul li::marker,
-                .markdown-preview ol li::marker {
-                  color: #000000 !important;
-                }
-                .dark .markdown-preview ul li::marker,
-                .dark .markdown-preview ol li::marker {
-                  color: #FFFFFF !important;
-                }
-                /* Ensure list items and their content follow theme */
-                .markdown-preview ul,
-                .markdown-preview ol,
-                .markdown-preview ul li,
-                .markdown-preview ol li {
-                  color: #000000 !important;
-                }
-                .dark .markdown-preview ul,
-                .dark .markdown-preview ol,
-                .dark .markdown-preview ul li,
-                .dark .markdown-preview ol li {
-                  color: #FFFFFF !important;
-                }
-                /* Force nested lists to maintain colors */
-                .markdown-preview ul ul,
-                .markdown-preview ul ol,
-                .markdown-preview ol ul,
-                .markdown-preview ol ol,
-                .markdown-preview ul ul li,
-                .markdown-preview ul ol li,
-                .markdown-preview ol ul li,
-                .markdown-preview ol ol li {
-                  color: #000000 !important;
-                }
-                .dark .markdown-preview ul ul,
-                .dark .markdown-preview ul ol,
-                .dark .markdown-preview ol ul,
-                .dark .markdown-preview ol ol,
-                .dark .markdown-preview ul ul li,
-                .dark .markdown-preview ul ol li,
-                .dark .markdown-preview ol ul li,
-                .dark .markdown-preview ol ol li {
-                  color: #FFFFFF !important;
-                }
-                /* HTML Table Styling for dangerouslySetInnerHTML tables */
-                /* DARK THEME - HTML Table Styling */
-                .dark .md-modal-content .table-html-container table {
-                  width: 100% !important;
-                  background-color: #020203 !important;
-                  background: #020203 !important;
-                  border: 2px solid #FFFFFF !important;
-                  border-collapse: separate !important;
-                  border-spacing: 0 !important;
-                  border-radius: 8px !important;
-                  overflow: hidden !important;
-                }
-
-                /* LIGHT THEME - HTML Table Styling */
-                html:not(.dark) .md-modal-content .table-html-container table {
-                  width: 100% !important;
-                  background-color: #FFFFFF !important;
-                  background: #FFFFFF !important;
-                  border: 2px solid #000000 !important;
-                  border-collapse: separate !important;
-                  border-spacing: 0 !important;
-                  border-radius: 8px !important;
-                  overflow: hidden !important;
-                }
-                
-                /* DARK THEME - FORCE HTML table cells to be uniform */
-                .dark .md-modal-content .table-html-container table *,
-                .dark .md-modal-content .table-html-container tr *,
-                .dark .md-modal-content .table-html-container tbody *,
-                .dark .md-modal-content .table-html-container thead * {
-                  background-color: #020203 !important;
-                  background: #020203 !important;
-                }
-
-                /* LIGHT THEME - FORCE HTML table cells to be uniform */
-                html:not(.dark) .md-modal-content .table-html-container table *,
-                html:not(.dark) .md-modal-content .table-html-container tr *,
-                html:not(.dark) .md-modal-content .table-html-container tbody *,
-                html:not(.dark) .md-modal-content .table-html-container thead * {
-                  background-color: #FFFFFF !important;
-                  background: #FFFFFF !important;
-                }
-                .md-modal-content .table-html-container tbody {
-                  background-color: #020203 !important;
-                  background: #020203 !important;
-                  border: none !important;
-                }
-                .md-modal-content .table-html-container tr {
-                  background-color: #020203 !important;
-                  background: #020203 !important;
-                  border: none !important;
-                }
-                .md-modal-content .table-html-container tr:hover {
-                  background-color: #020203 !important;
-                  background: #020203 !important;
-                }
-                /* DARK THEME - HTML Table Headers and Cells */
-                .dark .md-modal-content .table-html-container th {
-                  background-color: #020203 !important;
-                  background: #020203 !important;
-                  border: 1px solid #FFFFFF !important;
-                  border-color: #FFFFFF !important;
-                  color: #FFFFFF !important;
-                }
-                .dark .md-modal-content .table-html-container td {
-                  background-color: #020203 !important;
-                  background: #020203 !important;
-                  border: 1px solid #FFFFFF !important;
-                  border-color: #FFFFFF !important;
-                  color: #FFFFFF !important;
-                  padding: 12px !important;
-                  vertical-align: top !important;
-                  min-height: 48px !important;
-                }
-
-                /* LIGHT THEME - HTML Table Headers and Cells */
-                html:not(.dark) .md-modal-content .table-html-container th {
-                  background-color: #FFFFFF !important;
-                  background: #FFFFFF !important;
-                  border: 1px solid #000000 !important;
-                  border-color: #000000 !important;
-                  color: #000000 !important;
-                }
-                html:not(.dark) .md-modal-content .table-html-container td {
-                  background-color: #FFFFFF !important;
-                  background: #FFFFFF !important;
-                  border: 1px solid #000000 !important;
-                  border-color: #000000 !important;
-                  color: #000000 !important;
-                  padding: 12px !important;
-                  vertical-align: top !important;
-                  min-height: 48px !important;
-                }
-                /* Ensure proper styling for code blocks inside details */
-                .markdown-preview details pre {
-                  background-color: #1f2937 !important;
-                  color: #e5e7eb !important;
-                  padding: 12px !important;
-                  border-radius: 6px !important;
-                  overflow-x: auto !important;
-                }
-                .dark .markdown-preview details pre {
-                  background-color: #111827 !important;
-                  color: #d1d5db !important;
-                }
-                `
-                }} />
-                <div className="space-y-4">
-                  {parseMarkdownToReact(currentContent || '')}
+              {/* Renderização baseada no modo */}
+              {viewMode === 'mdx' && (
+                <div className={`md-modal-content markdown-preview markdown-content prose prose-gray dark:prose-invert max-w-none`}>
+                  <style dangerouslySetInnerHTML={{
+                    __html: `
+                    /* CSS styling simplificado para o modo MDX */
+                    .md-modal-content table {
+                      width: 100% !important;
+                      border: 2px solid #000000 !important;
+                      border-collapse: separate !important;
+                      border-spacing: 0 !important;
+                      border-radius: 8px !important;
+                      overflow: hidden !important;
+                    }
+                    .dark .md-modal-content table {
+                      border: 2px solid #FFFFFF !important;
+                    }
+                    .md-modal-content th,
+                    .md-modal-content td {
+                      border: 1px solid #000000 !important;
+                      padding: 12px 16px !important;
+                      vertical-align: top !important;
+                    }
+                    .dark .md-modal-content th,
+                    .dark .md-modal-content td {
+                      border: 1px solid #FFFFFF !important;
+                    }
+                    `
+                  }} />
+                  <div className="space-y-4">
+                    {parseMarkdownToReact(currentContent || '')}
+                  </div>
                 </div>
-              </div>
+              )}
+              
+              {viewMode === 'raw' && (
+                <RawTextView content={currentContent || ''} />
+              )}
+              
+              {viewMode === 'diff' && hasBothVersions && (
+                <DiffView 
+                  oldContent={document.md_file_old || ''} 
+                  newContent={document.md_file || ''} 
+                />
+              )}
+              
+              {viewMode === 'diff' && !hasBothVersions && (
+                <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+                  <GitCompare className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg">Diff não disponível</p>
+                  <p className="text-sm mt-2">É necessário ter as duas versões do documento para comparação</p>
+                </div>
+              )}
             </div>
           </div>
         </div>
