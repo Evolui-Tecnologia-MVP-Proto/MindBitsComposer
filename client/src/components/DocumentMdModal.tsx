@@ -626,7 +626,7 @@ function RawTextView({ content }: { content: string }) {
   const lines = content.split('\n');
   
   return (
-    <div className="bg-gray-900 dark:bg-[#111827] text-gray-100 dark:text-gray-300 p-4 rounded-lg font-mono text-sm overflow-x-auto">
+    <div className="dark:bg-[#111827] text-gray-100 dark:text-gray-300 p-4 rounded-lg font-mono text-sm overflow-x-auto bg-[#1b2028]">
       <table className="w-full border-collapse">
         <tbody>
           {lines.map((line, index) => (
