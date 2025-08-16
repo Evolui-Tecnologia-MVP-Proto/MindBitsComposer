@@ -126,7 +126,7 @@ export default function UserTable() {
       queryClient.invalidateQueries({ queryKey: ["/api/users"] });
       toast({
         title: "Senha resetada",
-        description: `A senha foi resetada com sucesso. A nova senha é: ${data.initialPassword}`,
+        description: data.message,
       });
       setUserToResetPassword(null);
     },
