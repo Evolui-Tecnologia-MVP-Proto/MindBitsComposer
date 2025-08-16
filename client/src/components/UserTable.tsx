@@ -13,7 +13,7 @@ import {
   KeyRound,
   MoreHorizontal 
 } from "lucide-react";
-import { User, UserStatus, UserRole } from "@shared/schema";
+import { User, UserStatus } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import NewUserModal from "./NewUserModal";
@@ -51,6 +51,14 @@ export default function UserTable() {
     error,
   } = useQuery<User[]>({
     queryKey: ["/api/users"],
+  });
+
+  // Query for user roles to map roleId to role name
+  const {
+    data: userRoles,
+    isLoading: userRolesLoading,
+  } = useQuery<Array<{id: number, name: string}>>({
+    queryKey: ["/api/user-roles"],
   });
 
   const toggleUserStatusMutation = useMutation({
@@ -139,17 +147,15 @@ export default function UserTable() {
     }
   };
 
-  const getTranslatedRole = (role: UserRole) => {
-    switch (role) {
-      case UserRole.ADMIN:
-        return "Administrador";
-      case UserRole.EDITOR:
-        return "Editor";
-      case UserRole.USER:
-        return "Usuário";
-      default:
-        return role;
+  const getRoleName = (roleId: number | null) => {
+    // Special case for Super Administrator (roleId = 0)
+    if (roleId === 0) {
+      return "Super Administrador";
     }
+    
+    // Find role name from userRoles array
+    const role = userRoles?.find(r => r.id === roleId);
+    return role ? role.name : "Usuário";
   };
 
   const getTranslatedStatus = (status: UserStatus) => {
@@ -293,7 +299,7 @@ export default function UserTable() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                          {getTranslatedRole(user.role as UserRole)}
+                          {getRoleName(user.roleId)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <DropdownMenu>
