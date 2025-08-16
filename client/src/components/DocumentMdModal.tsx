@@ -631,10 +631,10 @@ function RawTextView({ content }: { content: string }) {
         <tbody>
           {lines.map((line, index) => (
             <tr key={index}>
-              <td className="pr-4 text-gray-500 dark:text-gray-400 text-right select-none w-12 align-top">
+              <td className="pr-4 text-gray-500 dark:text-gray-400 text-right select-none w-12 align-top bg-transparent dark:bg-[#1B2028]">
                 {index + 1}
               </td>
-              <td className="text-gray-100 dark:text-gray-300 whitespace-pre-wrap break-words">
+              <td className="text-gray-100 dark:text-gray-300 whitespace-pre-wrap break-words bg-transparent dark:bg-[#1B2028]">
                 {line || '\u00A0'}
               </td>
             </tr>
@@ -686,13 +686,13 @@ function DiffView({ oldContent, newContent }: { oldContent: string; newContent: 
         <tbody>
           {diffLines.map((line, index) => (
             <tr key={index} className={getLineStyle(line.type)}>
-              <td className="pr-2 text-gray-500 dark:text-gray-400 text-right select-none w-8 align-top">
+              <td className="pr-2 text-gray-500 dark:text-gray-400 text-right select-none w-8 align-top bg-transparent dark:bg-[#1B2028]">
                 {line.lineNumber || ''}
               </td>
-              <td className="pr-2 text-gray-600 dark:text-gray-300 text-center select-none w-6 align-top">
+              <td className="pr-2 text-gray-600 dark:text-gray-300 text-center select-none w-6 align-top bg-transparent dark:bg-[#1B2028]">
                 {getLinePrefix(line.type)}
               </td>
-              <td className="text-gray-100 dark:text-gray-300 whitespace-pre-wrap break-words pl-2">
+              <td className="text-gray-100 dark:text-gray-300 whitespace-pre-wrap break-words pl-2 bg-transparent dark:bg-[#1B2028]">
                 {line.content || '\u00A0'}
               </td>
             </tr>
