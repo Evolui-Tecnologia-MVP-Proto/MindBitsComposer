@@ -214,6 +214,12 @@ export class DatabaseStorage implements IStorage {
       };
     }
     
+    // Always set status as "pending" for new users
+    finalUserData = {
+      ...finalUserData,
+      status: "pending" as UserStatus
+    };
+    
     const [user] = await db
       .insert(users)
       .values(finalUserData)
