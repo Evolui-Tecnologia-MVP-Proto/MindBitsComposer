@@ -42,6 +42,7 @@ Uma plataforma avançada de sincronização de workflows empresariais que permit
 #### Cards de Estatísticas (Base de Conhecimento)
 - **Card "A Revisar"**
   - Exibe total de documentos MindBits_CT com status "Integrado"
+  - Inclui linha adicional "X na minha alçada" mostrando documentos da responsabilidade do usuário logado
   - Ícone: Clock
   - Cor: Azul
   

@@ -96,6 +96,14 @@ export default function HomePage() {
     return userSpecialties.some((specialty: Specialty) => specialty.code === responsavel);
   };
 
+  // Calcular quantos documentos a revisar estão na alçada do usuário
+  const documentosARevisarNaMinhaAlcada = documentos.filter(doc => 
+    doc.origem === "MindBits_CT" && 
+    doc.status === "Integrado" && 
+    doc.responsavel &&
+    isUserResponsibleForSpecialty(doc.responsavel)
+  ).length;
+
   // Calcular documentos "em processo por mim" agrupados por responsável
   const documentosEmProcessoPorMim = documentos.filter(doc => {
     // Documento deve estar "Em Processo"
@@ -231,6 +239,11 @@ export default function HomePage() {
                 <CardContent className="pb-3">
                   <div className="text-xl font-bold text-gray-900 dark:text-gray-100">
                     {documentosARevisar}
+                    {documentosARevisarNaMinhaAlcada > 0 && (
+                      <div className="text-sm text-orange-600 dark:text-orange-400 mt-1">
+                        {documentosARevisarNaMinhaAlcada} na minha alçada
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
