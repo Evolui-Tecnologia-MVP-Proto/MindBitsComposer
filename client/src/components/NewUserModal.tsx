@@ -46,6 +46,9 @@ const formSchema = z.object({
   email: z.string().email({
     message: "E-mail inválido."
   }),
+  password: z.string().min(6, {
+    message: "Senha deve ter pelo menos 6 caracteres."
+  }),
   roleId: z.number().default(0),
   status: z.nativeEnum(UserStatus),
   flowProcessAcs: z.array(z.string()).default([])
@@ -68,6 +71,7 @@ export default function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
     defaultValues: {
       name: "",
       email: "",
+      password: "",
       status: UserStatus.ACTIVE,
       roleId: 0,
       flowProcessAcs: [],
@@ -188,6 +192,24 @@ export default function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
                   <FormLabel>E-mail</FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="email@exemplo.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Senha</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Digite a senha"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
