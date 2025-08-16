@@ -7632,7 +7632,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(204).send();
     } catch (error: any) {
       console.error("Erro ao excluir usuário:", error);
-      res.status(500).send("Erro ao excluir usuário");
+      
+      // Check if it's a foreign key constraint error
+      if (error.code === '23503') {
+        let userFriendlyMessage = "";
+        
+        // Map constraint names to user-friendly messages
+        if (error.constraint) {
+          const constraintMessages: { [key: string]: string } = {
+            "documentos_user_id_users_id_fk": "Este usuário possui documentos associados. Para excluir, primeiro transfira os documentos para outro usuário ou remova as associações.",
+            "global_assets_uploaded_by_users_id_fk": "Este usuário possui arquivos/assets globais associados. Para excluir, primeiro transfira os arquivos para outro usuário ou remova as associações.",
+            "documents_flows_user_id_users_id_fk": "Este usuário possui fluxos de documentos associados. Para excluir, primeiro transfira os fluxos para outro usuário ou remova as associações.",
+            "documents_flows_created_by_users_id_fk": "Este usuário criou fluxos de documentos. Para excluir, primeiro transfira a criação dos fluxos para outro usuário.",
+            "documents_flows_updated_by_users_id_fk": "Este usuário foi o último a atualizar fluxos de documentos. Para excluir, primeiro transfira as atualizações para outro usuário.",
+            "document_flow_executions_started_by_users_id_fk": "Este usuário iniciou execuções de fluxo de processo. Para excluir, primeiro transfira as execuções para outro usuário.",
+            "flow_actions_actor_users_id_fk": "Este usuário executou ações em fluxos de processo. Para excluir, primeiro transfira as ações para outro usuário.",
+            "document_editions_started_by_users_id_fk": "Este usuário iniciou edições de documentos. Para excluir, primeiro transfira as edições para outro usuário."
+          };
+          
+          userFriendlyMessage = constraintMessages[error.constraint] || 
+            "Este usuário possui movimentações de documentos vinculadas a ele. Para excluir, primeiro transfira as movimentações vinculadas para outro usuário.";
+        } else {
+          userFriendlyMessage = "Este usuário possui movimentações de documentos vinculadas a ele. Para excluir, primeiro transfira as movimentações vinculadas para outro usuário.";
+        }
+        
+        return res.status(400).json({ 
+          message: userFriendlyMessage,
+          type: "constraint_violation"
+        });
+      }
+      
+      // Generic error for other cases
+      res.status(500).json({ 
+        message: "Erro interno do servidor ao excluir usuário. Tente novamente." 
+      });
     }
   });
 
