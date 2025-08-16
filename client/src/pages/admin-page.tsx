@@ -1479,7 +1479,7 @@ export default function AdminPage() {
         </div>
         
         <Tabs defaultValue="usuarios" className="w-full mt-6">
-          <TabsList className="grid w-full grid-cols-6 bg-gray-100 dark:bg-[#0F172A]">
+          <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-[#0F172A]">
             <TabsTrigger value="usuarios" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
               <Users className="h-4 w-4 mr-2" />
               Usuários
@@ -1500,10 +1500,7 @@ export default function AdminPage() {
               <Database className="h-4 w-4 mr-2" />
               Logs
             </TabsTrigger>
-            <TabsTrigger value="configuracao" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
-              <Settings className="h-4 w-4 mr-2" />
-              Configuração
-            </TabsTrigger>
+
           </TabsList>
           
           <TabsContent value="usuarios" className="slide-in mt-6">
@@ -1908,20 +1905,7 @@ export default function AdminPage() {
             </Card>
           </TabsContent>
           
-          <TabsContent value="configuracao" className="slide-in mt-6">
-            <div className="bg-white shadow-sm rounded-lg p-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Configurações Gerais</h3>
-              <p className="text-gray-500">Configurações globais do sistema.</p>
-              
-              <div className="mt-4 border-t pt-4">
-                <h4 className="text-base font-medium mb-2">Sobre o Sistema</h4>
-                <p className="text-sm text-gray-500 mb-1">Versão: 1.0.0</p>
-                <p className="text-sm text-gray-500">
-                  EVO-MindBits Composer é uma plataforma para gerenciamento e integração de documentos
-                </p>
-              </div>
-            </div>
-          </TabsContent>
+
         </Tabs>
       </div>
       
