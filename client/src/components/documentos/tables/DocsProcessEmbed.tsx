@@ -1607,6 +1607,10 @@ export function DocsProcessEmbed({
       executionIdValue: execution?.executionId,
       keys: execution ? Object.keys(execution) : []
     });
+    
+    // Invalidar queries ao abrir modal para garantir dados atualizados
+    queryClient.invalidateQueries({ queryKey: ['/api/documentos/user-in-process'] });
+    
     if (execution) {
       // Buscar o documento correspondente na lista de documentos
       const documento = documentos?.find(doc => doc.id === execution.documentId);
@@ -1661,6 +1665,14 @@ export function DocsProcessEmbed({
       setSelectedFlowNode(null);
       console.log("🔴 Nó selecionado limpo ao abrir modal");
     }
+  };
+
+  // Função para invalidar queries ao fechar modal
+  const handleCloseFlowModal = () => {
+    console.log("🔄 Invalidando queries ao fechar modal do diagrama de fluxo");
+    queryClient.invalidateQueries({ queryKey: ['/api/documentos/user-in-process'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/documentos'] });
+    queryClient.invalidateQueries({ queryKey: ['/api/document-flow-executions'] });
   };
 
   const handleDeleteDocument = (documento: Documento) => {
@@ -2084,6 +2096,9 @@ export function DocsProcessEmbed({
         onClose={() => {
           console.log("🚪 Modal de fluxo sendo fechada");
           
+          // Invalidar queries quando modal fechar
+          handleCloseFlowModal();
+          
           // Fazer fitView e salvar viewport antes de fechar
           if (flowActionsRef.current?.fitView && flowActionsRef.current?.getViewport) {
             console.log("🎯 flowActionsRef encontrado, executando fitView");
@@ -2120,11 +2135,6 @@ export function DocsProcessEmbed({
           // Limpar nó selecionado ao fechar modal
           setSelectedFlowNode(null);
           console.log("📋 Nó selecionado limpo ao fechar modal");
-          
-          // Invalidar queries para atualizar a tabela quando modal for fechada
-          queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
-          queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
-          queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions/count"] });
         }}
         FlowWithAutoFitView={(props: any) => (
           <FlowWithAutoFitView 
