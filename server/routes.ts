@@ -7565,10 +7565,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      const user = await storage.createUser(req.body);
+      // Auto-generate password based on email (part before @ + "123")
+      const emailParts = req.body.email?.split('@');
+      if (!emailParts || emailParts.length < 2) {
+        return res.status(400).json({ message: "Email inválido" });
+      }
+      
+      const generatedPassword = emailParts[0] + "123";
+      
+      // Add the generated password to the request body
+      const userData = {
+        ...req.body,
+        password: generatedPassword
+      };
+      
+      const user = await storage.createUser(userData);
       res.status(201).json(user);
     } catch (error: any) {
       console.error("Erro ao criar usuário:", error);
+      
+      // Check for validation errors and return structured response
+      if (error.issues) {
+        return res.status(400).json({ 
+          message: "Dados inválidos",
+          errors: error.issues 
+        });
+      }
+      
       res.status(500).send("Erro ao criar usuário");
     }
   });
