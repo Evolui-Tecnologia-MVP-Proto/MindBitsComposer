@@ -117,11 +117,11 @@ export function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // DISABLED: Dev auth bypass middleware removed to fix session persistence
-  // app.use((req, res, next) => {
-  //   setupDevAuth(req);
-  //   next();
-  // });
+  // TEMPORARY: Enable dev auth bypass for User Roles testing
+  app.use((req, res, next) => {
+    setupDevAuth(req);
+    next();
+  });
 
   passport.use(
     new LocalStrategy(
