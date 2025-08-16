@@ -7669,6 +7669,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/users/transfer", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    const { sourceUserId, targetUserId } = req.body;
+    
+    if (!sourceUserId || !targetUserId) {
+      return res.status(400).json({ 
+        message: "sourceUserId e targetUserId são obrigatórios" 
+      });
+    }
+    
+    if (sourceUserId === targetUserId) {
+      return res.status(400).json({ 
+        message: "O usuário de origem não pode ser igual ao usuário de destino" 
+      });
+    }
+    
+    try {
+      // Verificar se ambos os usuários existem
+      const sourceUser = await storage.getUser(sourceUserId);
+      const targetUser = await storage.getUser(targetUserId);
+      
+      if (!sourceUser) {
+        return res.status(404).json({ 
+          message: "Usuário de origem não encontrado" 
+        });
+      }
+      
+      if (!targetUser) {
+        return res.status(404).json({ 
+          message: "Usuário de destino não encontrado" 
+        });
+      }
+      
+      // Transfer user dependencies
+      const transferredCount = await storage.transferUserDependencies(sourceUserId, targetUserId);
+      
+      res.json({ 
+        message: "Transferência concluída com sucesso",
+        transferredCount,
+        sourceUser: sourceUser.name,
+        targetUser: targetUser.name
+      });
+      
+    } catch (error: any) {
+      console.error("Erro na transferência de usuário:", error);
+      
+      res.status(500).json({ 
+        message: "Erro interno do servidor na transferência. Tente novamente.",
+        details: error.message
+      });
+    }
+  });
+
   // Generic tables routes
   app.get("/api/generic-tables/:name", async (req, res) => {
     console.log("🔍 [API] Requisição para generic-tables:", req.params.name);

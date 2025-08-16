@@ -280,6 +280,62 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.id, id));
   }
 
+  async transferUserDependencies(sourceUserId: number, targetUserId: number): Promise<number> {
+    let totalTransferred = 0;
+    
+    // List of tables and their user-related foreign key columns that need to be transferred
+    const tablesToTransfer = [
+      // Documents table
+      { table: 'documentos', column: 'user_id' },
+      
+      // Global assets table
+      { table: 'global_assets', column: 'uploaded_by' },
+      
+      // Documents flows table - multiple columns
+      { table: 'documents_flows', column: 'user_id' },
+      { table: 'documents_flows', column: 'created_by' },
+      { table: 'documents_flows', column: 'updated_by' },
+      
+      // Document flow executions table
+      { table: 'document_flow_executions', column: 'started_by' },
+      
+      // Flow actions table
+      { table: 'flow_actions', column: 'actor' },
+      
+      // Document editions table
+      { table: 'document_editions', column: 'started_by' },
+      
+      // Specialty users table (many-to-many)
+      { table: 'specialty_users', column: 'user_id' },
+      
+      // System logs table
+      { table: 'system_logs', column: 'user_id' },
+    ];
+    
+    // Execute transfers using raw SQL for better performance
+    for (const { table, column } of tablesToTransfer) {
+      try {
+        const result = await db.execute(sql.raw(`
+          UPDATE ${table} 
+          SET ${column} = ${targetUserId} 
+          WHERE ${column} = ${sourceUserId}
+        `));
+        
+        // Count affected rows (PostgreSQL specific)
+        const affectedRows = (result as any).rowCount || 0;
+        totalTransferred += affectedRows;
+        
+        console.log(`Transferred ${affectedRows} records in ${table}.${column}`);
+      } catch (error) {
+        console.error(`Error transferring ${table}.${column}:`, error);
+        // Continue with other transfers even if one fails
+      }
+    }
+    
+    console.log(`Total records transferred: ${totalTransferred}`);
+    return totalTransferred;
+  }
+
   // Template operations
   async getTemplate(id: string): Promise<Template | undefined> {
     const [template] = await db.select().from(templates).where(eq(templates.id, id));

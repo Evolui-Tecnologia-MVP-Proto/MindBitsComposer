@@ -11,7 +11,8 @@ import {
   Lock, 
   Unlock, 
   KeyRound,
-  MoreHorizontal 
+  MoreHorizontal,
+  ArrowRightLeft
 } from "lucide-react";
 import { User, UserStatus } from "@shared/schema";
 import { apiRequest, queryClient } from "@/lib/queryClient";
@@ -25,6 +26,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,6 +51,9 @@ export default function UserTable() {
   const [userToEdit, setUserToEdit] = useState<User | null>(null);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
   const [userToResetPassword, setUserToResetPassword] = useState<User | null>(null);
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [userToTransfer, setUserToTransfer] = useState<User | null>(null);
+  const [transferTargetUserId, setTransferTargetUserId] = useState<string>("");
   const { toast } = useToast();
   
   const {
@@ -125,6 +136,33 @@ export default function UserTable() {
         variant: "destructive",
       });
       setUserToResetPassword(null);
+    },
+  });
+
+  const transferUserMutation = useMutation({
+    mutationFn: async ({ sourceUserId, targetUserId }: { sourceUserId: number; targetUserId: number }) => {
+      const res = await apiRequest("POST", "/api/users/transfer", { 
+        sourceUserId, 
+        targetUserId 
+      });
+      return res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/users"] });
+      toast({
+        title: "Transferência concluída",
+        description: `${data.transferredCount} registros foram transferidos com sucesso.`,
+      });
+      setIsTransferModalOpen(false);
+      setUserToTransfer(null);
+      setTransferTargetUserId("");
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro na transferência",
+        description: error.message,
+        variant: "destructive",
+      });
     },
   });
 
@@ -345,6 +383,17 @@ export default function UserTable() {
                                 Resetar Senha
                               </DropdownMenuItem>
                               
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setUserToTransfer(user);
+                                  setIsTransferModalOpen(true);
+                                }}
+                                className="cursor-pointer text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                              >
+                                <ArrowRightLeft className="mr-2 h-4 w-4" />
+                                Transferir
+                              </DropdownMenuItem>
+                              
                               <DropdownMenuSeparator />
                               
                               <DropdownMenuItem
@@ -420,6 +469,71 @@ export default function UserTable() {
               className="bg-primary hover:bg-primary/90 dark:bg-[#1E40AF] dark:hover:bg-[#1E40AF]/90"
             >
               {resetPasswordMutation.isPending ? "Resetando..." : "Resetar Senha"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Modal de transferência de usuário */}
+      <AlertDialog open={isTransferModalOpen} onOpenChange={(open) => {
+        setIsTransferModalOpen(open);
+        if (!open) {
+          setUserToTransfer(null);
+          setTransferTargetUserId("");
+        }
+      }}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Transferir Dados do Usuário</AlertDialogTitle>
+            <AlertDialogDescription>
+              Transferir todas as movimentações e registros do usuário "{userToTransfer?.name}" para outro usuário.
+              Esta ação irá alterar todos os vínculos nas tabelas do sistema.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Usuário de Origem:
+                </label>
+                <div className="mt-1 p-2 bg-gray-100 dark:bg-gray-800 rounded text-sm">
+                  {userToTransfer?.name} ({userToTransfer?.email})
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Usuário de Destino:
+                </label>
+                <Select value={transferTargetUserId} onValueChange={setTransferTargetUserId}>
+                  <SelectTrigger className="mt-1">
+                    <SelectValue placeholder="Selecione o usuário de destino" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {users?.filter(u => u.id !== userToTransfer?.id).map((user) => (
+                      <SelectItem key={user.id} value={user.id.toString()}>
+                        {user.name} ({user.email})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => {
+                if (userToTransfer && transferTargetUserId) {
+                  transferUserMutation.mutate({
+                    sourceUserId: userToTransfer.id,
+                    targetUserId: parseInt(transferTargetUserId)
+                  });
+                }
+              }}
+              disabled={!transferTargetUserId || transferUserMutation.isPending}
+              className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
+            >
+              {transferUserMutation.isPending ? "Transferindo..." : "Transferir"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
