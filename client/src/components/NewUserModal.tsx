@@ -48,7 +48,6 @@ const formSchema = z.object({
   }),
 
   roleId: z.number().default(0),
-  status: z.nativeEnum(UserStatus),
   flowProcessAcs: z.array(z.string()).default([])
 });
 
@@ -69,7 +68,6 @@ export default function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
     defaultValues: {
       name: "",
       email: "",
-      status: UserStatus.ACTIVE,
       roleId: 0,
       flowProcessAcs: [],
     },
@@ -221,37 +219,6 @@ export default function NewUserModal({ isOpen, onClose }: NewUserModalProps) {
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Status</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex space-x-6"
-                    >
-                      <FormItem className="flex items-center space-x-2">
-                        <FormControl>
-                          <RadioGroupItem value={UserStatus.ACTIVE} />
-                        </FormControl>
-                        <FormLabel className="font-normal">Ativo</FormLabel>
-                      </FormItem>
-                      <FormItem className="flex items-center space-x-2">
-                        <FormControl>
-                          <RadioGroupItem value={UserStatus.INACTIVE} />
-                        </FormControl>
-                        <FormLabel className="font-normal">Inativo</FormLabel>
-                      </FormItem>
-                    </RadioGroup>
-                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
