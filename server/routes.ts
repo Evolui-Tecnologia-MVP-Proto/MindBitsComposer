@@ -2,7 +2,7 @@ import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, templates, specialties, insertSpecialtySchema, systemParams, insertSystemParamSchema, flowActions, serviceConnections, plugins, userRoles, insertUserRoleSchema } from "@shared/schema";
+import { PluginStatus, PluginType, documentos, documentsFlows, documentFlowExecutions, flowTypes, users, documentEditions, documentflowexecDocedition, templates, specialties, insertSpecialtySchema, systemParams, insertSystemParamSchema, flowActions, serviceConnections, plugins, userRoles, insertUserRoleSchema } from "@shared/schema";
 import { TemplateType, insertTemplateSchema, insertMondayMappingSchema, insertMondayColumnSchema, insertServiceConnectionSchema } from "@shared/schema";
 import { db } from "./db";
 import { eq, sql, desc, asc, and, gte, lte, isNull, or, ne, inArray } from "drizzle-orm";
@@ -4408,6 +4408,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         })
         .returning();
 
+      console.log("Verificando document_editions ativas para criar registro junction");
+      // Buscar document_editions ativas para este documento
+      const activeDocumentEditions = await db
+        .select()
+        .from(documentEditions)
+        .where(and(
+          eq(documentEditions.documentId, documentId),
+          or(
+            eq(documentEditions.status, 'in_progress'),
+            eq(documentEditions.status, 'draft'),
+            eq(documentEditions.status, 'editing'),
+            eq(documentEditions.status, 'ready_to_revise')
+          )
+        ));
+
+      // Criar registros na tabela junction para cada document_edition ativa
+      if (activeDocumentEditions.length > 0) {
+        const junctionRecords = activeDocumentEditions.map(edition => ({
+          flowExecutionId: flowExecution[0].id,
+          documentEditionId: edition.id
+        }));
+        
+        await db.insert(documentflowexecDocedition).values(junctionRecords);
+        console.log(`${junctionRecords.length} registros junction criados para document_editions ativas`);
+      } else {
+        console.log("Nenhuma document_edition ativa encontrada para o documento");
+      }
+
       console.log("Criando registros de flow_actions para nós executados");
       // Criar registros em flow_actions para cada nó com isExecuted = TRUE
       if (updatedFlowTasks.nodes && Array.isArray(updatedFlowTasks.nodes)) {
@@ -4463,6 +4491,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("=== FIM ERRO ===");
       res.status(500).json({ 
         error: "Erro interno do servidor ao iniciar documentação" 
+      });
+    }
+  });
+
+  // Endpoint para verificar registros junction documentflowexec_docedition
+  app.get("/api/documentflowexec-docedition/:flowExecutionId", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
+    
+    try {
+      const junctionRecords = await db
+        .select()
+        .from(documentflowexecDocedition)
+        .where(eq(documentflowexecDocedition.flowExecutionId, req.params.flowExecutionId));
+      
+      res.json(junctionRecords);
+    } catch (error: any) {
+      console.error("❌ Erro ao buscar registros junction:", error);
+      res.status(500).json({ 
+        error: "Erro ao buscar registros junction",
+        details: error.message 
       });
     }
   });
@@ -6347,6 +6395,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .returning();
       
       console.log('✅ Nova execução criada:', newExecution[0].id);
+
+      console.log('🔗 Verificando document_editions ativas para criar registro junction');
+      // Buscar document_editions ativas para este documento
+      const activeDocumentEditions = await db
+        .select()
+        .from(documentEditions)
+        .where(and(
+          eq(documentEditions.documentId, currentDocumentId),
+          or(
+            eq(documentEditions.status, 'in_progress'),
+            eq(documentEditions.status, 'draft'),
+            eq(documentEditions.status, 'editing'),
+            eq(documentEditions.status, 'ready_to_revise')
+          )
+        ));
+
+      // Criar registros na tabela junction para cada document_edition ativa
+      if (activeDocumentEditions.length > 0) {
+        const junctionRecords = activeDocumentEditions.map(edition => ({
+          flowExecutionId: newExecution[0].id,
+          documentEditionId: edition.id
+        }));
+        
+        await db.insert(documentflowexecDocedition).values(junctionRecords);
+        console.log(`🔗 ${junctionRecords.length} registros junction criados para document_editions ativas na transferência`);
+      } else {
+        console.log('🔗 Nenhuma document_edition ativa encontrada para o documento na transferência');
+      }
       
       // Log da transferência
       await SystemLogger.log({
