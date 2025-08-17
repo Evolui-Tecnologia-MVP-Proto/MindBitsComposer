@@ -139,7 +139,7 @@ export function UserRolesList() {
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ width: '200px' }}>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ width: '300px' }}>
                         Nome
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ width: '350px' }}>
@@ -159,7 +159,7 @@ export function UserRolesList() {
                   <tbody className="bg-white divide-y divide-gray-200 dark:divide-gray-700">
                     {filteredRoles?.map((role) => (
                       <tr key={role.id}>
-                        <td className="px-6 py-4 whitespace-nowrap" style={{ width: '200px', maxWidth: '200px' }}>
+                        <td className="px-6 py-4 whitespace-nowrap" style={{ width: '300px', maxWidth: '300px' }}>
                           <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate" title={role.name}>{role.name}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap" style={{ width: '350px', maxWidth: '350px' }}>
