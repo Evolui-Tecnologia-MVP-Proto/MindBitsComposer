@@ -48,13 +48,13 @@ export default function SaveFileModal({ isOpen, onClose, onSave, defaultFilename
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="composer-save-modal sm:max-w-[500px] bg-white border-gray-200 dark:bg-[#0F1729] dark:border-[#374151]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 text-gray-900 dark:text-gray-200">
             <Download className="w-5 h-5" />
             Salvar Documento
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-gray-600 dark:text-gray-300">
             Configure as opções de salvamento para o seu documento
           </DialogDescription>
         </DialogHeader>
@@ -157,13 +157,17 @@ export default function SaveFileModal({ isOpen, onClose, onSave, defaultFilename
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button 
+            variant="outline" 
+            onClick={onClose}
+            className="bg-gray-100 border-gray-300 text-gray-900 hover:bg-gray-200 dark:bg-[#374151] dark:text-gray-200 dark:border-[#374151] dark:hover:bg-[#4B5563]"
+          >
             Cancelar
           </Button>
           <Button 
             onClick={handleSave}
             disabled={!filename.trim()}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
           >
             <Download className="w-4 h-4" />
             Salvar

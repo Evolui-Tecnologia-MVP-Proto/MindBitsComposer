@@ -2785,9 +2785,9 @@ export default function LexicalPage() {
       {/* Modal de Confirmação para Finalizar */}
       {showFinalizeModal && (
         <AlertDialog open={showFinalizeModal} onOpenChange={setShowFinalizeModal}>
-          <AlertDialogContent className="dark:bg-[#0F1729] dark:border-[#374151]">
+          <AlertDialogContent className="composer-finalize-modal bg-white border-gray-200 dark:bg-[#0F1729] dark:border-[#374151]">
             <AlertDialogHeader>
-              <AlertDialogTitle className="dark:text-gray-200">
+              <AlertDialogTitle className="text-gray-900 dark:text-gray-200">
                 Confirmação de Finalização
               </AlertDialogTitle>
               <AlertDialogDescription asChild>
@@ -2824,7 +2824,7 @@ export default function LexicalPage() {
             <AlertDialogFooter>
               <AlertDialogCancel 
                 onClick={() => setShowFinalizeModal(false)}
-                className="dark:bg-[#374151] dark:text-gray-200 dark:border-[#374151] dark:hover:bg-[#4B5563]"
+                className="bg-gray-100 border-gray-300 text-gray-900 hover:bg-gray-200 dark:bg-[#374151] dark:text-gray-200 dark:border-[#374151] dark:hover:bg-[#4B5563]"
               >
                 Cancelar
               </AlertDialogCancel>
