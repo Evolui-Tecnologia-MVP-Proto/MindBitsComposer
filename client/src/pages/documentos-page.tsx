@@ -2,6 +2,8 @@ import { useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/use-auth";
+import { checkTabAccess, getAccessStyles } from "@/lib/accessControl";
 import { Button } from "@/components/ui/button";
 
 
@@ -49,6 +51,7 @@ import { GitHubTab } from "@/components/documentos/tabs/GitHubTab";
 import { DocsProcessEmbed } from "@/components/documentos/tables/DocsProcessEmbed";
 
 export default function DocumentosPage() {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("incluidos");
   const [selectedDocument, setSelectedDocument] = useState<Documento | null>(
     null,
@@ -1044,11 +1047,85 @@ export default function DocumentosPage() {
           className="w-full tabs-root flex flex-col flex-1 min-h-0"
         >
           <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-[#0F172A] mb-6">
-            <TabsTrigger value="incluidos" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Incluídos</TabsTrigger>
-            <TabsTrigger value="integrados-embed" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Integrados</TabsTrigger>
-            <TabsTrigger value="em-processo-embed" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Em processo</TabsTrigger>
-            <TabsTrigger value="concluidos" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Concluídos</TabsTrigger>
-            <TabsTrigger value="repositorio" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">Repositório</TabsTrigger>
+            {/* Tab 1 - Incluídos */}
+            {(() => {
+              const accessType = checkTabAccess(user?.userRole, 'menu4', 'tab1');
+              const styles = getAccessStyles(accessType);
+              if (styles.hidden) return null;
+              return (
+                <TabsTrigger 
+                  value="incluidos" 
+                  className={`text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] ${styles.className || ''}`}
+                  disabled={styles.disabled}
+                >
+                  Incluídos
+                </TabsTrigger>
+              );
+            })()}
+            
+            {/* Tab 2 - Integrados */}
+            {(() => {
+              const accessType = checkTabAccess(user?.userRole, 'menu4', 'tab2');
+              const styles = getAccessStyles(accessType);
+              if (styles.hidden) return null;
+              return (
+                <TabsTrigger 
+                  value="integrados-embed" 
+                  className={`text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] ${styles.className || ''}`}
+                  disabled={styles.disabled}
+                >
+                  Integrados
+                </TabsTrigger>
+              );
+            })()}
+            
+            {/* Tab 3 - Em processo */}
+            {(() => {
+              const accessType = checkTabAccess(user?.userRole, 'menu4', 'tab3');
+              const styles = getAccessStyles(accessType);
+              if (styles.hidden) return null;
+              return (
+                <TabsTrigger 
+                  value="em-processo-embed" 
+                  className={`text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] ${styles.className || ''}`}
+                  disabled={styles.disabled}
+                >
+                  Em processo
+                </TabsTrigger>
+              );
+            })()}
+            
+            {/* Tab 4 - Concluídos */}
+            {(() => {
+              const accessType = checkTabAccess(user?.userRole, 'menu4', 'tab4');
+              const styles = getAccessStyles(accessType);
+              if (styles.hidden) return null;
+              return (
+                <TabsTrigger 
+                  value="concluidos" 
+                  className={`text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] ${styles.className || ''}`}
+                  disabled={styles.disabled}
+                >
+                  Concluídos
+                </TabsTrigger>
+              );
+            })()}
+            
+            {/* Tab 5 - Repositório */}
+            {(() => {
+              const accessType = checkTabAccess(user?.userRole, 'menu4', 'tab5');
+              const styles = getAccessStyles(accessType);
+              if (styles.hidden) return null;
+              return (
+                <TabsTrigger 
+                  value="repositorio" 
+                  className={`text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] ${styles.className || ''}`}
+                  disabled={styles.disabled}
+                >
+                  Repositório
+                </TabsTrigger>
+              );
+            })()}
           </TabsList>
 
           <TabsContent value="incluidos" className="slide-in">

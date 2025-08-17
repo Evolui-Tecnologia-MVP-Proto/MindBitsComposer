@@ -35,6 +35,8 @@ import { toast } from '@/hooks/use-toast';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { useNavigationGuard } from '@/hooks/use-navigation-guard';
+import { useAuth } from '@/hooks/use-auth';
+import { checkTabAccess, getAccessStyles } from '@/lib/accessControl';
 import {
   Dialog,
   DialogContent,
@@ -1390,6 +1392,7 @@ FlowCanvas.displayName = 'FlowCanvas';
 
 
 export default function FluxosPage() {
+  const { user } = useAuth();
   const [currentFlowInfo, setCurrentFlowInfo] = useState<{code: string, name: string} | null>(null);
   const [activeTab, setActiveTab] = useState("editor");
   const [showDiscardModal, setShowDiscardModal] = useState<boolean>(false);
@@ -1458,14 +1461,39 @@ export default function FluxosPage() {
       <div className="flex-1 px-6 pb-6 min-h-0">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="flex flex-col h-full">
           <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
-            <TabsTrigger value="editor" className="flex items-center space-x-2">
-              <Edit className="h-4 w-4" />
-              <span>Editor</span>
-            </TabsTrigger>
-            <TabsTrigger value="biblioteca" className="flex items-center space-x-2">
-              <BookOpen className="h-4 w-4" />
-              <span>Biblioteca</span>
-            </TabsTrigger>
+            {/* Tab 1 - Editor */}
+            {(() => {
+              const accessType = checkTabAccess(user?.userRole, 'menu3', 'tab1');
+              const styles = getAccessStyles(accessType);
+              if (styles.hidden) return null;
+              return (
+                <TabsTrigger 
+                  value="editor" 
+                  className={`flex items-center space-x-2 ${styles.className || ''}`}
+                  disabled={styles.disabled}
+                >
+                  <Edit className="h-4 w-4" />
+                  <span>Editor</span>
+                </TabsTrigger>
+              );
+            })()}
+            
+            {/* Tab 2 - Biblioteca */}
+            {(() => {
+              const accessType = checkTabAccess(user?.userRole, 'menu3', 'tab2');
+              const styles = getAccessStyles(accessType);
+              if (styles.hidden) return null;
+              return (
+                <TabsTrigger 
+                  value="biblioteca" 
+                  className={`flex items-center space-x-2 ${styles.className || ''}`}
+                  disabled={styles.disabled}
+                >
+                  <BookOpen className="h-4 w-4" />
+                  <span>Biblioteca</span>
+                </TabsTrigger>
+              );
+            })()}
           </TabsList>
           
           <TabsContent value="editor" className="flex-1 mt-4 min-h-0">
