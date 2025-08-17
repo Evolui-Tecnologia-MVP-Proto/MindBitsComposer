@@ -344,12 +344,22 @@ export function GitHubIntegration() {
           description: `O arquivo "${fileToDelete.name}" foi removido do repositório.`,
         });
         
+        // Invalidar cache React Query para forçar recarregamento
+        queryClient.invalidateQueries({ queryKey: ["/api/github/repo/contents"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/repo-structure"] });
+        
         // Recarregar a lista de arquivos da pasta atual
         console.log('🔄 Recarregando lista de arquivos da pasta:', selectedFolderPath);
         await fetchFolderFiles(selectedFolderPath);
         
         // Também recarregar a estrutura geral do repositório
         await fetchGithubRepoStructure();
+        
+        // Forçar re-fetch após um pequeno delay para garantir sincronização
+        setTimeout(() => {
+          queryClient.refetchQueries({ queryKey: ["/api/github/repo/contents"] });
+          queryClient.refetchQueries({ queryKey: ["/api/repo-structure"] });
+        }, 1000);
       } else {
         const errorData = await response.json();
         console.error('❌ Erro na resposta:', errorData);
