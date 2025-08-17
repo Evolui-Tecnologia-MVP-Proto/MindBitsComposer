@@ -631,13 +631,13 @@ function RawTextView({ content }: { content: string }) {
         <tbody>
           {lines.map((line, index) => (
             <tr key={index}>
-              <td className="pr-4 text-gray-500 dark:text-gray-400 text-right select-none align-top bg-transparent dark:bg-[#1B2028]" style={{minWidth: '24px', maxWidth: '24px', width: '24px'}}>
+              <td className="pr-4 text-[#1B2028] dark:text-gray-400 text-right select-none align-top bg-transparent dark:bg-[#1B2028]" style={{minWidth: '24px', maxWidth: '24px', width: '24px'}}>
                 {index + 1}
               </td>
-              <td className="pr-2 text-gray-600 dark:text-gray-300 text-center select-none align-top bg-transparent dark:bg-[#1B2028]" style={{minWidth: '24px', maxWidth: '24px', width: '24px'}}>
+              <td className="pr-2 text-[#1B2028] dark:text-gray-300 text-center select-none align-top bg-transparent dark:bg-[#1B2028]" style={{minWidth: '24px', maxWidth: '24px', width: '24px'}}>
                 {' '}
               </td>
-              <td className="text-gray-100 dark:text-gray-300 whitespace-pre-wrap break-words pl-2 bg-transparent dark:bg-[#1B2028]">
+              <td className="text-[#1B2028] dark:text-gray-300 whitespace-pre-wrap break-words pl-2 bg-transparent dark:bg-[#1B2028]">
                 {line || '\u00A0'}
               </td>
             </tr>
