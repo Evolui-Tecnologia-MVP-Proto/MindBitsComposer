@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
+import { checkTabAccess, getAccessStyles } from "@/lib/accessControl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -192,50 +193,101 @@ export default function HomePage() {
           className="w-full"
         >
           <TabsList className="grid w-full grid-cols-4 bg-gray-100 dark:bg-[#0F172A]">
-            <TabsTrigger value="revisoes-ct-rag" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] flex items-center justify-between px-3">
-              <span>Revisões CT → RAG</span>
-              {activeTab === "revisoes-ct-rag" && (
-                <button 
-                  onClick={toggleTabContentCollapse}
-                  className="ml-2 hover:bg-black/10 rounded p-1"
+            {/* Tab 1 - Revisões CT → RAG */}
+            {(() => {
+              const accessType = checkTabAccess(user?.userRole, 'menu1', 'tab1');
+              const styles = getAccessStyles(accessType);
+              if (styles.hidden) return null;
+              return (
+                <TabsTrigger 
+                  value="revisoes-ct-rag" 
+                  className={`text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] flex items-center justify-between px-3 ${styles.className || ''}`}
+                  disabled={styles.disabled}
                 >
-                  {tabContentCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-                </button>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="triagem" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] flex items-center justify-between px-3">
-              <span>Triagem</span>
-              {activeTab === "triagem" && (
-                <button 
-                  onClick={toggleTabContentCollapse}
-                  className="ml-2 hover:bg-black/10 rounded p-1"
+                  <span>Revisões CT → RAG</span>
+                  {activeTab === "revisoes-ct-rag" && (
+                    <button 
+                      onClick={toggleTabContentCollapse}
+                      className="ml-2 hover:bg-black/10 rounded p-1"
+                    >
+                      {tabContentCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                    </button>
+                  )}
+                </TabsTrigger>
+              );
+            })()}
+            
+            {/* Tab 2 - Triagem */}
+            {(() => {
+              const accessType = checkTabAccess(user?.userRole, 'menu1', 'tab2');
+              const styles = getAccessStyles(accessType);
+              if (styles.hidden) return null;
+              return (
+                <TabsTrigger 
+                  value="triagem" 
+                  className={`text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] flex items-center justify-between px-3 ${styles.className || ''}`}
+                  disabled={styles.disabled}
                 >
-                  {tabContentCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-                </button>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="projetos" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] flex items-center justify-between px-3">
-              <span>Projetos</span>
-              {activeTab === "projetos" && (
-                <button 
-                  onClick={toggleTabContentCollapse}
-                  className="ml-2 hover:bg-black/10 rounded p-1"
+                  <span>Triagem</span>
+                  {activeTab === "triagem" && (
+                    <button 
+                      onClick={toggleTabContentCollapse}
+                      className="ml-2 hover:bg-black/10 rounded p-1"
+                    >
+                      {tabContentCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                    </button>
+                  )}
+                </TabsTrigger>
+              );
+            })()}
+            
+            {/* Tab 3 - Projetos */}
+            {(() => {
+              const accessType = checkTabAccess(user?.userRole, 'menu1', 'tab3');
+              const styles = getAccessStyles(accessType);
+              if (styles.hidden) return null;
+              return (
+                <TabsTrigger 
+                  value="projetos" 
+                  className={`text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] flex items-center justify-between px-3 ${styles.className || ''}`}
+                  disabled={styles.disabled}
                 >
-                  {tabContentCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-                </button>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="elicitacoes-dev" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] flex items-center justify-between px-3">
-              <span>Elicitações DEV</span>
-              {activeTab === "elicitacoes-dev" && (
-                <button 
-                  onClick={toggleTabContentCollapse}
-                  className="ml-2 hover:bg-black/10 rounded p-1"
+                  <span>Projetos</span>
+                  {activeTab === "projetos" && (
+                    <button 
+                      onClick={toggleTabContentCollapse}
+                      className="ml-2 hover:bg-black/10 rounded p-1"
+                    >
+                      {tabContentCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                    </button>
+                  )}
+                </TabsTrigger>
+              );
+            })()}
+            
+            {/* Tab 4 - Elicitações DEV */}
+            {(() => {
+              const accessType = checkTabAccess(user?.userRole, 'menu1', 'tab4');
+              const styles = getAccessStyles(accessType);
+              if (styles.hidden) return null;
+              return (
+                <TabsTrigger 
+                  value="elicitacoes-dev" 
+                  className={`text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] flex items-center justify-between px-3 ${styles.className || ''}`}
+                  disabled={styles.disabled}
                 >
-                  {tabContentCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-                </button>
-              )}
-            </TabsTrigger>
+                  <span>Elicitações DEV</span>
+                  {activeTab === "elicitacoes-dev" && (
+                    <button 
+                      onClick={toggleTabContentCollapse}
+                      className="ml-2 hover:bg-black/10 rounded p-1"
+                    >
+                      {tabContentCollapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                    </button>
+                  )}
+                </TabsTrigger>
+              );
+            })()}
           </TabsList>
 
           {/* Tab Content: Revisões CT → RAG */}
