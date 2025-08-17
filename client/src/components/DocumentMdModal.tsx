@@ -655,11 +655,11 @@ function DiffView({ oldContent, newContent }: { oldContent: string; newContent: 
   const getLineStyle = (type: DiffLine['type']) => {
     switch (type) {
       case 'added':
-        return 'bg-blue-100 dark:bg-[#3B82F6]/10 border-l-4 border-blue-500';
+        return 'bg-blue-100 dark:bg-blue-900/30 border-l-4 border-blue-500';
       case 'removed':
-        return 'bg-red-100 dark:bg-[#EF4444]/10 border-l-4 border-red-500';
+        return 'bg-red-100 dark:bg-red-900/30 border-l-4 border-red-500';
       case 'modified':
-        return 'bg-yellow-100 dark:bg-[#EAB308]/10 border-l-4 border-yellow-500';
+        return 'bg-yellow-100 dark:bg-yellow-900/30 border-l-4 border-yellow-500';
       default:
         return 'bg-gray-50 dark:bg-gray-800/50';
     }
@@ -680,7 +680,7 @@ function DiffView({ oldContent, newContent }: { oldContent: string; newContent: 
   
   return (
     <div className="bg-[#F1F5F9] dark:bg-[#1B2028] text-gray-800 dark:text-gray-300 p-4 rounded-lg font-mono text-sm overflow-x-auto">
-      <div className="mb-4 text-xs text-[#1B2028] dark:text-gray-400 border-b border-gray-600 pb-2">
+      <div className="mb-4 text-xs text-[#1B2028] dark:text-[#1B2028] border-b border-gray-600 pb-2">
         <span className="inline-block w-4 h-4 bg-blue-500 rounded mr-2"></span>Adicionado
         <span className="inline-block w-4 h-4 bg-yellow-500 rounded mr-2 ml-4"></span>Modificado
         <span className="inline-block w-4 h-4 bg-red-500 rounded mr-2 ml-4"></span>Removido
@@ -689,13 +689,13 @@ function DiffView({ oldContent, newContent }: { oldContent: string; newContent: 
         <tbody>
           {diffLines.map((line, index) => (
             <tr key={index} className={getLineStyle(line.type)}>
-              <td className="pr-4 text-[#1B2028] dark:text-gray-400 text-right select-none align-top bg-transparent" style={{minWidth: '24px', maxWidth: '24px', width: '24px'}}>
+              <td className="pr-4 text-[#1B2028] dark:text-[#1B2028] text-right select-none align-top bg-transparent dark:bg-[#1B2028]" style={{minWidth: '24px', maxWidth: '24px', width: '24px'}}>
                 {line.lineNumber || ''}
               </td>
-              <td className="pr-2 text-[#1B2028] dark:text-gray-300 text-center select-none align-top bg-transparent" style={{minWidth: '24px', maxWidth: '24px', width: '24px'}}>
+              <td className="pr-2 text-[#1B2028] dark:text-[#1B2028] text-center select-none align-top bg-transparent dark:bg-[#1B2028]" style={{minWidth: '24px', maxWidth: '24px', width: '24px'}}>
                 {getLinePrefix(line.type)}
               </td>
-              <td className="text-[#1B2028] dark:text-gray-300 whitespace-pre-wrap break-words pl-2 bg-transparent">
+              <td className="text-[#1B2028] dark:text-[#1B2028] whitespace-pre-wrap break-words pl-2 bg-transparent dark:bg-[#1B2028]">
                 {line.content || '\u00A0'}
               </td>
             </tr>
