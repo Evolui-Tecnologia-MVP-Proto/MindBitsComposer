@@ -2785,13 +2785,16 @@ export default function LexicalPage() {
       {/* Modal de Confirmação para Finalizar */}
       {showFinalizeModal && (
         <AlertDialog open={showFinalizeModal} onOpenChange={setShowFinalizeModal}>
-          <AlertDialogContent className="composer-finalize-modal bg-white border-gray-200 dark:bg-[#0F1729] dark:border-[#374151]">
+          <AlertDialogContent 
+            className="composer-finalize-modal bg-white border-gray-200 text-gray-900 dark:bg-[#0F1729] dark:border-[#374151] dark:text-gray-200"
+            style={undefined}
+          >
             <AlertDialogHeader>
               <AlertDialogTitle className="text-gray-900 dark:text-gray-200">
                 Confirmação de Finalização
               </AlertDialogTitle>
               <AlertDialogDescription asChild>
-                <div className="space-y-4">
+                <div className="space-y-4 text-gray-700 dark:text-gray-300">
                   {/* Card de Atenção existente */}
                   <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-600 rounded-lg p-4 mt-4">
                     <p className="text-yellow-800 dark:text-yellow-400">
@@ -2809,6 +2812,7 @@ export default function LexicalPage() {
                         id="marcar-descartar"
                         checked={marcarParaDescartar}
                         onCheckedChange={(checked) => setMarcarParaDescartar(checked as boolean)}
+                        className="border-red-400 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600 dark:border-red-500 dark:data-[state=checked]:bg-red-600 dark:data-[state=checked]:border-red-600"
                       />
                       <Label
                         htmlFor="marcar-descartar"
@@ -2821,7 +2825,7 @@ export default function LexicalPage() {
                 </div>
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter>
+            <AlertDialogFooter className="space-y-2 sm:space-y-0">
               <AlertDialogCancel 
                 onClick={() => setShowFinalizeModal(false)}
                 className="bg-gray-100 border-gray-300 text-gray-900 hover:bg-gray-200 dark:bg-[#374151] dark:text-gray-200 dark:border-[#374151] dark:hover:bg-[#4B5563]"
@@ -2835,7 +2839,7 @@ export default function LexicalPage() {
                   }
                 }}
                 disabled={finalizeMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"
+                className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
               >
                 {finalizeMutation.isPending ? "Finalizando..." : "Confirmar"}
               </AlertDialogAction>
