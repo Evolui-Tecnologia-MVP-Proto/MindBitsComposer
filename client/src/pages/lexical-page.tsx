@@ -2826,14 +2826,15 @@ export default function LexicalPage() {
                   </div>
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <AlertDialogFooter className="space-y-2 sm:space-y-0">
-                <AlertDialogCancel 
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 space-y-2 sm:space-y-0">
+                <Button 
+                  variant="outline"
                   onClick={() => setShowFinalizeModal(false)}
-                  className="bg-gray-100 border-gray-300 text-gray-900 hover:bg-gray-200 dark:bg-[#374151] dark:text-gray-200 dark:border-[#374151] dark:hover:bg-[#4B5563]"
+                  className="bg-gray-100 border-gray-300 text-gray-900 hover:bg-gray-200 dark:bg-[#374151] dark:text-gray-200 dark:border-[#374151] dark:hover:bg-[#4B5563] mt-2 sm:mt-0"
                 >
                   Cancelar
-                </AlertDialogCancel>
-                <AlertDialogAction 
+                </Button>
+                <Button 
                   onClick={() => {
                     if (selectedEdition?.id) {
                       finalizeMutation.mutate(selectedEdition.id);
@@ -2843,8 +2844,8 @@ export default function LexicalPage() {
                   className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
                 >
                   {finalizeMutation.isPending ? "Finalizando..." : "Confirmar"}
-                </AlertDialogAction>
-              </AlertDialogFooter>
+                </Button>
+              </div>
             </div>
           </AlertDialogPortal>
         </AlertDialog>
