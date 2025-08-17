@@ -2078,6 +2078,15 @@ export default function LexicalEditor({ content = '', onChange, onEditorStateCha
       return value;
     };
     
+    // Processar funções REPLACE
+    result = result.replace(/REPLACE\(([^,]+),\s*'([^']*)',\s*'([^']*)'\)/g, (match, field, searchValue, replaceValue) => {
+      const fieldName = field.trim();
+      const fieldValue = getFieldValue(fieldName);
+      const replaceResult = fieldValue.replace(new RegExp(searchValue, 'g'), replaceValue);
+      console.log(`🔍 DEBUG - REPLACE(${fieldName}, '${searchValue}', '${replaceValue}') = "${replaceResult}"`);
+      return replaceResult;
+    });
+    
     // Processar funções SUBSTR
     result = result.replace(/SUBSTR\(([^,]+),\s*(\d+),\s*(\d+)\)/g, (match, field, start, length) => {
       const fieldName = field.trim();
