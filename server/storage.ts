@@ -26,6 +26,7 @@ export interface IStorage {
   
   // User operations
   getUser(id: number): Promise<User | undefined>;
+  getUserWithRole(id: number): Promise<(User & {userRole?: UserRoleRecord}) | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   getAllUsers(): Promise<User[]>;
@@ -194,6 +195,53 @@ export class DatabaseStorage implements IStorage {
   // User operations
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+  
+  async getUserWithRole(id: number): Promise<(User & {userRole?: UserRoleRecord}) | undefined> {
+    const user = await this.getUser(id);
+    if (!user) return undefined;
+    
+    // Se roleId é 0 (Super Administrador), retorna com acesso completo
+    if (user.roleId === 0) {
+      return {
+        ...user,
+        userRole: {
+          id: 0,
+          name: 'Super Administrador',
+          description: 'Acesso completo ao sistema',
+          active: true,
+          access: {
+            accessLevels: {
+              menus: [
+                { id: 'menu1', type: 'SHOW', tabs: [{ id: 'tab1', type: 'SHOW' }, { id: 'tab2', type: 'SHOW' }, { id: 'tab3', type: 'SHOW' }, { id: 'tab4', type: 'SHOW' }] },
+                { id: 'menu2', type: 'SHOW' },
+                { id: 'menu3', type: 'SHOW', tabs: [{ id: 'tab1', type: 'SHOW' }, { id: 'tab2', type: 'SHOW' }] },
+                { id: 'menu4', type: 'SHOW', tabs: [{ id: 'tab1', type: 'SHOW' }, { id: 'tab2', type: 'SHOW' }, { id: 'tab3', type: 'SHOW' }, { id: 'tab4', type: 'SHOW' }, { id: 'tab5', type: 'SHOW' }] },
+                { id: 'menu5', type: 'SHOW', tabs: [{ id: 'tab1', type: 'SHOW' }, { id: 'tab2', type: 'SHOW' }] },
+                { id: 'menu6', type: 'SHOW', tabs: [{ id: 'tab1', type: 'SHOW' }, { id: 'tab2', type: 'SHOW' }] },
+                { id: 'menu7', type: 'SHOW' },
+                { id: 'menu8', type: 'SHOW', tabs: [{ id: 'tab1', type: 'SHOW' }, { id: 'tab2', type: 'SHOW' }, { id: 'tab3', type: 'SHOW' }, { id: 'tab4', type: 'SHOW' }, { id: 'tab5', type: 'SHOW' }] }
+              ]
+            }
+          },
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      };
+    }
+    
+    // Busca o role do usuário
+    if (user.roleId) {
+      const userRole = await this.getUserRole(user.roleId);
+      if (userRole) {
+        return {
+          ...user,
+          userRole
+        };
+      }
+    }
+    
     return user;
   }
 

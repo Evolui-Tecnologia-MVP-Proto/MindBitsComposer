@@ -219,9 +219,14 @@ export function setupAuth(app: Express) {
   });
 
   // Get current user
-  app.get("/api/user", (req, res) => {
+  app.get("/api/user", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    res.json(req.user);
+    
+    // Busca o usuário com role incluído
+    const userWithRole = await storage.getUserWithRole(req.user.id);
+    if (!userWithRole) return res.sendStatus(404);
+    
+    res.json(userWithRole);
   });
 
   // Change password

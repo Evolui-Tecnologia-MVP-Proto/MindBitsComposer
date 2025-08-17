@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/hooks/use-auth";
+import { checkTabAccess, getAccessStyles } from "@/lib/accessControl";
 import { 
   Dialog, 
   DialogContent, 
@@ -359,6 +361,7 @@ const DocumentRelationshipSelect = ({
 
 export default function AdminPage() {
   const { toast } = useToast();
+  const { user } = useAuth();
   
   // Estados para gerenciar modais e seleções
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -1479,27 +1482,91 @@ export default function AdminPage() {
         </div>
         
         <Tabs defaultValue="usuarios" className="w-full mt-6">
-          <TabsList className="grid w-full grid-cols-5 bg-gray-100 dark:bg-[#0F172A]">
-            <TabsTrigger value="usuarios" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
-              <Users className="h-4 w-4 mr-2" />
-              Usuários
-            </TabsTrigger>
-            <TabsTrigger value="user-roles" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
-              <Key className="h-4 w-4 mr-2" />
-              User Roles
-            </TabsTrigger>
-            <TabsTrigger value="monday" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
-              <CalendarDays className="h-4 w-4 mr-2" />
-              Integração Monday
-            </TabsTrigger>
-            <TabsTrigger value="servicos" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
-              <Plug className="h-4 w-4 mr-2" />
-              Integrações de Serviços
-            </TabsTrigger>
-            <TabsTrigger value="logs" className="text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF]">
-              <Database className="h-4 w-4 mr-2" />
-              Logs
-            </TabsTrigger>
+          <TabsList className={`grid w-full grid-cols-5 bg-gray-100 dark:bg-[#0F172A]`}>
+            {/* Tab 1 - Usuários */}
+            {(() => {
+              const accessType = checkTabAccess(user?.userRole, 'menu8', 'tab1');
+              const styles = getAccessStyles(accessType);
+              if (styles.hidden) return null;
+              return (
+                <TabsTrigger 
+                  value="usuarios" 
+                  className={`text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] ${styles.className || ''}`}
+                  disabled={styles.disabled}
+                >
+                  <Users className="h-4 w-4 mr-2" />
+                  Usuários
+                </TabsTrigger>
+              );
+            })()}
+            
+            {/* Tab 2 - User Roles */}
+            {(() => {
+              const accessType = checkTabAccess(user?.userRole, 'menu8', 'tab2');
+              const styles = getAccessStyles(accessType);
+              if (styles.hidden) return null;
+              return (
+                <TabsTrigger 
+                  value="user-roles" 
+                  className={`text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] ${styles.className || ''}`}
+                  disabled={styles.disabled}
+                >
+                  <Key className="h-4 w-4 mr-2" />
+                  User Roles
+                </TabsTrigger>
+              );
+            })()}
+            
+            {/* Tab 3 - Integração Monday */}
+            {(() => {
+              const accessType = checkTabAccess(user?.userRole, 'menu8', 'tab3');
+              const styles = getAccessStyles(accessType);
+              if (styles.hidden) return null;
+              return (
+                <TabsTrigger 
+                  value="monday" 
+                  className={`text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] ${styles.className || ''}`}
+                  disabled={styles.disabled}
+                >
+                  <CalendarDays className="h-4 w-4 mr-2" />
+                  Integração Monday
+                </TabsTrigger>
+              );
+            })()}
+            
+            {/* Tab 4 - Integrações de Serviços */}
+            {(() => {
+              const accessType = checkTabAccess(user?.userRole, 'menu8', 'tab4');
+              const styles = getAccessStyles(accessType);
+              if (styles.hidden) return null;
+              return (
+                <TabsTrigger 
+                  value="servicos" 
+                  className={`text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] ${styles.className || ''}`}
+                  disabled={styles.disabled}
+                >
+                  <Plug className="h-4 w-4 mr-2" />
+                  Integrações de Serviços
+                </TabsTrigger>
+              );
+            })()}
+            
+            {/* Tab 5 - Logs */}
+            {(() => {
+              const accessType = checkTabAccess(user?.userRole, 'menu8', 'tab5');
+              const styles = getAccessStyles(accessType);
+              if (styles.hidden) return null;
+              return (
+                <TabsTrigger 
+                  value="logs" 
+                  className={`text-center data-[state=active]:bg-[#1E40AF] data-[state=active]:text-white dark:data-[state=active]:bg-[#1E40AF] ${styles.className || ''}`}
+                  disabled={styles.disabled}
+                >
+                  <Database className="h-4 w-4 mr-2" />
+                  Logs
+                </TabsTrigger>
+              );
+            })()}
 
           </TabsList>
           
