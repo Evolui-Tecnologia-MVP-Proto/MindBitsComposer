@@ -482,6 +482,28 @@ export const insertDocumentEditionSchema = createInsertSchema(documentEditions).
 export type InsertDocumentEdition = z.infer<typeof insertDocumentEditionSchema>;
 export type DocumentEdition = typeof documentEditions.$inferSelect;
 
+// Document Flow Executions - Document Editions Junction table (N:N relationship)
+export const documentflowexecDocedition = pgTable("documentflowexec_docedition", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  flowExecutionId: uuid("flow_execution_id").notNull().references(() => documentFlowExecutions.id, { onDelete: "cascade" }),
+  documentEditionId: uuid("document_edition_id").notNull().references(() => documentEditions.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => ({
+  // Garante que uma combinação específica de flow_execution e document_edition não seja duplicada
+  uniqueFlowDocEdition: unique().on(table.flowExecutionId, table.documentEditionId),
+}));
+
+// Document Flow Executions - Document Editions Junction schema
+export const insertDocumentflowexecDoceditionSchema = createInsertSchema(documentflowexecDocedition).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertDocumentflowexecDocedition = z.infer<typeof insertDocumentflowexecDoceditionSchema>;
+export type DocumentflowexecDocedition = typeof documentflowexecDocedition.$inferSelect;
+
 // Generic Tables
 export const genericTables = pgTable("generic_tables", {
   id: uuid("id").defaultRandom().primaryKey(),
