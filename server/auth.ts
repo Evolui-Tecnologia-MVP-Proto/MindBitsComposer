@@ -275,8 +275,8 @@ export function setupAuth(app: Express) {
       // If this was a first login password change, update the flag and status
       if (user.mustChangePassword) {
         await storage.updateUserMustChangePassword(user.id, false);
-        // Change status from "pending" to "active" on first password change
-        await storage.updateUserStatus(user.id, "active");
+        // Change status from "pending" to "ACTIVE" on first password change
+        await storage.updateUserStatus(user.id, "ACTIVE");
       }
 
       res.status(200).json({ message: "Senha alterada com sucesso" });
