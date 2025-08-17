@@ -175,6 +175,125 @@ input.header-field-input,
   display: none !important;
 }
 
+/* ==============================================
+   COMPOSER FINALIZE MODAL - LIGHT THEME ONLY
+   ============================================== */
+
+/* Force light theme ONLY for composer finalize modal, regardless of global theme */
+.composer-finalize-modal {
+  background-color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  border-color: #D1D5DB !important;
+  color: #111827 !important;
+}
+
+/* Override dark theme styles specifically for this modal */
+.dark .composer-finalize-modal {
+  background-color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  border-color: #D1D5DB !important;
+  color: #111827 !important;
+}
+
+/* Modal text elements should be dark text on white background */
+.composer-finalize-modal h2,
+.composer-finalize-modal h3,
+.composer-finalize-modal p,
+.composer-finalize-modal label {
+  color: #111827 !important;
+}
+
+.dark .composer-finalize-modal h2,
+.dark .composer-finalize-modal h3,
+.dark .composer-finalize-modal p,
+.dark .composer-finalize-modal label {
+  color: #111827 !important;
+}
+
+/* Content areas inside the modal */
+.composer-finalize-modal .space-y-4,
+.composer-finalize-modal [role="alertdialog"] {
+  background-color: #FFFFFF !important;
+}
+
+.dark .composer-finalize-modal .space-y-4,
+.dark .composer-finalize-modal [role="alertdialog"] {
+  background-color: #FFFFFF !important;
+}
+
+/* Alert/warning boxes should keep their colors but adjust text */
+.composer-finalize-modal .bg-yellow-50 {
+  background-color: #FEF3C7 !important;
+  border-color: #FCD34D !important;
+}
+
+.composer-finalize-modal .text-yellow-800 {
+  color: #92400E !important;
+}
+
+.composer-finalize-modal .bg-red-50 {
+  background-color: #FEF2F2 !important;
+  border-color: #FCA5A5 !important;
+}
+
+.composer-finalize-modal .text-red-800 {
+  color: #991B1B !important;
+}
+
+/* Override dark theme for alert boxes in this modal */
+.dark .composer-finalize-modal .bg-yellow-50 {
+  background-color: #FEF3C7 !important;
+  border-color: #FCD34D !important;
+}
+
+.dark .composer-finalize-modal .text-yellow-800 {
+  color: #92400E !important;
+}
+
+.dark .composer-finalize-modal .bg-red-50 {
+  background-color: #FEF2F2 !important;
+  border-color: #FCA5A5 !important;
+}
+
+.dark .composer-finalize-modal .text-red-800 {
+  color: #991B1B !important;
+}
+
+/* Checkbox and label styling for light theme */
+.composer-finalize-modal [data-radix-checkbox-root] {
+  background-color: #FFFFFF !important;
+  border-color: #D1D5DB !important;
+}
+
+.dark .composer-finalize-modal [data-radix-checkbox-root] {
+  background-color: #FFFFFF !important;
+  border-color: #D1D5DB !important;
+}
+
+/* Button styling for light theme in this modal */
+.composer-finalize-modal button {
+  color: inherit;
+}
+
+/* Maximum specificity override for this specific modal */
+html.dark .composer-finalize-modal,
+body.dark .composer-finalize-modal,
+.dark .composer-finalize-modal {
+  background-color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  border-color: #D1D5DB !important;
+  color: #111827 !important;
+}
+
+/* Ensure no dark theme CSS affects this modal */
+html.dark [data-radix-alert-dialog-content].composer-finalize-modal,
+.dark [data-radix-alert-dialog-content].composer-finalize-modal {
+  background-color: #FFFFFF !important;
+  background: #FFFFFF !important;
+  border-color: #D1D5DB !important;
+  color: #111827 !important;
+}
+
 /* ReactFlow Background Grid - Clean Implementation */
 .react-flow__background {
   z-index: 0 !important;
