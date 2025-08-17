@@ -677,6 +677,13 @@ function DiffView({ oldContent, newContent }: { oldContent: string; newContent: 
         return ' ';
     }
   };
+
+  const getCellBackground = (type: DiffLine['type']) => {
+    if (type === 'removed') {
+      return 'bg-transparent dark:bg-[#4d0606]';
+    }
+    return 'bg-transparent dark:bg-[#1B2028]';
+  };
   
   return (
     <div className="bg-[#F1F5F9] dark:bg-[#1B2028] text-gray-800 dark:text-gray-300 p-4 rounded-lg font-mono text-sm overflow-x-auto">
@@ -689,13 +696,13 @@ function DiffView({ oldContent, newContent }: { oldContent: string; newContent: 
         <tbody>
           {diffLines.map((line, index) => (
             <tr key={index} className={getLineStyle(line.type)}>
-              <td className="pr-4 text-[#1B2028] dark:text-gray-400 text-right select-none align-top bg-transparent dark:bg-[#1B2028]" style={{minWidth: '24px', maxWidth: '24px', width: '24px'}}>
+              <td className={`pr-4 text-[#1B2028] dark:text-gray-400 text-right select-none align-top ${getCellBackground(line.type)}`} style={{minWidth: '24px', maxWidth: '24px', width: '24px'}}>
                 {line.lineNumber || ''}
               </td>
-              <td className="pr-2 text-[#1B2028] dark:text-gray-300 text-center select-none align-top bg-transparent dark:bg-[#1B2028]" style={{minWidth: '24px', maxWidth: '24px', width: '24px'}}>
+              <td className={`pr-2 text-[#1B2028] dark:text-gray-300 text-center select-none align-top ${getCellBackground(line.type)}`} style={{minWidth: '24px', maxWidth: '24px', width: '24px'}}>
                 {getLinePrefix(line.type)}
               </td>
-              <td className="text-[#1B2028] dark:text-gray-300 whitespace-pre-wrap break-words pl-2 bg-transparent dark:bg-[#1B2028]">
+              <td className={`text-[#1B2028] dark:text-gray-300 whitespace-pre-wrap break-words pl-2 ${getCellBackground(line.type)}`}>
                 {line.content || '\u00A0'}
               </td>
             </tr>
