@@ -544,7 +544,7 @@ export function DocumentosTable({
                     )}
                   </Button>
                 )}
-                {activeTab === "em-processo" && (
+                {(activeTab === "em-processo" || activeTab === "concluidos") && (
                   <Button
                     variant="ghost"
                     size="icon"
