@@ -52,8 +52,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const res = await apiRequest("POST", "/api/login", credentials);
       return await res.json();
     },
-    onSuccess: (userData: SelectUser & { requiresPasswordChange?: boolean; message?: string }) => {
-      queryClient.setQueryData(["/api/user"], userData);
+    onSuccess: async (userData: SelectUser & { requiresPasswordChange?: boolean; message?: string }) => {
+      // Invalidate and refetch user data to get complete user with role
+      await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       
       // Check if this is the first login or user has pending status (need to change password)
       if (userData.mustChangePassword || userData.requiresPasswordChange) {

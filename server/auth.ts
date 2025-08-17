@@ -181,25 +181,29 @@ export function setupAuth(app: Express) {
     try {
       const loginData = loginSchema.parse(req.body);
       
-      passport.authenticate("local", (err, user, info) => {
+      passport.authenticate("local", async (err, user, info) => {
         if (err) return next(err);
         if (!user) {
           return res.status(401).json({ message: info?.message || "E-mail ou senha inválidos" });
         }
         
-        req.login(user, (err) => {
+        req.login(user, async (err) => {
           if (err) return next(err);
           
+          // Busca o usuário com role incluído
+          const userWithRole = await storage.getUserWithRole(user.id);
+          if (!userWithRole) return res.sendStatus(404);
+          
           // Check if user status is "pending" and force password change
-          if (user.status === 'pending' || user.mustChangePassword) {
+          if (userWithRole.status === 'pending' || userWithRole.mustChangePassword) {
             return res.status(200).json({
-              ...user,
+              ...userWithRole,
               requiresPasswordChange: true,
               message: "Para continuar, é necessário alterar sua senha."
             });
           }
           
-          return res.status(200).json(user);
+          return res.status(200).json(userWithRole);
         });
       })(req, res, next);
     } catch (error) {
