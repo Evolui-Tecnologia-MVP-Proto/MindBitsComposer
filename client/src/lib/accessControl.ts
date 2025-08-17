@@ -29,7 +29,17 @@ export interface UserRole {
 // Função para verificar acesso a um menu
 export function checkMenuAccess(userRole: UserRole | undefined, menuId: string): AccessType {
   // Se não tem role, não tem acesso
-  if (!userRole || !userRole.access?.accessLevels?.menus) {
+  if (!userRole) {
+    return 'HIDE';
+  }
+  
+  // Super Administrador (ID 0) tem acesso completo
+  if (userRole.id === 0) {
+    return 'SHOW';
+  }
+  
+  // Se não tem configuração de acesso, não tem acesso
+  if (!userRole.access?.accessLevels?.menus) {
     return 'HIDE';
   }
   
@@ -48,7 +58,17 @@ export function checkMenuAccess(userRole: UserRole | undefined, menuId: string):
 // Função para verificar acesso a uma tab dentro de um menu
 export function checkTabAccess(userRole: UserRole | undefined, menuId: string, tabId: string): AccessType {
   // Se não tem role, não tem acesso
-  if (!userRole || !userRole.access?.accessLevels?.menus) {
+  if (!userRole) {
+    return 'HIDE';
+  }
+  
+  // Super Administrador (ID 0) tem acesso completo
+  if (userRole.id === 0) {
+    return 'SHOW';
+  }
+  
+  // Se não tem configuração de acesso, não tem acesso
+  if (!userRole.access?.accessLevels?.menus) {
     return 'HIDE';
   }
   
