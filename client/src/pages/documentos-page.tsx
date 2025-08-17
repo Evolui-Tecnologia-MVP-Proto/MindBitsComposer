@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
@@ -169,6 +169,16 @@ export default function DocumentosPage() {
   const queryClient = useQueryClient();
 
   const { toast } = useToast();
+
+  // Atualizar tabelas ao acessar a página
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/documents-flows"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/documentos/artifacts-count"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/document-editions-library"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/document-flow-executions/count"] });
+  }, [queryClient]);
 
   // Função para fechar modal de documentação e atualizar tabela
   const handleCloseDocumentationModal = useCallback(() => {

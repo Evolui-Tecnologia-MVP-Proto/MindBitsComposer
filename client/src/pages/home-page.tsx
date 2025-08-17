@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { checkTabAccess, getAccessStyles } from "@/lib/accessControl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -25,11 +25,20 @@ import { DocsProcessEmbed } from "@/components/documentos/tables/DocsProcessEmbe
 
 export default function HomePage() {
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedResponsavel, setSelectedResponsavel] = useState<string>("");
   const [showFilters, setShowFilters] = useState(false);
   const [activeTab, setActiveTab] = useState("revisoes-ct-rag");
   const [tabContentCollapsed, setTabContentCollapsed] = useState(true);
+
+  // Atualizar tabelas ao acessar a página
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ["/api/documentos"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/document-editions"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/user-specialties"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/documentos/user-in-process"] });
+  }, [queryClient]);
 
   // Função para alternar colapso do conteúdo da tab
   const toggleTabContentCollapse = (e: React.MouseEvent) => {
