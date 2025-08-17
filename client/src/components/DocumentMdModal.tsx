@@ -682,6 +682,9 @@ function DiffView({ oldContent, newContent }: { oldContent: string; newContent: 
     if (type === 'removed') {
       return 'bg-transparent dark:bg-[#4d0606]';
     }
+    if (type === 'modified') {
+      return 'bg-transparent dark:bg-[#3b3412]';
+    }
     return 'bg-transparent dark:bg-[#1B2028]';
   };
   
