@@ -680,7 +680,7 @@ function DiffView({ oldContent, newContent }: { oldContent: string; newContent: 
   
   return (
     <div className="bg-[#F1F5F9] dark:bg-[#1B2028] text-gray-800 dark:text-gray-300 p-4 rounded-lg font-mono text-sm overflow-x-auto">
-      <div className="mb-4 text-xs text-gray-400 border-b border-gray-600 pb-2">
+      <div className="mb-4 text-xs text-[#1B2028] dark:text-gray-400 border-b border-gray-600 pb-2">
         <span className="inline-block w-4 h-4 bg-blue-500 rounded mr-2"></span>Adicionado
         <span className="inline-block w-4 h-4 bg-yellow-500 rounded mr-2 ml-4"></span>Modificado
         <span className="inline-block w-4 h-4 bg-red-500 rounded mr-2 ml-4"></span>Removido
