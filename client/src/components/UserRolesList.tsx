@@ -142,7 +142,7 @@ export function UserRolesList() {
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ width: '200px' }}>
                         Nome
                       </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ width: '250px' }}>
+                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{ width: '350px' }}>
                         Descrição
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -162,7 +162,7 @@ export function UserRolesList() {
                         <td className="px-6 py-4 whitespace-nowrap" style={{ width: '200px', maxWidth: '200px' }}>
                           <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate" title={role.name}>{role.name}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap" style={{ width: '250px', maxWidth: '250px' }}>
+                        <td className="px-6 py-4 whitespace-nowrap" style={{ width: '350px', maxWidth: '350px' }}>
                           <div className="text-sm text-gray-900 dark:text-gray-100 truncate" title={role.description}>{role.description}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
