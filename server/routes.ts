@@ -6340,7 +6340,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.isAuthenticated()) return res.status(401).send("Não autorizado");
     
     try {
-      const { currentDocumentId, targetFlowId, flowTasks } = req.body;
+      const { currentDocumentId, targetFlowId, flowTasks, docTransfer } = req.body;
       
       console.log('🔄 Processando transferência de fluxo');
       console.log('🔄 Documento atual:', currentDocumentId);
@@ -6396,32 +6396,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log('✅ Nova execução criada:', newExecution[0].id);
 
-      console.log('🔗 Verificando document_editions ativas para criar registro junction');
-      // Buscar document_editions ativas para este documento
-      const activeDocumentEditions = await db
-        .select()
-        .from(documentEditions)
-        .where(and(
-          eq(documentEditions.documentId, currentDocumentId),
-          or(
-            eq(documentEditions.status, 'in_progress'),
-            eq(documentEditions.status, 'draft'),
-            eq(documentEditions.status, 'editing'),
-            eq(documentEditions.status, 'ready_to_revise')
-          )
-        ));
-
-      // Criar registros na tabela junction para cada document_edition ativa
-      if (activeDocumentEditions.length > 0) {
-        const junctionRecords = activeDocumentEditions.map(edition => ({
-          flowExecutionId: newExecution[0].id,
-          documentEditionId: edition.id
-        }));
+      console.log('🔗 Verificando propriedade docTransfer:', docTransfer);
+      
+      // Criar registros na tabela junction apenas se docTransfer for TRUE
+      if (docTransfer === true) {
+        console.log('🔗 docTransfer = TRUE: Verificando document_editions ativas para criar registro junction');
         
-        await db.insert(documentflowexecDocedition).values(junctionRecords);
-        console.log(`🔗 ${junctionRecords.length} registros junction criados para document_editions ativas na transferência`);
+        // Buscar document_editions ativas para este documento
+        const activeDocumentEditions = await db
+          .select()
+          .from(documentEditions)
+          .where(and(
+            eq(documentEditions.documentId, currentDocumentId),
+            or(
+              eq(documentEditions.status, 'in_progress'),
+              eq(documentEditions.status, 'draft'),
+              eq(documentEditions.status, 'editing'),
+              eq(documentEditions.status, 'ready_to_revise')
+            )
+          ));
+
+        // Criar registros na tabela junction para cada document_edition ativa
+        if (activeDocumentEditions.length > 0) {
+          const junctionRecords = activeDocumentEditions.map(edition => ({
+            flowExecutionId: newExecution[0].id,
+            documentEditionId: edition.id
+          }));
+          
+          await db.insert(documentflowexecDocedition).values(junctionRecords);
+          console.log(`🔗 ${junctionRecords.length} registros junction criados para document_editions ativas na transferência`);
+        } else {
+          console.log('🔗 Nenhuma document_edition ativa encontrada para o documento na transferência');
+        }
       } else {
-        console.log('🔗 Nenhuma document_edition ativa encontrada para o documento na transferência');
+        console.log('🔗 docTransfer = FALSE: Pulando criação de registros junction documentflowexec_docedition');
       }
       
       // Log da transferência

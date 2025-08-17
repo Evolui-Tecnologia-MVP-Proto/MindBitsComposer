@@ -2890,7 +2890,8 @@ function FlowWithAutoFitView({
           body: JSON.stringify({
             currentDocumentId: flowDiagramModal.flowData?.documentId,
             targetFlowId: selectedFlowNode.data.To_Flow_id,
-            flowTasks: updatedFlowTasks
+            flowTasks: updatedFlowTasks,
+            docTransfer: selectedFlowNode.data.docTransfer || false // Incluir propriedade docTransfer do node
           }),
         });
 
