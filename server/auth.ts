@@ -226,8 +226,12 @@ export function setupAuth(app: Express) {
   app.get("/api/user", async (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     
+    console.log("🔍 [DEBUG] Endpoint /api/user chamado para usuário ID:", req.user.id);
+    
     // Busca o usuário com role incluído
     const userWithRole = await storage.getUserWithRole(req.user.id);
+    console.log("🔍 [DEBUG] Dados do usuário retornados pelo getUserWithRole:", JSON.stringify(userWithRole, null, 2));
+    
     if (!userWithRole) return res.sendStatus(404);
     
     res.json(userWithRole);
