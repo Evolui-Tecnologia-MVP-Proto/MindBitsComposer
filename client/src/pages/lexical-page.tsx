@@ -2785,36 +2785,45 @@ export default function LexicalPage() {
       />
 
       {/* Modal de Confirmação para Finalizar */}
-      {showFinalizeModal && (() => {
-        console.log('🔥 Modal Finalização - isDark:', isDark, 'theme:', document.documentElement.classList.contains('dark'));
-        return true;
+      {(() => {
+        if (showFinalizeModal) {
+          const htmlDark = document.documentElement.classList.contains('dark');
+          console.log('🔥🔥🔥 Modal Finalização Abrindo:', {
+            showFinalizeModal,
+            isDark,
+            htmlDark,
+            theme: localStorage.getItem('theme'),
+            classList: document.documentElement.className
+          });
+        }
+        return showFinalizeModal;
       })() && (
         <AlertDialog open={showFinalizeModal} onOpenChange={setShowFinalizeModal}>
           <AlertDialogPortal>
-            <AlertDialogOverlay />
+            <AlertDialogOverlay className={isDark ? 'bg-black/80' : ''} />
             <div
-              className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg composer-finalize-modal"
+              className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg"
               style={{
-                backgroundColor: isDark ? '#0F172A' : '#FFFFFF',
-                borderColor: isDark ? '#374151' : '#E5E7EB',
-                color: isDark ? '#E5E7EB' : '#111827'
+                backgroundColor: document.documentElement.classList.contains('dark') ? '#0F172A' : '#FFFFFF',
+                borderColor: document.documentElement.classList.contains('dark') ? '#374151' : '#E5E7EB',
+                color: document.documentElement.classList.contains('dark') ? '#E5E7EB' : '#111827'
               }}
             >
               <AlertDialogHeader>
-                <AlertDialogTitle style={{ color: isDark ? '#E5E7EB' : '#111827' }}>
+                <AlertDialogTitle style={{ color: document.documentElement.classList.contains('dark') ? '#E5E7EB' : '#111827' }}>
                   Confirmação de Finalização
                 </AlertDialogTitle>
                 <AlertDialogDescription asChild>
-                  <div className="space-y-4" style={{ color: isDark ? '#D1D5DB' : '#374151' }}>
+                  <div className="space-y-4" style={{ color: document.documentElement.classList.contains('dark') ? '#D1D5DB' : '#374151' }}>
                     {/* Card de Atenção existente */}
                     <div 
                       className="rounded-lg p-4 mt-4 border"
                       style={{
-                        backgroundColor: isDark ? 'rgba(133, 77, 14, 0.3)' : '#FEF3C7',
-                        borderColor: isDark ? '#D97706' : '#FDE68A'
+                        backgroundColor: document.documentElement.classList.contains('dark') ? 'rgba(133, 77, 14, 0.3)' : '#FEF3C7',
+                        borderColor: document.documentElement.classList.contains('dark') ? '#D97706' : '#FDE68A'
                       }}
                     >
-                      <p style={{ color: isDark ? '#FCD34D' : '#92400E' }}>
+                      <p style={{ color: document.documentElement.classList.contains('dark') ? '#FCD34D' : '#92400E' }}>
                         <span className="font-bold">Atenção:</span> Finalizando a edição do documento você o libera para que seja processado para as fases consecutivas do fluxo definido. Esta ação não poderá ser desfeita caso alguma fase posterior seja processada. Confima a finalização do documento e efetiva disponibilização para a próxima fase?
                       </p>
                     </div>
@@ -2823,11 +2832,11 @@ export default function LexicalPage() {
                     <div 
                       className="rounded-lg p-4 border"
                       style={{
-                        backgroundColor: isDark ? 'rgba(127, 29, 29, 0.3)' : '#FEE2E2',
-                        borderColor: isDark ? '#DC2626' : '#FECACA'
+                        backgroundColor: document.documentElement.classList.contains('dark') ? 'rgba(127, 29, 29, 0.3)' : '#FEE2E2',
+                        borderColor: document.documentElement.classList.contains('dark') ? '#DC2626' : '#FECACA'
                       }}
                     >
-                      <p className="mb-3" style={{ color: isDark ? '#F87171' : '#991B1B' }}>
+                      <p className="mb-3" style={{ color: document.documentElement.classList.contains('dark') ? '#F87171' : '#991B1B' }}>
                         <span className="font-bold">Marcar este documento para descartar:</span> se marcada esta opção o documento será sinalizado como conteúdo irrelevante para tratamento de possível descarte nas fases futuras do processo.
                       </p>
                       <div className="flex items-center space-x-2">
@@ -2836,12 +2845,12 @@ export default function LexicalPage() {
                           checked={marcarParaDescartar}
                           onCheckedChange={(checked) => setMarcarParaDescartar(checked as boolean)}
                           className="data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600"
-                          style={{ borderColor: isDark ? '#EF4444' : '#F87171' }}
+                          style={{ borderColor: document.documentElement.classList.contains('dark') ? '#EF4444' : '#F87171' }}
                         />
                         <Label
                           htmlFor="marcar-descartar"
                           className="text-sm font-medium cursor-pointer"
-                          style={{ color: isDark ? '#F87171' : '#991B1B' }}
+                          style={{ color: document.documentElement.classList.contains('dark') ? '#F87171' : '#991B1B' }}
                         >
                           Marcar documento para descarte
                         </Label>
@@ -2856,9 +2865,9 @@ export default function LexicalPage() {
                   onClick={() => setShowFinalizeModal(false)}
                   className="mt-2 sm:mt-0"
                   style={{
-                    backgroundColor: isDark ? '#374151' : '#F3F4F6',
-                    color: isDark ? '#E5E7EB' : '#111827',
-                    borderColor: isDark ? '#374151' : '#D1D5DB'
+                    backgroundColor: document.documentElement.classList.contains('dark') ? '#374151' : '#F3F4F6',
+                    color: document.documentElement.classList.contains('dark') ? '#E5E7EB' : '#111827',
+                    borderColor: document.documentElement.classList.contains('dark') ? '#374151' : '#D1D5DB'
                   }}
                 >
                   Cancelar
