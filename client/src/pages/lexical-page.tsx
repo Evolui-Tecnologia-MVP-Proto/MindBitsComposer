@@ -16,6 +16,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useConfirmationToast } from "@/hooks/use-confirmation-toast";
 import { useNavigationGuard } from "@/hooks/use-navigation-guard";
+import { useTheme } from "@/hooks/use-theme";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Link } from "wouter";
@@ -111,6 +112,7 @@ export default function LexicalPage() {
   const { toast } = useToast();
   const { showConfirmation } = useConfirmationToast();
   const { hasUnsavedChanges, setHasUnsavedChanges, setSaveFunction } = useNavigationGuard();
+  const { isDark } = useTheme();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const lexicalFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -2788,24 +2790,36 @@ export default function LexicalPage() {
           <AlertDialogPortal>
             <AlertDialogOverlay />
             <div
-              className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg composer-finalize-modal bg-white border-gray-200 text-gray-900 dark:bg-[#0F1729] dark:border-[#374151] dark:text-gray-200"
+              className={`fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg composer-finalize-modal ${
+                isDark 
+                  ? 'bg-[#0F1729] border-[#374151] text-gray-200' 
+                  : 'bg-white border-gray-200 text-gray-900'
+              }`}
             >
               <AlertDialogHeader>
-                <AlertDialogTitle className="text-gray-900 dark:text-gray-200">
+                <AlertDialogTitle className={isDark ? 'text-gray-200' : 'text-gray-900'}>
                   Confirmação de Finalização
                 </AlertDialogTitle>
                 <AlertDialogDescription asChild>
-                  <div className="space-y-4 text-gray-700 dark:text-gray-300">
+                  <div className={`space-y-4 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                     {/* Card de Atenção existente */}
-                    <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-600 rounded-lg p-4 mt-4">
-                      <p className="text-yellow-800 dark:text-yellow-400">
+                    <div className={`rounded-lg p-4 mt-4 border ${
+                      isDark 
+                        ? 'bg-yellow-900/30 border-yellow-600' 
+                        : 'bg-yellow-50 border-yellow-200'
+                    }`}>
+                      <p className={isDark ? 'text-yellow-400' : 'text-yellow-800'}>
                         <span className="font-bold">Atenção:</span> Finalizando a edição do documento você o libera para que seja processado para as fases consecutivas do fluxo definido. Esta ação não poderá ser desfeita caso alguma fase posterior seja processada. Confima a finalização do documento e efetiva disponibilização para a próxima fase?
                       </p>
                     </div>
 
                     {/* Novo card vermelho para descarte */}
-                    <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-600 rounded-lg p-4">
-                      <p className="text-red-800 dark:text-red-400 mb-3">
+                    <div className={`rounded-lg p-4 border ${
+                      isDark 
+                        ? 'bg-red-900/30 border-red-600' 
+                        : 'bg-red-50 border-red-200'
+                    }`}>
+                      <p className={`mb-3 ${isDark ? 'text-red-400' : 'text-red-800'}`}>
                         <span className="font-bold">Marcar este documento para descartar:</span> se marcada esta opção o documento será sinalizado como conteúdo irrelevante para tratamento de possível descarte nas fases futuras do processo.
                       </p>
                       <div className="flex items-center space-x-2">
@@ -2813,11 +2827,15 @@ export default function LexicalPage() {
                           id="marcar-descartar"
                           checked={marcarParaDescartar}
                           onCheckedChange={(checked) => setMarcarParaDescartar(checked as boolean)}
-                          className="border-red-400 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600 dark:border-red-500 dark:data-[state=checked]:bg-red-600 dark:data-[state=checked]:border-red-600"
+                          className={`data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600 ${
+                            isDark ? 'border-red-500' : 'border-red-400'
+                          }`}
                         />
                         <Label
                           htmlFor="marcar-descartar"
-                          className="text-sm font-medium text-red-800 dark:text-red-400 cursor-pointer"
+                          className={`text-sm font-medium cursor-pointer ${
+                            isDark ? 'text-red-400' : 'text-red-800'
+                          }`}
                         >
                           Marcar documento para descarte
                         </Label>
@@ -2830,7 +2848,11 @@ export default function LexicalPage() {
                 <Button 
                   variant="outline"
                   onClick={() => setShowFinalizeModal(false)}
-                  className="bg-gray-100 border-gray-300 text-gray-900 hover:bg-gray-200 dark:bg-[#374151] dark:text-gray-200 dark:border-[#374151] dark:hover:bg-[#4B5563] mt-2 sm:mt-0"
+                  className={`mt-2 sm:mt-0 ${
+                    isDark 
+                      ? 'bg-[#374151] text-gray-200 border-[#374151] hover:bg-[#4B5563]' 
+                      : 'bg-gray-100 border-gray-300 text-gray-900 hover:bg-gray-200'
+                  }`}
                 >
                   Cancelar
                 </Button>
@@ -2841,7 +2863,7 @@ export default function LexicalPage() {
                     }
                   }}
                   disabled={finalizeMutation.isPending}
-                  className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   {finalizeMutation.isPending ? "Finalizando..." : "Confirmar"}
                 </Button>
