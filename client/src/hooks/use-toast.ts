@@ -181,20 +181,6 @@ function useToast() {
     }
   }, [state])
 
-  // Global click listener para fechar todos os toasts ao clicar em qualquer lugar
-  React.useEffect(() => {
-    const handleGlobalClick = () => {
-      if (state.toasts.length > 0) {
-        dispatch({ type: "DISMISS_TOAST" })
-      }
-    }
-
-    document.addEventListener('click', handleGlobalClick)
-    return () => {
-      document.removeEventListener('click', handleGlobalClick)
-    }
-  }, [state.toasts.length])
-
   return {
     ...state,
     toast,
