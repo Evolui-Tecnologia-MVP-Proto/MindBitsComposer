@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogPortal, AlertDialogOverlay } from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useConfirmationToast } from "@/hooks/use-confirmation-toast";
@@ -2785,66 +2785,68 @@ export default function LexicalPage() {
       {/* Modal de Confirmação para Finalizar */}
       {showFinalizeModal && (
         <AlertDialog open={showFinalizeModal} onOpenChange={setShowFinalizeModal}>
-          <AlertDialogContent 
-            className="composer-finalize-modal bg-white border-gray-200 text-gray-900 dark:bg-[#0F1729] dark:border-[#374151] dark:text-gray-200"
-            style={undefined}
-          >
-            <AlertDialogHeader>
-              <AlertDialogTitle className="text-gray-900 dark:text-gray-200">
-                Confirmação de Finalização
-              </AlertDialogTitle>
-              <AlertDialogDescription asChild>
-                <div className="space-y-4 text-gray-700 dark:text-gray-300">
-                  {/* Card de Atenção existente */}
-                  <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-600 rounded-lg p-4 mt-4">
-                    <p className="text-yellow-800 dark:text-yellow-400">
-                      <span className="font-bold">Atenção:</span> Finalizando a edição do documento você o libera para que seja processado para as fases consecutivas do fluxo definido. Esta ação não poderá ser desfeita caso alguma fase posterior seja processada. Confima a finalização do documento e efetiva disponibilização para a próxima fase?
-                    </p>
-                  </div>
+          <AlertDialogPortal>
+            <AlertDialogOverlay />
+            <div
+              className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg composer-finalize-modal bg-white border-gray-200 text-gray-900 dark:bg-[#0F1729] dark:border-[#374151] dark:text-gray-200"
+            >
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-gray-900 dark:text-gray-200">
+                  Confirmação de Finalização
+                </AlertDialogTitle>
+                <AlertDialogDescription asChild>
+                  <div className="space-y-4 text-gray-700 dark:text-gray-300">
+                    {/* Card de Atenção existente */}
+                    <div className="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-600 rounded-lg p-4 mt-4">
+                      <p className="text-yellow-800 dark:text-yellow-400">
+                        <span className="font-bold">Atenção:</span> Finalizando a edição do documento você o libera para que seja processado para as fases consecutivas do fluxo definido. Esta ação não poderá ser desfeita caso alguma fase posterior seja processada. Confima a finalização do documento e efetiva disponibilização para a próxima fase?
+                      </p>
+                    </div>
 
-                  {/* Novo card vermelho para descarte */}
-                  <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-600 rounded-lg p-4">
-                    <p className="text-red-800 dark:text-red-400 mb-3">
-                      <span className="font-bold">Marcar este documento para descartar:</span> se marcada esta opção o documento será sinalizado como conteúdo irrelevante para tratamento de possível descarte nas fases futuras do processo.
-                    </p>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="marcar-descartar"
-                        checked={marcarParaDescartar}
-                        onCheckedChange={(checked) => setMarcarParaDescartar(checked as boolean)}
-                        className="border-red-400 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600 dark:border-red-500 dark:data-[state=checked]:bg-red-600 dark:data-[state=checked]:border-red-600"
-                      />
-                      <Label
-                        htmlFor="marcar-descartar"
-                        className="text-sm font-medium text-red-800 dark:text-red-400 cursor-pointer"
-                      >
-                        Marcar documento para descarte
-                      </Label>
+                    {/* Novo card vermelho para descarte */}
+                    <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-600 rounded-lg p-4">
+                      <p className="text-red-800 dark:text-red-400 mb-3">
+                        <span className="font-bold">Marcar este documento para descartar:</span> se marcada esta opção o documento será sinalizado como conteúdo irrelevante para tratamento de possível descarte nas fases futuras do processo.
+                      </p>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="marcar-descartar"
+                          checked={marcarParaDescartar}
+                          onCheckedChange={(checked) => setMarcarParaDescartar(checked as boolean)}
+                          className="border-red-400 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600 dark:border-red-500 dark:data-[state=checked]:bg-red-600 dark:data-[state=checked]:border-red-600"
+                        />
+                        <Label
+                          htmlFor="marcar-descartar"
+                          className="text-sm font-medium text-red-800 dark:text-red-400 cursor-pointer"
+                        >
+                          Marcar documento para descarte
+                        </Label>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="space-y-2 sm:space-y-0">
-              <AlertDialogCancel 
-                onClick={() => setShowFinalizeModal(false)}
-                className="bg-gray-100 border-gray-300 text-gray-900 hover:bg-gray-200 dark:bg-[#374151] dark:text-gray-200 dark:border-[#374151] dark:hover:bg-[#4B5563]"
-              >
-                Cancelar
-              </AlertDialogCancel>
-              <AlertDialogAction 
-                onClick={() => {
-                  if (selectedEdition?.id) {
-                    finalizeMutation.mutate(selectedEdition.id);
-                  }
-                }}
-                disabled={finalizeMutation.isPending}
-                className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
-              >
-                {finalizeMutation.isPending ? "Finalizando..." : "Confirmar"}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="space-y-2 sm:space-y-0">
+                <AlertDialogCancel 
+                  onClick={() => setShowFinalizeModal(false)}
+                  className="bg-gray-100 border-gray-300 text-gray-900 hover:bg-gray-200 dark:bg-[#374151] dark:text-gray-200 dark:border-[#374151] dark:hover:bg-[#4B5563]"
+                >
+                  Cancelar
+                </AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={() => {
+                    if (selectedEdition?.id) {
+                      finalizeMutation.mutate(selectedEdition.id);
+                    }
+                  }}
+                  disabled={finalizeMutation.isPending}
+                  className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white"
+                >
+                  {finalizeMutation.isPending ? "Finalizando..." : "Confirmar"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </div>
+          </AlertDialogPortal>
         </AlertDialog>
       )}
 
